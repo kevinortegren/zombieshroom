@@ -66,6 +66,7 @@ namespace RootEngine
 		struct CustomUserPointer
 		{
 			PhysicsType::PhysicsType m_type;
+			PhysicsShape::PhysicsShape m_shape;
 			int m_vectorIndex; //Index in one of the different lists
 			void* m_entity; //My entity
 			std::map<void*, RootForce::CollisionInfo>* m_collisions; //List of all entities collided with since last update and data of the collisions

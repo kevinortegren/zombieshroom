@@ -299,6 +299,9 @@ namespace Physics
 		temp.m_radius = p_radius;
 		temp.m_type = PhysicsShape::SHAPE_SPHERE;
 		btCollisionShape* shape = CreateShape(temp);
+
+		m_userPointer.at(p_objectHandle)->m_shape = temp.m_type;
+
 		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
@@ -354,6 +357,9 @@ namespace Physics
 		temp.m_height = p_height;
 		temp.m_type = PhysicsShape::SHAPE_CYLINDER;
 		btCollisionShape* shape = CreateShape(temp);
+
+		m_userPointer.at(p_objectHandle)->m_shape = temp.m_type;
+
 		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
@@ -409,6 +415,9 @@ namespace Physics
 		temp.m_type = PhysicsShape::SHAPE_CONE;
 		btCollisionShape* shape = CreateShape(temp);
 		btVector3 fallInertia = btVector3(0,0,0);
+
+		m_userPointer.at(p_objectHandle)->m_shape = temp.m_type;
+
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
 			shape->calculateLocalInertia(p_mass, fallInertia);
@@ -463,6 +472,9 @@ namespace Physics
 		temp.m_scale = p_scale;
 		temp.m_type = PhysicsShape::SHAPE_CUSTOM_MESH;
 		btCollisionShape* shape = CreateShape(temp);
+
+		m_userPointer.at(p_objectHandle)->m_shape = temp.m_type;
+
 		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
@@ -521,6 +533,8 @@ namespace Physics
 		ShapelessObject* object = new ShapelessObject();
 		object->SetPos(p_position);
 		object->SetOrientation(p_rotation);
+
+		m_userPointer.at(p_objectHandle)->m_shape = PhysicsShape::SHAPE_NONE;
 
 		m_shapelessObjects.push_back(object);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_shapelessObjects.size()-1;
@@ -893,6 +907,14 @@ namespace Physics
 				if(m_playerObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
+					return false;
+				}
+			}
+			else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+			{
+				if(m_shapelessObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_shapelessObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
+				{
+					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing shapeless object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
 				}
 			}
