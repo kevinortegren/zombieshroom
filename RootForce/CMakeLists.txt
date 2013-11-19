@@ -10,8 +10,14 @@ set(SOURCES
     Source/Main.cpp
 )
 
-set(HEADERS )
-set(LIBRARIES )
+set(HEADERS 
+    Include/Main.h
+)
+
+set(LIBRARIES ${EXTERNAL_LIBRARIES})
+
+# Set search paths
+include_directories(Include)
 
 # Add the target
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})

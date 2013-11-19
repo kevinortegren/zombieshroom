@@ -8,9 +8,22 @@ project(${ROOT_PROJECT_NAME})
 # TODO: Find external libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
+find_package(SDL2 REQUIRED)
+
+set(EXTERNAL_INCLUDE_DIRS 
+    ${SDL2_INCLUDE_DIRS}
+)
+    
+set(EXTERNAL_LIBRARIES
+    ${SDL2_LIBRARY}
+)
+
+
 # TODO: Set global compiler options
 
 # TODO: Add sub projects and dependencies. Compile root project.
+include_directories(${EXTERNAL_INCLUDE_DIRS})
+
 add_subdirectory(RootEngine)
 add_subdirectory(RootForce)
 add_subdirectory(RootTools)
