@@ -6,9 +6,12 @@ set(PROJECT_NAME RootEngine)
 project(${PROJECT_NAME})
 
 # Set the files used in the target
-set(SOURCES )
-set(HEADERS )
-set(LIBRARIES )
+file(GLOB_RECURSE SOURCES Sources/ *.cpp)
+file(GLOB_RECURSE HEADERS Headers/ *.h)
+set(LIBRARIES ${EXTERNAL_LIBRARIES})
+
+#message("${SOURCES}")
+#message("${HEADERS}")
 
 # TODO: Add the target (commented until we actually have a source file)
 #add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
