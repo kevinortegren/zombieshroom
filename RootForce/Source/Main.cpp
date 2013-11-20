@@ -74,6 +74,8 @@ Main::Main()
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
+	// Initialize the engine context
 }
 
 Main::~Main() 
@@ -107,10 +109,10 @@ void Main::Start()
 void Main::HandleEvents()
 {
     SDL_Event event;
-    while(SDL_PollEvent(&event)){
-   
-	switch(event.type) {
-   
+    while(SDL_PollEvent(&event))
+	{
+		switch(event.type) 
+		{
 		case SDL_QUIT:
 			m_running = false;
 			break;
