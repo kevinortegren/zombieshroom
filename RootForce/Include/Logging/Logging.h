@@ -11,6 +11,7 @@ class Logging
 	public:
 		static Logging* GetInstance();
 		void LogTextToFile(string p_output);
+		void LogTextToConsole(string p_output);
 		bool OpenLogStream();
 		bool CloseLogStream();
 	protected:

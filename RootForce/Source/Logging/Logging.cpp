@@ -38,6 +38,20 @@ void Logging::LogTextToFile( string p_output )
 	
 }
 
+void Logging::LogTextToConsole( string p_output )
+{
+	// current date/time based on current system
+	time_t currentTime = time(0);
+
+	// convert now to tm struct for UTC
+	tm* gmtm = gmtime(&currentTime);
+
+	string UTC = GetTimeString(gmtm->tm_hour+1) + ":" + GetTimeString(gmtm->tm_min) + ":" + GetTimeString(gmtm->tm_sec);
+	string output = UTC + "    " + p_output + "\n";
+
+	printf(output.c_str());
+}
+
 bool Logging::OpenLogStream()
 {
 	// current date/time based on current system
