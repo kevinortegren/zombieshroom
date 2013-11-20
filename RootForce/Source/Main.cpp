@@ -1,14 +1,36 @@
 #include <Main.h>
 #include <exception>
+
 #include "Logging.h"
+
+#include <gtest/gtest.h>
+
+
 #undef main
+
+TEST(Test, Foo) 
+{
+	int a = 0;
+	EXPECT_TRUE(a == 0);
+}
 
 int main(int argc, char* argv[]) 
 {
 	try 
 	{
-		Main m;
-		m.Start();
+		if (argc > 1 && strcmp(argv[1], "-test") == 0)
+		{
+			testing::InitGoogleTest(&argc, argv);
+
+			int result = RUN_ALL_TESTS();
+			std::cin.get();
+			return result;
+		}
+		else
+		{
+			Main m;
+			m.Start();
+		}
 	} 
 	catch (std::exception& e) 
 	{
@@ -29,7 +51,11 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
+
 	Logging* test = Logging::GetInstance();
+
+	int a = 0;
+
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -59,12 +85,40 @@ Main::~Main()
 
 void Main::Start() 
 {
+
+	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
+		uint64_t now = SDL_GetPerformanceCounter();
+		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+		old = now;
+
 		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
-		SDL_Delay(2000);
-		m_running = false;
+		HandleEvents();
 	}
+}
+
+void Main::HandleEvents()
+{
+    SDL_Event event;
+    while(SDL_PollEvent(&event)){
+   
+	switch(event.type) {
+   
+		case SDL_QUIT:
+			m_running = false;
+			break;
+
+		case SDL_KEYDOWN:
+			break;
+
+		case SDL_KEYUP:
+			break;
+
+		default:
+			break;
+		}
+    }
 }
