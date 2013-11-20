@@ -54,26 +54,33 @@ Main::Main()
 
 	// ECS Test
 	
+	testSystem = world.GetSystemManager()->CreateSystem<TestComponentSystem>("test");
+	testSystem->SetUsage<TestComponent>(true);
+
+	testSystemTwo = world.GetSystemManager()->CreateSystem<TestComponentSystem>("test2");
+	testSystemTwo->SetUsage<TestComponent>(true);
+	testSystemTwo->SetUsage<TestComponentTwo>(true);
+
 	std::shared_ptr<ECS::Entity> entity = world.GetEntityManager()->CreateEntity();
 	std::shared_ptr<ECS::Entity> entity2 = world.GetEntityManager()->CreateEntity();
 	
 	std::shared_ptr<TestComponent> testComp1e1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
-	std::shared_ptr<TestComponent> testComp1e2 = world.GetEntityManager()->CreateComponent<TestComponent>(entity2);
-
-	std::shared_ptr<TestComponentTwo> testComp2e1 = world.GetEntityManager()->CreateComponent<TestComponentTwo>(entity);
-
 	testComp1e1->data = 57.0f;
-	testComp2e1->data = 126371.0f;
 
+	std::shared_ptr<TestComponent> testComp1e2 = world.GetEntityManager()->CreateComponent<TestComponent>(entity2);
 	testComp1e2->data = 333333.0f;
 
-	world.GetEntityManager()->RemoveAllComponents(entity);
+	world.GetSystemManager()->InitializeSystems();
 
-	world.GetEntityManager()->AddComponent<TestComponent>(testComp1e1, entity);
+	testSystem->Process();
 
+	//world.GetEntityManager()->RemoveComponent<TestComponent>(entity);
+	//world.GetEntityManager()->RemoveAllComponents(entity);
 	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
 
-	int a =0;
+	testSystem->Process();
+
+	int a = 0;
 }
 
 Main::~Main() 
@@ -95,6 +102,9 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		HandleEvents();
+
+		//testSystem->Process();
+		//testSystemTwo->Process();
 	}
 }
 
