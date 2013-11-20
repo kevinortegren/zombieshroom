@@ -1,14 +1,32 @@
 #include <Main.h>
 #include <exception>
+#include <gtest/gtest.h>
 
 #undef main
+
+TEST(Test, Foo) 
+{
+	int a = 0;
+	EXPECT_TRUE(a == 0);
+}
 
 int main(int argc, char* argv[]) 
 {
 	try 
 	{
-		Main m;
-		m.Start();
+		if (argc > 1 && strcmp(argv[1], "-test") == 0)
+		{
+			testing::InitGoogleTest(&argc, argv);
+
+			int result = RUN_ALL_TESTS();
+			std::cin.get();
+			return result;
+		}
+		else
+		{
+			Main m;
+			m.Start();
+		}
 	} 
 	catch (std::exception& e) 
 	{

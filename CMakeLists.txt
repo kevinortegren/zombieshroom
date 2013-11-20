@@ -23,6 +23,7 @@ set(EXTERNAL_LIBRARIES
 
 
 # TODO: Set global compiler options
+add_definitions(-D_VARIADIC_MAX=10)
 
 # TODO: Add sub projects and dependencies. Compile root project.
 include_directories(${EXTERNAL_INCLUDE_DIRS})
