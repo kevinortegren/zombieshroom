@@ -1,5 +1,5 @@
 # Ignore the build directory
-Build
+[Bb]uild
 
 # Ignore generated CMake files (from an accidental in-source build)
 CMakeCache.txt

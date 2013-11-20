@@ -25,10 +25,11 @@ void Logging::LogTextToFile( string p_output )
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
+	tm gmtm;
 	// convert now to tm struct for UTC
-	tm* gmtm = gmtime(&currentTime);
+	gmtime_s(&gmtm, &currentTime);
 	
-	string UTC = GetTimeString(gmtm->tm_hour+1) + ":" + GetTimeString(gmtm->tm_min) + ":" + GetTimeString(gmtm->tm_sec);
+	string UTC = GetTimeString(gmtm.tm_hour+1) + ":" + GetTimeString(gmtm.tm_min) + ":" + GetTimeString(gmtm.tm_sec);
 	string output = UTC + "    " + p_output + "\n";
 
 	if(m_logFileStream.is_open() || m_logFileStream.bad())
@@ -57,9 +58,11 @@ bool Logging::OpenLogStream()
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
+	tm gmtm;
 	// convert now to tm struct for UTC
-	tm* gmtm = gmtime(&currentTime);
-	string fileName = to_string(gmtm->tm_year+1900) + to_string(gmtm->tm_mon+1) + to_string(gmtm->tm_mday) + "_" + GetTimeString(gmtm->tm_hour+1) + "-" + GetTimeString(gmtm->tm_min) + "-" + GetTimeString(gmtm->tm_sec) + ".rlog";
+	gmtime_s(&gmtm, &currentTime);
+
+	string fileName = to_string(gmtm.tm_year+1900) + to_string(gmtm.tm_mon+1) + to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec) + ".rlog";
 	m_logFileStream.open(fileName);
 
 	return true;
