@@ -10,6 +10,9 @@ public:
 
 	void Start();
 private:
+
+	void HandleEvents();
+
 	bool m_running;
 	std::shared_ptr<SDL_Window> m_window;
 };

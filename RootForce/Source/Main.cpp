@@ -59,12 +59,40 @@ Main::~Main()
 
 void Main::Start() 
 {
+
+	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
+		uint64_t now = SDL_GetPerformanceCounter();
+		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+		old = now;
+
 		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
-		SDL_Delay(2000);
-		m_running = false;
+		HandleEvents();
 	}
+}
+
+void Main::HandleEvents()
+{
+    SDL_Event event;
+    while(SDL_PollEvent(&event)){
+   
+	switch(event.type) {
+   
+		case SDL_QUIT:
+			m_running = false;
+			break;
+
+		case SDL_KEYDOWN:
+			break;
+
+		case SDL_KEYUP:
+			break;
+
+		default:
+			break;
+		}
+    }
 }
