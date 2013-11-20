@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-
+	int a = 0;
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
