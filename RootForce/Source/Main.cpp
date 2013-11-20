@@ -2,9 +2,6 @@
 #include <exception>
 
 #include "Logging/Logging.h"
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
 #include <gtest/gtest.h>
 
 
@@ -53,12 +50,6 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile( "C:\\Users\\Kevin\\Downloads\\dae\\Medieval_building.DAE", 
-		aiProcess_CalcTangentSpace       | 
-		aiProcess_Triangulate            |
-		aiProcess_JoinIdenticalVertices  |
-		aiProcess_SortByPType);
 	int a = 0;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
@@ -92,13 +83,6 @@ void Main::Start()
 {
 	//Open the log file stream for this instance(Do this once at the beginning of the program)
 	Logging::GetInstance()->OpenLogStream();
-
-	//Include Logging.h in the file you want to use the logging function
-	//Write a string to the log file stream(Do this when you want to log something...)
-	Logging::GetInstance()->LogTextToFile("Log %f entry test ", 1.435);
-	
-	//Write a log string to console
-	Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
