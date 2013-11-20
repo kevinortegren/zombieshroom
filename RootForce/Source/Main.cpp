@@ -1,6 +1,6 @@
 #include <Main.h>
 #include <exception>
-
+#include "Logging.h"
 #undef main
 
 int main(int argc, char* argv[]) 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-
+	Logging* test = Logging::GetInstance();
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
