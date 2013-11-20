@@ -1,17 +1,15 @@
 #pragma once
 
 #include <string>
-#include <iostream>
-#include <fstream>
-
-using namespace std;
+#include <stdio.h>
+#include <stdarg.h>
 
 class Logging
 {
 	public:
 		static Logging* GetInstance();
-		void LogTextToFile(string p_output);
-		void LogTextToConsole(string p_output);
+		void LogTextToFile(const char * p_format, ...);
+		void LogTextToConsole(const char * p_format, ...);
 		bool OpenLogStream();
 		bool CloseLogStream();
 	protected:
@@ -21,9 +19,9 @@ class Logging
 
 		static Logging* s_loggingInstance;
 
-		ofstream m_logFileStream;
+		FILE* m_logFile;
 
-		string GetTimeString(int p_time);
+		std::string GetTimeString(int p_time);
 
 
 };

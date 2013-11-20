@@ -20,37 +20,42 @@ Logging* Logging::GetInstance()
 	return s_loggingInstance;
 }
 
-void Logging::LogTextToFile( string p_output )
+void Logging::LogTextToFile( const char * p_format, ... )
 {
+	va_list args;
+	va_start (args, p_format);
+
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
 	tm gmtm;
 	// convert now to tm struct for UTC
 	gmtime_s(&gmtm, &currentTime);
-	
-	string UTC = GetTimeString(gmtm.tm_hour+1) + ":" + GetTimeString(gmtm.tm_min) + ":" + GetTimeString(gmtm.tm_sec);
-	string output = UTC + "    " + p_output + "\n";
+	//Generate time string
+	std::string UTC = GetTimeString(gmtm.tm_hour+1) + ":" + GetTimeString(gmtm.tm_min) + ":" + GetTimeString(gmtm.tm_sec);
+	//Generate ouput string (time stamp + output text)
+	std::string output = UTC + "    " + p_format + "\n";
 
-	if(m_logFileStream.is_open() || m_logFileStream.bad())
-	{
-		m_logFileStream << output;
-	}
-	
+	vfprintf (m_logFile, output.c_str(), args);
+	fflush(m_logFile);
+	va_end (args);
 }
 
-void Logging::LogTextToConsole( string p_output )
+void Logging::LogTextToConsole( const char * p_format, ... )
 {
+	va_list args;
+	va_start (args, p_format);
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
 	// convert now to tm struct for UTC
 	tm* gmtm = gmtime(&currentTime);
 
-	string UTC = GetTimeString(gmtm->tm_hour+1) + ":" + GetTimeString(gmtm->tm_min) + ":" + GetTimeString(gmtm->tm_sec);
-	string output = UTC + "    " + p_output + "\n";
+	std::string UTC = GetTimeString(gmtm->tm_hour+1) + ":" + GetTimeString(gmtm->tm_min) + ":" + GetTimeString(gmtm->tm_sec);
+	std::string output = UTC + "    " + p_format + "\n";
 
-	printf(output.c_str());
+	vprintf(output.c_str(), args);
+	va_end (args);
 }
 
 bool Logging::OpenLogStream()
@@ -61,28 +66,33 @@ bool Logging::OpenLogStream()
 	tm gmtm;
 	// convert now to tm struct for UTC
 	gmtime_s(&gmtm, &currentTime);
+	//Generate file name from date and time
+	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec) + ".rlog";
+	//Open log file stream
+	m_logFile = fopen(fileName.c_str(), "w");
 
-	string fileName = to_string(gmtm.tm_year+1900) + to_string(gmtm.tm_mon+1) + to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec) + ".rlog";
-	m_logFileStream.open(fileName);
+	if(m_logFile == NULL)
+		return false;
 
 	return true;
 }
 
 bool Logging::CloseLogStream()
 {
-	if(m_logFileStream.is_open())
-	{
-		m_logFileStream.close();
+	if(m_logFile)
+	{   //Close stream
+		fclose(m_logFile);
 		return true;
 	}
+
 	return false;
 }
 
 std::string Logging::GetTimeString( int p_time )
 {
 	if(p_time < 10)
-		return "0" + to_string(p_time);
+		return "0" + std::to_string(p_time);
 	else
-		return to_string(p_time);
+		return std::to_string(p_time);
 }
 
