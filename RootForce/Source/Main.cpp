@@ -1,7 +1,7 @@
 #include <Main.h>
 #include <exception>
 
-#include "Logging.h"
+#include "Logging/Logging.h"
 
 #include <gtest/gtest.h>
 
@@ -52,8 +52,6 @@ Main::Main()
 	: m_running(true) 
 {
 
-	Logging* test = Logging::GetInstance();
-
 	int a = 0;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
@@ -85,6 +83,12 @@ Main::~Main()
 
 void Main::Start() 
 {
+	//Open the log file stream for this instance(Do this once at the beginning of the program)
+	Logging::GetInstance()->OpenLogStream();
+
+	//Include Logging.h in the file you want to use the logging function
+	//Write a string to the log file stream(Do this when you want to log something...)
+	Logging::GetInstance()->LogTextToFile("Log entry test");
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
