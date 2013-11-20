@@ -6,8 +6,8 @@ set(PROJECT_NAME RootEngine)
 project(${PROJECT_NAME})
 
 # Set the files used in the target
-file(GLOB_RECURSE SOURCES Sources/ *.cpp)
-file(GLOB_RECURSE HEADERS Headers/ *.h)
+file(GLOB_RECURSE SOURCES Source/*.cpp)
+file(GLOB_RECURSE HEADERS Include/*.h)
 set(LIBRARIES ${EXTERNAL_LIBRARIES})
 
 #message("${SOURCES}")
@@ -16,7 +16,9 @@ set(LIBRARIES ${EXTERNAL_LIBRARIES})
 # Set search paths
 include_directories(Include)
 
-# TODO: Add the target (commented until we actually have a source file)
-#add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
-#target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+# Add the target (commented until we actually have a source file)
+add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+
+# Add subdirectories
 add_subdirectory(Network)
