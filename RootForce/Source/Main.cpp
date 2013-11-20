@@ -51,36 +51,35 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
+	// CreateSystem allocates and stores a system with a string handler.
+	std::shared_ptr<ECS::ComponentSystem> system = world.GetSystemManager()->CreateSystem<TestComponentSystem>("System_Identifier");
 
-	// ECS Test
-	
-	testSystem = world.GetSystemManager()->CreateSystem<TestComponentSystem>("test");
-	testSystem->SetUsage<TestComponent>(true);
+	// Set usage enables use of the specified components in processing.
+	system->SetUsage<TestComponent>(true);
 
-	testSystemTwo = world.GetSystemManager()->CreateSystem<TestComponentSystem>("test2");
-	testSystemTwo->SetUsage<TestComponent>(true);
-	testSystemTwo->SetUsage<TestComponentTwo>(true);
-
+	// CreateEntity allocates and stores a entity.
 	std::shared_ptr<ECS::Entity> entity = world.GetEntityManager()->CreateEntity();
 	std::shared_ptr<ECS::Entity> entity2 = world.GetEntityManager()->CreateEntity();
 	
-	std::shared_ptr<TestComponent> testComp1e1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
-	testComp1e1->data = 57.0f;
+	// CreateComponent allocates and stores a specified component belonging to a entity.
+	std::shared_ptr<TestComponent> testComp1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
+	testComp1->Data = 57.0f;
 
-	std::shared_ptr<TestComponent> testComp1e2 = world.GetEntityManager()->CreateComponent<TestComponent>(entity2);
-	testComp1e2->data = 333333.0f;
-
+	// Initialize system sets up all the system for processing.
 	world.GetSystemManager()->InitializeSystems();
 
-	testSystem->Process();
+	// Process will execute the logic flow.
+	system->Process();
 
-	//world.GetEntityManager()->RemoveComponent<TestComponent>(entity);
-	//world.GetEntityManager()->RemoveAllComponents(entity);
+	// Removal methods.
+	world.GetEntityManager()->RemoveComponent<TestComponent>(entity);
+	world.GetEntityManager()->RemoveAllComponents(entity);
 	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
 
-	testSystem->Process();
+	system->Process();
 
-	int a = 0;
+	// Processing by requesting the system from the system manager.
+	world.GetSystemManager()->GetSystem<TestComponentSystem>("System_Identifier")->Process();
 }
 
 Main::~Main() 

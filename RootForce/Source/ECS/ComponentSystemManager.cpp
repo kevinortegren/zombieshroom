@@ -5,7 +5,7 @@ void ECS::ComponentSystemManager::AddEntityToSystems(std::shared_ptr<ECS::Entity
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
 		// Validate entity against system.
-		for(int i = 0; i < (*itr).second->m_componentTypes.size(); ++i)
+		for(size_t i = 0; i < (*itr).second->m_componentTypes.size(); ++i)
 		{
 			if((*itr).second->m_componentTypes.at(i))
 				if(!p_entity->m_componentTypes.at(i))
@@ -22,7 +22,7 @@ void ECS::ComponentSystemManager::RemoveEntityFromSystems(std::shared_ptr<ECS::E
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
 		// Validate entity against system.
-		for(int i = 0; i < (*itr).second->m_componentTypes.size(); ++i)
+		for(size_t i = 0; i < (*itr).second->m_componentTypes.size(); ++i)
 		{
 			if((*itr).second->m_componentTypes.at(i))
 				if(!p_entity->m_componentTypes.at(i))

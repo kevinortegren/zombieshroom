@@ -3,51 +3,42 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
-#include <ECS/ECS.h>
-
-enum ComponentType
-{
-	TYPE_TEST
-};
+#include <ECS/World.h>
 
 struct TestComponent : public ECS::Component<TestComponent>
 {
-	float data;
-};
-
-struct TestComponentTwo : public ECS::Component<TestComponentTwo>
-{
-	float data;
+	float Data;
 };
 
 struct TestComponentSystem : public ECS::ComponentSystem
 {
+	// Constructor.
 	TestComponentSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world)
-	{}
+		: ECS::ComponentSystem(p_world) {}
 
-	ECS::ComponentMapper<TestComponent> m_testComps;
+	// Component Mappers.
+	ECS::ComponentMapper<TestComponent> m_mapper;
 
 	void Init()
 	{
-		std::cout << "Init TestComponentSystem" << std::endl;
+		std::cout << "Init ComponentSystem" << std::endl;
 
-		m_testComps.Init(m_world->GetEntityManager());
+		m_mapper.Init(m_world->GetEntityManager());
 	}
 
 	void Begin()
 	{
-		std::cout << "Begin TestComponentSystem" << std::endl;
+		std::cout << "Begin ComponentSystem" << std::endl;
 	}
 
 	void ProcessEntity(std::shared_ptr<ECS::Entity> p_entity)
 	{
-		std::cout << "Entity " << m_testComps.Get(p_entity)->data << std::endl;
+		std::cout << "Component Data Fetch " << m_mapper.Get(p_entity)->Data << std::endl;
 	}
 
 	void End()
 	{
-		std::cout << "End TestComponentSystem" << std::endl;
+		std::cout << "End ComponentSystem\n" << std::endl;
 	}
 };
 
@@ -65,9 +56,4 @@ private:
 	std::shared_ptr<SDL_Window> m_window;
 
 	ECS::World world;
-
-	std::shared_ptr<ECS::ComponentSystem> testSystem;
-	std::shared_ptr<ECS::ComponentSystem> testSystemTwo;
-
-
 };

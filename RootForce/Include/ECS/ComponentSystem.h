@@ -7,6 +7,8 @@
 #include <set>
 #include <memory>
 
+#define ECS_COMPSYSTEM_BITS 32
+
 namespace ECS
 {
 	class World;
@@ -37,7 +39,7 @@ namespace ECS
 		World* m_world;
 
 	private:
-		std::bitset<2> m_componentTypes;
+		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;
 		std::set<std::shared_ptr<Entity>> m_activeEntities;
 		
 	};

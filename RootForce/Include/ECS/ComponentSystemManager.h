@@ -27,8 +27,13 @@ namespace ECS
 			
 			m_systems[p_systemName] = system;
 
-
 			return system;
+		}
+
+		template<class T>
+		T* GetSystem(const std::string& p_systemName)
+		{
+			return static_cast<T*>(m_systems[p_systemName].get());
 		}
 
 		void InitializeSystems();

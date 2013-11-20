@@ -25,7 +25,7 @@ void ECS::EntityManager::RemoveEntity(std::shared_ptr<ECS::Entity> p_entity)
 
 void ECS::EntityManager::RemoveAllComponents(std::shared_ptr<ECS::Entity> p_entity)
 {
-	for(int i = 0; i < m_components.size(); ++i) 
+	for(size_t i = 0; i < m_components.size(); ++i) 
 	{
 		if(m_components[i].size() > p_entity->m_id) {
 			m_components[i][p_entity->m_id] = nullptr;

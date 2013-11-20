@@ -2,6 +2,8 @@
 
 #include <bitset>
 
+#define ECS_ENTITY_BITS 32
+
 namespace ECS
 {
 	class Entity
@@ -10,14 +12,13 @@ namespace ECS
 		friend class EntityManager;
 		friend class ComponentSystemManager; 
 
-		Entity(int p_id)
+		Entity(unsigned int p_id)
 			: m_id(p_id) {}
 
-		int GetId() const { return m_id; }
+		unsigned int GetId() const { return m_id; }
 
 	private:
-		int m_id;
-		std::bitset<2> m_componentTypes;
-
+		unsigned int m_id;
+		std::bitset<ECS_ENTITY_BITS> m_componentTypes;
 	};
 }

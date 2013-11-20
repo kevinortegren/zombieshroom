@@ -70,11 +70,14 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(std::shared_ptr<Entity> p_entity)
 		{
-			m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
+			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
+			{
+				m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
 
-			p_entity->m_componentTypes.set(Component<T>::GetTypeId(), 0);
+				p_entity->m_componentTypes.set(Component<T>::GetTypeId(), 0);
 
-			m_systemManager->RemoveEntityFromSystems(p_entity);
+				m_systemManager->RemoveEntityFromSystems(p_entity);
+			}
 		}
 
 		template<class T>

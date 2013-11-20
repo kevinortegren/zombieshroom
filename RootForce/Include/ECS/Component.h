@@ -2,7 +2,7 @@
 
 namespace ECS
 {
-	static int s_count;
+	static unsigned int s_count;
 
 	class ComponentInterface {};
 
@@ -10,15 +10,15 @@ namespace ECS
 	class Component : public ComponentInterface
 	{
 	public:
-		static int GetTypeId();
-		static int s_typeId;
+		static unsigned int GetTypeId();
+		static unsigned int s_typeId;
 	};
 
 	template<class T>
-	int Component<T>::s_typeId = s_count++;
+	unsigned int Component<T>::s_typeId = s_count++;
 
 	template<class T>
-	int Component<T>::GetTypeId()
+	unsigned int Component<T>::GetTypeId()
 	{
 		return s_typeId;
 	}
