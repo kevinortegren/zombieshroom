@@ -12,12 +12,14 @@ find_package(SDL2 REQUIRED)
 find_package(GTest REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(RakNet REQUIRED)
+find_package(Assimp REQUIRED)
 
 set(EXTERNAL_INCLUDE_DIRS 
     ${SDL2_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
     ${RAKNET_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
 )
     
 set(EXTERNAL_LIBRARIES
@@ -25,6 +27,7 @@ set(EXTERNAL_LIBRARIES
     ${GTEST_LIBRARY}
     ${GLEW_LIBRARY}
     ${RAKNET_LIBRARY}
+    ${ASSIMP_LIBRARY}
 )
 
 
