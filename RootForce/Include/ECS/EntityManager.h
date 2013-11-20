@@ -21,15 +21,20 @@ namespace ECS
 		{
 			std::shared_ptr<C> component = std::shared_ptr<C>(new C);
 
+			std::vector<std::shared_ptr<ComponentInterface>>& componentList = m_components[p_componentType];
+			if(entity->GetId() >= componentList.size())
+				componentList.resize(componentList.size() + 1);
 
+			m_components[entity->GetId()].push_back(component);
 
+			return component;
 		}
 
 	private:
 		int m_nextID;
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		std::stack<int> m_recyledIds;
-		std::vector<std::vector<ComponentInterface>> m_components;
+		std::vector<std::vector<std::shared_ptr<ComponentInterface>>> m_components;
 
 	};
 }
