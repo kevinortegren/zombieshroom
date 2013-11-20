@@ -1,11 +1,11 @@
-#include "MeshImporter.h"
+#include "Importers/MeshImporter.h"
 
 
-MeshImporter::MeshImporter(void)
+MeshImporter::MeshImporter()
 {
 }
 
 
-MeshImporter::~MeshImporter(void)
+MeshImporter::~MeshImporter()
 {
 }

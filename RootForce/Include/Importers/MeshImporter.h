@@ -2,7 +2,7 @@
 class MeshImporter
 {
 public:
-	MeshImporter(void);
-	~MeshImporter(void);
+	MeshImporter();
+	~MeshImporter();
 };
 
