@@ -55,7 +55,23 @@ Main::Main()
 	// ECS Test
 	
 	std::shared_ptr<ECS::Entity> entity = world.GetEntityManager()->CreateEntity();
+	std::shared_ptr<ECS::Entity> entity2 = world.GetEntityManager()->CreateEntity();
+	
+	std::shared_ptr<TestComponent> testComp1e1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
+	std::shared_ptr<TestComponent> testComp1e2 = world.GetEntityManager()->CreateComponent<TestComponent>(entity2);
 
+	std::shared_ptr<TestComponentTwo> testComp2e1 = world.GetEntityManager()->CreateComponent<TestComponentTwo>(entity);
+
+	testComp1e1->data = 57.0f;
+	testComp2e1->data = 126371.0f;
+
+	testComp1e2->data = 333333.0f;
+
+	world.GetEntityManager()->RemoveAllComponents(entity);
+
+	world.GetEntityManager()->AddComponent<TestComponent>(testComp1e1, entity);
+
+	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
 
 	int a =0;
 }

@@ -27,3 +27,12 @@ void ECS::EntityManager::RemoveEntity(std::shared_ptr<ECS::Entity> p_entity)
 	m_recyledIds.push(p_entity->GetId());
 	m_entities.erase(m_entities.begin() + p_entity->GetId());
 }
+
+void ECS::EntityManager::RemoveAllComponents(std::shared_ptr<ECS::Entity> p_entity)
+{
+	for(auto itr = m_components.begin(); itr != m_components.end(); ++itr) 
+	{
+		if((*itr).size() > p_entity->GetId())
+			(*itr)[p_entity->GetId()] = nullptr;
+	}
+}

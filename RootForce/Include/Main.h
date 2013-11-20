@@ -10,7 +10,12 @@ enum ComponentType
 	TYPE_TEST
 };
 
-struct TestComponent : public ECS::ComponentInterface
+struct TestComponent : public ECS::Component<TestComponent>
+{
+	float data;
+};
+
+struct TestComponentTwo : public ECS::Component<TestComponentTwo>
 {
 	float data;
 };
