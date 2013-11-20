@@ -6,15 +6,12 @@ set(PROJECT_NAME RootForce)
 project(${PROJECT_NAME})
 
 # Set the files used in the target
-set(SOURCES 
-    Source/Main.cpp
-)
-
-set(HEADERS 
-    Include/Main.h
-)
-
+file(GLOB_RECURSE SOURCES Sources/ *.cpp)
+file(GLOB_RECURSE HEADERS Headers/ *.h)
 set(LIBRARIES ${EXTERNAL_LIBRARIES})
+
+#message("${SOURCES}")
+#message("${HEADERS}")
 
 # Set search paths
 include_directories(Include)
