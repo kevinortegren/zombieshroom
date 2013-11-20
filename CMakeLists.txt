@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 set(ROOT_PROJECT_NAME ZombieShroom)
 project(${ROOT_PROJECT_NAME})
 
-# TODO: Find external libraries
+# Find external libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
 find_package(SDL2 REQUIRED)
@@ -25,12 +25,13 @@ set(EXTERNAL_LIBRARIES
 )
 
 
-# TODO: Set global compiler options
+# Set global compiler options
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
 
-# TODO: Add sub projects and dependencies. Compile root project.
+# Add sub projects and dependencies.
 include_directories(${EXTERNAL_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR})
 
 add_subdirectory(RootEngine)
 add_subdirectory(RootForce)
