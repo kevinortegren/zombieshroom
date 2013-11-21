@@ -8,6 +8,7 @@ project(${ROOT_PROJECT_NAME})
 # Find external libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
+find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(GTest REQUIRED)
 find_package(GLEW REQUIRED)
@@ -23,6 +24,7 @@ set(EXTERNAL_INCLUDE_DIRS
 set(EXTERNAL_LIBRARIES
     ${SDL2_LIBRARY}
     ${GTEST_LIBRARY}
+    ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARY}
     ${RAKNET_LIBRARY}
 )

@@ -2,6 +2,7 @@
 #include <exception>
 
 #include "Logging/Logging.h"
+#include "Renderer/Renderer.h"
 
 #include <gtest/gtest.h>
 
@@ -57,8 +58,6 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	// TODO: Set OpenGL attributes? This needs to be done before a window is opened, but responsibility suits the engine/renderer better.
-
 	// TODO: Make these parameters more configurable.
 	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 			"Root Force",
@@ -73,6 +72,7 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
+	Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
 
 	// ECS Test
 	
@@ -130,8 +130,8 @@ void Main::Start()
 
 void Main::HandleEvents()
 {
-    SDL_Event event;
-    while(SDL_PollEvent(&event)){
+	SDL_Event event;
+	while(SDL_PollEvent(&event)){
    
 	switch(event.type) {
    
@@ -148,5 +148,5 @@ void Main::HandleEvents()
 		default:
 			break;
 		}
-    }
+	}
 }
