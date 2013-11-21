@@ -46,6 +46,7 @@ add_subdirectory(RootEngine)
 add_subdirectory(RootForce)
 add_subdirectory(RootTools)
 add_subdirectory(Utility)
+add_subdirectory(Assets)
 
 # Copy the runtime dependencies to the output directory when dependency target is built
 # TODO: This is hardcoded to the Debug folder. We cannot use a Release build...
