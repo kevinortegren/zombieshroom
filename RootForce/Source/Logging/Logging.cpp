@@ -48,10 +48,11 @@ void Logging::LogTextToConsole( const char * p_format, ... )
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
+	tm gmtm; 
 	// convert now to tm struct for UTC
-	tm* gmtm = gmtime(&currentTime);
+	gmtime_s(&gmtm, &currentTime);
 
-	std::string UTC = GetTimeString(gmtm->tm_hour+1) + ":" + GetTimeString(gmtm->tm_min) + ":" + GetTimeString(gmtm->tm_sec);
+	std::string UTC = GetTimeString(gmtm.tm_hour+1) + ":" + GetTimeString(gmtm.tm_min) + ":" + GetTimeString(gmtm.tm_sec);
 	std::string output = UTC + "    " + p_format + "\n";
 
 	vprintf(output.c_str(), args);
@@ -69,7 +70,7 @@ bool Logging::OpenLogStream()
 	//Generate file name from date and time
 	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec) + ".rlog";
 	//Open log file stream
-	m_logFile = fopen(fileName.c_str(), "w");
+	fopen_s(&m_logFile, fileName.c_str(), "w");
 
 	if(m_logFile == NULL)
 		return false;

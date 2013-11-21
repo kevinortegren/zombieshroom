@@ -1,10 +1,5 @@
 #include <ECS/EntityManager.h>
-
-ECS::EntityManager::EntityManager()
-	: m_nextID(0)
-{
-
-}
+#include <ECS/ComponentSystemManager.h>
 
 std::shared_ptr<ECS::Entity> ECS::EntityManager::CreateEntity()
 {
@@ -24,15 +19,24 @@ std::shared_ptr<ECS::Entity> ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(std::shared_ptr<ECS::Entity> p_entity)
 {
-	m_recyledIds.push(p_entity->GetId());
-	m_entities.erase(m_entities.begin() + p_entity->GetId());
+	m_recyledIds.push(p_entity->m_id);
+	m_entities.erase(m_entities.begin() + p_entity->m_id);
 }
 
 void ECS::EntityManager::RemoveAllComponents(std::shared_ptr<ECS::Entity> p_entity)
 {
-	for(auto itr = m_components.begin(); itr != m_components.end(); ++itr) 
+	for(size_t i = 0; i < m_components.size(); ++i) 
 	{
-		if((*itr).size() > p_entity->GetId())
-			(*itr)[p_entity->GetId()] = nullptr;
+		if(m_components[i].size() > p_entity->m_id) {
+			m_components[i][p_entity->m_id] = nullptr;
+			p_entity->m_componentTypes.set(i, 0);
+		}
 	}
+
+	m_systemManager->RemoveEntityFromSystems(p_entity);
+}
+
+std::vector<std::shared_ptr<ECS::ComponentInterface>>& ECS::EntityManager::GetComponentList(int p_typeId)
+ {  
+	 return m_components[p_typeId]; 
 }

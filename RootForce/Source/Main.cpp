@@ -3,7 +3,6 @@
 
 #include "Logging/Logging.h"
 #include "Renderer/Renderer.h"
-
 #include <gtest/gtest.h>
 
 
@@ -52,7 +51,10 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -72,28 +74,37 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
+<<<<<<< HEAD
 	Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
+=======
+	// CreateSystem allocates and stores a system with a string handler.
+	std::shared_ptr<ECS::ComponentSystem> gameLogic = world.GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
+>>>>>>> origin/master
 
-	// ECS Test
-	
-	std::shared_ptr<ECS::Entity> entity = world.GetEntityManager()->CreateEntity();
-	std::shared_ptr<ECS::Entity> entity2 = world.GetEntityManager()->CreateEntity();
-	
-	std::shared_ptr<TestComponent> testComp1e1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
-	std::shared_ptr<TestComponent> testComp1e2 = world.GetEntityManager()->CreateComponent<TestComponent>(entity2);
+	// CreateEntity allocates and stores a entity.
+	std::shared_ptr<ECS::Entity> rolf = world.GetEntityManager()->CreateEntity();
 
-	std::shared_ptr<TestComponentTwo> testComp2e1 = world.GetEntityManager()->CreateComponent<TestComponentTwo>(entity);
+	// CreateComponent allocates and stores a specified component belonging to a entity.
+	std::shared_ptr<Player> playerData = world.GetEntityManager()->CreateComponent<Player>(rolf);
+	playerData->m_health = 10.0f;
+	playerData->m_name = "Rolf";
 
-	testComp1e1->data = 57.0f;
-	testComp2e1->data = 126371.0f;
+	std::shared_ptr<Transform> transformData = world.GetEntityManager()->CreateComponent<Transform>(rolf);
+	transformData->m_x = 0.0f;
+	transformData->m_y = -5.0f;
 
-	testComp1e2->data = 333333.0f;
+	// Initialize system sets up all the system for processing.
+	world.GetSystemManager()->InitializeSystems();
 
-	world.GetEntityManager()->RemoveAllComponents(entity);
-
-	world.GetEntityManager()->AddComponent<TestComponent>(testComp1e1, entity);
-
+<<<<<<< HEAD
 	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
+=======
+	// Process will execute the logic flow.
+	gameLogic->Process();
+
+	// Processing by requesting the system from the system manager.
+	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
+>>>>>>> origin/master
 }
 
 Main::~Main() 
@@ -103,6 +114,7 @@ Main::~Main()
 
 void Main::Start() 
 {
+<<<<<<< HEAD
 	//Open the log file stream for this instance(Do this once at the beginning of the program)
 	Logging::GetInstance()->OpenLogStream();
 
@@ -114,6 +126,12 @@ void Main::Start()
 	Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
 
+=======
+
+	//Open the log file stream for this instance(Do this once at the beginning of the program)
+	Logging::GetInstance()->OpenLogStream();
+
+>>>>>>> origin/master
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{

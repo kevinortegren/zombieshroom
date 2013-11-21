@@ -3,21 +3,69 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
-#include <ECS/ECS.h>
+#include <ECS/World.h>
+#include "Logging/Logging.h"
 
-enum ComponentType
+struct Transform : public ECS::Component<Transform>
 {
-	TYPE_TEST
+	float m_x;
+	float m_y;
 };
 
-struct TestComponent : public ECS::Component<TestComponent>
+struct Player : public ECS::Component<Player>
 {
-	float data;
+	std::string m_name;
+	float m_health;
 };
 
-struct TestComponentTwo : public ECS::Component<TestComponentTwo>
+struct GameLogicSystem : public ECS::ComponentSystem
 {
-	float data;
+	GameLogicSystem(ECS::World* p_world)
+		: ECS::ComponentSystem(p_world) 
+	{
+		// Enabling use of Player/Transform components in the system.
+		SetUsage<Player>();
+		SetUsage<Transform>();
+	}
+
+	// Component mappers map player data to entities.
+	ECS::ComponentMapper<Player> m_players;
+	ECS::ComponentMapper<Transform> m_transforms;
+
+	void Init()
+	{
+		// Init will fill the map with entity data.
+		m_players.Init(m_world->GetEntityManager());
+		m_transforms.Init(m_world->GetEntityManager());
+	}
+
+	void Begin()
+	{
+		// Will be executed before any processing occurs in each frame.
+	}
+
+	void ProcessEntity(std::shared_ptr<ECS::Entity> p_entity)
+	{
+		Player* player = m_players.Get(p_entity);
+		Transform* transform = m_transforms.Get(p_entity);
+
+		if( transform->m_y < 0)
+		{
+			player->m_health -= 10.0f;
+		}
+
+		if(player->m_health <= 0.0f)
+		{
+			Logging::GetInstance()->LogTextToConsole("Player %s is dead", player->m_name.c_str());
+	
+			m_world->GetEntityManager()->RemoveEntity(p_entity);
+		}
+	}
+
+	void End()
+	{
+		// Will be executed after any processing occurs in each frame.
+	}
 };
 
 class Main {
