@@ -51,10 +51,6 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -74,12 +70,10 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-<<<<<<< HEAD
 	Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
-=======
+
 	// CreateSystem allocates and stores a system with a string handler.
 	std::shared_ptr<ECS::ComponentSystem> gameLogic = world.GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
->>>>>>> origin/master
 
 	// CreateEntity allocates and stores a entity.
 	std::shared_ptr<ECS::Entity> rolf = world.GetEntityManager()->CreateEntity();
@@ -96,15 +90,12 @@ Main::Main()
 	// Initialize system sets up all the system for processing.
 	world.GetSystemManager()->InitializeSystems();
 
-<<<<<<< HEAD
-	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
-=======
 	// Process will execute the logic flow.
 	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
 	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
->>>>>>> origin/master
+
 }
 
 Main::~Main() 
@@ -114,7 +105,7 @@ Main::~Main()
 
 void Main::Start() 
 {
-<<<<<<< HEAD
+
 	//Open the log file stream for this instance(Do this once at the beginning of the program)
 	Logging::GetInstance()->OpenLogStream();
 
@@ -126,12 +117,6 @@ void Main::Start()
 	Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
 
-=======
-
-	//Open the log file stream for this instance(Do this once at the beginning of the program)
-	Logging::GetInstance()->OpenLogStream();
-
->>>>>>> origin/master
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
