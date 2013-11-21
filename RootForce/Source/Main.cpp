@@ -111,7 +111,6 @@ Main::Main()
 	
 
 	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
-
 }
 
 Main::~Main() 
