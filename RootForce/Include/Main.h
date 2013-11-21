@@ -5,40 +5,65 @@
 
 #include <ECS/World.h>
 
-struct TestComponent : public ECS::Component<TestComponent>
+struct Transform : public ECS::Component<Transform>
 {
-	float Data;
+	float m_x;
+	float m_y;
 };
 
-struct TestComponentSystem : public ECS::ComponentSystem
+struct Player : public ECS::Component<Player>
 {
-	// Constructor.
-	TestComponentSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world) {}
+	std::string m_name;
+	float m_health;
+};
 
-	// Component Mappers.
-	ECS::ComponentMapper<TestComponent> m_mapper;
+struct GameLogicSystem : public ECS::ComponentSystem
+{
+	GameLogicSystem(ECS::World* p_world)
+		: ECS::ComponentSystem(p_world) 
+	{
+		// Enabling use of Player/Transform components in the system.
+		SetUsage<Player>(true);
+		SetUsage<Transform>(true);
+	}
+
+	// Component mappers map player data to entities.
+	ECS::ComponentMapper<Player> m_players;
+	ECS::ComponentMapper<Transform> m_transforms;
 
 	void Init()
 	{
-		std::cout << "Init ComponentSystem" << std::endl;
-
-		m_mapper.Init(m_world->GetEntityManager());
+		// Init will fill the map with entity data.
+		m_players.Init(m_world->GetEntityManager());
+		m_transforms.Init(m_world->GetEntityManager());
 	}
 
 	void Begin()
 	{
-		std::cout << "Begin ComponentSystem" << std::endl;
+		// Will be executed before any processing occurs in each frame.
 	}
 
 	void ProcessEntity(std::shared_ptr<ECS::Entity> p_entity)
 	{
-		std::cout << "Component Data Fetch " << m_mapper.Get(p_entity)->Data << std::endl;
+		Player* player = m_players.Get(p_entity);
+		Transform* transform = m_transforms.Get(p_entity);
+
+		if( transform->m_y < 0)
+		{
+			player->m_health -= 10.0f;
+		}
+
+		if(player->m_health <= 0.0f)
+		{
+			std::cout << "Player " << player->m_health << " is dead." << std::endl;
+
+			m_world->GetEntityManager()->RemoveEntity(p_entity);
+		}
 	}
 
 	void End()
 	{
-		std::cout << "End ComponentSystem\n" << std::endl;
+		// Will be executed after any processing occurs in each frame.
 	}
 };
 

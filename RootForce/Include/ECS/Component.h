@@ -7,9 +7,8 @@ namespace ECS
 	class ComponentInterface {};
 
 	template<class T>
-	class Component : public ComponentInterface
+	struct Component : public ComponentInterface
 	{
-	public:
 		static unsigned int GetTypeId();
 		static unsigned int s_typeId;
 	};

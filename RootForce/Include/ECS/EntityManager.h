@@ -49,10 +49,8 @@ namespace ECS
 			// Flag the entity to use the component.
 			p_entity->m_componentTypes.set(Component<T>::GetTypeId());
 
-			// Add the entity to affected systems.
 			m_systemManager->AddEntityToSystems(p_entity);
 
-			// Return a pointer to the component for editing. 
 			return component;
 		}
 

@@ -52,34 +52,28 @@ Main::Main()
 	}
 
 	// CreateSystem allocates and stores a system with a string handler.
-	std::shared_ptr<ECS::ComponentSystem> system = world.GetSystemManager()->CreateSystem<TestComponentSystem>("System_Identifier");
-
-	// Set usage enables use of the specified components in processing.
-	system->SetUsage<TestComponent>(true);
+	std::shared_ptr<ECS::ComponentSystem> gameLogic = world.GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
 
 	// CreateEntity allocates and stores a entity.
-	std::shared_ptr<ECS::Entity> entity = world.GetEntityManager()->CreateEntity();
-	std::shared_ptr<ECS::Entity> entity2 = world.GetEntityManager()->CreateEntity();
-	
+	std::shared_ptr<ECS::Entity> rolf = world.GetEntityManager()->CreateEntity();
+
 	// CreateComponent allocates and stores a specified component belonging to a entity.
-	std::shared_ptr<TestComponent> testComp1 = world.GetEntityManager()->CreateComponent<TestComponent>(entity);
-	testComp1->Data = 57.0f;
+	std::shared_ptr<Player> playerData = world.GetEntityManager()->CreateComponent<Player>(rolf);
+	playerData->m_health = 10.0f;
+	playerData->m_name = "Rolf";
+
+	std::shared_ptr<Transform> transformData = world.GetEntityManager()->CreateComponent<Transform>(rolf);
+	transformData->m_x = 0.0f;
+	transformData->m_y = -5.0f;
 
 	// Initialize system sets up all the system for processing.
 	world.GetSystemManager()->InitializeSystems();
 
 	// Process will execute the logic flow.
-	system->Process();
-
-	// Removal methods.
-	world.GetEntityManager()->RemoveComponent<TestComponent>(entity);
-	world.GetEntityManager()->RemoveAllComponents(entity);
-	world.GetEntityManager()->RemoveAllComponentsOfType<TestComponent>();
-
-	system->Process();
+	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
-	world.GetSystemManager()->GetSystem<TestComponentSystem>("System_Identifier")->Process();
+	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
 }
 
 Main::~Main() 
@@ -101,9 +95,6 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		HandleEvents();
-
-		//testSystem->Process();
-		//testSystemTwo->Process();
 	}
 }
 
