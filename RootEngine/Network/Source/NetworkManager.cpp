@@ -1,6 +1,7 @@
 #include <NetworkManager.h>
 #include <Client.h>
 #include <Server.h>
+#include <iostream>
 
 void NetworkManager::Initialize(PeerType::PeerType p_peerType)
 {

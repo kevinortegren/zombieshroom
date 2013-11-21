@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <SDL2/SDL.h>
+#include <RootEngine/Include/RootEngine.h>
 
 #include <ECS/World.h>
 #include "Logging/Logging.h"
@@ -80,6 +81,7 @@ private:
 
 	bool m_running;
 	std::shared_ptr<SDL_Window> m_window;
+	RootEngine::Context m_engineContext;
 
 	ECS::World world;
 };

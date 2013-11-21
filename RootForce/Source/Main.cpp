@@ -94,8 +94,8 @@ Main::Main()
 	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
-	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
 
+	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
 }
 
 Main::~Main() 
@@ -133,11 +133,11 @@ void Main::Start()
 
 void Main::HandleEvents()
 {
-	SDL_Event event;
-	while(SDL_PollEvent(&event)){
-   
-	switch(event.type) {
-   
+    SDL_Event event;
+    while(SDL_PollEvent(&event))
+	{
+		switch(event.type) 
+		{
 		case SDL_QUIT:
 			m_running = false;
 			break;

@@ -32,15 +32,23 @@ set(EXTERNAL_LIBRARIES
     ${ASSIMP_LIBRARY}
 )
 
-
 # Set global compiler options
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
 
 # Add sub projects and dependencies.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 include_directories(${EXTERNAL_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_subdirectory(RootEngine)
 add_subdirectory(RootForce)
 add_subdirectory(RootTools)
+
+# Copy the runtime dependencies to the output directory when dependency target is built
+# TODO: This is hardcoded to the Debug folder. We cannot use a Release build...
+add_custom_target(_Dependencies ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+)
+ 
