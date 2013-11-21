@@ -60,14 +60,14 @@ struct GameLogicSystem : public ECS::ComponentSystem
 };
 
 
-TEST(System, CreateEntity) 
+/*TEST(System, CreateEntity) 
 {
 	ECS::Entity* rolf = m_world->GetEntityManager()->CreateEntity();
 
 	int a = 0;
 
 	EXPECT_TRUE(a == 0);
-}
+}*/
 
 
 //ECS::ComponentSystem* gameLogic = m_engineContext->GetWorld()->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");

@@ -16,15 +16,6 @@ TEST(Test, Foo)
 	EXPECT_TRUE(a == 0);
 }
 
-void GameLogicSystem::Init()
-{
-	// Init will fill the map with entity data.
-	//m_players.Init(m_world->GetEntityManager());
-	//m_transforms.Init(m_world->GetEntityManager());
-
-	m_world->GetEntityManager()->GetComponentList(0);
-}
-
 int main(int argc, char* argv[]) 
 {
 	try 
@@ -73,13 +64,13 @@ Main::Main()
 	typedef RootEngine::ContextInterface* ( *CREATECONTEXT )(int);
 	CREATECONTEXT createContextFunc = (CREATECONTEXT)DynamicLoader::LoadProcess(handle, "CreateContext");
 
+	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
 	if (createContextFunc == nullptr)
 	{
 		std::cout << "Failed to load engine function: " << DynamicLoader::GetLastError() << std::endl;
 		throw std::runtime_error("");
 	}
 
-	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK);
 	if(m_engineContext != nullptr)
 	{
 
@@ -87,9 +78,8 @@ Main::Main()
 	}
 	else
 	{
-		std::cout << "Couldnt call create context." << std::endl;
+		std::cout << "Couldn't call create context." << std::endl;
 	}
-
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -109,6 +99,9 @@ Main::Main()
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
+	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
+
 }
 
 Main::~Main() 
@@ -146,8 +139,8 @@ void Main::Start()
 
 void Main::HandleEvents()
 {
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
+	SDL_Event event;
+	while(SDL_PollEvent(&event))
 	{
 		switch(event.type) 
 		{
