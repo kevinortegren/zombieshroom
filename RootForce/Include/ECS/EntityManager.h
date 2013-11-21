@@ -18,6 +18,7 @@ namespace ECS
 		EntityManager(ComponentSystemManager* p_systemManager)
 			: m_nextID(0), m_systemManager(p_systemManager) {}
 
+
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
 
@@ -88,6 +89,7 @@ namespace ECS
 		void RemoveAllComponents(Entity* p_entity);
 		
 		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
+		int GetNumEntities() const { return m_entities.size(); }
 
 	private:
 

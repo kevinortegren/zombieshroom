@@ -8,6 +8,8 @@
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 
+#include <ECS/Tests/TestSystem.h>
+
 #undef main
 
 TEST(Test, Foo) 
@@ -99,6 +101,14 @@ Main::Main()
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
+	ECS::Entity* e = m_world.GetEntityManager()->CreateEntity();
+	
+	int a = m_world.GetEntityManager()->GetNumEntities();
+	m_world.GetEntityManager()->RemoveEntity(e);
+
+	int b = m_world.GetEntityManager()->GetNumEntities();
+	
 
 	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
 

@@ -59,17 +59,50 @@ struct GameLogicSystem : public ECS::ComponentSystem
 	}
 };
 
-
-/*TEST(System, CreateEntity) 
+class ECSTest : public testing::Test
 {
-	ECS::Entity* rolf = m_world->GetEntityManager()->CreateEntity();
+protected:
+	void SetUp()
+	{
+		a = 1;
+	}
 
-	int a = 0;
+	void TearDown()
+	{
 
-	EXPECT_TRUE(a == 0);
-}*/
+	}
 
+	ECS::World m_world;
+	int a;
+	ECS::Entity* m_entity1;
+};
 
+TEST_F(ECSTest, CreateEntity) 
+{
+	ECS::Entity* m_entity1 = m_world.GetEntityManager()->CreateEntity();
+
+	ASSERT_TRUE(m_entity1 != NULL);
+	EXPECT_EQ(0, m_entity1 ->GetId());
+	EXPECT_EQ(1, this->m_world.GetEntityManager()->GetNumEntities());
+
+	ECS::Entity*m_entity2 = m_world.GetEntityManager()->CreateEntity();
+
+	ASSERT_TRUE(m_entity2 != NULL);
+	EXPECT_EQ(1, m_entity2->GetId());
+	EXPECT_EQ(2, this->m_world.GetEntityManager()->GetNumEntities());
+
+	EXPECT_EQ(1, this->a);
+}
+
+TEST_F(ECSTest, RemoveEntity) 
+{
+	ECS::Entity* m_entity1 = m_world.GetEntityManager()->CreateEntity();
+
+	this->m_world.GetEntityManager()->RemoveEntity(m_entity1);
+	EXPECT_EQ(0, this->m_world.GetEntityManager()->GetNumEntities());
+}
+
+/*
 //ECS::ComponentSystem* gameLogic = m_engineContext->GetWorld()->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
 
 	//E
@@ -77,7 +110,6 @@ struct GameLogicSystem : public ECS::ComponentSystem
 	// CreateSystem allocates and stores a system with a string handler.
 
 	// CreateEntity allocates and stores a entity.
-	/*
 
 	// CreateComponent allocates and stores a specified component belonging to a entity.
 	Player* playerData = m_engineContext->GetWorld()->GetEntityManager()->CreateComponent<Player>(rolf);
@@ -93,3 +125,4 @@ struct GameLogicSystem : public ECS::ComponentSystem
 
 	// Process will execute the logic flow.
 	gameLogic->Process();
+	*/
