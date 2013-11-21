@@ -34,10 +34,9 @@ namespace RootEngine
         Context(int flags);
 		~Context();
 
-		ECS::World* GetWorld() { return m_world; }
+		ECS::World* GetWorld();
 
 	private:
-
 		void LoadNetwork();
 
 		/** Add interface classes */		

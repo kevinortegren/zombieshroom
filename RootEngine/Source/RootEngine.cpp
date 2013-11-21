@@ -1,6 +1,8 @@
 #include <RootEngine.h>
 #include <iostream>
 
+#include <glm/glm.hpp>
+
 namespace RootEngine
 {
 	typedef NetworkManager* (*GETNETWORKINTERFACE)();
@@ -9,23 +11,24 @@ namespace RootEngine
     {
 		std::cout << "Creating Engine Context" << std::endl;
 
+		// Load external dlls.
 		if((flag & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
 		}
 
-		// TODO: Load the rest of the submodules
-		
+		// Load engine modules.
 		m_world = new ECS::World;
     }
 
 	Context::~Context()
 	{
-		if(m_world != nullptr)
-		{
-			delete m_world;
-			m_world = nullptr;
-		}
+		delete m_world;
+	}
+
+	ECS::World* Context::GetWorld()
+	{ 
+		return m_world; 
 	}
 
 	void Context::LoadNetwork()
@@ -54,6 +57,7 @@ namespace RootEngine
 	
 	ContextInterface* CreateContext(int flags)
 	{
-		return new Context(flags);
+		static Context context(flags);
+		return &context;
 	}
 }
