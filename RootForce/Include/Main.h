@@ -24,8 +24,8 @@ struct GameLogicSystem : public ECS::ComponentSystem
 		: ECS::ComponentSystem(p_world) 
 	{
 		// Enabling use of Player/Transform components in the system.
-		SetUsage<Player>(true);
-		SetUsage<Transform>(true);
+		SetUsage<Player>();
+		SetUsage<Transform>();
 	}
 
 	// Component mappers map player data to entities.

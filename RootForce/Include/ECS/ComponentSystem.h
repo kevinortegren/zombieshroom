@@ -22,9 +22,9 @@ namespace ECS
 			: m_world(p_world) {}
 
 		template<class T>
-		void SetUsage(bool p_use)
+		void SetUsage()
 		{
-			m_componentTypes[Component<T>::GetTypeId()] = p_use;
+			m_componentTypes[Component<T>::GetTypeId()] = 1;
 		}
 
 		void Process();
