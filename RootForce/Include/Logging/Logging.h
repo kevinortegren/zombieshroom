@@ -5,23 +5,25 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-enum LOG_TAG
-{
-	RENDER,
-	NETWORK,
-	DEBUG,
-	GENERAL,
-	NOTAG,
-	PHYSICS,
-	TOOLS,
-	SOUND,
-	GAME,
-	COMPONENT
-};
+
 
 class Logging
 {
 	public:
+		enum LOG_TAG
+		{
+			RENDER,
+			NETWORK,
+			DEBUG,
+			GENERAL,
+			NOTAG,
+			PHYSICS,
+			TOOLS,
+			SOUND,
+			GAME,
+			COMPONENT
+		};
+
 		static Logging* GetInstance();
 		void LogTextToFileTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
 		void LogTextToFileVerbose(unsigned int p_vLevel, const char* p_format, ...);

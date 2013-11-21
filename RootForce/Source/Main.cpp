@@ -104,7 +104,6 @@ Main::~Main()
 
 void Main::Start() 
 {
-
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
