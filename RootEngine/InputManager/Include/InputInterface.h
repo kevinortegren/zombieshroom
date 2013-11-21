@@ -47,22 +47,24 @@ struct vector2 //Just temporary TODO: replace with real glm::vec2 or similar onc
 	float x;
 	float y;
 };
-
-class InputInterface abstract
+namespace InputManager
 {
-public:
-	// Called from the loop calling SDL_PollEvent for events of types SDL_KEYDOWN, SDL_KEYUP, SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP
-	// Updates the internal input status data, later polled with the functions available below
-	virtual void HandleInput(SDL_Event& p_event) = 0;
+	class InputInterface abstract
+	{
+	public:
+		// Called from the loop calling SDL_PollEvent for events of types SDL_KEYDOWN, SDL_KEYUP, SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP
+		// Updates the internal input status data, later polled with the functions available below
+		virtual void HandleInput(SDL_Event& p_event) = 0;
 
-	// Returns the key state of a specific keyboard key (SDL_SCANCODE_XXX) or mouse button
-	virtual KeyState::KeyState GetKeyState(SDL_Keycode p_key) = 0;
-	virtual KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button) = 0;
+		// Returns the key state of a specific keyboard key (SDL_SCANCODE_XXX) or mouse button
+		virtual KeyState::KeyState GetKeyState(SDL_Keycode p_key) = 0;
+		virtual KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button) = 0;
 
-	// Returns the global and delta mouse position
-	virtual vector2 GetGlobalMousePos() = 0;
-	virtual vector2 GetDeltaMousePos() = 0;
+		// Returns the global and delta mouse position
+		virtual vector2 GetGlobalMousePos() = 0;
+		virtual vector2 GetDeltaMousePos() = 0;
 
-};
+	};
 
-extern "C++" INPSYS_DLL_EXPORT InputInterface* APIENTRY GetInputInterface();
+	extern "C++" INPSYS_DLL_EXPORT InputInterface* APIENTRY GetInputInterface();
+}
