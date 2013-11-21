@@ -22,3 +22,4 @@ target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 # Add subdirectories
 add_subdirectory(Network)
+add_subdirectory(InputManager)
