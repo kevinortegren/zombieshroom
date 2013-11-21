@@ -3,8 +3,8 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
-#include <ECS/World.h>
-#include "Logging/Logging.h"
+#include "RootEngine/Include/ECS/World.h"
+#include "RootEngine/Include/Logging/Logging.h"
 
 struct Transform : public ECS::Component<Transform>
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ECS/EntityManager.h>
-#include <ECS/ComponentSystemManager.h>
+#include "RootEngine/Include/ECS/EntityManager.h"
+#include "RootEngine/Include/ECS/ComponentSystemManager.h"
 
 namespace ECS
 {

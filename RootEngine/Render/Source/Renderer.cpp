@@ -1,6 +1,6 @@
-#include <Renderer/Renderer.h>
 #include <GL/glew.h>
-#include "Logging/Logging.h"
+#include "RootEngine/Include/Logging/Logging.h"
+#include "RootEngine/Render/Include/Renderer.h"
 
 namespace Engine
 {

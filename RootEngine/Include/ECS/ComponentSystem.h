@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ECS/Entity.h>
-#include <ECS/ComponentMapper.h>
+#include "RootEngine/Include/ECS/Entity.h"
+#include "RootEngine/Include/ECS/ComponentMapper.h"
 
 #include <bitset>
 #include <set>

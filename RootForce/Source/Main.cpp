@@ -1,8 +1,8 @@
 #include <Main.h>
 #include <exception>
 
-#include "Logging/Logging.h"
-#include "Renderer/Renderer.h"
+#include "RootEngine/Include/Logging/Logging.h"
+#include "RootEngine/Render/Include/Renderer.h"
 #include <gtest/gtest.h>
 
 
