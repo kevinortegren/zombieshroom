@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Bullet/BulletCollision/CollisionShapes/btShapeHull.h"
+#include "Bullet/BulletCollision/CollisionDispatch/btGhostObject.h"
 
 using namespace PhysicsSubSystem;
 
@@ -43,7 +44,7 @@ void RootPhysics::Init()
 	m_solver = new btSequentialImpulseConstraintSolver();
 	m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 	m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
-
+	
 }
 
 
@@ -80,10 +81,10 @@ void RootPhysics::Update()
 
 		m_dynamicWorld->stepSimulation(1/60.f,10);
 		btTransform trans;
-		m_dynamicObjects.at(1)->getMotionState()->getWorldTransform(trans);
-	
+		m_dynamicObjects.at(0)->getMotionState()->getWorldTransform(trans);
+	//	trans = m_controllableObjects.at(0)->getGhostObject()->getWorldTransform();
 		std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
-	
+		
 	}
 }
 //Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -99,7 +100,7 @@ void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer
 	startTransform.setIdentity();
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-
+	
 	//Create a motionstate
 	btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 
@@ -107,13 +108,12 @@ void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer
 	btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
 	m_dynamicWorld->addRigidBody(objectBody);
 }
-
+//Done
 int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
 {
 	//creates the mesh shape
 	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
 	btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
-
 	//Cull unneccesary vertices to improve performance 
 	btShapeHull* objectHull = new btShapeHull(objectMeshShape);
 	btScalar margin = objectMeshShape->getMargin();
@@ -127,7 +127,6 @@ int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
 	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
-
 	//Set startpos and start rotation and bind them to a motionstate
 	btTransform startTransform;
 	startTransform.setIdentity();
@@ -149,4 +148,58 @@ int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer
 	delete objectHull;
 	//return index of body to caller as a reference 
 	return m_dynamicObjects.size()-1;
+}
+
+void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, float* p_velocity )
+{
+	m_dynamicObjects.at(p_objectIndex)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+}
+
+void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
+{
+	btVector3 fallInertia =  btVector3(0,0,0);
+	m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
+	m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
+}
+
+
+
+void RootPhysics::ControllableObjectJump(int p_objectIndex,  float p_jumpForce )
+{
+
+}
+
+void RootPhysics::SetControllableObjectVelocityXZ( int p_objectIndex, float* p_velocity )
+{
+	float y = m_dynamicObjects.at(p_objectIndex)->getLinearVelocity().y();
+	m_dynamicObjects.at(p_objectIndex)->setLinearVelocity(btVector3(p_velocity[0], y, p_velocity[1]));
+}
+
+int RootPhysics::AddControllableObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass)
+{
+	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
+	btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
+	//Cull unneccesary vertices to improve performance 
+	btShapeHull* objectHull = new btShapeHull(objectMeshShape);
+	btScalar margin = objectMeshShape->getMargin();
+	objectHull->buildHull(margin);
+	btConvexHullShape* simplifiedObject = new btConvexHullShape();
+	for(int i = 0; i < objectHull->numVertices(); i++)
+	{
+		simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+	}
+	simplifiedObject->recalcLocalAabb();
+	
+	//create a kinematic controller
+	btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+	btKinematicCharacterController* controller = new btKinematicCharacterController(ghostObject, simplifiedObject, 0.3f);
+	controller->warp(btVector3(p_position[0], p_position[1], p_position[2]));
+	m_controllableObjects.push_back(controller);
+
+	m_dynamicWorld->addAction(controller);
+	delete indexVertexArray;
+	delete objectMeshShape;
+	delete objectHull;
+	//return the index
+	return m_controllableObjects.size() -1;
 }
