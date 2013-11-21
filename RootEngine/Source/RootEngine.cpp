@@ -52,7 +52,7 @@ namespace RootEngine
 		}
 	}
 	
-	Context* CreateContext(int flags)
+	ContextInterface* CreateContext(int flags)
 	{
 		return new Context(flags);
 	}

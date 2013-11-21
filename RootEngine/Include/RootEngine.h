@@ -22,11 +22,19 @@ namespace RootEngine
 		};
 	}
 
-    class Context
+	class ContextInterface
+	{
+	public:
+		virtual ECS::World* GetWorld() = 0;
+	};
+
+	class Context : public ContextInterface
     {
     public:
         Context(int flags);
 		~Context();
+
+		ECS::World* GetWorld() { return m_world; }
 
 	private:
 
@@ -38,5 +46,8 @@ namespace RootEngine
 
     };
 
-	ROOTENGINE_DLL_EXPORT Context* CreateContext(int flags);
+	extern "C"
+	{
+		ROOTENGINE_DLL_EXPORT ContextInterface* CreateContext(int flags);
+	}
 }

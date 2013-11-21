@@ -21,6 +21,6 @@ namespace DynamicLoader
 
 	const char* GetLastError()
 	{
-
+		return nullptr;
 	}
 }

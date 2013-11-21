@@ -57,7 +57,7 @@ struct GameLogicSystem : public ECS::ComponentSystem
 
 		if(player->m_health <= 0.0f)
 		{
-			Logging::GetInstance()->LogTextToConsole("Player %s is dead", player->m_name.c_str());
+			//Logging::GetInstance()->LogTextToConsole("Player %s is dead", player->m_name.c_str());
 	
 			m_world->GetEntityManager()->RemoveEntity(p_entity);
 		}
@@ -81,5 +81,5 @@ private:
 
 	bool m_running;
 	std::shared_ptr<SDL_Window> m_window;
-	RootEngine::Context m_engineContext;
+	RootEngine::ContextInterface* m_engineContext;
 };
