@@ -1,5 +1,5 @@
 #include <Main.h>
-#include <exception>
+#include <stdexcept>
 
 #include "RootEngine/Include/Logging/Logging.h"
 #include "RootEngine/Render/Include/Renderer.h"
@@ -46,11 +46,13 @@ int main(int argc, char* argv[])
 	catch (std::exception& e) 
 	{
 		// TODO: Log exception message
+		std::cin.get();
 		return 1;
 	} 
 	catch (...) 
 	{
 		// TODO: Log unknown exception message
+		std::cin.get();
 		return 1;
 	}
 	
@@ -62,9 +64,20 @@ Main::Main()
 {
 
 	void* handle = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+	if (handle == nullptr)
+	{
+		std::cerr << "Failed to load engine: " << DynamicLoader::GetLastError() << std::endl;
+		throw std::runtime_error("");
+	}
 
 	typedef RootEngine::ContextInterface* ( *CREATECONTEXT )(int);
 	CREATECONTEXT createContextFunc = (CREATECONTEXT)DynamicLoader::LoadProcess(handle, "CreateContext");
+
+	if (createContextFunc == nullptr)
+	{
+		std::cout << "Failed to load engine function: " << DynamicLoader::GetLastError() << std::endl;
+		throw std::runtime_error("");
+	}
 
 	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK);
 	if(m_engineContext != nullptr)
