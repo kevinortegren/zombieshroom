@@ -2,9 +2,6 @@
 #include <exception>
 
 #include "Logging/Logging.h"
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
 #include <gtest/gtest.h>
 
 
@@ -53,12 +50,6 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile( "C:\\Users\\Kevin\\Downloads\\dae\\Medieval_building.DAE", 
-		aiProcess_CalcTangentSpace       | 
-		aiProcess_Triangulate            |
-		aiProcess_JoinIdenticalVertices  |
-		aiProcess_SortByPType);
 	int a = 0;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
