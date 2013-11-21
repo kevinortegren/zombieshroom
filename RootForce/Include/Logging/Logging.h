@@ -21,17 +21,22 @@ class Logging
 			TOOLS,
 			SOUND,
 			GAME,
-			COMPONENT
+			COMPONENT,
+			ERR
 		};
 
 		static Logging* GetInstance();
-		void LogTextToFileTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
-		void LogTextToFileVerbose(unsigned int p_vLevel, const char* p_format, ...);
+		void LogTextToFile(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
+		void LogTextToFile(unsigned int p_vLevel, const char* p_format, ...);
 		void LogTextToFile(const char* p_format, ...);
 		
-		void LogTextToConsoleTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
-		void LogTextToConsoleVerbose(unsigned int p_vLevel, const char* p_format, ...);
+		void LogTextToConsole(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
+		void LogTextToConsole(unsigned int p_vLevel, const char* p_format, ...);
 		void LogTextToConsole(const char* p_format, ...);
+
+		void LogText(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ...);
+		void LogText(unsigned int p_vLevel, const char* p_format, ...);
+		void LogText(const char* p_format, ...);
 
 		bool OpenLogStream();
 		bool CloseLogStream();

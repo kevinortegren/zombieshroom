@@ -2,7 +2,6 @@
 #include <exception>
 #include <gtest/gtest.h>
 
-
 #undef main
 
 TEST(Test, Foo) 

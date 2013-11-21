@@ -16,6 +16,7 @@ Logging::Logging()
 	m_stringTagList.push_back("SOUND ");
 	m_stringTagList.push_back("GAME  ");
 	m_stringTagList.push_back("CMPSYS");
+	m_stringTagList.push_back("ERROR ");
 
 	OpenLogStream();
 }
@@ -73,17 +74,16 @@ std::string Logging::GetTimeString( int p_time )
 		return std::to_string(p_time);
 }
 
-void Logging::LogTextToFileTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToFile(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
 			WriteToFile(p_tag, p_vLevel, p_format, args);
-	
 	va_end (args);
 }
 
-void Logging::LogTextToFileVerbose( unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToFile( unsigned int p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -101,16 +101,16 @@ void Logging::LogTextToFile( const char * p_format, ... )
 	va_end (args);
 }
 
-void Logging::LogTextToConsoleTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToConsole(LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-			WriteToConsole(p_tag, p_vLevel, p_format, args);
+		WriteToConsole(p_tag, p_vLevel, p_format, args);
 	va_end (args);
 }
 
-void Logging::LogTextToConsoleVerbose( unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToConsole( unsigned int p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -128,11 +128,47 @@ void Logging::LogTextToConsole( const char * p_format, ... )
 	va_end (args);
 }
 
+void Logging::LogText( LOG_TAG p_tag, unsigned int p_vLevel, const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+	{
+		WriteToConsole(p_tag, p_vLevel, p_format, args);
+		WriteToFile(p_tag, p_vLevel, p_format, args);
+	}
+	va_end (args);
+}
+
+void Logging::LogText( unsigned int p_vLevel, const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if(p_vLevel <= m_verboseLevel && CheckTag(NOTAG))
+	{
+		WriteToConsole(NOTAG, p_vLevel, p_format, args);
+		WriteToFile(NOTAG, p_vLevel, p_format, args);
+	}
+	va_end (args);
+}
+
+void Logging::LogText( const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if(m_defaultVerbose <= m_verboseLevel && CheckTag(NOTAG))
+	{
+		WriteToConsole(NOTAG, m_defaultVerbose, p_format, args);
+		WriteToFile(NOTAG, m_defaultVerbose, p_format, args);
+	}
+	va_end (args);
+}
+
 void Logging::SetVerboseLevel( unsigned int p_vLevel )
 {
 	m_verboseLevel = p_vLevel;
-	LogTextToConsoleTagVerbose(NOTAG, 0, "Verbose level set to %d", p_vLevel);
-	LogTextToFileTagVerbose(NOTAG, 0, "Verbose level set to %d", p_vLevel);
+	LogTextToConsole(NOTAG, 0, "Verbose level set to %d", p_vLevel);
+	LogTextToFile(NOTAG, 0, "Verbose level set to %d", p_vLevel);
 }
 
 void Logging::AddExclusiveTags( LOG_TAG p_tag)
@@ -186,6 +222,8 @@ std::string Logging::GetStringFromTag( LOG_TAG p_tag )
 {
 	return m_stringTagList.at(p_tag);
 }
+
+
 
 
 
