@@ -17,7 +17,6 @@ namespace Engine
 			void Render();
 			void Cleanup();
 
-
 		private:
 			GLRenderer();
 			~GLRenderer();

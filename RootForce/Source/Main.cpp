@@ -2,7 +2,7 @@
 #include <exception>
 
 #include "Logging/Logging.h"
-#include "Renderer/Renderer.h"
+//#include "Renderer/Renderer.h"
 #include <gtest/gtest.h>
 
 
@@ -70,7 +70,7 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
+	//Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
 
 	// CreateSystem allocates and stores a system with a string handler.
 	std::shared_ptr<ECS::ComponentSystem> gameLogic = world.GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
