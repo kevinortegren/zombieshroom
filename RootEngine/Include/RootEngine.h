@@ -16,6 +16,6 @@ namespace RootEngine
         Context();
 
 		/** Add interface classes */
-		NetworkManager* m_networkInterface;
+		Network::NetworkManager* m_networkInterface;
     };
 }

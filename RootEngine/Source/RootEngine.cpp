@@ -3,7 +3,7 @@
 
 namespace RootEngine
 {
-	typedef NetworkManager* (*GETNETWORKINTERFACE)();
+	typedef Network::NetworkManager* (*GETNETWORKINTERFACE)();
 
     Context::Context()
     {
@@ -16,7 +16,7 @@ namespace RootEngine
 				GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) GetProcAddress(library, "GetNetworkInterface");
 				if (libGetNetworkInterface != nullptr)
 				{
-					m_networkInterface = (NetworkManager*)libGetNetworkInterface();
+					m_networkInterface = (Network::NetworkManager*)libGetNetworkInterface();
 				}
 				else
 				{
