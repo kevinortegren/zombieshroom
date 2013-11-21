@@ -2,5 +2,9 @@
 
 namespace RootEngine
 {
-    
+    class Context
+    {
+    public:
+        Context();
+    };
 }
