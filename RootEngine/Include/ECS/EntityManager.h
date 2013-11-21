@@ -89,9 +89,9 @@ namespace ECS
 
 		void RemoveAllComponents(Entity* p_entity);
 		
-	private:
-
 		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
+
+	private:
 
 		ComponentSystemManager* m_systemManager;
 		int m_nextID;
