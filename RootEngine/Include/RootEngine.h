@@ -7,15 +7,36 @@
 #endif
 
 #include <RootEngine/Network/Include/NetworkManager.h>
+#include <RootEngine/Include/ECS/World.h>
 
 namespace RootEngine
 {
-    class ROOTENGINE_DLL_EXPORT Context
+	namespace SubsystemInit
+	{
+		enum SubsystemInit
+		{
+			INIT_NETWORK = 1,
+			INIT_INPUT = 2,
+			INIT_RENDER = 4,
+			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER
+		};
+	}
+
+    class Context
     {
     public:
-        Context();
+        Context(int flags);
+		~Context();
 
-		/** Add interface classes */
+	private:
+
+		void LoadNetwork();
+
+		/** Add interface classes */		
 		NetworkManager* m_networkInterface;
+		ECS::World* m_world;
+
     };
+
+	ROOTENGINE_DLL_EXPORT Context* CreateContext(int flags);
 }

@@ -14,7 +14,7 @@ namespace ECS
 			m_componentList = p_entityManager->GetComponentList(Component<T>::GetTypeId());
 		}
 
-		T* Get(std::shared_ptr<Entity> p_entity)
+		T* Get(Entity* p_entity)
 		{
 			return static_cast<T*>(m_componentList[p_entity->GetId()].get());;
 		}

@@ -13,7 +13,7 @@ namespace ECS
 {
 	class World;
 
-	class ComponentSystem
+	class  ComponentSystem
 	{
 	public:
 		friend class ComponentSystemManager;
@@ -32,7 +32,7 @@ namespace ECS
 		// Impl. Interface.
 		virtual void Init() = 0;
 		virtual void Begin() = 0;
-		virtual void ProcessEntity(std::shared_ptr<Entity> p_entity) = 0;
+		virtual void ProcessEntity(Entity* p_entity) = 0;
 		virtual void End() = 0;
 
 	protected:
@@ -40,7 +40,7 @@ namespace ECS
 
 	private:
 		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;
-		std::set<std::shared_ptr<Entity>> m_activeEntities;
+		std::set<Entity*> m_activeEntities;
 		
 	};
 }

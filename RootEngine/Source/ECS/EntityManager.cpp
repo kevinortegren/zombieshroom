@@ -1,7 +1,7 @@
 #include <ECS/EntityManager.h>
 #include <ECS/ComponentSystemManager.h>
 
-std::shared_ptr<ECS::Entity> ECS::EntityManager::CreateEntity()
+ECS::Entity* ECS::EntityManager::CreateEntity()
 {
 	int id = m_nextID;
 	if(m_recyledIds.size() > 0)
@@ -14,16 +14,16 @@ std::shared_ptr<ECS::Entity> ECS::EntityManager::CreateEntity()
 	std::shared_ptr<ECS::Entity> entity = std::shared_ptr<ECS::Entity>(new ECS::Entity(id));
 	m_entities.push_back(entity);
 	m_nextID++;
-	return entity;
+	return entity.get();
 }
 
-void ECS::EntityManager::RemoveEntity(std::shared_ptr<ECS::Entity> p_entity)
+void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
 	m_recyledIds.push(p_entity->m_id);
 	m_entities.erase(m_entities.begin() + p_entity->m_id);
 }
 
-void ECS::EntityManager::RemoveAllComponents(std::shared_ptr<ECS::Entity> p_entity)
+void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
 	for(size_t i = 0; i < m_components.size(); ++i) 
 	{

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RootEngine/Include/ECS/Entity.h"
-#include "RootEngine/Include/ECS/Component.h"
+#include <RootEngine/Include/ECS/Entity.h>
+#include <RootEngine/Include/ECS/Component.h>
 #include <memory>
 #include <vector>
 #include <stack>
@@ -18,11 +18,11 @@ namespace ECS
 		EntityManager(ComponentSystemManager* p_systemManager)
 			: m_nextID(0), m_systemManager(p_systemManager) {}
 
-		std::shared_ptr<Entity> CreateEntity();
-		void RemoveEntity(std::shared_ptr<Entity> p_entity);
+		Entity* CreateEntity();
+		void RemoveEntity(ECS::Entity* p_entity);
 
 		template<class T> 
-		std::shared_ptr<T> CreateComponent(std::shared_ptr<Entity> p_entity)
+		std::shared_ptr<T> CreateComponent(Entity* p_entity)
 		{
 			// Allocate memory for component.
 			std::shared_ptr<T> component = std::shared_ptr<T>(new T);
@@ -55,7 +55,7 @@ namespace ECS
 		}
 
 		template<class T>
-		void AddComponent(std::shared_ptr<T> p_component, std::shared_ptr<Entity> p_entity)
+		void AddComponent(T* p_component, Entity* entity)
 		{
 			assert(p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
 		
@@ -66,7 +66,7 @@ namespace ECS
 		}
 
 		template<class T> 
-		void RemoveComponent(std::shared_ptr<Entity> p_entity)
+		void RemoveComponent(Entity* p_entity)
 		{
 			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
 			{
@@ -87,11 +87,12 @@ namespace ECS
 			}
 		}
 
-		void RemoveAllComponents(std::shared_ptr<Entity> p_entity);
+		void RemoveAllComponents(Entity* p_entity);
 		
+	private:
+
 		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
 
-	private:
 		ComponentSystemManager* m_systemManager;
 		int m_nextID;
 		std::vector<std::shared_ptr<Entity>> m_entities;

@@ -61,7 +61,7 @@ namespace Engine
 
 		void GLRenderer::Render()
 		{
-
+			
 		}
 
 		void GLRenderer::Cleanup()

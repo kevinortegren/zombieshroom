@@ -1,6 +1,6 @@
 #include <ECS/ComponentSystemManager.h>
 
-void ECS::ComponentSystemManager::AddEntityToSystems(std::shared_ptr<ECS::Entity> p_entity)
+void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
@@ -17,7 +17,7 @@ void ECS::ComponentSystemManager::AddEntityToSystems(std::shared_ptr<ECS::Entity
 	}
 }
 
-void ECS::ComponentSystemManager::RemoveEntityFromSystems(std::shared_ptr<ECS::Entity> p_entity)
+void ECS::ComponentSystemManager::RemoveEntityFromSystems(Entity* p_entity)
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{

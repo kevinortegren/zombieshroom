@@ -19,7 +19,7 @@ namespace ECS
 			: m_world(p_world) {}
 
 		template<class T>
-		std::shared_ptr<T> CreateSystem(const std::string& p_systemName)
+		T* CreateSystem(const char* p_systemName)
 		{
 			std::shared_ptr<T> system = std::shared_ptr<T>(new T(m_world));
 
@@ -31,7 +31,7 @@ namespace ECS
 		}
 
 		template<class T>
-		T* GetSystem(const std::string& p_systemName)
+		T* GetSystem(const char* p_systemName)
 		{
 			return static_cast<T*>(m_systems[p_systemName].get());
 		}
@@ -39,8 +39,8 @@ namespace ECS
 		void InitializeSystems();
 
 	private:
-		void AddEntityToSystems(std::shared_ptr<Entity> p_entity);
-		void RemoveEntityFromSystems(std::shared_ptr<Entity> p_entity);
+		void AddEntityToSystems(Entity* p_entity);
+		void RemoveEntityFromSystems(Entity* p_entity);
 
 		World* m_world;
 		std::map<std::string, std::shared_ptr<ComponentSystem>> m_systems;
