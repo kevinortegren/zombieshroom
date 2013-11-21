@@ -20,7 +20,8 @@ void InputManager::HandleInput(SDL_Event& p_event)
 	switch(p_event.type)
 	{
 	case SDL_KEYDOWN:
-		m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN_EDGE;
+		if(!p_event.key.repeat)
+			m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN_EDGE;
 		break;
 	case SDL_KEYUP:
 		m_keyState[p_event.key.keysym.scancode] = KeyState::UP_EDGE;
@@ -32,8 +33,8 @@ void InputManager::HandleInput(SDL_Event& p_event)
 		m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP_EDGE;
 		break;
 	case SDL_MOUSEMOTION:
-		m_deltaMousePos.x = m_globMousePos.x - p_event.motion.x;
-		m_deltaMousePos.y = m_globMousePos.y - p_event.motion.y;
+		m_deltaMousePos.x += m_globMousePos.x - p_event.motion.x;
+		m_deltaMousePos.y += m_globMousePos.y - p_event.motion.y;
 		m_globMousePos.x = p_event.motion.x;
 		m_globMousePos.y = p_event.motion.y;
 		break;
@@ -67,7 +68,9 @@ vector2 InputManager::GetGlobalMousePos()
 
 vector2 InputManager::GetDeltaMousePos()
 {
-	return m_deltaMousePos;
+	vector2 temp = m_deltaMousePos;
+	m_deltaMousePos = vector2(0,0);
+	return temp;
 }
 
 InputInterface* APIENTRY GetInputInterface() { static InputManager s_im; return &s_im; }
