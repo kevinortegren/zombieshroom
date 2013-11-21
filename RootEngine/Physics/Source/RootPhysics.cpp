@@ -41,6 +41,7 @@ void RootPhysics::Init()
 	m_collisionConfig= new btDefaultCollisionConfiguration();
 	m_dispatcher = new btCollisionDispatcher(m_collisionConfig);
 	m_broadphase = new btDbvtBroadphase();
+	m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 	m_solver = new btSequentialImpulseConstraintSolver();
 	m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 	m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
@@ -78,11 +79,11 @@ void RootPhysics::Update()
 {
 	for (int i=0 ; i<300 ; i++) 
 	{
-
+		
 		m_dynamicWorld->stepSimulation(1/60.f,10);
 		btTransform trans;
-		m_dynamicObjects.at(0)->getMotionState()->getWorldTransform(trans);
-	//	trans = m_controllableObjects.at(0)->getGhostObject()->getWorldTransform();
+		//m_dynamicObjects.at(0)->getMotionState()->getWorldTransform(trans);
+		trans = m_controllableObjects.at(0)->getGhostObject()->getWorldTransform();
 		std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
 		
 	}
@@ -143,9 +144,11 @@ int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer
 
 	//add to the dynamic object vector
 	m_dynamicObjects.push_back(objectBody);
+
 	delete indexVertexArray;
 	delete objectMeshShape;
 	delete objectHull;
+
 	//return index of body to caller as a reference 
 	return m_dynamicObjects.size()-1;
 }
@@ -161,7 +164,6 @@ void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
 	m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
 }
-
 
 
 void RootPhysics::ControllableObjectJump(int p_objectIndex,  float p_jumpForce )
@@ -192,11 +194,22 @@ int RootPhysics::AddControllableObjectToWorld(int p_numTriangles, int* p_indexBu
 	
 	//create a kinematic controller
 	btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
-	btKinematicCharacterController* controller = new btKinematicCharacterController(ghostObject, simplifiedObject, 0.3f);
-	controller->warp(btVector3(p_position[0], p_position[1], p_position[2]));
+	btTransform startTransform;
+	startTransform.setIdentity();
+	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
+	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+	ghostObject->setWorldTransform(startTransform);
+	ghostObject->setCollisionShape(simplifiedObject);
+	ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+	btKinematicCharacterController* controller = new btKinematicCharacterController(ghostObject, simplifiedObject, 1);
+	controller->setGravity(-m_dynamicWorld->getGravity().y());
+	
 	m_controllableObjects.push_back(controller);
-
+	//WHY MUST WE MOVE...
+//	controller->setWalkDirection(btVector3(0.0f,0.0f,0.1f));
+	m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
 	m_dynamicWorld->addAction(controller);
+
 	delete indexVertexArray;
 	delete objectMeshShape;
 	delete objectHull;
