@@ -92,6 +92,7 @@ Main::Main()
 
 	// Processing by requesting the system from the system manager.
 	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
+
 }
 
 Main::~Main() 
