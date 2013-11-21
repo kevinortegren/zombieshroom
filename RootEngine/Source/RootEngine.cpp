@@ -11,11 +11,11 @@ namespace RootEngine
 	{
 		std::cout << "Creating Engine Context" << std::endl;
 
+		// Load external dlls.
 		if((flag & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
 		}
-
 		if((flag & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
 		{
 			LoadRender();
@@ -23,16 +23,11 @@ namespace RootEngine
 
 		// TODO: Load the rest of the submodules
 		
-		m_world = new ECS::World;
 	}
 
 	Context::~Context()
 	{
-		if(m_world != nullptr)
-		{
-			delete m_world;
-			m_world = nullptr;
-		}
+
 	}
 
 	void Context::LoadNetwork()
@@ -90,7 +85,8 @@ namespace RootEngine
 	
 	ContextInterface* CreateContext(int flags)
 	{
-		return new Context(flags);
+		static Context context(flags);
+		return &context;
 	}
 
 }

@@ -21,6 +21,17 @@ namespace DynamicLoader
 
 	const char* GetLastError()
 	{
-		return nullptr;
+		char* str = "";
+
+		DWORD error = ::GetLastError();
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+			0,
+			error,
+			0,
+			(LPSTR)&str,
+			0,
+			0);
+
+		return str;
 	}
 }
