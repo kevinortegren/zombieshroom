@@ -13,13 +13,16 @@ namespace RootEngine
 			static GLRenderer* GetInstance();
 
 			void SetupSDLContext(SDL_Window* p_window);
-
 			void Render();
 			void Cleanup();
+
 
 		private:
 			GLRenderer();
 			~GLRenderer();
+
+			bool CheckExtension(const char* p_extension);
+			int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
 			static GLRenderer* s_rendererInstance;
 			SDL_GLContext m_glContext;

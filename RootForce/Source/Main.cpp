@@ -110,6 +110,7 @@ Main::Main()
 	}
 
 	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
+
 	/*
 	// CreateSystem allocates and stores a system with a string handler.
 
