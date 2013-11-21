@@ -2,14 +2,16 @@
 
 #include "NetworkInterface.h"
 #include "Networker.h"
-
-class NetworkManager : public NetworkInterface
+namespace Network
 {
-public:
-	void Initialize(PeerType::PeerType p_peerType);
-	Networker* GetNetworkSystem() { return m_networkSys; }
+	class NetworkManager : public NetworkInterface
+	{
+	public:
+		void Initialize(PeerType::PeerType p_peerType);
+		Networker* GetNetworkSystem() { return m_networkSys; }
 
-private:
-	Networker* m_networkSys;
+	private:
+		Networker* m_networkSys;
 
-};
+	};
+}
