@@ -1,8 +1,10 @@
 #include <Main.h>
 #include <exception>
 
+
 #include "RootEngine/Include/Logging/Logging.h"
 #include "RootEngine/Render/Include/Renderer.h"
+
 #include <gtest/gtest.h>
 
 
@@ -94,8 +96,8 @@ Main::Main()
 	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
-
 	world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
+
 }
 
 Main::~Main() 
@@ -133,8 +135,8 @@ void Main::Start()
 
 void Main::HandleEvents()
 {
-	SDL_Event event;
-	while(SDL_PollEvent(&event))
+    SDL_Event event;
+    while(SDL_PollEvent(&event))
 	{
 		switch(event.type) 
 		{

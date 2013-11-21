@@ -7,6 +7,8 @@ namespace RootEngine
 
     Context::Context()
     {
+		std::cout << "Creating Engine Context" << std::endl;
+
 		// Load the network module
 		// TODO: Perhaps abstract the DLL loading code
 		{

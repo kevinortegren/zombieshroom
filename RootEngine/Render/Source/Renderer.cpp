@@ -1,6 +1,8 @@
+
 #include <GL/glew.h>
 #include "RootEngine/Include/Logging/Logging.h"
 #include "RootEngine/Render/Include/Renderer.h"
+#include <GL/glew.h>
 
 namespace Engine
 {
@@ -44,7 +46,7 @@ namespace Engine
 
 			m_glContext = SDL_GL_CreateContext(p_window);
 			if(!m_glContext) {
-				Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
+				//Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
 			}
 			SDL_GL_SetSwapInterval(0);
 			int width, height;
@@ -54,7 +56,7 @@ namespace Engine
 			glClearColor(0,0,0,1);
 			glClear(GL_COLOR_BUFFER_BIT);
 			SDL_GL_SwapWindow(p_window);
-			Logging::GetInstance()->LogTextToConsole("Successfully opened OpenGL 4.4 context");
+			//Logging::GetInstance()->LogTextToConsole("Successfully opened OpenGL 4.4 context");
 		}
 
 		void GLRenderer::Render()
