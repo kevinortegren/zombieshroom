@@ -81,11 +81,6 @@ Main::~Main()
 
 void Main::Start() 
 {
-	//Open the log file stream for this instance(Do this once at the beginning of the program)
-	Logging::GetInstance()->OpenLogStream();
-
-	
-
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
