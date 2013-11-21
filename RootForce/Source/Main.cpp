@@ -59,7 +59,7 @@ Main::Main()
 	typedef RootEngine::ContextInterface* ( *CREATECONTEXT )(int);
 	CREATECONTEXT createContextFunc = (CREATECONTEXT)DynamicLoader::LoadProcess(handle, "CreateContext");
 
-	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK);
+	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
 	if(m_engineContext != nullptr)
 	{
 
@@ -67,9 +67,8 @@ Main::Main()
 	}
 	else
 	{
-		std::cout << "Couldnt call create context." << std::endl;
+		std::cout << "Couldn't call create context." << std::endl;
 	}
-
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -90,8 +89,10 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	/*Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
 
+
+	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
+	/*
 	// CreateSystem allocates and stores a system with a string handler.
 	std::shared_ptr<ECS::ComponentSystem> gameLogic = m_engineContext.m_world->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
 
@@ -153,8 +154,8 @@ void Main::Start()
 
 void Main::HandleEvents()
 {
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
+	SDL_Event event;
+	while(SDL_PollEvent(&event))
 	{
 		switch(event.type) 
 		{

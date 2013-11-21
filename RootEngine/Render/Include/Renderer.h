@@ -1,13 +1,13 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "RenderInterface.h"
 
-namespace Engine
+namespace RootEngine
 {
 	namespace Renderer
 	{
 
-		class GLRenderer 
+		class GLRenderer : public RendererInterface
 		{
 		public:
 			static GLRenderer* GetInstance();
@@ -24,5 +24,10 @@ namespace Engine
 			static GLRenderer* s_rendererInstance;
 			SDL_GLContext m_glContext;
 		};
+
+		extern "C"
+		{
+			RENDERSYS_DLL_EXPORT RendererInterface* CreateRenderer();
+		}
 	}
 }

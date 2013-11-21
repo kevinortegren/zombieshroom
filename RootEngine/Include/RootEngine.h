@@ -7,6 +7,7 @@
 #endif
 
 #include <RootEngine/Network/Include/NetworkManager.h>
+#include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Include/ECS/World.h>
 
 namespace RootEngine
@@ -26,25 +27,29 @@ namespace RootEngine
 	{
 	public:
 		virtual ECS::World* GetWorld() = 0;
+		virtual Renderer::RendererInterface* GetRenderer() = 0;
 	};
 
 	class Context : public ContextInterface
-    {
-    public:
-        Context(int flags);
+	{
+	public:
+		Context(int flags);
 		~Context();
 
 		ECS::World* GetWorld() { return m_world; }
+		Renderer::RendererInterface* GetRenderer();
 
 	private:
 
 		void LoadNetwork();
+		void LoadRender();
 
 		/** Add interface classes */		
 		NetworkManager* m_networkInterface;
+		Renderer::RendererInterface* m_renderer;
 		ECS::World* m_world;
 
-    };
+	};
 
 	extern "C"
 	{

@@ -4,7 +4,7 @@
 #include "RootEngine/Render/Include/Renderer.h"
 #include <GL/glew.h>
 
-namespace Engine
+namespace RootEngine
 {
 	namespace Renderer
 	{
@@ -67,6 +67,11 @@ namespace Engine
 		void GLRenderer::Cleanup()
 		{
 			SDL_GL_DeleteContext(m_glContext);
+		}
+
+		RendererInterface* CreateRenderer()
+		{
+			return GLRenderer::GetInstance();
 		}
 	}
 }
