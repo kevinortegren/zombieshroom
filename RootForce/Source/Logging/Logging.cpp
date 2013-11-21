@@ -110,7 +110,6 @@ void Logging::LogTextToConsoleTagVerbose(LOG_TAG p_tag, unsigned int p_vLevel, c
 	va_end (args);
 }
 
-
 void Logging::LogTextToConsoleVerbose( unsigned int p_vLevel, const char* p_format, ... )
 {
 	va_list args;

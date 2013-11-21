@@ -91,7 +91,9 @@ Main::Main()
 	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
+
 	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
+
 
 }
 
@@ -102,6 +104,7 @@ Main::~Main()
 
 void Main::Start() 
 {
+
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
