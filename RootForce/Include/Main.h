@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 #include <ECS/World.h>
+#include "Logging/Logging.h"
 
 struct Transform : public ECS::Component<Transform>
 {
@@ -55,8 +56,8 @@ struct GameLogicSystem : public ECS::ComponentSystem
 
 		if(player->m_health <= 0.0f)
 		{
-			std::cout << "Player " << player->m_health << " is dead." << std::endl;
-
+			Logging::GetInstance()->LogTextToConsole("Player %s is dead", player->m_name.c_str());
+	
 			m_world->GetEntityManager()->RemoveEntity(p_entity);
 		}
 	}

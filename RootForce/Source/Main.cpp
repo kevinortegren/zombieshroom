@@ -1,14 +1,35 @@
 #include <Main.h>
 #include <exception>
 
+
+#include <gtest/gtest.h>
+
+
 #undef main
+
+TEST(Test, Foo) 
+{
+	int a = 0;
+	EXPECT_TRUE(a == 0);
+}
 
 int main(int argc, char* argv[]) 
 {
 	try 
 	{
-		Main m;
-		m.Start();
+		if (argc > 1 && strcmp(argv[1], "-test") == 0)
+		{
+			testing::InitGoogleTest(&argc, argv);
+
+			int result = RUN_ALL_TESTS();
+			std::cin.get();
+			return result;
+		}
+		else
+		{
+			Main m;
+			m.Start();
+		}
 	} 
 	catch (std::exception& e) 
 	{
@@ -29,6 +50,7 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
+	int a = 0;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -83,6 +105,9 @@ Main::~Main()
 
 void Main::Start() 
 {
+
+	//Open the log file stream for this instance(Do this once at the beginning of the program)
+	Logging::GetInstance()->OpenLogStream();
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

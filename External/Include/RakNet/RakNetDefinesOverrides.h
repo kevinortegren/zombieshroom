@@ -1,0 +1,4 @@
+// USER EDITABLE FILE
+
+#define _RAKNET_THREADSAFE 
+
