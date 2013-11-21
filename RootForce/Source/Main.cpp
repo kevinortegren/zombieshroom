@@ -1,7 +1,5 @@
 #include <Main.h>
 #include <exception>
-
-#include "Logging/Logging.h"
 #include <gtest/gtest.h>
 
 
@@ -50,8 +48,6 @@ int main(int argc, char* argv[])
 Main::Main() 
 	: m_running(true) 
 {
-	int a = 0;
-
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -72,6 +68,30 @@ Main::Main()
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
+	// CreateSystem allocates and stores a system with a string handler.
+	std::shared_ptr<ECS::ComponentSystem> gameLogic = world.GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
+
+	// CreateEntity allocates and stores a entity.
+	std::shared_ptr<ECS::Entity> rolf = world.GetEntityManager()->CreateEntity();
+
+	// CreateComponent allocates and stores a specified component belonging to a entity.
+	std::shared_ptr<Player> playerData = world.GetEntityManager()->CreateComponent<Player>(rolf);
+	playerData->m_health = 10.0f;
+	playerData->m_name = "Rolf";
+
+	std::shared_ptr<Transform> transformData = world.GetEntityManager()->CreateComponent<Transform>(rolf);
+	transformData->m_x = 0.0f;
+	transformData->m_y = -5.0f;
+
+	// Initialize system sets up all the system for processing.
+	world.GetSystemManager()->InitializeSystems();
+
+	// Process will execute the logic flow.
+	gameLogic->Process();
+
+	// Processing by requesting the system from the system manager.
+	//world.GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();
 }
 
 Main::~Main() 
@@ -98,10 +118,10 @@ void Main::Start()
 void Main::HandleEvents()
 {
     SDL_Event event;
-    while(SDL_PollEvent(&event)){
-   
-	switch(event.type) {
-   
+    while(SDL_PollEvent(&event))
+	{
+		switch(event.type) 
+		{
 		case SDL_QUIT:
 			m_running = false;
 			break;
