@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/RootEngine.h>
 
-#include "RootEngine/Include/ECS/World.h"
+#include <ECS/World.h>
 #include "RootEngine/Include/Logging/Logging.h"
 
 struct Transform : public ECS::Component<Transform>
@@ -33,12 +33,7 @@ struct GameLogicSystem : public ECS::ComponentSystem
 	ECS::ComponentMapper<Player> m_players;
 	ECS::ComponentMapper<Transform> m_transforms;
 
-	void Init()
-	{
-		// Init will fill the map with entity data.
-		m_players.Init(m_world->GetEntityManager());
-		m_transforms.Init(m_world->GetEntityManager());
-	}
+	void Init();
 
 	void Begin()
 	{
@@ -47,7 +42,7 @@ struct GameLogicSystem : public ECS::ComponentSystem
 
 	void ProcessEntity(ECS::Entity* p_entity)
 	{
-		Player* player = m_players.Get(p_entity);
+		/*Player* player = m_players.Get(p_entity);
 		Transform* transform = m_transforms.Get(p_entity);
 
 		if( transform->m_y < 0)
@@ -59,8 +54,8 @@ struct GameLogicSystem : public ECS::ComponentSystem
 		{
 			//Logging::GetInstance()->LogTextToConsole("Player %s is dead", player->m_name.c_str());
 	
-			m_world->GetEntityManager()->RemoveEntity(p_entity);
-		}
+			//m_world->GetEntityManager()->RemoveEntity(p_entity);
+		}*/
 	}
 
 	void End()

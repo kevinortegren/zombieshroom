@@ -8,14 +8,21 @@
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 
-#include <RootEngine/Include/RootEngine.h>
-
 #undef main
 
 TEST(Test, Foo) 
 {
 	int a = 0;
 	EXPECT_TRUE(a == 0);
+}
+
+void GameLogicSystem::Init()
+{
+	// Init will fill the map with entity data.
+	//m_players.Init(m_world->GetEntityManager());
+	//m_transforms.Init(m_world->GetEntityManager());
+
+	m_world->GetEntityManager()->GetComponentList(0);
 }
 
 int main(int argc, char* argv[]) 
@@ -90,32 +97,33 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	/*Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
+	
+	//ECS::ComponentSystem* gameLogic = m_engineContext->GetWorld()->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
+
+	//Engine::Renderer::GLRenderer::GetInstance()->SetupSDLContext(m_window.get());
 
 	// CreateSystem allocates and stores a system with a string handler.
-	std::shared_ptr<ECS::ComponentSystem> gameLogic = m_engineContext.m_world->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");
 
 	// CreateEntity allocates and stores a entity.
-	std::shared_ptr<ECS::Entity> rolf = m_engineContext.m_world->GetEntityManager()->CreateEntity();
+	/*ECS::Entity* rolf = m_engineContext->GetWorld()->GetEntityManager()->CreateEntity();
 
 	// CreateComponent allocates and stores a specified component belonging to a entity.
-	std::shared_ptr<Player> playerData = m_engineContext.m_world->GetEntityManager()->CreateComponent<Player>(rolf);
+	Player* playerData = m_engineContext->GetWorld()->GetEntityManager()->CreateComponent<Player>(rolf);
 	playerData->m_health = 10.0f;
 	playerData->m_name = "Rolf";
 
-	std::shared_ptr<Transform> transformData = m_engineContext.m_world->GetEntityManager()->CreateComponent<Transform>(rolf);
+	Transform* transformData = m_engineContext->GetWorld()->GetEntityManager()->CreateComponent<Transform>(rolf);
 	transformData->m_x = 0.0f;
 	transformData->m_y = -5.0f;
 
 	// Initialize system sets up all the system for processing.
-	m_engineContext.m_world->GetSystemManager()->InitializeSystems();
+	m_engineContext->GetWorld()->GetSystemManager()->InitializeSystems();
 
 	// Process will execute the logic flow.
 	gameLogic->Process();
 
 	// Processing by requesting the system from the system manager.
-	m_engineContext.m_world->GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();*/
-
+	m_engineContext->GetWorld()->GetSystemManager()->GetSystem<GameLogicSystem>("GameLogic")->Process();*/
 }
 
 Main::~Main() 

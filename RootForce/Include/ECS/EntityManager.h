@@ -1,7 +1,7 @@
 #pragma once
 
-#include <RootEngine/Include/ECS/Entity.h>
-#include <RootEngine/Include/ECS/Component.h>
+#include <ECS/Entity.h>
+#include <ECS/Component.h>
 #include <memory>
 #include <vector>
 #include <stack>
@@ -22,13 +22,11 @@ namespace ECS
 		void RemoveEntity(ECS::Entity* p_entity);
 
 		template<class T> 
-		std::shared_ptr<T> CreateComponent(Entity* p_entity)
+		T* CreateComponent(Entity* p_entity)
 		{
 			// Allocate memory for component.
 			std::shared_ptr<T> component = std::shared_ptr<T>(new T);
 			
-			std::cout << Component<T>::GetTypeId() << std::endl;
-
 			/* Component TypeId is enumerated 0,1,2.. etc.
 			So we resize the component type vector to match the ids.
 			*/
@@ -51,7 +49,7 @@ namespace ECS
 
 			m_systemManager->AddEntityToSystems(p_entity);
 
-			return component;
+			return component.get();
 		}
 
 		template<class T>

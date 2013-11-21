@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RootEngine/Include/ECS/EntityManager.h"
+#include <ECS/EntityManager.h>
 #include <vector>
 
 namespace ECS

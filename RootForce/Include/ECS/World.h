@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RootEngine/Include/ECS/EntityManager.h"
-#include "RootEngine/Include/ECS/ComponentSystemManager.h"
+#include <ECS/EntityManager.h>
+#include <ECS/ComponentSystemManager.h>
 
 namespace ECS
 {
@@ -14,8 +14,8 @@ namespace ECS
 			m_entityManager(&m_systemManager)
 		{}
 
-		EntityManager* GetEntityManager() { return &m_entityManager; }
-		ComponentSystemManager* GetSystemManager() { return &m_systemManager; }
+		EntityManager* GetEntityManager();
+		ComponentSystemManager* GetSystemManager();
 
 	private:
 		ComponentSystemManager m_systemManager;

@@ -7,7 +7,6 @@
 #endif
 
 #include <RootEngine/Network/Include/NetworkManager.h>
-#include <RootEngine/Include/ECS/World.h>
 
 namespace RootEngine
 {
@@ -22,27 +21,18 @@ namespace RootEngine
 		};
 	}
 
-	class ContextInterface
-	{
-	public:
-		virtual ECS::World* GetWorld() = 0;
-	};
+	class ContextInterface {};
 
 	class Context : public ContextInterface
     {
     public:
         Context(int flags);
-		~Context();
-
-		ECS::World* GetWorld();
 
 	private:
 		void LoadNetwork();
 
 		/** Add interface classes */		
 		NetworkManager* m_networkInterface;
-		ECS::World* m_world;
-
     };
 
 	extern "C"

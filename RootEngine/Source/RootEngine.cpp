@@ -1,8 +1,6 @@
 #include <RootEngine.h>
 #include <iostream>
 
-#include <glm/glm.hpp>
-
 namespace RootEngine
 {
 	typedef NetworkManager* (*GETNETWORKINTERFACE)();
@@ -16,20 +14,7 @@ namespace RootEngine
 		{
 			LoadNetwork();
 		}
-
-		// Load engine modules.
-		m_world = new ECS::World;
     }
-
-	Context::~Context()
-	{
-		delete m_world;
-	}
-
-	ECS::World* Context::GetWorld()
-	{ 
-		return m_world; 
-	}
 
 	void Context::LoadNetwork()
 	{

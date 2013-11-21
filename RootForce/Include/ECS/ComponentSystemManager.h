@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RootEngine/Include/ECS/ComponentSystem.h"
+#include <ECS/ComponentSystem.h>
 #include <map>
 #include <string>
 #include <memory>
@@ -27,7 +27,7 @@ namespace ECS
 			
 			m_systems[p_systemName] = system;
 
-			return system;
+			return system.get();
 		}
 
 		template<class T>
