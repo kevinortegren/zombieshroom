@@ -108,6 +108,8 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
+	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
+
 }
 
 Main::~Main() 
@@ -140,6 +142,7 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		HandleEvents();
+		m_engineContext->GetRenderer()->Render();
 	}
 }
 

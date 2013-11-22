@@ -43,7 +43,7 @@ namespace RootEngine
 		void LoadRender();
 
 		/** Add interface classes */		
-		NetworkManager* m_networkInterface;
+		Network::NetworkManager* m_networkInterface;
 		Renderer::RendererInterface* m_renderer;
 	};
 

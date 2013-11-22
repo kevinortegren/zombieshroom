@@ -1,5 +1,5 @@
 #include "Importers/MeshImporter.h"
-#include "Logging/Logging.h"
+#include <RootEngine/Include/Logging/Logging.h>
 
 
 MeshImporter::MeshImporter()
@@ -17,15 +17,15 @@ void MeshImporter::LoadMesh( const std::string p_fileName )
 	Assimp::Importer importer;
 
 	const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
-	Logging::GetInstance()->LogText(Logging::DEBUG, 2,		"Starting to load mesh    '%s'", p_fileName.c_str());
+	//Logging::GetInstance()->LogText(Logging::DEBUG, 2,		"Starting to load mesh    '%s'", p_fileName.c_str());
 	if (aiscene) 
 	{
 		InitFromScene(aiscene, p_fileName);
-		Logging::GetInstance()->LogText(Logging::DEBUG, 2,	"Successfully loaded mesh '%s'", p_fileName.c_str());
+		//Logging::GetInstance()->LogText(Logging::DEBUG, 2,	"Successfully loaded mesh '%s'", p_fileName.c_str());
 	}
 	else 
 	{
-		Logging::GetInstance()->LogText(Logging::ERR, 1, "Error parsing '%s': '%s'", p_fileName.c_str(), importer.GetErrorString());
+		//Logging::GetInstance()->LogText(Logging::ERR, 1, "Error parsing '%s': '%s'", p_fileName.c_str(), importer.GetErrorString());
 	}
 }
 
@@ -68,7 +68,9 @@ void MeshImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh )
 	{
 		const aiFace& Face = p_aiMesh->mFaces[i];
 		if(Face.mNumIndices != 3)
-			Logging::GetInstance()->LogText(Logging::ERR, 1, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+		{
+			//Logging::GetInstance()->LogText(Logging::ERR, 1, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+		}
 		Indices.push_back(Face.mIndices[0]);
 		Indices.push_back(Face.mIndices[1]);
 		Indices.push_back(Face.mIndices[2]);

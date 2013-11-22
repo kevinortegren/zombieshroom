@@ -36,9 +36,9 @@ GLint Shader::LoadFromFile( GLenum p_shaderType, const char* p_filename )
 	}
 
 	// Get the size of the file
-    shaderFile.seekg(0,std::ios::end);
+    shaderFile.seekg(0, std::ios::end);
     std::streampos length = shaderFile.tellg();
-    shaderFile.seekg(0,std::ios::beg);
+    shaderFile.seekg(0, std::ios::beg);
 
 	// Use a vector as the buffer.
     std::vector< char > buffer( (unsigned int)length );
