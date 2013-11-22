@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Bullet/BulletCollision/CollisionShapes/btShapeHull.h"
-#include "Bullet/BulletCollision/CollisionDispatch/btGhostObject.h"
+
 
 using namespace PhysicsSubSystem;
 
@@ -77,13 +77,14 @@ void RootPhysics::supertestfunc()
 //Make a real update
 void RootPhysics::Update()
 {
-	for (int i=0 ; i<300 ; i++) 
+//	for (int i=0 ; i<300 ; i++) 
 	{
 		
 		m_dynamicWorld->stepSimulation(1/60.f,10);
 		btTransform trans;
 		//m_dynamicObjects.at(0)->getMotionState()->getWorldTransform(trans);
-		trans = m_controllableObjects.at(0)->getGhostObject()->getWorldTransform();
+
+
 		std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
 		
 	}
@@ -104,7 +105,6 @@ void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer
 	
 	//Create a motionstate
 	btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-
 	//create the body
 	btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
 	m_dynamicWorld->addRigidBody(objectBody);
@@ -163,56 +163,5 @@ void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	btVector3 fallInertia =  btVector3(0,0,0);
 	m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
 	m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
-}
-
-
-void RootPhysics::ControllableObjectJump(int p_objectIndex,  float p_jumpForce )
-{
-
-}
-
-void RootPhysics::SetControllableObjectVelocityXZ( int p_objectIndex, float* p_velocity )
-{
-	float y = m_dynamicObjects.at(p_objectIndex)->getLinearVelocity().y();
-	m_dynamicObjects.at(p_objectIndex)->setLinearVelocity(btVector3(p_velocity[0], y, p_velocity[1]));
-}
-
-int RootPhysics::AddControllableObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass)
-{
-	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
-	btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
-	//Cull unneccesary vertices to improve performance 
-	btShapeHull* objectHull = new btShapeHull(objectMeshShape);
-	btScalar margin = objectMeshShape->getMargin();
-	objectHull->buildHull(margin);
-	btConvexHullShape* simplifiedObject = new btConvexHullShape();
-	for(int i = 0; i < objectHull->numVertices(); i++)
-	{
-		simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
-	}
-	simplifiedObject->recalcLocalAabb();
 	
-	//create a kinematic controller
-	btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
-	btTransform startTransform;
-	startTransform.setIdentity();
-	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-	ghostObject->setWorldTransform(startTransform);
-	ghostObject->setCollisionShape(simplifiedObject);
-	ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
-	btKinematicCharacterController* controller = new btKinematicCharacterController(ghostObject, simplifiedObject, 1);
-	controller->setGravity(-m_dynamicWorld->getGravity().y());
-	
-	m_controllableObjects.push_back(controller);
-	//WHY MUST WE MOVE...
-//	controller->setWalkDirection(btVector3(0.0f,0.0f,0.1f));
-	m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
-	m_dynamicWorld->addAction(controller);
-
-	delete indexVertexArray;
-	delete objectMeshShape;
-	delete objectHull;
-	//return the index
-	return m_controllableObjects.size() -1;
 }

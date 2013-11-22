@@ -1367,22 +1367,24 @@ int main()
 {
 	PhysicsSubSystem::RootPhysics* m_physics = new PhysicsSubSystem::RootPhysics();
 	m_physics->Init();
-	float planeNormal[3] = {0, 1, 0};
+	float planeNormal[3] = {0, 2, 0};
 	float planePos[3] = {0, 0 , 0};
 	m_physics->CreatePlane(planeNormal,planePos);
 	m_physics->supertestfunc();
 	float pos[3] = {0,15,0};
 	float rot[3] = {0,0,0};
 	float posdyn[3] = {0,10,0};
-	float posdyn2[3] = {0,9.8f,0};
+	float posdyn2[3] = {0,11,0};
 	float rotdyn[3] = {0,0,0};
-	float SPEED[3] = {0,10,0};
+	float SPEED[3] = {0,0,10};
 	//m_physics->AddStaticObjectToWorld(NUM_TRIANGLES, &gIndices[0][0], 3*sizeof(int), NUM_VERTICES, &gVertices[0], sizeof(float)*3, pos,rot);
-	//m_physics->AddDynamicObjectToWorld(NUM_TRIANGLES, &gIndices[0][0], 3*sizeof(int), NUM_VERTICES, &gVertices[0], sizeof(float)*3, posdyn, rotdyn, 1.0f);
-	m_physics->AddControllableObjectToWorld(NUM_TRIANGLES, &gIndices[0][0], 3*sizeof(int), NUM_VERTICES, &gVertices[0], sizeof(float)*3, posdyn, rotdyn, 1.0f);
+	m_physics->AddDynamicObjectToWorld(NUM_TRIANGLES, &gIndices[0][0], 3*sizeof(int), NUM_VERTICES, &gVertices[0], sizeof(float)*3, posdyn, rotdyn, 1.0f);
 	int kanin = m_physics->AddDynamicObjectToWorld(NUM_TRIANGLES, &gIndices[0][0], 3*sizeof(int), NUM_VERTICES, &gVertices[0], sizeof(float)*3, posdyn2, rotdyn, 50.0f);
 	m_physics->SetDynamicObjectVelocity(kanin, SPEED);
-	m_physics->Update();
+	for( int i = 0; i < 300; i++)
+	{
+		m_physics->Update();
+	}
 	delete m_physics;
 	system("pause");
 	return -1;

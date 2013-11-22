@@ -29,7 +29,7 @@ subject to the following restrictions:
 static btVector3
 getNormalizedVector(const btVector3& v)
 {
-	btVector3 n = v.normalized();
+		btVector3 n = v.normalized();
 	if (n.length() < SIMD_EPSILON) {
 		n.setValue(0, 0, 0);
 	}
