@@ -8,8 +8,49 @@
 
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
-void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) {
-	printf("Message : %s\n", message);
+void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
+{
+	std::cout << "---------------------opengl-callback-start------------" << std::endl;
+	std::cout << "message: "<< message << std::endl;
+	std::cout << "type: ";
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:
+		std::cout << "ERROR";
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		std::cout << "DEPRECATED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		std::cout << "UNDEFINED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		std::cout << "PORTABILITY";
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		std::cout << "PERFORMANCE";
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		std::cout << "OTHER";
+		break;
+	}
+	std::cout << std::endl;
+
+	std::cout << "id: " << id << std::endl;
+	std::cout << "severity: ";
+	switch (severity)
+	{
+	case GL_DEBUG_SEVERITY_LOW:
+		std::cout << "LOW";
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		std::cout << "MEDIUM";
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		std::cout << "HIGH";
+		break;
+	}
+	std::cout << std::endl;
+	std::cout << "---------------------opengl-callback-end--------------" << std::endl;
 }
 #endif
 
@@ -78,17 +119,30 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		glFrontFace(GL_CW);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
-		glDebugMessageCallback(PrintOpenGLError, NULL);
+		if(glDebugMessageCallback){
+			std::cout << "Register OpenGL debug callback " << std::endl;
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(PrintOpenGLError, nullptr);
+			GLuint unusedIds = 0;
+			glDebugMessageControl(GL_DONT_CARE,
+				GL_DONT_CARE,
+				GL_DONT_CARE,
+				0,
+				&unusedIds,
+				true);
+		}
+		else
+			std::cout << "glDebugMessageCallback not available" << std::endl;
 #endif
 
 		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
 
 		float data[] = {
 			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
-			-0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
+			-0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f, 
 			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f
 		};
 
@@ -102,7 +156,7 @@ namespace Render
 
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
-		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
+		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
 		if(m_effect.Compile() != GL_TRUE)
 			std::cout << "Couldn't compile shader." << std::endl;
 		m_effect.Apply();
@@ -123,7 +177,7 @@ namespace Render
 	{
 		m_buffer.BindVertexArray();
 
-		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
+		glDrawArrays( GL_TRIANGLES, -1, 3 * 6);
 
 		m_buffer.UnbindVertexArray();
 
