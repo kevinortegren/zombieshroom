@@ -11,7 +11,6 @@
 
 #include <ECS/Tests/TestSystem.h>
 
-
 #include <exception>
 #include <gtest/gtest.h>
 
@@ -139,6 +138,9 @@ void Main::Start()
 		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
+
+		m_engineContext->GetRenderer()->
+
 		HandleEvents();
 	}
 }

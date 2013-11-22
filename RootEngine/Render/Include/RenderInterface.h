@@ -8,18 +8,14 @@
 #define RENDERSYS_DLL_EXPORT __declspec(dllimport)
 #endif
 
-namespace RootEngine
+namespace Render
 {
-	namespace Renderer
+	class RendererInterface abstract
 	{
-		class RendererInterface abstract
-		{
-		public:
-			virtual void SetupSDLContext(SDL_Window* p_window) = 0;
-			virtual void Render() = 0;
-			virtual void Cleanup() = 0;
-		};
-
-	}
-
+	public:
+		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
+		virtual void Render() = 0;
+		virtual void Cleanup() = 0;
+	};
 }
+

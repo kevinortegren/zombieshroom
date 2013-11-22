@@ -4,8 +4,8 @@
 
 namespace RootEngine
 {
-	typedef NetworkManager* (*GETNETWORKINTERFACE)();
-	typedef Renderer::RendererInterface* (*CREATERENDERER)();
+	typedef Network::NetworkManager* (*GETNETWORKINTERFACE)();
+	typedef Render::RendererInterface* (*CREATERENDERER)();
 
 	Context::Context(int flag)
 	{
@@ -41,7 +41,7 @@ namespace RootEngine
 			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) GetProcAddress(library, "GetNetworkInterface");
 			if (libGetNetworkInterface != nullptr)
 			{
-				m_networkInterface = (NetworkManager*)libGetNetworkInterface();
+				m_networkInterface = (Network::NetworkManager*)libGetNetworkInterface();
 			}
 			else
 			{
@@ -65,7 +65,7 @@ namespace RootEngine
 			CREATERENDERER libGetRenderer = (CREATERENDERER) GetProcAddress(library, "CreateRenderer");
 			if (libGetRenderer != nullptr)
 			{
-				m_renderer = (Renderer::RendererInterface*)libGetRenderer();
+				m_renderer = (Render::RendererInterface*)libGetRenderer();
 			}
 			else
 			{
@@ -78,7 +78,7 @@ namespace RootEngine
 		}
 	}
 
-	Renderer::RendererInterface* Context::GetRenderer()
+	Render::RendererInterface* Context::GetRenderer()
 	{
 		return m_renderer;
 	}

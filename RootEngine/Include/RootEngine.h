@@ -27,7 +27,7 @@ namespace RootEngine
 	class ContextInterface
 	{
 	public:
-		virtual Renderer::RendererInterface* GetRenderer() = 0;
+		virtual Render::RendererInterface* GetRenderer() = 0;
 	};
 
 
@@ -36,15 +36,15 @@ namespace RootEngine
 	public:
 		Context(int flags);
 		~Context();
-		Renderer::RendererInterface* GetRenderer();
+		Render::RendererInterface* GetRenderer();
 
 	private:
 		void LoadNetwork();
 		void LoadRender();
 
 		/** Add interface classes */		
-		NetworkManager* m_networkInterface;
-		Renderer::RendererInterface* m_renderer;
+		Network::NetworkManager* m_networkInterface;
+		Render::RendererInterface* m_renderer;
 	};
 
 	extern "C"

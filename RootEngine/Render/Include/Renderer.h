@@ -2,35 +2,38 @@
 
 #include "RenderInterface.h"
 
-namespace RootEngine
+#include <GraphicsBuffer.h>
+#include <Effect.h>
+
+namespace Render
 {
-	namespace Renderer
+	class GLRenderer : public RendererInterface
 	{
+	public:
+		static GLRenderer* GetInstance();
 
-		class GLRenderer : public RendererInterface
-		{
-		public:
-			static GLRenderer* GetInstance();
-
-			void SetupSDLContext(SDL_Window* p_window);
-			void Render();
-			void Cleanup();
+		void SetupSDLContext(SDL_Window* p_window);
+		void Render();
+		void Cleanup();
 
 
-		private:
-			GLRenderer();
-			~GLRenderer();
+	private:
+		GLRenderer();
+		~GLRenderer();
 
-			bool CheckExtension(const char* p_extension);
-			int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
+		bool CheckExtension(const char* p_extension);
+		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
-			static GLRenderer* s_rendererInstance;
-			SDL_GLContext m_glContext;
-		};
+		static GLRenderer* s_rendererInstance;
+		SDL_GLContext m_glContext;
+		SDL_Window* m_window;
 
-		extern "C"
-		{
-			RENDERSYS_DLL_EXPORT RendererInterface* CreateRenderer();
-		}
+		Render::Effect m_effect;
+		Render::GraphicsBuffer m_buffer;
+	};
+
+	extern "C"
+	{
+		RENDERSYS_DLL_EXPORT RendererInterface* CreateRenderer();
 	}
 }
