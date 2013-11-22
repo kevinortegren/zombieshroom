@@ -66,7 +66,7 @@ namespace Render
 		glewExperimental = GL_TRUE; 
 		GLenum err = glewInit();
 		if (err != GLEW_OK) {
-			printf("Error init glew.\n");
+			printf("Failed to initialize glew!\n");
 			return;
 		}
 
@@ -104,7 +104,7 @@ namespace Render
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		if(m_effect.Compile() != GL_TRUE)
-			std::cout << "Couldnt compile shader." << std::endl;
+			std::cout << "Couldn't compile shader." << std::endl;
 		m_effect.Apply();
 	
 		m_effect.SetUniformMatrix( "normalMatrix", glm::mat3(1) );
