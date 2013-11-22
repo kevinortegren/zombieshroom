@@ -48,7 +48,6 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 	};
 
-
 	extern "C"
 	{
 		ROOTENGINE_DLL_EXPORT ContextInterface* CreateContext(int flags);

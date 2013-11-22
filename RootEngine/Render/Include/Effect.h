@@ -13,6 +13,7 @@ namespace Render
 		~Effect( );
 
 		void CreateEffect();
+
 		GLint AttachShader( GLenum p_shaderType, const char* p_filename );
 
 		GLint Compile( );

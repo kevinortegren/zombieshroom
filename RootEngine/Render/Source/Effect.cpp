@@ -5,10 +5,12 @@
 
 #include <cstdio>
 
+
 namespace Render
 {
 	Effect::Effect(void)
 	{
+
 	}
 
 	Effect::~Effect(void)
