@@ -84,7 +84,7 @@ namespace Render
 		glDebugMessageCallback(PrintOpenGLError, NULL);
 #endif
 
-		printf("Available video memory: %i KB", GetAvailableVideoMemory());
+		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
 
 		float data[] = {
 			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
