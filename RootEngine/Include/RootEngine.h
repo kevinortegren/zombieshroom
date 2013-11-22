@@ -34,18 +34,20 @@ namespace RootEngine
 	class Context : public ContextInterface
 	{
 	public:
+
 		Context(int flags);
 		~Context();
+
 		Render::RendererInterface* GetRenderer();
 
 	private:
 		void LoadNetwork();
 		void LoadRender();
 
-		/** Add interface classes */		
 		Network::NetworkManager* m_networkInterface;
 		Render::RendererInterface* m_renderer;
 	};
+
 
 	extern "C"
 	{

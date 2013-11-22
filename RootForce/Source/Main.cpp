@@ -100,12 +100,14 @@ Main::Main()
 			SDL_WINDOWPOS_UNDEFINED,
 			1280,
 			720,
-			SDL_WINDOW_OPENGL),
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 		SDL_DestroyWindow);
 	if (m_window == nullptr) 
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
+	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
 
 }
 
@@ -139,9 +141,8 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 
-		m_engineContext->GetRenderer()->
-
 		HandleEvents();
+		m_engineContext->GetRenderer()->Render();
 	}
 }
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "RenderInterface.h"
-
-#include <GraphicsBuffer.h>
-#include <Effect.h>
+#include <RootEngine/Render/Include/RenderInterface.h>
+#include <RootEngine/Render/Include/GraphicsBuffer.h>
+#include <RootEngine/Render/Include/Effect.h>
 
 namespace Render
 {
@@ -15,7 +14,6 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void Render();
 		void Cleanup();
-
 
 	private:
 		GLRenderer();

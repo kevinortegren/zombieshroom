@@ -12,14 +12,13 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 }
 #endif
 
-
 namespace Render
 {
 	GLRenderer* GLRenderer::s_rendererInstance = nullptr;
 
 	GLRenderer::GLRenderer()
 	{
-		glewInit();
+		
 	}
 
 	GLRenderer::~GLRenderer()
@@ -39,47 +38,51 @@ namespace Render
 
 	void GLRenderer::SetupSDLContext(SDL_Window* p_window)
 	{
-		m_window = p_window;
-
 		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
 #if defined (_DEBUG)
 		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
 			std::cout << SDL_GetError();
 			//Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
 		}
+
 		SDL_GL_SetSwapInterval(0);
 
 		int width, height;
 		SDL_GetWindowSize(p_window, &width, &height);
 		glViewport(0, 0, width, height);
 
-		glClearColor(0,0,0,1);
-		glFrontFace(GL_CW);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-#if defined(_DEBUG) && defined(WIN32)
-		if(CheckExtension("GL_ARB_debug_output"))
-			glDebugMessageCallbackARB(PrintOpenGLError, NULL);
-#endif
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		SDL_GL_SwapWindow(p_window);
+		// Init GLEW.
+		glewExperimental = GL_TRUE; 
+		GLenum err = glewInit();
+		if (err != GLEW_OK) {
+			printf("Error init glew.\n");
+			return;
+		}
 
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
 		printf("OpenGL context version: %d.%d\n", major, minor);
 		//Logging::GetInstance()->LogTextToConsole("Successfully opened OpenGL 4.4 context");
+
+		glClearColor(0,0,0,1);
+		glFrontFace(GL_CW);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+
+#if defined(_DEBUG) && defined(WIN32)
+		if(CheckExtension("GL_ARB_debug_output"))
+			glDebugMessageCallback(PrintOpenGLError, NULL);
+#endif
 
 		printf("Available video memory: %i KB", GetAvailableVideoMemory());
 
@@ -90,12 +93,14 @@ namespace Render
 		};
 
 		int numVertices = 3;
+		int size = 6 * sizeof(float);
 
-		Render::InitGraphicsBuffer(&m_buffer, 2);
-		Render::SetVertexAtribPointer(m_buffer.m_vbo, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL);
-		Render::SetVertexAtribPointer(m_buffer.m_vbo, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (3 * sizeof(float)));
-		Render::BufferData(m_buffer.m_vbo, numVertices, 6 * sizeof(float), data); 
+		m_buffer.Init(2);
+		m_buffer.SetVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL);
+		m_buffer.SetVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (3 * sizeof(float)));
+		m_buffer.BufferData(m_buffer.m_vbo, 3, size, data); 
 
+		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		if(m_effect.Compile() != GL_TRUE)
@@ -110,13 +115,17 @@ namespace Render
 		m_effect.SetUniformVector( "lightDirection", glm::vec3( 0.f, 0.f, -1.f ) );
 		m_effect.SetUniformVector( "intensityDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
 		m_effect.SetUniformVector( "coefficientDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
+
+		m_window = p_window;
 	}
 
 	void GLRenderer::Render()
 	{
-		Render::BindVertexArray(&m_buffer);
+		m_buffer.BindVertexArray();
 
 		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
+
+		m_buffer.UnbindVertexArray();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		SDL_GL_SwapWindow(m_window);

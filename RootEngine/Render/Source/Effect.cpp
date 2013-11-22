@@ -7,16 +7,19 @@
 
 namespace Render
 {
-
 	Effect::Effect(void)
 	{
-		m_glHandle = glCreateProgram();
 	}
 
 	Effect::~Effect(void)
 	{
 		if( m_glHandle != 0 )
 			glDeleteProgram( m_glHandle );
+	}
+
+	void Effect::CreateEffect()
+	{
+		m_glHandle = glCreateProgram();
 	}
 
 	GLint Effect::AttachShader( GLenum p_shaderType, const char* p_filename )
