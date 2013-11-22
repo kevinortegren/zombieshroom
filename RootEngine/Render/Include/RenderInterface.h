@@ -17,5 +17,5 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void Cleanup() = 0;
 	};
-}
 
+}

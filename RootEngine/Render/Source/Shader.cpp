@@ -7,7 +7,6 @@
 
 namespace Render
 {
-
 	Shader::Shader( )
 	{
 		m_glHandle = 0;

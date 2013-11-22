@@ -19,15 +19,16 @@ namespace Render
 		GLRenderer();
 		~GLRenderer();
 
+		void SetAttributes();
 		bool CheckExtension(const char* p_extension);
 		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
-		SDL_Window* m_window;
 
-		Render::Effect m_effect;
-		Render::GraphicsBuffer m_buffer;
+		GraphicsBuffer m_buffer;
+		Effect m_effect;
+		SDL_Window* m_window;
 	};
 
 	extern "C"

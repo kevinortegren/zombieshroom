@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Render/Include/Shader.h>
 #include <GL/glew.h>
 #include <iostream>
 
@@ -44,7 +45,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -80,8 +81,7 @@ namespace Render
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 
 #if defined(_DEBUG) && defined(WIN32)
-		if(CheckExtension("GL_ARB_debug_output"))
-			glDebugMessageCallback(PrintOpenGLError, NULL);
+		glDebugMessageCallback(PrintOpenGLError, NULL);
 #endif
 
 		printf("Available video memory: %i KB", GetAvailableVideoMemory());
