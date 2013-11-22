@@ -4,54 +4,49 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Shader.h>
 #include <GL/glew.h>
-#include <iostream>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
 {
-	std::cout << "---------------------opengl-callback-start------------" << std::endl;
-	std::cout << "message: "<< message << std::endl;
-	std::cout << "type: ";
+	Render::g_context.m_logger->LogText("message: %s", message);
+	Render::g_context.m_logger->LogText("type: ");
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR:
-		std::cout << "ERROR";
+		Render::g_context.m_logger->LogText("ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		std::cout << "DEPRECATED_BEHAVIOR";
+		Render::g_context.m_logger->LogText("DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		std::cout << "UNDEFINED_BEHAVIOR";
+		Render::g_context.m_logger->LogText("UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		std::cout << "PORTABILITY";
+		Render::g_context.m_logger->LogText("PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		std::cout << "PERFORMANCE";
+		Render::g_context.m_logger->LogText("PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		std::cout << "OTHER";
+		Render::g_context.m_logger->LogText("OTHER");
 		break;
 	}
-	std::cout << std::endl;
 
-	std::cout << "id: " << id << std::endl;
-	std::cout << "severity: ";
+	Render::g_context.m_logger->LogText("id: %i", id);
+	Render::g_context.m_logger->LogText("severity: ");
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_LOW:
-		std::cout << "LOW";
+		Render::g_context.m_logger->LogText("LOW");
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		std::cout << "MEDIUM";
+		Render::g_context.m_logger->LogText("MEDIUM");
 		break;
 	case GL_DEBUG_SEVERITY_HIGH:
-		std::cout << "HIGH";
+		Render::g_context.m_logger->LogText("HIGH");
 		break;
 	}
-	std::cout << std::endl;
-	std::cout << "---------------------opengl-callback-end--------------" << std::endl;
 }
 #endif
 
@@ -96,7 +91,7 @@ namespace Render
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
-			std::cout << SDL_GetError();
+			g_context.m_logger->LogText("%s", SDL_GetError());
 			//Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
 		}
 
@@ -126,7 +121,7 @@ namespace Render
 
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallback){
-			std::cout << "Register OpenGL debug callback " << std::endl;
+			g_context.m_logger->LogText("Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(PrintOpenGLError, nullptr);
 			GLuint unusedIds = 0;
@@ -138,7 +133,7 @@ namespace Render
 				true);
 		}
 		else
-			std::cout << "glDebugMessageCallback not available" << std::endl;
+			g_context.m_logger->LogText("glDebugMessageCallback not available");
 #endif
 
 		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
@@ -161,7 +156,7 @@ namespace Render
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
 		if(m_effect.Compile() != GL_TRUE)
-			std::cout << "Couldn't compile shader." << std::endl;
+			Render::g_context.m_logger->LogText("Couldn't compile shader.");
 		m_effect.Apply();
 	
 		m_effect.SetUniformMatrix( "normalMatrix", glm::mat3(1) );

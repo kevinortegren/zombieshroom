@@ -122,7 +122,7 @@ void Main::Start()
 		// TODO: Render and present game
 
 		HandleEvents();
-		//m_engineContext.m_renderer->Render();
+		m_engineContext.m_renderer->Render();
 	}
 }
 
