@@ -76,6 +76,18 @@ namespace Render
 		return s_rendererInstance;
 	}
 
+
+	void GLRenderer::Startup()
+	{
+
+	}
+
+	void GLRenderer::Shutdown()
+	{
+		SDL_GL_DeleteContext(m_glContext);
+	}
+
+
 	void GLRenderer::SetupSDLContext(SDL_Window* p_window)
 	{
 		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
@@ -208,7 +220,7 @@ namespace Render
 	}
 }
 
-Render::GLRenderer* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
+Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
 {
 	Render::g_context = p_context;
 

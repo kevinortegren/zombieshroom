@@ -44,7 +44,7 @@ namespace RootEngine
 
 		Logging m_logger;
 		Network::NetworkManager* m_network;
-		Render::GLRenderer* m_renderer;
+		Render::RendererInterface* m_renderer;
 	};
 }
 

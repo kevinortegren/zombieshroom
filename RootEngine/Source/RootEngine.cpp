@@ -8,6 +8,9 @@ namespace RootEngine
 {
 	EngineMain::~EngineMain()
 	{
+		m_network->Shutdown();
+		m_renderer->Shutdown();
+
 		DynamicLoader::FreeSharedLibrary(m_networkModule);
 		DynamicLoader::FreeSharedLibrary(m_renderModule);
 	}
@@ -57,7 +60,8 @@ namespace RootEngine
 			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
 			if (libGetNetworkInterface != nullptr)
 			{
-				m_network = (Network::NetworkManager*)libGetNetworkInterface();
+				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);
+				m_network->Startup();
 			}
 			else
 			{
@@ -80,6 +84,7 @@ namespace RootEngine
 			if (libGetRenderer != nullptr)
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
+				m_renderer->Startup();
 			}
 			else
 			{

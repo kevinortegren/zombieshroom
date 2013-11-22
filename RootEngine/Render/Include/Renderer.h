@@ -13,7 +13,7 @@
 
 namespace Render
 {
-	class RendererInterface abstract
+	class RendererInterface : public RootEngine::SubsystemInterface
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
@@ -26,6 +26,8 @@ namespace Render
 	public:
 		static GLRenderer* GetInstance();
 
+		void Startup();
+		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
 		void Render();
 		void Cleanup();
@@ -49,6 +51,6 @@ namespace Render
 
 extern "C"
 {
-	typedef Render::GLRenderer* (*CREATERENDERER)(RootEngine::SubsystemSharedContext);
-	RENDERSYS_DLL_EXPORT Render::GLRenderer* CreateRenderer(RootEngine::SubsystemSharedContext p_context);
+	typedef Render::RendererInterface* (*CREATERENDERER)(RootEngine::SubsystemSharedContext);
+	RENDERSYS_DLL_EXPORT Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context);
 }

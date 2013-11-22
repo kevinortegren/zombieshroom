@@ -1,5 +1,6 @@
 #pragma once
 #include "Networker.h"
+#include <RootEngine/Include/SubsystemSharedContext.h>
 
 #if defined(_WINDLL)
 #define NETSYS_DLL_EXPORT __declspec(dllexport)
@@ -19,7 +20,7 @@ namespace PeerType
 
 namespace Network
 {
-	class NetworkInterface abstract
+	class NetworkInterface : public RootEngine::SubsystemInterface
 	{
 	public:
 		// Initializes the network socket as either server or client
@@ -31,6 +32,6 @@ namespace Network
 
 extern "C" 
 {
-	typedef Network::NetworkInterface* (*GETNETWORKINTERFACE) ();
-	NETSYS_DLL_EXPORT Network::NetworkInterface* GetNetworkInterface();
+	typedef Network::NetworkInterface* (*GETNETWORKINTERFACE) (RootEngine::SubsystemSharedContext);
+	NETSYS_DLL_EXPORT Network::NetworkInterface* GetNetworkInterface(RootEngine::SubsystemSharedContext p_context);
 }
