@@ -5,6 +5,7 @@
 #include <RootEngine/Render/Include/Shader.h>
 #include <GL/glew.h>
 #include <iostream>
+#include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
@@ -15,6 +16,8 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 
 namespace Render
 {
+	RootEngine::SubsystemSharedContext g_context;
+
 	GLRenderer* GLRenderer::s_rendererInstance = nullptr;
 
 	GLRenderer::GLRenderer()
@@ -117,6 +120,8 @@ namespace Render
 		m_effect.SetUniformVector( "coefficientDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
 
 		m_window = p_window;
+
+		g_context.m_logger->LogText("Logging from renderer!");
 	}
 
 	void GLRenderer::Render()
@@ -152,9 +157,11 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
+}
 
-	RendererInterface* CreateRenderer()
-	{
-		return GLRenderer::GetInstance();
-	}
+Render::GLRenderer* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
+{
+	Render::g_context = p_context;
+
+	return Render::GLRenderer::GetInstance();
 }

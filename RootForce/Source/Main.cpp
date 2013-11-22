@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
+#include <RootEngine/Include/RootEngine.h>
 
 #include <ECS/Tests/TestSystem.h>
 
@@ -60,32 +61,12 @@ Main::Main()
 	: m_running(true)
 {
 
-	void* handle = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
-	if (handle == nullptr)
-	{
-		std::cerr << "Failed to load engine: " << DynamicLoader::GetLastError() << std::endl;
-		throw std::runtime_error("");
-	}
+	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
-	typedef RootEngine::ContextInterface* ( *CREATECONTEXT )(int);
-	CREATECONTEXT createContextFunc = (CREATECONTEXT)DynamicLoader::LoadProcess(handle, "CreateContext");
+	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
 
-	m_engineContext = createContextFunc(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
-	if (createContextFunc == nullptr)
-	{
-		std::cout << "Failed to load engine function: " << DynamicLoader::GetLastError() << std::endl;
-		throw std::runtime_error("");
-	}
-
-	if(m_engineContext != nullptr)
-	{
-
-
-	}
-	else
-	{
-		std::cout << "Couldn't call create context." << std::endl;
-	}
+	m_engineContext.m_logger->LogText("Hello world from logger");
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -106,13 +87,13 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
-
+	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 }
 
 Main::~Main() 
 {
 	SDL_Quit();
+	DynamicLoader::FreeSharedLibrary(m_engineModule);
 }
 
 void Main::Start() 
@@ -141,7 +122,7 @@ void Main::Start()
 		// TODO: Render and present game
 
 		HandleEvents();
-		m_engineContext->GetRenderer()->Render();
+		//m_engineContext.m_renderer->Render();
 	}
 }
 

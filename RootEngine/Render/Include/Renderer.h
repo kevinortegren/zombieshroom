@@ -1,11 +1,26 @@
 #pragma once
 
-#include <RootEngine/Render/Include/RenderInterface.h>
 #include <RootEngine/Render/Include/GraphicsBuffer.h>
 #include <RootEngine/Render/Include/Effect.h>
+#include <RootEngine/Include/SubsystemSharedContext.h>
+#include <SDL2/SDL.h>
+
+#if defined(_WINDLL)
+#define RENDERSYS_DLL_EXPORT __declspec(dllexport)
+#else
+#define RENDERSYS_DLL_EXPORT __declspec(dllimport)
+#endif
 
 namespace Render
 {
+	class RendererInterface abstract
+	{
+	public:
+		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
+		virtual void Render() = 0;
+		virtual void Cleanup() = 0;
+	};
+
 	class GLRenderer : public RendererInterface
 	{
 	public:
@@ -30,9 +45,10 @@ namespace Render
 		Effect m_effect;
 		SDL_Window* m_window;
 	};
+}
 
-	extern "C"
-	{
-		RENDERSYS_DLL_EXPORT RendererInterface* CreateRenderer();
-	}
+extern "C"
+{
+	typedef Render::GLRenderer* (*CREATERENDERER)(RootEngine::SubsystemSharedContext);
+	RENDERSYS_DLL_EXPORT Render::GLRenderer* CreateRenderer(RootEngine::SubsystemSharedContext p_context);
 }
