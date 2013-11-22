@@ -30,4 +30,5 @@ void main()
 	vec3 specular = pow ( max( 0.0f, dot( r, v ) ), powerSpecular ) * intensitySpecular;
 
 	frag_color = vec3( coefficientAmbient * intensityAmbient + coefficientDiffuse * vert_diffuseColor + coefficientSpecular * specular );
+	frag_color = vec3(1);
 }

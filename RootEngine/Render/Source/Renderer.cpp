@@ -87,7 +87,6 @@ namespace Render
 		SDL_GL_DeleteContext(m_glContext);
 	}
 
-
 	void GLRenderer::SetupSDLContext(SDL_Window* p_window)
 	{
 		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
@@ -96,7 +95,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -125,44 +124,47 @@ namespace Render
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
 		printf("OpenGL context version: %d.%d\n", major, minor);
-		//Logging::GetInstance()->LogTextToConsole("Successfully opened OpenGL 4.4 context");
 
 		glClearColor(0,0,0,1);
 		glFrontFace(GL_CW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
-		if(glDebugMessageCallback){
-			g_context.m_logger->LogText("Register OpenGL debug callback ");
+			/*g_context.m_logger->LogText("Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(PrintOpenGLError, nullptr);
-			GLuint unusedIds = 0;
+			/*GLuint unusedIds = 0;
 			glDebugMessageControl(GL_DONT_CARE,
 				GL_DONT_CARE,
 				GL_DONT_CARE,
 				0,
 				&unusedIds,
-				true);
-		}
-		else
-			g_context.m_logger->LogText("glDebugMessageCallback not available");
+				true);*/
+				glDebugMessageCallbackARB(PrintOpenGLError, NULL);
 #endif
 
 		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
 
-		float data[] = {
-			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
-			-0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f, 
-			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f
+		float positions[] = {
+			0.5f, 0.5f, 1.f,
+			-0.5f, 0.5f, 1.f,
+			-0.5f, -0.5f, 1.f
+		};
+
+		float normals[] = {
+			0.f, 0.f, 1.f,
+			0.f, 0.f, 1.f, 
+			0.f, 0.f, 1.f
 		};
 
 		int numVertices = 3;
-		int size = 6 * sizeof(float);
 
-		m_buffer.Init(2);
-		m_buffer.SetVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL);
-		m_buffer.SetVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (3 * sizeof(float)));
-		m_buffer.BufferData(m_buffer.m_vbo, 3, size, data); 
+		m_buffer.Init(2, 2);
+		m_buffer.SetVertexAttribPointer(0, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (char*)NULL);
+		m_buffer.SetVertexAttribPointer(1, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (char*)NULL);
+
+		m_buffer.BufferData(0, numVertices, 3 * sizeof(float), positions); 
+		m_buffer.BufferData(1, numVertices, 3 * sizeof(float), normals); 
 
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
@@ -187,13 +189,14 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		m_buffer.BindVertexArray();
 
-		glDrawArrays( GL_TRIANGLES, -1, 3 * 6);
+		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
 
 		m_buffer.UnbindVertexArray();
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		SDL_GL_SwapWindow(m_window);
 	}
 
