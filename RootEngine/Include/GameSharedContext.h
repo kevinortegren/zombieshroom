@@ -9,7 +9,7 @@ namespace RootEngine
 	struct GameSharedContext
 	{
 		Logging* m_logger;
-		Render::GLRenderer* m_renderer;
-		Network::NetworkManager* m_network;
+		Render::RendererInterface* m_renderer;
+		Network::NetworkInterface* m_network;
 	};
 }

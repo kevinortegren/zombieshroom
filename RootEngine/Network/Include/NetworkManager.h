@@ -7,6 +7,9 @@ namespace Network
 	class NetworkManager : public NetworkInterface
 	{
 	public:
+		void Startup();
+		void Shutdown();
+
 		void Initialize(PeerType::PeerType p_peerType);
 		Networker* GetNetworkSystem() { return m_networkSys; }
 

@@ -4,6 +4,16 @@
 #include <iostream>
 namespace Network
 {
+	void NetworkManager::Startup()
+	{
+
+	}
+
+	void NetworkManager::Shutdown()
+	{
+
+	}
+
 	void NetworkManager::Initialize(PeerType::PeerType p_peerType)
 	{
 		switch( p_peerType )
@@ -21,7 +31,7 @@ namespace Network
 	}
 }
 
-Network::NetworkInterface* GetNetworkInterface()
+Network::NetworkInterface* GetNetworkInterface(RootEngine::SubsystemSharedContext p_context)
 { 
 	static Network::NetworkManager s_nm; 
 	return &s_nm;
