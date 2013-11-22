@@ -27,6 +27,10 @@ namespace Network
 		// Returns the network interface
 		virtual Networker* GetNetworkSystem() = 0;
 	};
+}
 
-	extern "C++" NETSYS_DLL_EXPORT NetworkInterface* APIENTRY GetNetworkInterface();
+extern "C" 
+{
+	typedef Network::NetworkInterface* (*GETNETWORKINTERFACE) ();
+	NETSYS_DLL_EXPORT Network::NetworkInterface* GetNetworkInterface();
 }

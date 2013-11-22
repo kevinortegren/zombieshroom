@@ -6,9 +6,10 @@
 	#define ROOTENGINE_DLL_EXPORT __declspec(dllimport)
 #endif
 
-#include <RootEngine/Network/Include/NetworkManager.h>
-#include <RootEngine/Render/Include/Renderer.h>
-
+#include <memory>
+#include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/SubsystemSharedContext.h>
+#include <RootEngine/Include/GameSharedContext.h>
 
 namespace RootEngine
 {
@@ -23,33 +24,32 @@ namespace RootEngine
 		};
 	}
 
-
-	class ContextInterface
+	class EngineMain
 	{
 	public:
-		virtual Render::RendererInterface* GetRenderer() = 0;
-	};
+		~EngineMain();
 
-
-	class Context : public ContextInterface
-	{
-	public:
-
-		Context(int flags);
-		~Context();
-
-		Render::RendererInterface* GetRenderer();
-
+		void Initialize(int flags);
+		GameSharedContext GetGameSharedContext();
+		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
 		void LoadNetwork();
 		void LoadRender();
 
-		Network::NetworkManager* m_networkInterface;
-		Render::RendererInterface* m_renderer;
-	};
+		void* m_networkModule;
+		void* m_renderModule;
 
-	extern "C"
-	{
-		ROOTENGINE_DLL_EXPORT ContextInterface* CreateContext(int flags);
-	}
+		SubsystemSharedContext m_subsystemSharedContext;
+		GameSharedContext m_gameSharedContext;
+
+		Logging m_logger;
+		Network::NetworkManager* m_network;
+		Render::GLRenderer* m_renderer;
+	};
+}
+
+extern "C"
+{
+	typedef RootEngine::GameSharedContext ( *INITIALIZEENGINE )(int);
+	ROOTENGINE_DLL_EXPORT RootEngine::GameSharedContext InitializeEngine(int flags);
 }

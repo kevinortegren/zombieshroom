@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+//#include <Windows.h>
 #include <SDL2/SDL.h>
 
 
@@ -65,6 +65,10 @@ namespace InputManager
 		virtual vector2 GetDeltaMousePos() = 0;
 
 	};
+}
 
-	extern "C++" INPSYS_DLL_EXPORT InputInterface* APIENTRY GetInputInterface();
+extern "C" 
+{
+	typedef InputManager::InputInterface* (* GETINPUTINTERFACE) ();
+	INPSYS_DLL_EXPORT InputManager::InputInterface* GetInputInterface();
 }

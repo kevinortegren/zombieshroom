@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Windows.h>
+//#include <Windows.h>
 #include <gl/GL.h>
 #include <glm/glm.hpp>
 

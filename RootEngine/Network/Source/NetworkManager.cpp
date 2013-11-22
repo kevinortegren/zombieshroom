@@ -19,7 +19,10 @@ namespace Network
 			break;
 		}
 	}
+}
 
-	NetworkInterface* APIENTRY GetNetworkInterface() { static NetworkManager s_nm; return &s_nm; }
-
+Network::NetworkInterface* GetNetworkInterface()
+{ 
+	static Network::NetworkManager s_nm; 
+	return &s_nm;
 }

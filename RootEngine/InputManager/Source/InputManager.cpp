@@ -73,7 +73,6 @@ namespace InputManager
 		m_deltaMousePos = vector2(0,0);
 		return temp;
 	}
-
-	InputInterface* APIENTRY GetInputInterface() { static InputManager s_im; return &s_im; }
-
 }
+
+InputManager::InputInterface* GetInputInterface() { static InputManager::InputManager s_im; return &s_im; }
