@@ -4,7 +4,7 @@
 
 namespace RootEngine
 {
-	namespace Renderer
+	namespace Render
 	{
 
 		class GLRenderer : public RendererInterface

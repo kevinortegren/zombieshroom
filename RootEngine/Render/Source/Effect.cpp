@@ -5,6 +5,8 @@
 
 #include <cstdio>
 
+using Render::Effect;
+
 Effect::Effect(void)
 {
 	m_glHandle = glCreateProgram();

@@ -10,7 +10,7 @@
 
 namespace RootEngine
 {
-	namespace Renderer
+	namespace Render
 	{
 		class RendererInterface abstract
 		{

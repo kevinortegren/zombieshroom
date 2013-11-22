@@ -14,7 +14,7 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 
 namespace RootEngine
 {
-	namespace Renderer
+	namespace Render
 	{
 		GLRenderer* GLRenderer::s_rendererInstance = nullptr;
 
