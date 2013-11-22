@@ -17,13 +17,16 @@ namespace PeerType
 	};
 }
 
-class NetworkInterface abstract
+namespace Network
 {
-public:
-	// Initializes the network socket as either server or client
-	virtual void Initialize(PeerType::PeerType p_peerType) = 0;
-	// Returns the network interface
-	virtual Networker* GetNetworkSystem() = 0;
-};
+	class NetworkInterface abstract
+	{
+	public:
+		// Initializes the network socket as either server or client
+		virtual void Initialize(PeerType::PeerType p_peerType) = 0;
+		// Returns the network interface
+		virtual Networker* GetNetworkSystem() = 0;
+	};
 
-extern "C++" NETSYS_DLL_EXPORT NetworkInterface* APIENTRY GetNetworkInterface();
+	extern "C++" NETSYS_DLL_EXPORT NetworkInterface* APIENTRY GetNetworkInterface();
+}

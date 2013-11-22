@@ -1,4 +1,5 @@
 #include <Main.h>
+
 #include <stdexcept>
 
 #include "RootEngine/Include/Logging/Logging.h"
@@ -9,6 +10,11 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 
 #include <ECS/Tests/TestSystem.h>
+
+
+#include <exception>
+#include <gtest/gtest.h>
+
 
 #undef main
 
@@ -102,15 +108,6 @@ Main::Main()
 		// TODO: Log error and throw exception (?)
 	}
 
-	ECS::Entity* e = m_world.GetEntityManager()->CreateEntity();
-	
-	int a = m_world.GetEntityManager()->GetNumEntities();
-	m_world.GetEntityManager()->RemoveEntity(e);
-
-	int b = m_world.GetEntityManager()->GetNumEntities();
-	
-
-	m_engineContext->GetRenderer()->SetupSDLContext(m_window.get());
 }
 
 Main::~Main() 
