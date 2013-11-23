@@ -1,7 +1,9 @@
 #pragma once
 
-#include <RootEngine/Render/Include/GraphicsBuffer.h>
+#include <RootEngine/Render/Include/Buffer.h>
 #include <RootEngine/Render/Include/Effect.h>
+#include <RootEngine/Render/Include/VertexAttributes.h>
+
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <SDL2/SDL.h>
 
@@ -43,8 +45,10 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 
-		GraphicsBuffer m_buffer;
+		Buffer m_buffer;
 		Effect m_effect;
+		VertexAttributes m_attributes;
+
 		SDL_Window* m_window;
 	};
 }

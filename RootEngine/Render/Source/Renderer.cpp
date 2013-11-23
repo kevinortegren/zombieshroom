@@ -103,7 +103,6 @@ namespace Render
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
 			g_context.m_logger->LogText("%s", SDL_GetError());
-			//Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -130,41 +129,45 @@ namespace Render
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
-			/*g_context.m_logger->LogText("Register OpenGL debug callback ");
+		if(glDebugMessageCallbackARB)
+		{
+			g_context.m_logger->LogText("Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			glDebugMessageCallback(PrintOpenGLError, nullptr);
-			/*GLuint unusedIds = 0;
-			glDebugMessageControl(GL_DONT_CARE,
+			glDebugMessageCallbackARB(PrintOpenGLError, nullptr);
+			GLuint unusedIds = 0;
+			glDebugMessageControlARB(GL_DONT_CARE,
 				GL_DONT_CARE,
 				GL_DONT_CARE,
 				0,
 				&unusedIds,
-				true);*/
-				glDebugMessageCallbackARB(PrintOpenGLError, NULL);
+				true);
+		}
+		else
+			g_context.m_logger->LogText("glDebugMessageCallback not available");
 #endif
+
+		// Check for extensions.
+		CheckExtension("ARB_vertex_attrib_binding");
 
 		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
 
-		float positions[] = {
-			0.5f, 0.5f, 1.f,
-			-0.5f, 0.5f, 1.f,
-			-0.5f, -0.5f, 1.f
+		float vertices[] = {
+			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
+			-0.5f, 0.5f, 1.f, 0.f, 0.0f, 1.f,
+			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
+			 0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f
 		};
 
-		float normals[] = {
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f, 
-			0.f, 0.f, 1.f
-		};
+		int numVertices = 4;
 
-		int numVertices = 3;
+		m_attributes.Init(2);
+		m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
+		m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
 
-		m_buffer.Init(2, 2);
-		m_buffer.SetVertexAttribPointer(0, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (char*)NULL);
-		m_buffer.SetVertexAttribPointer(1, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (char*)NULL);
+		m_buffer.Init(GL_ARRAY_BUFFER);
+		m_buffer.BufferData(numVertices, 6 * sizeof(float), vertices); 
 
-		m_buffer.BufferData(0, numVertices, 3 * sizeof(float), positions); 
-		m_buffer.BufferData(1, numVertices, 3 * sizeof(float), normals); 
+		m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 6 * sizeof(float));
 
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
@@ -191,11 +194,11 @@ namespace Render
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_buffer.BindVertexArray();
+		m_attributes.Bind();
 
 		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
 
-		m_buffer.UnbindVertexArray();
+		m_attributes.Unbind();
 
 		SDL_GL_SwapWindow(m_window);
 	}

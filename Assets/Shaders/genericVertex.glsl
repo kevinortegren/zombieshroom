@@ -29,5 +29,4 @@ void main()
 	vert_diffuseColor = max( 0.0f, dot( normalize( vert_lightVec ), vert_normal ) ) * intensityDiffuse;
 
 	gl_Position = projectionMatrix * vert_eyeCoords;
-	gl_Position = vec4(in_position, 1.0f);
 }
