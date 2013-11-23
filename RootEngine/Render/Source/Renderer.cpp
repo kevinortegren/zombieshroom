@@ -3,7 +3,6 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Shader.h>
-#include <GL/glew.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -146,8 +145,6 @@ namespace Render
 #endif
 
 		// Check for extensions.
-		CheckExtension("ARB_vertex_attrib_binding");
-
 		g_context.m_logger->LogText(LogTag::RENDER, 1, "Available video memory: %i KB", GetAvailableVideoMemory());
 
 		// Temporary.
@@ -164,23 +161,21 @@ namespace Render
 			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
 			-0.5f, 0.5f, 1.f, 0.f, 0.0f, 1.f,
 			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
-			 0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f
 		};
 
-		int numVertices = 4;
+		int numVertices = 3;
 
 		m_buffer.Init(GL_ARRAY_BUFFER);
 		m_buffer.BufferData(numVertices, 6 * sizeof(float), vertices); 
 
 		m_attributes.Init(2);
+		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)0 + 3 * sizeof(float));
 
-		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL );
-		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + 3 * sizeof(float));
-
-		//m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
-		//m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
-
-		//m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 6 * sizeof(float));
+		/*m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
+		m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+		
+		m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 0);*/
 
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
@@ -205,6 +200,7 @@ namespace Render
 		m_angle = 0.0f;
 
 		m_window = p_window;
+
 	}
 
 	void GLRenderer::Render()
@@ -224,6 +220,8 @@ namespace Render
 		m_attributes.Bind();
 
 		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
+
+	
 
 		m_attributes.Unbind();
 

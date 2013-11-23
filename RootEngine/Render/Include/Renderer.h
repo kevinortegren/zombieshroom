@@ -33,6 +33,8 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void Render();
 
+		bool CheckExtension(const char* p_extension);
+
 	private:
 		GLRenderer();
 		~GLRenderer();
@@ -41,20 +43,18 @@ namespace Render
 		void Swap();
 
 		void SetAttributes();
-		bool CheckExtension(const char* p_extension);
+	
 		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
-
+		GLuint m_vao;
 		// Temporary.
 
 		Buffer m_buffer;
 		Effect m_effect;
 		VertexAttributes m_attributes;
-
-		Buffer m_uniforms;
 
 		glm::mat4 m_world;
 		float m_angle;
@@ -65,17 +65,19 @@ namespace Render
 			glm::mat4 m_normal;
 		} m_uniformVars;
 
+		Buffer m_uniforms;
+
 		// Camera stuff.
-
 		Camera m_camera;
-		Buffer m_camerBuffer;
-
+		
 		struct
 		{
 			glm::mat4 m_projection;
 			glm::mat4 m_view;
 
 		} m_cameraVars;
+
+		Buffer m_camerBuffer;
 	};
 }
 
