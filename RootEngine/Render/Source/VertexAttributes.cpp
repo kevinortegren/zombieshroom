@@ -1,6 +1,7 @@
 #include <RootEngine/Render/Include/VertexAttributes.h>
 
 #include <GL/glew.h>
+#include <assert.h>
 
 namespace Render
 {
@@ -60,4 +61,15 @@ namespace Render
 		glVertexAttribBinding(p_location, p_bindingIndex);
 		Unbind();
 	}
+
+	void VertexAttributes::SetVertexAttribPointer(GLuint p_bufferId, GLuint p_location, GLint p_size, GLenum p_type, GLboolean p_normalized, GLsizei p_stride, GLvoid* p_pointer)
+	{
+		assert(p_location < m_numAttribs);
+
+		Bind();
+		glBindBuffer(GL_ARRAY_BUFFER,p_bufferId);
+		glVertexAttribPointer( p_location, p_size, p_type, p_normalized, p_stride, p_pointer );
+		Unbind();
+	}
+
 }

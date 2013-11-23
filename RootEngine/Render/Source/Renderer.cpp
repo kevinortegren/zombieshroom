@@ -76,7 +76,6 @@ namespace Render
 		return s_rendererInstance;
 	}
 
-
 	void GLRenderer::Startup()
 	{
 
@@ -94,8 +93,8 @@ namespace Render
 		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -115,14 +114,14 @@ namespace Render
 		glewExperimental = GL_TRUE; 
 		GLenum err = glewInit();
 		if (err != GLEW_OK) {
-			printf("Failed to initialize glew!\n");
+			Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "Failed to initialize glew!");
 			return;
 		}
 
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
-		printf("OpenGL context version: %d.%d\n", major, minor);
+		Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
 		glFrontFace(GL_CW);
@@ -131,7 +130,7 @@ namespace Render
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallbackARB)
 		{
-			g_context.m_logger->LogText("Register OpenGL debug callback ");
+			g_context.m_logger->LogText(LogTag::RENDER, 1, "Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallbackARB(PrintOpenGLError, nullptr);
 			GLuint unusedIds = 0;
@@ -143,13 +142,23 @@ namespace Render
 				true);
 		}
 		else
-			g_context.m_logger->LogText("glDebugMessageCallback not available");
+			g_context.m_logger->LogText(LogTag::RENDER, 1, "glDebugMessageCallback not available");
 #endif
 
 		// Check for extensions.
 		CheckExtension("ARB_vertex_attrib_binding");
 
-		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
+		g_context.m_logger->LogText(LogTag::RENDER, 1, "Available video memory: %i KB", GetAvailableVideoMemory());
+
+		// Temporary.
+
+		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
+		
+		m_cameraVars.m_projection = m_camera.GetProjection();
+		m_cameraVars.m_view = m_camera.GetView();
+		
+		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
+		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
 		float vertices[] = {
 			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
@@ -160,39 +169,57 @@ namespace Render
 
 		int numVertices = 4;
 
-		m_attributes.Init(2);
-		m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
-		m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
-
 		m_buffer.Init(GL_ARRAY_BUFFER);
 		m_buffer.BufferData(numVertices, 6 * sizeof(float), vertices); 
 
-		m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 6 * sizeof(float));
+		m_attributes.Init(2);
 
+		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL );
+		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + 3 * sizeof(float));
+
+		//m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
+		//m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+
+		//m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 6 * sizeof(float));
+
+		m_uniforms.Init(GL_UNIFORM_BUFFER);
+
+		m_world = glm::mat4x4(1);
+
+		m_uniformVars.m_world = m_world;
+		m_uniformVars.m_normal = glm::mat4(1);
+
+		m_uniforms.BufferData(1, sizeof(m_uniformVars), &m_uniformVars);
+	
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
+
 		if(m_effect.Compile() != GL_TRUE)
 			Render::g_context.m_logger->LogText("Couldn't compile shader.");
+		
 		m_effect.Apply();
 	
-		m_effect.SetUniformMatrix( "normalMatrix", glm::mat3(1) );
-		m_effect.SetUniformMatrix( "modelMatrix", glm::mat4(1) );
-		m_effect.SetUniformMatrix( "viewMatrix", glm::mat4(1) );
-		m_effect.SetUniformMatrix( "projectionMatrix", glm::mat4(1) );
-	
-		m_effect.SetUniformVector( "lightDirection", glm::vec3( 0.f, 0.f, -1.f ) );
-		m_effect.SetUniformVector( "intensityDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
-		m_effect.SetUniformVector( "coefficientDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
+		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);
+
+		m_angle = 0.0f;
 
 		m_window = p_window;
-
-		g_context.m_logger->LogText("Logging from renderer!");
 	}
 
 	void GLRenderer::Render()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		Clear();
+
+		m_angle += 0.0000001f;
+		m_world = glm::rotate<float>(m_world, m_angle, 0.0f, 1.0f, 0.0f);
+
+		m_uniformVars.m_world = m_world;
+		m_uniformVars.m_normal = glm::mat4(1);
+
+		m_uniforms.BufferSubData(0, sizeof(m_uniformVars), &m_uniformVars);
+		
+		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
 		m_attributes.Bind();
 
@@ -200,18 +227,23 @@ namespace Render
 
 		m_attributes.Unbind();
 
-		SDL_GL_SwapWindow(m_window);
+		Swap();
 	}
 
-	void GLRenderer::Cleanup()
+	void GLRenderer::Clear()
 	{
-		SDL_GL_DeleteContext(m_glContext);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void GLRenderer::Swap()
+	{
+		SDL_GL_SwapWindow(m_window);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)
 	{
 		if(glewIsExtensionSupported(p_extension) == GL_FALSE) {
-			printf( "Missing OpenGL extension: %s\n", p_extension);
+			g_context.m_logger->LogText(LogTag::RENDER, 1,  "Missing OpenGL extension: %s", p_extension);
 			return false;
 		}
 		return true;

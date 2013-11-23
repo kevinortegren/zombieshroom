@@ -3,6 +3,7 @@
 #include <RootEngine/Render/Include/Buffer.h>
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
+#include <RootEngine/Render/Include/Camera.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <SDL2/SDL.h>
@@ -20,7 +21,6 @@ namespace Render
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void Render() = 0;
-		virtual void Cleanup() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -32,11 +32,13 @@ namespace Render
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
 		void Render();
-		void Cleanup();
 
 	private:
 		GLRenderer();
 		~GLRenderer();
+
+		void Clear();
+		void Swap();
 
 		void SetAttributes();
 		bool CheckExtension(const char* p_extension);
@@ -44,12 +46,36 @@ namespace Render
 
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
+		SDL_Window* m_window;
+
+		// Temporary.
 
 		Buffer m_buffer;
 		Effect m_effect;
 		VertexAttributes m_attributes;
 
-		SDL_Window* m_window;
+		Buffer m_uniforms;
+
+		glm::mat4 m_world;
+		float m_angle;
+
+		struct 
+		{
+			glm::mat4 m_world;
+			glm::mat4 m_normal;
+		} m_uniformVars;
+
+		// Camera stuff.
+
+		Camera m_camera;
+		Buffer m_camerBuffer;
+
+		struct
+		{
+			glm::mat4 m_projection;
+			glm::mat4 m_view;
+
+		} m_cameraVars;
 	};
 }
 
