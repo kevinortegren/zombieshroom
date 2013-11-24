@@ -1,6 +1,7 @@
 #include <RootEngine/Render/Include/Buffer.h>
 
 Render::Buffer::Buffer()
+	: m_numElements(0), m_size(0)
 {
 
 }

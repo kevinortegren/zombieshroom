@@ -4,7 +4,19 @@
 
 namespace Render
 {
-	class Buffer
+	class BufferInterface
+	{
+	public:
+		virtual void Init(GLenum p_type) = 0;
+		virtual void BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data) = 0;
+		virtual void BufferSubData(size_t p_offset, size_t p_length, void* p_data) = 0;
+		virtual GLuint GetBufferId() const = 0;
+		virtual GLenum GetBufferType() const = 0;
+		virtual size_t GetNumElements() const = 0;
+		virtual size_t GetBufferSize() const = 0;
+	};
+
+	class Buffer : public BufferInterface
 	{
 	public:
 		Buffer();

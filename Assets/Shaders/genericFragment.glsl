@@ -1,18 +1,16 @@
 #version 400
 
 in vec3 vert_normal;
-
-/*in vec4 vert_eyeCoords;
 in vec3 vert_lightVec;
-
+in vec3 vert_eyeCoords;
 in vec3 vert_diffuseColor;
 
-// Ambient
+/*// Ambient
 uniform vec3 coefficientAmbient;
 uniform vec3 intensityAmbient;
 
 // Diffuse
-uniform vec3 coefficientDiffuse;
+uniform vec3 coefficientDiffuse; 
 
 // Specular
 uniform vec3 coefficientSpecular;
@@ -30,5 +28,6 @@ void main()
 	vec3 specular = pow ( max( 0.0f, dot( r, v ) ), powerSpecular ) * intensitySpecular;
 
 	frag_color = vec3( coefficientAmbient * intensityAmbient + coefficientDiffuse * vert_diffuseColor + coefficientSpecular * specular );*/
-	frag_color = vec3(1);
+	frag_color = vec3(0.3 + vert_diffuseColor);
+	//frag_color = vec3(1);
 }

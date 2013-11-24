@@ -4,9 +4,11 @@
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
+#include <RootEngine/Render/Include/RenderJob.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <SDL2/SDL.h>
+#include <memory>
 
 #if defined(_WINDLL)
 #define RENDERSYS_DLL_EXPORT __declspec(dllexport)
@@ -20,7 +22,10 @@ namespace Render
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
+		virtual void AddRenderJob(RenderJob* p_job) = 0;
 		virtual void Render() = 0;
+		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
+		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -31,9 +36,13 @@ namespace Render
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
+		void AddRenderJob(RenderJob* p_job);
 		void Render();
 
 		bool CheckExtension(const char* p_extension);
+
+		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
+		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
 
 	private:
 		GLRenderer();
@@ -49,27 +58,16 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
-		GLuint m_vao;
-		// Temporary.
 
-		Buffer m_buffer;
+		std::vector<RenderJob*> m_jobs;
+
+		// Effect.
 		Effect m_effect;
-		VertexAttributes m_attributes;
-
-		glm::mat4 m_world;
-		float m_angle;
-
-		struct 
-		{
-			glm::mat4 m_world;
-			glm::mat4 m_normal;
-		} m_uniformVars;
-
 		Buffer m_uniforms;
 
-		// Camera stuff.
+		// Camera
 		Camera m_camera;
-		
+		Buffer m_camerBuffer;
 		struct
 		{
 			glm::mat4 m_projection;
@@ -77,7 +75,13 @@ namespace Render
 
 		} m_cameraVars;
 
-		Buffer m_camerBuffer;
+		// Lights.
+		Buffer m_lights;
+		struct
+		{
+			glm::vec3 m_direction;
+
+		} m_lightVars;
 	};
 }
 

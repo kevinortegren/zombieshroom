@@ -147,7 +147,7 @@ namespace Render
 		// Check for extensions.
 		g_context.m_logger->LogText(LogTag::RENDER, 1, "Available video memory: %i KB", GetAvailableVideoMemory());
 
-		// Temporary.
+		m_window = p_window;
 
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
 		
@@ -157,35 +157,6 @@ namespace Render
 		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
 		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
-		float vertices[] = {
-			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
-			-0.5f, 0.5f, 1.f, 0.f, 0.0f, 1.f,
-			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
-		};
-
-		int numVertices = 3;
-
-		m_buffer.Init(GL_ARRAY_BUFFER);
-		m_buffer.BufferData(numVertices, 6 * sizeof(float), vertices); 
-
-		m_attributes.Init(2);
-		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-		m_attributes.SetVertexAttribPointer(m_buffer.GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)0 + 3 * sizeof(float));
-
-		/*m_attributes.SetFormat(0, 3, sizeof(float), GL_FLOAT, GL_FALSE, 0);
-		m_attributes.SetFormat(1, 3, sizeof(float), GL_FLOAT, GL_FALSE, 3 * sizeof(float));
-		
-		m_attributes.SetVertexBuffer(m_buffer.GetBufferId(), 0);*/
-
-		m_uniforms.Init(GL_UNIFORM_BUFFER);
-
-		m_world = glm::mat4x4(1);
-
-		m_uniformVars.m_world = m_world;
-		m_uniformVars.m_normal = glm::mat4(1);
-
-		m_uniforms.BufferData(1, sizeof(m_uniformVars), &m_uniformVars);
-	
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
@@ -195,35 +166,41 @@ namespace Render
 		
 		m_effect.Apply();
 	
-		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);
+		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
-		m_angle = 0.0f;
+		m_lights.Init(GL_UNIFORM_BUFFER);
+		m_lightVars.m_direction = glm::vec3(0,0,-1);
+		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 
-		m_window = p_window;
+		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
+		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 
+	}
+
+	void GLRenderer::AddRenderJob(RenderJob* p_job)
+	{
+		m_jobs.push_back(p_job);
 	}
 
 	void GLRenderer::Render()
 	{
 		Clear();
 
-		m_angle += 0.0000001f;
-		m_world = glm::rotate<float>(m_world, m_angle, 0.0f, 1.0f, 0.0f);
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
+			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
-		m_uniformVars.m_world = m_world;
-		m_uniformVars.m_normal = glm::mat4(1);
+			(*itr)->m_attributes->Bind();
 
-		m_uniforms.BufferSubData(0, sizeof(m_uniformVars), &m_uniformVars);
-		
-		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*itr)->m_indexBuffer->GetBufferId());
+			glDrawElements(GL_TRIANGLES, (*itr)->m_indexBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
 
-		m_attributes.Bind();
+			(*itr)->m_attributes->Unbind();
+		}
 
-		glDrawArrays( GL_TRIANGLES, 0, 3 * 6);
-
-	
-
-		m_attributes.Unbind();
+		m_jobs.clear();
 
 		Swap();
 	}
