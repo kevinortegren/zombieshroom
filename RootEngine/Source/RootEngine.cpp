@@ -22,6 +22,8 @@ namespace RootEngine
 		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 		
 		m_memTracker = new MemoryTracker(&m_logger);
+
+		m_modelLoader = new ModelImporter(&m_logger);
 		
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;

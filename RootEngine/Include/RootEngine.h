@@ -11,6 +11,7 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
+#include <RootEngine/Include/ModelImporter.h>
 
 namespace RootEngine
 {
@@ -46,11 +47,12 @@ namespace RootEngine
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
 
-		Logging m_logger;
-		MemoryTracker* m_memTracker;
-		Network::NetworkManager* m_network;
-		Render::RendererInterface* m_renderer;
-		GUISystem::GUISystemInterface* m_gui;
+		Logging			m_logger;
+		MemoryTracker*	m_memTracker;
+		ModelImporter*	m_modelLoader;
+		Network::NetworkManager*		m_network;
+		Render::RendererInterface*		m_renderer;
+		GUISystem::GUISystemInterface*	m_gui;
 	};
 }
 
