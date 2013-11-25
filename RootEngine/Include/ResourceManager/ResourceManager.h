@@ -2,6 +2,8 @@
 
 #include <string>
 #include <map>
+#include <RootEngine/Include/ModelImporter.h>
+#include <RootEngine/Include/Logging/Logging.h>
 
 namespace Render
 {
@@ -10,7 +12,6 @@ namespace Render
 
 namespace RootEngine
 {
-	class Model;
 
 	class ResourceManagerInterface
 	{
@@ -23,7 +24,7 @@ namespace RootEngine
 	class ResourceManager : public ResourceManagerInterface
 	{
 	public:
-		ResourceManager();
+		ResourceManager(Logging* p_logger);
 		~ResourceManager();
 
 		void LoadCollada(std::string p_path);
@@ -35,5 +36,8 @@ namespace RootEngine
 		std::map<std::string, Model*> m_models;
 		std::map<std::string, Render::Mesh*> m_meshes;
 		//std::map<std::string, Render::Texture*> m_textures;
+
+		ModelImporter* m_modelImporter;
+		Logging* m_logger;
 	};
 }

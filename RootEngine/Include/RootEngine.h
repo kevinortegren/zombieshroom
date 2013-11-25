@@ -12,6 +12,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <RootEngine/Include/YamlParser.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace RootEngine
 {

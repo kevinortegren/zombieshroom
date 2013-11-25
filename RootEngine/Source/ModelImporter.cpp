@@ -1,14 +1,19 @@
 #include <RootEngine/Include/ModelImporter.h>
-#include <RootEngine/Render/Include/RenderExtern.h>
 
 namespace RootEngine
 {
 	
-	ModelImporter::~ModelImporter()
+	ModelImporter::ModelImporter(Logging* p_logger) : m_logger(p_logger)
 	{
+		m_model = new Model();
 	}
 
-	void ModelImporter::LoadMesh( const std::string p_fileName )
+	ModelImporter::~ModelImporter()
+	{
+		
+	}
+
+	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
 
 		Assimp::Importer importer;
@@ -24,20 +29,21 @@ namespace RootEngine
 		{
 			m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", p_fileName.c_str(), importer.GetErrorString());
 		}
+
+		return m_model;
 	}
 
 	void ModelImporter::InitFromScene( const aiScene* p_scene, const std::string p_filename )
 	{
-	//	m_entries.resize(p_scene->mNumMeshes);
-		//m_textures.resize(p_scene->mNumMaterials);
-
+	
 		// Initialize the meshes in the scene one by one
-		/*for (unsigned int i = 0 ; i < m_entries.size() ; i++) 
+		for (unsigned int i = 0 ; i < p_scene->mNumMeshes ; i++) 
 		{
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
 			InitMesh(i, paiMesh);
 		}
-		InitMaterials(p_scene, p_filename);*/
+		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
+		InitMaterials(p_scene, p_filename);
 	}
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh )
@@ -71,6 +77,7 @@ namespace RootEngine
 			indices.push_back(Face.mIndices[1]);
 			indices.push_back(Face.mIndices[2]);
 		}
+		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces", p_aiMesh->mNumFaces);
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
