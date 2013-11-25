@@ -1,6 +1,7 @@
 #pragma once
 
 #include <RootEngine/Render/Include/Buffer.h>
+
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
@@ -62,6 +63,7 @@ namespace Render
 		std::vector<RenderJob*> m_jobs;
 
 		// Effect.
+
 		Effect m_effect;
 		Buffer m_uniforms;
 

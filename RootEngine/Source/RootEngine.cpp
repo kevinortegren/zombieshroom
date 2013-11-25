@@ -4,6 +4,8 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 
+#include <RootEngine/Include/EffectParser.h>
+
 namespace RootEngine
 {
 	EngineMain::~EngineMain()
@@ -19,6 +21,9 @@ namespace RootEngine
 	void EngineMain::Initialize(int flags)
 	{
 		std::cout << "Creating Engine Context" << std::endl;
+
+		RootEngine::EffectParser p;
+		p.Load("test.yaml");
 
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;

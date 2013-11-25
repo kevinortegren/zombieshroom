@@ -140,7 +140,7 @@ void Main::Start()
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);;
+	uniforms.m_world = glm::mat4(1);
 
 	Render::RenderJob job;
 

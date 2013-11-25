@@ -11,6 +11,8 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
+#include <RootEngine/Include/YamlParser.h>
+
 namespace RootEngine
 {
 	namespace SubsystemInit

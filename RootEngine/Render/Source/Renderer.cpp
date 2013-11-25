@@ -175,7 +175,6 @@ namespace Render
 		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
 		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 		m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
-
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob* p_job)
@@ -191,7 +190,6 @@ namespace Render
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
 			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-
 
 			(*itr)->m_attributes->Bind();
 
