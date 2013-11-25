@@ -13,6 +13,8 @@
 #include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <RootEngine/Include/ModelImporter.h>
 
+#include <RootEngine/Include/YamlParser.h>
+
 namespace RootEngine
 {
 	namespace SubsystemInit

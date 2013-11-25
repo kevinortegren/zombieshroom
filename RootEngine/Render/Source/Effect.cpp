@@ -4,7 +4,6 @@
 #include <RootEngine/Render/Include/RenderExtern.h>
 #include <cstdio>
 
-
 namespace Render
 {
 	Effect::Effect(void)
@@ -112,4 +111,9 @@ namespace Render
 		return loc;
 	}
 
+	void Load()
+	{
+
+
+	}
 }

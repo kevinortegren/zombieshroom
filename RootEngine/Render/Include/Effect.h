@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <Windows.h>
 #include <gl/GL.h>
 #include <glm/glm.hpp>
 #include <string>
@@ -12,6 +11,8 @@ namespace Render
 	public:
 		Effect( );
 		~Effect( );
+
+		void Load();
 
 		void CreateEffect();
 
