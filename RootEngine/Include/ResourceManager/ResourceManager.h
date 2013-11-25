@@ -29,6 +29,7 @@ namespace RootEngine
 	{
 	public:
 		ResourceManager(Logging* p_logger);
+		ResourceManager();
 		~ResourceManager();
 		
 		void Init(std::string p_workingDirectory, Render::RendererInterface* p_renderer);

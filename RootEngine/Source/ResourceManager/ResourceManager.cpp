@@ -7,6 +7,11 @@ namespace RootEngine
 		m_modelImporter = new ModelImporter(m_logger);
 	}
 
+	ResourceManager::ResourceManager()
+	{
+
+	}
+
 	ResourceManager::~ResourceManager()
 	{
 		delete m_modelImporter;

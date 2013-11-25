@@ -32,15 +32,9 @@ namespace RootEngine
 
 		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 
-		RootEngine::EffectParser p;
-		p.Load("test.yaml");
-
 		m_network = nullptr;
 		m_renderer = nullptr;
 		m_gui = nullptr;
-
-		RootEngine::EffectParser p;
-		p.Load("Assets/Scripts/test.yaml");
 
 		m_memTracker = new MemoryTracker(&m_logger);
 		
@@ -155,6 +149,12 @@ namespace RootEngine
 			m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
+
+	EngineMain::EngineMain()
+	{
+
+	}
+
 }
 
 namespace RootEngine

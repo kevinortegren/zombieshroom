@@ -32,6 +32,7 @@ namespace RootEngine
 	class EngineMain
 	{
 	public:
+		EngineMain();
 		~EngineMain();
 
 		void Initialize(int p_flags, std::string p_workingDirectory);
