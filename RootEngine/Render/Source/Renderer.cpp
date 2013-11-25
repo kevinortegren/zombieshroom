@@ -3,7 +3,6 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Shader.h>
-#include <GL/glew.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -76,7 +75,6 @@ namespace Render
 		return s_rendererInstance;
 	}
 
-
 	void GLRenderer::Startup()
 	{
 
@@ -87,7 +85,6 @@ namespace Render
 		SDL_GL_DeleteContext(m_glContext);
 	}
 
-
 	void GLRenderer::SetupSDLContext(SDL_Window* p_window)
 	{
 		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
@@ -95,8 +92,8 @@ namespace Render
 		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -104,7 +101,6 @@ namespace Render
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
 			g_context.m_logger->LogText("%s", SDL_GetError());
-			//Logging::GetInstance()->LogTextToConsole("%s", SDL_GetError());
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -117,27 +113,27 @@ namespace Render
 		glewExperimental = GL_TRUE; 
 		GLenum err = glewInit();
 		if (err != GLEW_OK) {
-			printf("Failed to initialize glew!\n");
+			Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "Failed to initialize glew!");
 			return;
 		}
 
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
-		printf("OpenGL context version: %d.%d\n", major, minor);
-		//Logging::GetInstance()->LogTextToConsole("Successfully opened OpenGL 4.4 context");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
 		glFrontFace(GL_CW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
-		if(glDebugMessageCallback){
-			g_context.m_logger->LogText("Register OpenGL debug callback ");
+		if(glDebugMessageCallbackARB)
+		{
+			g_context.m_logger->LogText(LogTag::RENDER, 1, "Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			glDebugMessageCallback(PrintOpenGLError, nullptr);
+			glDebugMessageCallbackARB(PrintOpenGLError, nullptr);
 			GLuint unusedIds = 0;
-			glDebugMessageControl(GL_DONT_CARE,
+			glDebugMessageControlARB(GL_DONT_CARE,
 				GL_DONT_CARE,
 				GL_DONT_CARE,
 				0,
@@ -145,67 +141,85 @@ namespace Render
 				true);
 		}
 		else
-			g_context.m_logger->LogText("glDebugMessageCallback not available");
+			g_context.m_logger->LogText(LogTag::RENDER, 1, "glDebugMessageCallback not available");
 #endif
 
-		printf("Available video memory: %i KB\n", GetAvailableVideoMemory());
+		// Check for extensions.
+		g_context.m_logger->LogText(LogTag::RENDER, 1, "Available video memory: %i KB", GetAvailableVideoMemory());
 
-		float data[] = {
-			0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
-			-0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f, 
-			-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f
-		};
+		m_window = p_window;
 
-		int numVertices = 3;
-		int size = 6 * sizeof(float);
-
-		m_buffer.Init(2);
-		m_buffer.SetVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL);
-		m_buffer.SetVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (3 * sizeof(float)));
-		m_buffer.BufferData(m_buffer.m_vbo, 3, size, data); 
+		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
+		
+		m_cameraVars.m_projection = m_camera.GetProjection();
+		m_cameraVars.m_view = m_camera.GetView();
+		
+		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
+		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
 		m_effect.CreateEffect();
 		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
 		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
+
 		if(m_effect.Compile() != GL_TRUE)
 			Render::g_context.m_logger->LogText("Couldn't compile shader.");
+		
 		m_effect.Apply();
 	
-		m_effect.SetUniformMatrix( "normalMatrix", glm::mat3(1) );
-		m_effect.SetUniformMatrix( "modelMatrix", glm::mat4(1) );
-		m_effect.SetUniformMatrix( "viewMatrix", glm::mat4(1) );
-		m_effect.SetUniformMatrix( "projectionMatrix", glm::mat4(1) );
-	
-		m_effect.SetUniformVector( "lightDirection", glm::vec3( 0.f, 0.f, -1.f ) );
-		m_effect.SetUniformVector( "intensityDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
-		m_effect.SetUniformVector( "coefficientDiffuse", glm::vec3( 1.f, 1.f, 1.f ) );
+		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
-		m_window = p_window;
+		m_lights.Init(GL_UNIFORM_BUFFER);
+		m_lightVars.m_direction = glm::vec3(0,0,-1);
+		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 
-		g_context.m_logger->LogText("Logging from renderer!");
+		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
+		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+
+	}
+
+	void GLRenderer::AddRenderJob(RenderJob* p_job)
+	{
+		m_jobs.push_back(p_job);
 	}
 
 	void GLRenderer::Render()
 	{
-		m_buffer.BindVertexArray();
+		Clear();
 
-		glDrawArrays( GL_TRIANGLES + 879579, 0, 3 * 6);
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
+			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
-		m_buffer.UnbindVertexArray();
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		SDL_GL_SwapWindow(m_window);
+			(*itr)->m_attributes->Bind();
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*itr)->m_indexBuffer->GetBufferId());
+			glDrawElements(GL_TRIANGLES, (*itr)->m_indexBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+
+			(*itr)->m_attributes->Unbind();
+		}
+
+		m_jobs.clear();
+
+		Swap();
 	}
 
-	void GLRenderer::Cleanup()
+	void GLRenderer::Clear()
 	{
-		SDL_GL_DeleteContext(m_glContext);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void GLRenderer::Swap()
+	{
+		SDL_GL_SwapWindow(m_window);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)
 	{
 		if(glewIsExtensionSupported(p_extension) == GL_FALSE) {
-			printf( "Missing OpenGL extension: %s\n", p_extension);
+			g_context.m_logger->LogText(LogTag::RENDER, 1,  "Missing OpenGL extension: %s", p_extension);
 			return false;
 		}
 		return true;

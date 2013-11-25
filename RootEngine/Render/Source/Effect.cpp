@@ -90,16 +90,26 @@ namespace Render
 	{
 		glUniformMatrix3fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
 	}
-	void Effect::SetUniformMatrix( const char* _name, glm::mat4& _val )
+	void Effect::SetUniformMatrix( const char* _name, const glm::mat4& _val )
 	{
 		glUniformMatrix4fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
+	}
+
+	void Effect::SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot) {
+
+		GLint uniformBlockIndex = glGetUniformBlockIndex(m_glHandle, bufferName.c_str());
+
+		if (uniformBlockIndex != -1) {
+			glUniformBlockBinding(m_glHandle, uniformBlockIndex, slot);
+			glBindBufferBase(GL_UNIFORM_BUFFER, slot, p_bufferId);
+		}
 	}
 
 	GLint GetLocation( GLuint p_handle, const char* p_name )
 	{
 		GLint loc = glGetUniformLocation( p_handle, p_name );
 		if( loc == 0 )
-			printf( "Failed to locate GL variable %s.\n" );
+			printf( "Failed to locate GL variable %s.\n", p_name );
 		return loc;
 	}
 
