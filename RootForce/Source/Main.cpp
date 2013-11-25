@@ -3,8 +3,8 @@
 #include <stdexcept>
 
 #include <RootEngine/Include/Logging/Logging.h>
-
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Render/Include/Vertex.h>
 
 
 #include <gtest/gtest.h>
@@ -15,7 +15,6 @@
 #include <ECS/Tests/TestSystem.h>
 
 #include <exception>
-#include <gtest/gtest.h>
 
 #include <glm/glm.hpp>
 
@@ -114,39 +113,25 @@ void Main::Start()
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
 	int numVertices = 3;
-	float vertices[] = {
-		0.5f, 0.5f, 1.f, 0.f, 0.f, 1.f,
-		-0.5f, 0.5f, 1.f, 0.f, 0.0f, 1.f,
-		-0.5f, -0.5f, 1.f, 0.f, 0.f, 1.f,
-	};
-
+	Render::Vertex1P1N realVertices[3];
+	realVertices[0].m_pos = glm::vec3(0.5f, 0.5f, 1.f); realVertices[0].m_normal = glm::vec3(0.f, 0.f, 1.f);
+	realVertices[1].m_pos = glm::vec3(-0.5f, 0.5f, 1.f); realVertices[1].m_normal = glm::vec3(0.f, 0.0f, 1.f);
+	realVertices[2].m_pos = glm::vec3(-0.5f, -0.5f, 1.f); realVertices[2].m_normal = glm::vec3(0.f, 0.f, 1.f);
 	int numIndices = 3;
 	GLuint indices[] = {
 		0, 1, 2
 	};
 
-	std::shared_ptr<Render::BufferInterface> vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-	vertexBuffer->Init(GL_ARRAY_BUFFER);
-	vertexBuffer->BufferData(numVertices, 6 * sizeof(float), vertices); 
-
-	std::shared_ptr<Render::BufferInterface> indexBuffer = m_engineContext.m_renderer->CreateBuffer();
-	indexBuffer->Init(GL_ELEMENT_ARRAY_BUFFER);
-	indexBuffer->BufferData(numIndices, sizeof(GLuint), indices);
-
-	std::shared_ptr<Render::VertexAttributesInterface> attrs = m_engineContext.m_renderer->CreateVertexAttributes();
-	attrs->Init(2);
-	attrs->SetVertexAttribPointer(vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	attrs->SetVertexAttribPointer(vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)0 + 3 * sizeof(float));
+	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
+	mesh->Init(realVertices, 3, indices, numIndices);
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);;
+	uniforms.m_world = glm::mat4(1);
 
 	Render::RenderJob job;
 
-	job.m_vertexBuffer = vertexBuffer;
-	job.m_indexBuffer = indexBuffer;
-	job.m_attributes = attrs;
+	job.m_mesh = mesh;
 	job.m_uniforms = &uniforms;
 
 	float angle = 0.0f;

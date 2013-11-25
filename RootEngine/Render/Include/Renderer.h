@@ -5,6 +5,7 @@
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
+#include <RootEngine/Render/Include/Mesh.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <SDL2/SDL.h>
@@ -26,6 +27,8 @@ namespace Render
 		virtual void Render() = 0;
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
+		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
+
 	};
 
 	class GLRenderer : public RendererInterface
@@ -43,6 +46,7 @@ namespace Render
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
+		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
 
 	private:
 		GLRenderer();

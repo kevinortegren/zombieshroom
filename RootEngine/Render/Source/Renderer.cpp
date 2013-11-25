@@ -193,12 +193,9 @@ namespace Render
 			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
 
-			(*itr)->m_attributes->Bind();
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*itr)->m_indexBuffer->GetBufferId());
-			glDrawElements(GL_TRIANGLES, (*itr)->m_indexBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
-
-			(*itr)->m_attributes->Unbind();
+			(*itr)->m_mesh->Bind();
+			(*itr)->m_mesh->DrawArrays();
+			(*itr)->m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
