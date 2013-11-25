@@ -14,6 +14,7 @@ namespace RootEngine
 
 
 
+
 		DynamicLoader::FreeSharedLibrary(m_networkModule);
 		DynamicLoader::FreeSharedLibrary(m_renderModule);
 		DynamicLoader::FreeSharedLibrary(m_guiModule);
@@ -99,7 +100,6 @@ namespace RootEngine
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
 				m_renderer->Startup();
-
 			}
 			else
 			{
@@ -122,6 +122,7 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
+
 			}
 			else
 			{
