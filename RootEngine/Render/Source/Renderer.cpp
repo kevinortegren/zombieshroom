@@ -189,7 +189,7 @@ namespace Render
 	{
 		m_buffer.BindVertexArray();
 
-		glDrawArrays( GL_TRIANGLES, -1, 3 * 6);
+		glDrawArrays( GL_TRIANGLES + 879579, 0, 3 * 6);
 
 		m_buffer.UnbindVertexArray();
 
