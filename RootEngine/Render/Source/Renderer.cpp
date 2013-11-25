@@ -145,7 +145,11 @@ namespace Render
 #endif
 
 		// Check for extensions.
-		g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
+		if(CheckExtension("GL_NVX_gpu_memory_info"))
+		{
+			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
+		}
+		CheckExtension("NV_texture_multisample");
 
 		m_window = p_window;
 
