@@ -38,19 +38,6 @@ namespace RootEngine
 			};
 		}
 
-		//struct vector2 //Just temporary TODO: replace with real glm::vec2 or similar once implemented in the whole solution
-		//{
-		//	vector2()
-		//	{
-		//	}
-		//	vector2(float x, float y)
-		//	{
-		//		this->x = x;
-		//		this->y = y;
-		//	}
-		//	float x;
-		//	float y;
-		//};
 
 		class InputInterface abstract : public RootEngine::SubsystemInterface
 		{
@@ -72,6 +59,6 @@ namespace RootEngine
 }
 extern "C" 
 {
-	typedef RootEngine::InputManager::InputInterface* (* GETINPUTINTERFACE)(RootEngine::SubsystemSharedContext);
+	typedef RootEngine::InputManager::InputInterface* (* CREATEINPUTINTERFACE)(RootEngine::SubsystemSharedContext);
 	SUBSYSTEM_DLL_EXPORT RootEngine::InputManager::InputInterface* CreateInputSystem(RootEngine::SubsystemSharedContext p_context);
 }

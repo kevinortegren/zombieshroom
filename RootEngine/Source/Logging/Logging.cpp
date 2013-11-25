@@ -16,6 +16,7 @@ Logging::Logging()
 	m_stringTagList.push_back("CMPSYS");
 	m_stringTagList.push_back("ERROR ");
 	m_stringTagList.push_back("GUI   ");
+	m_stringTagList.push_back("INPUT ");
 
 	m_stringLevelList.push_back("FATAL_ERR  ");
 	m_stringLevelList.push_back("NON_FAT_ERR");

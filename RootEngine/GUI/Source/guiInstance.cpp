@@ -15,6 +15,8 @@ namespace RootEngine
 			m_fileInterface = new guiFileInterface();
 
 			m_rootContext = NULL;
+
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
 		}
 
 

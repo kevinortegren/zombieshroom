@@ -11,7 +11,7 @@ namespace RootEngine
 		NetworkManager* NetworkManager::s_networkManager = nullptr;
 		void NetworkManager::Startup()
 		{
-
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
 		}
 
 		void NetworkManager::Shutdown()
@@ -26,9 +26,11 @@ namespace RootEngine
 			{
 			case PeerType::SERVER:
 				m_networkSys = new Server();
+				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Server created successfully");
 				break;
 			case PeerType::CLIENT:
 				m_networkSys = new Client();
+				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Client created successfully");
 				break;
 			default:
 				// Log error

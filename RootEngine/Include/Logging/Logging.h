@@ -20,7 +20,8 @@ namespace LogTag
 		GAME,
 		COMPONENT,
 		ERR,
-		GUI
+		GUI,
+		INPUT
 	};
 }
 

@@ -38,10 +38,12 @@ namespace RootEngine
 		void LoadNetwork();
 		void LoadRender();
 		void LoadGUI();
+		void LoadInputSystem();
 
 		void* m_networkModule;
 		void* m_renderModule;
 		void* m_guiModule;
+		void* m_inputModule;
 
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
@@ -51,6 +53,7 @@ namespace RootEngine
 		Network::NetworkManager* m_network;
 		Render::RendererInterface* m_renderer;
 		GUISystem::GUISystemInterface* m_gui;
+		InputManager::InputInterface* m_inputSys;
 	};
 }
 
