@@ -19,9 +19,12 @@ namespace RootEngine
 	void EngineMain::Initialize(int flags)
 	{
 		std::cout << "Creating Engine Context" << std::endl;
-
+		
+		m_memTracker = new MemoryTracker(&m_logger);
+		
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;
+		m_subsystemSharedContext.m_memTracker = m_memTracker;
 
 		// Load external dlls.
 		if((flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -37,6 +40,7 @@ namespace RootEngine
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &m_logger;
+		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_network = m_network;
 	}
