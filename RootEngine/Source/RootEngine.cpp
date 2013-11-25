@@ -63,6 +63,7 @@ namespace RootEngine
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);
 				m_network->Startup();
+
 			}
 			else
 			{
