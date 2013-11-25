@@ -11,6 +11,7 @@ namespace RootEngine
 		m_network->Shutdown();
 		m_renderer->Shutdown();
 
+
 		DynamicLoader::FreeSharedLibrary(m_networkModule);
 		DynamicLoader::FreeSharedLibrary(m_renderModule);
 	}
@@ -85,6 +86,7 @@ namespace RootEngine
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
 				m_renderer->Startup();
+
 			}
 			else
 			{
