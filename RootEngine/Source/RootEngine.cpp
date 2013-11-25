@@ -12,9 +12,6 @@ namespace RootEngine
 		m_renderer->Shutdown();
 		m_gui->Shutdown();
 
-
-
-
 		DynamicLoader::FreeSharedLibrary(m_networkModule);
 		DynamicLoader::FreeSharedLibrary(m_renderModule);
 		DynamicLoader::FreeSharedLibrary(m_guiModule);
@@ -22,7 +19,7 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int flags)
 	{
-		std::cout << "Creating Engine Context" << std::endl;
+		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 		
 		m_memTracker = new MemoryTracker(&m_logger);
 		
@@ -122,16 +119,16 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
-
+				m_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
 			}
 			else
 			{
-				m_logger.LogText(LogTag::GUI, 1, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::GUI, 1, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 }

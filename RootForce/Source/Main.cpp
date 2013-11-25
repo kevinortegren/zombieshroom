@@ -67,9 +67,7 @@ Main::Main()
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
-	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
-
-	m_engineContext.m_logger->LogText("Hello world from logger");
+	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
