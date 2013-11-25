@@ -4,15 +4,10 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 
-<<<<<<< HEAD
 #include <RootEngine/Include/EffectParser.h>
 
 namespace RootEngine
 {
-=======
-namespace RootEngine
-{
->>>>>>> 9dec6792e5535797dcf06a82a9a190453ce07d1b
 	EngineMain::~EngineMain()
 	{
 		m_network->Shutdown();
@@ -26,18 +21,17 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int flags)
 	{
-<<<<<<< HEAD
+
 		std::cout << "Creating Engine Context" << std::endl;
 
 		RootEngine::EffectParser p;
 		p.Load("test.yaml");
 
-=======
+
 		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 		
 		m_memTracker = new MemoryTracker(&m_logger);
 		
->>>>>>> 9dec6792e5535797dcf06a82a9a190453ce07d1b
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
