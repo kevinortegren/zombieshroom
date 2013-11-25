@@ -15,6 +15,7 @@ Logging::Logging()
 	m_stringTagList.push_back("GAME  ");
 	m_stringTagList.push_back("CMPSYS");
 	m_stringTagList.push_back("ERROR ");
+	m_stringTagList.push_back("GUI   ");
 
 	OpenLogStream();
 }
