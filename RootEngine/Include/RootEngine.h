@@ -10,6 +10,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Include/Memory/MemoryTracker.h>
 
 namespace RootEngine
 {
@@ -46,6 +47,7 @@ namespace RootEngine
 		GameSharedContext m_gameSharedContext;
 
 		Logging m_logger;
+		MemoryTracker* m_memTracker;
 		Network::NetworkManager* m_network;
 		Render::RendererInterface* m_renderer;
 		GUISystem::GUISystemInterface* m_gui;

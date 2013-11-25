@@ -41,8 +41,8 @@ namespace RootEngine
 			case SDL_MOUSEMOTION:
 				m_deltaMousePos.x += m_globMousePos.x - p_event.motion.x;
 				m_deltaMousePos.y += m_globMousePos.y - p_event.motion.y;
-				m_globMousePos.x = (float)p_event.motion.x;
-				m_globMousePos.y = (float)p_event.motion.y;
+				m_globMousePos.x = static_cast<float>(p_event.motion.x);
+				m_globMousePos.y = static_cast<float>(p_event.motion.y);
 				break;
 			}
 		}

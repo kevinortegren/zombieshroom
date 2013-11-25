@@ -10,6 +10,7 @@ namespace RootEngine
 	struct GameSharedContext
 	{
 		Logging* m_logger;
+		MemoryTracker* m_memTracker;
 		Render::RendererInterface* m_renderer;
 		Network::NetworkInterface* m_network;
 		GUISystem::GUISystemInterface* m_gui;

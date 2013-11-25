@@ -11,6 +11,9 @@ namespace RootEngine
 		m_renderer->Shutdown();
 		m_gui->Shutdown();
 
+
+
+
 		DynamicLoader::FreeSharedLibrary(m_networkModule);
 		DynamicLoader::FreeSharedLibrary(m_renderModule);
 		DynamicLoader::FreeSharedLibrary(m_guiModule);
@@ -19,9 +22,12 @@ namespace RootEngine
 	void EngineMain::Initialize(int flags)
 	{
 		std::cout << "Creating Engine Context" << std::endl;
-
+		
+		m_memTracker = new MemoryTracker(&m_logger);
+		
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;
+		m_subsystemSharedContext.m_memTracker = m_memTracker;
 
 		// Load external dlls.
 		if((flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -41,6 +47,7 @@ namespace RootEngine
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &m_logger;
+		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
@@ -72,12 +79,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::NETWORK, 1, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::NETWORK, 1, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -92,16 +99,15 @@ namespace RootEngine
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
 				m_renderer->Startup();
-
 			}
 			else
 			{
-				m_logger.LogText(LogTag::RENDER, 1, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::RENDER, 1, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -115,6 +121,7 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
+
 			}
 			else
 			{
