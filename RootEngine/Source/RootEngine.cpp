@@ -1,6 +1,5 @@
 #include <RootEngine.h>
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Network/Include/NetworkInterface.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 

@@ -26,6 +26,7 @@ namespace RootEngine
 			delete m_sysInterface;
 			delete m_renderInterface;
 			delete m_fileInterface;
+			delete s_gui;
 		}
 
 		void guiInstance::Initalize(float p_width, float p_height)

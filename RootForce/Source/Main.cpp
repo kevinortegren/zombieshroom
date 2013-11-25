@@ -15,7 +15,6 @@
 #include <ECS/Tests/TestSystem.h>
 
 #include <exception>
-#include <gtest/gtest.h>
 
 #include <glm/glm.hpp>
 
