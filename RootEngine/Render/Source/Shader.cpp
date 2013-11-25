@@ -43,11 +43,12 @@ namespace Render
 		shaderFile.seekg(0,std::ios::beg);
 
 		// Use a vector as the buffer.
-		std::vector< char > buffer( (unsigned int)length );
+		//std::vector< char > buffer( (unsigned int)length );
+		std::string buffer; buffer.resize((unsigned int)length);
 		shaderFile.read( &buffer[ 0 ], length );
 
 		// load source from a char array
-		const char* ptr = buffer.data(); // get character pointer
+		const char* ptr = buffer.c_str(); // get character pointer
 		glShaderSource( m_glHandle, 1, &ptr, NULL );
 
 		// compile shader
