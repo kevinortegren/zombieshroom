@@ -10,6 +10,9 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Include/Memory/MemoryTracker.h>
+
+#include <RootEngine/Include/YamlParser.h>
 
 namespace RootEngine
 {
@@ -20,7 +23,8 @@ namespace RootEngine
 			INIT_NETWORK = 1,
 			INIT_INPUT = 2,
 			INIT_RENDER = 4,
-			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER
+			INIT_GUI = 8,
+			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI
 		};
 	}
 
@@ -35,16 +39,20 @@ namespace RootEngine
 	private:
 		void LoadNetwork();
 		void LoadRender();
+		void LoadGUI();
 
 		void* m_networkModule;
 		void* m_renderModule;
+		void* m_guiModule;
 
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
 
 		Logging m_logger;
+		MemoryTracker* m_memTracker;
 		Network::NetworkManager* m_network;
 		Render::RendererInterface* m_renderer;
+		GUISystem::GUISystemInterface* m_gui;
 	};
 }
 
