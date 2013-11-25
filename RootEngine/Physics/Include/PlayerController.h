@@ -1,7 +1,7 @@
 #pragma once
-#include "btBulletDynamicsCommon.h"
-#include "btBulletCollisionCommon.h"
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
+#include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <vector>
 class PlayerController
 {
@@ -14,6 +14,7 @@ public:
 	//Assumes the float* is a float[3]
 	void Walk(float* p_dir);
 	void Jump(float p_jumpforce);
+	void SetVelocity(float* p_velocity);
 	void Update();
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};

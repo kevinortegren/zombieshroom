@@ -67,7 +67,7 @@ Main::Main()
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
-	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_NETWORK | RootEngine::SubsystemInit::INIT_RENDER);
+	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
 
 	m_engineContext.m_logger->LogText("Hello world from logger");
 
@@ -124,7 +124,6 @@ void Main::Start()
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(realVertices, 3, indices, numIndices);
-
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
