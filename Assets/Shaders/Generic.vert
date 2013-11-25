@@ -11,13 +11,13 @@ layout(std140) uniform PerFrame
 
 layout(std140) uniform PerObject
 {
-    mat4 modelMatrix;
+	mat4 modelMatrix;
 	mat4 normalMatrix;
 };
 
 layout(std140) uniform Lights
 {
-    vec3 lightDirection;
+	vec3 lightDirection;
 };
 
 out vec3 vert_normal;

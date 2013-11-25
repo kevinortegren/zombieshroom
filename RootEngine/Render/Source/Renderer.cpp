@@ -157,8 +157,9 @@ namespace Render
 		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
 		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
+
 		//m_effect.Apply();
-	
+
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
