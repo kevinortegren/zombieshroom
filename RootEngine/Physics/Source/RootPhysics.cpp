@@ -4,7 +4,7 @@
 #include "Bullet/BulletCollision/CollisionShapes/btShapeHull.h"
 
 
-using namespace PhysicsSubSystem;
+using namespace Physics;
 
 RootPhysics::RootPhysics()
 {
@@ -14,6 +14,14 @@ RootPhysics::RootPhysics()
 RootPhysics::~RootPhysics()
 {
 
+	
+}
+void RootPhysics::Startup()
+{
+
+}
+void RootPhysics::Shutdown()
+{
 	//Magic loop of deleting
 	for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 	{
@@ -59,21 +67,6 @@ void RootPhysics::CreatePlane(float* p_normal, float* p_position)
 	m_dynamicWorld->addRigidBody(planeBody);
 }
 
-//We have a falling ball, it's shiny
-void RootPhysics::supertestfunc()
-{
-	btCollisionShape* ball = new btSphereShape(1);
-	btDefaultMotionState* ballstate = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,2,0)));
-	btScalar mass = 0;
-	btVector3 fallInertia(0,0,0);
-	ball->calculateLocalInertia(mass, fallInertia);
-	btRigidBody::btRigidBodyConstructionInfo ballbodyinfo(mass,ballstate,ball,fallInertia);
-	fallingballbody = new btRigidBody(ballbodyinfo);
-	//fallingballbody->setLinearVelocity(btVector3(0,20,0)); // IT MOVES
-	m_dynamicWorld->addRigidBody(fallingballbody);
-	
-}
-
 //Make a real update
 void RootPhysics::Update()
 {
@@ -84,11 +77,11 @@ void RootPhysics::Update()
 			m_playerObject.at(i)->Update();
 		}
 		m_dynamicWorld->stepSimulation(1/60.f,10);
-		btTransform trans;
-		trans.setOrigin(m_playerObject.at(0)->GetPosition());
+		//btTransform trans;
+		//trans.setOrigin(m_playerObject.at(0)->GetPosition());
 
 
-		std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
+	//	std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
 		
 	}
 }
@@ -189,4 +182,22 @@ void RootPhysics::PlayerMoveXZ( int p_objectIndex, float* p_direction )
 void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
 {
 	m_playerObject.at(p_objectIndex)->Jump(p_jumpForce);
+}
+
+void RootPhysics::GetPlayerPos( int p_objectIndex, float* p_playerPos )
+{
+	btVector3 temp = m_playerObject.at(p_objectIndex)->GetPosition();
+	p_playerPos[0] = temp.getX();
+	p_playerPos[1] = temp.getY();
+	p_playerPos[2] = temp.getZ();
+
+
+}
+void RootPhysics::GetObjectPos(int p_objectIndex, float* p_objectPos)
+{
+	btVector3 temp = m_dynamicObjects.at(p_objectIndex)->getWorldTransform().getOrigin();
+
+	p_objectPos[0] = temp.getX();
+	p_objectPos[1] = temp.getY();
+	p_objectPos[2] = temp.getZ();
 }

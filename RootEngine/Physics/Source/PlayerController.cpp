@@ -30,8 +30,6 @@ PlayerController::PlayerController( void )
 
 PlayerController::~PlayerController( void )
 {
-	m_dynamicWorld->removeRigidBody(m_rigidBody);
-	m_dynamicWorld->removeCollisionObject(m_ghostObject);
 	delete m_rigidBody;
 	delete m_ghostObject;
 }
