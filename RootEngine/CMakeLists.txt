@@ -27,4 +27,4 @@ add_subdirectory(Network)
 add_subdirectory(Physics)
 add_subdirectory(InputManager)
 add_subdirectory(Render)
-
+add_subdirectory(GUI)

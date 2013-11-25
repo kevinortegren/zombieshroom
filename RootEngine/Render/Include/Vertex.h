@@ -4,20 +4,27 @@
 
 namespace Render
 {
-	struct Vertex1P
+	struct Vertex abstract
 	{
-		glm::vec4 m_pos;
+		glm::vec3 m_pos;
 	};
 
-	struct Vertex1P1C
+	struct Vertex1P : public Vertex
 	{
-		glm::vec4 m_pos;
+	};
+
+	struct Vertex1P1N : public Vertex
+	{
+		glm::vec3 m_normal;
+	};
+
+	struct Vertex1P1C : public Vertex
+	{
 		glm::vec4 m_color;
 	};
 
-	struct Vertex1P1N1UV
+	struct Vertex1P1N1UV : public Vertex
 	{
-		glm::vec4 m_pos;
 		glm::vec3 m_normal;
 		glm::vec2 m_UV;
 	};

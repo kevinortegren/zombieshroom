@@ -38,6 +38,16 @@ void RootPhysics::Shutdown()
 		m_dynamicWorld->removeCollisionObject( obj );
 		delete obj;
 	}
+	for(int i = 0; i < m_playerObject.size(); i++)
+	{
+		delete m_playerObject[i];
+	}
+	for(int i = 0; i < m_dynamicObjects.size(); i++)
+	{
+		delete m_dynamicObjects[i];
+	}
+	m_dynamicObjects.clear();
+	m_playerObject.clear();
 	delete m_dynamicWorld;
 	delete m_solver;
 	delete m_collisionConfig;
