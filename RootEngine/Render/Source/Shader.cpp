@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 
 #include "Shader.h"
-
+#include <RootEngine/Render/Include/RenderExtern.h>
 #include <fstream>
 #include <vector>
 
@@ -25,7 +25,7 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			printf( "ERROR creating shader type %d\n", p_shaderType );
+			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 
@@ -33,7 +33,7 @@ namespace Render
 	
 		if( !shaderFile.is_open( ) )
 		{
-			printf( "ERROR creating opening shader file %s\n", p_filename );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "ERROR creating opening shader file %s ! [%s, line %d]", p_filename, __FUNCTION__, __LINE__);
 			return GL_FALSE;
 		}
 
@@ -58,7 +58,7 @@ namespace Render
 		glGetShaderiv( m_glHandle, GL_COMPILE_STATUS, &result );
 		if( result != GL_TRUE )
 		{
-			printf( "ERROR compiling shader type %d\n", p_shaderType );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Compiling shader type %d ! [%s, line %d]", p_shaderType, __FUNCTION__, __LINE__ );
 			int length = 0;
 			glGetShaderiv( m_glHandle, GL_INFO_LOG_LENGTH, &length );
 			if( length > 0 )
@@ -67,7 +67,7 @@ namespace Render
 				char* errorLog = new char[ length ];
 				int written = 0;
 				glGetShaderInfoLog( m_glHandle, length, &written, errorLog );
-				printf( "Shader error log;\n%s\n", errorLog );
+				Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Shader error log;\n%s", errorLog  );
 				delete[ ] errorLog;
 			}
 			return result;

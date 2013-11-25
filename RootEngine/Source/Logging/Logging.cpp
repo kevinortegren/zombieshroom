@@ -2,7 +2,7 @@
 #include <ctime>
 
 Logging::Logging()
-	:m_verboseLevel(2), m_defaultVerbose(2)
+	:m_verboseLevel(LogLevel::DEBUG_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
 	m_stringTagList.push_back("RENDER");
 	m_stringTagList.push_back("NETWOR");
@@ -15,6 +15,12 @@ Logging::Logging()
 	m_stringTagList.push_back("GAME  ");
 	m_stringTagList.push_back("CMPSYS");
 	m_stringTagList.push_back("ERROR ");
+
+	m_stringLevelList.push_back("FATAL_ERR  ");
+	m_stringLevelList.push_back("NON_FAT_ERR");
+	m_stringLevelList.push_back("WARNING    ");
+	m_stringLevelList.push_back("DEBUG_PRINT");
+	m_stringLevelList.push_back("DATA_PRINT ");
 
 	OpenLogStream();
 }
@@ -62,7 +68,7 @@ std::string Logging::GetTimeString( int p_time )
 		return std::to_string(p_time);
 }
 
-void Logging::LogTextToFile(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -71,7 +77,7 @@ void Logging::LogTextToFile(LogTag::LogTag p_tag, unsigned int p_vLevel, const c
 	va_end (args);
 }
 
-void Logging::LogTextToFile( unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToFile(LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -89,7 +95,7 @@ void Logging::LogTextToFile( const char * p_format, ... )
 	va_end (args);
 }
 
-void Logging::LogTextToConsole(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -98,7 +104,7 @@ void Logging::LogTextToConsole(LogTag::LogTag p_tag, unsigned int p_vLevel, cons
 	va_end (args);
 }
 
-void Logging::LogTextToConsole( unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogTextToConsole( LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -116,7 +122,7 @@ void Logging::LogTextToConsole( const char * p_format, ... )
 	va_end (args);
 }
 
-void Logging::LogText( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogText( LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -128,7 +134,7 @@ void Logging::LogText( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* 
 	va_end (args);
 }
 
-void Logging::LogText( unsigned int p_vLevel, const char* p_format, ... )
+void Logging::LogText( LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
@@ -152,11 +158,11 @@ void Logging::LogText( const char* p_format, ... )
 	va_end (args);
 }
 
-void Logging::SetVerboseLevel( unsigned int p_vLevel )
+void Logging::SetVerboseLevel( LogLevel::LogLevel p_vLevel )
 {
 	m_verboseLevel = p_vLevel;
-	LogTextToConsole(LogTag::NOTAG, 0, "Verbose level set to %d", p_vLevel);
-	LogTextToFile(LogTag::NOTAG, 0, "Verbose level set to %d", p_vLevel);
+	LogTextToConsole(LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
+	LogTextToFile(LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
 }
 
 void Logging::AddExclusiveTags( LogTag::LogTag p_tag)
@@ -164,19 +170,19 @@ void Logging::AddExclusiveTags( LogTag::LogTag p_tag)
 	m_exTagList.push_back(p_tag);
 }
 
-void Logging::WriteToFile(LogTag::LogTag p_tag, unsigned int p_vLevel,std::string p_format, va_list p_args )
+void Logging::WriteToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel,std::string p_format, va_list p_args )
 {
 	
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + p_format + "\n";
+	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
 	fflush(m_logFile);
 }
 
-void Logging::WriteToConsole(LogTag::LogTag p_tag, unsigned int p_vLevel, std::string p_format, va_list p_args )
+void Logging::WriteToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )
 {
 	
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + p_format + "\n";
+	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "\n";
 
 	vprintf(output.c_str(), p_args);
 }
@@ -209,6 +215,11 @@ bool Logging::CheckTag(LogTag::LogTag p_tag)
 std::string Logging::GetStringFromTag( LogTag::LogTag p_tag )
 {
 	return m_stringTagList.at(p_tag);
+}
+
+std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
+{
+	return m_stringLevelList.at(p_level);
 }
 
 

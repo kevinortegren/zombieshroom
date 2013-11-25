@@ -67,12 +67,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::NETWORK, 1, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::NETWORK, 1, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -91,12 +91,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::RENDER, 1, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::RENDER, 1, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 }
