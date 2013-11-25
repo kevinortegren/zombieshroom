@@ -79,10 +79,13 @@ void RootPhysics::Update()
 {
 //	for (int i=0 ; i<300 ; i++) 
 	{
-		
+		for(unsigned int i = 0; i < m_playerObject.size(); i++)
+		{
+			m_playerObject.at(i)->Update();
+		}
 		m_dynamicWorld->stepSimulation(1/60.f,10);
 		btTransform trans;
-		//m_dynamicObjects.at(0)->getMotionState()->getWorldTransform(trans);
+		trans.setOrigin(m_playerObject.at(0)->GetPosition());
 
 
 		std::cout << "bunny height: " << trans.getOrigin().getY() << " bunny x: " << trans.getOrigin().getX() << " bunny z: " << trans.getOrigin().getZ() << std::endl;
@@ -164,4 +167,26 @@ void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
 	m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
 	
+}
+
+int RootPhysics::AddPlayerObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, 
+										int p_vertexStride, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+{
+	PlayerController* player = new PlayerController();
+	player->Init(m_dynamicWorld, p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices, p_vertexBuffer
+		, p_vertexStride, p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
+
+	m_playerObject.push_back(player);
+
+	return m_playerObject.size() -1;
+}
+
+void RootPhysics::PlayerMoveXZ( int p_objectIndex, float* p_direction )
+{
+	m_playerObject.at(p_objectIndex)->Walk(p_direction);
+}
+
+void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
+{
+	m_playerObject.at(p_objectIndex)->Jump(p_jumpForce);
 }
