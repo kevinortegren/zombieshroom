@@ -44,17 +44,17 @@ namespace RootEngine
 			return s_networkManager;
 		}
 
-		NetworkInterface* CreateNetwork(RootEngine::SubsystemSharedContext p_context)
-		{ 
-			g_context = p_context;
-
-			return NetworkManager::GetInstance();
-		}
+		
 		
 	}
 }
 
+RootEngine::Network::NetworkInterface* CreateNetwork(RootEngine::SubsystemSharedContext p_context)
+{ 
+	RootEngine::Network::g_context = p_context;
 
+	return RootEngine::Network::NetworkManager::GetInstance();
+}
 
 TEST(NETWORK, NETWORK_SEND)
 {

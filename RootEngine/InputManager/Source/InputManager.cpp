@@ -87,14 +87,16 @@ namespace RootEngine
 				return s_inputSys;
 		}
 
-		RootEngine::InputManager::InputInterface* CreateInputSystem(RootEngine::SubsystemSharedContext p_context)
-		{
-			g_context = p_context;
-
-			return RootEngine::InputManager::InputManager::GetInstance();
-		}
+		
 	}
 
+}
+
+RootEngine::InputManager::InputInterface* CreateInputSystem(RootEngine::SubsystemSharedContext p_context)
+{
+	RootEngine::InputManager::g_context = p_context;
+
+	return RootEngine::InputManager::InputManager::GetInstance();
 }
 
 TEST(INPUT, KEYTEST)

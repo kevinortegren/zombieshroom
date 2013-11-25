@@ -77,13 +77,15 @@ namespace RootEngine
 			return s_gui;
 		}
 
-		GUISystemInterface* CreateGUI(RootEngine::SubsystemSharedContext p_context)
-		{
-			g_context = p_context;
-
-			return guiInstance::GetInstance();
-		}
+		
 	}
+}
+
+RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemSharedContext p_context)
+{
+	RootEngine::GUISystem::g_context = p_context;
+
+	return RootEngine::GUISystem::guiInstance::GetInstance();
 }
 
 TEST(GUI, GUITest1)
