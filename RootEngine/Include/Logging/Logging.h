@@ -38,16 +38,16 @@ namespace LogLevel
 class LoggingInterface
 {
 public:
+		virtual void LogTextToFile(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LogTextToFile( LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogTextToFile(const char* p_format, ...) = 0;
 		
+		virtual void LogTextToConsole(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LogTextToConsole(LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogTextToConsole(const char* p_format, ...) = 0;
 
+		virtual void LogText(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogText(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LogText(LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
 		virtual void LogText(const char* p_format, ...) = 0;
 
 		virtual bool OpenLogStream() = 0;
@@ -64,16 +64,16 @@ class Logging : public LoggingInterface
 		Logging();
 		~Logging();
 
+		void LogTextToFile(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...);
 		void LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LogTextToFile(LogLevel::LogLevel p_vLevel, const char* p_format, ...);
 		void LogTextToFile(const char* p_format, ...);
 		
+		void LogTextToConsole(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...);
 		void LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LogTextToConsole(LogLevel::LogLevel p_vLevel, const char* p_format, ...);
 		void LogTextToConsole(const char* p_format, ...);
 
+		void LogText(LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ...);
 		void LogText(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LogText(LogLevel::LogLevel p_vLevel, const char* p_format, ...);
 		void LogText(const char* p_format, ...);
 
 		bool OpenLogStream();

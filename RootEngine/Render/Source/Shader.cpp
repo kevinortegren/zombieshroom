@@ -25,7 +25,7 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Creating shader type %d", p_shaderType);
+			Render::g_context.m_logger->LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 

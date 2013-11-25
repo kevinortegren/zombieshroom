@@ -77,15 +77,6 @@ void Logging::LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, c
 	va_end (args);
 }
 
-void Logging::LogTextToFile(LogLevel::LogLevel p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToFile(LogTag::NOTAG, p_vLevel, p_format, args);
-	va_end (args);
-}
-
 void Logging::LogTextToFile( const char * p_format, ... )
 {
 	va_list args;
@@ -101,15 +92,6 @@ void Logging::LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
 		WriteToConsole(p_tag, p_vLevel, p_format, args);
-	va_end (args);
-}
-
-void Logging::LogTextToConsole( LogLevel::LogLevel p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToConsole(LogTag::NOTAG, p_vLevel, p_format, args);
 	va_end (args);
 }
 
@@ -130,18 +112,6 @@ void Logging::LogText( LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const 
 	{
 		WriteToConsole(p_tag, p_vLevel, p_format, args);
 		WriteToFile(p_tag, p_vLevel, p_format, args);
-	}
-	va_end (args);
-}
-
-void Logging::LogText( LogLevel::LogLevel p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-	{
-		WriteToConsole(LogTag::NOTAG, p_vLevel, p_format, args);
-		WriteToFile(LogTag::NOTAG, p_vLevel, p_format, args);
 	}
 	va_end (args);
 }
@@ -222,7 +192,36 @@ std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
 	return m_stringLevelList.at(p_level);
 }
 
+//DEPRECATED FUNCTIONS, PLEASE USE LogLevel:: INSTEAD OF unsigned int
+void Logging::LogTextToFile( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+		WriteToFile(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
+	va_end (args);
+}
 
+void Logging::LogTextToConsole( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+		WriteToConsole(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
+	va_end (args);
+}
+
+void Logging::LogText( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
+{
+	va_list args;
+	va_start (args, p_format);
+	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+	{
+		WriteToConsole(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
+		WriteToFile(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
+	}
+	va_end (args);
+}
 
 
 
