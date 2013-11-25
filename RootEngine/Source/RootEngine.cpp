@@ -25,8 +25,7 @@ namespace RootEngine
 		std::cout << "Creating Engine Context" << std::endl;
 
 		RootEngine::EffectParser p;
-		p.Load("test.yaml");
-
+		p.Load("Assets/Scripts/test.yaml");
 
 		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 		

@@ -7,21 +7,21 @@
 #include <glm/glm.hpp>
 #include <RootEngine/Render/Include/Vertex.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Include/Logging/Logging.h>
 
-namespace Render
+namespace RootEngine
 {
-	class MeshImporter
+	class ModelImporter
 	{
 	public:
-		MeshImporter();
-		~MeshImporter();
+		ModelImporter(Logging* p_logger) : m_logger(p_logger){}
+		~ModelImporter();
 
 		void LoadMesh(const std::string p_fileName);
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh);
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
-
-		std::vector<Mesh> m_entries;
-		std::vector<int> m_textures;
+	private:
+		Logging* m_logger;
 	};
 }
