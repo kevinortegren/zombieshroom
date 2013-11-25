@@ -11,8 +11,6 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
-#include <RootEngine/Include/ModelImporter.h>
-
 #include <RootEngine/Include/YamlParser.h>
 
 namespace RootEngine
@@ -51,7 +49,6 @@ namespace RootEngine
 
 		Logging			m_logger;
 		MemoryTracker*	m_memTracker;
-		ModelImporter*	m_modelLoader;
 		Network::NetworkManager*		m_network;
 		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;
