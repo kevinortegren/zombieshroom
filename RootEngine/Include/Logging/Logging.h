@@ -19,7 +19,8 @@ namespace LogTag
 		SOUND,
 		GAME,
 		COMPONENT,
-		ERR
+		ERR,
+		GUI
 	};
 }
 
