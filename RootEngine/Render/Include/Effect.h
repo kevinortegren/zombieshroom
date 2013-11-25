@@ -6,13 +6,22 @@
 
 namespace Render
 {
-	class Effect
+	class EffectInterface
+	{
+	public:
+		virtual void CreateEffect() = 0;
+		virtual GLint AttachShader( GLenum p_shaderType, const char* p_filename ) = 0;
+		virtual GLint Compile( ) = 0;
+		virtual void Apply( ) = 0;
+	
+		virtual void SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot) = 0;
+	};
+
+	class Effect : public EffectInterface
 	{
 	public:
 		Effect( );
 		~Effect( );
-
-		void Load();
 
 		void CreateEffect();
 

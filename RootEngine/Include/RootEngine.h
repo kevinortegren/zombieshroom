@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
@@ -33,7 +34,7 @@ namespace RootEngine
 	public:
 		~EngineMain();
 
-		void Initialize(int flags);
+		void Initialize(int p_flags, std::string p_workingDirectory);
 		GameSharedContext GetGameSharedContext();
 		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
@@ -50,6 +51,7 @@ namespace RootEngine
 
 		Logging			m_logger;
 		MemoryTracker*	m_memTracker;
+		ResourceManager m_resourceManager;
 		Network::NetworkManager*		m_network;
 		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;
@@ -58,6 +60,6 @@ namespace RootEngine
 
 extern "C"
 {
-	typedef RootEngine::GameSharedContext ( *INITIALIZEENGINE )(int);
-	ROOTENGINE_DLL_EXPORT RootEngine::GameSharedContext InitializeEngine(int flags);
+	typedef RootEngine::GameSharedContext ( *INITIALIZEENGINE )(int, std::string);
+	ROOTENGINE_DLL_EXPORT RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workingDirectory);
 }

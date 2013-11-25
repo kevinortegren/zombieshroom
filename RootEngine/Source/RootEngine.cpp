@@ -10,47 +10,66 @@ namespace RootEngine
 {
 	EngineMain::~EngineMain()
 	{
-		m_network->Shutdown();
-		m_renderer->Shutdown();
-		m_gui->Shutdown();
-
-		DynamicLoader::FreeSharedLibrary(m_networkModule);
-		DynamicLoader::FreeSharedLibrary(m_renderModule);
-		DynamicLoader::FreeSharedLibrary(m_guiModule);
+		if(m_network != nullptr)
+		{
+			m_network->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_networkModule);
+		}
+		if(m_renderer != nullptr)
+		{
+			m_renderer->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_renderModule);
+		}
+		if(m_gui != nullptr)
+		{
+			m_gui->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_guiModule);
+		}
 	}
 
-	void EngineMain::Initialize(int flags)
+	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
+
 		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 
 		RootEngine::EffectParser p;
 		p.Load("test.yaml");
 
-		m_memTracker = new MemoryTracker(&m_logger);
+		m_network = nullptr;
+		m_renderer = nullptr;
+		m_gui = nullptr;
 
+		RootEngine::EffectParser p;
+		p.Load("Assets/Scripts/test.yaml");
+
+		m_memTracker = new MemoryTracker(&m_logger);
+		
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &m_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
 
 		// Load external dlls.
-		if((flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
+		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
 		}
-		if((flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
+		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
 		{
 			LoadRender();
 		}
-		if((flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
+		if((p_flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
 		{
 			LoadGUI();
 		}
+
+		m_resourceManager.Init(p_workingDirectory, m_renderer);
 
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &m_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
+		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
@@ -143,8 +162,8 @@ namespace RootEngine
 	extern RootEngine::EngineMain* g_engineMain;
 }
 
-RootEngine::GameSharedContext InitializeEngine(int flags)
+RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workingDirectory)
 {
-	RootEngine::g_engineMain->Initialize(flags);
+	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }

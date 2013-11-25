@@ -123,6 +123,8 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		glFrontFace(GL_CW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
@@ -145,7 +147,11 @@ namespace Render
 #endif
 
 		// Check for extensions.
-		g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
+		if(CheckExtension("GL_NVX_gpu_memory_info"))
+		{
+			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
+		}
+		CheckExtension("NV_texture_multisample");
 
 		m_window = p_window;
 
@@ -154,27 +160,21 @@ namespace Render
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
 		
-		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
-		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
+		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
-		m_effect.CreateEffect();
-		m_effect.AttachShader( GL_VERTEX_SHADER, "Assets/Shaders/Generic.vert");
-		m_effect.AttachShader( GL_FRAGMENT_SHADER, "Assets/Shaders/Generic.frag");
 
-		if(m_effect.Compile() != GL_TRUE)
-			Render::g_context.m_logger->LogText("Couldn't compile shader.");
-		
-		m_effect.Apply();
-	
+		//m_effect.Apply();
+
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
 		m_lightVars.m_direction = glm::vec3(0,0,-1);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 
-		m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
-		m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-		m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+		//m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
+		//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		//m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob* p_job)
@@ -189,8 +189,13 @@ namespace Render
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
-			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
+
+			(*itr)->m_effect->Apply();
+			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 			(*itr)->m_mesh->Bind();
 			(*itr)->m_mesh->DrawArrays();
 			(*itr)->m_mesh->Unbind();
