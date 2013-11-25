@@ -11,9 +11,12 @@ namespace RootEngine
 		EffectImporter(Render::RendererInterface* p_renderer)
 			: m_renderer(p_renderer) {}
 
-		void Process(const YAML::Node& p_node); 
+		void Process(const YAML::Node& p_node);
+		void SetWorkingDirectory(std::string p_workingDirectory);
 
+		std::shared_ptr<Render::EffectInterface> m_effect;
 	private:
 		Render::RendererInterface* m_renderer;
+		std::string m_workingDirectory;
 	};
 }

@@ -74,7 +74,7 @@ namespace Render
 
 		// Camera
 		Camera m_camera;
-		Buffer m_camerBuffer;
+		Buffer m_cameraBuffer;
 		struct
 		{
 			glm::mat4 m_projection;

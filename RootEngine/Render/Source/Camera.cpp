@@ -18,7 +18,7 @@ void Camera::LookAt()
 
 void Camera::PerspectiveProjection(float p_fov, float p_near, float p_far)
 {
-	m_projection = glm::perspectiveFov<float>(p_fov, 800, 600, p_near, p_far);
+	m_projection = glm::perspectiveFov<float>(p_fov, 1280, 720, p_near, p_far);
 }
 
 void Camera::Update()

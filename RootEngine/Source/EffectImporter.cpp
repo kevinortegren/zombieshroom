@@ -29,24 +29,31 @@ namespace RootEngine
 			passes[i]["type"] >> type;
 			
 			GLenum glType;
+			std::string extension;
 			if(type == "vertex") 
 			{
 				glType = GL_VERTEX_SHADER;
+				extension = ".vert";
 			}
 			else if(type == "fragment")
 			{
 				glType = GL_FRAGMENT_SHADER;
+				extension = ".frag";
 			}
 
-			std::string shader = std::string("Assets/Shaders/" + shaderName  + ".glsl");
-			effect->AttachShader( GL_VERTEX_SHADER, shader.c_str());
+			std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
+			effect->AttachShader(glType, shader.c_str());
 
 			std::cout << shaderName << std::endl;
 			std::cout << type << std::endl;
 		}
 
 		effect->Compile();
+		m_effect = effect;
+	}
 
-
+	void EffectImporter::SetWorkingDirectory(std::string p_workingDirectory)
+	{
+		m_workingDirectory = p_workingDirectory;
 	}
 }

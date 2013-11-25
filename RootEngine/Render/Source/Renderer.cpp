@@ -123,6 +123,8 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		glFrontFace(GL_CW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
@@ -158,8 +160,8 @@ namespace Render
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
 		
-		m_camerBuffer.Init(GL_UNIFORM_BUFFER);
-		m_camerBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
+		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
 
 		//m_effect.Apply();
@@ -189,6 +191,11 @@ namespace Render
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
 			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
+
+			(*itr)->m_effect->Apply();
+			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 			(*itr)->m_mesh->Bind();
 			(*itr)->m_mesh->DrawArrays();
 			(*itr)->m_mesh->Unbind();
