@@ -1,8 +1,7 @@
 #include <GL/glew.h>
-
 #include "Effect.h"
 #include "Shader.h"
-
+#include <RootEngine/Render/Include/RenderExtern.h>
 #include <cstdio>
 
 namespace Render
@@ -45,7 +44,7 @@ namespace Render
 
 		if( status != GL_TRUE )
 		{
-			printf( "ERROR: failed to link shader programme\n" );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to link shader programme[%s, line %d]", __FUNCTION__, __LINE__ );
 			int length = 200;
 			//glGetShaderiv( handle, GL_INFO_LOG_LENGTH, &length );
 			if( length > 0 )
@@ -54,7 +53,7 @@ namespace Render
 				char* errorLog = new char[ length ];
 				int written = 0;
 				glGetProgramInfoLog( m_glHandle, length, &written, errorLog );
-				printf( "Shader error log:\n%s\n", errorLog );
+				Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Shader error log:\n\t\t%s", errorLog , __FUNCTION__, __LINE__ );
 				delete[ ] errorLog;
 			}
 			return status;
@@ -108,7 +107,7 @@ namespace Render
 	{
 		GLint loc = glGetUniformLocation( p_handle, p_name );
 		if( loc == 0 )
-			printf( "Failed to locate GL variable %s.\n", p_name );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::NON_FATAL_ERROR, "Failed to locate GL variable %s.\n", p_name , __FUNCTION__, __LINE__ );
 		return loc;
 	}
 

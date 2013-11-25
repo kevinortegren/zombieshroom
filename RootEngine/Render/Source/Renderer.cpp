@@ -113,14 +113,14 @@ namespace Render
 		glewExperimental = GL_TRUE; 
 		GLenum err = glewInit();
 		if (err != GLEW_OK) {
-			Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "Failed to initialize glew!");
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to initialize glew!");
 			return;
 		}
 
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
-		Render::g_context.m_logger->LogText(LogTag::RENDER, 1, "OpenGL context version: %d.%d", major, minor);
+		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
 		glFrontFace(GL_CW);
@@ -129,7 +129,7 @@ namespace Render
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallbackARB)
 		{
-			g_context.m_logger->LogText(LogTag::RENDER, 1, "Register OpenGL debug callback ");
+			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Register OpenGL debug callback ");
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallbackARB(PrintOpenGLError, nullptr);
 			GLuint unusedIds = 0;
@@ -141,11 +141,11 @@ namespace Render
 				true);
 		}
 		else
-			g_context.m_logger->LogText(LogTag::RENDER, 1, "glDebugMessageCallback not available");
+			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::NON_FATAL_ERROR, "glDebugMessageCallback not available");
 #endif
 
 		// Check for extensions.
-		g_context.m_logger->LogText(LogTag::RENDER, 1, "Available video memory: %i KB", GetAvailableVideoMemory());
+		g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
 
 		m_window = p_window;
 
@@ -191,12 +191,9 @@ namespace Render
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
 			m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
-			(*itr)->m_attributes->Bind();
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*itr)->m_indexBuffer->GetBufferId());
-			glDrawElements(GL_TRIANGLES, (*itr)->m_indexBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
-
-			(*itr)->m_attributes->Unbind();
+			(*itr)->m_mesh->Bind();
+			(*itr)->m_mesh->DrawArrays();
+			(*itr)->m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
@@ -217,7 +214,7 @@ namespace Render
 	bool GLRenderer::CheckExtension(const char* p_extension)
 	{
 		if(glewIsExtensionSupported(p_extension) == GL_FALSE) {
-			g_context.m_logger->LogText(LogTag::RENDER, 1,  "Missing OpenGL extension: %s", p_extension);
+			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::WARNING,  "Missing OpenGL extension: %s", p_extension);
 			return false;
 		}
 		return true;
