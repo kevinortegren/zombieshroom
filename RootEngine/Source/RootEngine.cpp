@@ -89,7 +89,6 @@ namespace RootEngine
 		return m_subsystemSharedContext;
 	}
 
-
 	void EngineMain::LoadNetwork()
 	{
 		// Load the network module

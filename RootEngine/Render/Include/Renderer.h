@@ -39,6 +39,9 @@ namespace Render
 	class GLRenderer : public RendererInterface
 	{
 	public:
+		GLRenderer();
+		~GLRenderer();
+
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
@@ -54,9 +57,6 @@ namespace Render
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 
 	private:
-		GLRenderer();
-		~GLRenderer();
-
 		void Clear();
 		void Swap();
 

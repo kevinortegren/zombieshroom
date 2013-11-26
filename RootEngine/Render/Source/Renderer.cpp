@@ -194,13 +194,11 @@ namespace Render
 		m_lights.Init(GL_UNIFORM_BUFFER);
 		m_lightVars.m_direction = glm::vec3(0,0,-1);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
-
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
 	{
 		/*SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
 		int width;
 		int height;
 		SDL_GetWindowSize(m_window, &width, &height);*/
@@ -283,4 +281,11 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
+}
+
+Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
+{
+	Render::g_context = p_context;
+
+	return new Render::GLRenderer;
 }
