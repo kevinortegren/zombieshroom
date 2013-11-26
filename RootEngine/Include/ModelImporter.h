@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <RootEngine/Render/Include/Vertex.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <memory>
 
@@ -14,7 +15,7 @@ namespace RootEngine
 {
 	struct Model
 	{
-		std::vector<Render::Mesh*> m_meshes;
+		std::vector<std::shared_ptr<Render::MeshInterface>> m_meshes;
 		//vector<Texture*> m_textures;
 		//vector<AnimationData*> m_animations;
 	};
@@ -24,10 +25,10 @@ namespace RootEngine
 	public:
 		
 
-		ModelImporter(Logging* p_logger);
+		ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer);
 		~ModelImporter();
 
-		Model* LoadModel(const std::string p_fileName);
+		std::shared_ptr<Model> LoadModel(const std::string p_fileName);
 		
 	private:
 
@@ -36,6 +37,7 @@ namespace RootEngine
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 
 		Logging*	m_logger;
-		Model*		m_model; 
+		std::shared_ptr<Model>		m_model; 
+		Render::RendererInterface* m_renderer;
 	};
 }

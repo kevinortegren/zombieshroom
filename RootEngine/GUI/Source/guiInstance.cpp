@@ -15,6 +15,8 @@ namespace RootEngine
 			m_fileInterface = new guiFileInterface();
 
 			m_rootContext = NULL;
+
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
 		}
 
 
@@ -26,6 +28,7 @@ namespace RootEngine
 			delete m_sysInterface;
 			delete m_renderInterface;
 			delete m_fileInterface;
+			delete s_gui;
 		}
 
 		void guiInstance::Initalize(float p_width, float p_height)
@@ -76,13 +79,15 @@ namespace RootEngine
 			return s_gui;
 		}
 
-		GUISystemInterface* CreateGUI(RootEngine::SubsystemSharedContext p_context)
-		{
-			g_context = p_context;
-
-			return guiInstance::GetInstance();
-		}
+		
 	}
+}
+
+RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemSharedContext p_context)
+{
+	RootEngine::GUISystem::g_context = p_context;
+
+	return RootEngine::GUISystem::guiInstance::GetInstance();
 }
 
 TEST(GUI, GUITest1)

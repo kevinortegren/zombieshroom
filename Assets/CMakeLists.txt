@@ -16,4 +16,4 @@ add_custom_target(${PROJECT_NAME} ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Assets)
 
 source_group("Shaders" FILES ${SHADERS})
-source_group("Scrips" FILES ${SCRIPTS})
+source_group("Scripts" FILES ${SCRIPTS})

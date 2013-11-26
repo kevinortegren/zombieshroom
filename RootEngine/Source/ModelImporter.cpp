@@ -3,9 +3,10 @@
 namespace RootEngine
 {
 	
-	ModelImporter::ModelImporter(Logging* p_logger) : m_logger(p_logger)
+	ModelImporter::ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer)
 	{
-		m_model = new Model();
+		m_logger	= p_logger;
+		m_renderer	= p_renderer;
 	}
 
 	ModelImporter::~ModelImporter()
@@ -13,21 +14,25 @@ namespace RootEngine
 		
 	}
 
-	Model* ModelImporter::LoadModel(const std::string p_fileName)
+	std::shared_ptr<Model> ModelImporter::LoadModel(const std::string p_fileName)
 	{
-
+		m_model = std::shared_ptr<Model>(new Model());
 		Assimp::Importer importer;
 
 		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
-		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", p_fileName.c_str());
+
+		char fileName[128];
+		_splitpath(p_fileName.c_str(), NULL, NULL, fileName, NULL);
+
+		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", fileName);
 		if (aiscene) 
 		{
 			InitFromScene(aiscene, p_fileName);
-			m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", p_fileName.c_str());
+			m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
 		{
-			m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", p_fileName.c_str(), importer.GetErrorString());
+			m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
 		}
 
 		return m_model;
@@ -42,7 +47,7 @@ namespace RootEngine
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
 			InitMesh(i, paiMesh);
 		}
-		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
+		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Created %d meshes ",p_scene->mNumMeshes);
 		InitMaterials(p_scene, p_filename);
 	}
 
@@ -77,7 +82,11 @@ namespace RootEngine
 			indices.push_back(Face.mIndices[1]);
 			indices.push_back(Face.mIndices[2]);
 		}
-		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces", p_aiMesh->mNumFaces);
+		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
+
+		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
+		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
+		m_model->m_meshes.push_back(tempmesh);
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )

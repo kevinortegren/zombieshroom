@@ -83,8 +83,8 @@ namespace Utility
 			m_vertices[2].m_pos = glm::vec3(-1.0f, +1.0f, 0.0f);
 			m_vertices[3].m_pos = glm::vec3(+1.0f, +1.0f, 0.0f);
 
-			m_indices[0] = 0; m_indices[1] = 2; m_indices[2] = 1;
-			m_indices[3] = 2; m_indices[4] = 3; m_indices[5] = 1;
+			m_indices[0] = 0; m_indices[1] = 1; m_indices[2] = 2;
+			m_indices[3] = 2; m_indices[4] = 1; m_indices[5] = 3;
 		}
 	}
 }
