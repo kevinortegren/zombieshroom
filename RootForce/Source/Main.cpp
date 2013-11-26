@@ -95,7 +95,6 @@ Main::Main(std::string p_workingDirectory)
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 	m_engineContext.m_resourceManager->LoadEffect("test");
-	m_engineContext.m_resourceManager->LoadCollada("testhouse");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 }
 
