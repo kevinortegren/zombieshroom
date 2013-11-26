@@ -118,7 +118,7 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
-	Utility::ScreenQuad quad(Render::VertexType::VERTEXTYPE_1P);
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
@@ -154,7 +154,7 @@ void Main::Start()
 		// TODO: Render and present game
 
 		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
+		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.2f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);

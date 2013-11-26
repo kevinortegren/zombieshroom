@@ -39,23 +39,23 @@ namespace Utility
 			m_vertices[6].m_pos = vec3(max.x, max.y, min.z);
 			m_vertices[7].m_pos = vec3(max.x, min.y, min.z);
 
-			m_indices[0] = 0; m_indices[1] = 1; m_indices[2] = 4;
-			m_indices[3] = 5; m_indices[4] = 4; m_indices[5] = 1;
+			m_indices[0] = 0; m_indices[1] = 4; m_indices[2] = 1;
+			m_indices[3] = 5; m_indices[4] = 1; m_indices[5] = 4;
 
-			m_indices[6] = 2; m_indices[7] = 4; m_indices[8] = 5;
-			m_indices[9] = 2; m_indices[10] = 5; m_indices[11] = 3;
+			m_indices[6] = 2; m_indices[7] = 5; m_indices[8] = 4;
+			m_indices[9] = 2; m_indices[10] = 3; m_indices[11] = 5;
 
-			m_indices[12] = 6; m_indices[13] = 2; m_indices[14] = 3;
-			m_indices[15] = 6; m_indices[16] = 3; m_indices[17] = 7;
+			m_indices[12] = 6; m_indices[13] = 3; m_indices[14] = 2;
+			m_indices[15] = 6; m_indices[16] = 7; m_indices[17] = 3;
 
-			m_indices[18] = 0; m_indices[19] = 6; m_indices[20] = 7;
-			m_indices[21] = 0; m_indices[22] = 7; m_indices[23] = 1;
+			m_indices[18] = 0; m_indices[19] = 7; m_indices[20] = 6;
+			m_indices[21] = 0; m_indices[22] = 1; m_indices[23] = 7;
 
-			m_indices[24] = 0; m_indices[25] = 4; m_indices[26] = 2;
-			m_indices[27] = 0; m_indices[28] = 2; m_indices[29] = 6;
+			m_indices[24] = 0; m_indices[25] = 2; m_indices[26] = 4;
+			m_indices[27] = 0; m_indices[28] = 6; m_indices[29] = 2;
 
-			m_indices[30] = 1; m_indices[31] = 3; m_indices[32] = 5;
-			m_indices[33] = 1; m_indices[34] = 7; m_indices[35] = 3;
+			m_indices[30] = 1; m_indices[31] = 5; m_indices[32] = 3;
+			m_indices[33] = 1; m_indices[34] = 3; m_indices[35] = 7;
 		}
 	}
 
