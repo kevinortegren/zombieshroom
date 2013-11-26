@@ -26,6 +26,8 @@ namespace RootEngine
 
 			//Updates the elapsed time as well as updates and renders the gui context
 			virtual void Update(float p_time) = 0;
+
+			virtual void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) = 0;
 		};
 
 		class guiInstance : public GUISystemInterface
@@ -38,6 +40,8 @@ namespace RootEngine
 			bool AttachDocument(std::string p_path); 
 
 			void Update(float p_time);
+
+			void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) { m_renderInterface->SetEffect(p_effect); }
 
 			static guiInstance* GetInstance();
 

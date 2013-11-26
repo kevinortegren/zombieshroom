@@ -11,7 +11,6 @@ namespace LogTag
 	{
 		RENDER,
 		NETWORK,
-		DEBUG,
 		GENERAL,
 		NOTAG,
 		PHYSICS,
@@ -19,7 +18,6 @@ namespace LogTag
 		SOUND,
 		GAME,
 		COMPONENT,
-		ERR,
 		GUI,
 		INPUT
 	};

@@ -1,14 +1,13 @@
-#include "guiRenderInterface.h"
+
 #include <Rocket/Core/Platform.h>
 #include <windows.h>
 #include <GL/glew.h>
-#include <gl/Gl.h>
+//#include <gl/Gl.h>
 //#include <gl/Glu.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
+#include "guiRenderInterface.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
-#include <RootEngine/Render/Include/Effect.h>
 
 #define GL_CLAMP_TO_EDGE 0x812F
 
@@ -23,10 +22,6 @@ namespace RootEngine
 
 guiRenderInterface::guiRenderInterface(void)
 {
-	m_effect.CreateEffect();
-	m_effect.AttachShader(GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
-	m_effect.AttachShader(GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
-	m_effect.Compile();
 }
 
 
@@ -44,10 +39,14 @@ void guiRenderInterface::SetViewport(int width, int height)
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
 void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
-	m_effect.Apply();
+	m_effect->Apply();
 	//glPushMatrix();
 	//glTranslatef(translation.x, translation.y, 0);
 	glm::mat4 matrixOfDoom = glm::translate(translation.x, translation.y, 0.f);
+
+	m_effect->SetUniformMatrix("projectionMatrix", glm::mat4(1));
+	m_effect->SetUniformMatrix("viewMatrix", glm::mat4(1));
+	m_effect->SetUniformMatrix("modelMatrix", glm::mat4(1));
 
 	GLuint gbuf;
 	glGenBuffers(1, &gbuf);

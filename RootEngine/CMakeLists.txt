@@ -16,6 +16,10 @@ set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader)
 # Set search paths
 include_directories(Include)
 
+# Set compiler flags
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+
 
 # Add the target
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

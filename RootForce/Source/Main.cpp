@@ -28,6 +28,9 @@ TEST(Test, Foo)
 
 int main(int argc, char* argv[]) 
 {
+	std::string path(argv[0]);
+	std::string rootforcename = "Rootforce.exe";
+	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
 		if (argc > 1 && strcmp(argv[1], "-test") == 0)
@@ -40,7 +43,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			Main m;
+			Main m(path);
 			m.Start();
 		}
 	} 
@@ -60,16 +63,15 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-Main::Main() 
+Main::Main(std::string p_workingDirectory) 
 	: m_running(true)
 {
 
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
-	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
+	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
-	m_engineContext.m_logger->LogText("Hello world from logger");
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -91,6 +93,7 @@ Main::Main()
 	}
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	m_engineContext.m_resourceManager->LoadEffect("test");
 }
 
 Main::~Main() 
@@ -124,8 +127,10 @@ void Main::Start()
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(realVertices, 3, indices, numIndices);
+	
 	m_engineContext.m_gui->Initalize(1280, 720);
 	m_engineContext.m_gui->AttachDocument("Assets/GUI/demo.rml");
+
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
@@ -134,7 +139,8 @@ void Main::Start()
 
 	job.m_mesh = mesh;
 	job.m_uniforms = &uniforms;
-
+	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("test"));
 	float angle = 0.0f;
 
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -145,18 +151,19 @@ void Main::Start()
 		old = now;
 
 		HandleEvents();
-		
+
 		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
 
-		angle += 0.0000001f;
-		uniforms.m_world = glm::rotate<float>(uniforms.m_world, angle, 0.0f, 1.0f, 0.0f);
+		angle += 90.0f*dt;
+		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);
+		
 		m_engineContext.m_renderer->Clear();
-		//m_engineContext.m_renderer->Render();
+		m_engineContext.m_renderer->Render();
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
