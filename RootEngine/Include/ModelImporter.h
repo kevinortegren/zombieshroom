@@ -18,6 +18,12 @@ namespace RootEngine
 		std::vector<std::shared_ptr<Render::MeshInterface>> m_meshes;
 		//vector<Texture*> m_textures;
 		//vector<AnimationData*> m_animations;
+		
+		unsigned int numberOfIndices;
+		unsigned int numberOfVertices;
+		unsigned int numberOfFaces;
+		std::vector<glm::vec3> meshPoints;
+		std::vector<unsigned int> meshIndices;
 	};
 
 	class ModelImporter
@@ -35,6 +41,7 @@ namespace RootEngine
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh);
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
+		std::vector<glm::vec3> GetMeshPoints(std::vector<Render::Vertex1P1N1UV> p_vertices);
 
 		Logging*	m_logger;
 		std::shared_ptr<Model>		m_model; 
