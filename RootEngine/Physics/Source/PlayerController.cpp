@@ -159,7 +159,7 @@ void PlayerController::ParseGhostContacts()
 				{
 					//const btVector3& ptA = point.getPositionWorldOnA();
 					const btVector3& ptB = point.getPositionWorldOnB();
-
+					
 					//const btVector3& normalOnB = point.m_normalWorldOnB();
 					//Check if on ground
 					if(ptB.getY() < m_motionTransform.getOrigin().getY() - m_heightOffset /*Offset to get under ground*/ - 0.01f)

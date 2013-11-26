@@ -7,7 +7,7 @@ namespace Physics
 {
 	RootEngine::SubsystemSharedContext g_context;
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
-
+	
 	RootPhysics::RootPhysics()
 	{
 
@@ -20,6 +20,7 @@ namespace Physics
 	}
 	void RootPhysics::Startup()
 	{
+		
 		Init();
 	}
 	void RootPhysics::Shutdown()
@@ -56,6 +57,19 @@ namespace Physics
 		delete m_broadphase;
 		delete m_dispatcher;
 	}
+	/*
+	bool hti
+	void* object;
+	id
+	bool isAbility
+	int id, id=0=Terrain, id1= ability id2 = player
+	*/
+	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
+	bool CallbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
+	{
+		
+		return false;
+	}
 	void RootPhysics::Init()
 	{
 		m_collisionConfig= new btDefaultCollisionConfiguration();
@@ -65,7 +79,8 @@ namespace Physics
 		m_solver = new btSequentialImpulseConstraintSolver();
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
-	
+		gContactAddedCallback = &CallbackFunc;
+		g_context.m_logger->LogTextToConsole(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
 	}
 
 
@@ -111,6 +126,7 @@ namespace Physics
 	//Done
 	int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
 	{
+		
 		//creates the mesh shape
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
 		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
@@ -137,19 +153,35 @@ namespace Physics
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
-
-		//add the body to the world
+		
+		//add the body to the world,  TODO : We should also set a user defined gravity for the object
 		m_dynamicWorld->addRigidBody(objectBody);
 
 		//add to the dynamic object vector
 		m_dynamicObjects.push_back(objectBody);
 
+		//The user pointer should be something we can use to detect which ability a player collides with
+		/*PhysicWorldInfo tempInfo;
+		tempInfo.m_collidedType = -1;
+		tempInfo.m_hasHit = false;
+		tempInfo.m_index = m_userPointer.size();
+		tempInfo.m_type = ABILITY;
+		tempInfo.m_position[0] = p_position[0];
+		tempInfo.m_position[1] = p_position[1];
+		tempInfo.m_position[2] = p_position[2];
+		CustomUserPointer* temp = new CustomUserPointer();
+		temp->m_object = objectBody;
+		temp->m_worldInfo = tempInfo;
+		temp->m_vectorIndex = m_dynamicObjects.size()-1;
+		objectBody->setUserPointer(temp);
+		m_userPointer.push_back(temp);*/
 		delete indexVertexArray;
 		delete objectMeshShape;
 		delete objectHull;
 
-		//return index of body to caller as a reference 
 		return m_dynamicObjects.size()-1;
+		//return index of body to caller as a reference 
+		//return m_dynamicObjects.size()-1;
 	}
 
 	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, float* p_velocity )
@@ -172,7 +204,6 @@ namespace Physics
 			, p_vertexStride, p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
 		m_playerObject.push_back(player);
-
 		return m_playerObject.size() -1;
 	}
 
@@ -219,6 +250,33 @@ namespace Physics
 		//This might be so incredibly broken that i don't even how the compiler lets us do it
  		m_playerObject.at(p_objectIndex)->SetVelocity(temp * p_pushForce);
 	}
+
+	void RootPhysics::RemoveObject( int p_objectIndex, int p_type )
+	{
+		//if(p_type == PLAYER)
+		//{
+		//	//m_playerObject.at(p_objectIndex)->
+		//}
+		//if(p_type == ABILITY)
+		//{
+		//	CustomUserPointer* temp = m_userPointer.at(p_objectIndex);
+		//	delete [] temp->m_worldInfo.m_position;
+		//	btRigidBody* body = (btRigidBody*)temp->m_object;
+		//	delete body->getMotionState();
+		//	delete body->getCollisionShape();
+		//	m_dynamicWorld->removeCollisionObject(body);
+		//	delete body;	
+		//	delete m_dynamicObjects[temp->m_vectorIndex];
+		//	
+
+
+		//}
+
+
+
+	}
+
+	
 
 }
 

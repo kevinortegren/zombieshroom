@@ -4,7 +4,6 @@
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
-
 #if defined(_WINDLL)
 #define PHYSICS_DLL_EXPORT __declspec(dllexport)
 #else
@@ -13,6 +12,15 @@
 
 namespace Physics
 {
+
+	struct PhysicWorldInfo
+	{
+		bool m_hasHit;
+		int m_index;
+		int m_collidedType; //Might not be needed
+		float m_position[3];
+		int m_type;
+	};
 	class PhysicsInterface : public RootEngine::SubsystemInterface
 	{
 	public:
@@ -40,6 +48,8 @@ namespace Physics
 		virtual void GetPlayerPos(int p_objectIndex, float* p_playerPos)= 0;
 		/// p_objectPos should be of type float[3]
 		virtual void GetObjectPos(int p_objectIndex, float* p_objectPos) = 0;
+
+		virtual void RemoveObject(int p_objectIndex, int p_type) = 0;
 	};
 
 
@@ -61,7 +71,7 @@ namespace Physics
 		void SetDynamicObjectVelocity(int p_objectIndex, float* p_velocity); ///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 
 		void SetObjectMass(int p_objectIndex, float p_mass);
-
+		
 		///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 		void AddStaticObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation);
 		/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
@@ -73,17 +83,29 @@ namespace Physics
 		void GetPlayerPos(int p_objectIndex, float* p_playerPos);	/// p_playerPos should be of type float[3]	
 		void GetObjectPos(int p_objectIndex, float* p_objectPos);/// p_objectPos should be of type float[3]
 
+		void RemoveObject(int p_objectIndex, int p_type);
+
 	private:
+		/*const int TERRAIN = 0;
+		const int PLAYER = 1;
+		const int ABILITY = 2;*/
+		struct CustomUserPointer
+		{
+			void* m_object; //btRigidbody for abilitys and playercontroller for players
+			PhysicWorldInfo m_worldInfo;
+			int m_vectorIndex;
+		};
 		void Init();
 		RootPhysics();
 		~RootPhysics();
+
 		btDiscreteDynamicsWorld* m_dynamicWorld;
 		btDefaultCollisionConfiguration* m_collisionConfig;
 		btCollisionDispatcher* m_dispatcher;
 		btSequentialImpulseConstraintSolver* m_solver;
 		btBroadphaseInterface* m_broadphase;
-		btRigidBody* fallingballbody;
 		static RootPhysics* s_physicsInstance;
+		std::vector<CustomUserPointer*> m_userPointer;
 		std::vector<btRigidBody*> m_dynamicObjects;
 		std::vector<PlayerController*> m_playerObject;
 	};

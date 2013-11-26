@@ -59,6 +59,7 @@ namespace RootEngine
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
+		 
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -165,7 +166,7 @@ namespace RootEngine
 			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
-
+	
 }
 
 namespace RootEngine
