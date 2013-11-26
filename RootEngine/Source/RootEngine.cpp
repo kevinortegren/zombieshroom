@@ -4,7 +4,8 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 
-#include <RootEngine/Include/EffectParser.h>
+#include <RootEngine/Include/Logging/Logging.h>
+Logging	g_logger;
 
 namespace RootEngine
 {
@@ -29,17 +30,16 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
-
-		m_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
+		g_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 
 		m_network = nullptr;
 		m_renderer = nullptr;
 		m_gui = nullptr;
 
-		m_memTracker = new MemoryTracker(&m_logger);
+		m_memTracker = new MemoryTracker(&g_logger);
 		
 		// Setup the subsystem context
-		m_subsystemSharedContext.m_logger = &m_logger;
+		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
 
 		// Load external dlls.
@@ -61,7 +61,7 @@ namespace RootEngine
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
-		m_gameSharedContext.m_logger = &m_logger;
+		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
@@ -95,12 +95,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -118,12 +118,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -137,16 +137,16 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
-				m_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
+				g_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
 			}
 			else
 			{
-				m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
