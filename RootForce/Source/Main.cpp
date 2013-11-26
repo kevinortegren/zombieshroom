@@ -137,7 +137,6 @@ void Main::Start()
 	
 
 	Render::RenderJob job;
-	
 	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	job.m_uniforms = &uniforms;
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
