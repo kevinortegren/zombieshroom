@@ -14,6 +14,7 @@
 #include <RootEngine/Include/RootEngine.h>
 
 #include <ECS/Tests/TestSystem.h>
+#include <RenderingSystem.h>
 
 #include <exception>
 
@@ -95,6 +96,7 @@ Main::Main(std::string p_workingDirectory)
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 	m_engineContext.m_resourceManager->LoadEffect("test");
+	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
 	m_engineContext.m_resourceManager->LoadCollada("testhouse");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 }
@@ -136,7 +138,7 @@ void Main::Start()
 
 	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	job.m_uniforms = &uniforms;
-	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	job.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
 
 	float angle = 0.0f;
 

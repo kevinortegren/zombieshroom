@@ -6,6 +6,7 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/EffectImporter.h>
+//#include <RootEngine/Include/TextureImporter.h>
 
 
 namespace RootEngine
@@ -16,9 +17,11 @@ namespace RootEngine
 	public:
 		virtual void LoadCollada(std::string p_path) = 0;
 		virtual void LoadEffect(std::string p_path) = 0;
+		//virtual void LoadTexture(std::string p_path) = 0;
 
 		virtual std::shared_ptr<Model> GetModel(std::string p_handle) = 0;
 		virtual std::shared_ptr<Render::EffectInterface> GetEffect(std::string p_handle) = 0;
+		//virtual std::shared_ptr<Render::Texture> GetTexture(std::string p_handle) = 0;
 	};
 
 	class ResourceManager : public ResourceManagerInterface
