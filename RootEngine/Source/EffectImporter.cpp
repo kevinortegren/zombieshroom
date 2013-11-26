@@ -14,12 +14,12 @@ namespace RootEngine
 
 		// Parsing technique.
 		p_node["name"] >> techName;
-		p_node["param"] >> param;
+		p_node["parama"] >> param;
 
 		effect->CreateEffect();
 
 		const YAML::Node& passes = p_node["passes"];
-		for(int i = 0; i < passes.size(); ++i)
+		for(size_t i = 0; i < passes.size(); ++i)
 		{
 			std::string shaderName;
 			passes[i]["name"] >> shaderName;

@@ -5,5 +5,5 @@ find_path(YAML_INCLUDE_DIRS
     HINTS "${CMAKE_SOURCE_DIR}/External/Include")
 
 find_library(YAML_LIBRARY
-    NAMES libyaml-cppmdd
+    NAMES libyaml-cppmd
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
