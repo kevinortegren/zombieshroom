@@ -19,7 +19,7 @@ namespace RootEngine
 		m_model = std::shared_ptr<Model>(new Model());
 		Assimp::Importer importer;
 
-		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, 128, NULL, 0);
