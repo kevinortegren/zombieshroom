@@ -24,6 +24,8 @@ out vec3 vert_normal;
 out vec3 vert_lightVec;
 out vec3 vert_diffuseColor;
 
+
+
 void main()
 {
 	vert_normal = normalize( normalMatrix * vec4(in_normal, 0.0f)).xyz;

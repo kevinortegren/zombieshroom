@@ -13,8 +13,10 @@ namespace Render
 		void Unbind();
 		void Read();
 
+		Render::Texture m_color;
+
 	private:
 		GLuint m_fbo;
-		Render::Texture m_color;
+		
 	};
 }

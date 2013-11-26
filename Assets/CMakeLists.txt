@@ -12,7 +12,7 @@ file(GLOB_RECURSE SCRIPTS Scripts/*)
 # Add the target
 
 add_custom_target(${PROJECT_NAME} ALL
-	SOURCES ${SHADERS}
+	SOURCES ${SHADERS} ${SCRIPTS}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Assets)
 
 source_group("Shaders" FILES ${SHADERS})

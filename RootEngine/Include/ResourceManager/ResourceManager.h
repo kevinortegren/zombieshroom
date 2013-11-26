@@ -14,7 +14,6 @@ namespace Render
 
 namespace RootEngine
 {
-
 	class ResourceManagerInterface
 	{
 	public:
@@ -51,6 +50,5 @@ namespace RootEngine
 		Logging* m_logger;
 		std::shared_ptr<EffectImporter> m_effectImporter;
 		std::string m_workingDirectory;
-
 	};
 }

@@ -15,6 +15,7 @@ namespace Render
 		virtual void Apply( ) = 0;
 	
 		virtual void SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot) = 0;
+		virtual void SetTexture(GLuint p_textureHandle, const std::string& textureName, unsigned int slot) = 0;
 	};
 
 	class Effect : public EffectInterface
@@ -30,6 +31,7 @@ namespace Render
 		void Apply( );
 	
 		void SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot);
+		void SetTexture(GLuint p_textureHandle, const std::string& textureName, unsigned int slot);
 
 	private:
 

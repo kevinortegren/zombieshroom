@@ -1,14 +1,15 @@
 #pragma once
 
 #include <RootEngine/Render/Include/Buffer.h>
-
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/GeometryBuffer.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
+
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -66,6 +67,10 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
+
+		GeometryBuffer m_gbuffer;
+		std::shared_ptr<EffectInterface> m_output;
+
 
 		std::vector<RenderJob*> m_jobs;
 

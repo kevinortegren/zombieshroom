@@ -1,8 +1,10 @@
 
 #include <GL/glew.h>
+
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Render/Include/Shader.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -155,6 +157,12 @@ namespace Render
 
 		m_window = p_window;
 
+		m_gbuffer.Init(1280, 720);
+
+		g_context.m_resourceManager->LoadEffect("Output");
+		m_output = g_context.m_resourceManager->GetEffect("Output");
+	
+
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
 		
 		m_cameraVars.m_projection = m_camera.GetProjection();
@@ -163,18 +171,11 @@ namespace Render
 		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
-
-		//m_effect.Apply();
-
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
 		m_lightVars.m_direction = glm::vec3(0,0,-1);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
-
-		//m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
-		//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-		//m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob* p_job)
@@ -186,20 +187,31 @@ namespace Render
 	{
 		Clear();
 
+		// Geometry pass.
+		m_gbuffer.Bind();
+
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
-			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-
 
 			(*itr)->m_effect->Apply();
-			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+
 			(*itr)->m_mesh->Bind();
 			(*itr)->m_mesh->DrawArrays();
 			(*itr)->m_mesh->Unbind();
 		}
+
+		m_gbuffer.Unbind();
+		m_gbuffer.Read();
+
+		
+		m_output->Apply();
+		m_output->SetTexture(m_gbuffer.m_color.GetHandle(), "g_Texture", 0);
+
+		// Draw fsq.
 
 		m_jobs.clear();
 

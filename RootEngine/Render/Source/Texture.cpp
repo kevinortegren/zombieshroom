@@ -77,13 +77,10 @@ bool Render::Texture::Load(const std::string& filepath)
 	return true;
 }
 
-void Render::Texture::Enable(GLuint shaderProgram, unsigned int slot)
+void Render::Texture::Enable(unsigned int slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_textureHandle);
-
-	GLint uniformLocation = glGetUniformLocation(shaderProgram, "g_Texture");
-	glUniform1i(uniformLocation, slot);
 }
 
 glm::vec2 Render::Texture::GetInverseTextureSize() const

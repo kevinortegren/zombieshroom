@@ -1,5 +1,4 @@
 #include <RootEngine.h>
-#include <RootEngine/Render/Include/Renderer.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 
@@ -40,6 +39,7 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
+		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -58,7 +58,6 @@ namespace RootEngine
 		{
 			LoadInputSystem();
 		}
-
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer);
 

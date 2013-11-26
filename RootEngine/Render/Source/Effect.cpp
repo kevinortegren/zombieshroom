@@ -102,6 +102,11 @@ namespace Render
 			glBindBufferBase(GL_UNIFORM_BUFFER, slot, p_bufferId);
 		}
 	}
+	void Effect::SetTexture(GLuint p_textureHandle, const std::string& textureName, unsigned int slot)
+	{
+		GLint uniformLocation = glGetUniformLocation(m_glHandle, textureName.c_str());
+		glUniform1i(uniformLocation, slot);
+	}
 
 	GLint GetLocation( GLuint p_handle, const char* p_name )
 	{

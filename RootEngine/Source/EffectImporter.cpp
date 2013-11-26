@@ -1,4 +1,5 @@
 #include <RootEngine/Include/EffectImporter.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 #include <RootEngine/Include/Logging/Logging.h>
 extern Logging	g_logger;

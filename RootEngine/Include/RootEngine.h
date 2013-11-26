@@ -6,14 +6,9 @@
 	#define ROOTENGINE_DLL_EXPORT __declspec(dllimport)
 #endif
 
-#include <memory>
-#include <RootEngine/Include/Logging/Logging.h>
-#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
-#include <RootEngine/Include/Memory/MemoryTracker.h>
-#include <RootEngine/Include/YamlParser.h>
-#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <memory>
 
 namespace RootEngine
 {

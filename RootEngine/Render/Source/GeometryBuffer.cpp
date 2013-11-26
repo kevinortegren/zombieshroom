@@ -34,6 +34,6 @@ namespace Render
 
 	void GeometryBuffer::Read()
 	{
-		
+		m_color.Enable(0);
 	}
 }

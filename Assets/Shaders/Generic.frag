@@ -17,10 +17,15 @@ uniform vec3 coefficientSpecular;
 uniform float powerSpecular;
 uniform vec3 intensitySpecular;*/
 
-out vec3 frag_color;
+struct FSOutput
+{
+    vec3 Diffuse;
+};
 
 void main()
 {
+	FSOutput FSout;
+
 	/*vec3 n = normalize( vert_normal );
 	vec3 v = normalize( -vec3( vert_eyeCoords ) );
 	vec3 r = reflect( -normalize( vert_lightVec ), vert_normal );
@@ -28,6 +33,8 @@ void main()
 	vec3 specular = pow ( max( 0.0f, dot( r, v ) ), powerSpecular ) * intensitySpecular;
 
 	frag_color = vec3( coefficientAmbient * intensityAmbient + coefficientDiffuse * vert_diffuseColor + coefficientSpecular * specular );*/
-	frag_color = vec3(0.3 + vert_diffuseColor);
+	vec3 frag_color = vec3(0.3 + vert_diffuseColor);
 	//frag_color = vec3(1);
+
+	FSout.Diffuse = frag_color;
 }
