@@ -6,7 +6,6 @@ Logging::Logging()
 {
 	m_stringTagList.push_back("RENDER");
 	m_stringTagList.push_back("NETWOR");
-	m_stringTagList.push_back("DEBUG ");
 	m_stringTagList.push_back("GNERAL");
 	m_stringTagList.push_back("NOTAG ");
 	m_stringTagList.push_back("PHYSIC");
@@ -14,7 +13,6 @@ Logging::Logging()
 	m_stringTagList.push_back("SOUND ");
 	m_stringTagList.push_back("GAME  ");
 	m_stringTagList.push_back("CMPSYS");
-	m_stringTagList.push_back("ERROR ");
 	m_stringTagList.push_back("GUI   ");
 	m_stringTagList.push_back("INPUT ");
 
