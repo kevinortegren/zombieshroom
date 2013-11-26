@@ -41,5 +41,7 @@ public:
 private:
 	int m_width;
 	int m_height;
+
+	Render::Effect m_effect;
 };
 

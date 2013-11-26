@@ -124,7 +124,8 @@ void Main::Start()
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(realVertices, 3, indices, numIndices);
-
+	m_engineContext.m_gui->Initalize(1280, 720);
+	m_engineContext.m_gui->AttachDocument("Assets/GUI/demo.rml");
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
@@ -144,7 +145,7 @@ void Main::Start()
 		old = now;
 
 		HandleEvents();
-
+		
 		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
@@ -154,8 +155,10 @@ void Main::Start()
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);
-
-		m_engineContext.m_renderer->Render();
+		m_engineContext.m_renderer->Clear();
+		//m_engineContext.m_renderer->Render();
+		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
+		m_engineContext.m_renderer->Swap();
 	}
 }
 

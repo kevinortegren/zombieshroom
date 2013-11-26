@@ -185,8 +185,6 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		Clear();
-
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
@@ -200,7 +198,6 @@ namespace Render
 
 		m_jobs.clear();
 
-		Swap();
 	}
 
 	void GLRenderer::Clear()

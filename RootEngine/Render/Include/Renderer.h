@@ -24,7 +24,9 @@ namespace Render
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
+		virtual void Clear() = 0;
 		virtual void Render() = 0;
+		virtual void Swap() = 0;
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
@@ -40,8 +42,9 @@ namespace Render
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
 		void AddRenderJob(RenderJob* p_job);
+		void Clear();
 		void Render();
-
+		void Swap();
 		bool CheckExtension(const char* p_extension);
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
@@ -52,8 +55,7 @@ namespace Render
 		GLRenderer();
 		~GLRenderer();
 
-		void Clear();
-		void Swap();
+		
 
 		void SetAttributes();
 	

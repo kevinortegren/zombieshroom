@@ -1,13 +1,32 @@
 #include "guiRenderInterface.h"
 #include <Rocket/Core/Platform.h>
 #include <windows.h>
+#include <GL/glew.h>
 #include <gl/Gl.h>
-#include <gl/Glu.h>
+//#include <gl/Glu.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+#include <RootEngine/Include/SubsystemSharedContext.h>
+#include <RootEngine/Render/Include/Effect.h>
 
 #define GL_CLAMP_TO_EDGE 0x812F
 
+
+namespace RootEngine
+{
+	namespace GUISystem
+	{
+		extern RootEngine::SubsystemSharedContext g_context;
+	}
+}
+
 guiRenderInterface::guiRenderInterface(void)
 {
+	m_effect.CreateEffect();
+	m_effect.AttachShader(GL_VERTEX_SHADER, "Assets/Shaders/genericVertex.glsl");
+	m_effect.AttachShader(GL_FRAGMENT_SHADER, "Assets/Shaders/genericFragment.glsl");
+	m_effect.Compile();
 }
 
 
@@ -23,31 +42,39 @@ void guiRenderInterface::SetViewport(int width, int height)
 
 
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
-void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int ROCKET_UNUSED(num_vertices), int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
+void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
-	glPushMatrix();
-	glTranslatef(translation.x, translation.y, 0);
+	m_effect.Apply();
+	//glPushMatrix();
+	//glTranslatef(translation.x, translation.y, 0);
+	glm::mat4 matrixOfDoom = glm::translate(translation.x, translation.y, 0.f);
 
-	glVertexPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].position);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Rocket::Core::Vertex), &vertices[0].colour);
+	GLuint gbuf;
+	glGenBuffers(1, &gbuf);
+	glBindBuffer(GL_ARRAY_BUFFER, gbuf);
+	glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(Rocket::Core::Vector2f), &vertices[0].position, GL_STREAM_DRAW);
+	//glVertexPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].position);
+	//glEnableClientState(GL_COLOR_ARRAY);
+	//glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Rocket::Core::Vertex), &vertices[0].colour);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Rocket::Core::Vector2f), (char*)NULL);
 
 	if (!texture)
 	{
-		glDisable(GL_TEXTURE_2D);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glDisable(GL_TEXTURE_2D);
+		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 	else
 	{
-		glEnable(GL_TEXTURE_2D);
+		/*glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].tex_coord);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].tex_coord);*/
+		RootEngine::GUISystem::g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Error: gui texturing not yet implemented.");
 	}
 
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, indices);
 
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 // Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.		
