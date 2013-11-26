@@ -29,7 +29,7 @@
 namespace gli{
 namespace detail
 {
-	view::view
+	inline view::view
 	(
 		size_type const & BaseLayer,
 		size_type const & MaxLayer,
@@ -46,7 +46,7 @@ namespace detail
 		MaxLevel(MaxLevel)
 	{}
 
-	view & view::operator=(view const & View)
+	inline view & view::operator=(view const & View)
 	{
 		this->BaseLayer = View.BaseLayer;
 		this->MaxLayer = View.MaxLayer;

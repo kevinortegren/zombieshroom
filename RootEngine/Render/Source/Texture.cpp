@@ -1,5 +1,24 @@
 #include <RootEngine/Render/Include/Texture.h>
 
+Render::Texture::~Texture()
+{
+	glDeleteTextures(1, &m_textureHandle);
+}
+
+bool Render::Texture::Load(int p_width, int p_height)
+{
+	glGenTextures(1, &m_textureHandle);
+	glBindTexture(GL_TEXTURE_2D, m_textureHandle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	return true;
+}
+
 bool Render::Texture::Load(const std::string& filepath)
 {
 	gli::texture2D texture(gli::loadStorageDDS(filepath));
@@ -75,5 +94,10 @@ glm::vec2 Render::Texture::GetInverseTextureSize() const
 glm::vec2 Render::Texture::GetSize() const
 {
 	return glm::vec2(m_textureWidth, m_textureHeight);
+}
+
+GLuint Render::Texture::GetHandle() const
+{
+	return m_textureHandle;
 }
 
