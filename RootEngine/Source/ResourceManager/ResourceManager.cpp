@@ -33,13 +33,14 @@ namespace RootEngine
 		m_effects[p_path] = m_effectImporter->m_effect;
 	}
 
-	Render::Mesh* ResourceManager::GetMesh(std::string p_handle)
-	{
-		return nullptr;
-	}
-
 	std::shared_ptr<Render::EffectInterface> ResourceManager::GetEffect(std::string p_handle)
 	{
 		return m_effects[p_handle];
 	}
+
+	std::shared_ptr<Model> ResourceManager::GetModel( std::string p_handle )
+	{
+		return m_models[p_handle];
+	}
+
 }
