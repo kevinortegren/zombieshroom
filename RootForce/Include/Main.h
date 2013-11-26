@@ -4,10 +4,11 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <ECS/World.h>
+#include <string>
 
 class Main {
 public:
-	Main();
+	Main(std::string p_workingDirectory);
 	~Main();
 
 	void Start();

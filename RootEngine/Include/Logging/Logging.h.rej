@@ -1,0 +1,11 @@
+diff a/RootEngine/Include/Logging/Logging.h b/RootEngine/Include/Logging/Logging.h	(rejected hunks)
+@@ -20,7 +20,8 @@
+ 		GAME,
+ 		COMPONENT,
+ 		ERR,
+-		GUI
++		GUI,
++		INPUT
+ 	};
+ }
+ 

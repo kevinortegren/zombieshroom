@@ -1,6 +1,7 @@
 #pragma once
 
 #include <RootEngine/Render/Include/Buffer.h>
+
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
@@ -25,10 +26,12 @@ namespace Render
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
 		virtual void Render() = 0;
+
+		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
-
+		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -47,6 +50,7 @@ namespace Render
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
 		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
+		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 
 	private:
 		GLRenderer();
@@ -66,12 +70,11 @@ namespace Render
 		std::vector<RenderJob*> m_jobs;
 
 		// Effect.
-		Effect m_effect;
 		Buffer m_uniforms;
 
 		// Camera
 		Camera m_camera;
-		Buffer m_camerBuffer;
+		Buffer m_cameraBuffer;
 		struct
 		{
 			glm::mat4 m_projection;
