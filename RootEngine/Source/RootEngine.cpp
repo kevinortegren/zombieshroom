@@ -40,7 +40,7 @@ namespace RootEngine
 		m_renderer = nullptr;
 		m_gui = nullptr;
 
-		m_memTracker = new MemoryTracker(&m_logger);
+		m_memTracker = new MemoryTracker(&g_logger);
 
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
@@ -60,7 +60,7 @@ namespace RootEngine
 			LoadGUI();
 		}
 
-		m_resourceManager.Init(p_workingDirectory, m_renderer, &m_logger);
+		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
