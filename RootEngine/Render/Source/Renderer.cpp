@@ -55,8 +55,6 @@ namespace Render
 {
 	RootEngine::SubsystemSharedContext g_context;
 
-	GLRenderer* GLRenderer::s_rendererInstance = nullptr;
-
 	GLRenderer::GLRenderer()
 	{
 		
@@ -65,16 +63,6 @@ namespace Render
 	GLRenderer::~GLRenderer()
 	{
 
-	}
-
-	GLRenderer* GLRenderer::GetInstance()
-	{
-		if(!s_rendererInstance)
-		{
-			s_rendererInstance = new GLRenderer();
-		}
-
-		return s_rendererInstance;
 	}
 
 	void GLRenderer::Startup()
@@ -154,11 +142,12 @@ namespace Render
 		{
 			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
 		}
+
 		CheckExtension("NV_texture_multisample");
 
 		m_window = p_window;
 
-		m_gbuffer.Init(1280, 720);
+		m_gbuffer.Init(width, height);
 
 		// Setup fullscreen quad.
 
@@ -183,10 +172,14 @@ namespace Render
 
 		m_fullscreenQuad.Init(verts, 4, indices, 6);
 		
+		// Load effects.
+
 		g_context.m_resourceManager->LoadEffect("Output");
 		m_output = g_context.m_resourceManager->GetEffect("Output");
 	
-		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
+		// Setup camera.
+
+		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
 		
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
@@ -194,11 +187,31 @@ namespace Render
 		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
+		// Setup uniforms buffers.
+
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
 		m_lightVars.m_direction = glm::vec3(0,0,-1);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
+
+	}
+
+	void GLRenderer::SetResolution(int p_width, int p_height)
+	{
+		/*SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+		int width;
+		int height;
+		SDL_GetWindowSize(m_window, &width, &height);*/
+
+		SDL_SetWindowSize(m_window, p_width, p_height);
+		
+		m_gbuffer.Resize(p_width, p_height);
+
+		glViewport(0, 0, p_width, p_height);
+
+		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob* p_job)
@@ -230,12 +243,12 @@ namespace Render
 
 		m_jobs.clear();
 
-		m_gbuffer.Unbind();
-		m_gbuffer.Read();
+		m_gbuffer.Unbind(); // Unbind GBuffer and restore backbuffer.
+		m_gbuffer.Read(); // Enable the GBuffer for reads.
 
 		m_output->Apply();
 
-		m_output->SetTexture(m_gbuffer.m_color.GetHandle(), "g_Texture", 0);
+		m_output->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Texture", 0);
 
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.DrawArrays();
@@ -270,11 +283,4 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
-}
-
-Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
-{
-	Render::g_context = p_context;
-
-	return Render::GLRenderer::GetInstance();
 }

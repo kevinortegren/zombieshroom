@@ -18,6 +18,7 @@ uniform float powerSpecular;
 uniform vec3 intensitySpecular;*/
 
 layout (location = 0) out vec3 def_p; // "go to GL_COLOR_ATTACHMENT0"
+layout (location = 1) out vec3 def_n; // "go to GL_COLOR_ATTACHMENT0"
 
 void main()
 {
@@ -32,4 +33,5 @@ void main()
 	//frag_color = vec3(1);
 
 	def_p = frag_color;
+	def_n = vert_normal;
 }

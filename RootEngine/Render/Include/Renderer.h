@@ -25,6 +25,7 @@ namespace Render
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
+		virtual void SetResolution(int p_width, int p_height) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
 		virtual void Render() = 0;
 
@@ -38,11 +39,10 @@ namespace Render
 	class GLRenderer : public RendererInterface
 	{
 	public:
-		static GLRenderer* GetInstance();
-
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
+		void SetResolution(int p_width, int p_height);
 		void AddRenderJob(RenderJob* p_job);
 		void Render();
 
