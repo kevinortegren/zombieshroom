@@ -160,10 +160,32 @@ namespace Render
 
 		m_gbuffer.Init(1280, 720);
 
+		// Setup fullscreen quad.
+
+		Render::Vertex1P1UV verts[4];
+		verts[0].m_pos = glm::vec3(-1.0f, -1.0f, 0.0f);
+		verts[1].m_pos = glm::vec3(+1.0f, -1.0f, 0.0f);
+		verts[2].m_pos = glm::vec3(-1.0f, +1.0f, 0.0f);
+		verts[3].m_pos = glm::vec3(+1.0f, +1.0f, 0.0f);
+
+		verts[0].m_UV = glm::vec2(0.0f, 0.0f);
+		verts[1].m_UV = glm::vec2(1.0f, 0.0f);
+		verts[2].m_UV = glm::vec2(0.0f, 1.0f);
+		verts[3].m_UV = glm::vec2(1.0f, 1.0f);
+		
+		unsigned int indices[6];
+		indices[0] = 0; 
+		indices[1] = 1; 
+		indices[2] = 2;
+		indices[3] = 2;
+		indices[4] = 1; 
+		indices[5] = 3;
+
+		m_fullscreenQuad.Init(verts, 4, indices, 6);
+		
 		g_context.m_resourceManager->LoadEffect("Output");
 		m_output = g_context.m_resourceManager->GetEffect("Output");
 	
-
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
 		
 		m_cameraVars.m_projection = m_camera.GetProjection();
@@ -196,6 +218,7 @@ namespace Render
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
 
 			(*itr)->m_effect->Apply();
+
 			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
 			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
@@ -205,16 +228,18 @@ namespace Render
 			(*itr)->m_mesh->Unbind();
 		}
 
+		m_jobs.clear();
+
 		m_gbuffer.Unbind();
 		m_gbuffer.Read();
 
-		
 		m_output->Apply();
+
 		m_output->SetTexture(m_gbuffer.m_color.GetHandle(), "g_Texture", 0);
 
-		// Draw fsq.
-
-		m_jobs.clear();
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.DrawArrays();
+		m_fullscreenQuad.Unbind();
 
 		Swap();
 	}

@@ -17,15 +17,10 @@ uniform vec3 coefficientSpecular;
 uniform float powerSpecular;
 uniform vec3 intensitySpecular;*/
 
-struct FSOutput
-{
-    vec3 Diffuse;
-};
+layout (location = 0) out vec3 def_p; // "go to GL_COLOR_ATTACHMENT0"
 
 void main()
 {
-	FSOutput FSout;
-
 	/*vec3 n = normalize( vert_normal );
 	vec3 v = normalize( -vec3( vert_eyeCoords ) );
 	vec3 r = reflect( -normalize( vert_lightVec ), vert_normal );
@@ -36,5 +31,5 @@ void main()
 	vec3 frag_color = vec3(0.3 + vert_diffuseColor);
 	//frag_color = vec3(1);
 
-	FSout.Diffuse = frag_color;
+	def_p = frag_color;
 }

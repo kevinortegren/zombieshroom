@@ -9,6 +9,7 @@ namespace Render
 		enum VertexType
 		{
 			VERTEXTYPE_1P,
+			VERTEXTYPE_1P1UV,
 			VERTEXTYPE_1P1N,
 			VERTEXTYPE_1P1C,
 			VERTEXTYPE_1P1N1UV
@@ -22,6 +23,11 @@ namespace Render
 
 	struct Vertex1P : public Vertex
 	{
+	};
+
+	struct Vertex1P1UV : public Vertex
+	{
+		glm::vec2 m_UV;
 	};
 
 	struct Vertex1P1N : public Vertex

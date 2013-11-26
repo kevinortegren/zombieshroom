@@ -69,6 +69,7 @@ namespace Render
 		SDL_Window* m_window;
 
 		GeometryBuffer m_gbuffer;
+		Mesh m_fullscreenQuad;
 		std::shared_ptr<EffectInterface> m_output;
 
 

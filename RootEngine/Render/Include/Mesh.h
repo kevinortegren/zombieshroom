@@ -10,6 +10,7 @@ namespace Render
 	{
 	public:
 		virtual void Init(Vertex1P* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
+		virtual void Init(Vertex1P1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
 		virtual void Init(Vertex1P1N* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
 		virtual void Init(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
 		virtual void Init(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
@@ -24,6 +25,7 @@ namespace Render
 		Mesh();
 		~Mesh();
 		virtual void Init(Vertex1P* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
+		virtual void Init(Vertex1P1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
 		virtual void Init(Vertex1P1N* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
 		virtual void Init(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
 		virtual void Init(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
@@ -34,6 +36,5 @@ namespace Render
 		Buffer m_vertexBuffer;
 		Buffer m_elementBuffer;
 		VertexAttributes m_vertexAttributes;
-
 	};
 }
