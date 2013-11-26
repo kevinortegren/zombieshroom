@@ -124,7 +124,7 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		glCullFace(GL_BACK);
 		glFrontFace(GL_CW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 

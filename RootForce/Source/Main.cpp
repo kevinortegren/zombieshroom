@@ -5,7 +5,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Vertex.h>
-
+#include <RootForce/Include/RawMeshPrimitives.h>
 
 #include <gtest/gtest.h>
 
@@ -115,6 +115,18 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
+	Utility::ScreenQuad cube(Render::VertexType::VERTEXTYPE_1P);
+	std::shared_ptr<Render::MeshInterface> cubemesh = m_engineContext.m_renderer->CreateMesh();
+	cubemesh->Init(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices, cube.m_indices, cube.m_numberOfIndices);
+	Render::Uniforms cubeuniforms;
+	cubeuniforms.m_normal = glm::mat4(1);
+	cubeuniforms.m_world = glm::mat4(1);
+	Render::RenderJob cubejob;
+	cubejob.m_mesh = cubemesh;
+	cubejob.m_uniforms = &cubeuniforms;
+	cubejob.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+
+
 	int numVertices = 3;
 	Render::Vertex1P1N realVertices[3];
 	realVertices[0].m_pos = glm::vec3(0.5f, 0.5f, 1.f); realVertices[0].m_normal = glm::vec3(0.f, 0.f, 1.f);
@@ -157,7 +169,11 @@ void Main::Start()
 		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
-		m_engineContext.m_renderer->AddRenderJob(&job);
+		cubeuniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), -angle, 0.2f, 1.0f, 0.0f);
+		cubeuniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
+
+		//m_engineContext.m_renderer->AddRenderJob(&job);
+		m_engineContext.m_renderer->AddRenderJob(&cubejob);
 
 		m_engineContext.m_renderer->Render();
 	}

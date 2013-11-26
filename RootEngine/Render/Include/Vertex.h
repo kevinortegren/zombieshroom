@@ -4,6 +4,17 @@
 
 namespace Render
 {
+	namespace VertexType
+	{
+		enum VertexType
+		{
+			VERTEXTYPE_1P,
+			VERTEXTYPE_1P1N,
+			VERTEXTYPE_1P1C,
+			VERTEXTYPE_1P1N1UV
+		};
+	}
+
 	struct Vertex abstract
 	{
 		glm::vec3 m_pos;
