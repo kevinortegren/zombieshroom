@@ -67,13 +67,14 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
+		std::vector<RenderJob*> m_jobs;
 
 		GeometryBuffer m_gbuffer;
+
 		Mesh m_fullscreenQuad;
+
+		std::shared_ptr<EffectInterface> m_deferred;
 		std::shared_ptr<EffectInterface> m_output;
-
-
-		std::vector<RenderJob*> m_jobs;
 
 		// Effect.
 		Buffer m_uniforms;
@@ -92,6 +93,7 @@ namespace Render
 		Buffer m_lights;
 		struct
 		{
+			glm::vec3 m_ambient;
 			glm::vec3 m_direction;
 
 		} m_lightVars;

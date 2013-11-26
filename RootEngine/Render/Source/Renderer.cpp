@@ -177,6 +177,9 @@ namespace Render
 		g_context.m_resourceManager->LoadEffect("Output");
 		m_output = g_context.m_resourceManager->GetEffect("Output");
 	
+		g_context.m_resourceManager->LoadEffect("Deferred");
+		m_deferred = g_context.m_resourceManager->GetEffect("Deferred");
+	
 		// Setup camera.
 
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -193,6 +196,7 @@ namespace Render
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
 		m_lightVars.m_direction = glm::vec3(0,0,-1);
+		m_lightVars.m_ambient = glm::vec3(0.3f,0.3f,0.3f);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 	}
 
@@ -232,7 +236,6 @@ namespace Render
 
 			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
 			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 
 			(*itr)->m_mesh->Bind();
 			(*itr)->m_mesh->DrawArrays();
@@ -244,13 +247,22 @@ namespace Render
 		m_gbuffer.Unbind(); // Unbind GBuffer and restore backbuffer.
 		m_gbuffer.Read(); // Enable the GBuffer for reads.
 
-		m_output->Apply();
+		// Lighting pass.
 
-		m_output->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Texture", 0);
+		m_deferred->Apply();
+				
+		m_deferred->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Diffuse", 0);
+		m_deferred->SetTexture(m_gbuffer.m_normals.GetHandle(), "g_Normals", 1);
+		
+		m_deferred->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 
 		m_fullscreenQuad.Bind();
-		m_fullscreenQuad.DrawArrays();
+
+		m_fullscreenQuad.DrawInstanced(1);
+
 		m_fullscreenQuad.Unbind();
+
+		// Output.
 
 		Swap();
 	}

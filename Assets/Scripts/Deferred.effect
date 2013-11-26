@@ -1,0 +1,7 @@
+- name: Tech1
+  param: foo
+  passes:
+  - name: diffuse
+    type: vertex
+  - name: diffuse
+    type: fragment

@@ -21,6 +21,7 @@ namespace Render
 
 	class Mesh : public MeshInterface
 	{
+	friend class GLRenderer;
 	public:
 		Mesh();
 		~Mesh();
@@ -36,5 +37,8 @@ namespace Render
 		Buffer m_vertexBuffer;
 		Buffer m_elementBuffer;
 		VertexAttributes m_vertexAttributes;
+
+	private:
+		void DrawInstanced(GLsizei p_instances);
 	};
 }

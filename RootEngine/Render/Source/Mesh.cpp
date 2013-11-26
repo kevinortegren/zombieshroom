@@ -82,4 +82,9 @@ namespace Render
 	{
 		glDrawElements(GL_TRIANGLES, m_elementBuffer.GetBufferSize(), GL_UNSIGNED_INT, 0);
 	}
+
+	void Mesh::DrawInstanced(GLsizei p_instances)
+	{
+		glDrawElementsInstanced(GL_TRIANGLES, m_elementBuffer.GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+	}
 }

@@ -29,7 +29,7 @@ namespace RootEngine
 
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_effectImporter->Load(m_workingDirectory + "Assets//Scripts//" + p_path + ".yaml");
+		m_effectImporter->Load(m_workingDirectory + "Assets//Scripts//" + p_path + ".effect");
 		m_effects[p_path] = m_effectImporter->m_effect;
 	}
 
