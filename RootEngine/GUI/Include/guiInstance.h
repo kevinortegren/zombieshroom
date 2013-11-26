@@ -5,6 +5,7 @@
 #include "guiFileInterface.h"
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <string>
 
 #if defined(_WINDLL)
     #define SUBSYSTEM_DLL_EXPORT __declspec(dllexport)
@@ -27,7 +28,10 @@ namespace RootEngine
 			//Updates the elapsed time as well as updates and renders the gui context
 			virtual void Update(float p_time) = 0;
 
+			//Sets an already loaded rendering effect to the gui context
 			virtual void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) = 0;
+
+			virtual void SetWorkingDir(std::string p_workingDir) = 0;
 		};
 
 		class guiInstance : public GUISystemInterface
@@ -45,6 +49,8 @@ namespace RootEngine
 
 			static guiInstance* GetInstance();
 
+			void SetWorkingDir(std::string p_workingDir) { m_workingDir = p_workingDir; }
+
 
 
 		private:
@@ -56,6 +62,7 @@ namespace RootEngine
 			Rocket::Core::Context* m_rootContext;
 
 			static guiInstance* s_gui;
+			std::string m_workingDir;
 		};
 	}
 

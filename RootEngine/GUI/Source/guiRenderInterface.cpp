@@ -35,45 +35,82 @@ void guiRenderInterface::SetViewport(int width, int height)
     m_height = height;
 }
 
+void guiRenderInterface::SetEffect(std::shared_ptr<Render::EffectInterface> p_effect)
+{
+	m_effect = p_effect;
+	m_effect->Apply();
+	m_effect->SetUniformMatrix(
+		"projectionMatrix",
+		glm::mat4(
+			2.f/m_width, 0.f, 0.f, 0.f,
+			0.f, -2.f/m_height, 0.f, 0.f,
+			0.f, 0.f, 1.f, 0.f,
+			-1.f, 1.f, 0.f, 1.f
+		)
+	);
+}
+
 
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
 void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
+	glm::mat4 modelMatrix = glm::translate(translation.x*2.f/m_width, translation.y*2.f/m_height, 0.f);
+
 	m_effect->Apply();
-	//glPushMatrix();
-	//glTranslatef(translation.x, translation.y, 0);
-	glm::mat4 matrixOfDoom = glm::translate(translation.x, translation.y, 0.f);
+	m_effect->SetUniformMatrix("modelMatrix", modelMatrix);
 
-	m_effect->SetUniformMatrix("projectionMatrix", glm::mat4(1));
-	m_effect->SetUniformMatrix("viewMatrix", glm::mat4(1));
-	m_effect->SetUniformMatrix("modelMatrix", glm::mat4(1));
-
-	GLuint gbuf;
-	glGenBuffers(1, &gbuf);
-	glBindBuffer(GL_ARRAY_BUFFER, gbuf);
-	glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(Rocket::Core::Vector2f), &vertices[0].position, GL_STREAM_DRAW);
-	//glVertexPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].position);
-	//glEnableClientState(GL_COLOR_ARRAY);
-	//glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Rocket::Core::Vertex), &vertices[0].colour);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Rocket::Core::Vector2f), (char*)NULL);
-
-	if (!texture)
+	std::vector<float> tmp;
+	for( int i = 0; i < num_vertices; i++ )
 	{
-		//glDisable(GL_TEXTURE_2D);
-		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		tmp.push_back(vertices[i].position.x);
+		tmp.push_back(vertices[i].position.y);
+		
+		tmp.push_back(vertices[i].colour.red/255.f);
+		tmp.push_back(vertices[i].colour.green/255.f);
+		tmp.push_back(vertices[i].colour.blue/255.f);
+		tmp.push_back(vertices[i].colour.alpha/255.f);
+
+		tmp.push_back(vertices[i].tex_coord.x);
+		tmp.push_back(vertices[i].tex_coord.y);
 	}
-	else
+
+	GLuint gbuf[2], vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glGenBuffers(2, gbuf);
+	glBindBuffer(GL_ARRAY_BUFFER, gbuf[0]);
+	glBufferData(GL_ARRAY_BUFFER, tmp.size() * sizeof(float), tmp.data(), GL_STREAM_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL+2*sizeof(float));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL+6*sizeof(float));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gbuf[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(int), indices, GL_STREAM_DRAW);
+
+	if(texture)
 	{
-		/*glEnable(GL_TEXTURE_2D);
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+		glActiveTexture(GL_TEXTURE1);
+		m_effect->SetUniformInt("texSampler", 1);
 		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].tex_coord);*/
-		RootEngine::GUISystem::g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Error: gui texturing not yet implemented.");
+
+		glDisable( GL_BLEND );
 	}
 
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, indices);
 
-	//glPopMatrix();
+	glDisable( GL_CULL_FACE );
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
+	glEnable( GL_CULL_FACE );
+	
+	glActiveTexture(GL_TEXTURE0);
+	glDeleteBuffers(2, gbuf);
+	glDeleteVertexArrays(1, &vao);
 }
 
 // Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.		

@@ -16,7 +16,7 @@ public:
      */
     void SetViewport(int width, int height);
 
-	void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) { m_effect = p_effect; }
+	void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect);
 
 	/// Called by Rocket when it wants to render geometry that it does not wish to optimise.
 	void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation);

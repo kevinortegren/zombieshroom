@@ -94,6 +94,7 @@ Main::Main(std::string p_workingDirectory)
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 	m_engineContext.m_resourceManager->LoadEffect("test");
+	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 }
 
 Main::~Main() 
@@ -129,7 +130,7 @@ void Main::Start()
 	mesh->Init(realVertices, 3, indices, numIndices);
 	
 	m_engineContext.m_gui->Initalize(1280, 720);
-	m_engineContext.m_gui->AttachDocument("Assets/GUI/demo.rml");
+	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
@@ -140,7 +141,7 @@ void Main::Start()
 	job.m_mesh = mesh;
 	job.m_uniforms = &uniforms;
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
-	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("test"));
+	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 	float angle = 0.0f;
 
 	uint64_t old = SDL_GetPerformanceCounter();

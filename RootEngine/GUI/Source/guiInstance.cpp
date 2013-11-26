@@ -33,6 +33,7 @@ namespace RootEngine
 
 		void guiInstance::Initalize(float p_width, float p_height)
 		{
+
 			Rocket::Core::SetSystemInterface(m_sysInterface);
 			m_sysInterface->SetElapsedTime(0.1f);
 
@@ -43,6 +44,8 @@ namespace RootEngine
 
 			Rocket::Core::Initialise();
 
+			Rocket::Core::FontDatabase::LoadFontFace("C://Windows//Fonts//arial.ttf");
+
 			m_rootContext = Rocket::Core::CreateContext("root", Rocket::Core::Vector2i(p_width, p_height));
 			if(m_rootContext == nullptr)
 				g_context.m_logger->LogText(LogTag::GUI, 1, "Error: failed to create gui context");
@@ -51,8 +54,8 @@ namespace RootEngine
 		bool guiInstance::AttachDocument(std::string p_path)
 		{
 
-			Rocket::Core::ElementDocument* document = m_rootContext->LoadDocument(p_path.c_str());
-
+			Rocket::Core::ElementDocument* document = m_rootContext->LoadDocument((m_workingDir + p_path).c_str());
+			document->AppendChild(document->CreateTextNode("man cakes"));
 			if(document != NULL)
 			{
 				document->Show();
