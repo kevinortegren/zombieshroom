@@ -68,95 +68,114 @@ std::string Logging::GetTimeString( int p_time )
 		return std::to_string(p_time);
 }
 
-void Logging::LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
+//////////////////////////////////////////////////////////////////////////
+//FILE LOGGING
+//////////////////////////////////////////////////////////////////////////
+void Logging::LTF(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-			WriteToFile(p_tag, p_vLevel, p_format, args);
+		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
 	va_end (args);
 }
 
-void Logging::LogTextToFile( const char * p_format, ... )
+void Logging::LTF(std::string p_func, int p_line, const char * p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToFile(LogTag::NOTAG, m_defaultVerbose, p_format, args);
+		WriteToFile(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
 	va_end (args);
 }
 
-void Logging::LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
+//////////////////////////////////////////////////////////////////////////
+//CONSOLE LOGGING
+//////////////////////////////////////////////////////////////////////////
+void Logging::LTC(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-		WriteToConsole(p_tag, p_vLevel, p_format, args);
+		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
 	va_end (args);
 }
 
-void Logging::LogTextToConsole( const char * p_format, ... )
+void Logging::LTC(std::string p_func, int p_line,const char * p_format, ...)
 {
 	va_list args;
 	va_start (args, p_format);
 	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToConsole(LogTag::NOTAG, m_defaultVerbose, p_format, args);
+		WriteToConsole(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
 	va_end (args);
 }
 
-void Logging::LogText( LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
+//////////////////////////////////////////////////////////////////////////
+//FILE AND CONSOLE LOGGING
+//////////////////////////////////////////////////////////////////////////
+void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
 	{
-		WriteToConsole(p_tag, p_vLevel, p_format, args);
-		WriteToFile(p_tag, p_vLevel, p_format, args);
+		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
+		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
 	}
 	va_end (args);
 }
 
-void Logging::LogText( const char* p_format, ... )
+void Logging::LT(std::string p_func, int p_line,const char* p_format, ... )
 {
 	va_list args;
 	va_start (args, p_format);
 	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
 	{
-		WriteToConsole(LogTag::NOTAG, m_defaultVerbose, p_format, args);
-		WriteToFile(LogTag::NOTAG, m_defaultVerbose, p_format, args);
+		WriteToConsole(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
+		WriteToFile(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
 	}
 	va_end (args);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Set verbose level ( defualt is LogLevel::DEBUG_PRINT)
+//////////////////////////////////////////////////////////////////////////
 void Logging::SetVerboseLevel( LogLevel::LogLevel p_vLevel )
 {
 	m_verboseLevel = p_vLevel;
-	LogTextToConsole(LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
-	LogTextToFile(LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
+	LT(__FUNCTION__, __LINE__, LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Add filters for tags. Only displays those added. No filters as default(show all filters)
+//////////////////////////////////////////////////////////////////////////
 void Logging::AddExclusiveTags( LogTag::LogTag p_tag)
 {
 	m_exTagList.push_back(p_tag);
 }
 
-void Logging::WriteToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel,std::string p_format, va_list p_args )
+//////////////////////////////////////////////////////////////////////////
+//Final write functions
+//////////////////////////////////////////////////////////////////////////
+void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel,std::string p_format, va_list p_args )
 {
 	
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "\n";
+	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
 	fflush(m_logFile);
 }
 
-void Logging::WriteToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )
+void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )
 {
-	
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "\n";
+	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  + "\n";
 
 	vprintf(output.c_str(), p_args);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Returns a correctly formatted time string
+//////////////////////////////////////////////////////////////////////////
 std::string Logging::GetTimeFormatString()
 {
 	time_t currentTime = time(0);
@@ -168,6 +187,9 @@ std::string Logging::GetTimeFormatString()
 	return GetTimeString(gmtm.tm_hour+1) + ":" + GetTimeString(gmtm.tm_min) + ":" + GetTimeString(gmtm.tm_sec);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Checks for filters
+//////////////////////////////////////////////////////////////////////////
 bool Logging::CheckTag(LogTag::LogTag p_tag)
 {
 	if(m_exTagList.size() == 0)
@@ -182,6 +204,9 @@ bool Logging::CheckTag(LogTag::LogTag p_tag)
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Enum-to-string converters CHANGE THIS TO MAP
+//////////////////////////////////////////////////////////////////////////
 std::string Logging::GetStringFromTag( LogTag::LogTag p_tag )
 {
 	return m_stringTagList.at(p_tag);
@@ -190,37 +215,6 @@ std::string Logging::GetStringFromTag( LogTag::LogTag p_tag )
 std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
 {
 	return m_stringLevelList.at(p_level);
-}
-
-//DEPRECATED FUNCTIONS, PLEASE USE LogLevel:: INSTEAD OF unsigned int
-void Logging::LogTextToFile( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-		WriteToFile(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
-	va_end (args);
-}
-
-void Logging::LogTextToConsole( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-		WriteToConsole(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
-	va_end (args);
-}
-
-void Logging::LogText( LogTag::LogTag p_tag, unsigned int p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if((int)p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-	{
-		WriteToConsole(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
-		WriteToFile(p_tag, (LogLevel::LogLevel)p_vLevel, p_format, args);
-	}
-	va_end (args);
 }
 
 

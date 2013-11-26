@@ -45,7 +45,7 @@ namespace RootEngine
 
 			m_rootContext = Rocket::Core::CreateContext("root", Rocket::Core::Vector2i(p_width, p_height));
 			if(m_rootContext == nullptr)
-				g_context.m_logger->LogText(LogTag::GUI, 1, "Error: failed to create gui context");
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Error: failed to create gui context");
 		}
 
 		bool guiInstance::AttachDocument(std::string p_path)
@@ -60,7 +60,7 @@ namespace RootEngine
 				return true;
 			}
 
-			g_context.m_logger->LogText(LogTag::GUI, 2, "Warning: failed to load document %s", p_path.c_str());
+			g_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "Warning: failed to load document %s", p_path.c_str());
 			return false;
 		}
 

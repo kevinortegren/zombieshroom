@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
+#include <RootEngine/Include/Logging/Logging.h>
 
 namespace Physics
 {
@@ -20,7 +21,6 @@ namespace Physics
 	}
 	void RootPhysics::Startup()
 	{
-		
 		Init();
 	}
 	void RootPhysics::Shutdown()
@@ -80,7 +80,7 @@ namespace Physics
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
 		gContactAddedCallback = &CallbackFunc;
-		g_context.m_logger->LogTextToConsole(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
+	//	g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded %d", 2);
 	}
 
 

@@ -25,7 +25,7 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
+			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 
@@ -33,7 +33,7 @@ namespace Render
 	
 		if( !shaderFile.is_open( ) )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "ERROR creating opening shader file %s ! [%s, line %d]", p_filename, __FUNCTION__, __LINE__);
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "ERROR creating opening shader file %s ", p_filename);
 			return GL_FALSE;
 		}
 
@@ -59,7 +59,7 @@ namespace Render
 		glGetShaderiv( m_glHandle, GL_COMPILE_STATUS, &result );
 		if( result != GL_TRUE )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Compiling shader type %d ! [%s, line %d]", p_shaderType, __FUNCTION__, __LINE__ );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Compiling shader type %d ", p_shaderType);
 			int length = 0;
 			glGetShaderiv( m_glHandle, GL_INFO_LOG_LENGTH, &length );
 			if( length > 0 )
