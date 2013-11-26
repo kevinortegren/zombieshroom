@@ -128,7 +128,6 @@ void Main::Start()
 	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	job.m_uniforms = &uniforms;
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
-	
 	float angle = 0.0f;
 
 	uint64_t old = SDL_GetPerformanceCounter();
