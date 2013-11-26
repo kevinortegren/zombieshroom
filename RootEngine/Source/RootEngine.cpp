@@ -8,6 +8,10 @@
 
 namespace RootEngine
 {
+	EngineMain::EngineMain()
+	{
+
+	}
 	EngineMain::~EngineMain()
 	{
 		if(m_network != nullptr)
@@ -36,6 +40,8 @@ namespace RootEngine
 		m_renderer = nullptr;
 		m_gui = nullptr;
 
+		
+
 		m_memTracker = new MemoryTracker(&m_logger);
 		
 		// Setup the subsystem context
@@ -56,8 +62,7 @@ namespace RootEngine
 			LoadGUI();
 		}
 
-		m_resourceManager.Init(p_workingDirectory, m_renderer);
-
+		m_resourceManager.Init(p_workingDirectory, m_renderer, &m_logger);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -149,12 +154,6 @@ namespace RootEngine
 			m_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
-
-	EngineMain::EngineMain()
-	{
-
-	}
-
 }
 
 namespace RootEngine
