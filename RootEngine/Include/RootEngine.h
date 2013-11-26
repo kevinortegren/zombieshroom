@@ -37,7 +37,7 @@ namespace RootEngine
 		void LoadNetwork();
 		void LoadRender();
 		void LoadGUI();
-		void LoadInputSystem();
+		//void LoadInputSystem();
 
 		void* m_networkModule;
 		void* m_renderModule;

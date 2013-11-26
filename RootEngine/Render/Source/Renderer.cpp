@@ -126,8 +126,9 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
-		glFrontFace(GL_CW);
+		glCullFace(GL_BACK);
+		glEnable(GL_DEPTH_TEST);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)

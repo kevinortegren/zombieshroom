@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <RootForce/Include/RawMeshPrimitives.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
@@ -50,6 +51,7 @@ int main(int argc, char* argv[])
 	catch (std::exception& e) 
 	{
 		// TODO: Log exception message
+		std::cout << e.what() << "\n";
 		std::cin.get();
 		return 1;
 	} 
@@ -72,7 +74,6 @@ Main::Main(std::string p_workingDirectory)
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
 	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_RENDER, p_workingDirectory);
 
-
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -94,6 +95,8 @@ Main::Main(std::string p_workingDirectory)
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 	m_engineContext.m_resourceManager->LoadEffect("test");
+	m_engineContext.m_resourceManager->LoadCollada("testhouse");
+	m_engineContext.m_resourceManager->LoadCollada("testchar");
 }
 
 Main::~Main() 
@@ -115,26 +118,23 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
-	int numVertices = 3;
-	Render::Vertex1P1N realVertices[3];
-	realVertices[0].m_pos = glm::vec3(0.5f, 0.5f, 1.f); realVertices[0].m_normal = glm::vec3(0.f, 0.f, 1.f);
-	realVertices[1].m_pos = glm::vec3(-0.5f, 0.5f, 1.f); realVertices[1].m_normal = glm::vec3(0.f, 0.0f, 1.f);
-	realVertices[2].m_pos = glm::vec3(-0.5f, -0.5f, 1.f); realVertices[2].m_normal = glm::vec3(0.f, 0.f, 1.f);
-	int numIndices = 3;
-	GLuint indices[] = {
-		0, 1, 2
-	};
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
-	mesh->Init(realVertices, 3, indices, numIndices);
+	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
 
+	Render::RenderJob quadJob;
+	quadJob.m_mesh = mesh;
+	quadJob.m_uniforms = &uniforms;
+	quadJob.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+
 	Render::RenderJob job;
 
-	job.m_mesh = mesh;
+	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	job.m_uniforms = &uniforms;
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
 
@@ -154,10 +154,11 @@ void Main::Start()
 		// TODO: Render and present game
 
 		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
+		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.2f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);
+		m_engineContext.m_renderer->AddRenderJob(&quadJob);
 
 		m_engineContext.m_renderer->Render();
 	}
