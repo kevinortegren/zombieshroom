@@ -1,6 +1,5 @@
 #include <RootEngine.h>
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Network/Include/NetworkInterface.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 
@@ -59,6 +58,11 @@ namespace RootEngine
 		{
 			LoadGUI();
 		}
+		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
+		{
+			LoadInputSystem();
+		}
+
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		// TODO: Load the rest of the submodules
@@ -70,6 +74,7 @@ namespace RootEngine
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
+		m_gameSharedContext.m_inputSys = m_inputSys;
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -89,7 +94,7 @@ namespace RootEngine
 		m_networkModule = DynamicLoader::LoadSharedLibrary("Network.dll");
 		if (m_networkModule != nullptr)
 		{
-			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
+			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "CreateNetwork");
 			if (libGetNetworkInterface != nullptr)
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);
@@ -152,6 +157,34 @@ namespace RootEngine
 			g_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
+
+	void EngineMain::LoadInputSystem()
+	{
+		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
+		if(m_guiModule != nullptr)
+		{
+			CREATEINPUTINTERFACE libGetInputSys = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
+			if (libGetInputSys != nullptr)
+			{
+				m_inputSys = (InputManager::InputManager*)libGetInputSys(m_subsystemSharedContext);
+				m_inputSys->Startup();
+			}
+			else
+			{
+				m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load InputManager subsystem: %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load InputManager subsystem: %s", DynamicLoader::GetLastError());
+		}
+	}
+
+	EngineMain::EngineMain()
+	{
+
+	}
+
 }
 
 namespace RootEngine

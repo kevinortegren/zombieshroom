@@ -14,7 +14,7 @@ namespace RootEngine
 
 		// Parsing technique.
 		p_node["name"] >> techName;
-		p_node["parama"] >> param;
+		p_node["param"] >> param;
 
 		effect->CreateEffect();
 

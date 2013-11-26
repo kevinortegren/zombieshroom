@@ -18,7 +18,8 @@ namespace LogTag
 		SOUND,
 		GAME,
 		COMPONENT,
-		GUI
+		GUI,
+		INPUT
 	};
 }
 

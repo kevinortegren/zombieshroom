@@ -4,26 +4,32 @@
 #include <SDL2/SDL.h>
 
 #define MAX_KEYS 512
-namespace InputManager
+namespace RootEngine
 {
-	class InputManager: public InputInterface
+	namespace InputManager
 	{
-	public:
-		InputManager(void);
-		~InputManager(void);
-		void HandleInput(SDL_Event& p_event);
+		class InputManager: public InputInterface
+		{
+		public:
+			void Startup(void);
+			void Shutdown(void);
+			void HandleInput(SDL_Event& p_event);
 
-		KeyState::KeyState GetKeyState(SDL_Keycode p_key);
-		KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
+			KeyState::KeyState GetKeyState(SDL_Keycode p_key);
+			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
 
-		vector2 GetGlobalMousePos();
-		vector2 GetDeltaMousePos();
-	private:
-		KeyState::KeyState m_keyState[MAX_KEYS];
+			glm::vec2 GetGlobalMousePos();
+			glm::vec2 GetDeltaMousePos();
 
-		vector2 m_globMousePos;
-		vector2 m_deltaMousePos;
+			static InputManager* GetInstance();
+		private:
+			KeyState::KeyState m_keyState[MAX_KEYS];
 
-	};
+			glm::vec2 m_globMousePos;
+			glm::vec2 m_deltaMousePos;
+
+			static InputManager* s_inputSys;
+		};
+	}
 }
 
