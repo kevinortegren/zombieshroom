@@ -10,6 +10,8 @@
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
+#include <RootEngine/Render/Include/Lights.h>
+
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -27,6 +29,8 @@ namespace Render
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void SetResolution(int p_width, int p_height) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
+		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
+		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
 		virtual void Render() = 0;
 
 		// Resource creation.
@@ -47,6 +51,8 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void SetResolution(int p_width, int p_height);
 		void AddRenderJob(RenderJob* p_job);
+		void AddDirectionalLight(const DirectionalLight& p_light, int index);
+		void SetAmbientLight(const glm::vec4& p_color);
 		void Render();
 
 		bool CheckExtension(const char* p_extension);
@@ -67,6 +73,7 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
+
 		std::vector<RenderJob*> m_jobs;
 
 		GeometryBuffer m_gbuffer;
@@ -78,12 +85,12 @@ namespace Render
 		std::shared_ptr<EffectInterface> m_deferred;
 		std::shared_ptr<EffectInterface> m_output;
 
-		// Effect.
 		Buffer m_uniforms;
-
-		// Camera
-		Camera m_camera;
+		Buffer m_lights;
 		Buffer m_cameraBuffer;
+
+		Camera m_camera;
+	
 		struct
 		{
 			glm::mat4 m_projection;
@@ -91,14 +98,14 @@ namespace Render
 
 		} m_cameraVars;
 
-		// Lights.
-		Buffer m_lights;
 		struct
 		{
-			glm::vec3 m_ambient;
-			glm::vec3 m_direction;
-
+			glm::vec4 m_ambient;
+			DirectionalLight m_lights[16];
+		
 		} m_lightVars;
+
+		size_t m_numDirectionalLights;
 	};
 }
 

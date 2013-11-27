@@ -30,14 +30,14 @@ namespace RootEngine
 
 				program->CreateProgram();
 
-				const YAML::Node& shaders = programs[i]["shaders"];
-				for(size_t j = 0; j < shaders.size(); ++j)
+				const YAML::Node& shaders = programs[j]["shaders"];
+				for(size_t k = 0; k < shaders.size(); ++k)
 				{	
 					std::string shaderName;
-					shaders[j]["name"] >> shaderName;
+					shaders[k]["name"] >> shaderName;
 					
 					std::string type;
-					shaders[j]["type"] >> type;
+					shaders[k]["type"] >> type;
 			
 					GLenum glType;
 					std::string extension;

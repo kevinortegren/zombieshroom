@@ -7,7 +7,7 @@ namespace Render
 {
 	class TextureInterface
 	{
-		virtual bool Load(int p_width, int p_height) = 0;
+		virtual bool Load(int p_width, int p_height, GLenum p_format) = 0;
 		virtual bool Load(const std::string& filepath) = 0;
 
 		virtual void Enable(unsigned int slot) = 0;
@@ -22,7 +22,7 @@ namespace Render
 	public:
 		~Texture();
 
-		bool Load(int p_width, int p_height);
+		bool Load(int p_width, int p_height, GLenum p_format);
 		bool Load(const std::string& filepath);
 
 		void Enable(unsigned int slot);

@@ -56,6 +56,7 @@ namespace Render
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
+		: m_numDirectionalLights(0)
 	{
 		
 	}
@@ -197,8 +198,6 @@ namespace Render
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
 		m_lights.Init(GL_UNIFORM_BUFFER);
-		m_lightVars.m_direction = glm::vec3(0,0,-1);
-		m_lightVars.m_ambient = glm::vec3(0.3f,0.3f,0.3f);
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 	}
 
@@ -223,11 +222,26 @@ namespace Render
 		m_jobs.push_back(p_job);
 	}
 
+	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
+	{
+		m_lightVars.m_lights[index] = p_light;
+		m_numDirectionalLights++;
+	}
+
+	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
+	{
+		m_lightVars.m_ambient = p_color;
+	}
+
 	void GLRenderer::Render()
 	{
 		Clear();
 
 		// Geometry pass.
+		
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+
 		m_gbuffer.Bind();
 
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
@@ -256,24 +270,38 @@ namespace Render
 		m_gbuffer.Read(); // Enable the GBuffer for reads.
 
 		// Lighting pass.
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-		for(auto itr = m_lightingTech->GetPrograms().begin(); itr != m_lightingTech->GetPrograms().end(); ++itr)
-		{
-			(*itr)->Apply();
+		// Buffer light data.
+		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
-			(*itr)->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Diffuse", 0);
-			(*itr)->SetTexture(m_gbuffer.m_normals.GetHandle(), "g_Normals", 1);
+		m_fullscreenQuad.Bind();
 
-			(*itr)->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+		auto ambient = m_lightingTech->GetPrograms()[0];
+		auto directional = m_lightingTech->GetPrograms()[1];
 
-			m_fullscreenQuad.Bind();
+		// Ambient pass.
+		ambient->Apply();
+		ambient->SetTexture(m_gbuffer.m_diffuseHandle, "g_Diffuse", 0);
+		ambient->SetTexture(m_gbuffer.m_normalsHandle, "g_Normals", 1);
+		ambient->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 
-			m_fullscreenQuad.DrawInstanced(1);
+		m_fullscreenQuad.DrawInstanced(1);
 
-			m_fullscreenQuad.Unbind();
-		}
+		// Directional pass.
+		directional->Apply();
+		directional->SetTexture(m_gbuffer.m_diffuseHandle, "g_Diffuse", 0);
+		directional->SetTexture(m_gbuffer.m_normalsHandle, "g_Normals", 1);
+		directional->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+
+		m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
+
+		m_fullscreenQuad.Unbind();
 
 		// Output.
+
 
 		Swap();
 	}

@@ -118,6 +118,24 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+
+	Render::DirectionalLight red;
+	red.m_color = glm::vec4(0.3f,0,0,1);
+	red.m_direction = glm::vec3(1, 0, 0);
+
+	Render::DirectionalLight green;
+	green.m_color = glm::vec4(0,0.3f,0,1);
+	green.m_direction = glm::vec3(0, 0, -1);
+
+	Render::DirectionalLight blue;
+	blue.m_color = glm::vec4(0,0,0.3f,1);
+	blue.m_direction = glm::vec3(-1, 0, 0);
+
+	m_engineContext.m_renderer->AddDirectionalLight(red, 0);
+	m_engineContext.m_renderer->AddDirectionalLight(green, 1);
+	m_engineContext.m_renderer->AddDirectionalLight(blue, 2);
+
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
