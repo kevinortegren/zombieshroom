@@ -109,6 +109,9 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
 	ECS::ComponentSystem* renderingSystem = m_world.GetSystemManager()->CreateSystem<RootForce::RenderingSystem>("RenderingSystem");
+	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
+	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
+
 	m_world.GetSystemManager()->InitializeSystems();
 	
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
@@ -116,9 +119,21 @@ void Main::Start()
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0999f, 0.0999f, 0.0999f);
 
+
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
+
+	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
+	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
+
+
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
 	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	//guyRenderable->m_material;
+	//guyRenderable->m_mesh = mesh;
+
+	Render::Material guyMaterial;
+	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
+	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	guyRenderable->m_material = guyMaterial;
 
 	//Open the log file stream for this instance(Do this once at the beginning of the program)
 	//Logging::GetInstance()->OpenLogStream();
@@ -130,27 +145,6 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
-	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
-
-	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
-	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
-
-	Render::Uniforms uniforms;
-	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);
-
-	Render::RenderJob quadJob;
-	quadJob.m_mesh = mesh;
-	quadJob.m_uniforms = &uniforms;
-	quadJob.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
-
-	Render::RenderJob job;
-
-	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	job.m_uniforms = &uniforms;
-	job.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
-
-	float angle = 0.0f;
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -165,14 +159,8 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 
-		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.2f, 1.0f, 0.0f);
-		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
-		m_engineContext.m_renderer->AddRenderJob(&job);
-		m_engineContext.m_renderer->AddRenderJob(&quadJob);
-
-		//renderingSystem->Process();
+		renderingSystem->Process();
 
 		m_engineContext.m_renderer->Render();
 	}

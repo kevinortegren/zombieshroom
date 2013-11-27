@@ -91,7 +91,7 @@ namespace ECS
 
 		void RemoveAllComponents(Entity* p_entity);
 		
-		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
+		std::vector<std::shared_ptr<ComponentInterface>>* GetComponentList(int p_typeId);
 		int GetNumEntities() const { return m_entities.size(); }
 
 	private:

@@ -38,7 +38,7 @@ namespace detail
 	{
 		typedef std::size_t size_type;
 
-		view(
+		inline view(
 			size_type const & BaseLayer,
 			size_type const & MaxLayer,
 			size_type const & BaseFace,
@@ -46,7 +46,7 @@ namespace detail
 			size_type const & BaseLevel,
 			size_type const & MaxLevel);
 
-		view & operator=(view const & View);
+		inline view & operator=(view const & View);
 
 		size_type BaseLayer; 
 		size_type MaxLayer; 

@@ -41,9 +41,9 @@ namespace RootForce
 				Transform* transform = m_transforms.Get(p_entity);
 				Renderable* renderable = m_renderables.Get(p_entity);
 
-				if(renderable->m_material == nullptr)
+				if(renderable->m_material.m_effect == nullptr)
 				{
-					m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no material", p_entity->GetId());
+					m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no effect", p_entity->GetId());
 					return;
 				}
 				if(renderable->m_mesh == nullptr)
@@ -54,14 +54,16 @@ namespace RootForce
 
 				Render::Uniforms uniforms;
 				uniforms.m_world = glm::translate(glm::mat4(1.0f), transform->m_position);
+				uniforms.m_world = glm::mat4(1.0f);
+				uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 				//todo: add loop for multiple submeshes?
 				Render::RenderJob job;
 				job.m_mesh = renderable->m_mesh;
-				job.m_uniforms = &uniforms;
-				job.m_effect = renderable->m_material->m_effect;
+				job.m_uniforms = uniforms;
+				job.m_material = &renderable->m_material;
 
-				m_renderer->AddRenderJob(&job);
+				m_renderer->AddRenderJob(job);
 			}
 		}
 

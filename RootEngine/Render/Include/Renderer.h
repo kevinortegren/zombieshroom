@@ -24,7 +24,7 @@ namespace Render
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
-		virtual void AddRenderJob(RenderJob* p_job) = 0;
+		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void Render() = 0;
 
 		// Resource creation.
@@ -32,6 +32,7 @@ namespace Render
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
+		virtual TextureInterface* CreateTexture() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -42,7 +43,7 @@ namespace Render
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
-		void AddRenderJob(RenderJob* p_job);
+		void AddRenderJob(const RenderJob& p_job);
 		void Render();
 
 		bool CheckExtension(const char* p_extension);
@@ -51,6 +52,7 @@ namespace Render
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
 		MeshInterface* CreateMesh() { return new Mesh; } //Remember to delete
 		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
+		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
 
 	private:
 		GLRenderer();
@@ -59,7 +61,7 @@ namespace Render
 		void Clear();
 		void Swap();
 
-		void SetAttributes();
+		void BindMaterial(Material* p_material);
 	
 		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
@@ -67,7 +69,7 @@ namespace Render
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 
-		std::vector<RenderJob*> m_jobs;
+		std::vector<RenderJob> m_jobs;
 
 		// Effect.
 		Buffer m_uniforms;
