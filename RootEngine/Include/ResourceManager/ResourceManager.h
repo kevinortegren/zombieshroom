@@ -19,8 +19,8 @@ namespace RootEngine
 		virtual void LoadEffect(std::string p_path) = 0;
 		//virtual void LoadTexture(std::string p_path) = 0;
 
-		virtual std::shared_ptr<Model> GetModel(std::string p_handle) = 0;
-		virtual std::shared_ptr<Render::EffectInterface> GetEffect(std::string p_handle) = 0;
+		virtual Model* GetModel(std::string p_handle) = 0;
+		virtual Render::EffectInterface* GetEffect(std::string p_handle) = 0;
 		//virtual std::shared_ptr<Render::Texture> GetTexture(std::string p_handle) = 0;
 	};
 
@@ -35,13 +35,13 @@ namespace RootEngine
 		void LoadCollada(std::string p_path);
 		void LoadEffect(std::string p_path);
 
-		std::shared_ptr<Model> GetModel(std::string p_handle);
-		std::shared_ptr<Render::EffectInterface> GetEffect(std::string p_handle);
+		Model* GetModel(std::string p_handle);
+		Render::EffectInterface* GetEffect(std::string p_handle);
 
 	private:
-		std::map<std::string, std::shared_ptr<Model>> m_models;
-		std::map<std::string, std::shared_ptr<Render::MeshInterface>> m_meshes;
-		std::map<std::string, std::shared_ptr<Render::EffectInterface>> m_effects;
+		std::map<std::string, Model*> m_models;
+		std::map<std::string, Render::MeshInterface*> m_meshes;
+		std::map<std::string, Render::EffectInterface*> m_effects;
 		//std::map<std::string, Render::Texture*> m_textures;
 
 		Logging* m_logger;

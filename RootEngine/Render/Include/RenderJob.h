@@ -20,8 +20,8 @@ namespace Render
 		//std::shared_ptr<BufferInterface> m_vertexBuffer;
 		//std::shared_ptr<BufferInterface> m_indexBuffer;
 		//std::shared_ptr<VertexAttributesInterface> m_attributes;
-		std::shared_ptr<EffectInterface> m_effect;
-		std::shared_ptr<MeshInterface> m_mesh;
+		EffectInterface* m_effect;
+		MeshInterface* m_mesh;
 		Uniforms* m_uniforms;
 	};
 }

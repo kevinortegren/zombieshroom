@@ -13,7 +13,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-#include <ECS/Tests/TestSystem.h>
 #include <RenderingSystem.h>
 
 #include <exception>
@@ -93,12 +92,6 @@ Main::Main(std::string p_workingDirectory)
 	{
 		// TODO: Log error and throw exception (?)
 	}
-
-	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
-	m_engineContext.m_resourceManager->LoadEffect("test");
-	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
-	m_engineContext.m_resourceManager->LoadCollada("testhouse");
-	m_engineContext.m_resourceManager->LoadCollada("testchar");
 }
 
 Main::~Main() 
@@ -109,6 +102,23 @@ Main::~Main()
 
 void Main::Start() 
 {
+	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	m_engineContext.m_resourceManager->LoadEffect("test");
+	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
+	m_engineContext.m_resourceManager->LoadCollada("testhouse");
+	m_engineContext.m_resourceManager->LoadCollada("testchar");
+
+	ECS::ComponentSystem* renderingSystem = m_world.GetSystemManager()->CreateSystem<RootForce::RenderingSystem>("RenderingSystem");
+	m_world.GetSystemManager()->InitializeSystems();
+	
+	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
+	guyTransform->m_position = glm::vec3(0.0999f, 0.0999f, 0.0999f);
+
+	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
+	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	//guyRenderable->m_material;
 
 	//Open the log file stream for this instance(Do this once at the beginning of the program)
 	//Logging::GetInstance()->OpenLogStream();
@@ -122,7 +132,7 @@ void Main::Start()
 
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
-	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
+	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
 
 	Render::Uniforms uniforms;
@@ -161,6 +171,8 @@ void Main::Start()
 
 		m_engineContext.m_renderer->AddRenderJob(&job);
 		m_engineContext.m_renderer->AddRenderJob(&quadJob);
+
+		//renderingSystem->Process();
 
 		m_engineContext.m_renderer->Render();
 	}

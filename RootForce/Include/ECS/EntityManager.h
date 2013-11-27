@@ -16,8 +16,10 @@ namespace ECS
 	{
 	public:
 		EntityManager(ComponentSystemManager* p_systemManager)
-			: m_nextID(0), m_systemManager(p_systemManager) {}
-
+			: m_nextID(0), m_systemManager(p_systemManager) 
+		{
+			m_components.resize(ECS::s_count);
+		}
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
@@ -33,6 +35,7 @@ namespace ECS
 			*/
 			if(Component<T>::GetTypeId() >= m_components.size())
 				m_components.resize(Component<T>::GetTypeId() + 1);
+
 
 			// By using the component id we can retrieve the vector of components of that type.
 			std::vector<std::shared_ptr<ComponentInterface>>& componentList = m_components[Component<T>::GetTypeId()];

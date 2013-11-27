@@ -30,8 +30,8 @@ namespace Render
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
-		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
+		virtual MeshInterface* CreateMesh() = 0;
+		virtual EffectInterface* CreateEffect() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -49,8 +49,8 @@ namespace Render
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
-		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
+		MeshInterface* CreateMesh() { return new Mesh; } //Remember to delete
+		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
 
 	private:
 		GLRenderer();
