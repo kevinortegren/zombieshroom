@@ -164,60 +164,13 @@ void Main::Start()
 		angle += 90.0f*dt;
 		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
-		m_engineContext.m_renderer->AddRenderJob(&job);
-	//	testfuncofawesome(m_engineContext.m_physics->GetDebugVectors());
 		m_engineContext.m_physics->Update();
-		//m_engineContext.m_renderer->DrawLine(m_engineContext.m_physics->GetDebugVectors());
+		m_engineContext.m_renderer->AddRenderJob(&job);
+		
 		
 		m_engineContext.m_renderer->Render();
 		
 	}
-}
-void Main::testfuncofawesome(std::vector<glm::vec3> p_debugVectors)
-{
-	m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Entered testfunofawesome");
-	int size  = p_debugVectors.size();
-		if(size <= 0)
-		{
-
-			m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Breaking testfunc");
-			return;
-		}
-		
-		
-		Render::Vertex1P1C* vertices = new Render::Vertex1P1C();
-		unsigned int* indices = (unsigned int*)malloc(sizeof(unsigned int) * size);
-
-		/*m_debugVectors.push_back(from);
-		m_debugVectors.push_back(to);
-		m_debugVectors.push_back(color);*/
-
-		m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "the for ");
-		for(int i = 0; i < size; i++)
-		{
-			m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Iteration %d of %d ", i, size);
-
-			vertices[i].m_pos = p_debugVectors[i];
-			vertices[i].m_color = glm::vec4(1.0f, 0, 0, 1.0f);
-			indices[i] = i;
-		}
-
-		m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "after for ");
-		//vertices[0].m_pos = p_pos1;
-		//vertices[0].m_color = glm::vec4(p_colour, 1.0f);
-		//vertices[1].m_pos = p_pos2;
-		//vertices[1].m_color = glm::vec4(p_colour, 1.0f);
-
-		
-
-		Render::Uniforms uniforms;
-		uniforms.m_normal = glm::mat4(1);
-		uniforms.m_world = glm::mat4(1);
-		m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "testfunofawesome creating mesh ");
-		std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
-
-		m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Leaving testfunofawesome");
-		//mesh->Init(vertices, size, indices, size);
 }
 void Main::HandleEvents()
 {

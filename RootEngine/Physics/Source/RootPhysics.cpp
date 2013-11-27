@@ -9,6 +9,7 @@ namespace Physics
 	RootEngine::SubsystemSharedContext g_context;
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
+	RootEngine::ResourceManagerInterface* g_resourceManager;
 	
 	RootPhysics::RootPhysics()
 	{
@@ -152,7 +153,7 @@ namespace Physics
 		for(int i = 0; i < objectHull->numVertices(); i++)
 		{
 			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
+			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
 		}
 		simplifiedObject->recalcLocalAabb();
 		//Set Inertia
@@ -306,9 +307,10 @@ namespace Physics
 
 }
 
-Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer )
+Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer , RootEngine::ResourceManagerInterface* p_resourceManager)
 {
 	Physics::g_context = p_context;
 	Physics::g_renderer = p_renderer;
+	Physics::g_resourceManager = p_resourceManager;
 	return Physics::RootPhysics::GetInstance();
 }

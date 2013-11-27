@@ -1,6 +1,7 @@
 #include <Bullet/LinearMath/btIDebugDraw.h>
 #include <vector>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 class DebugDrawer : public btIDebugDraw
 {
@@ -25,4 +26,5 @@ public:
 	 std::vector<glm::vec3> GetDebugVectors()const {return m_debugVectors;}
 private:
 	std::vector<glm::vec3> m_debugVectors;
+	int m_counter;
 };
