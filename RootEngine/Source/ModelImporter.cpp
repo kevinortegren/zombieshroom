@@ -82,6 +82,7 @@ namespace RootEngine
 			indices.push_back(Face.mIndices[1]);
 			indices.push_back(Face.mIndices[2]);
 		}
+		
 		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
 		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
