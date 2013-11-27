@@ -27,8 +27,8 @@ namespace Render
 		virtual GLint Compile( ) = 0;
 		virtual void Apply( ) = 0;
 	
-		virtual void SetUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
-		virtual void SetTexture(const std::string& textureName, unsigned int slot) = 0;
+		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
+		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
 	};
 
 	class Program : public ProgramInterface
@@ -37,12 +37,14 @@ namespace Render
 		Program();
 		~Program();
 		void CreateProgram();
+
 		GLint AttachShader( GLenum p_shaderType, const char* p_filename );
 		GLint Compile();
+
 		void Apply();
 
-		void SetUniformBuffer(const std::string& bufferName, unsigned int slot);
-		void SetTexture(const std::string& textureName, unsigned int slot);
+		void BindUniformBuffer(const std::string& bufferName, unsigned int slot);
+		void BindTexture(const std::string& textureName, unsigned int slot);
 
 	private:
 		GLuint m_glHandle;
@@ -52,10 +54,7 @@ namespace Render
 	{
 	public:
 		virtual std::shared_ptr<Program> CreateProgram() = 0;
-		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;
-		virtual void SetUniformBuffer(GLuint p_bufferID, unsigned int p_slot) = 0;
-		virtual void SetTexture(GLuint p_textureHandle, unsigned int p_slot) = 0;
-		
+		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;	
 	};
 
 	class Technique : public TechniqueInterface
@@ -65,9 +64,6 @@ namespace Render
 
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
-
-		void SetUniformBuffer(GLuint p_bufferID, unsigned int p_slot);
-		void SetTexture(GLuint p_textureHandle, unsigned int p_slot);
 
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;

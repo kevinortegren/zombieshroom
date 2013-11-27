@@ -137,7 +137,7 @@ namespace Render
 		glUseProgram( m_glHandle );
 	}
 
-	void Program::SetUniformBuffer(const std::string& bufferName, unsigned int slot) {
+	void Program::BindUniformBuffer(const std::string& bufferName, unsigned int slot) {
 
 		GLint uniformBlockIndex = glGetUniformBlockIndex(m_glHandle, bufferName.c_str());
 
@@ -145,7 +145,7 @@ namespace Render
 			glUniformBlockBinding(m_glHandle, uniformBlockIndex, slot);
 		}
 	}
-	void Program::SetTexture(const std::string& textureName, unsigned int slot)
+	void Program::BindTexture(const std::string& textureName, unsigned int slot)
 	{
 		GLint uniformLocation = glGetUniformLocation(m_glHandle, textureName.c_str());
 		glUniform1i(uniformLocation, slot);
@@ -161,16 +161,6 @@ namespace Render
 	std::vector<std::shared_ptr<Program>>& Technique::GetPrograms()
 	{
 		return m_program;
-	}
-
-	void Technique::SetUniformBuffer(GLuint p_bufferID, unsigned int p_slot)
-	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, p_slot, p_bufferID);
-	}
-
-	void Technique::SetTexture(GLuint p_textureHandle, unsigned int p_slot)
-	{
-
 	}
 
 	std::shared_ptr<Technique> Effect::CreateTechnique()

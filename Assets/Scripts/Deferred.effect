@@ -1,6 +1,6 @@
 - name: DeferredLighting
   techniques:
-    - name: Tech1
+    - name: Lighting
       uniforms:
         - name: PerFrame
           slot: 0

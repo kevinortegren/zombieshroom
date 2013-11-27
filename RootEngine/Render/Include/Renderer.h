@@ -78,16 +78,10 @@ namespace Render
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 
-		std::vector<RenderJob*> m_jobs;
-
 		GeometryBuffer m_gbuffer;
-
 		Mesh m_fullscreenQuad;
 
-		std::shared_ptr<TechniqueInterface> m_lightingTech;
-
-		std::shared_ptr<EffectInterface> m_deferred;
-		std::shared_ptr<EffectInterface> m_output;
+		std::vector<RenderJob*> m_jobs;
 
 		Buffer m_uniforms;
 		Buffer m_lights;
@@ -110,6 +104,8 @@ namespace Render
 		} m_lightVars;
 
 		size_t m_numDirectionalLights;
+
+		std::shared_ptr<TechniqueInterface> m_lightingTech;
 	};
 }
 

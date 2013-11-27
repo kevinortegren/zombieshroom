@@ -68,7 +68,7 @@ namespace RootEngine
 					int slot;
 					uniforms[j]["slot"] >> slot;
 
-					program->SetUniformBuffer(name, slot);
+					program->BindUniformBuffer(name, slot);
 
 				}
 
@@ -81,7 +81,7 @@ namespace RootEngine
 					int slot;
 					texture[j]["slot"] >> slot;
 
-					program->SetTexture(name, slot);
+					program->BindTexture(name, slot);
 
 				}
 			}

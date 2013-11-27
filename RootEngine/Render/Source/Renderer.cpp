@@ -174,13 +174,10 @@ namespace Render
 		m_fullscreenQuad.Init(verts, 4, indices, 6);
 		
 		// Load effects.
-		g_context.m_resourceManager->LoadEffect("Output");
-		m_output = g_context.m_resourceManager->GetEffect("Output");
-	
 		g_context.m_resourceManager->LoadEffect("Deferred");
-		m_deferred = g_context.m_resourceManager->GetEffect("Deferred");
+		std::shared_ptr<EffectInterface> deferred = g_context.m_resourceManager->GetEffect("Deferred");
 	
-		m_lightingTech = m_deferred->GetTechniques()[0];
+		m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -263,7 +260,7 @@ namespace Render
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 
-		// Bind GBuffer FBO.
+		// Bind GBuffer.
 		m_gbuffer.Bind();
 
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
@@ -305,7 +302,6 @@ namespace Render
 
 		// Buffer light data.
 		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
-		m_lightingTech->SetUniformBuffer(m_lights.GetBufferId(), 2);
 
 		auto ambient = m_lightingTech->GetPrograms()[0];
 		auto directional = m_lightingTech->GetPrograms()[1];

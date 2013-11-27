@@ -1,6 +1,6 @@
-- name: Generic
+- name: Mesh
   techniques:
-    - name: bar
+    - name: Diffuse
       uniforms:
         - name: PerFrame
           slot: 0
@@ -8,9 +8,9 @@
           slot: 1
       textures:
       programs:
-      - name: Generic
+      - name: Mesh
         shaders:
-          - name: Generic
+          - name: mesh
             type: vertex
-          - name: Generic
+          - name: mesh
             type: fragment
