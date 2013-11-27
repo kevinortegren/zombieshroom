@@ -32,7 +32,7 @@ struct GameLogicSystem : public ECS::ComponentSystem
 		// Will be executed before any processing occurs in each frame.
 	}
 
-	void ProcessEntity(ECS::Entity* p_entity)
+	void ProcessEntity(ECS::Entity* p_entity, float dt)
 	{
 		Player* player = m_players.Get(p_entity);
 		Transform* transform = m_transforms.Get(p_entity);

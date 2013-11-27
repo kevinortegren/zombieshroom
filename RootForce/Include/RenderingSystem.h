@@ -34,7 +34,7 @@ namespace RootForce
 
 		}
 
-		void ProcessEntity(ECS::Entity* p_entity)
+		void ProcessEntity(ECS::Entity* p_entity, float dt)
 		{
 			if(m_renderer && m_logger)
 			{
@@ -54,7 +54,6 @@ namespace RootForce
 
 				Render::Uniforms uniforms;
 				uniforms.m_world = glm::translate(glm::mat4(1.0f), transform->m_position);
-				uniforms.m_world = glm::mat4(1.0f);
 				uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 				//todo: add loop for multiple submeshes?

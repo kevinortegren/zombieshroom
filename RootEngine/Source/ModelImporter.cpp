@@ -19,10 +19,10 @@ namespace RootEngine
 		m_model = new Model(); //Owned by ResourceManager
 		Assimp::Importer importer;
 
-		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
 		char fileName[128];
-		_splitpath(p_fileName.c_str(), NULL, NULL, fileName, NULL);
+		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, 128, NULL, 0);
 
 		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", fileName);
 		if (aiscene) 
@@ -82,15 +82,35 @@ namespace RootEngine
 			indices.push_back(Face.mIndices[1]);
 			indices.push_back(Face.mIndices[2]);
 		}
+		
 		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
 		Render::MeshInterface* tempmesh = m_renderer->CreateMesh();
 		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
+
 		m_model->m_meshes.push_back(tempmesh);
+		m_model->meshIndices = indices;
+		m_model->meshPoints = GetMeshPoints(vertices);
+		m_model->numberOfFaces = p_aiMesh->mNumFaces;
+		m_model->numberOfIndices = indices.size();
+		m_model->numberOfVertices = vertices.size();
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
 		
 	}
+
+	std::vector<glm::vec3> ModelImporter::GetMeshPoints( std::vector<Render::Vertex1P1N1UV> p_vertices )
+	{
+		std::vector<glm::vec3> returnVec;
+
+		for (Render::Vertex1P1N1UV v : p_vertices ) 
+		{
+			returnVec.push_back(v.m_pos);
+		}
+
+		return returnVec;
+	}
+
 }
