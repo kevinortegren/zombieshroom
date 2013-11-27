@@ -130,21 +130,6 @@ void Main::Start()
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
 
 
-	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
-	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
-	int indicesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
-	float* tempVertices = (float*)malloc(verticesTotal * 3 * sizeof(float));
-	for(int i = 0; i < verticesTotal; i ++)
-	{
-		tempVertices[i] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].x;
-		tempVertices[i+1] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].y;
-		tempVertices[i+2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;		
-	}
-	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
-	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
-
-	float pos[3] = {0,0,0};
-	int handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, pos,1.0f );
 
 
 	float angle = 0.0f;
