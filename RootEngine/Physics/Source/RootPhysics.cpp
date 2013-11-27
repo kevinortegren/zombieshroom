@@ -67,7 +67,6 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool CallbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
-		
 		return false;
 	}
 	void RootPhysics::Init()
@@ -80,7 +79,7 @@ namespace Physics
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
 		gContactAddedCallback = &CallbackFunc;
-	//	g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded %d", 2);
+		g_context.m_logger->LT("wsaedf", 45, LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
 	}
 
 
