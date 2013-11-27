@@ -1,13 +1,19 @@
 #include <RootEngine.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Network/Include/NetworkManager.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 #include <iostream>
-
 #include <RootEngine/Include/Logging/Logging.h>
+
 Logging	g_logger;
 
 namespace RootEngine
 {
+	EngineMain::EngineMain()
+	{
+
+	}
 	EngineMain::~EngineMain()
 	{
 		if(m_network != nullptr)
@@ -25,7 +31,13 @@ namespace RootEngine
 			m_gui->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_guiModule);
 		}
+		if(m_physics != nullptr)
+		{
+			m_physics->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_physicsModule);
+		}
 	}
+
 
 	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
@@ -36,7 +48,7 @@ namespace RootEngine
 		m_gui = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
-		
+
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
@@ -54,15 +66,17 @@ namespace RootEngine
 		{
 			LoadGUI();
 		}
+		if((p_flags & SubsystemInit::INIT_PHYSICS) == SubsystemInit::INIT_PHYSICS)
+		{
+			LoadPhysics();
+		}
 		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
 		{
 			LoadInputSystem();
 		}
 
-
-		m_resourceManager.Init(p_workingDirectory, m_renderer);
+		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
-
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -72,7 +86,9 @@ namespace RootEngine
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
+		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
+		 
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -92,7 +108,7 @@ namespace RootEngine
 		m_networkModule = DynamicLoader::LoadSharedLibrary("Network.dll");
 		if (m_networkModule != nullptr)
 		{
-			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "CreateNetwork");
+			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
 			if (libGetNetworkInterface != nullptr)
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);
@@ -121,6 +137,7 @@ namespace RootEngine
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
 				m_renderer->Startup();
+			
 			}
 			else
 			{
@@ -156,35 +173,52 @@ namespace RootEngine
 		}
 	}
 
-
-	void EngineMain::LoadInputSystem()
+	void EngineMain::LoadPhysics()
 	{
-		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
-		if(m_guiModule != nullptr)
+		m_physicsModule = DynamicLoader::LoadSharedLibrary("Physics.dll");
+		if(m_physicsModule != nullptr)
 		{
-			CREATEINPUTINTERFACE libGetInputSys = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
-			if (libGetInputSys != nullptr)
+			CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
+			if(libGetPhysics != nullptr)
 			{
-				m_inputSys = (InputManager::InputManager*)libGetInputSys(m_subsystemSharedContext);
-				m_inputSys->Startup();
+				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext);
+				m_physics->Startup();
+				
 			}
 			else
 			{
-				m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load InputManager subsystem: %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load InputManager subsystem: %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
 
-	EngineMain::EngineMain()
+	void EngineMain::LoadInputSystem()
 	{
-
+		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
+		if(m_inputModule != nullptr)
+		{
+			CREATEINPUTINTERFACE libGetInputSystem = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
+			if(libGetInputSystem != nullptr)
+			{
+				m_inputSys = (InputManager::InputInterface*)libGetInputSystem(m_subsystemSharedContext);
+				m_inputSys->Startup();
+				
+			}
+			else
+			{
+				m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load input subsystem %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load input subsystem %s", DynamicLoader::GetLastError());
+		}
 	}
-
-
+	
 }
 
 namespace RootEngine

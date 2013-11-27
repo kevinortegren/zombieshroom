@@ -40,7 +40,6 @@ namespace Render
 	{
 	public:
 		static GLRenderer* GetInstance();
-
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
