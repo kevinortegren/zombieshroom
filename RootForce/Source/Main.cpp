@@ -74,6 +74,7 @@ Main::Main(std::string p_workingDirectory)
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+
 	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_RENDER | RootEngine::SubsystemInit::INIT_PHYSICS | RootEngine::SubsystemInit::INIT_INPUT, p_workingDirectory);
 	
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
@@ -94,6 +95,7 @@ Main::Main(std::string p_workingDirectory)
 	{
 		// TODO: Log error and throw exception (?)
 	}
+
 }
 
 Main::~Main() 

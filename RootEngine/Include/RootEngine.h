@@ -62,6 +62,7 @@ namespace RootEngine
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
+
 	};
 }
 

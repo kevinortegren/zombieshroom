@@ -6,7 +6,9 @@
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+
 #include <RootEngine/InputManager/Include/InputManager.h>
+
 
 
 namespace RootEngine
@@ -21,5 +23,6 @@ namespace RootEngine
 		GUISystem::GUISystemInterface* m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
+
 	};
 }
