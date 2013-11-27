@@ -39,12 +39,12 @@ bool Logging::OpenLogStream()
 	// convert now to tm struct for UTC
 	gmtime_s(&gmtm, &currentTime);
 	//Generate file name from date and time
-	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec) + ".rlog";
+	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec);
+	std::string logName = fileName + ".txt";
+	std::string commaName = fileName + ".rlog";
 	//Open log file stream
-	fopen_s(&m_logFile, fileName.c_str(), "w");
-
-	if(m_logFile == NULL)
-		return false;
+	fopen_s(&m_logFile, logName.c_str(), "w");
+	fopen_s(&m_commaFile, commaName.c_str(), "w");
 
 	return true;
 }
@@ -54,6 +54,11 @@ bool Logging::CloseLogStream()
 	if(m_logFile)
 	{   //Close stream
 		fclose(m_logFile);
+		return true;
+	}
+	if(m_commaFile)
+	{   //Close stream
+		fclose(m_commaFile);
 		return true;
 	}
 
@@ -161,9 +166,12 @@ void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, 
 {
 	
 	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
+	std::string commaOutput = GetTimeFormatString() + ";;" + GetStringFromTag(p_tag) + ";;" + GetStringFromLevel(p_vLevel) +  ";;" + p_format + ";;" + p_func + ";;" + std::to_string(p_line) + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
+	vfprintf (m_commaFile, commaOutput.c_str(), p_args);
 	fflush(m_logFile);
+	fflush(m_commaFile);
 }
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )

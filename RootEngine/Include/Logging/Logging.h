@@ -89,6 +89,7 @@ class Logging : public LoggingInterface
 	private:
 
 		FILE* m_logFile;
+		FILE* m_commaFile;
 
 		std::string GetTimeString(int p_time);
 		std::string GetTimeFormatString();
