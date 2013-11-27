@@ -68,7 +68,7 @@ namespace RootForce
 
 		void End()
 		{
-
+			m_renderer->Render();
 		}
 
 		void SetRendererInterface(Render::RendererInterface* p_renderer)

@@ -75,8 +75,8 @@ Main::Main(std::string p_workingDirectory)
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
 
-	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_RENDER | RootEngine::SubsystemInit::INIT_PHYSICS | RootEngine::SubsystemInit::INIT_INPUT, p_workingDirectory);
-	
+	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
+
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
 		// TODO: Log error and throw exception (?)
@@ -109,7 +109,17 @@ void Main::Start()
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 	m_engineContext.m_resourceManager->LoadEffect("test");
 	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
+	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
+
+	m_engineContext.m_gui->Initalize(1280, 720);
+	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+
+	Render::Uniforms uniforms;
+	uniforms.m_normal = glm::mat4(1);
+	uniforms.m_world = glm::mat4(1);
+	
+	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -149,12 +159,10 @@ void Main::Start()
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
-
 
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
 	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
@@ -179,13 +187,17 @@ void Main::Start()
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
+		
+		m_engineContext.m_physics->Update();
+
+		m_engineContext.m_renderer->Clear();
 
 
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 
-		m_engineContext.m_renderer->Render();
-		m_engineContext.m_physics->Update();
+		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
+		m_engineContext.m_renderer->Swap();
 	}
 }
 
@@ -194,6 +206,8 @@ void Main::HandleEvents()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
+		m_engineContext.m_gui->HandleEvent(event);
+		m_engineContext.m_inputSys->HandleInput(event);
 		switch(event.type) 
 		{
 		case SDL_QUIT:

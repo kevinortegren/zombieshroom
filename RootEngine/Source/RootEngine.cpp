@@ -75,8 +75,8 @@ namespace RootEngine
 			LoadPhysics();
 		}
 
-
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
+		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -88,6 +88,7 @@ namespace RootEngine
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
+		m_gameSharedContext.m_inputSys = m_inputSys;
 		 
 	}
 

@@ -3,7 +3,10 @@
 #include "InputInterface.h"
 #include <SDL2/SDL.h>
 
+#define MAX_KEYS 512
+
 #define MAX_KEYS SDL_NUM_SCANCODES
+
 namespace RootEngine
 {
 	namespace InputManager
@@ -23,6 +26,7 @@ namespace RootEngine
 
 			static InputManager* GetInstance();
 		private:
+
 			KeyState::KeyState m_keyState[MAX_KEYS];
 
 			glm::vec2 m_globMousePos;

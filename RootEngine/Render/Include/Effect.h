@@ -15,6 +15,13 @@ namespace Render
 		virtual void Apply( ) = 0;
 	
 		virtual void SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot) = 0;
+
+		virtual void SetUniformInt( const char* p_varname, int p_val ) = 0;
+		virtual void SetUniformFloat( const char* p_varname, float p_val ) = 0;
+		virtual void SetUniformVector( const char* p_varname, glm::vec3& p_val ) = 0;
+		virtual void SetUniformVector( const char* p_varname, glm::vec4& p_val ) = 0;
+		virtual void SetUniformMatrix( const char* p_varname, glm::mat3& p_val ) = 0;
+		virtual void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val ) = 0;
 	};
 
 	class Effect : public EffectInterface
@@ -31,14 +38,16 @@ namespace Render
 	
 		void SetUniformBuffer(GLuint p_bufferId, const std::string& bufferName, unsigned int slot);
 
-	private:
-
+		
 		void SetUniformInt( const char* p_varname, int p_val );
 		void SetUniformFloat( const char* p_varname, float p_val );
 		void SetUniformVector( const char* p_varname, glm::vec3& p_val );
 		void SetUniformVector( const char* p_varname, glm::vec4& p_val );
 		void SetUniformMatrix( const char* p_varname, glm::mat3& p_val );
 		void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val );
+
+	private:
+
 
 		GLuint m_glHandle;
 	};

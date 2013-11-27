@@ -93,7 +93,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -185,8 +185,6 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		Clear();
-
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
@@ -206,7 +204,6 @@ namespace Render
 
 		m_jobs.clear();
 
-		Swap();
 	}
 
 	void GLRenderer::Clear()
