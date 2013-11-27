@@ -9,9 +9,5 @@ out vec4 frag_color;
 
 void main()
 {
-	vec2 size = textureSize(texSampler);
-	if(size != vec2(0))
-		frag_color = vert_color * texture(texSampler, vert_texCoord);
-	else
-		frag_color = vert_color;
+	frag_color = vert_color * texture(texSampler, vert_texCoord);
 }

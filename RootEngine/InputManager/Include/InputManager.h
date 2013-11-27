@@ -2,7 +2,7 @@
 #pragma once
 #include "InputInterface.h"
 #include <SDL2/SDL.h>
-
+#include <Rocket/Core/Input.h>
 #define MAX_KEYS 512
 namespace RootEngine
 {
@@ -23,6 +23,7 @@ namespace RootEngine
 
 			static InputManager* GetInstance();
 		private:
+
 			KeyState::KeyState m_keyState[MAX_KEYS];
 
 			glm::vec2 m_globMousePos;

@@ -45,7 +45,7 @@
 	<body template="window">
 		<form>
 			<handle id="test" movetarget="#document">
-			<p>This is a test text of doom.</p>
+			<p>This is a test text, welcome to this test.</p>
 		</form>
 	</body>
 </rml>

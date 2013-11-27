@@ -167,6 +167,7 @@ void Main::Start()
 		m_engineContext.m_renderer->Render();
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
+
 	}
 }
 
@@ -175,6 +176,8 @@ void Main::HandleEvents()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
+		m_engineContext.m_gui->HandleEvent(event);
+		m_engineContext.m_inputSys->HandleInput(event);
 		switch(event.type) 
 		{
 		case SDL_QUIT:

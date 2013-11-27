@@ -2,8 +2,6 @@
 #include <Rocket/Core/Platform.h>
 #include <windows.h>
 #include <GL/glew.h>
-//#include <gl/Gl.h>
-//#include <gl/Glu.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "guiRenderInterface.h"
@@ -100,15 +98,17 @@ void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_
 		m_effect->SetUniformInt("texSampler", 1);
 		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
 
-		glDisable( GL_BLEND );
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 
 	glDisable( GL_CULL_FACE );
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
 	glEnable( GL_CULL_FACE );
-	
-	glActiveTexture(GL_TEXTURE0);
+	glDisable( GL_BLEND );
 	glDeleteBuffers(2, gbuf);
 	glDeleteVertexArrays(1, &vao);
 }

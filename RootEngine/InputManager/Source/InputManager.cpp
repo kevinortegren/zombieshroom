@@ -46,6 +46,8 @@ namespace RootEngine
 				m_globMousePos.x = static_cast<float>(p_event.motion.x);
 				m_globMousePos.y = static_cast<float>(p_event.motion.y);
 				break;
+			default:
+				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
 			}
 		}
 
