@@ -7,6 +7,7 @@ namespace Physics
 {
 	RootEngine::SubsystemSharedContext g_context;
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
+	Render::RendererInterface* g_renderer;
 	
 	RootPhysics::RootPhysics()
 	{
@@ -282,9 +283,9 @@ namespace Physics
 
 }
 
-Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context )
+Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer )
 {
 	Physics::g_context = p_context;
-
+	Physics::g_renderer = p_renderer;
 	return Physics::RootPhysics::GetInstance();
 }

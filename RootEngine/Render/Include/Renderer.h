@@ -26,6 +26,7 @@ namespace Render
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
 		virtual void Render() = 0;
+		virtual void DrawLine(glm::vec3 p_pos1, glm::vec3 p_pos2, glm::vec3 p_colour) = 0;
 		
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
@@ -43,6 +44,7 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void AddRenderJob(RenderJob* p_job);
 		void Render();
+		void DrawLine(glm::vec3 p_pos1, glm::vec3 p_pos2, glm::vec3 p_colour);
 
 		bool CheckExtension(const char* p_extension);
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <RootEngine/Render/Include/Renderer.h>
 #if defined(_WINDLL)
 #define PHYSICS_DLL_EXPORT __declspec(dllexport)
 #else
@@ -112,6 +113,6 @@ namespace Physics
 }
 extern "C"
 {
-	typedef Physics::PhysicsInterface* (*CREATEPHYSICS)(RootEngine::SubsystemSharedContext);
-	PHYSICS_DLL_EXPORT Physics::PhysicsInterface* CreatePhysics(RootEngine::SubsystemSharedContext p_context);
+	typedef Physics::PhysicsInterface* (*CREATEPHYSICS)(RootEngine::SubsystemSharedContext, Render::RendererInterface *);
+	PHYSICS_DLL_EXPORT Physics::PhysicsInterface* CreatePhysics(RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer);
 }

@@ -233,6 +233,32 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
+
+	void GLRenderer::DrawLine(glm::vec3 p_pos1, glm::vec3 p_pos2, glm::vec3 p_colour)
+	{
+		Vertex1P1C* vertices = new Render::Vertex1P1C() ;
+		vertices[0].m_pos = p_pos1;
+		vertices[0].m_color = glm::vec4(p_colour, 1.0f);
+		vertices[1].m_pos = p_pos2;
+		vertices[1].m_color = glm::vec4(p_colour, 1.0f);
+
+		unsigned int indices[2] = {0, 1};
+
+		Uniforms uniforms;
+		uniforms.m_normal = glm::mat4(1);
+		uniforms.m_world = glm::mat4(1);
+
+		std::shared_ptr<MeshInterface> mesh = CreateMesh();
+		mesh->Init(vertices, 2, indices, 2);
+
+		RenderJob job;
+		job.m_mesh = mesh;
+		job.m_uniforms = &uniforms;
+		job.m_effect = 0;//GetEffect("generic");
+
+		AddRenderJob(&job);
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

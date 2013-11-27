@@ -176,7 +176,7 @@ namespace RootEngine
 			CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
 			if(libGetPhysics != nullptr)
 			{
-				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext);
+				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext, m_renderer);
 				m_physics->Startup();
 				
 			}
