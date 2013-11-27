@@ -81,7 +81,9 @@ namespace Physics
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
 		gContactAddedCallback = &CallbackFunc;
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
-		//m_dynamicWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe);
+		m_debugDrawer = new DebugDrawer();
+		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
+		m_dynamicWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe);
 		//m_dynamicWorld->debugDrawWorld();
 
 	}
@@ -100,13 +102,15 @@ namespace Physics
 	//Make a real update
 	void RootPhysics::Update()
 	{
-			for(unsigned int i = 0; i < m_playerObject.size(); i++)
-			{
-				m_playerObject.at(i)->Update();
-			}
-			m_dynamicWorld->stepSimulation(1/60.f,10);
-			
-			m_dynamicWorld->debugDrawWorld();
+		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Clearing debug vectors");
+		m_debugDrawer->ClearDebugVectors();
+		for(unsigned int i = 0; i < m_playerObject.size(); i++)
+		{
+			m_playerObject.at(i)->Update();
+		}
+		m_dynamicWorld->stepSimulation(1/60.f,10);
+		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
+		m_dynamicWorld->debugDrawWorld();
 	}
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation )
@@ -130,17 +134,25 @@ namespace Physics
 	//Done
 	int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
 	{
+		
+		/*for(int i = 0; i < p_numVertices; i+=3)
+		{
+			g_context.m_logger->LogTextToConsole(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "vertex : %d x: %f y: %f z: %f", i, p_vertexBuffer[i],p_vertexBuffer[i+1],p_vertexBuffer[i+2]);
+		}*/
 		//creates the mesh shape
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
+		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices ,  p_vertexBuffer, p_vertexStride);
+		
 		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
 		//Cull unneccesary vertices to improve performance 
 		btShapeHull* objectHull = new btShapeHull(objectMeshShape);
+	
 		btScalar margin = objectMeshShape->getMargin();
 		objectHull->buildHull(margin);
 		btConvexHullShape* simplifiedObject = new btConvexHullShape();
 		for(int i = 0; i < objectHull->numVertices(); i++)
 		{
 			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
 		}
 		simplifiedObject->recalcLocalAabb();
 		//Set Inertia
@@ -155,6 +167,7 @@ namespace Physics
 
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
+		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
 		
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
@@ -276,6 +289,16 @@ namespace Physics
 		//}
 
 
+
+	}
+
+	std::vector<glm::vec3> RootPhysics::GetDebugVectors()
+	{
+		return m_debugDrawer->GetDebugVectors();
+	}
+
+	void RootPhysics::CreateSphere( float p_radius, float p_mass)
+	{
 
 	}
 

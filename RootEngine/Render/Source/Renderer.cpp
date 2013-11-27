@@ -234,29 +234,47 @@ namespace Render
 		return cur_avail_mem_kb;
 	}
 
-	void GLRenderer::DrawLine(glm::vec3 p_pos1, glm::vec3 p_pos2, glm::vec3 p_colour)
+	void GLRenderer::DrawLine(std::vector<glm::vec3> p_debugVectors)
 	{
-		Vertex1P1C* vertices = new Render::Vertex1P1C() ;
-		vertices[0].m_pos = p_pos1;
-		vertices[0].m_color = glm::vec4(p_colour, 1.0f);
-		vertices[1].m_pos = p_pos2;
-		vertices[1].m_color = glm::vec4(p_colour, 1.0f);
+		int size  = p_debugVectors.size();
+		if(size <= 0)
+			return;
 
-		unsigned int indices[2] = {0, 1};
+		
+		Vertex1P1C* vertices = new Render::Vertex1P1C();
+		unsigned int* indices = (unsigned int*)malloc(sizeof(unsigned int) * size);
+
+		/*m_debugVectors.push_back(from);
+		m_debugVectors.push_back(to);
+		m_debugVectors.push_back(color);*/
+		for(int i = 0; i < size; i+=2)
+		{
+			vertices[i].m_pos = p_debugVectors[i];
+			vertices[i].m_color = glm::vec4(1.0f, 0, 0, 1.0f);
+			indices[i] = i;
+		}
+		int hurdeur = 3;
+		//vertices[0].m_pos = p_pos1;
+		//vertices[0].m_color = glm::vec4(p_colour, 1.0f);
+		//vertices[1].m_pos = p_pos2;
+		//vertices[1].m_color = glm::vec4(p_colour, 1.0f);
+
+		
 
 		Uniforms uniforms;
 		uniforms.m_normal = glm::mat4(1);
 		uniforms.m_world = glm::mat4(1);
 
 		std::shared_ptr<MeshInterface> mesh = CreateMesh();
-		mesh->Init(vertices, 2, indices, 2);
+		mesh->Init(vertices, size, indices, size);
 
-		RenderJob job;
-		job.m_mesh = mesh;
-		job.m_uniforms = &uniforms;
-		job.m_effect = 0;//GetEffect("generic");
+		//RenderJob job;
+		//job.m_mesh = mesh;
+		//job.m_uniforms = &uniforms;
+		//job.m_effect = 0; //GIVE US OUR RESOURCE MANAGER GODDAMNIT!!
 
-		AddRenderJob(&job);
+		//AddRenderJob(&job);
+		
 	}
 
 }
