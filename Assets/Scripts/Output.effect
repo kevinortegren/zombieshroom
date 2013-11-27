@@ -1,7 +1,10 @@
-- name: Tech1
-  param: foo
-  passes:
-  - name: Output
-    type: vertex
-  - name: Output
-    type: fragment
+- name: Output
+  techniques:
+    - name: bar
+      programs:
+        - name: Output
+          shaders:
+            - name: Output
+              type: vertex
+            - name: Output
+              type: fragment

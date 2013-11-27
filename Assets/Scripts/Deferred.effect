@@ -1,7 +1,18 @@
-- name: Tech1
-  param: foo
-  passes:
-  - name: diffuse
-    type: vertex
-  - name: diffuse
-    type: fragment
+- name: DeferredLighting
+  techniques:
+    - name: Tech1
+      programs:
+        - name: ambient
+          shaders:
+            - name: ambient
+              type: vertex
+            - name: ambient
+              type: fragment
+        - name: diffuse
+          shaders:
+            - name: diffuse
+              type: vertex
+            - name: diffuse
+              type: fragment
+
+

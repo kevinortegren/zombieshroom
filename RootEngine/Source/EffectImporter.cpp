@@ -8,47 +8,58 @@ namespace RootEngine
 {
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
-		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
+		std::shared_ptr<Render::Effect> effect = m_renderer->CreateEffect();
 		
 		std::string techName;
-		std::string param;
 
 		// Parsing technique.
 		p_node["name"] >> techName;
-		p_node["param"] >> param;
 
-		effect->CreateEffect();
-
-		const YAML::Node& passes = p_node["passes"];
-		for(size_t i = 0; i < passes.size(); ++i)
+		const YAML::Node& techniques = p_node["techniques"];
+		for(size_t i = 0; i < techniques.size(); ++i)
 		{
-			std::string shaderName;
-			passes[i]["name"] >> shaderName;
+			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique();
 
-			// Parse type of shader.
-			std::string type;
-			passes[i]["type"] >> type;
+			std::string techniqueName;
+			techniques[i]["name"] >> techniqueName;
+
+			const YAML::Node& programs = techniques[i]["programs"];
+			for(size_t j = 0; j < programs.size(); ++j)
+			{
+				std::shared_ptr<Render::Program> program = technique->CreateProgram();
+
+				program->CreateProgram();
+
+				const YAML::Node& shaders = programs[i]["shaders"];
+				for(size_t j = 0; j < shaders.size(); ++j)
+				{	
+					std::string shaderName;
+					shaders[j]["name"] >> shaderName;
+					
+					std::string type;
+					shaders[j]["type"] >> type;
 			
-			GLenum glType;
-			std::string extension;
-			if(type == "vertex") 
-			{
-				glType = GL_VERTEX_SHADER;
-				extension = ".vert";
-			}
-			else if(type == "fragment")
-			{
-				glType = GL_FRAGMENT_SHADER;
-				extension = ".frag";
-			}
+					GLenum glType;
+					std::string extension;
+					if(type == "vertex") 
+					{
+						glType = GL_VERTEX_SHADER;
+						extension = ".vert";
+					}
+					else if(type == "fragment")
+					{
+						glType = GL_FRAGMENT_SHADER;
+						extension = ".frag";
+					}
 
-			std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
-			effect->AttachShader(glType, shader.c_str());
+					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
+					program->AttachShader(glType, shader.c_str());
 
-			g_logger.LogText("Loading %s type %s", shaderName.c_str(), type.c_str());
+				}
+				program->Compile();
+			}
 		}
 
-		effect->Compile();
 		m_effect = effect;
 	}
 

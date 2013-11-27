@@ -180,6 +180,8 @@ namespace Render
 		g_context.m_resourceManager->LoadEffect("Deferred");
 		m_deferred = g_context.m_resourceManager->GetEffect("Deferred");
 	
+		m_lightingTech = m_deferred->GetTechniques()[0];
+
 		// Setup camera.
 
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -232,14 +234,20 @@ namespace Render
 		{
 			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
 
-			(*itr)->m_effect->Apply();
+			for(auto itrT = (*itr)->m_effect->GetTechniques().begin(); itrT != (*itr)->m_effect->GetTechniques().end(); ++itrT)
+			{
+				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
+				{
+					(*itrP)->Apply();
 
-			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+					(*itrP)->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+					(*itrP)->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
-			(*itr)->m_mesh->Bind();
-			(*itr)->m_mesh->DrawArrays();
-			(*itr)->m_mesh->Unbind();
+					(*itr)->m_mesh->Bind();
+					(*itr)->m_mesh->DrawArrays();
+					(*itr)->m_mesh->Unbind();
+				}
+			}
 		}
 
 		m_jobs.clear();
@@ -249,18 +257,21 @@ namespace Render
 
 		// Lighting pass.
 
-		m_deferred->Apply();
-				
-		m_deferred->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Diffuse", 0);
-		m_deferred->SetTexture(m_gbuffer.m_normals.GetHandle(), "g_Normals", 1);
-		
-		m_deferred->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+		for(auto itr = m_lightingTech->GetPrograms().begin(); itr != m_lightingTech->GetPrograms().end(); ++itr)
+		{
+			(*itr)->Apply();
 
-		m_fullscreenQuad.Bind();
+			(*itr)->SetTexture(m_gbuffer.m_diffuse.GetHandle(), "g_Diffuse", 0);
+			(*itr)->SetTexture(m_gbuffer.m_normals.GetHandle(), "g_Normals", 1);
 
-		m_fullscreenQuad.DrawInstanced(1);
+			(*itr)->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 
-		m_fullscreenQuad.Unbind();
+			m_fullscreenQuad.Bind();
+
+			m_fullscreenQuad.DrawInstanced(1);
+
+			m_fullscreenQuad.Unbind();
+		}
 
 		// Output.
 

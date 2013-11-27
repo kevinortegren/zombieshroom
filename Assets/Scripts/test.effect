@@ -1,7 +1,10 @@
-- name: Tech1
-  param: foo
-  passes:
-  - name: Generic
-    type: vertex
-  - name: Generic
-    type: fragment
+- name: Generic
+  techniques:
+    - name: bar
+      programs:
+      - name: Generic
+        shaders:
+          - name: Generic
+            type: vertex
+          - name: Generic
+            type: fragment
