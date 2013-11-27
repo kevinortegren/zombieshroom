@@ -1,6 +1,9 @@
 #include <RootEngine/Include/YamlParser.h>
+#include <RootEngine/Include/Logging/Logging.h>
 #include <fstream>
 #include <iostream>
+
+extern Logging g_logger;
 
 namespace RootEngine
 {
@@ -9,6 +12,10 @@ namespace RootEngine
 		try
 		{
 			std::ifstream file(filepath, std::ifstream::in);
+			if(!file.good())
+			{
+				g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Failed to load yaml file: %s", filepath.c_str());
+			}
 			YAML::Parser parser(file);
 
 			YAML::Node doc;

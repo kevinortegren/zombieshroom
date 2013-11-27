@@ -15,7 +15,7 @@ namespace RootEngine
 {
 	struct Model
 	{
-		std::vector<std::shared_ptr<Render::MeshInterface>> m_meshes;
+		std::vector<Render::MeshInterface*> m_meshes;
 		//vector<Texture*> m_textures;
 		//vector<AnimationData*> m_animations;
 		
@@ -34,7 +34,7 @@ namespace RootEngine
 		ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer);
 		~ModelImporter();
 
-		std::shared_ptr<Model> LoadModel(const std::string p_fileName);
+		Model* LoadModel(const std::string p_fileName);
 		
 	private:
 
@@ -44,7 +44,7 @@ namespace RootEngine
 		std::vector<glm::vec3> GetMeshPoints(std::vector<Render::Vertex1P1N1UV> p_vertices);
 
 		Logging*	m_logger;
-		std::shared_ptr<Model>		m_model; 
+		Model*		m_model; 
 		Render::RendererInterface* m_renderer;
 	};
 }

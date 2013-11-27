@@ -20,6 +20,7 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 			to[i] = p_to[i];
 			color[i]  = p_color[i];
 		}
+
 		
 		Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Line %d between (%f, %f, %f) and (%f, %f, %f)", m_counter, from[0], from[1], from[2], to[0], to[1], to[2]);
 		m_counter++;
@@ -29,7 +30,7 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 		vertices[1].m_pos = to;
 		vertices[1].m_color = glm::vec4(color, 1.0f);
 		unsigned int indices[2] = {0,1};
-		std::shared_ptr<Render::MeshInterface> mesh = Physics::g_renderer->CreateMesh();
+		Render::MeshInterface* mesh = Physics::g_renderer->CreateMesh();
 		mesh->Init(vertices, 2, indices, 2);
 		Render::Uniforms uniforms;
 		uniforms.m_normal = glm::mat4(1);
@@ -38,10 +39,13 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 
 		Render::RenderJob job;
 		job.m_mesh = mesh;
-		job.m_uniforms = &uniforms;
-		job.m_effect = Physics::g_resourceManager->GetEffect("test");
+		job.m_uniforms = uniforms;
+		m_mat.m_effect = Physics::g_resourceManager->GetEffect("test"); 
+		job.m_material = &m_mat;
 
-		Physics::g_renderer->AddRenderJob(&job);
+	
+		
+		Physics::g_renderer->AddRenderJob(job);
 		
 	}
 }
@@ -49,6 +53,7 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 DebugDrawer::DebugDrawer()
 {
 	m_counter = 0;
+	
 }
 
 DebugDrawer::~DebugDrawer()

@@ -1,12 +1,9 @@
 #include <ECS/World.h>
-#include "RootEngine/Include/Logging/Logging.h"
+#include <RootForce/Include/Transform.h>
+#include <RootEngine/Include/Logging/Logging.h>
 #include <gtest/gtest.h>
 
-struct Transform : public ECS::Component<Transform>
-{
-	float m_x;
-	float m_y;
-};
+using RootForce::Transform;
 
 struct Player : public ECS::Component<Player>
 {
@@ -35,12 +32,12 @@ struct GameLogicSystem : public ECS::ComponentSystem
 		// Will be executed before any processing occurs in each frame.
 	}
 
-	void ProcessEntity(ECS::Entity* p_entity)
+	void ProcessEntity(ECS::Entity* p_entity, float dt)
 	{
 		Player* player = m_players.Get(p_entity);
 		Transform* transform = m_transforms.Get(p_entity);
 
-		if( transform->m_y < 0)
+		if( transform->m_position.y < 0)
 		{
 			player->m_health -= 10.0f;
 		}

@@ -8,6 +8,7 @@ project(${PROJECT_NAME})
 # Set the files used in the target
 file(GLOB_RECURSE SHADERS Shaders/*)
 file(GLOB_RECURSE SCRIPTS Scripts/*)
+file(GLOB_RECURSE GUI GUI/*)
 
 # Add the target
 
@@ -17,3 +18,4 @@ add_custom_target(${PROJECT_NAME} ALL
 
 source_group("Shaders" FILES ${SHADERS})
 source_group("Scripts" FILES ${SCRIPTS})
+source_group("GUI" FILES ${GUI})

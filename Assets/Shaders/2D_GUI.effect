@@ -1,0 +1,7 @@
+- name: Tech1
+  param: foo
+  passes:
+  - name: 2D_GUI
+    type: vertex
+  - name: 2D_GUI
+    type: fragment

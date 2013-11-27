@@ -93,7 +93,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -124,9 +124,9 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		glCullFace(GL_FRONT);
-		glFrontFace(GL_CW);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -178,33 +178,32 @@ namespace Render
 		//m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 	}
 
-	void GLRenderer::AddRenderJob(RenderJob* p_job)
+	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
 	}
 
 	void GLRenderer::Render()
 	{
-		Clear();
-
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
-			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
+			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
 
-			(*itr)->m_effect->Apply();
-			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
-			(*itr)->m_mesh->Bind();
-			(*itr)->m_mesh->DrawArrays();
-			(*itr)->m_mesh->Unbind();
+			BindMaterial((*itr).m_material);
+
+			(*itr).m_material->m_effect->Apply();
+			(*itr).m_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			(*itr).m_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+			(*itr).m_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+			(*itr).m_mesh->Bind();
+			(*itr).m_mesh->DrawArrays();
+			(*itr).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
 
-		Swap();
 	}
 
 	void GLRenderer::Clear()
@@ -215,6 +214,16 @@ namespace Render
 	void GLRenderer::Swap()
 	{
 		SDL_GL_SwapWindow(m_window);
+	}
+
+	void GLRenderer::BindMaterial(Material* p_material)
+	{
+		p_material->m_effect->Apply();
+		p_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		p_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+
+		//p_material->m_diffuseMap->GetID();
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)
@@ -234,48 +243,6 @@ namespace Render
 		return cur_avail_mem_kb;
 	}
 
-	void GLRenderer::DrawLine(std::vector<glm::vec3> p_debugVectors)
-	{
-		int size  = p_debugVectors.size();
-		if(size <= 0)
-			return;
-
-		
-		Vertex1P1C* vertices = new Render::Vertex1P1C();
-		unsigned int* indices = (unsigned int*)malloc(sizeof(unsigned int) * size);
-
-		/*m_debugVectors.push_back(from);
-		m_debugVectors.push_back(to);
-		m_debugVectors.push_back(color);*/
-		for(int i = 0; i < size; i+=2)
-		{
-			vertices[i].m_pos = p_debugVectors[i];
-			vertices[i].m_color = glm::vec4(1.0f, 0, 0, 1.0f);
-			indices[i] = i;
-		}
-		int hurdeur = 3;
-		//vertices[0].m_pos = p_pos1;
-		//vertices[0].m_color = glm::vec4(p_colour, 1.0f);
-		//vertices[1].m_pos = p_pos2;
-		//vertices[1].m_color = glm::vec4(p_colour, 1.0f);
-
-		
-
-		Uniforms uniforms;
-		uniforms.m_normal = glm::mat4(1);
-		uniforms.m_world = glm::mat4(1);
-
-		std::shared_ptr<MeshInterface> mesh = CreateMesh();
-		mesh->Init(vertices, size, indices, size);
-
-		//RenderJob job;
-		//job.m_mesh = mesh;
-		//job.m_uniforms = &uniforms;
-		//job.m_effect = 0; //GIVE US OUR RESOURCE MANAGER GODDAMNIT!!
-
-		//AddRenderJob(&job);
-		
-	}
 
 }
 

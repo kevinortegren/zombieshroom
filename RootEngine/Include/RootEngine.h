@@ -41,11 +41,10 @@ namespace RootEngine
 		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
 		void LoadNetwork();
+		void LoadInput();
 		void LoadRender();
 		void LoadGUI();
 		void LoadPhysics();
-
-		void LoadInputSystem();
 
 		void* m_networkModule;
 		void* m_renderModule;
@@ -63,7 +62,6 @@ namespace RootEngine
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
-
 
 	};
 }
