@@ -57,6 +57,33 @@ namespace RootEngine
 
 				}
 				program->Compile();
+				program->Apply();
+
+				const YAML::Node& uniforms = techniques[i]["uniforms"];
+				for(size_t j = 0; j < uniforms.size(); ++j)
+				{
+					std::string name;
+					uniforms[j]["name"] >> name;
+					
+					int slot;
+					uniforms[j]["slot"] >> slot;
+
+					program->SetUniformBuffer(name, slot);
+
+				}
+
+				const YAML::Node& texture = techniques[i]["textures"];
+				for(size_t j = 0; j < texture.size(); ++j)
+				{
+					std::string name;
+					texture[j]["name"] >> name;
+					
+					int slot;
+					texture[j]["slot"] >> slot;
+
+					program->SetTexture(name, slot);
+
+				}
 			}
 		}
 

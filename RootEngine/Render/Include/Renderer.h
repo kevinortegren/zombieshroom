@@ -63,6 +63,10 @@ namespace Render
 		std::shared_ptr<Effect> CreateEffect() { return std::shared_ptr<Effect>(new Effect); }
 
 	private:
+
+		void GeometryPass();
+		void LightingPass();
+
 		void Clear();
 		void Swap();
 

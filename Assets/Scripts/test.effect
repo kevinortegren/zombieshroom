@@ -1,6 +1,12 @@
 - name: Generic
   techniques:
     - name: bar
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
       programs:
       - name: Generic
         shaders:

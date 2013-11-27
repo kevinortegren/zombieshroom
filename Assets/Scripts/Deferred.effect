@@ -1,6 +1,18 @@
 - name: DeferredLighting
   techniques:
     - name: Tech1
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+        - name: Lights
+          slot: 2
+      textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Normals
+          slot: 1 
       programs:
         - name: ambient
           shaders:
