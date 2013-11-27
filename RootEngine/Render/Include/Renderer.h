@@ -26,7 +26,7 @@ namespace Render
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
 		virtual void Render() = 0;
-
+		
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
@@ -38,7 +38,6 @@ namespace Render
 	{
 	public:
 		static GLRenderer* GetInstance();
-
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
