@@ -14,9 +14,9 @@ namespace RootEngine
 		
 	}
 
-	std::shared_ptr<Model> ModelImporter::LoadModel(const std::string p_fileName)
+	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
-		m_model = std::shared_ptr<Model>(new Model());
+		m_model = new Model(); //Owned by ResourceManager
 		Assimp::Importer importer;
 
 		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
@@ -85,7 +85,7 @@ namespace RootEngine
 		
 		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
-		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
+		Render::MeshInterface* tempmesh = m_renderer->CreateMesh();
 		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
 
 		m_model->m_meshes.push_back(tempmesh);

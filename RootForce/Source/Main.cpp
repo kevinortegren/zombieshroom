@@ -10,10 +10,12 @@
 
 #include <gtest/gtest.h>
 
+#include <RootForce/Include/RawMeshPrimitives.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-#include <ECS/Tests/TestSystem.h>
+#include <RenderingSystem.h>
+#include <PlayerControlSystem.h>
 
 #include <exception>
 
@@ -72,6 +74,7 @@ Main::Main(std::string p_workingDirectory)
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+
 	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
@@ -93,10 +96,6 @@ Main::Main(std::string p_workingDirectory)
 		// TODO: Log error and throw exception (?)
 	}
 
-	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
-	m_engineContext.m_resourceManager->LoadEffect("test");
-	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
-	m_engineContext.m_resourceManager->LoadCollada("testchar");
 }
 
 Main::~Main() 
@@ -107,19 +106,12 @@ Main::~Main()
 
 void Main::Start() 
 {
-	int numVertices = 3;
-	Render::Vertex1P1N realVertices[3];
-	realVertices[0].m_pos = glm::vec3(0.5f, 0.5f, 1.f); realVertices[0].m_normal = glm::vec3(0.f, 0.f, 1.f);
-	realVertices[1].m_pos = glm::vec3(-0.5f, 0.5f, 1.f); realVertices[1].m_normal = glm::vec3(0.f, 0.0f, 1.f);
-	realVertices[2].m_pos = glm::vec3(-0.5f, -0.5f, 1.f); realVertices[2].m_normal = glm::vec3(0.f, 0.f, 1.f);
-	int numIndices = 3;
-	GLuint indices[] = {
-		0, 1, 2
-	};
+	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	m_engineContext.m_resourceManager->LoadEffect("test");
+	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
+	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
+	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
-	std::shared_ptr<Render::MeshInterface> mesh = m_engineContext.m_renderer->CreateMesh();
-	mesh->Init(realVertices, 3, indices, numIndices);
-	
 	m_engineContext.m_gui->Initalize(1280, 720);
 	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
 
@@ -127,14 +119,64 @@ void Main::Start()
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
 	
-	
-	Render::RenderJob job;
-	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	job.m_uniforms = &uniforms;
-	job.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
 	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
-	float angle = 0.0f;
 
+	// Initialize the system for controlling the player.
+	std::vector<RootForce::Keybinding> keybindings(4);
+	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
+	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
+	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+
+	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
+	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
+	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+
+	keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
+	keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
+	keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+
+	keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
+	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
+	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+
+	ECS::ComponentSystem* playerControlSystem = m_world.GetSystemManager()->CreateSystem<RootForce::PlayerControlSystem>("PlayerControlSystem");
+	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetInputInterface(m_engineContext.m_inputSys);
+	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetLoggingInterface(m_engineContext.m_logger);
+	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetKeybindings(keybindings);
+
+	// Initialize the system for rendering the scene.
+	ECS::ComponentSystem* renderingSystem = m_world.GetSystemManager()->CreateSystem<RootForce::RenderingSystem>("RenderingSystem");
+	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
+	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
+
+	m_world.GetSystemManager()->InitializeSystems();
+
+	
+
+	// Setup a dummy player entity and add components to it
+	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
+	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
+
+	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
+	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
+
+	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
+	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	//guyRenderable->m_mesh = mesh;
+
+	Render::Material guyMaterial;
+	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
+	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	guyRenderable->m_material = guyMaterial;
+
+	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
+
+
+	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{
@@ -143,21 +185,17 @@ void Main::Start()
 		old = now;
 
 		HandleEvents();
-
-		// TODO: Poll and handle events
 		// TODO: Update game state
 		// TODO: Render and present game
-
-		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
-		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
-
-		m_engineContext.m_renderer->AddRenderJob(&job);
-		
 		
 		m_engineContext.m_physics->Update();
+
 		m_engineContext.m_renderer->Clear();
-		m_engineContext.m_renderer->Render();
+
+
+		playerControlSystem->Process(dt);
+		renderingSystem->Process(dt);
+
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
@@ -176,16 +214,9 @@ void Main::HandleEvents()
 			m_running = false;
 			break;
 
-		case SDL_KEYDOWN:
-			break;
-
-		case SDL_KEYUP:
-			break;
-
 		default:
-			break;
+			if (m_engineContext.m_inputSys != nullptr)
+				m_engineContext.m_inputSys->HandleInput(event);
 		}
 	}
 }
-
-

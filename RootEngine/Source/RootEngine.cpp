@@ -58,6 +58,10 @@ namespace RootEngine
 		{
 			LoadNetwork();
 		}
+		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
+		{
+			LoadInput();
+		}
 		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
 		{
 			LoadRender();
@@ -70,10 +74,6 @@ namespace RootEngine
 		{
 			LoadPhysics();
 		}
-		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
-		{
-			LoadInputSystem();
-		}
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
@@ -84,6 +84,7 @@ namespace RootEngine
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
+		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
@@ -123,6 +124,30 @@ namespace RootEngine
 		else
 		{
 			g_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+		}
+	}
+
+	void EngineMain::LoadInput()
+	{
+		// Load the input module
+		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
+		if (m_inputModule != nullptr)
+		{
+			CREATEINPUTINTERFACE libCreateInputInterface = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
+			if (libCreateInputInterface != nullptr)
+			{
+				m_inputSys = (InputManager::InputInterface*)libCreateInputInterface(m_subsystemSharedContext);
+				m_inputSys->Startup();
+
+			}
+			else
+			{
+				g_logger.LogText(LogTag::INPUT,  LogLevel::FATAL_ERROR, "Failed to load Input subsystem: %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			g_logger.LogText(LogTag::INPUT,  LogLevel::FATAL_ERROR, "Failed to load Input subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -193,29 +218,6 @@ namespace RootEngine
 		else
 		{
 			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
-		}
-	}
-
-	void EngineMain::LoadInputSystem()
-	{
-		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
-		if(m_inputModule != nullptr)
-		{
-			CREATEINPUTINTERFACE libGetInputSystem = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
-			if(libGetInputSystem != nullptr)
-			{
-				m_inputSys = (InputManager::InputInterface*)libGetInputSystem(m_subsystemSharedContext);
-				m_inputSys->Startup();
-				
-			}
-			else
-			{
-				m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load input subsystem %s", DynamicLoader::GetLastError());
-			}
-		}
-		else
-		{
-			m_logger.LogText(LogTag::INPUT, LogLevel::FATAL_ERROR, "Failed to load input subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
 	

@@ -24,7 +24,7 @@ namespace Render
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
-		virtual void AddRenderJob(RenderJob* p_job) = 0;
+		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
 		virtual void Swap() = 0;
@@ -32,8 +32,9 @@ namespace Render
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
-		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
+		virtual MeshInterface* CreateMesh() = 0;
+		virtual EffectInterface* CreateEffect() = 0;
+		virtual TextureInterface* CreateTexture() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -43,16 +44,17 @@ namespace Render
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
-		void AddRenderJob(RenderJob* p_job);
 		void Clear();
+		void AddRenderJob(const RenderJob& p_job);
 		void Render();
 		void Swap();
 		bool CheckExtension(const char* p_extension);
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
-		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
+		MeshInterface* CreateMesh() { return new Mesh; } //Remember to delete
+		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
+		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
 
 	private:
 		GLRenderer();
@@ -60,7 +62,7 @@ namespace Render
 
 		
 
-		void SetAttributes();
+		void BindMaterial(Material* p_material);
 	
 		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
 
@@ -68,7 +70,7 @@ namespace Render
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 
-		std::vector<RenderJob*> m_jobs;
+		std::vector<RenderJob> m_jobs;
 
 		// Effect.
 		Buffer m_uniforms;

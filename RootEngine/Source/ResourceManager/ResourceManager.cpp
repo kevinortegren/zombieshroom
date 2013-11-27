@@ -9,6 +9,30 @@ namespace RootEngine
 
 	ResourceManager::~ResourceManager()
 	{
+		auto modelitr = m_models.begin();
+		for(; modelitr != m_models.end(); modelitr++)
+		{
+			delete (*modelitr).second;
+			(*modelitr).second = nullptr;
+		}
+		m_models.clear();
+
+		auto meshitr = m_meshes.begin();
+		for(; meshitr != m_meshes.end(); meshitr++)
+		{
+			delete (*meshitr).second;
+			(*meshitr).second = nullptr;
+		}
+		m_meshes.clear();
+
+		auto effectitr = m_effects.begin();
+		for(; effectitr != m_effects.end(); effectitr++)
+		{
+			delete (*effectitr).second;
+			(*effectitr).second = nullptr;
+		}
+		m_effects.clear();
+
 	}
 
 	void ResourceManager::Init(std::string p_workingDirectory, Render::RendererInterface* p_renderer, Logging* p_logger)
@@ -29,16 +53,16 @@ namespace RootEngine
 
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_effectImporter->Load(m_workingDirectory + "Assets//Scripts//" + p_path + ".yaml");
+		m_effectImporter->Load(m_workingDirectory + "Assets//Shaders//" + p_path + ".effect");
 		m_effects[p_path] = m_effectImporter->m_effect;
 	}
 
-	std::shared_ptr<Render::EffectInterface> ResourceManager::GetEffect(std::string p_handle)
+	Render::EffectInterface* ResourceManager::GetEffect(std::string p_handle)
 	{
 		return m_effects[p_handle];
 	}
 
-	std::shared_ptr<Model> ResourceManager::GetModel( std::string p_handle )
+	Model* ResourceManager::GetModel( std::string p_handle )
 	{
 		return m_models[p_handle];
 	}

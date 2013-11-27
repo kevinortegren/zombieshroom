@@ -124,9 +124,9 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		glCullFace(GL_FRONT);
-		glFrontFace(GL_CW);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -178,7 +178,7 @@ namespace Render
 		//m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 	}
 
-	void GLRenderer::AddRenderJob(RenderJob* p_job)
+	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
 	}
@@ -187,17 +187,19 @@ namespace Render
 	{
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
-			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
+			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 
 
-			(*itr)->m_effect->Apply();
-			(*itr)->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-			(*itr)->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-			(*itr)->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
-			(*itr)->m_mesh->Bind();
-			(*itr)->m_mesh->DrawArrays();
-			(*itr)->m_mesh->Unbind();
+			BindMaterial((*itr).m_material);
+
+			(*itr).m_material->m_effect->Apply();
+			(*itr).m_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			(*itr).m_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+			(*itr).m_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+			(*itr).m_mesh->Bind();
+			(*itr).m_mesh->DrawArrays();
+			(*itr).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
@@ -212,6 +214,16 @@ namespace Render
 	void GLRenderer::Swap()
 	{
 		SDL_GL_SwapWindow(m_window);
+	}
+
+	void GLRenderer::BindMaterial(Material* p_material)
+	{
+		p_material->m_effect->Apply();
+		p_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		p_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+
+		//p_material->m_diffuseMap->GetID();
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)

@@ -2,8 +2,11 @@
 #pragma once
 #include "InputInterface.h"
 #include <SDL2/SDL.h>
-#include <Rocket/Core/Input.h>
+
 #define MAX_KEYS 512
+
+#define MAX_KEYS SDL_NUM_SCANCODES
+
 namespace RootEngine
 {
 	namespace InputManager
@@ -15,7 +18,7 @@ namespace RootEngine
 			void Shutdown(void);
 			void HandleInput(SDL_Event& p_event);
 
-			KeyState::KeyState GetKeyState(SDL_Keycode p_key);
+			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
 
 			glm::vec2 GetGlobalMousePos();

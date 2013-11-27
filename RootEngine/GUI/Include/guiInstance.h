@@ -29,7 +29,7 @@ namespace RootEngine
 			virtual void Update(float p_time) = 0;
 
 			//Sets an already loaded rendering effect to the gui context
-			virtual void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) = 0;
+			virtual void SetEffect(Render::EffectInterface* p_effect) = 0;
 
 			virtual void SetWorkingDir(std::string p_workingDir) = 0;
 
@@ -51,7 +51,7 @@ namespace RootEngine
 
 			void Update(float p_time);
 
-			void SetEffect(std::shared_ptr<Render::EffectInterface> p_effect) { m_renderInterface->SetEffect(p_effect); }
+			void SetEffect(Render::EffectInterface* p_effect) { m_renderInterface->SetEffect(p_effect); }
 
 			static guiInstance* GetInstance();
 
