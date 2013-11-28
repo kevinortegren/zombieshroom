@@ -31,6 +31,9 @@ void guiRenderInterface::SetViewport(int width, int height)
 {
     m_width = width;
     m_height = height;
+
+	Rocket::Core::byte byteWhite[] = {255, 255, 255, 255};
+	GenerateTexture(m_whiteTexture, byteWhite, Rocket::Core::Vector2i(1, 1));
 }
 
 void guiRenderInterface::SetEffect(Render::EffectInterface* p_effect)
@@ -91,20 +94,20 @@ void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_
 
 	if(texture)
 	{
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-		glActiveTexture(GL_TEXTURE1);
-		m_effect->SetUniformInt("texSampler", 1);
+		glActiveTexture(GL_TEXTURE0);
+		m_effect->SetUniformInt("texSampler", 0);
 		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
 
 	}
 	else
 	{
 		glActiveTexture(GL_TEXTURE0);
+		m_effect->SetUniformInt("texSampler", 0);
+		glBindTexture(GL_TEXTURE_2D, (GLuint) m_whiteTexture);
 	}
 
-
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glDisable( GL_CULL_FACE );
 	glDisable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);

@@ -2,6 +2,7 @@
 #include "Logging\Logging.h"
 #include <gtest/gtest.h>
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
+#include <Rocket/Debugger.h>
 namespace RootEngine
 {
 	namespace GUISystem
@@ -33,7 +34,6 @@ namespace RootEngine
 
 		void guiInstance::Initalize(float p_width, float p_height)
 		{
-
 			Rocket::Core::SetSystemInterface(m_sysInterface);
 			m_sysInterface->SetElapsedTime(0.1f);
 
@@ -43,17 +43,18 @@ namespace RootEngine
 			Rocket::Core::SetFileInterface(m_fileInterface);
 
 			Rocket::Core::Initialise();
-
+			
 			Rocket::Core::FontDatabase::LoadFontFace("C://Windows//Fonts//arial.ttf"); //TODO: Remove once testing is completed
 
 			m_rootContext = Rocket::Core::CreateContext("root", Rocket::Core::Vector2i(p_width, p_height));
+			Rocket::Debugger::Initialise(m_rootContext);
 			if(m_rootContext == nullptr)
 				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Error: failed to create gui context");
 		}
 
 		std::shared_ptr<Rocket::Core::ElementDocument> guiInstance::AttachDocument(std::string p_path)
 		{
-			std::shared_ptr<Rocket::Core::ElementDocument> document(m_rootContext->LoadDocument((m_workingDir + p_path).c_str()));
+			std::shared_ptr<Rocket::Core::ElementDocument> document(m_rootContext->LoadDocument((m_workingDir+"Assets//GUI//" + p_path).c_str()));
 
 			if(document != NULL)
 			{
@@ -67,7 +68,7 @@ namespace RootEngine
 
 		void guiInstance::LoadFont(std::string p_path)
 		{
-			if(!Rocket::Core::FontDatabase::LoadFontFace((m_workingDir + p_path).c_str()))
+			if(!Rocket::Core::FontDatabase::LoadFontFace((m_workingDir + "Assets//Fonts//" + p_path).c_str()))
 				g_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "Warning: failed to load Font %s", p_path.c_str());
 		}
 

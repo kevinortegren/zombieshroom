@@ -46,5 +46,6 @@ private:
 	int m_height;
 
 	Render::EffectInterface* m_effect;
+	Rocket::Core::TextureHandle m_whiteTexture;
 };
 

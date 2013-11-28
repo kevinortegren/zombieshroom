@@ -21,6 +21,8 @@
 
 #include <glm/glm.hpp>
 
+
+
 #undef main
 
 TEST(Test, Foo) 
@@ -113,8 +115,8 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
 	m_engineContext.m_gui->Initalize(1280, 720);
-	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
-	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("demo.rml");
+	m_engineContext.m_debugOverlay->Initialize(m_engineContext.m_gui->AttachDocument("debug.rml"));
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
@@ -151,8 +153,13 @@ void Main::Start()
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
 
 	m_world.GetSystemManager()->InitializeSystems();
+	Rocket::Core::Element* elem = Rocket::Core::Factory::InstanceElement(nullptr, "div", "div", Rocket::Core::XMLAttributes());
+	elem->SetInnerRML("debug me you bastard!");
+	m_engineContext.m_debugOverlay->AttachGUIElement(elem, false);
+	elem = Rocket::Core::Factory::InstanceElement(nullptr, "div", "div", Rocket::Core::XMLAttributes());
+	elem->SetInnerRML("debug me you bastard2!");
+	m_engineContext.m_debugOverlay->AttachGUIElement(elem, false);
 
-	
 
 	// Setup a dummy player entity and add components to it
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
@@ -201,7 +208,6 @@ void Main::Start()
 		m_engineContext.m_renderer->Swap();
 	}
 	document->RemoveReference();
-	debugdoc->RemoveReference();
 }
 
 void Main::HandleEvents()

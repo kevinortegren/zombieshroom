@@ -14,5 +14,5 @@ void main()
 {
 	vert_color = in_color;
 	vert_texCoord = in_texCoord;
-	gl_Position = projectionMatrix * modelMatrix * vec4( in_position, 0.0f, 1.0f);
+	gl_Position = modelMatrix * projectionMatrix * vec4( in_position, 0.0f, 1.0f);
 }
