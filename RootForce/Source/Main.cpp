@@ -112,7 +112,8 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
 	m_engineContext.m_gui->Initalize(1280, 720);
-	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
@@ -163,7 +164,6 @@ void Main::Start()
 	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
 
-
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
 	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	//guyRenderable->m_mesh = mesh;
@@ -174,6 +174,7 @@ void Main::Start()
 	guyRenderable->m_material = guyMaterial;
 
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
+
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
 	int indicesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
@@ -182,7 +183,7 @@ void Main::Start()
 	{
 		tempVertices[i*3] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].x;  // 0, 3, 6, 9
 		tempVertices[i*3 + 1] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].y; //1, 4, 7, 10
-		tempVertices[i*3 + 2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2,5,8,11  	
+		tempVertices[i*3 + 2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2,5,8,11   
 	}
 	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
 	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
@@ -211,8 +212,8 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		m_engineContext.m_physics->GetPlayerPos(handle, x);
-	//	m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		
+		//  m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
+
 
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
 			m_engineContext.m_physics->PlayerJump(handle, 10.0f);
@@ -220,15 +221,20 @@ void Main::Start()
 		{
 			m_engineContext.m_physics->PlayerKnockback(handle, speed , 20.0f);
 		}
-		m_engineContext.m_renderer->Clear();
-		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
+		 guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
 		m_engineContext.m_physics->Update(dt);
+
+		m_engineContext.m_renderer->Clear();
+
+
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
+	document->RemoveReference();
+	debugdoc->RemoveReference();
 }
 
 void Main::HandleEvents()
@@ -236,8 +242,6 @@ void Main::HandleEvents()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
-		m_engineContext.m_gui->HandleEvent(event);
-		m_engineContext.m_inputSys->HandleInput(event);
 		switch(event.type) 
 		{
 		case SDL_QUIT:
@@ -247,6 +251,8 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
+			if (m_engineContext.m_gui != nullptr)
+				m_engineContext.m_gui->HandleEvent(event);
 		}
 	}
 }

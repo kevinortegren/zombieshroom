@@ -51,19 +51,18 @@ namespace RootEngine
 				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Error: failed to create gui context");
 		}
 
-		bool guiInstance::AttachDocument(std::string p_path)
+		std::shared_ptr<Rocket::Core::ElementDocument> guiInstance::AttachDocument(std::string p_path)
 		{
-			Rocket::Core::ElementDocument* document = m_rootContext->LoadDocument((m_workingDir + p_path).c_str());
+			std::shared_ptr<Rocket::Core::ElementDocument> document(m_rootContext->LoadDocument((m_workingDir + p_path).c_str()));
 
 			if(document != NULL)
 			{
 				document->Show();
-				document->RemoveReference();
-				return true;
+				return document;
 			}
 
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "Warning: failed to load document %s", p_path.c_str());
-			return false;
+			return nullptr;
 		}
 
 		void guiInstance::LoadFont(std::string p_path)
