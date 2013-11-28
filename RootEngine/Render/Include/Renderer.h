@@ -29,6 +29,7 @@ namespace Render
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
+		virtual void RenderLines() = 0;
 
 		virtual void Swap() = 0;
 
@@ -51,6 +52,7 @@ namespace Render
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
+		void RenderLines();
 		void Swap();
 		bool CheckExtension(const char* p_extension);
 

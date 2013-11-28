@@ -212,6 +212,23 @@ namespace Render
 
 	}
 
+	void GLRenderer::RenderLines()
+	{
+		Mesh lineMesh;
+		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+		for(unsigned int i = 0; i < m_lines.size(); i++)
+		{
+			lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+			lineVertices[i*2].m_color = m_lines[i].m_color;
+			lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+			lineVertices[i*2+1].m_color = m_lines[i].m_color;
+		}
+		lineMesh.Init(lineVertices, m_lines.size()*2, 0, 0);
+
+		delete [] lineVertices;
+		m_lines.clear();
+	}
+
 	void GLRenderer::Clear()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

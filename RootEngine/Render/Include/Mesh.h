@@ -34,6 +34,6 @@ namespace Render
 		Buffer m_vertexBuffer;
 		Buffer m_elementBuffer;
 		VertexAttributes m_vertexAttributes;
-
+		bool m_isIndexed;
 	};
 }
