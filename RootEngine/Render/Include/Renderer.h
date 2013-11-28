@@ -100,6 +100,7 @@ namespace Render
 		{
 			glm::mat4 m_projection;
 			glm::mat4 m_view;
+			glm::mat4 m_invView;
 			glm::mat4 m_invProj;
 			glm::mat4 m_invViewProj;
 

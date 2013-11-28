@@ -13,6 +13,8 @@
           slot: 0
         - name: g_Normals
           slot: 1 
+        - name: g_Depth
+          slot: 2
       programs:
         - name: ambient
           shaders:

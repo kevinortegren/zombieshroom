@@ -19,7 +19,7 @@ out vec3 vert_normal;
 
 void main()
 {
-	vert_normal = normalize( normalMatrix * vec4(in_normal, 0.0f)).xyz;
+	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 }

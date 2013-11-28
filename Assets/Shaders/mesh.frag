@@ -20,7 +20,6 @@ layout (location = 1) out vec3 def_n;
 void main()
 {
 	vec3 frag_color = vec3(1);
-
 	vec3 normal = normalize(vert_normal);	
 
 	def_p = frag_color;

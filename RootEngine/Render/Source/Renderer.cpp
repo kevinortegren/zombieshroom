@@ -186,9 +186,9 @@ namespace Render
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
 		
+		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
-		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_view * m_cameraVars.m_projection);
-
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 
 		// PerFrame uniforms.
 		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
@@ -270,6 +270,7 @@ namespace Render
 	void GLRenderer::GeometryPass()
 	{
 		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 		glDisable(GL_BLEND);
 
 		// Bind GBuffer.
@@ -323,11 +324,11 @@ namespace Render
 
 		// Ambient.
 		ambient->Apply();
-		//m_fullscreenQuad.DrawArrays();
+		m_fullscreenQuad.DrawArrays();
 
 		// Directional.
 		directional->Apply();
-		//m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
+		m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
 
 		// Pointlights.
 		pointlight->Apply();

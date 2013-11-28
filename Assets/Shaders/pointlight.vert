@@ -9,6 +9,7 @@ layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
+	mat4 invView;
 	mat4 invProj;
 	mat4 invViewProj;
 };
@@ -43,4 +44,5 @@ void main() {
     ex_TexCoord = in_TexCoord;
 
 	ex_Light = plights[gl_InstanceID];
+	ex_Light.LightPosition = (viewMatrix * vec4(ex_Light.LightPosition, 1.0f)).xyz; 
 }

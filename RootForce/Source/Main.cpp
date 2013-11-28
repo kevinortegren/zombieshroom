@@ -118,31 +118,35 @@ void Main::Start()
 	//Write a log string to console
 	//Logging::GetInstance()->LogTextToConsole("Console entry test %d", 12);
 
-	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-	Render::DirectionalLight red;
-	red.m_color = glm::vec4(0.1f,0,0,1);
-	red.m_direction = glm::vec3(1, 0, 0);
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.1f,0.1f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
 
-	Render::DirectionalLight green;
-	green.m_color = glm::vec4(0,0.1f,0,1);
-	green.m_direction = glm::vec3(0, 0, -1);
+	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 
-	Render::DirectionalLight blue;
-	blue.m_color = glm::vec4(0,0,0.1f,1);
-	blue.m_direction = glm::vec3(-1, 0, 0);
+	Render::PointLight red;
+	red.m_position = glm::vec3(15.0f, 0.0f, 0.0f);
+	red.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	red.m_range = 17.0f;
+	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
 
-	m_engineContext.m_renderer->AddDirectionalLight(red, 0);
-	m_engineContext.m_renderer->AddDirectionalLight(green, 1);
-	m_engineContext.m_renderer->AddDirectionalLight(blue, 2);
+	Render::PointLight blue;
+	blue.m_position = glm::vec3(-15.0f, 0.0f, 0.0f);
+	blue.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	blue.m_range = 17.0f;
+	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
 
-	Render::PointLight pl;
-	pl.m_position = glm::vec3(0, 0, 10);
-	pl.m_attenuation = glm::vec3(0, 1.0f, 0);
-	pl.m_range = 10.0f;
-	pl.m_color = glm::vec4(1.0f, 1.0f, 0, 1);
+	Render::PointLight green;
+	green.m_position = glm::vec3(0.0f, 0.0f, 15.0f);
+	green.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	green.m_range = 23.0f;
+	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
 
-	m_engineContext.m_renderer->AddPointLight(pl, 0);
+	m_engineContext.m_renderer->AddPointLight(red, 0);
+	m_engineContext.m_renderer->AddPointLight(blue, 1);
+	m_engineContext.m_renderer->AddPointLight(green, 2);
 
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
@@ -165,6 +169,9 @@ void Main::Start()
 	job.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	float angle = 0.0f;
+	glm::mat4 rot;
+	glm::mat4 trans;
+	trans = glm::translate(glm::vec3(0, 0, 0));
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -180,7 +187,9 @@ void Main::Start()
 		// TODO: Render and present game
 
 		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
+		rot = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
+
+		uniforms.m_world = trans * rot;
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);

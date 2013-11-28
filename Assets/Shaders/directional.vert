@@ -9,6 +9,8 @@ layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
+	mat4 invView;
+	mat4 invProj;
 	mat4 invViewProj;
 };
 
