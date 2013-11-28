@@ -21,10 +21,17 @@ namespace RootForce
 		glm::vec3 GetFront();
 		glm::mat3 GetMatrix();
 
+		//////////////////////////////////////////////////////////////////////////
+		//Seldom useful outside Orientation class
+		//////////////////////////////////////////////////////////////////////////
 		void SetOrientation(float p_rotationX, float p_rotationY, float p_rotationZ);
 		void SetOrientation(float p_angle, glm::vec3 p_axis);
 		void SetOrientation(glm::quat p_orientation);
 
+
+		//////////////////////////////////////////////////////////////////////////
+		//Very useful
+		//////////////////////////////////////////////////////////////////////////
 		void Pitch(float p_angle);
 		void Yaw(float p_angle);
 		void Roll(float p_angle);
@@ -38,6 +45,8 @@ namespace RootForce
 		void RotateGlobal(float p_rotationX, float p_rotationY, float p_rotationZ);
 		void RotateGlobal(float p_angle, glm::vec3 p_axis);
 		void RotateGlobal(glm::quat p_rotation);
+
+		void LookAt(glm::vec3 p_direction, glm::vec3 p_upVector); //not implemented yet
 
 	private:
 		glm::quat m_orientation;

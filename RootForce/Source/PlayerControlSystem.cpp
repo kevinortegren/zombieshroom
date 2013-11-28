@@ -70,8 +70,6 @@ namespace RootForce
 		// TODO: The speed needs to be variable (in what component?) and centralized.
 		float speed = controller->speed;
 
-		// TODO: Cannot control camera yet - need an orientation class
-
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)

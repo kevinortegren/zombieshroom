@@ -189,4 +189,10 @@ namespace RootForce
 	{
 		m_orientation = glm::cross(p_orientation, m_orientation);
 	}
+
+	void Orientation::LookAt(glm::vec3 p_direction, glm::vec3 p_upVector)
+	{
+
+	}
+
 }
