@@ -24,6 +24,7 @@ layout(std140) uniform PerFrame
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
+uniform sampler2D g_Pos;
 
 out vec4 out_Color;
 
@@ -31,8 +32,13 @@ vec3 GetVSPositionFromDepth()
 {
 	float z = texture(g_Depth, ex_TexCoord).r;
 
+	if(z == 1)
+		discard;
+		
+	z = z * 2 - 1;
+
 	float x = ex_TexCoord.x * 2 - 1;
-    float y = (1 - ex_TexCoord.y) * 2 - 1;
+    float y = ex_TexCoord.y * 2 - 1;
 
 	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
     vec4 sPos = invProj * vProjectedPos;
@@ -57,7 +63,7 @@ void main() {
 	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
 	vec3 light = vec3(0);
-	if(dist < ex_Light.Range)
+	if(dist <= ex_Light.Range)
 	{
 		vec3 spec_color = vec3(1) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
 		vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;

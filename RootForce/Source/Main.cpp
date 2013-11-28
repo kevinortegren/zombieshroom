@@ -127,21 +127,21 @@ void Main::Start()
 	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 
 	Render::PointLight red;
-	red.m_position = glm::vec3(15.0f, 0.0f, 0.0f);
-	red.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
-	red.m_range = 17.0f;
+	red.m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+	red.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	red.m_range = 2.0f;
 	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
 
 	Render::PointLight blue;
-	blue.m_position = glm::vec3(-15.0f, 0.0f, 0.0f);
-	blue.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
-	blue.m_range = 17.0f;
+	blue.m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
+	blue.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	blue.m_range = 2.0f;
 	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
 
 	Render::PointLight green;
-	green.m_position = glm::vec3(0.0f, 0.0f, 15.0f);
-	green.m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
-	green.m_range = 23.0f;
+	green.m_position = glm::vec3(0.0f, 3.0f, 1.0f);
+	green.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	green.m_range = 2.0f;
 	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
 
 	m_engineContext.m_renderer->AddPointLight(red, 0);
@@ -193,7 +193,7 @@ void Main::Start()
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);
-		m_engineContext.m_renderer->AddRenderJob(&quadJob);
+		//m_engineContext.m_renderer->AddRenderJob(&quadJob);
 
 		m_engineContext.m_renderer->Render();
 	}

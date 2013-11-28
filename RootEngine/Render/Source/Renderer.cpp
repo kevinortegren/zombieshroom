@@ -200,8 +200,23 @@ namespace Render
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
 
+		
+		glGenFramebuffers(1, &m_debugFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
+
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
+
+		glGenTextures(1, &m_testHandle);
+		glBindTexture(GL_TEXTURE_2D, m_testHandle);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_testHandle, 0);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -308,6 +323,14 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
+		//DEBUG
+		/*glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
+
+		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, buffers);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+
 		// Lighting pass.
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);

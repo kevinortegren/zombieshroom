@@ -24,7 +24,7 @@ namespace Render
 		GLuint m_depthHandle;
 		GLuint m_diffuseHandle; // 24bit Diffuse 8bit Empty
 		GLuint m_normalsHandle;// 24bit ViewSpaceNormals 8bit Empty.
-
+		GLuint m_posHandle;
 		GLuint m_lightingAcc;
 	};
 }

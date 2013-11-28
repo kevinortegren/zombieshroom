@@ -119,6 +119,14 @@ namespace Render
 
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
+
+		//debug
+
+		GLuint m_debugFbo;
+		GLuint m_testHandle;
+		//GLuint m_testHandle;
+
+
 	};
 }
 
