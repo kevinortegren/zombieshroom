@@ -53,9 +53,13 @@ namespace Physics
 		/// p_objectPos should be of type float[3]
 		virtual void GetObjectPos(int p_objectIndex, float* p_objectPos) = 0;
 
+		virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
+		virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
+		virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
+
 		virtual void RemoveObject(int p_objectIndex, int p_type) = 0;
 
-		virtual std::vector<glm::vec3> GetDebugVectors() = 0 ;
+		
 	};
 
 
@@ -89,9 +93,11 @@ namespace Physics
 		void GetPlayerPos(int p_objectIndex, float* p_playerPos);	/// p_playerPos should be of type float[3]	
 		void GetObjectPos(int p_objectIndex, float* p_objectPos);/// p_objectPos should be of type float[3]
 
+		void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
+		void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
+		void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
 		void RemoveObject(int p_objectIndex, int p_type);
 
-		std::vector<glm::vec3> GetDebugVectors();
 
 	private:
 		/*const int TERRAIN = 0;

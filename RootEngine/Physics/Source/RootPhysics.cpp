@@ -111,7 +111,7 @@ namespace Physics
 		}
 		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-	//	m_dynamicWorld->debugDrawWorld();
+		//m_dynamicWorld->debugDrawWorld();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -174,7 +174,7 @@ namespace Physics
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
-		
+		objectBody->setActivationState(DISABLE_DEACTIVATION);
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
 		m_dynamicWorld->addRigidBody(objectBody);
 
@@ -271,7 +271,7 @@ namespace Physics
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
 		//This might be so incredibly broken that i don't even how the compiler lets us do it
- 		m_playerObject.at(p_objectIndex)->SetVelocity(temp * p_pushForce);
+ 		m_playerObject.at(p_objectIndex)->Knockback(temp * p_pushForce);
 	}
 
 	void RootPhysics::RemoveObject( int p_objectIndex, int p_type )
@@ -299,10 +299,6 @@ namespace Physics
 
 	}
 
-	std::vector<glm::vec3> RootPhysics::GetDebugVectors()
-	{
-		return m_debugDrawer->GetDebugVectors();
-	}
 
 	int RootPhysics::CreateSphere( float p_radius, float p_mass, float* p_position)
 	{
@@ -316,9 +312,34 @@ namespace Physics
 		sphere->calculateLocalInertia(p_mass,fallinertia);
 		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
 		btRigidBody* body = new btRigidBody(sphereCI);
+		body->setActivationState(DISABLE_DEACTIVATION);
 		m_dynamicWorld->addRigidBody(body);
 		m_dynamicObjects.push_back(body);
 		return m_dynamicObjects.size()-1;
+	}
+
+	void RootPhysics::GetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
+	{
+		btRigidBody* body = m_dynamicObjects.at(p_objectIndex);
+		p_objectOrientation[0] = body->getOrientation().x();
+		p_objectOrientation[1] = body->getOrientation().y();
+		p_objectOrientation[2] = body->getOrientation().z();
+		p_objectOrientation[3] = body->getOrientation().w();
+	}
+
+	void RootPhysics::SetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
+	{
+		btRigidBody* body = m_dynamicObjects.at(p_objectIndex);
+		float x,y,z;
+		x = p_objectOrientation[0];
+		y = p_objectOrientation[1];
+		z = p_objectOrientation[2];
+		body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, 1), body->getWorldTransform().getOrigin()));
+	}
+
+	void RootPhysics::SetPlayerOrientation( int p_objectIndex, float* p_playerOrientation )
+	{
+		m_playerObject.at(p_objectIndex)->SetOrientation(p_playerOrientation);
 	}
 
 	

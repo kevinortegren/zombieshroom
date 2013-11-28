@@ -247,10 +247,19 @@ void PlayerController::Jump( float p_jumpforce )
 	}
 }
 
-void PlayerController::SetVelocity(float* p_velocity )
+void PlayerController::Knockback(float* p_velocity )
 {
 	m_rigidBody->applyCentralImpulse(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
 	m_manualVelocity += btVector3(p_velocity[0], p_velocity[1], p_velocity[2]);
+}
+
+void PlayerController::SetOrientation( float* p_orientation )
+{
+	float x,y,z;
+	x = p_orientation[0];
+	y = p_orientation[1];
+	z = p_orientation[2];
+	m_motionState->setWorldTransform(btTransform(btQuaternion(x,y,z, 1), m_rigidBody->getWorldTransform().getOrigin()));
 }
 
 

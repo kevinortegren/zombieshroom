@@ -187,21 +187,22 @@ void Main::Start()
 	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
 	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
 
-	float pos[3] = {0,2,2};
+	float pos[3] = {0,-1,2};
 	float rot[3] = {0,0,0};
-	int handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f ,10.f, 2, 0.3f);
+	int handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f);
 	float normal[3] = {0,1,0};
-	float position[3] = {0, -5, 0};
+	float position[3] = {0, -2, 0};
 	m_engineContext.m_physics->CreatePlane(normal, position);
 	float normal2[3] = {0,0,1};
 	float position2[3] = {0, 0, -50};
 	m_engineContext.m_physics->CreatePlane(normal2, position2);
 	float speed[3] = {0, 5, -5};
+	float speedup[3] = {0, 10 , 0};
 	float x[3];
-	float ballpos[3] = {0,-1, 2};
-	int ballHandle = m_engineContext.m_physics->CreateSphere(1, 5,ballpos );
+	float ballpos[3] = {0,-1, 4};
+	//int ballHandle = m_engineContext.m_physics->CreateSphere(1, 5,ballpos );
 	float ballspeed[3] = {0, 0, 5};
-
+	float orientation[4] = {0,0,0, 0};
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -214,21 +215,27 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		
-		m_engineContext.m_physics->GetPlayerPos(handle, x);
+		m_engineContext.m_physics->GetObjectPos(handle, x);
 		//  m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
 
 
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
-			m_engineContext.m_physics->PlayerJump(handle, 10.0f);
+			m_engineContext.m_physics->SetDynamicObjectVelocity(handle, speedup);
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
 		{
-			m_engineContext.m_physics->PlayerKnockback(handle, speed , 20.0f);
+			m_engineContext.m_physics->SetDynamicObjectVelocity(handle, speed);
 		}
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
+			//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
+			m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
 		}
 		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
+		
+		m_engineContext.m_physics->GetObjectOrientation(handle, orientation);
+
+		guyTransform->m_orientation.SetOrientation(glm::quat(orientation[0], -orientation[1], orientation[2], orientation[3]));
+		//guyTransform->m_orientation.Rotate(orientation[0], orientation[1], orientation[2]);
 		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
