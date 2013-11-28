@@ -20,8 +20,10 @@
 #include <exception>
 
 #include <glm/glm.hpp>
+#include <SDL2/SDL_syswm.h>
 
-
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 #undef main
 
@@ -89,8 +91,8 @@ Main::Main(std::string p_workingDirectory)
 			"Root Force",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			1280,
-			720,
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 		SDL_DestroyWindow);
 	if (m_window == nullptr) 
@@ -171,6 +173,9 @@ void Main::Start()
 
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 
+	m_engineContext.m_gui->SetWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+	m_engineContext.m_gui->LoadURL("demo.html");
+	m_engineContext.m_gui->SetRenderEffect(m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -188,9 +193,11 @@ void Main::Start()
 
 		m_engineContext.m_renderer->Clear();
 
-
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
+
+		m_engineContext.m_gui->Update();
+		m_engineContext.m_gui->Render();
 
 		m_engineContext.m_renderer->Swap();
 	}
