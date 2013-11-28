@@ -20,11 +20,18 @@
               type: vertex
             - name: ambient
               type: fragment
-        - name: diffuse
+        - name: directional
           shaders:
-            - name: diffuse
+            - name: directional
               type: vertex
-            - name: diffuse
+            - name: directional
               type: fragment
+        - name: pointlight
+          shaders:
+            - name: pointlight
+              type: vertex
+            - name: pointlight
+              type: fragment
+
 
 

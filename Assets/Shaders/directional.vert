@@ -5,6 +5,13 @@ layout(location = 1) in vec2 in_TexCoord;
 
 in int gl_InstanceID;
 
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+	mat4 invViewProj;
+};
+
 struct DirectionalLight
 {
 	vec3 LightDirection;
@@ -26,4 +33,5 @@ void main() {
     ex_TexCoord = in_TexCoord;
 
 	ex_Light = lights[gl_InstanceID];
+	ex_Light.LightDirection = normalize(viewMatrix * vec4(ex_Light.LightDirection, 0.0f)).xyz;
 }

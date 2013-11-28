@@ -56,7 +56,8 @@ namespace Render
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
-		: m_numDirectionalLights(0)
+		: m_numDirectionalLights(0),
+		m_numPointLights(0)
 	{
 		
 	}
@@ -185,6 +186,10 @@ namespace Render
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
 		
+		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_view * m_cameraVars.m_projection);
+
+
 		// PerFrame uniforms.
 		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
@@ -222,8 +227,14 @@ namespace Render
 
 	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
 	{
-		m_lightVars.m_lights[index] = p_light;
+		m_lightVars.m_dlights[index] = p_light;
 		m_numDirectionalLights++;
+	}
+
+	void GLRenderer::AddPointLight(const PointLight& p_light, int index)
+	{
+		m_lightVars.m_plights[index] = p_light;
+		m_numPointLights++;
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -234,6 +245,7 @@ namespace Render
 	void GLRenderer::Render()
 	{
 		Clear();
+
 
 		// Buffer Per Frame data.
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
@@ -305,18 +317,21 @@ namespace Render
 
 		auto ambient = m_lightingTech->GetPrograms()[0];
 		auto directional = m_lightingTech->GetPrograms()[1];
+		auto pointlight = m_lightingTech->GetPrograms()[2];
 
 		m_fullscreenQuad.Bind();
 
-		// Ambient pass.
+		// Ambient.
 		ambient->Apply();
+		//m_fullscreenQuad.DrawArrays();
 
-		m_fullscreenQuad.DrawArrays();
-
-		// Directional pass.
+		// Directional.
 		directional->Apply();
+		//m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
 
-		m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
+		// Pointlights.
+		pointlight->Apply();
+		m_fullscreenQuad.DrawInstanced(m_numPointLights);
 
 		m_fullscreenQuad.Unbind();
 	}

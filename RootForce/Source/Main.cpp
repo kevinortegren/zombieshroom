@@ -121,20 +121,28 @@ void Main::Start()
 	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
 
 	Render::DirectionalLight red;
-	red.m_color = glm::vec4(0.3f,0,0,1);
+	red.m_color = glm::vec4(0.1f,0,0,1);
 	red.m_direction = glm::vec3(1, 0, 0);
 
 	Render::DirectionalLight green;
-	green.m_color = glm::vec4(0,0.3f,0,1);
+	green.m_color = glm::vec4(0,0.1f,0,1);
 	green.m_direction = glm::vec3(0, 0, -1);
 
 	Render::DirectionalLight blue;
-	blue.m_color = glm::vec4(0,0,0.3f,1);
+	blue.m_color = glm::vec4(0,0,0.1f,1);
 	blue.m_direction = glm::vec3(-1, 0, 0);
 
 	m_engineContext.m_renderer->AddDirectionalLight(red, 0);
 	m_engineContext.m_renderer->AddDirectionalLight(green, 1);
 	m_engineContext.m_renderer->AddDirectionalLight(blue, 2);
+
+	Render::PointLight pl;
+	pl.m_position = glm::vec3(0, 0, 10);
+	pl.m_attenuation = glm::vec3(0, 1.0f, 0);
+	pl.m_range = 10.0f;
+	pl.m_color = glm::vec4(1.0f, 1.0f, 0, 1);
+
+	m_engineContext.m_renderer->AddPointLight(pl, 0);
 
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
@@ -148,13 +156,13 @@ void Main::Start()
 	Render::RenderJob quadJob;
 	quadJob.m_mesh = mesh;
 	quadJob.m_uniforms = &uniforms;
-	quadJob.m_effect = m_engineContext.m_resourceManager->GetEffect("mesh");
+	quadJob.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	Render::RenderJob job;
 
 	job.m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	job.m_uniforms = &uniforms;
-	job.m_effect = m_engineContext.m_resourceManager->GetEffect("mesh");
+	job.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	float angle = 0.0f;
 
@@ -172,7 +180,7 @@ void Main::Start()
 		// TODO: Render and present game
 
 		angle += 90.0f*dt;
-		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.2f, 1.0f, 0.0f);
+		uniforms.m_world = glm::rotate<float>(glm::mat4(1.0f), angle, 0.0f, 1.0f, 0.0f);
 		uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
 		m_engineContext.m_renderer->AddRenderJob(&job);

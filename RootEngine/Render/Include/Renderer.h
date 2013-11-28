@@ -10,7 +10,7 @@
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
-#include <RootEngine/Render/Include/Lights.h>
+#include <RootEngine/Render/Include/Light.h>
 
 #include <SDL2/SDL.h>
 #include <memory>
@@ -29,8 +29,12 @@ namespace Render
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void SetResolution(int p_width, int p_height) = 0;
 		virtual void AddRenderJob(RenderJob* p_job) = 0;
+
 		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
+		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
+
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
+
 		virtual void Render() = 0;
 
 		// Resource creation.
@@ -51,7 +55,10 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void SetResolution(int p_width, int p_height);
 		void AddRenderJob(RenderJob* p_job);
+
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
+		void AddPointLight(const PointLight& p_light, int index);
+
 		void SetAmbientLight(const glm::vec4& p_color);
 		void Render();
 
@@ -93,17 +100,22 @@ namespace Render
 		{
 			glm::mat4 m_projection;
 			glm::mat4 m_view;
+			glm::mat4 m_invProj;
+			glm::mat4 m_invViewProj;
 
 		} m_cameraVars;
 
 		struct
 		{
 			glm::vec4 m_ambient;
-			DirectionalLight m_lights[16];
+			DirectionalLight m_dlights[16];
+			PointLight m_plights[16];
 		
 		} m_lightVars;
 
 		size_t m_numDirectionalLights;
+		size_t m_numPointLights;
+
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
 	};
