@@ -107,6 +107,7 @@ Main::~Main()
 void Main::Start() 
 {
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
 	m_engineContext.m_resourceManager->LoadEffect("test");
 	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
 	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
@@ -114,13 +115,9 @@ void Main::Start()
 
 	m_engineContext.m_gui->Initalize(1280, 720);
 	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
-
-	Render::Uniforms uniforms;
-	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);
 	
 	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
-
+	
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -151,8 +148,6 @@ void Main::Start()
 
 	m_world.GetSystemManager()->InitializeSystems();
 
-	
-
 	// Setup a dummy player entity and add components to it
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 
@@ -174,7 +169,7 @@ void Main::Start()
 	guyRenderable->m_material = guyMaterial;
 
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-
+	guyControl->speed = 10.0f;
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -192,7 +187,7 @@ void Main::Start()
 
 		m_engineContext.m_renderer->Clear();
 
-
+		
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 

@@ -65,10 +65,10 @@ namespace RootForce
 
 
 		// TODO: The facing needs to be in the transform component
-		glm::vec3 facing = glm::vec3(0.0f, 0.0f, -1.0f);
+		glm::vec3 facing = transform->m_orientation.GetFront();
 		
 		// TODO: The speed needs to be variable (in what component?) and centralized.
-		float speed = 10.0f;
+		float speed = controller->speed;
 
 		// TODO: Cannot control camera yet - need an orientation class
 
@@ -85,10 +85,11 @@ namespace RootForce
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Player position: (%f, %f, %f)", transform->m_position.x, transform->m_position.y, transform->m_position.z);
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					// TODO: Implement strafing
+					transform->m_orientation.Yaw(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					// TODO: Implement strafing
+					transform->m_orientation.Yaw(90.0f * dt);
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 					// TODO: Implement activation of abilities
