@@ -195,4 +195,9 @@ namespace RootForce
 
 	}
 
+	glm::quat Orientation::GetQuaterion()
+	{
+		return m_orientation;
+	}
+
 }

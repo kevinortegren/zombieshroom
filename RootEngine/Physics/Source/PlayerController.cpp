@@ -255,11 +255,18 @@ void PlayerController::Knockback(float* p_velocity )
 
 void PlayerController::SetOrientation( float* p_orientation )
 {
-	float x,y,z;
+	
+	float x,y,z, w;
 	x = p_orientation[0];
 	y = p_orientation[1];
 	z = p_orientation[2];
-	m_motionState->setWorldTransform(btTransform(btQuaternion(x,y,z, 1), m_rigidBody->getWorldTransform().getOrigin()));
+	w = p_orientation[3];
+	
+	btTransform transform;
+	transform.setIdentity();
+	transform.setRotation(btQuaternion(x,y,z, w));
+	transform.setOrigin(m_ghostObject->getWorldTransform().getOrigin());
+	m_ghostObject->setWorldTransform(transform);
 }
 
 

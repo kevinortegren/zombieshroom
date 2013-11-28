@@ -4,6 +4,7 @@
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
 
+
 namespace Physics
 {
 	RootEngine::SubsystemSharedContext g_context;
@@ -157,7 +158,7 @@ namespace Physics
 			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
 			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
 		}
-		simplifiedObject->setLocalScaling(btVector3(5, 5, 5));
+		
 		simplifiedObject->recalcLocalAabb();
 		
 		//Set Inertia
@@ -207,11 +208,15 @@ namespace Physics
 
 	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, float* p_velocity )
 	{
+		if(m_dynamicObjects.size() == 0)
+			return;
 		m_dynamicObjects.at(p_objectIndex)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
 	}
 
 	void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	{
+		if(m_dynamicObjects.size() == 0)
+			return;
 		btVector3 fallInertia =  btVector3(0,0,0);
 		m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
 		m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
@@ -230,16 +235,22 @@ namespace Physics
 
 	void RootPhysics::PlayerMoveXZ( int p_objectIndex, float* p_direction )
 	{
+		if(m_playerObject.size() == 0)
+			return;
 		m_playerObject.at(p_objectIndex)->Walk(p_direction);
 	}
 
 	void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
 	{
+		if(m_playerObject.size() == 0)
+			return;
 		m_playerObject.at(p_objectIndex)->Jump(p_jumpForce);
 	}
 
 	void RootPhysics::GetPlayerPos( int p_objectIndex, float* p_playerPos )
 	{
+		if(m_playerObject.size() == 0)
+			return;
 		btVector3 temp = m_playerObject.at(p_objectIndex)->GetPosition();
 		p_playerPos[0] = temp.getX();
 		p_playerPos[1] = temp.getY();
@@ -249,6 +260,8 @@ namespace Physics
 	}
 	void RootPhysics::GetObjectPos(int p_objectIndex, float* p_objectPos)
 	{
+		if(m_dynamicObjects.size() == 0)
+			return;
 		btVector3 temp = m_dynamicObjects.at(p_objectIndex)->getWorldTransform().getOrigin();
 
 		p_objectPos[0] = temp.getX();
@@ -267,7 +280,8 @@ namespace Physics
 
  	void RootPhysics::PlayerKnockback( int p_objectIndex, float* p_pushDirection, float p_pushForce )
 	{
-		
+		if(m_playerObject.size() == 0)
+			return;
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
 		//This might be so incredibly broken that i don't even how the compiler lets us do it
@@ -291,12 +305,7 @@ namespace Physics
 		//	delete body;	
 		//	delete m_dynamicObjects[temp->m_vectorIndex];
 		//	
-
-
 		//}
-
-
-
 	}
 
 
@@ -320,6 +329,8 @@ namespace Physics
 
 	void RootPhysics::GetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
 	{
+		if(m_dynamicObjects.size() == 0)
+			return;
 		btRigidBody* body = m_dynamicObjects.at(p_objectIndex);
 		p_objectOrientation[0] = body->getOrientation().x();
 		p_objectOrientation[1] = body->getOrientation().y();
@@ -329,6 +340,8 @@ namespace Physics
 
 	void RootPhysics::SetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
 	{
+		if(m_dynamicObjects.size() == 0)
+			return;
 		btRigidBody* body = m_dynamicObjects.at(p_objectIndex);
 		float x,y,z;
 		x = p_objectOrientation[0];
@@ -339,7 +352,10 @@ namespace Physics
 
 	void RootPhysics::SetPlayerOrientation( int p_objectIndex, float* p_playerOrientation )
 	{
+		if(m_playerObject.size() == 0)
+			return;
 		m_playerObject.at(p_objectIndex)->SetOrientation(p_playerOrientation);
+		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "ROTATTIONN : %f %f %f %f",p_playerOrientation[0] ,p_playerOrientation[1], p_playerOrientation[2], p_playerOrientation[3]);
 	}
 
 	
