@@ -19,10 +19,10 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 			from[i] = p_from[i];
 			to[i] = p_to[i];
 			color[i]  = p_color[i];
+			//color[i] = 1;
 		}
 
 		
-		Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Line %d between (%f, %f, %f) and (%f, %f, %f)", m_counter, from[0], from[1], from[2], to[0], to[1], to[2]);
 		m_counter++;
 		Render::Vertex1P1C vertices[2];
 		vertices[0].m_pos = from;

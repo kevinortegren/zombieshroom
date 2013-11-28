@@ -83,14 +83,14 @@ namespace Physics
 		gContactAddedCallback = &CallbackFunc;
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
 		m_debugDrawer = new DebugDrawer();
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
-		m_dynamicWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe);
-		//m_dynamicWorld->debugDrawWorld();
+		m_dynamicWorld->debugDrawWorld();
 
 	}
 
 
-	//Creates a impassable plane
+	//Creates an impassable plane
 	void RootPhysics::CreatePlane(float* p_normal, float* p_position)
 	{
 		btCollisionShape* plane = new btStaticPlaneShape(btVector3(p_normal[0],p_normal[1],p_normal[2]), 0);
@@ -99,20 +99,21 @@ namespace Physics
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
 		m_dynamicWorld->addRigidBody(planeBody);
 	}
-
+	//////////////////////////////////////////////////////////////////////////
 	//Make a real update
-	void RootPhysics::Update()
+	void RootPhysics::Update(float p_dt)
 	{
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Clearing debug vectors");
-		m_debugDrawer->ClearDebugVectors();
+		
 		for(unsigned int i = 0; i < m_playerObject.size(); i++)
 		{
 			m_playerObject.at(i)->Update();
 		}
-		m_dynamicWorld->stepSimulation(1/60.f,10);
+		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-		m_dynamicWorld->debugDrawWorld();
+	//	m_dynamicWorld->debugDrawWorld();
 	}
+	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation )
 	{
@@ -144,9 +145,10 @@ namespace Physics
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices ,  p_vertexBuffer, p_vertexStride);
 		
 		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
+		//objectMeshShape->setLocalScaling(btVector3(10,10,10));
 		//Cull unneccesary vertices to improve performance 
 		btShapeHull* objectHull = new btShapeHull(objectMeshShape);
-	
+		
 		btScalar margin = objectMeshShape->getMargin();
 		objectHull->buildHull(margin);
 		btConvexHullShape* simplifiedObject = new btConvexHullShape();
@@ -155,7 +157,9 @@ namespace Physics
 			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
 			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
 		}
+		simplifiedObject->setLocalScaling(btVector3(5, 5, 5));
 		simplifiedObject->recalcLocalAabb();
+		
 		//Set Inertia
 		btVector3 fallInertia =  btVector3(0,0,0);
 		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
@@ -263,7 +267,9 @@ namespace Physics
 
  	void RootPhysics::PlayerKnockback( int p_objectIndex, float* p_pushDirection, float p_pushForce )
 	{
+		
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
+		temp.normalize();
 		//This might be so incredibly broken that i don't even how the compiler lets us do it
  		m_playerObject.at(p_objectIndex)->SetVelocity(temp * p_pushForce);
 	}
@@ -298,8 +304,19 @@ namespace Physics
 		return m_debugDrawer->GetDebugVectors();
 	}
 
-	void RootPhysics::CreateSphere( float p_radius, float p_mass)
+	void RootPhysics::CreateSphere( float p_radius, float p_mass, float* p_position)
 	{
+		btCollisionShape* sphere = new btSphereShape(p_radius);
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), pos ));
+		btVector3 fallinertia(0,0,0);
+		sphere->calculateLocalInertia(p_mass,fallinertia);
+		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
+		btRigidBody* body = new btRigidBody(sphereCI);
+		m_dynamicWorld->addRigidBody(body);
 
 	}
 
