@@ -1,0 +1,50 @@
+<rml>
+	<head>
+		<title>Debug overlay</title>
+		<style>
+			body {
+				font-family: Arial;
+			}
+			
+			.red {
+				color: #FF0000;
+			}
+			.yellow {
+				color: #FFFF00;
+			}
+			.green {
+				color: #00FF00;
+			}
+			.white {
+				color: #FFFFFF;
+			}
+			.gray {
+				color: #999999;
+			}
+			.black {
+				color: #000000;
+			}
+			
+			#position {
+				width: 400px;
+				height: 200px;
+			}
+			#network {
+				float: left;
+				width: 400px;
+				height: 200px;
+			}
+			#graphics {
+				width: 400px;
+				height: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="network"></div>
+		<div id="position"></div>
+		<div id="graphics">
+			<input type="checkbox" id="toggleWireframe" onclick="toggleWireframe" /> Wireframe mode
+		</div>
+	</body>
+</rml>

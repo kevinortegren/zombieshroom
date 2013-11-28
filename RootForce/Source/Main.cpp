@@ -113,8 +113,11 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
+
 	m_engineContext.m_gui->Initalize(1280, 720);
-	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
+
 	
 	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 	
@@ -194,6 +197,8 @@ void Main::Start()
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
+	document->RemoveReference();
+	debugdoc->RemoveReference();
 }
 
 void Main::HandleEvents()
@@ -201,8 +206,6 @@ void Main::HandleEvents()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
-		m_engineContext.m_gui->HandleEvent(event);
-		m_engineContext.m_inputSys->HandleInput(event);
 		switch(event.type) 
 		{
 		case SDL_QUIT:
@@ -212,6 +215,8 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
+			if (m_engineContext.m_gui != nullptr)
+				m_engineContext.m_gui->HandleEvent(event);
 		}
 	}
 }
