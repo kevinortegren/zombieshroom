@@ -121,7 +121,8 @@ void Main::Start()
 	mesh->Init(realVertices, 3, indices, numIndices);
 	
 	m_engineContext.m_gui->Initalize(1280, 720);
-	m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
+	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
 
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
@@ -161,6 +162,8 @@ void Main::Start()
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
+	document->RemoveReference();
+	debugdoc->RemoveReference();
 }
 
 void Main::HandleEvents()

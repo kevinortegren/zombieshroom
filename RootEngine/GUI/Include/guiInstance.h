@@ -23,7 +23,7 @@ namespace RootEngine
 			virtual void Initalize(float p_width, float p_height) = 0;
 
 			//Attach a .rml document to the root context
-			virtual bool AttachDocument(std::string p_path) = 0; 
+			virtual std::shared_ptr<Rocket::Core::ElementDocument> AttachDocument(std::string p_path) = 0; 
 
 			//Updates the elapsed time as well as updates and renders the gui context
 			virtual void Update(float p_time) = 0;
@@ -47,7 +47,7 @@ namespace RootEngine
 			void Shutdown();
 			void Initalize(float p_width, float p_height);
 
-			bool AttachDocument(std::string p_path); 
+			std::shared_ptr<Rocket::Core::ElementDocument> AttachDocument(std::string p_path); 
 
 			void Update(float p_time);
 
