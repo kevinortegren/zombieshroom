@@ -1,0 +1,7 @@
+- name: DiffuseTexture
+  param: foo
+  passes:
+  - name: DiffuseTexture
+    type: vertex
+  - name: DiffuseTexture
+    type: fragment

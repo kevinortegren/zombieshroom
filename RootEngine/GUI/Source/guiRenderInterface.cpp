@@ -33,7 +33,7 @@ void guiRenderInterface::SetViewport(int width, int height)
     m_height = height;
 }
 
-void guiRenderInterface::SetEffect(std::shared_ptr<Render::EffectInterface> p_effect)
+void guiRenderInterface::SetEffect(Render::EffectInterface* p_effect)
 {
 	m_effect = p_effect;
 	m_effect->Apply();
@@ -106,7 +106,9 @@ void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_
 
 
 	glDisable( GL_CULL_FACE );
+	glDisable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
+	glEnable(GL_DEPTH_TEST);
 	glEnable( GL_CULL_FACE );
 	glDisable( GL_BLEND );
 	glDeleteBuffers(2, gbuf);
