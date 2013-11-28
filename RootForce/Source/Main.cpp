@@ -114,15 +114,9 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
-	m_engineContext.m_gui->Initalize(1280, 720);
-	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("demo.rml");
-	m_engineContext.m_debugOverlay->Initialize(m_engineContext.m_gui->AttachDocument("debug.rml"));
-
 	Render::Uniforms uniforms;
 	uniforms.m_normal = glm::mat4(1);
 	uniforms.m_world = glm::mat4(1);
-	
-	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -153,12 +147,6 @@ void Main::Start()
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
 
 	m_world.GetSystemManager()->InitializeSystems();
-	Rocket::Core::Element* elem = Rocket::Core::Factory::InstanceElement(nullptr, "div", "div", Rocket::Core::XMLAttributes());
-	elem->SetInnerRML("debug me you bastard!");
-	m_engineContext.m_debugOverlay->AttachGUIElement(elem, false);
-	elem = Rocket::Core::Factory::InstanceElement(nullptr, "div", "div", Rocket::Core::XMLAttributes());
-	elem->SetInnerRML("debug me you bastard2!");
-	m_engineContext.m_debugOverlay->AttachGUIElement(elem, false);
 
 
 	// Setup a dummy player entity and add components to it
@@ -204,10 +192,8 @@ void Main::Start()
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 
-		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 		m_engineContext.m_renderer->Swap();
 	}
-	document->RemoveReference();
 }
 
 void Main::HandleEvents()
@@ -224,8 +210,6 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
-			if (m_engineContext.m_gui != nullptr)
-				m_engineContext.m_gui->HandleEvent(event);
 		}
 	}
 }

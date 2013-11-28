@@ -77,7 +77,6 @@ namespace RootEngine
 		}
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
-		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
