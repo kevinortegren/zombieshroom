@@ -27,6 +27,7 @@ namespace Render
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
+
 		virtual void Swap() = 0;
 
 		// Resource creation.

@@ -15,7 +15,7 @@ public:
 private:
 
 	void HandleEvents();
-
+	void testfuncofawesome(std::vector<glm::vec3> p_debugVectors);
 	bool m_running;
 	void* m_engineModule;
 	std::shared_ptr<SDL_Window> m_window;

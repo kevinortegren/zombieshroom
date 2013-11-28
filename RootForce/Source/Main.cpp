@@ -174,6 +174,7 @@ void Main::Start()
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
 
+	
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -186,7 +187,8 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		
-		m_engineContext.m_physics->Update();
+		
+		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
 
@@ -220,3 +222,4 @@ void Main::HandleEvents()
 		}
 	}
 }
+
