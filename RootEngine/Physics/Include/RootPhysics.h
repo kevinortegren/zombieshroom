@@ -31,7 +31,7 @@ namespace Physics
 		virtual void CreatePlane(float* p_normal, float* p_position) = 0;
 		virtual void Update(float p_dt) = 0;
 
-		virtual void CreateSphere(float p_radius, float p_mass, float* p_position) = 0;
+		virtual int CreateSphere(float p_radius, float p_mass, float* p_position) = 0;
 		///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
 		virtual void PlayerKnockback(int p_objectIndex, float* p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
 		virtual void PlayerMoveXZ(int p_objectIndex, float* p_direction) = 0;
@@ -67,7 +67,7 @@ namespace Physics
 		
 		static RootPhysics* GetInstance();
 		void CreatePlane(float* p_normal, float* p_position);
-		void CreateSphere(float p_radius, float p_mass, float* p_position);
+		int CreateSphere(float p_radius, float p_mass, float* p_position);
 		void Update(float p_dt);
 		///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
 		void PlayerMoveXZ(int p_objectIndex, float* p_direction);

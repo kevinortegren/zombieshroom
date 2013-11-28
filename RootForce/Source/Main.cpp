@@ -188,7 +188,7 @@ void Main::Start()
 	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
 	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
 
-	float pos[3] = {0,0,2};
+	float pos[3] = {0,2,2};
 	float rot[3] = {0,0,0};
 	int handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f ,10.f, 2, 0.3f);
 	float normal[3] = {0,1,0};
@@ -199,7 +199,9 @@ void Main::Start()
 	m_engineContext.m_physics->CreatePlane(normal2, position2);
 	float speed[3] = {0, 5, -5};
 	float x[3];
-
+	float ballpos[3] = {0,-1, 2};
+	int ballHandle = m_engineContext.m_physics->CreateSphere(1, 5,ballpos );
+	float ballspeed[3] = {0, 0, 5};
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -220,6 +222,10 @@ void Main::Start()
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
 		{
 			m_engineContext.m_physics->PlayerKnockback(handle, speed , 20.0f);
+		}
+		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
 		}
 		 guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
 		m_engineContext.m_physics->Update(dt);

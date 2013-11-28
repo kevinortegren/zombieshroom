@@ -304,7 +304,7 @@ namespace Physics
 		return m_debugDrawer->GetDebugVectors();
 	}
 
-	void RootPhysics::CreateSphere( float p_radius, float p_mass, float* p_position)
+	int RootPhysics::CreateSphere( float p_radius, float p_mass, float* p_position)
 	{
 		btCollisionShape* sphere = new btSphereShape(p_radius);
 		btVector3 pos;
@@ -317,7 +317,8 @@ namespace Physics
 		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
 		btRigidBody* body = new btRigidBody(sphereCI);
 		m_dynamicWorld->addRigidBody(body);
-
+		m_dynamicObjects.push_back(body);
+		return m_dynamicObjects.size()-1;
 	}
 
 	
