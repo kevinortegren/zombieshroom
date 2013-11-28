@@ -1,3 +1,4 @@
+
 #include <Main.h>
 
 #include <stdexcept>
@@ -106,21 +107,20 @@ Main::~Main()
 void Main::Start() 
 {
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
 	m_engineContext.m_resourceManager->LoadEffect("test");
 	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
 	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
+
 	m_engineContext.m_gui->Initalize(1280, 720);
 	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
 	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
 
-	Render::Uniforms uniforms;
-	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);
 	
 	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
-
+	
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -151,8 +151,6 @@ void Main::Start()
 
 	m_world.GetSystemManager()->InitializeSystems();
 
-	
-
 	// Setup a dummy player entity and add components to it
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 
@@ -174,6 +172,7 @@ void Main::Start()
 	guyRenderable->m_material = guyMaterial;
 
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
+	guyControl->speed = 10.0f;
 
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
@@ -202,6 +201,7 @@ void Main::Start()
 	float ballpos[3] = {0,-1, 2};
 	int ballHandle = m_engineContext.m_physics->CreateSphere(1, 5,ballpos );
 	float ballspeed[3] = {0, 0, 5};
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -213,6 +213,7 @@ void Main::Start()
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
+		
 		m_engineContext.m_physics->GetPlayerPos(handle, x);
 		//  m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
 
@@ -227,12 +228,12 @@ void Main::Start()
 		{
 			m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
 		}
-		 guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
+		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
 		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
 
-
+		
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 
