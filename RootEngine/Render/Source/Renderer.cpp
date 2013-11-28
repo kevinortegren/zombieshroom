@@ -183,6 +183,12 @@ namespace Render
 		m_jobs.push_back(p_job);
 	}
 
+	void GLRenderer::AddLine( glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color )
+	{
+		m_lines.push_back(Line(p_fromPoint, p_toPoint, p_color));
+	}
+
+
 	void GLRenderer::Render()
 	{
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
