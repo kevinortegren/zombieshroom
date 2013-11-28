@@ -85,11 +85,11 @@ namespace RootForce
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Player position: (%f, %f, %f)", transform->m_position.x, transform->m_position.y, transform->m_position.z);
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					transform->m_orientation.Yaw(-90.0f * dt);
+					transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					// TODO: Implement strafing
-					transform->m_orientation.Yaw(90.0f * dt);
+					transform->m_orientation.YawGlobal(90.0f * dt);
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 					// TODO: Implement activation of abilities
