@@ -39,7 +39,8 @@ namespace RootEngine
 			glActiveTexture(GL_TEXTURE0);
 			glGenTextures(1, &m_texture);
 			glBindTexture(GL_TEXTURE_2D, m_texture);
-			//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, p_width, p_height);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
@@ -102,15 +103,6 @@ namespace RootEngine
 			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
 
 			m_view->LoadURL(url);
-
-			/*while (m_view->IsLoading())
-				m_core->Update();
-
-			Sleep(300);
-			m_core->Update();
-
-			bool hej = ((Awesomium::BitmapSurface*)m_view->surface())->SaveToPNG(Awesomium::WSLit((m_workingDir + "name.PNG").c_str()));
-*/
 		}
 
 		void guiInstance::SetRenderEffect( Render::EffectInterface* p_effect )
@@ -126,11 +118,7 @@ namespace RootEngine
 				return;
 
 			const unsigned char* blargh = p_surface->buffer();
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			bool hej = p_surface->SaveToPNG(Awesomium::WSLit((m_workingDir + "name.png").c_str()));
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
 		}
 
 	}
