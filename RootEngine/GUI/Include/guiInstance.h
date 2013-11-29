@@ -20,13 +20,23 @@ namespace RootEngine
 		class GUISystemInterface abstract : public RootEngine::SubsystemInterface
 		{
 		public:
+			//Sets the window properties to the gui core
 			virtual void SetWindow(int p_width, int p_height) = 0;
+
 			virtual void Update() = 0;
 			virtual void Render() = 0;
+
+			//loads a single .html file into the view
 			virtual void LoadURL(std::string p_path) = 0;
+
 			virtual void SetWorkingDir(std::string p_path) = 0;
+
+			//Sets the render effect that will be used by the gui
 			virtual void SetRenderEffect(Render::EffectInterface* p_effect) = 0;
+
 			virtual void HandleEvents(SDL_Event p_event) = 0;
+
+			//returns the webView that displayes the .html file
 			virtual Awesomium::WebView* GetView() = 0;
 		};
 
