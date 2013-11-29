@@ -46,10 +46,12 @@ namespace RootEngine
 				m_globMousePos.x = static_cast<float>(p_event.motion.x);
 				m_globMousePos.y = static_cast<float>(p_event.motion.y);
 				break;
+			default:
+				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
 			}
 		}
 
-		KeyState::KeyState InputManager::GetKeyState(SDL_Keycode p_key)
+		KeyState::KeyState InputManager::GetKeyState(SDL_Scancode p_key)
 		{
 			if(m_keyState[p_key] == KeyState::DOWN_EDGE)
 			{
@@ -66,7 +68,7 @@ namespace RootEngine
 
 		KeyState::KeyState InputManager::GetKeyState(MouseButton::MouseButton p_button)
 		{
-			return GetKeyState((SDL_Keycode)p_button);
+			return GetKeyState((SDL_Scancode)p_button);
 		}
 
 		glm::vec2 InputManager::GetGlobalMousePos()
@@ -105,7 +107,7 @@ TEST(INPUT, KEYTEST)
 {
 	RootEngine::InputManager::InputInterface* ii = RootEngine::InputManager::InputManager::GetInstance();
 	
-	int randkey = rand()%512;
+	SDL_Scancode randkey = (SDL_Scancode) (rand() % 512);
 	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP);
 	SDL_Event falseevent;
 	falseevent.type = SDL_KEYDOWN;

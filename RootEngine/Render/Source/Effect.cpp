@@ -24,7 +24,7 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
+			//Render::g_context.m_logger.LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 
@@ -206,7 +206,7 @@ namespace Render
 	GLint GetLocation( GLuint p_handle, const char* p_name )
 	{
 		GLint loc = glGetUniformLocation( p_handle, p_name );
-		if( loc == 0 )
+		if( loc == -1 )
 			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::NON_FATAL_ERROR, "Failed to locate GL variable %s.\n", p_name , __FUNCTION__, __LINE__ );
 		return loc;
 	} */

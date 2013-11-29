@@ -1,10 +1,22 @@
-#include "guiRenderInterface.h"
+
 #include <Rocket/Core/Platform.h>
 #include <windows.h>
-#include <gl/Gl.h>
-#include <gl/Glu.h>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include "guiRenderInterface.h"
+#include <RootEngine/Include/SubsystemSharedContext.h>
 
 #define GL_CLAMP_TO_EDGE 0x812F
+
+
+namespace RootEngine
+{
+	namespace GUISystem
+	{
+		extern RootEngine::SubsystemSharedContext g_context;
+	}
+}
 
 guiRenderInterface::guiRenderInterface(void)
 {
@@ -21,33 +33,86 @@ void guiRenderInterface::SetViewport(int width, int height)
     m_height = height;
 }
 
+void guiRenderInterface::SetEffect(Render::EffectInterface* p_effect)
+{
+	/*m_effect = p_effect;
+	m_effect-Apply();
+	m_effect->SetUniformMatrix(
+		"projectionMatrix",
+		glm::mat4(
+			2.f/m_width, 0.f, 0.f, 0.f,
+			0.f, -2.f/m_height, 0.f, 0.f,
+			0.f, 0.f, 1.f, 0.f,
+			-1.f, 1.f, 0.f, 1.f
+		)
+	);*/
+}
+
 
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
-void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int ROCKET_UNUSED(num_vertices), int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
+void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
-	glPushMatrix();
-	glTranslatef(translation.x, translation.y, 0);
+	/*glm::mat4 modelMatrix = glm::translate(translation.x*2.f/m_width, translation.y*2.f/m_height, 0.f);
 
-	glVertexPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].position);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Rocket::Core::Vertex), &vertices[0].colour);
+	m_effect->Apply();
+	m_effect->SetUniformMatrix("modelMatrix", modelMatrix);
 
-	if (!texture)
+	std::vector<float> tmp;
+	for( int i = 0; i < num_vertices; i++ )
 	{
-		glDisable(GL_TEXTURE_2D);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		tmp.push_back(vertices[i].position.x);
+		tmp.push_back(vertices[i].position.y);
+		
+		tmp.push_back(vertices[i].colour.red/255.f);
+		tmp.push_back(vertices[i].colour.green/255.f);
+		tmp.push_back(vertices[i].colour.blue/255.f);
+		tmp.push_back(vertices[i].colour.alpha/255.f);
+
+		tmp.push_back(vertices[i].tex_coord.x);
+		tmp.push_back(vertices[i].tex_coord.y);
+	}
+
+	GLuint gbuf[2], vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glGenBuffers(2, gbuf);
+	glBindBuffer(GL_ARRAY_BUFFER, gbuf[0]);
+	glBufferData(GL_ARRAY_BUFFER, tmp.size() * sizeof(float), tmp.data(), GL_STREAM_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL+2*sizeof(float));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)NULL+6*sizeof(float));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gbuf[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices * sizeof(int), indices, GL_STREAM_DRAW);
+
+	if(texture)
+	{
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+		glActiveTexture(GL_TEXTURE1);
+		m_effect->SetUniformInt("texSampler", 1);
+		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
+
 	}
 	else
 	{
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, (GLuint) texture);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Rocket::Core::Vertex), &vertices[0].tex_coord);
+		glActiveTexture(GL_TEXTURE0);
 	}
 
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, indices);
 
-	glPopMatrix();
+	glDisable( GL_CULL_FACE );
+	glDisable(GL_DEPTH_TEST);
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable( GL_CULL_FACE );
+	glDisable( GL_BLEND );
+	glDeleteBuffers(2, gbuf);
+	glDeleteVertexArrays(1, &vao);*/
 }
 
 // Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.		

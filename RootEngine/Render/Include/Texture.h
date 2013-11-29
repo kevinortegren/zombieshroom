@@ -2,18 +2,19 @@
 
 #include <GL/glew.h>
 #include <gli/gli.hpp>
+#include <string>
 
 namespace Render
 {
-	class TextureInterface
+	struct TextureInterface
 	{
-		virtual bool Load(int p_width, int p_height, GLenum p_format) = 0;
 		virtual bool Load(const std::string& filepath) = 0;
-
 		virtual void Enable(unsigned int slot) = 0;
-
+		virtual unsigned int GetID() = 0;
+		virtual unsigned int GetWidth() = 0;
+		virtual unsigned int GetHeight() = 0;
+		virtual glm::vec2 GetSize() = 0;
 		virtual glm::vec2 GetInverseTextureSize() const = 0;
-		virtual glm::vec2 GetSize() const = 0;
 		virtual GLuint GetHandle() const = 0;
 	};
 
@@ -22,14 +23,17 @@ namespace Render
 	public:
 		~Texture();
 
-		bool Load(int p_width, int p_height, GLenum p_format);
 		bool Load(const std::string& filepath);
-
 		void Enable(unsigned int slot);
-		glm::vec2 GetInverseTextureSize() const;
-		glm::vec2 GetSize() const;
+
+		unsigned int GetID();
+		unsigned int GetWidth();
+		unsigned int GetHeight();
 		GLuint GetHandle() const;
-	
+
+		glm::vec2 GetSize();
+		glm::vec2 GetInverseTextureSize() const;
+		
 	private:
 		GLuint m_textureHandle;
 		int m_textureWidth;

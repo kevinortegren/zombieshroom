@@ -87,7 +87,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -176,7 +176,7 @@ namespace Render
 		
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
-		std::shared_ptr<EffectInterface> deferred = g_context.m_resourceManager->GetEffect("Deferred");
+		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
 	
 		m_lightingTech = deferred->GetTechniques()[0];
 
@@ -235,7 +235,7 @@ namespace Render
 		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
 	}
 
-	void GLRenderer::AddRenderJob(RenderJob* p_job)
+	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
 	}
@@ -257,19 +257,20 @@ namespace Render
 		m_lightVars.m_ambient = p_color;
 	}
 
+	void GLRenderer::AddLine( glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color )
+	{
+		m_lines.push_back(Line(p_fromPoint, p_toPoint, p_color));
+	}
+
+
 	void GLRenderer::Render()
 	{
-		Clear();
-
-
 		// Buffer Per Frame data.
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
 		GeometryPass();
 
-		LightingPass();
-		
-		Swap();
+		LightingPass();	
 	}
 
 	void GLRenderer::Clear()
@@ -294,11 +295,11 @@ namespace Render
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			// Buffer object uniforms.
-			m_uniforms.BufferData(1, sizeof(Uniforms), (*itr)->m_uniforms);
+			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 
-			(*itr)->m_mesh->Bind();
+			(*itr).m_mesh->Bind();
 
-			for(auto itrT = (*itr)->m_effect->GetTechniques().begin(); itrT != (*itr)->m_effect->GetTechniques().end(); ++itrT)
+			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
 				// Bind PerObjects uniforms.
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
@@ -308,11 +309,11 @@ namespace Render
 					// Apply program.
 					(*itrP)->Apply();
 
-					(*itr)->m_mesh->DrawArrays();			
+					(*itr).m_mesh->DrawArrays();			
 				}
 			}
 
-			(*itr)->m_mesh->Unbind();
+			(*itr).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
@@ -360,6 +361,16 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 	}
 
+	void GLRenderer::BindMaterial(Material* p_material)
+	{
+		/*p_material->m_effect->Apply();
+		p_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		p_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);*/
+
+		//p_material->m_diffuseMap->GetID();
+	}
+
 	bool GLRenderer::CheckExtension(const char* p_extension)
 	{
 		if(glewIsExtensionSupported(p_extension) == GL_FALSE) {
@@ -376,6 +387,8 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
+
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

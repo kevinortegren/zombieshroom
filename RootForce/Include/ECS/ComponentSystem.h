@@ -27,12 +27,12 @@ namespace ECS
 			m_componentTypes[Component<T>::GetTypeId()] = 1;
 		}
 
-		void Process();
+		void Process(float dt);
 
 		// Impl. Interface.
 		virtual void Init() = 0;
 		virtual void Begin() = 0;
-		virtual void ProcessEntity(Entity* p_entity) = 0;
+		virtual void ProcessEntity(Entity* p_entity, float dt) = 0;
 		virtual void End() = 0;
 
 	protected:

@@ -14,7 +14,7 @@ namespace RootEngine
 		void Process(const YAML::Node& p_node);
 		void SetWorkingDirectory(std::string p_workingDirectory);
 
-		std::shared_ptr<Render::EffectInterface> m_effect;
+		Render::EffectInterface* m_effect;
 	private:
 		Render::RendererInterface* m_renderer;
 		std::string m_workingDirectory;

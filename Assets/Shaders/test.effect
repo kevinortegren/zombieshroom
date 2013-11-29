@@ -1,0 +1,7 @@
+- name: Tech1
+  param: foo
+  passes:
+  - name: Generic
+    type: vertex
+  - name: Generic
+    type: fragment
