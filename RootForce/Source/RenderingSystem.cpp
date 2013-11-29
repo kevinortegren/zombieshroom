@@ -54,8 +54,7 @@ namespace RootForce
 
 	void RenderingSystem::End()
 	{
-		m_renderer->Render();
-		m_renderer->RenderLines();
+
 	}
 
 	void RenderingSystem::SetRendererInterface(Render::RendererInterface* p_renderer)

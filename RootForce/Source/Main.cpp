@@ -197,6 +197,8 @@ void Main::Start()
 		renderingSystem->Process(dt);
 
 		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
+		m_engineContext.m_renderer->Render();
+		m_engineContext.m_renderer->RenderLines();
 		m_engineContext.m_renderer->Swap();
 	}
 	document->RemoveReference();
