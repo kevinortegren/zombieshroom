@@ -3,8 +3,6 @@
 #include "InputInterface.h"
 #include <SDL2/SDL.h>
 
-#define MAX_KEYS 512
-
 #define MAX_KEYS SDL_NUM_SCANCODES
 
 namespace RootEngine
