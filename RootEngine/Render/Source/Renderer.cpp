@@ -1,10 +1,10 @@
 
 #include <GL/glew.h>
+
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Render/Include/Shader.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -55,9 +55,9 @@ namespace Render
 {
 	RootEngine::SubsystemSharedContext g_context;
 
-	GLRenderer* GLRenderer::s_rendererInstance = nullptr;
-
 	GLRenderer::GLRenderer()
+		: m_numDirectionalLights(0),
+		m_numPointLights(0)
 	{
 		
 	}
@@ -65,16 +65,6 @@ namespace Render
 	GLRenderer::~GLRenderer()
 	{
 
-	}
-
-	GLRenderer* GLRenderer::GetInstance()
-	{
-		if(!s_rendererInstance)
-		{
-			s_rendererInstance = new GLRenderer();
-		}
-
-		return s_rendererInstance;
 	}
 
 	void GLRenderer::Startup()
@@ -89,6 +79,8 @@ namespace Render
 
 	void GLRenderer::SetupSDLContext(SDL_Window* p_window)
 	{
+		m_window = p_window;
+
 		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
 #if defined (_DEBUG)
 		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
@@ -156,16 +148,34 @@ namespace Render
 		}
 		CheckExtension("NV_texture_multisample");
 
-		m_window = p_window;
+		// Setup GBuffer.
+		m_gbuffer.Init(width, height);
 
-		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
-		
-		m_cameraVars.m_projection = m_camera.GetProjection();
-		m_cameraVars.m_view = m_camera.GetView();
-		
-		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
-		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		// Setup fullscreen quad.
+		Render::Vertex1P1UV verts[4];
+		verts[0].m_pos = glm::vec3(-1.0f, -1.0f, 0.0f);
+		verts[1].m_pos = glm::vec3(+1.0f, -1.0f, 0.0f);
+		verts[2].m_pos = glm::vec3(-1.0f, +1.0f, 0.0f);
+		verts[3].m_pos = glm::vec3(+1.0f, +1.0f, 0.0f);
 
+		verts[0].m_UV = glm::vec2(0.0f, 0.0f);
+		verts[1].m_UV = glm::vec2(1.0f, 0.0f);
+		verts[2].m_UV = glm::vec2(0.0f, 1.0f);
+		verts[3].m_UV = glm::vec2(1.0f, 1.0f);
+		
+		unsigned int indices[6];
+		indices[0] = 0; 
+		indices[1] = 1; 
+		indices[2] = 2;
+		indices[3] = 2;
+		indices[4] = 1; 
+		indices[5] = 3;
+
+		m_fullscreenQuad.Init(verts, 4, indices, 6);
+		
+		// Load effects.
+		g_context.m_resourceManager->LoadEffect("Deferred");
+		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
 
 		g_context.m_resourceManager->LoadEffect("Color");
 		m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
@@ -173,21 +183,83 @@ namespace Render
 		{
 			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
 		}
+		m_debugTech = m_debugEffect->GetTechniques()[0];
+		m_lightingTech = deferred->GetTechniques()[0];
 
+		// Setup camera.
+		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
+		
+		m_cameraVars.m_projection = m_camera.GetProjection();
+		m_cameraVars.m_view = m_camera.GetView();
+		
+		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
+		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
+
+		// PerFrame uniforms.
+		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
+		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cameraBuffer.GetBufferId());
+
+		// Light uniforms.
+		m_lights.Init(GL_UNIFORM_BUFFER);
+		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
+
+		glGenFramebuffers(1, &m_debugFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
+
+		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
-		m_lights.Init(GL_UNIFORM_BUFFER);
-		m_lightVars.m_direction = glm::vec3(0,0,-1);
-		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
+		glGenTextures(1, &m_testHandle);
+		glBindTexture(GL_TEXTURE_2D, m_testHandle);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		//m_effect.SetUniformBuffer(m_camerBuffer.GetBufferId(), "PerFrame", 0);			
-		//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-		//m_effect.SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_testHandle, 0);
+	}
+
+	void GLRenderer::SetResolution(int p_width, int p_height)
+	{
+		/*SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		int width;
+		int height;
+		SDL_GetWindowSize(m_window, &width, &height);*/
+
+		SDL_SetWindowSize(m_window, p_width, p_height);
+		
+		m_gbuffer.Resize(p_width, p_height);
+
+		glViewport(0, 0, p_width, p_height);
+
+		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
 	}
 
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
+	}
+
+	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
+	{
+		m_lightVars.m_dlights[index] = p_light;
+		m_numDirectionalLights++;
+	}
+
+	void GLRenderer::AddPointLight(const PointLight& p_light, int index)
+	{
+		m_lightVars.m_plights[index] = p_light;
+		m_numPointLights++;
+	}
+
+	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
+	{
+		m_lightVars.m_ambient = p_color;
 	}
 
 	void GLRenderer::AddLine( glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color )
@@ -198,25 +270,56 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		// Buffer Per Frame data.
+		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+
+		GeometryPass();
+
+		LightingPass();	
+	}
+
+	void GLRenderer::Swap()
+	{
+		SDL_GL_SwapWindow(m_window);
+	}
+
+	void GLRenderer::GeometryPass()
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glDisable(GL_BLEND);
+
+		// Bind GBuffer.
+		m_gbuffer.Bind();
+
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
+			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-
-
-			BindMaterial((*itr).m_material);
-
-			(*itr).m_material->m_effect->Apply();
-			(*itr).m_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-			(*itr).m_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-			(*itr).m_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+			
 			(*itr).m_mesh->Bind();
-			(*itr).m_mesh->Draw();
+
+			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
+			{
+				// Bind PerObjects uniforms.
+				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
+
+				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
+				{
+					// Apply program.
+					(*itrP)->Apply();
+
+					(*itr).m_mesh->Draw();			
+				}
+			}
 			(*itr).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
 
+		m_gbuffer.Unbind(); // Unbind GBuffer and restore backbuffer.
+		m_gbuffer.Read(); // Enable the GBuffer for reads.
 	}
 
 	void GLRenderer::RenderLines()
@@ -237,9 +340,7 @@ namespace Render
 		uniforms.m_world = glm::mat4(1.0f);
 
 		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
-		m_debugEffect->Apply();
-		m_debugEffect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-		m_debugEffect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+		m_debugTech->GetPrograms()[0]->Apply();
 
 		lineMesh.Bind();
 		lineMesh.Draw();
@@ -252,19 +353,54 @@ namespace Render
 	void GLRenderer::Clear()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
 
-	void GLRenderer::Swap()
+	}
+	void GLRenderer::LightingPass()
+
 	{
-		SDL_GL_SwapWindow(m_window);
+		//DEBUG
+		/*glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
+
+		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, buffers);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+
+		// Lighting pass.
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+		// Buffer light data.
+		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
+
+		auto ambient = m_lightingTech->GetPrograms()[0];
+		auto directional = m_lightingTech->GetPrograms()[1];
+		auto pointlight = m_lightingTech->GetPrograms()[2];
+
+		m_fullscreenQuad.Bind();
+
+		// Ambient.
+		ambient->Apply();
+		m_fullscreenQuad.Draw();
+
+		// Directional.
+		directional->Apply();
+		m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
+
+		// Pointlights.
+		pointlight->Apply();
+		m_fullscreenQuad.DrawInstanced(m_numPointLights);
+
+		m_fullscreenQuad.Unbind();
 	}
 
 	void GLRenderer::BindMaterial(Material* p_material)
 	{
-		p_material->m_effect->Apply();
+		/*p_material->m_effect->Apply();
 		p_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
 		p_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
+		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);*/
 
 		//p_material->m_diffuseMap->GetID();
 	}
@@ -293,5 +429,5 @@ Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_c
 {
 	Render::g_context = p_context;
 
-	return Render::GLRenderer::GetInstance();
+	return new Render::GLRenderer;
 }

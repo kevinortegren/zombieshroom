@@ -7,9 +7,14 @@
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/GeometryBuffer.h>
+
 #include <RootEngine/Render/Include/Line.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
+
+#include <RootEngine/Render/Include/Light.h>
+
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -25,9 +30,18 @@ namespace Render
 	{
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
+		virtual void SetResolution(int p_width, int p_height) = 0;
+
+		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
+		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
+
+		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
+
+
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
+
 		virtual void Render() = 0;
 		virtual void RenderLines() = 0;
 
@@ -44,10 +58,20 @@ namespace Render
 	class GLRenderer : public RendererInterface
 	{
 	public:
-		static GLRenderer* GetInstance();
+		GLRenderer();
+		~GLRenderer();
+
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
+		void SetResolution(int p_width, int p_height);
+
+		void AddDirectionalLight(const DirectionalLight& p_light, int index);
+		void AddPointLight(const PointLight& p_light, int index);
+
+		void SetAmbientLight(const glm::vec4& p_color);
+
+
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
@@ -63,10 +87,9 @@ namespace Render
 		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
 
 	private:
-		GLRenderer();
-		~GLRenderer();
 
-		
+		void GeometryPass();
+		void LightingPass();
 
 		void BindMaterial(Material* p_material);
 	
@@ -76,30 +99,52 @@ namespace Render
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 
+		GeometryBuffer m_gbuffer;
+		Mesh m_fullscreenQuad;
+
 		std::vector<RenderJob> m_jobs;
 		std::vector<Line> m_lines;
 
 		// Effect.
 		EffectInterface* m_debugEffect;
 		Buffer m_uniforms;
-
-		// Camera
-		Camera m_camera;
+		Buffer m_lights;
 		Buffer m_cameraBuffer;
+
+		Camera m_camera;
+	
 		struct
 		{
 			glm::mat4 m_projection;
 			glm::mat4 m_view;
+			glm::mat4 m_invView;
+			glm::mat4 m_invProj;
+			glm::mat4 m_invViewProj;
 
 		} m_cameraVars;
 
-		// Lights.
-		Buffer m_lights;
 		struct
 		{
-			glm::vec3 m_direction;
-
+			glm::vec4 m_ambient;
+			DirectionalLight m_dlights[16];
+			PointLight m_plights[16];
+		
 		} m_lightVars;
+
+		size_t m_numDirectionalLights;
+		size_t m_numPointLights;
+
+
+		std::shared_ptr<TechniqueInterface> m_lightingTech;
+		std::shared_ptr<TechniqueInterface> m_debugTech;
+
+		//debug
+
+		GLuint m_debugFbo;
+		GLuint m_testHandle;
+		//GLuint m_testHandle;
+
+
 	};
 }
 

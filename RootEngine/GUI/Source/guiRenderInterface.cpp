@@ -35,8 +35,8 @@ void guiRenderInterface::SetViewport(int width, int height)
 
 void guiRenderInterface::SetEffect(Render::EffectInterface* p_effect)
 {
-	m_effect = p_effect;
-	m_effect->Apply();
+	/*m_effect = p_effect;
+	m_effect-Apply();
 	m_effect->SetUniformMatrix(
 		"projectionMatrix",
 		glm::mat4(
@@ -45,14 +45,14 @@ void guiRenderInterface::SetEffect(Render::EffectInterface* p_effect)
 			0.f, 0.f, 1.f, 0.f,
 			-1.f, 1.f, 0.f, 1.f
 		)
-	);
+	);*/
 }
 
 
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
 void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, const Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
-	glm::mat4 modelMatrix = glm::translate(translation.x*2.f/m_width, translation.y*2.f/m_height, 0.f);
+	/*glm::mat4 modelMatrix = glm::translate(translation.x*2.f/m_width, translation.y*2.f/m_height, 0.f);
 
 	m_effect->Apply();
 	m_effect->SetUniformMatrix("modelMatrix", modelMatrix);
@@ -112,7 +112,7 @@ void guiRenderInterface::RenderGeometry(Rocket::Core::Vertex* vertices, int num_
 	glEnable( GL_CULL_FACE );
 	glDisable( GL_BLEND );
 	glDeleteBuffers(2, gbuf);
-	glDeleteVertexArrays(1, &vao);
+	glDeleteVertexArrays(1, &vao);*/
 }
 
 // Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.		

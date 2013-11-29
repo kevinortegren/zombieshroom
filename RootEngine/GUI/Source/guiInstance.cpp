@@ -132,7 +132,7 @@ namespace RootEngine
 
 		void guiInstance::MouseMovement(glm::vec2 p_pos)
 		{
-			m_rootContext->ProcessMouseMove((int)p_pos.x, (int)p_pos.y, 0); //TODO: not sure if the last argument should be 0
+			//m_rootContext->ProcessMouseMove((int)p_pos.x, (int)p_pos.y, 0); //TODO: not sure if the last argument should be 0
 		}
 
 		void guiInstance::MouseButtonState(Rocket::Core::Input::KeyIdentifier p_buttonIndex, bool p_isDown)

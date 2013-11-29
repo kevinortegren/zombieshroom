@@ -1,0 +1,12 @@
+- name: Output
+  techniques:
+    - name: bar
+      uniforms:
+      textures:
+      programs:
+        - name: Output
+          shaders:
+            - name: Output
+              type: vertex
+            - name: Output
+              type: fragment
