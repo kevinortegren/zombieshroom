@@ -192,7 +192,7 @@ void Main::Start()
 
 		m_engineContext.m_renderer->Clear();
 
-		m_engineContext.m_renderer->AddLine(glm::vec3(0.0f), glm::vec3(100.0f), glm::vec4(1.0f));
+
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 
