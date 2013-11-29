@@ -6,6 +6,15 @@
 
 namespace Render
 {
+	namespace Primitive
+	{
+		enum Primitive
+		{
+			TRIANGLES,
+			LINES
+		};
+	}
+
 	class MeshInterface
 	{
 	public:
@@ -15,7 +24,8 @@ namespace Render
 		virtual void Init(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices) = 0;
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
-		virtual void DrawArrays() = 0;
+		virtual void Draw() = 0;
+		virtual void SetPrimitive(int p_primitive) = 0;
 	};
 
 	class Mesh : public MeshInterface
@@ -29,11 +39,13 @@ namespace Render
 		virtual void Init(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices);
 		virtual void Bind();
 		virtual void Unbind();
-		virtual void DrawArrays();
+		virtual void Draw();
+		virtual void SetPrimitive(int p_primitive);
 
 		Buffer m_vertexBuffer;
 		Buffer m_elementBuffer;
 		VertexAttributes m_vertexAttributes;
-
+		bool m_isIndexed;
+		GLenum m_primitive;
 	};
 }

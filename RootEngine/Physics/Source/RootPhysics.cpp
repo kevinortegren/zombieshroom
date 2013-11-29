@@ -84,7 +84,7 @@ namespace Physics
 		gContactAddedCallback = &CallbackFunc;
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 
@@ -98,6 +98,7 @@ namespace Physics
 		btDefaultMotionState* planeMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(p_position[0],p_position[1],p_position[2])));
 		btRigidBody::btRigidBodyConstructionInfo planeRigidbodyCI(0, planeMotionState, plane, btVector3(0, 0, 0));
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
+		planeBody->setCollisionFlags(planeBody->getCollisionFlags() | btRigidBody::CF_DISABLE_VISUALIZE_OBJECT);
 		m_dynamicWorld->addRigidBody(planeBody);
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ namespace Physics
 		}
 		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-		//m_dynamicWorld->debugDrawWorld();
+		m_dynamicWorld->debugDrawWorld();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -138,15 +139,10 @@ namespace Physics
 	int RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
 	{
 		
-		/*for(int i = 0; i < p_numVertices; i+=3)
-		{
-			g_context.m_logger->LogTextToConsole(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "vertex : %d x: %f y: %f z: %f", i, p_vertexBuffer[i],p_vertexBuffer[i+1],p_vertexBuffer[i+2]);
-		}*/
 		//creates the mesh shape
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices ,  p_vertexBuffer, p_vertexStride);
 		
 		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
-		//objectMeshShape->setLocalScaling(btVector3(10,10,10));
 		//Cull unneccesary vertices to improve performance 
 		btShapeHull* objectHull = new btShapeHull(objectMeshShape);
 		
@@ -161,6 +157,41 @@ namespace Physics
 		
 		simplifiedObject->recalcLocalAabb();
 		
+		btCompoundShape* compShape = new btCompoundShape(true);
+		btTransform localTransform;
+		localTransform.setIdentity();
+		localTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		localTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
+
+		compShape->addChildShape(localTransform, simplifiedObject);
+
+		btVector3 fallInertia =  btVector3(0,0,0);
+		compShape->calculateLocalInertia(p_mass,fallInertia);
+
+		btTransform massTrans;
+		massTrans.setIdentity();
+		massTrans.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		massTrans.setOrigin(btVector3(p_position[0],p_position[1]-1,p_position[2]));
+
+		localTransform.inverse();
+		massTrans.inverse();
+
+		btMotionState* state = new btDefaultMotionState( massTrans, localTransform);
+
+		//create a body
+		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, state,simplifiedObject, fallInertia );
+		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
+		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
+		objectBody->setActivationState(DISABLE_DEACTIVATION);
+
+		//add the body to the world,  TODO : We should also set a user defined gravity for the object
+		m_dynamicWorld->addRigidBody(objectBody);
+
+		//add to the dynamic object vector
+		m_dynamicObjects.push_back(objectBody);
+
+
+/*
 		//Set Inertia
 		btVector3 fallInertia =  btVector3(0,0,0);
 		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
@@ -176,6 +207,7 @@ namespace Physics
 		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
+		
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
 		m_dynamicWorld->addRigidBody(objectBody);
 
@@ -208,7 +240,7 @@ namespace Physics
 
 	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, float* p_velocity )
 	{
-		if(m_dynamicObjects.size() == 0 || p_objectIndex > m_dynamicObjects.size()-1)
+		if(m_dynamicObjects.size() == 0 || (unsigned int)p_objectIndex > m_dynamicObjects.size()-1)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing object at index %d", p_objectIndex);
 			return;
@@ -218,7 +250,7 @@ namespace Physics
 
 	void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	{
-		if(m_dynamicObjects.size() == 0 || p_objectIndex > m_dynamicObjects.size()-1)
+		if(m_dynamicObjects.size() == 0 || (unsigned int)p_objectIndex > m_dynamicObjects.size()-1)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing object at index %d", p_objectIndex);
 			return;
@@ -275,7 +307,7 @@ namespace Physics
 	}
 	void RootPhysics::GetObjectPos(int p_objectIndex, float* p_objectPos)
 	{
-		if(m_dynamicObjects.size() == 0 || p_objectIndex > m_dynamicObjects.size()-1)
+		if(m_dynamicObjects.size() == 0 || (unsigned int)p_objectIndex > m_dynamicObjects.size()-1)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing object at index %d", p_objectIndex);
 			return;
@@ -350,21 +382,28 @@ namespace Physics
 
 	void RootPhysics::GetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
 	{
-		if(m_dynamicObjects.size() == 0 || p_objectIndex > m_dynamicObjects.size()-1)
+		if(m_dynamicObjects.size() == 0 || (unsigned int)p_objectIndex > m_dynamicObjects.size()-1)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing object at index %d", p_objectIndex);
 			return;
 		}
 		btRigidBody* body = m_dynamicObjects.at(p_objectIndex);
-		p_objectOrientation[0] = body->getOrientation().x();
-		p_objectOrientation[1] = body->getOrientation().y();
-		p_objectOrientation[2] = body->getOrientation().z();
-		p_objectOrientation[3] = body->getOrientation().w();
+		btTransform transform;
+		transform = body->getWorldTransform();
+		
+		p_objectOrientation[0] = transform.getRotation().w();
+		p_objectOrientation[1] = transform.getRotation().x();
+		p_objectOrientation[2] = transform.getRotation().y();
+		p_objectOrientation[3] = transform.getRotation().z();
+			/*p_objectOrientation[0] = body->getOrientation().x();
+			p_objectOrientation[1] = body->getOrientation().y();
+			p_objectOrientation[2] = body->getOrientation().z();
+			p_objectOrientation[3] = body->getOrientation().w();*/
 	}
 
 	void RootPhysics::SetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
 	{
-		if(m_dynamicObjects.size() == 0 || p_objectIndex > m_dynamicObjects.size()-1)
+		if(m_dynamicObjects.size() == 0 || (unsigned int)p_objectIndex > m_dynamicObjects.size()-1)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing object at index %d", p_objectIndex);
 			return;
@@ -375,8 +414,8 @@ namespace Physics
 		y = p_objectOrientation[1];
 		z = p_objectOrientation[2];
 		w = p_objectOrientation[3];
-		//body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, 1), body->getWorldTransform().getOrigin()));
-		body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+		body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+		//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 	}
 
 	void RootPhysics::SetPlayerOrientation( int p_objectIndex, float* p_playerOrientation )

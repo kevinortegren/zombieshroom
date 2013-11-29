@@ -7,6 +7,7 @@
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/Line.h>
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <SDL2/SDL.h>
@@ -25,8 +26,10 @@ namespace Render
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
+		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
+		virtual void RenderLines() = 0;
 
 		virtual void Swap() = 0;
 
@@ -47,7 +50,9 @@ namespace Render
 		void SetupSDLContext(SDL_Window* p_window);
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
+		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
+		void RenderLines();
 		void Swap();
 		bool CheckExtension(const char* p_extension);
 
@@ -72,8 +77,10 @@ namespace Render
 		SDL_Window* m_window;
 
 		std::vector<RenderJob> m_jobs;
+		std::vector<Line> m_lines;
 
 		// Effect.
+		EffectInterface* m_debugEffect;
 		Buffer m_uniforms;
 
 		// Camera

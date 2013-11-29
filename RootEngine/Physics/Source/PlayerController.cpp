@@ -82,7 +82,7 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	m_ghostObject->setUserPointer(this);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 
@@ -255,7 +255,7 @@ void PlayerController::Knockback(float* p_velocity )
 
 void PlayerController::SetOrientation( float* p_orientation )
 {
-	
+
 	float x,y,z, w;
 	x = p_orientation[0];
 	y = p_orientation[1];
@@ -265,8 +265,9 @@ void PlayerController::SetOrientation( float* p_orientation )
 	btTransform transform;
 	transform.setIdentity();
 	transform.setRotation(btQuaternion(x,y,z, w));
-	transform.setOrigin(m_ghostObject->getWorldTransform().getOrigin());
-	m_ghostObject->setWorldTransform(transform);
+	transform.setOrigin(m_rigidBody->getWorldTransform().getOrigin());
+	m_rigidBody->setWorldTransform(transform);
+
 }
 
 

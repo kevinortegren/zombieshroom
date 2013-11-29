@@ -178,6 +178,7 @@ void Main::Start()
 	guyRenderable2->m_material = guyMaterial;
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
+
 	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
 	guyControl2->speed = 10.0f;
 	//////////////////////////////////////////////////////////////////////////
@@ -196,7 +197,7 @@ void Main::Start()
 
 	float pos[3] = {3,0,0};
 	float rot[3] = {0,0,0};
-	int handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 1,0.02f);
+	int handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
 	float pos2[3] = {0,5,-20};
 	float rot2[3] = {0,0,0};
 	int handle2 = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
@@ -214,17 +215,21 @@ void Main::Start()
 	float* speed;
 	float speedup[3] = {0, 10 , 0};
 	float x[3], x2[3];
-	/*for(int i = 0 ; i < 300; i++)
+	for(int i = 0 ; i < 10; i++)
 	{
-	float ballpos[3] = {0,3 + i * 1.5f, 0};
-	int ballHandle = m_engineContext.m_physics->CreateSphere(1, 1.05f,ballpos );
-	}*/
+		float ballpos[3] = {0,3 + i * 1.5f, 0};
+		int ballHandle = m_engineContext.m_physics->CreateSphere(1, 1.05f,ballpos );
+	}
 	
 	float ballspeed[3] = {0, 0, 5};
 	float orientationPlayer[4] = {0,0,0, 0};
 	float orientation[4] = {0,0,0, 0};
 	float yaw = 0;
 	//////////////////////////////////////////////////////////////////////////
+
+
+
+	
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -237,6 +242,7 @@ void Main::Start()
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
+
 		float x3[3];
 		m_engineContext.m_physics->GetPlayerPos(handle, x);
 		m_engineContext.m_physics->GetObjectPos(handle2, x2);
@@ -291,11 +297,14 @@ void Main::Start()
 		m_engineContext.m_physics->GetObjectOrientation(handle2, orientation);
 		guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
 		
+
+		
+		
+
 		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
 
-		
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 

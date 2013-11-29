@@ -192,6 +192,7 @@ namespace RootForce
 
 	void Orientation::LookAt(glm::vec3 p_direction, glm::vec3 p_upVector)
 	{
+		m_orientation = quat(1.0f, 0.0f, 0.0f, 0.0f);
 
 	}
 

@@ -1,6 +1,8 @@
 
 #include <GL/glew.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Shader.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
@@ -165,7 +167,12 @@ namespace Render
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 
 
-		//m_effect.Apply();
+		g_context.m_resourceManager->LoadEffect("Color");
+		m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
+		if(m_debugEffect == nullptr)
+		{
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
+		}
 
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
@@ -183,6 +190,12 @@ namespace Render
 		m_jobs.push_back(p_job);
 	}
 
+	void GLRenderer::AddLine( glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color )
+	{
+		m_lines.push_back(Line(p_fromPoint, p_toPoint, p_color));
+	}
+
+
 	void GLRenderer::Render()
 	{
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
@@ -198,12 +211,42 @@ namespace Render
 			(*itr).m_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
 			(*itr).m_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);
 			(*itr).m_mesh->Bind();
-			(*itr).m_mesh->DrawArrays();
+			(*itr).m_mesh->Draw();
 			(*itr).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
 
+	}
+
+	void GLRenderer::RenderLines()
+	{
+		Mesh lineMesh;
+		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+		for(unsigned int i = 0; i < m_lines.size(); i++)
+		{
+			lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+			lineVertices[i*2].m_color = m_lines[i].m_color;
+			lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+			lineVertices[i*2+1].m_color = m_lines[i].m_color;
+		}
+		lineMesh.Init(lineVertices, m_lines.size()*2, 0, 0);
+		lineMesh.SetPrimitive(Primitive::LINES);
+
+		Uniforms uniforms;
+		uniforms.m_world = glm::mat4(1.0f);
+
+		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+		m_debugEffect->Apply();
+		m_debugEffect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+		m_debugEffect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
+
+		lineMesh.Bind();
+		lineMesh.Draw();
+		lineMesh.Unbind();
+
+		delete [] lineVertices;
+		m_lines.clear();
 	}
 
 	void GLRenderer::Clear()
