@@ -153,12 +153,11 @@ void Main::Start()
 
 	// Setup a dummy player entity and add components to it
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
-	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
+	
 
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
-	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, -6.0f);
+	
 
 	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
@@ -168,20 +167,28 @@ void Main::Start()
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
 	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 	//guyRenderable->m_mesh = mesh;
-	RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
-	guyRenderable2->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	
 
 	Render::Material guyMaterial;
 	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
 	guyRenderable->m_material = guyMaterial;
-	guyRenderable2->m_material = guyMaterial;
+	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
 
+	
+	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
+
+	/*
+	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
+	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
+	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, -6.0f);
+	RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
+	guyRenderable2->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	guyRenderable2->m_material = guyMaterial;
 	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
 	guyControl2->speed = 10.0f;
-	//////////////////////////////////////////////////////////////////////////
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
 	int indicesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
@@ -225,6 +232,7 @@ void Main::Start()
 	float orientationPlayer[4] = {0,0,0, 0};
 	float orientation[4] = {0,0,0, 0};
 	float yaw = 0;
+	*/
 	//////////////////////////////////////////////////////////////////////////
 
 
@@ -243,59 +251,60 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 
-		float x3[3];
-		m_engineContext.m_physics->GetPlayerPos(handle, x);
-		m_engineContext.m_physics->GetObjectPos(handle2, x2);
+		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
+		//float x3[3];
+		//m_engineContext.m_physics->GetPlayerPos(handle, x);
+		//m_engineContext.m_physics->GetObjectPos(handle2, x2);
 
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
-			m_engineContext.m_physics->PlayerJump(handle, 10.0f);
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
-		{
-			glm::vec3 temp = guyTransform->m_orientation.GetFront();
-			speed = &temp.x;
-			speed[1] = 4;
-			m_engineContext.m_physics->PlayerKnockback(handle, speed, 50.0f);
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			//speed[2] *= -1;
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			m_engineContext.m_physics->SetDynamicObjectVelocity(handle2, speedup);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			//speed[2] *= -1;
-		//	glm::vec3 test = guyTransform2->m_orientation.GetFront();
+		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
+		//	m_engineContext.m_physics->PlayerJump(handle, 10.0f);
+		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
+		//{
+		//	glm::vec3 temp = guyTransform->m_orientation.GetFront();
+		//	speed = &temp.x;
+		//	speed[1] = 4;
+		//	m_engineContext.m_physics->PlayerKnockback(handle, speed, 50.0f);
+		//}
+		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//{
+		//	//speed[2] *= -1;
+		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
+		//	m_engineContext.m_physics->SetDynamicObjectVelocity(handle2, speedup);
+		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
+		//}
+		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN)
+		//{
+		//	//speed[2] *= -1;
+		////	glm::vec3 test = guyTransform2->m_orientation.GetFront();
+		////	float* funtime = &test.x;
+		////	m_engineContext.m_physics->PlayerMoveXZ(handle2, funtime);
+		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
+		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
+		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
+		//}
+		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
+		//{
+		//	//speed[2] *= -1;
+		//	glm::vec3 test = guyTransform->m_orientation.GetFront();
 		//	float* funtime = &test.x;
-		//	m_engineContext.m_physics->PlayerMoveXZ(handle2, funtime);
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			//speed[2] *= -1;
-			glm::vec3 test = guyTransform->m_orientation.GetFront();
-			float* funtime = &test.x;
-			m_engineContext.m_physics->PlayerMoveXZ(handle, funtime);
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		}
-		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
-		guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
-		
-		glm::quat test = guyTransform->m_orientation.GetQuaterion();
+		//	m_engineContext.m_physics->PlayerMoveXZ(handle, funtime);
+		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
+		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
+		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
+		//}
+		//guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
+		//guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
+		//
+		//glm::quat test = guyTransform->m_orientation.GetQuaterion();
 
-		orientationPlayer[0] = test.x;
-		orientationPlayer[1] = test.y;
-		orientationPlayer[2] = test.z;
-		orientationPlayer[3] = test.w;
+		//orientationPlayer[0] = test.x;
+		//orientationPlayer[1] = test.y;
+		//orientationPlayer[2] = test.z;
+		//orientationPlayer[3] = test.w;
 
-		m_engineContext.m_physics->SetPlayerOrientation(handle,orientationPlayer);
-		m_engineContext.m_physics->GetObjectOrientation(handle2, orientation);
-		guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
+		//m_engineContext.m_physics->SetPlayerOrientation(handle,orientationPlayer);
+		//m_engineContext.m_physics->GetObjectOrientation(handle2, orientation);
+		//guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
 		
 
 		

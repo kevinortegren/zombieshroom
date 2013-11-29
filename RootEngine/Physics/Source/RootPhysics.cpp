@@ -156,42 +156,46 @@ namespace Physics
 		}
 		
 		simplifiedObject->recalcLocalAabb();
+
+
+
 		
-		btCompoundShape* compShape = new btCompoundShape(true);
-		btTransform localTransform;
-		localTransform.setIdentity();
-		localTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-		localTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
+		//btCompoundShape* compShape = new btCompoundShape(true);
+		//btTransform localTransform;
+		//localTransform.setIdentity();
+		//localTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		//localTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 
-		compShape->addChildShape(localTransform, simplifiedObject);
+		//compShape->addChildShape(localTransform, simplifiedObject);
 
-		btVector3 fallInertia =  btVector3(0,0,0);
-		compShape->calculateLocalInertia(p_mass,fallInertia);
+		//btVector3 fallInertia =  btVector3(0,0,0);
+		//compShape->calculateLocalInertia(p_mass,fallInertia);
 
-		btTransform massTrans;
-		massTrans.setIdentity();
-		massTrans.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-		massTrans.setOrigin(btVector3(p_position[0],p_position[1]-1,p_position[2]));
+		//btTransform massTrans;
+		//massTrans.setIdentity();
+		//massTrans.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		////massTrans.setOrigin(btVector3(0, 1, 0));
+		//massTrans.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 
-		localTransform.inverse();
-		massTrans.inverse();
+		//localTransform.inverse();
+		//massTrans.inverse();
 
-		btMotionState* state = new btDefaultMotionState( massTrans, localTransform);
+		//btMotionState* state = new btDefaultMotionState(localTransform, massTrans);
 
-		//create a body
-		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, state,simplifiedObject, fallInertia );
-		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
-		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
-		objectBody->setActivationState(DISABLE_DEACTIVATION);
+		////create a body
+		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, state,compShape, fallInertia );
+		////btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
+		//btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
+		//objectBody->setActivationState(DISABLE_DEACTIVATION);
 
-		//add the body to the world,  TODO : We should also set a user defined gravity for the object
-		m_dynamicWorld->addRigidBody(objectBody);
+		////add the body to the world,  TODO : We should also set a user defined gravity for the object
+		//m_dynamicWorld->addRigidBody(objectBody);
 
-		//add to the dynamic object vector
-		m_dynamicObjects.push_back(objectBody);
+		////add to the dynamic object vector
+		//m_dynamicObjects.push_back(objectBody);
 
 
-/*
+
 		//Set Inertia
 		btVector3 fallInertia =  btVector3(0,0,0);
 		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
@@ -313,10 +317,10 @@ namespace Physics
 			return;
 		}
 		btVector3 temp = m_dynamicObjects.at(p_objectIndex)->getWorldTransform().getOrigin();
-
 		p_objectPos[0] = temp.getX();
 		p_objectPos[1] = temp.getY();
 		p_objectPos[2] = temp.getZ();
+		
 	}
 
 	RootPhysics* RootPhysics::GetInstance()
