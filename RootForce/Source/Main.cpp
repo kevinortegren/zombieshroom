@@ -176,6 +176,7 @@ void Main::Start()
 	m_engineContext.m_gui->SetWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 	m_engineContext.m_gui->LoadURL("debug.html");
 	m_engineContext.m_gui->SetRenderEffect(m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
+	m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -184,6 +185,8 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
+		m_engineContext.m_debugOverlay->Clear();
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
 
 		HandleEvents();
 		// TODO: Update game state
