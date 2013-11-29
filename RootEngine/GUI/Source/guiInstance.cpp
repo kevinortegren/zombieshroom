@@ -33,15 +33,18 @@ namespace RootEngine
 			m_height = p_height;
 			m_view = m_core->CreateWebView(p_width, p_height);
 			
-			//m_view->SetTransparent(true);
+			m_view->SetTransparent(true);
 
 			// Prepare a texture for output
 			glActiveTexture(GL_TEXTURE0);
 			glGenTextures(1, &m_texture);
 			glBindTexture(GL_TEXTURE_2D, m_texture);
+
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
 			glBindVertexArray(m_vertexArrayBuffer);
