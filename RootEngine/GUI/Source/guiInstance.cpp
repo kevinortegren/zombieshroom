@@ -36,7 +36,9 @@ namespace RootEngine
 			//m_view->SetTransparent(true);
 
 			// Prepare a texture for output
+			glActiveTexture(GL_TEXTURE0);
 			glGenTextures(1, &m_texture);
+			glBindTexture(GL_TEXTURE_2D, m_texture);
 			//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, p_width, p_height);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			// Prepare a quad for texture output
@@ -46,10 +48,10 @@ namespace RootEngine
 			glGenBuffers(1, &vertexBufferObject);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			float quadVertices[] = {
-				-1.f, 1.f, 0.f, 1.f,
-				-1.f, -1.f, 0.f, 0.f,
-				1.f, 1.f, 1.f, 1.f,
-				1.f, -1.f, 1.f, 0.f
+				-1.f, 1.f, 0.f, 0.f,
+				-1.f, -1.f, 0.f, 1.f,
+				1.f, 1.f, 1.f, 0.f,
+				1.f, -1.f, 1.f, 1.f
 			};
 			glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(float), quadVertices, GL_STATIC_DRAW);
 			glEnableVertexAttribArray(0);
@@ -125,7 +127,9 @@ namespace RootEngine
 
 			const unsigned char* blargh = p_surface->buffer();
 			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, blargh);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			bool hej = p_surface->SaveToPNG(Awesomium::WSLit((m_workingDir + "name.png").c_str()));
 		}
 
