@@ -1,6 +1,5 @@
 #include <GL/glew.h>
 
-#include "Shader.h"
 #include <RootEngine/Render/Include/RenderExtern.h>
 #include <fstream>
 #include <vector>

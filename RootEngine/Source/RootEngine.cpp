@@ -53,6 +53,7 @@ namespace RootEngine
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
 		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
+		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -207,7 +208,7 @@ namespace RootEngine
 			CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
 			if(libGetPhysics != nullptr)
 			{
-				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext);
+				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext, m_renderer, &m_resourceManager);
 				m_physics->Startup();
 				
 			}
@@ -234,3 +235,4 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
+

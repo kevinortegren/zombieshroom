@@ -4,6 +4,8 @@
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Physics/Include/DebugDrawer.h>
 #if defined(_WINDLL)
 #define PHYSICS_DLL_EXPORT __declspec(dllexport)
 #else
@@ -27,7 +29,9 @@ namespace Physics
 		
 		virtual void Init() = 0;
 		virtual void CreatePlane(float* p_normal, float* p_position) = 0;
-		virtual void Update() = 0;
+		virtual void Update(float p_dt) = 0;
+
+		virtual int CreateSphere(float p_radius, float p_mass, float* p_position) = 0;
 		///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
 		virtual void PlayerKnockback(int p_objectIndex, float* p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
 		virtual void PlayerMoveXZ(int p_objectIndex, float* p_direction) = 0;
@@ -49,7 +53,13 @@ namespace Physics
 		/// p_objectPos should be of type float[3]
 		virtual void GetObjectPos(int p_objectIndex, float* p_objectPos) = 0;
 
+		virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
+		virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
+		virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
+
 		virtual void RemoveObject(int p_objectIndex, int p_type) = 0;
+
+		
 	};
 
 
@@ -60,9 +70,9 @@ namespace Physics
 		void Shutdown();
 		
 		static RootPhysics* GetInstance();
-
 		void CreatePlane(float* p_normal, float* p_position);
-		void Update();
+		int CreateSphere(float p_radius, float p_mass, float* p_position);
+		void Update(float p_dt);
 		///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
 		void PlayerMoveXZ(int p_objectIndex, float* p_direction);
 		
@@ -83,7 +93,11 @@ namespace Physics
 		void GetPlayerPos(int p_objectIndex, float* p_playerPos);	/// p_playerPos should be of type float[3]	
 		void GetObjectPos(int p_objectIndex, float* p_objectPos);/// p_objectPos should be of type float[3]
 
+		void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
+		void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
+		void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
 		void RemoveObject(int p_objectIndex, int p_type);
+
 
 	private:
 		/*const int TERRAIN = 0;
@@ -98,7 +112,7 @@ namespace Physics
 		void Init();
 		RootPhysics();
 		~RootPhysics();
-
+		DebugDrawer* m_debugDrawer;
 		btDiscreteDynamicsWorld* m_dynamicWorld;
 		btDefaultCollisionConfiguration* m_collisionConfig;
 		btCollisionDispatcher* m_dispatcher;
@@ -112,6 +126,6 @@ namespace Physics
 }
 extern "C"
 {
-	typedef Physics::PhysicsInterface* (*CREATEPHYSICS)(RootEngine::SubsystemSharedContext);
-	PHYSICS_DLL_EXPORT Physics::PhysicsInterface* CreatePhysics(RootEngine::SubsystemSharedContext p_context);
+	typedef Physics::PhysicsInterface* (*CREATEPHYSICS)(RootEngine::SubsystemSharedContext, Render::RendererInterface *, RootEngine::ResourceManagerInterface*);
+	PHYSICS_DLL_EXPORT Physics::PhysicsInterface* CreatePhysics(RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer, RootEngine::ResourceManagerInterface* p_resouceManager);
 }

@@ -1,7 +1,7 @@
-- name: Tech1
+- name: Color
   param: foo
   passes:
-  - name: Generic
+  - name: Color
     type: vertex
-  - name: Generic
+  - name: Color
     type: fragment

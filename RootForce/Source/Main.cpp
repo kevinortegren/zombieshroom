@@ -1,4 +1,3 @@
-
 #include <Main.h>
 
 #include <stdexcept>
@@ -20,7 +19,6 @@
 #include <exception>
 
 #include <glm/glm.hpp>
-#include <SDL2/SDL_syswm.h>
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -111,20 +109,49 @@ Main::~Main()
 void Main::Start() 
 {
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
-	m_engineContext.m_resourceManager->LoadEffect("test");
-	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
-	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
-	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
-	Render::Uniforms uniforms;
-	uniforms.m_normal = glm::mat4(1);
-	uniforms.m_world = glm::mat4(1);
+	m_engineContext.m_resourceManager->LoadEffect("Mesh");
+	m_engineContext.m_resourceManager->LoadCollada("testchar");
+  
+	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
+
+	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
+
+	Render::PointLight red;
+	red.m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+	red.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	red.m_range = 2.0f;
+	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
+
+	Render::PointLight blue;
+	blue.m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
+	blue.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	blue.m_range = 2.0f;
+	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
+
+	Render::PointLight green;
+	green.m_position = glm::vec3(0.0f, 3.0f, 1.0f);
+	green.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	green.m_range = 2.0f;
+	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
+
+	m_engineContext.m_renderer->AddPointLight(red, 0);
+	m_engineContext.m_renderer->AddPointLight(blue, 1);
+	m_engineContext.m_renderer->AddPointLight(green, 2);
+
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
@@ -150,14 +177,11 @@ void Main::Start()
 
 	m_world.GetSystemManager()->InitializeSystems();
 
-
 	// Setup a dummy player entity and add components to it
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
@@ -168,11 +192,12 @@ void Main::Start()
 
 	Render::Material guyMaterial;
 	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
-	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 	guyRenderable->m_material = guyMaterial;
 
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-
+	guyControl->speed = 10.0f;
+  
 	m_engineContext.m_gui->SetWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 	m_engineContext.m_gui->LoadURL("debug.html");
 	m_engineContext.m_gui->SetRenderEffect(m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
@@ -185,6 +210,7 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
+    
 		m_engineContext.m_debugOverlay->Clear();
 		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
 
@@ -192,10 +218,10 @@ void Main::Start()
 		// TODO: Update game state
 		// TODO: Render and present game
 		
-		m_engineContext.m_physics->Update();
+		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
-
+	
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 

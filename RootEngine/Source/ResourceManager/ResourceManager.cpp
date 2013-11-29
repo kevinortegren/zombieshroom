@@ -53,7 +53,10 @@ namespace RootEngine
 
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_effectImporter->Load(m_workingDirectory + "Assets//Shaders//" + p_path + ".effect");
+		m_logger->LogText("%s", p_path.c_str());
+
+		m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
+
 		m_effects[p_path] = m_effectImporter->m_effect;
 	}
 
