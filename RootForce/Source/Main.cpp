@@ -174,7 +174,7 @@ void Main::Start()
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 
 	m_engineContext.m_gui->SetWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-	m_engineContext.m_gui->LoadURL("demo.html");
+	m_engineContext.m_gui->LoadURL("buttontest.html");
 	m_engineContext.m_gui->SetRenderEffect(m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 
 	// Start the main loop
@@ -217,6 +217,8 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
+			if(m_engineContext.m_gui != nullptr)
+				m_engineContext.m_gui->HandleEvents(event);
 		}
 	}
 }

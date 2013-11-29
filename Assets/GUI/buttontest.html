@@ -1,0 +1,15 @@
+<html>
+	<head>
+		<script type="text/javascript">
+			function onevent(e)
+			{
+				document.body.backgroundColor = "#FF0000";
+				document.body.innerHTML += e.keyCode;
+			}
+		</script>
+	</head>
+	<body onkeydown="onevent(event);" onmousedown="alert('asd'); onevent(event);">
+		<div id="blargh" style="width: 300px; height: 100px; background-color: #0000FF;">
+		</div>
+	</body>
+</html>

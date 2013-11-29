@@ -100,7 +100,9 @@ namespace RootEngine
 
 		void guiInstance::LoadURL( std::string p_path )
 		{
-			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
+			//Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
+			//Awesomium::WebURL url(Awesomium::WSLit("http://www.github.com/Meraz/FOOT_Pacman"));
+			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + "buttontest.html").c_str()));
 
 			m_view->LoadURL(url);
 		}
@@ -119,6 +121,77 @@ namespace RootEngine
 
 			const unsigned char* blargh = p_surface->buffer();
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
+		}
+
+		void guiInstance::HandleEvents( SDL_Event p_event )
+		{
+			Awesomium::WebKeyboardEvent tempEvent;
+			char* temp = new char[20];
+			int keyCheck = 0;
+			switch(p_event.type)
+			{
+			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+				keyCheck = MapToAwesomium(p_event.key.keysym.scancode);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				keyCheck = MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT);
+				break;
+			}
+			if(keyCheck == -1)
+				return;
+			switch(p_event.type)
+			{
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
+					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+					std::strncpy(tempEvent.key_identifier, temp, 20);
+					if(p_event.type == SDL_KEYDOWN)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
+					if(p_event.type == SDL_KEYUP)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
+					m_view->InjectKeyboardEvent(tempEvent);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					break;
+				case SDL_MOUSEBUTTONUP:
+					m_view->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					break;
+				case SDL_MOUSEMOTION:
+					m_view->InjectMouseMove(p_event.motion.x, p_event.motion.y);
+					break;
+				default:
+					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
+			}
+		}
+
+		int guiInstance::MapToAwesomium( SDL_Keycode p_key )
+		{
+			if(p_key >= SDL_Scancode::SDL_SCANCODE_A && p_key <= SDL_Scancode::SDL_SCANCODE_Z)
+				return (int)(p_key + Awesomium::KeyCodes::AK_A - SDL_Scancode::SDL_SCANCODE_A);
+			else if(p_key >= SDL_Scancode::SDL_SCANCODE_1 && p_key <= SDL_Scancode::SDL_SCANCODE_9)
+				return (int)(p_key + Awesomium::KeyCodes::AK_1 - SDL_Scancode::SDL_SCANCODE_1);
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_0)
+				return Awesomium::KeyCodes::AK_0;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_SPACE)
+				return Awesomium::KeyCodes::AK_SPACE;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN)
+				return Awesomium::KeyCodes::AK_RETURN;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
+				return Awesomium::KeyCodes::AK_BACK;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_TAB)
+				return Awesomium::KeyCodes::AK_TAB;
+			else if(p_key == InputManager::MouseButton::LEFT)
+				return Awesomium::kMouseButton_Left;
+			else if(p_key == InputManager::MouseButton::RIGHT)
+				return Awesomium::kMouseButton_Right;
+			else
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::MASS_DATA_PRINT, "Key %d not mapped for Awesomium", p_key);
+
+			return -1;
 		}
 
 	}

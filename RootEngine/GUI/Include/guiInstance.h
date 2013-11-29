@@ -5,6 +5,7 @@
 #include <Awesomium/BitmapSurface.h>
 #include <string>
 #include <RootEngine/Render/Include/Effect.h>
+#include <SDL2/SDL.h>
 
 #if defined(_WINDLL)
     #define SUBSYSTEM_DLL_EXPORT __declspec(dllexport)
@@ -25,6 +26,8 @@ namespace RootEngine
 			virtual void LoadURL(std::string p_path) = 0;
 			virtual void SetWorkingDir(std::string p_path) = 0;
 			virtual void SetRenderEffect(Render::EffectInterface* p_effect) = 0;
+			virtual void HandleEvents(SDL_Event p_event) = 0;
+			virtual Awesomium::WebView* GetView() = 0;
 		};
 
 		class guiInstance : public GUISystemInterface
@@ -39,7 +42,8 @@ namespace RootEngine
 			void LoadURL(std::string p_path);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 			void SetRenderEffect(Render::EffectInterface* p_effect);
-			
+			void HandleEvents(SDL_Event p_event);
+			Awesomium::WebView* GetView() { return m_view; }
 
 			static guiInstance* GetInstance();
 
@@ -56,6 +60,8 @@ namespace RootEngine
 			GLuint m_vertexArrayBuffer;
 
 			void SurfaceToTexture(Awesomium::BitmapSurface* p_surface);
+			int MapToAwesomium(SDL_Keycode p_key);
+			int MapEventToAwesomium(SDL_Event p_event);
 		};
 	}
 
