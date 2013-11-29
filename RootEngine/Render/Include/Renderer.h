@@ -1,6 +1,7 @@
 #pragma once
 
 #include <RootEngine/Render/Include/Buffer.h>
+
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
@@ -9,7 +10,6 @@
 #include <RootEngine/Render/Include/GeometryBuffer.h>
 
 #include <RootEngine/Render/Include/Line.h>
-
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
@@ -43,17 +43,16 @@ namespace Render
 		virtual void Clear() = 0;
 
 		virtual void Render() = 0;
+		virtual void RenderLines() = 0;
 
 		virtual void Swap() = 0;
 
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
 		virtual TextureInterface* CreateTexture() = 0;
-
 	};
 
 	class GLRenderer : public RendererInterface
@@ -76,14 +75,13 @@ namespace Render
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
-
 		void Render();
+		void RenderLines();
 		void Swap();
 		bool CheckExtension(const char* p_extension);
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-
 		MeshInterface* CreateMesh() { return new Mesh; } //Remember to delete
 		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
 		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
@@ -107,6 +105,8 @@ namespace Render
 		std::vector<RenderJob> m_jobs;
 		std::vector<Line> m_lines;
 
+		// Effect.
+		EffectInterface* m_debugEffect;
 		Buffer m_uniforms;
 		Buffer m_lights;
 		Buffer m_cameraBuffer;
@@ -136,6 +136,7 @@ namespace Render
 
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
+		std::shared_ptr<TechniqueInterface> m_debugTech;
 
 		//debug
 

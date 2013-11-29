@@ -1,0 +1,16 @@
+- name: Color
+  techniques:
+    - name: Color
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+      programs:
+      - name: Color
+        shaders:
+          - name: Color
+            type: vertex
+          - name: Color
+            type: fragment

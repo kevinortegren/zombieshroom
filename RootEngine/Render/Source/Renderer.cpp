@@ -146,7 +146,6 @@ namespace Render
 		{
 			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
 		}
-
 		CheckExtension("NV_texture_multisample");
 
 		// Setup GBuffer.
@@ -177,7 +176,14 @@ namespace Render
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
 		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
-	
+
+		g_context.m_resourceManager->LoadEffect("Color");
+		m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
+		if(m_debugEffect == nullptr)
+		{
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
+		}
+		m_debugTech = m_debugEffect->GetTechniques()[0];
 		m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
@@ -200,7 +206,6 @@ namespace Render
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
 
-		
 		glGenFramebuffers(1, &m_debugFbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
 
@@ -273,11 +278,6 @@ namespace Render
 		LightingPass();	
 	}
 
-	void GLRenderer::Clear()
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
 	void GLRenderer::Swap()
 	{
 		SDL_GL_SwapWindow(m_window);
@@ -296,7 +296,8 @@ namespace Render
 		{
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
-
+			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
+			
 			(*itr).m_mesh->Bind();
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
@@ -309,10 +310,9 @@ namespace Render
 					// Apply program.
 					(*itrP)->Apply();
 
-					(*itr).m_mesh->DrawArrays();			
+					(*itr).m_mesh->Draw();			
 				}
 			}
-
 			(*itr).m_mesh->Unbind();
 		}
 
@@ -322,7 +322,41 @@ namespace Render
 		m_gbuffer.Read(); // Enable the GBuffer for reads.
 	}
 
+	void GLRenderer::RenderLines()
+	{
+		Mesh lineMesh;
+		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+		for(unsigned int i = 0; i < m_lines.size(); i++)
+		{
+			lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+			lineVertices[i*2].m_color = m_lines[i].m_color;
+			lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+			lineVertices[i*2+1].m_color = m_lines[i].m_color;
+		}
+		lineMesh.Init(lineVertices, m_lines.size()*2, 0, 0);
+		lineMesh.SetPrimitive(Primitive::LINES);
+
+		Uniforms uniforms;
+		uniforms.m_world = glm::mat4(1.0f);
+
+		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+		m_debugTech->GetPrograms()[0]->Apply();
+
+		lineMesh.Bind();
+		lineMesh.Draw();
+		lineMesh.Unbind();
+
+		delete [] lineVertices;
+		m_lines.clear();
+	}
+
+	void GLRenderer::Clear()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	}
 	void GLRenderer::LightingPass()
+
 	{
 		//DEBUG
 		/*glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
@@ -348,7 +382,7 @@ namespace Render
 
 		// Ambient.
 		ambient->Apply();
-		m_fullscreenQuad.DrawArrays();
+		m_fullscreenQuad.Draw();
 
 		// Directional.
 		directional->Apply();
