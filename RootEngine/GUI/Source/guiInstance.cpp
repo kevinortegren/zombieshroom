@@ -1,8 +1,9 @@
+#include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <gtest/gtest.h>
 #include <Awesomium/STLHelpers.h>
 #include <GL/glew.h>
 #include <GL/GL.h>
-#include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 #include "guiInstance.h"
 #include "Logging/Logging.h"
 
@@ -27,13 +28,17 @@ namespace RootEngine
 			delete s_gui;
 		}
 
-		void guiInstance::SetWindow( int p_width, int p_height )
+		void guiInstance::Initialize( int p_width, int p_height )
 		{
 			m_width = p_width;
 			m_height = p_height;
 			m_view = m_core->CreateWebView(p_width, p_height);
 			
 			m_view->SetTransparent(true);
+			
+  
+			g_context.m_resourceManager->LoadEffect("2D_GUI");
+			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
 
 			// Prepare a texture for output
 			glActiveTexture(GL_TEXTURE0);
@@ -73,11 +78,10 @@ namespace RootEngine
 
 		void guiInstance::Render()
 		{
-			m_effect->Apply();
+			m_program->Apply();
 
 			glBindVertexArray(m_vertexArrayBuffer);
 
-			m_effect->SetUniformInt("texSampler", 0);
 			glActiveTexture(GL_TEXTURE0);
 			SurfaceToTexture((Awesomium::BitmapSurface*)m_view->surface());
 
@@ -106,11 +110,6 @@ namespace RootEngine
 			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
 
 			m_view->LoadURL(url);
-		}
-
-		void guiInstance::SetRenderEffect( Render::EffectInterface* p_effect )
-		{
-			m_effect = p_effect;
 		}
 
 		void guiInstance::SurfaceToTexture(Awesomium::BitmapSurface* p_surface)

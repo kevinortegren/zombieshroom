@@ -112,8 +112,6 @@ void Main::Start()
 
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
-  
-	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -201,9 +199,8 @@ void Main::Start()
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
   
-	m_engineContext.m_gui->SetWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+	m_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	m_engineContext.m_gui->LoadURL("debug.html");
-	m_engineContext.m_gui->SetRenderEffect(m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
 	m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
 
 

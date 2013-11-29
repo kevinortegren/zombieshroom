@@ -21,7 +21,7 @@ namespace RootEngine
 		{
 		public:
 			//Sets the window properties to the gui core
-			virtual void SetWindow(int p_width, int p_height) = 0;
+			virtual void Initialize(int p_width, int p_height) = 0;
 
 			virtual void Update() = 0;
 			virtual void Render() = 0;
@@ -30,9 +30,6 @@ namespace RootEngine
 			virtual void LoadURL(std::string p_path) = 0;
 
 			virtual void SetWorkingDir(std::string p_path) = 0;
-
-			//Sets the render effect that will be used by the gui
-			virtual void SetRenderEffect(Render::EffectInterface* p_effect) = 0;
 
 			virtual void HandleEvents(SDL_Event p_event) = 0;
 
@@ -46,12 +43,11 @@ namespace RootEngine
 			void Startup();
 			void Shutdown();
 
-			void SetWindow(int p_width, int p_height);
+			void Initialize(int p_width, int p_height);
 			void Update();
 			void Render();
 			void LoadURL(std::string p_path);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
-			void SetRenderEffect(Render::EffectInterface* p_effect);
 			void HandleEvents(SDL_Event p_event);
 			Awesomium::WebView* GetView() { return m_view; }
 
@@ -66,7 +62,7 @@ namespace RootEngine
 			int m_width, m_height;
 
 			GLuint m_texture;
-			Render::EffectInterface* m_effect;
+			std::shared_ptr<Render::ProgramInterface> m_program;
 			GLuint m_vertexArrayBuffer;
 
 			void SurfaceToTexture(Awesomium::BitmapSurface* p_surface);
