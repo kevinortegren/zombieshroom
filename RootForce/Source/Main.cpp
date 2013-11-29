@@ -2,22 +2,17 @@
 #include <Main.h>
 
 #include <stdexcept>
-
-#include <RootEngine/Include/Logging/Logging.h>
-#include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Render/Include/Vertex.h>
-
-
+#include <exception>
 #include <gtest/gtest.h>
 
-#include <RootForce/Include/RawMeshPrimitives.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
 #include <RenderingSystem.h>
 #include <PlayerControlSystem.h>
+#include <LightSystem.h>
 
-#include <exception>
+#include <RootForce/Include/RawMeshPrimitives.h>
 
 #include <glm/glm.hpp>
 
@@ -111,6 +106,11 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
+	// Cube mesh.
+	std::shared_ptr<Render::MeshInterface> cubeMesh = m_engineContext.m_renderer->CreateMesh();
+	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
+	cubeMesh->Init(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices, cube.m_indices, cube.m_numberOfIndices);
+
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -124,30 +124,6 @@ void Main::Start()
 	directional.m_direction = glm::vec3(1, 0, 0);
 
 	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
-
-	Render::PointLight red;
-	red.m_position = glm::vec3(1.0f, 3.0f, 0.0f);
-	red.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	red.m_range = 2.0f;
-	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
-
-	Render::PointLight blue;
-	blue.m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
-	blue.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	blue.m_range = 2.0f;
-	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
-
-	Render::PointLight green;
-	green.m_position = glm::vec3(0.0f, 3.0f, 1.0f);
-	green.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	green.m_range = 2.0f;
-	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
-
-	m_engineContext.m_renderer->AddPointLight(red, 0);
-	m_engineContext.m_renderer->AddPointLight(blue, 1);
-	m_engineContext.m_renderer->AddPointLight(green, 2);
-
-	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
@@ -171,28 +147,50 @@ void Main::Start()
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
 
+	ECS::ComponentSystem* pointLightSystem = m_world.GetSystemManager()->CreateSystem<RootForce::PointLightSystem>("PointLightSystem");
+	reinterpret_cast<RootForce::PointLightSystem*>(pointLightSystem)->SetRenderInterface(m_engineContext.m_renderer);
+
+	ECS::ComponentSystem* directionalLightSystem = m_world.GetSystemManager()->CreateSystem<RootForce::DirectionalLightSystem>("DirectionalLightSystem");
+	reinterpret_cast<RootForce::DirectionalLightSystem*>(pointLightSystem)->SetRenderInterface(m_engineContext.m_renderer);
+
 	m_world.GetSystemManager()->InitializeSystems();
 
+	// Setup lights.
+	{
+		ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
+
+		RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
+		redTrans->m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+		redTrans->m_scale = glm::vec3(0.1f);
+
+		RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
+		redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
+		redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+		redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+		redPL->m_range = 2.0f;
+
+		RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
+		redRender->m_mesh = cubeMesh;
+		redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	}
+
 	// Setup a dummy player entity and add components to it
-	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+	{
+		ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 
-	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
-	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+		RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
+		guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
-	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
+		RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
+		guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 
-	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
-	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	//guyRenderable->m_mesh = mesh;
+		Render::Material guyMaterial;
+		guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+		guyRenderable->m_material = guyMaterial;
 
-	Render::Material guyMaterial;
-	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
-	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-	guyRenderable->m_material = guyMaterial;
-
-	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-	guyControl->speed = 10.0f;
+		RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
+		guyControl->speed = 10.0f;
+	}
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -205,11 +203,14 @@ void Main::Start()
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
-		
+		m_engineContext.m_renderer->Clear();
+
+		// Update Engine systems.
 		m_engineContext.m_physics->Update(dt);
 
-		m_engineContext.m_renderer->Clear();
-	
+		// Update Game systems.
+		pointLightSystem->Process(dt);
+
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
 

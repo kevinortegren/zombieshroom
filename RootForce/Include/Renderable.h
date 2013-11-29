@@ -10,8 +10,7 @@ namespace RootForce
 {
 	struct Renderable : public ECS::Component<Renderable>
 	{
-		Renderable(){m_mesh = nullptr;}
-		Render::MeshInterface* m_mesh;
+		std::shared_ptr<Render::MeshInterface> m_mesh;
 		Render::Material m_material;
 	};
 }

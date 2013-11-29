@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ECS/World.h>
 #include <RootForce/Include/Transform.h>
 #include <RootEngine/Include/Logging/Logging.h>

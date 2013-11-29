@@ -40,7 +40,6 @@ namespace RootEngine
 
 	void ModelImporter::InitFromScene( const aiScene* p_scene, const std::string p_filename )
 	{
-	
 		// Initialize the meshes in the scene one by one
 		for (unsigned int i = 0 ; i < p_scene->mNumMeshes ; i++) 
 		{
@@ -85,7 +84,7 @@ namespace RootEngine
 		
 		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
-		Render::MeshInterface* tempmesh = m_renderer->CreateMesh();
+		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
 		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
 
 		m_model->m_meshes.push_back(tempmesh);

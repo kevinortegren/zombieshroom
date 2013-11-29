@@ -17,13 +17,13 @@ namespace RootEngine
 		}
 		m_models.clear();
 
-		auto meshitr = m_meshes.begin();
+		/*auto meshitr = m_meshes.begin();
 		for(; meshitr != m_meshes.end(); meshitr++)
 		{
 			delete (*meshitr).second;
 			(*meshitr).second = nullptr;
 		}
-		m_meshes.clear();
+		m_meshes.clear();*/
 
 		auto effectitr = m_effects.begin();
 		for(; effectitr != m_effects.end(); effectitr++)

@@ -262,7 +262,6 @@ namespace Render
 		m_lines.push_back(Line(p_fromPoint, p_toPoint, p_color));
 	}
 
-
 	void GLRenderer::Render()
 	{
 		// Buffer Per Frame data.
@@ -276,6 +275,9 @@ namespace Render
 	void GLRenderer::Clear()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_numDirectionalLights = 0;
+		m_numPointLights = 0;
 	}
 
 	void GLRenderer::Swap()

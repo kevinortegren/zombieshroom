@@ -30,7 +30,7 @@ void DebugDrawer::drawLine( const btVector3& p_from, const btVector3& p_to, cons
 		vertices[1].m_pos = to;
 		vertices[1].m_color = glm::vec4(color, 1.0f);
 		unsigned int indices[2] = {0,1};
-		Render::MeshInterface* mesh = Physics::g_renderer->CreateMesh();
+		std::shared_ptr<Render::MeshInterface> mesh = Physics::g_renderer->CreateMesh();
 		mesh->Init(vertices, 2, indices, 2);
 		Render::Uniforms uniforms;
 		uniforms.m_normal = glm::mat4(1);

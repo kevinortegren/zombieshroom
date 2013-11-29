@@ -50,7 +50,8 @@ namespace Render
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 
-		virtual MeshInterface* CreateMesh() = 0;
+		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
+
 		virtual EffectInterface* CreateEffect() = 0;
 		virtual TextureInterface* CreateTexture() = 0;
 
@@ -84,7 +85,7 @@ namespace Render
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
 
-		MeshInterface* CreateMesh() { return new Mesh; } //Remember to delete
+		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); } //Remember to delete
 		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
 		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
 

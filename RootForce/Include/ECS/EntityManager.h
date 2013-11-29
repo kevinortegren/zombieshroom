@@ -18,7 +18,7 @@ namespace ECS
 		EntityManager(ComponentSystemManager* p_systemManager)
 			: m_nextID(0), m_systemManager(p_systemManager) 
 		{
-			m_components.resize(ECS::s_count);
+			m_components.resize(ECS::s_count + 1);
 		}
 
 		Entity* CreateEntity();

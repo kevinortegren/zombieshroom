@@ -5,14 +5,16 @@ void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
 		// Validate entity against system.
+		bool insert = true;
 		for(size_t i = 0; i < (*itr).second->m_componentTypes.size(); ++i)
 		{
 			if((*itr).second->m_componentTypes.at(i))
 				if(!p_entity->m_componentTypes.at(i))
-					return; // Validation fails.
+					insert = false; // Validation fails.
 		}
 
 		// Validation sucess insert the entity in the system.
+		if(insert)
 		(*itr).second->m_activeEntities.insert(p_entity);
 	}
 }

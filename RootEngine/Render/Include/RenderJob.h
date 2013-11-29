@@ -21,7 +21,7 @@ namespace Render
 		//std::shared_ptr<BufferInterface> m_indexBuffer;
 		//std::shared_ptr<VertexAttributesInterface> m_attributes;
 		Material* m_material;
-		MeshInterface* m_mesh;
+		std::shared_ptr<MeshInterface> m_mesh;
 		Uniforms m_uniforms;
 	};
 }
