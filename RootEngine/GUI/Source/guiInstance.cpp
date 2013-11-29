@@ -37,8 +37,8 @@ namespace RootEngine
 
 			// Prepare a texture for output
 			glGenTextures(1, &m_texture);
-			glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height);
-			//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_FLOAT, 0);
+			//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, p_width, p_height);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
 			glBindVertexArray(m_vertexArrayBuffer);
@@ -46,14 +46,16 @@ namespace RootEngine
 			glGenBuffers(1, &vertexBufferObject);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			float quadVertices[] = {
-				-1.f, -1.f,
-				1.f, 1.f,
-				-1.f, 1.f,
-				1.f, -1.f
+				-1.f, 1.f, 0.f, 1.f,
+				-1.f, -1.f, 0.f, 0.f,
+				1.f, 1.f, 1.f, 1.f,
+				1.f, -1.f, 1.f, 0.f
 			};
-			glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(float), quadVertices, GL_STATIC_DRAW);
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (char*)NULL);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL+2*sizeof(float));
 			// Done, unbind VAO
 			glBindVertexArray(0);
 		}
@@ -66,22 +68,20 @@ namespace RootEngine
 		void guiInstance::Render()
 		{
 			m_effect->Apply();
-			m_effect->SetUniformInt("texSampler", 0);
 
 			glBindVertexArray(m_vertexArrayBuffer);
 
+			m_effect->SetUniformInt("texSampler", 0);
 			glActiveTexture(GL_TEXTURE0);
 			SurfaceToTexture((Awesomium::BitmapSurface*)m_view->surface());
 
 			glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			glDisable( GL_CULL_FACE );
 			glDisable(GL_DEPTH_TEST);
 
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 			glEnable(GL_DEPTH_TEST);
-			glEnable( GL_CULL_FACE );
 			glDisable( GL_BLEND );
 
 			glBindVertexArray(0);
@@ -124,7 +124,8 @@ namespace RootEngine
 				return;
 
 			const unsigned char* blargh = p_surface->buffer();
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, blargh);
 			bool hej = p_surface->SaveToPNG(Awesomium::WSLit((m_workingDir + "name.png").c_str()));
 		}
 
