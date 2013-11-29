@@ -110,7 +110,7 @@ namespace RootEngine
 		m_networkModule = DynamicLoader::LoadSharedLibrary("Network.dll");
 		if (m_networkModule != nullptr)
 		{
-			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
+			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "CreateNetwork");
 			if (libGetNetworkInterface != nullptr)
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);

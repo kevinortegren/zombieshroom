@@ -16,7 +16,7 @@ namespace RootEngine
 
 			m_rootContext = NULL;
 
-			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Successful startup of GUI");
 		}
 
 

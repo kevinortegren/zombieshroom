@@ -203,6 +203,7 @@ void Main::Start()
 		old = now;
 
 		HandleEvents();
+		playerControlSystem->Process(dt);
 		// TODO: Update game state
 		// TODO: Render and present game
 		
@@ -211,7 +212,7 @@ void Main::Start()
 		m_engineContext.m_renderer->Clear();
 
 
-		playerControlSystem->Process(dt);
+
 		renderingSystem->Process(dt);
 		m_engineContext.m_renderer->AddLine(glm::vec3(0.0f), glm::vec3(1.0f), glm::vec4(1.0f));
 		m_engineContext.m_renderer->Render();
