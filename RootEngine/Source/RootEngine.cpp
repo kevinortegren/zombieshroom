@@ -52,7 +52,7 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
-		//m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
+		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)

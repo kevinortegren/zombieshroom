@@ -80,6 +80,7 @@ namespace Render
 		std::vector<Line> m_lines;
 
 		// Effect.
+		EffectInterface* m_debugEffect;
 		Buffer m_uniforms;
 
 		// Camera
