@@ -48,11 +48,10 @@ set(EXTERNAL_LIBRARIES
 	${ROCKET_DEBUGGER_LIBRARY}
 )
 
-message("${EXTERNAL_LIBRARIES}")
-
 # Set global compiler options
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
+add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

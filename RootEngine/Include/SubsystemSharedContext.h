@@ -2,7 +2,6 @@
 
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
-//#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace RootEngine
 {

@@ -234,3 +234,4 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
+

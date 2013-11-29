@@ -108,24 +108,46 @@ void Main::Start()
 {
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-	m_engineContext.m_resourceManager->LoadEffect("test");
-	m_engineContext.m_resourceManager->LoadEffect("DiffuseTexture");
-	m_engineContext.m_resourceManager->LoadEffect("2D_GUI");
+	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
-
-	m_engineContext.m_gui->Initalize(1280, 720);
-	std::shared_ptr<Rocket::Core::ElementDocument> document = m_engineContext.m_gui->AttachDocument("Assets//GUI//demo.rml");
-	std::shared_ptr<Rocket::Core::ElementDocument> debugdoc = m_engineContext.m_gui->AttachDocument("Assets//GUI//debug.rml");
-
-	
-	m_engineContext.m_gui->SetEffect( m_engineContext.m_resourceManager->GetEffect("2D_GUI"));
-	
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
+
+	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
+
+	Render::PointLight red;
+	red.m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+	red.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	red.m_range = 2.0f;
+	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
+
+	Render::PointLight blue;
+	blue.m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
+	blue.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	blue.m_range = 2.0f;
+	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
+
+	Render::PointLight green;
+	green.m_position = glm::vec3(0.0f, 3.0f, 1.0f);
+	green.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	green.m_range = 2.0f;
+	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
+
+	m_engineContext.m_renderer->AddPointLight(red, 0);
+	m_engineContext.m_renderer->AddPointLight(blue, 1);
+	m_engineContext.m_renderer->AddPointLight(green, 2);
+
+	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
@@ -159,8 +181,6 @@ void Main::Start()
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	
 
-	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
-
 	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
 	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
 	
@@ -171,11 +191,12 @@ void Main::Start()
 
 	Render::Material guyMaterial;
 	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
-	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("test");
+	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 	guyRenderable->m_material = guyMaterial;
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
+
 
 	
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
@@ -235,9 +256,6 @@ void Main::Start()
 	*/
 	//////////////////////////////////////////////////////////////////////////
 
-
-
-	
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -307,21 +325,20 @@ void Main::Start()
 		//guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
 		
 
-		
-		
-
 		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Clear();
 
+
+
 		playerControlSystem->Process(dt);
 		renderingSystem->Process(dt);
+		m_engineContext.m_renderer->Render();
+		m_engineContext.m_renderer->RenderLines();
 
-		m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
+
 		m_engineContext.m_renderer->Swap();
 	}
-	document->RemoveReference();
-	debugdoc->RemoveReference();
 }
 
 void Main::HandleEvents()
@@ -338,8 +355,6 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
-			if (m_engineContext.m_gui != nullptr)
-				m_engineContext.m_gui->HandleEvent(event);
 		}
 	}
 }

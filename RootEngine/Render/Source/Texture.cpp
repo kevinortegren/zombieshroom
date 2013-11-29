@@ -1,9 +1,14 @@
 #include <RootEngine/Render/Include/Texture.h>
-
 #include <gli/gli.hpp>
 
 namespace Render
 {
+
+	Texture::~Texture()
+	{
+		glDeleteTextures(1, &m_textureHandle);
+	}
+
 	bool Texture::Load(const std::string& filepath)
 	{
 		gli::texture2D texture(gli::loadStorageDDS(filepath));
@@ -62,9 +67,11 @@ namespace Render
 		return true;
 	}
 
-	void Texture::Enable()
-	{
 
+	void Texture::Enable(unsigned int slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_textureHandle);
 	}
 
 	unsigned int Texture::GetID()
@@ -87,8 +94,14 @@ namespace Render
 		return glm::vec2(m_textureWidth, m_textureHeight);
 	}
 
+	GLuint Texture::GetHandle() const
+	{
+		return m_textureHandle;
+	}
+
 	glm::vec2 Texture::GetInverseTextureSize() const
 	{
 		return glm::vec2(1 / (float)m_textureWidth, 1 / (float)m_textureWidth);
 	}
 }
+

@@ -11,7 +11,6 @@
 
 namespace RootEngine
 {
-
 	class ResourceManagerInterface
 	{
 	public:
@@ -48,6 +47,5 @@ namespace RootEngine
 		std::shared_ptr<ModelImporter> m_modelImporter;
 		std::shared_ptr<EffectImporter> m_effectImporter;
 		std::string m_workingDirectory;
-
 	};
 }
