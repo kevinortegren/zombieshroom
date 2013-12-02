@@ -220,6 +220,8 @@ void Main::Start()
 
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
 
+	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
+	glm::vec3 a = t->m_position;
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

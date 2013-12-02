@@ -32,7 +32,6 @@ namespace ECS
 			if(Component<T>::GetTypeId() >= m_components.size())
 				m_components.resize(Component<T>::GetTypeId() + 1);
 
-
 			// By using the component id we can retrieve the vector of components of that type.
 			std::vector<std::shared_ptr<ComponentInterface>>& componentList = m_components[Component<T>::GetTypeId()];
 
@@ -74,6 +73,12 @@ namespace ECS
 
 				m_systemManager->RemoveEntityFromSystems(p_entity);
 			}
+		}
+
+		template<class T>
+		T* GetComponent(Entity* p_entity)
+		{
+			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());
 		}
 
 		template<class T>
