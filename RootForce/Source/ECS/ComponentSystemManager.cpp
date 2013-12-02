@@ -1,5 +1,13 @@
 #include <ECS/ComponentSystemManager.h>
 
+ECS::ComponentSystemManager::~ComponentSystemManager()
+{
+	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
+	{
+		delete (*itr).second;
+	}
+}
+
 void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
@@ -15,7 +23,10 @@ void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
 
 		// Validation sucess insert the entity in the system.
 		if(insert)
-		(*itr).second->m_activeEntities.insert(p_entity);
+		{
+			(*itr).second->m_activeEntities.insert(p_entity);
+			(*itr).second->Init();
+		}
 	}
 }
 
@@ -31,16 +42,12 @@ void ECS::ComponentSystemManager::RemoveEntityFromSystems(Entity* p_entity)
 				{
 					// Everytime validation fails for a system agains a entity, if the entity exist remove it.
 					if((*itr).second->m_activeEntities.find(p_entity) != (*itr).second->m_activeEntities.end())
+					{
 						(*itr).second->m_activeEntities.erase(p_entity);
+						(*itr).second->Init();
+					}
 				}
 		}
 	}
 }
 
-void ECS::ComponentSystemManager::InitializeSystems()
-{
-	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
-	{
-		(*itr).second->Init();
-	}
-}

@@ -137,23 +137,27 @@ void Main::Start()
 	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
-	ECS::ComponentSystem* playerControlSystem = m_world.GetSystemManager()->CreateSystem<RootForce::PlayerControlSystem>("PlayerControlSystem");
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetInputInterface(m_engineContext.m_inputSys);
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetLoggingInterface(m_engineContext.m_logger);
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetKeybindings(keybindings);
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
+
+	RootForce::PlayerControlSystem* playerControlSystem = new RootForce::PlayerControlSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::PlayerControlSystem>(playerControlSystem, "PlayerControlSystem");
+
+	playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
+	playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
+	playerControlSystem->SetKeybindings(keybindings);
 
 	// Initialize the system for rendering the scene.
-	ECS::ComponentSystem* renderingSystem = m_world.GetSystemManager()->CreateSystem<RootForce::RenderingSystem>("RenderingSystem");
-	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
-	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
+	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
-	ECS::ComponentSystem* pointLightSystem = m_world.GetSystemManager()->CreateSystem<RootForce::PointLightSystem>("PointLightSystem");
-	reinterpret_cast<RootForce::PointLightSystem*>(pointLightSystem)->SetRenderInterface(m_engineContext.m_renderer);
+	renderingSystem->SetLoggingInterface(m_engineContext.m_logger);
+	renderingSystem->SetRendererInterface(m_engineContext.m_renderer);
 
-	ECS::ComponentSystem* directionalLightSystem = m_world.GetSystemManager()->CreateSystem<RootForce::DirectionalLightSystem>("DirectionalLightSystem");
-	reinterpret_cast<RootForce::DirectionalLightSystem*>(pointLightSystem)->SetRenderInterface(m_engineContext.m_renderer);
-
-	m_world.GetSystemManager()->InitializeSystems();
+	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
+	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
 	// Setup lights.
 	{

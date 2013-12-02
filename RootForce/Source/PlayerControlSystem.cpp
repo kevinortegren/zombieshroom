@@ -15,7 +15,11 @@ namespace RootForce
 
 
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world) {}
+		: ECS::ComponentSystem(p_world) 
+	{
+		SetUsage<Transform>();
+		SetUsage<PlayerInputControlComponent>();
+	}
 
 	void PlayerControlSystem::SetKeybindings(const std::vector<Keybinding>& keybindings)
 	{
@@ -34,9 +38,6 @@ namespace RootForce
 
 	void PlayerControlSystem::Init()
 	{
-		SetUsage<Transform>();
-		SetUsage<PlayerInputControlComponent>();
-
 		m_transforms.Init(m_world->GetEntityManager());
 		m_controllers.Init(m_world->GetEntityManager());
 	}

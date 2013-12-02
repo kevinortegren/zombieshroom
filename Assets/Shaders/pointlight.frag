@@ -24,7 +24,6 @@ layout(std140) uniform PerFrame
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
-uniform sampler2D g_Pos;
 
 out vec4 out_Color;
 

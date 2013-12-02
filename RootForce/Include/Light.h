@@ -11,10 +11,4 @@ namespace RootForce
 		glm::vec3 m_attenuation;
 		float m_range;
 	};
-
-	struct DirectionalLight : public ECS::Component<DirectionalLight>
-	{
-		glm::vec4 m_color;
-
-	};
 }

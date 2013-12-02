@@ -389,8 +389,6 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
-
-
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

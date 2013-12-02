@@ -2,27 +2,6 @@
 
 namespace RootForce
 {	
-	void DirectionalLightSystem::Init()
-	{
-		m_dlights.Init(m_world->GetEntityManager());
-		m_transforms.Init(m_world->GetEntityManager());
-	}
-
-	void DirectionalLightSystem::Begin()
-	{
-
-	}
-
-	void DirectionalLightSystem::ProcessEntity(ECS::Entity* p_entity, float dt)
-	{
-
-	}
-
-	void DirectionalLightSystem::End()
-	{
-		
-	}
-
 	void PointLightSystem::Init()
 	{
 		m_plights.Init(m_world->GetEntityManager());
@@ -31,7 +10,7 @@ namespace RootForce
 
 	void PointLightSystem::Begin()
 	{
-		lightCount = 0;
+		m_lightCount = 0;
 	}
 
 	void PointLightSystem::ProcessEntity(ECS::Entity* p_entity, float dt)
@@ -45,13 +24,13 @@ namespace RootForce
 		pl.m_attenuation = pointLight->m_attenuation;
 		pl.m_range = pointLight->m_range;
 
-		m_renderer->AddPointLight(pl, lightCount);
+		m_renderer->AddPointLight(pl, m_lightCount);
 
-		lightCount++;
+		m_lightCount++;
 	}
 
 	void PointLightSystem::End()
 	{
-		lightCount = 0;
+		m_lightCount = 0;
 	}
 }

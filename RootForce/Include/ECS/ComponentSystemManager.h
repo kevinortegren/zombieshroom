@@ -17,32 +17,27 @@ namespace ECS
 
 		ComponentSystemManager(World* p_world)
 			: m_world(p_world) {}
+		~ComponentSystemManager();
 
 		template<class T>
-		T* CreateSystem(const char* p_systemName)
+		void AddSystem(T* p_system, const char* p_systemName)
 		{
-			std::shared_ptr<T> system = std::shared_ptr<T>(new T(m_world));
-
 			assert(m_systems.find(p_systemName) == m_systems.end());
 			
-			m_systems[p_systemName] = system;
-
-			return system.get();
+			m_systems[p_systemName] = p_system;
 		}
 
 		template<class T>
 		T* GetSystem(const char* p_systemName)
 		{
-			return static_cast<T*>(m_systems[p_systemName].get());
+			return static_cast<T*>(m_systems[p_systemName]);
 		}
-
-		void InitializeSystems();
 
 	private:
 		void AddEntityToSystems(Entity* p_entity);
 		void RemoveEntityFromSystems(Entity* p_entity);
 
 		World* m_world;
-		std::map<std::string, std::shared_ptr<ComponentSystem>> m_systems;
+		std::map<std::string, ComponentSystem*> m_systems;
 	};
 }
