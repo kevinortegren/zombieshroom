@@ -1,4 +1,7 @@
 #pragma once
+
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <string>
 #include <vector>
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -48,3 +51,5 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 	};
 }
+
+#endif

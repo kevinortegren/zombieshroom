@@ -1,5 +1,7 @@
 #include <RootEngine/Include/ModelImporter.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 namespace RootEngine
 {
 	
@@ -114,3 +116,5 @@ namespace RootEngine
 	}
 
 }
+
+#endif

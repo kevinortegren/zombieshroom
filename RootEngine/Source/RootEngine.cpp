@@ -1,8 +1,12 @@
 #include <RootEngine.h>
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Network/Include/NetworkManager.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
-#include <RootEngine/Physics/Include/RootPhysics.h>
+
+#ifndef COMPILE_LEVEL_EDITOR
+	#include <RootEngine/Network/Include/NetworkManager.h>
+	#include <RootEngine/Physics/Include/RootPhysics.h>
+#endif
+
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
 
@@ -16,26 +20,31 @@ namespace RootEngine
 	}
 	EngineMain::~EngineMain()
 	{
-		if(m_network != nullptr)
-		{
-			m_network->Shutdown();
-			DynamicLoader::FreeSharedLibrary(m_networkModule);
-		}
 		if(m_renderer != nullptr)
 		{
 			m_renderer->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_renderModule);
 		}
+
+#ifndef COMPILE_LEVEL_EDITOR
+		if(m_network != nullptr)
+		{
+			m_network->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_networkModule);
+		}
+		
 		if(m_gui != nullptr)
 		{
 			m_gui->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_guiModule);
 		}
+
 		if(m_physics != nullptr)
 		{
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+#endif
 	}
 
 
@@ -43,9 +52,14 @@ namespace RootEngine
 	{
 		g_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
 
-		m_network = nullptr;
 		m_renderer = nullptr;
+
+#ifndef COMPILE_LEVEL_EDITOR
+		m_network = nullptr;
 		m_gui = nullptr;
+		m_inputSys = nullptr;
+		m_physics = nullptr;
+#endif
 
 		m_memTracker = new MemoryTracker(&g_logger);
 
@@ -55,6 +69,12 @@ namespace RootEngine
 		//m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
+		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
+		{
+			LoadRender();
+		}
+
+#ifndef COMPILE_LEVEL_EDITOR
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
@@ -62,10 +82,6 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
 		{
 			LoadInput();
-		}
-		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
-		{
-			LoadRender();
 		}
 		if((p_flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
 		{
@@ -76,21 +92,28 @@ namespace RootEngine
 			LoadPhysics();
 		}
 
-		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
-		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
+#endif
+
+		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
+		
+#ifndef COMPILE_LEVEL_EDITOR
+		m_gui->SetWorkingDir(p_workingDirectory);
+#endif
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
+
+#ifndef COMPILE_LEVEL_EDITOR
 		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		 
+#endif
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -103,7 +126,32 @@ namespace RootEngine
 		return m_subsystemSharedContext;
 	}
 
+	void EngineMain::LoadRender()
+	{
+		// Load the render module
+		m_renderModule = DynamicLoader::LoadSharedLibrary("Render.dll");
+		if (m_renderModule != nullptr)
+		{
+			CREATERENDERER libGetRenderer = (CREATERENDERER) DynamicLoader::LoadProcess(m_renderModule, "CreateRenderer");
+			if (libGetRenderer != nullptr)
+			{
+				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
+				m_renderer->Startup();
+			
+			}
+			else
+			{
+				g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
+		}
+	}
 
+
+#ifndef COMPILE_LEVEL_EDITOR
 	void EngineMain::LoadNetwork()
 	{
 		// Load the network module
@@ -152,30 +200,6 @@ namespace RootEngine
 		}
 	}
 
-	void EngineMain::LoadRender()
-	{
-		// Load the render module
-		m_renderModule = DynamicLoader::LoadSharedLibrary("Render.dll");
-		if (m_renderModule != nullptr)
-		{
-			CREATERENDERER libGetRenderer = (CREATERENDERER) DynamicLoader::LoadProcess(m_renderModule, "CreateRenderer");
-			if (libGetRenderer != nullptr)
-			{
-				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
-				m_renderer->Startup();
-			
-			}
-			else
-			{
-				g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
-			}
-		}
-		else
-		{
-			g_logger.LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to load Render subsystem: %s", DynamicLoader::GetLastError());
-		}
-	}
-
 	void EngineMain::LoadGUI()
 	{
 		m_guiModule = DynamicLoader::LoadSharedLibrary("GUI.dll");
@@ -221,6 +245,7 @@ namespace RootEngine
 			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
+#endif
 	
 }
 

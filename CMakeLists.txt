@@ -70,6 +70,8 @@ else()
 		${GLEW_LIBRARY_64}
 		${YAML_LIBRARY_DEBUG_64}
 	)
+	
+	add_definitions(-DCOMPILE_LEVEL_EDITOR)
 endif()
 
 message("${EXTERNAL_LIBRARIES}")
