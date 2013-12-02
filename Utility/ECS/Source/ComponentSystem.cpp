@@ -1,5 +1,5 @@
-#include <ECS/ComponentSystem.h>
-#include <ECS/World.h>
+#include <Utility\ECS\Include\ComponentSystem.h>
+#include <Utility\ECS\Include\World.h>
 
 void ECS::ComponentSystem::Process()
 {

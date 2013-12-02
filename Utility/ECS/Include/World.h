@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ECS/EntityManager.h>
-#include <ECS/ComponentSystemManager.h>
-#include <ECS/TagManager.h>
-#include <ECS/GroupManager.h>
+#include <Utility\ECS\Include\EntityManager.h>
+#include <Utility\ECS\Include\ComponentSystemManager.h>
+#include <Utility\ECS\Include\TagManager.h>
+#include <Utility\ECS\Include\GroupManager.h>
 
 namespace ECS
 {

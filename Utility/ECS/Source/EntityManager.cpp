@@ -1,5 +1,5 @@
-#include <ECS/EntityManager.h>
-#include <ECS/ComponentSystemManager.h>
+#include <Utility\ECS\Include\EntityManager.h>
+#include <Utility\ECS\Include\ComponentSystemManager.h>
 
 ECS::EntityManager::EntityManager(ComponentSystemManager* p_systemManager)
 	: m_nextID(0), m_systemManager(p_systemManager) 

@@ -90,7 +90,6 @@ Main::Main(std::string p_workingDirectory)
 	{
 		// TODO: Log error and throw exception (?)
 	}
-
 }
 
 Main::~Main() 

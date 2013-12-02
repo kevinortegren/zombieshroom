@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ECS/Entity.h>
-#include <ECS/Component.h>
+#include <Utility\ECS\Include\Entity.h>
+#include <Utility\ECS\Include\Component.h>
 #include <memory>
 #include <vector>
 #include <stack>

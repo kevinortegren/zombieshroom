@@ -1,4 +1,4 @@
-#include <ECS\GroupManager.h>
+#include <Utility\ECS\Include\GroupManager.h>
 #include <iostream>
 
 void ECS::GroupManager::RegisterEntity(const std::string& p_group, ECS::Entity* p_entity)
