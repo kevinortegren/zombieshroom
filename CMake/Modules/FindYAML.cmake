@@ -12,5 +12,6 @@ find_library(YAML_LIBRARY_DEBUG
     NAMES libyaml-cppmdd
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib/Debug")
 	
-message(${YAML_LIBRARY})
-message(${YAML_LIBRARY_DEBUG})
+find_library(YAML_LIBRARY_DEBUG_64
+    NAMES libyaml-cppmdd64
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/Debug")

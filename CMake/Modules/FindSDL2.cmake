@@ -7,3 +7,7 @@ find_path(SDL2_INCLUDE_DIRS
 find_library(SDL2_LIBRARY
     NAMES SDL2
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+
+find_library(SDL2_LIBRARY_64
+    NAMES SDL264
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
