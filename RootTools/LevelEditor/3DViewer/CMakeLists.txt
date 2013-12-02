@@ -8,6 +8,7 @@ project(${PROJECT_NAME})
 # Set the files used in the target
 file(GLOB_RECURSE SOURCES Source/*.cpp)
 file(GLOB_RECURSE HEADERS Include/*.h)
+set(LIBRARIES )
 
 # Set search paths
 include_directories(Include)

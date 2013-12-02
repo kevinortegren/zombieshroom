@@ -511,7 +511,7 @@ void MayaListToList(MObject node)
 					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
 					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					mesh.getVertexNormal(triangleVertices[j],false, normal, space_local);
+					mesh.getVertexNormal(localIndex[j],false, normal, space_local);
 					SM.meshList[meshIndex].normal[count].x = normal.x;
 					SM.meshList[meshIndex].normal[count].y = normal.y;
 					SM.meshList[meshIndex].normal[count].z = normal.z;
