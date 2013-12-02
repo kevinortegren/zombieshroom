@@ -33,6 +33,12 @@ PlayerController::~PlayerController( void )
 	delete m_rigidBody;
 	delete m_ghostObject;
 }
+void PlayerController::RemovePlayer()
+{
+
+	m_dynamicWorld->removeRigidBody(m_rigidBody);
+	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+}
 
 void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
 							float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
@@ -76,13 +82,13 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_rigidBody->setAngularFactor(0.0f);
 	//Don't enter sleep mode if you stand still for a while
 	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
-
+	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() );
 	m_dynamicWorld->addRigidBody(m_rigidBody);
 
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	m_ghostObject->setUserPointer(this);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 
@@ -269,6 +275,8 @@ void PlayerController::SetOrientation( float* p_orientation )
 	m_rigidBody->setWorldTransform(transform);
 
 }
+
+
 
 
 

@@ -15,14 +15,7 @@
 namespace Physics
 {
 
-	struct PhysicWorldInfo
-	{
-		bool m_hasHit;
-		int m_index;
-		int m_collidedType; //Might not be needed
-		float m_position[3];
-		int m_type;
-	};
+	
 	class PhysicsInterface : public RootEngine::SubsystemInterface
 	{
 	public:
@@ -44,10 +37,13 @@ namespace Physics
 		virtual void AddStaticObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation) = 0;
 		/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 		virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-		virtual int AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass) = 0;
+		virtual int* AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass) = 0;
 		//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-		virtual int AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass,
+		virtual int* AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass,
 			float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+		virtual int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity) = 0;
+
+		virtual void SetGravity(int p_objectIndex, float* p_gravity) = 0;
 		/// p_playerPos should be of type float[3]
 		virtual void GetPlayerPos(int p_objectIndex, float* p_playerPos)= 0;
 		/// p_objectPos should be of type float[3]
@@ -86,13 +82,16 @@ namespace Physics
 		void AddStaticObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation);
 		/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 		The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-		int AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass);
+		int* AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass);
 		///Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-		int AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride,
+		int* AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride,
 									float* p_position, float* p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
+
+		int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity);
 		void GetPlayerPos(int p_objectIndex, float* p_playerPos);	/// p_playerPos should be of type float[3]	
 		void GetObjectPos(int p_objectIndex, float* p_objectPos);/// p_objectPos should be of type float[3]
 
+		void SetGravity(int p_objectIndex, float* p_gravity);
 		void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 		void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 		void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
@@ -105,11 +104,14 @@ namespace Physics
 		const int ABILITY = 2;*/
 		struct CustomUserPointer
 		{
-			void* m_object; //btRigidbody for abilitys and playercontroller for players
-			PhysicWorldInfo m_worldInfo;
+			int m_type;
 			int m_vectorIndex;
+			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
+			bool m_collided;
+			void* m_collisionFunc(int); // A function from the gamelogic that should be called when a collision (not static or dynamic) object occurs
 		};
 		void Init();
+		bool DoesObjectExist(int p_objectIndex);
 		RootPhysics();
 		~RootPhysics();
 		DebugDrawer* m_debugDrawer;

@@ -17,6 +17,7 @@ public:
 	void Knockback(float* p_velocity);
 	void Update();
 	void SetOrientation(float* p_orientation);
+	void RemovePlayer();
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};
 	bool IsOnGround() const {return m_onGround;};
