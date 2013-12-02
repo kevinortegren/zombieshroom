@@ -173,6 +173,8 @@ void Main::Start()
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
 	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
 
+	m_engineContext.m_logger->SetVerboseLevel(LogLevel::FATAL_ERROR);
+
 	m_world.GetSystemManager()->InitializeSystems();
 
 	// Setup a dummy player entity and add components to it
@@ -273,7 +275,7 @@ void Main::Start()
     
 		m_engineContext.m_debugOverlay->Clear();
 		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
-
+		
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game

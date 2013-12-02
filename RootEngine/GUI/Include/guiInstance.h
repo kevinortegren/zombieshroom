@@ -6,6 +6,7 @@
 #include <string>
 #include <RootEngine/Render/Include/Effect.h>
 #include <SDL2/SDL.h>
+#include "gl_texture_surface.h"
 
 #if defined(_WINDLL)
     #define SUBSYSTEM_DLL_EXPORT __declspec(dllexport)
@@ -64,8 +65,10 @@ namespace RootEngine
 			GLuint m_texture;
 			std::shared_ptr<Render::ProgramInterface> m_program;
 			GLuint m_vertexArrayBuffer;
+			GLTextureSurfaceFactory* m_glTexSurfaceFactory;
+			Awesomium::Surface* m_surface;
 
-			void SurfaceToTexture(Awesomium::BitmapSurface* p_surface);
+			void SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
 		};
