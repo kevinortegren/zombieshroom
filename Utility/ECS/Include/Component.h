@@ -2,8 +2,6 @@
 
 namespace ECS
 {
-	static unsigned int s_count;
-
 	class ComponentInterface {};
 
 	template<class T>

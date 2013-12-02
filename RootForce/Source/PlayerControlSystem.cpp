@@ -13,9 +13,8 @@ namespace RootForce
 		Action = action;
 	}
 
-
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world) 
+		: ECS::EntitySystem(p_world) 
 	{
 		SetUsage<Transform>();
 		SetUsage<PlayerInputControlComponent>();

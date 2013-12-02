@@ -84,9 +84,13 @@ namespace RootEngine
 		
 		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
-		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
-		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
-		tempmesh->SetPrimitive(Render::Primitive::TRIANGLES);
+		std::shared_ptr<Render::Mesh> tempmesh = m_renderer->CreateMesh();
+		tempmesh->m_vertexBuffer = m_renderer->CreateBuffer();
+		tempmesh->m_elementBuffer = m_renderer->CreateBuffer();
+		tempmesh->m_vertexAttributes = m_renderer->CreateVertexAttributes();
+		tempmesh->CreateIndexBuffer(&indices[0], indices.size());
+		tempmesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
+		tempmesh->m_primitive = GL_TRIANGLES;
 
 		m_model->m_meshes.push_back(tempmesh);
 		m_model->meshIndices = indices;

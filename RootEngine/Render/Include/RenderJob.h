@@ -17,11 +17,9 @@ namespace Render
 
 	struct RenderJob
 	{
-		//std::shared_ptr<BufferInterface> m_vertexBuffer;
-		//std::shared_ptr<BufferInterface> m_indexBuffer;
-		//std::shared_ptr<VertexAttributesInterface> m_attributes;
-		Material* m_material;
-		std::shared_ptr<MeshInterface> m_mesh;
+		std::shared_ptr<Mesh> m_mesh;
+
+		Material* m_material;	
 		Uniforms m_uniforms;
 	};
 }

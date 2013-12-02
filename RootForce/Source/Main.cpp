@@ -108,9 +108,13 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
 	// Cube mesh.
-	std::shared_ptr<Render::MeshInterface> cubeMesh = m_engineContext.m_renderer->CreateMesh();
+	std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
 	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	cubeMesh->Init(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices, cube.m_indices, cube.m_numberOfIndices);
+	cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
+	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
+	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);

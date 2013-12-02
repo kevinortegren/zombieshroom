@@ -15,7 +15,7 @@ namespace RootEngine
 {
 	struct Model
 	{
-		std::vector<std::shared_ptr<Render::MeshInterface>> m_meshes;
+		std::vector<std::shared_ptr<Render::Mesh>> m_meshes;
 		//vector<Texture*> m_textures;
 		//vector<AnimationData*> m_animations;
 		

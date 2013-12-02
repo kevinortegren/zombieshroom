@@ -10,10 +10,10 @@
 namespace RootForce
 {
 
-	struct RenderingSystem : public ECS::ComponentSystem
+	struct RenderingSystem : public ECS::EntitySystem
 	{
 		RenderingSystem(ECS::World* p_world)
-			: ECS::ComponentSystem(p_world)
+			: ECS::EntitySystem(p_world)
 		{
 			SetUsage<Renderable>();
 			SetUsage<Transform>();

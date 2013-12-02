@@ -47,7 +47,7 @@ namespace RootForce
 
 
 	/** This system will update the player entity depending on input received. */
-	class PlayerControlSystem : public ECS::ComponentSystem
+	class PlayerControlSystem : public ECS::EntitySystem
 	{
 	public:
 		PlayerControlSystem(ECS::World* p_world);
