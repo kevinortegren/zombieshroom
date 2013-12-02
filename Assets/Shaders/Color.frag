@@ -1,13 +1,13 @@
 #version 400
 
-out vec3 frag_color;
+out vec4 frag_color;
 
 in Fragment
 {
-	vec3 color;
+	vec4 color;
 } fragment;
 
 void main()
 {
-	frag_color = vec3(0.3 + fragment.color);
+	frag_color = fragment.color;
 }

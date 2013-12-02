@@ -62,7 +62,15 @@ namespace RootEngine
 
 	Render::EffectInterface* ResourceManager::GetEffect(std::string p_handle)
 	{
-		return m_effects[p_handle];
+		if(m_effects.find(p_handle) != m_effects.end())
+		{
+			return m_effects[p_handle];
+		}
+		else
+		{
+			m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
+			return nullptr;
+		}
 	}
 
 	Model* ResourceManager::GetModel( std::string p_handle )

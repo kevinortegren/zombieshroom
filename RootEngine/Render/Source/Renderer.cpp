@@ -311,7 +311,7 @@ namespace Render
 					// Apply program.
 					(*itrP)->Apply();
 
-					(*itr).m_mesh->DrawArrays();			
+					(*itr).m_mesh->Draw();			
 				}
 			}
 
@@ -350,7 +350,7 @@ namespace Render
 
 		// Ambient.
 		ambient->Apply();
-		m_fullscreenQuad.DrawArrays();
+		m_fullscreenQuad.Draw();
 
 		// Directional.
 		directional->Apply();

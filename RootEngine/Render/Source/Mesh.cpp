@@ -4,7 +4,7 @@ namespace Render
 {
 	Mesh::Mesh()
 	{
-
+		m_primitive = GL_TRIANGLES;
 	}
 
 	Mesh::~Mesh()
@@ -46,10 +46,15 @@ namespace Render
 
 	void Mesh::Init(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices, unsigned int* p_indices, unsigned int p_numberOfIndices)
 	{
+		m_isIndexed = false;
 		m_vertexBuffer.Init(GL_ARRAY_BUFFER);
-		m_elementBuffer.Init(GL_ELEMENT_ARRAY_BUFFER);
+
 		m_vertexBuffer.BufferData(p_numberOfVertices, 7 * sizeof(float), p_vertices);
-		m_elementBuffer.BufferData(p_numberOfIndices, sizeof(GLuint), p_indices);
+		if(p_indices != 0)
+		{
+			m_elementBuffer.Init(GL_ELEMENT_ARRAY_BUFFER);	
+			m_elementBuffer.BufferData(p_numberOfIndices, sizeof(GLuint), p_indices);
+		}
 		m_vertexAttributes.Init(2);
 		m_vertexAttributes.SetVertexAttribPointer(m_vertexBuffer.GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
 		m_vertexAttributes.SetVertexAttribPointer(m_vertexBuffer.GetBufferId(), 1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (char*)0 + 3 * sizeof(float));
@@ -70,7 +75,10 @@ namespace Render
 	void Mesh::Bind()
 	{
 		m_vertexAttributes.Bind();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer.GetBufferId());
+		if(m_isIndexed)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer.GetBufferId());
+		}
 	}
 
 	void Mesh::Unbind()
@@ -78,9 +86,28 @@ namespace Render
 		m_vertexAttributes.Unbind();
 	}
 
-	void Mesh::DrawArrays()
+	void Mesh::Draw()
 	{
-		glDrawElements(GL_TRIANGLES, m_elementBuffer.GetBufferSize(), GL_UNSIGNED_INT, 0);
+		if(m_isIndexed)
+		{
+			glDrawElements(m_primitive, m_elementBuffer.GetBufferSize(), GL_UNSIGNED_INT, 0);
+		}
+		else
+		{
+			glDrawArrays(m_primitive, 0, m_vertexBuffer.GetBufferSize());
+		}
+	}
+
+	void Mesh::SetPrimitive(int p_primitive)
+	{
+		if(p_primitive == Primitive::TRIANGLES)
+		{
+			m_primitive = GL_TRIANGLES;
+		}
+		else if(p_primitive == Primitive::LINES)
+		{
+			m_primitive = GL_LINES;
+		}
 	}
 
 	void Mesh::DrawInstanced(GLsizei p_instances)

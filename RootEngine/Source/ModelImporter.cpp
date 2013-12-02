@@ -86,6 +86,7 @@ namespace RootEngine
 
 		std::shared_ptr<Render::MeshInterface> tempmesh = m_renderer->CreateMesh();
 		tempmesh->Init(&vertices[0], vertices.size(), &indices[0], indices.size());
+		tempmesh->SetPrimitive(Render::Primitive::TRIANGLES);
 
 		m_model->m_meshes.push_back(tempmesh);
 		m_model->meshIndices = indices;

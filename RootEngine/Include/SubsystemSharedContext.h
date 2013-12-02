@@ -2,16 +2,18 @@
 
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 
 namespace RootEngine
 {
-	class ResourceManager;
+	class ResourceManagerInterface;
 
 	struct SubsystemSharedContext
 	{
 		Logging* m_logger;
 		MemoryTracker* m_memTracker;
-		ResourceManager* m_resourceManager;
+		DebugOverlayInterface* m_debugOverlay;
+		ResourceManagerInterface* m_resourceManager;
 	};
 
 	/** This class needs to be implemented by all subsystem interfaces */
