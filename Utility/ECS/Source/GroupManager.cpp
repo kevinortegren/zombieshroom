@@ -29,7 +29,7 @@ void ECS::GroupManager::PrintEntitiesInGroup(const std::string& p_group)
 
 	for (std::multimap<std::string, ECS::Entity*>::iterator itr = range.first; itr != range.second; ++itr)
 	{
-		std::cout << (*itr).second->GetId() << std::endl;
+		//std::cout << (*itr).second->GetId() << std::endl;
 	}
 }
 

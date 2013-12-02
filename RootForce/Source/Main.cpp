@@ -200,7 +200,6 @@ void Main::Start()
 	
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 	
-
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	
@@ -216,10 +215,8 @@ void Main::Start()
   
 	m_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	m_engineContext.m_gui->LoadURL("debug.html");
-	//m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
+	m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
 
-
-	
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
 	/*
@@ -296,8 +293,8 @@ void Main::Start()
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
     
-		//m_engineContext.m_debugOverlay->Clear();
-		//m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
+		m_engineContext.m_debugOverlay->Clear();
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
 
 		m_world.SetDelta(dt);
 
@@ -377,8 +374,8 @@ void Main::Start()
 		//m_engineContext.m_renderer->RenderLines();
 
 
-		//m_engineContext.m_gui->Update();
-		//m_engineContext.m_gui->Render();
+		m_engineContext.m_gui->Update();
+		m_engineContext.m_gui->Render();
 
 		m_engineContext.m_renderer->Swap();
 	}
