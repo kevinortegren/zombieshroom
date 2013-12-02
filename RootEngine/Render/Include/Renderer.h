@@ -43,6 +43,7 @@ namespace Render
 		virtual void Clear() = 0;
 
 		virtual void Render() = 0;
+		virtual void RenderLines() = 0;
 
 		virtual void Swap() = 0;
 
@@ -79,6 +80,7 @@ namespace Render
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 
 		void Render();
+		void RenderLines();
 		void Swap();
 		bool CheckExtension(const char* p_extension);
 
@@ -137,6 +139,7 @@ namespace Render
 
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
+		std::shared_ptr<TechniqueInterface> m_debugTech;
 
 		//debug
 
