@@ -15,7 +15,7 @@ namespace RootForce
 
 
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world) 
+		: ECS::ComponentSystem(p_world, 0.0f) 
 	{
 		SetUsage<Transform>();
 		SetUsage<PlayerInputControlComponent>();
@@ -59,11 +59,11 @@ namespace RootForce
 		}
 	}
 
-	void PlayerControlSystem::ProcessEntity(ECS::Entity* p_entity, float dt)
+	void PlayerControlSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
+		float dt = m_world->GetDelta();
 		Transform* transform = m_transforms.Get(p_entity);
 		PlayerInputControlComponent* controller = m_controllers.Get(p_entity);
-
 
 		// TODO: The facing needs to be in the transform component
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -78,6 +78,7 @@ namespace RootForce
 				case PlayerAction::MOVE_FORWARDS:
 					transform->m_position += facing * speed * dt;
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Player position: (%f, %f, %f)", transform->m_position.x, transform->m_position.y, transform->m_position.z);
+
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					transform->m_position -= facing * speed * dt;
@@ -92,6 +93,8 @@ namespace RootForce
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 					// TODO: Implement activation of abilities
+					
+
 					break;
 				default:
 					break;

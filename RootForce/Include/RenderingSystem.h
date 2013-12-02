@@ -20,7 +20,7 @@ namespace RootForce
 		}
 		void Init();
 		void Begin();
-		void ProcessEntity(ECS::Entity* p_entity, float dt);
+		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 		void SetRendererInterface(Render::RendererInterface* p_renderer);
 		void SetLoggingInterface(Logging::LoggingInterface* p_logger);

@@ -9,7 +9,10 @@ namespace ECS
 	class TagManager
 	{
 	public:
-		void RegisterEntity(const char* p_tag, Entity* p_entity);
+		void RegisterEntity(const std::string& p_tag, Entity* p_entity);
+		void Unregister(const std::string& p_tag);
+
+		Entity* GetEntityByTag(const std::string& p_tag);
 
 	private:
 		std::map<std::string, Entity*> m_tags; 

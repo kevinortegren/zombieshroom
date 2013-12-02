@@ -160,41 +160,65 @@ void Main::Start()
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
 	// Setup lights.
-	{
-		ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
+	
+	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
 
-		RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
-		redTrans->m_position = glm::vec3(1.0f, 3.0f, 0.0f);
-		redTrans->m_scale = glm::vec3(0.1f);
+	RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
+	redTrans->m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+	redTrans->m_scale = glm::vec3(0.1f);
 
-		RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
-		redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
-		redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-		redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-		redPL->m_range = 2.0f;
+	RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
+	redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
+	redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	redPL->m_range = 2.0f;
 
-		RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
-		redRender->m_mesh = cubeMesh;
-		redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-	}
+	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
+	redRender->m_mesh = cubeMesh;
+	redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+
+	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* blueTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(blue);
+	blueTrans->m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
+	blueTrans->m_scale = glm::vec3(0.1f);
+
+	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
+	bluePL->m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
+	bluePL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	bluePL->m_range = 2.0f;
+
+	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
+	blueRender->m_mesh = cubeMesh;
+	blueRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+
+	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
+	m_world.GetGroupManager()->RegisterEntity("Lights", red);
+	
 
 	// Setup a dummy player entity and add components to it
-	{
-		ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+	
+	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 
-		RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
-		guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
+	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-		RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
-		guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
+	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
 
-		Render::Material guyMaterial;
-		guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-		guyRenderable->m_material = guyMaterial;
+	Render::Material guyMaterial;
+	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyRenderable->m_material = guyMaterial;
 
-		RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-		guyControl->speed = 10.0f;
-	}
+	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
+	guyControl->speed = 10.0f;
+
+	m_world.GetTagManager()->RegisterEntity("Player", guy);
+	
+	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
+
+	m_world.GetGroupManager()->UnregisterEntity("Lights", red);
+
+	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -203,6 +227,8 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
+
+		m_world.SetDelta(dt);
 
 		HandleEvents();
 		// TODO: Update game state
@@ -213,10 +239,9 @@ void Main::Start()
 		m_engineContext.m_physics->Update(dt);
 
 		// Update Game systems.
-		pointLightSystem->Process(dt);
-
-		playerControlSystem->Process(dt);
-		renderingSystem->Process(dt);
+		pointLightSystem->Process();
+		playerControlSystem->Process();
+		renderingSystem->Process();
 
 		m_engineContext.m_renderer->Swap();
 	}

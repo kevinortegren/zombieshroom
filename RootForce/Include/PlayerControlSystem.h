@@ -58,7 +58,7 @@ namespace RootForce
 
 		void Init();
 		void Begin();
-		void ProcessEntity(ECS::Entity* p_entity, float dt);
+		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 	private:
 		std::vector<Keybinding> m_keybindings;

@@ -13,7 +13,7 @@ namespace RootForce
 		m_lightCount = 0;
 	}
 
-	void PointLightSystem::ProcessEntity(ECS::Entity* p_entity, float dt)
+	void PointLightSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		Transform* transform = m_transforms.Get(p_entity);
 		PointLight* pointLight = m_plights.Get(p_entity);

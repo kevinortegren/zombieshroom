@@ -4,7 +4,7 @@
 ECS::EntityManager::EntityManager(ComponentSystemManager* p_systemManager)
 	: m_nextID(0), m_systemManager(p_systemManager) 
 {
-	m_components.resize(10);	
+	m_components.resize(32);	
 }
 
 ECS::Entity* ECS::EntityManager::CreateEntity()
