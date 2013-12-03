@@ -7,6 +7,9 @@ namespace Render
 {
 	struct Material
 	{
+		Material()
+			: m_diffuseMap(nullptr) {}
+
 		Render::TextureInterface* m_diffuseMap;
 		Render::TextureInterface* m_specularMap;
 		Render::TextureInterface* m_normalMap;

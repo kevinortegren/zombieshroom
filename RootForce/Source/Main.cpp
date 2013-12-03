@@ -185,9 +185,9 @@ void Main::Start()
 	blueTrans->m_scale = glm::vec3(0.1f);
 
 	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
-	bluePL->m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
-	bluePL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	bluePL->m_range = 2.0f;
+	bluePL->m_color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	bluePL->m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	bluePL->m_range = 20.0f;
 
 	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
 	blueRender->m_mesh = cubeMesh;
@@ -209,7 +209,9 @@ void Main::Start()
 
 	Render::Material guyMaterial;
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
 	guyRenderable->m_material = guyMaterial;
+	
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
@@ -295,6 +297,7 @@ void Main::Start()
 		old = now;
 	
 		m_engineContext.m_debugOverlay->Clear();
+
 		m_world.SetDelta(dt);
 		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();

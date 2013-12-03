@@ -17,9 +17,10 @@ namespace RootEngine
 		void guiInstance::Startup(void)
 		{
 			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
-			g_context.m_logger->LogText(LogTag::GUI, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
+			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
 			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
 			m_core->set_surface_factory(m_glTexSurfaceFactory);
+
 		}
 
 
