@@ -2,6 +2,7 @@
 
 #include <map>
 #include <Utility/ECS/Include/World.h>
+#include <RootForce/Include/Physics.h>
 #include <Transform.h>
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>

@@ -214,6 +214,8 @@ void Main::Start()
 	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
 	guyRenderable->m_material = guyMaterial;
 	
+	RootForce::PhysicsAccessor* guyPhysics = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(guy);
+	
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
@@ -252,7 +254,7 @@ void Main::Start()
 
 	float pos[3] = {3,0,0};
 	float rot[3] = {0,0,0};
-	int* handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
+	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
 	float pos2[3] = {0,5,-20};
 	float rot2[3] = {0,0,0};
 	int* handle2 = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
@@ -327,6 +329,7 @@ void Main::Start()
 	
 
 
+/*
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
 			m_engineContext.m_physics->PlayerJump(*handle, 10.0f);
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
@@ -379,6 +382,7 @@ void Main::Start()
 		orientationPlayer[2] = -test.z;
 		orientationPlayer[3] = -test.w;
 		m_engineContext.m_physics->SetPlayerOrientation(*handle,orientationPlayer);
+*/
 
 
 
