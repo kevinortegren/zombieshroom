@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Root project settings
-set(PROJECT_NAME LUA)
+set(PROJECT_NAME Script)
 project(${PROJECT_NAME})
 
 # Set the files used in the target
