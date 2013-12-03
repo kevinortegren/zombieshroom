@@ -3,7 +3,7 @@
 #include <iostream>
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
-
+#include "vld.h"
 
 namespace Physics
 {
@@ -29,6 +29,7 @@ namespace Physics
 	}
 	void RootPhysics::Shutdown()
 	{
+		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Shutting down physics");
 		//Magic loop of deleting
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 		{
@@ -40,34 +41,35 @@ namespace Physics
 			}
 			if(body && body->getCollisionShape())
 			{
-				delete body->getCollisionShape();
+				btCollisionShape* temp = body->getCollisionShape();
+				delete temp;
 			}
 			m_dynamicWorld->removeCollisionObject( obj );
 			delete obj;
 		}
 		for(unsigned int i = 0; i < m_playerObject.size(); i++)
 		{
-			delete m_playerObject[i];
+			PlayerController* temp = m_playerObject[i];
+			delete temp;
 		}
-		for(unsigned int i = 0; i < m_dynamicObjects.size(); i++)
+		for(unsigned int i = 0; i < m_userPointer.size(); i++)
 		{
-			delete m_dynamicObjects[i];
+			CustomUserPointer* temp = m_userPointer[i];
+			delete temp;
 		}
 		m_dynamicObjects.clear();
 		m_playerObject.clear();
+		m_userPointer.clear();
+		delete m_debugDrawer;
 		delete m_dynamicWorld;
 		delete m_solver;
-		delete m_collisionConfig;
 		delete m_broadphase;
 		delete m_dispatcher;
+		delete m_collisionConfig;
+		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Shutdown complete");
+		
 	}
-	/*
-	bool hti
-	void* object;
-	id
-	bool isAbility
-	int id, id=0=Terrain, id1= ability id2 = player
-	*/
+
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
@@ -107,6 +109,7 @@ namespace Physics
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
 		planeBody->setCollisionFlags(planeBody->getCollisionFlags() | btRigidBody::CF_DISABLE_VISUALIZE_OBJECT);
 		m_dynamicWorld->addRigidBody(planeBody);
+
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Make a real update
@@ -141,6 +144,15 @@ namespace Physics
 		//create the body
 		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
 		m_dynamicWorld->addRigidBody(objectBody);
+	/*	indexVertexArray = 0;
+		objectMeshShape = 0;
+		motionstate = 0;
+		objectBody = 0;
+		delete indexVertexArray;
+		delete objectMeshShape;
+		delete motionstate;
+		delete objectBody;
+*/
 	}
 	//Done
 	int* RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
@@ -160,48 +172,8 @@ namespace Physics
 		{
 			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
 			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
-		}
-		
+		}	
 		simplifiedObject->recalcLocalAabb();
-
-
-
-		
-		//btCompoundShape* compShape = new btCompoundShape(true);
-		//btTransform localTransform;
-		//localTransform.setIdentity();
-		//localTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-		//localTransform.setOrigin(btVector3(p_position[0],p_position[1] +1,p_position[2]));
-
-		//compShape->addChildShape(localTransform, simplifiedObject);
-
-		//btVector3 fallInertia =  btVector3(0,0,0);
-		//compShape->calculateLocalInertia(p_mass,fallInertia);
-
-		//btTransform massTrans;
-		//massTrans.setIdentity();
-		//massTrans.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
-		////massTrans.setOrigin(btVector3(0, 1, 0));
-		//massTrans.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-
-		//localTransform.inverse();
-		//massTrans.inverse();
-
-		//btMotionState* state = new btDefaultMotionState(localTransform, massTrans);
-
-		////create a body
-		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, state,compShape, fallInertia );
-		////btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
-		//btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
-		//objectBody->setActivationState(DISABLE_DEACTIVATION);
-
-		////add the body to the world,  TODO : We should also set a user defined gravity for the object
-		//m_dynamicWorld->addRigidBody(objectBody);
-
-		////add to the dynamic object vector
-		//m_dynamicObjects.push_back(objectBody);
-
-
 		///// WORKING STUFF
 		////Set Inertia
 		btVector3 fallInertia =  btVector3(0,0,0);
@@ -226,25 +198,17 @@ namespace Physics
 		m_dynamicObjects.push_back(objectBody);
 		/////END OF WORKING STUFF
 
-		//The user pointer should be something we can use to detect which ability a player collides with
-		/*PhysicWorldInfo tempInfo;
-		tempInfo.m_collidedType = -1;
-		tempInfo.m_hasHit = false;
-		tempInfo.m_index = m_userPointer.size();
-		tempInfo.m_type = ABILITY;
-		tempInfo.m_position[0] = p_position[0];
-		tempInfo.m_position[1] = p_position[1];
-		tempInfo.m_position[2] = p_position[2];
-		CustomUserPointer* temp = new CustomUserPointer();
-		temp->m_object = objectBody;
-		temp->m_worldInfo = tempInfo;
-		temp->m_vectorIndex = m_dynamicObjects.size()-1;
-		objectBody->setUserPointer(temp);
-		m_userPointer.push_back(temp);*/
+		//indexVertexArray = 0;
+		//objectMeshShape = 0;
+		/*	objectHull = 0;
+		simplifiedObject = 0;
+
 		delete indexVertexArray;
 		delete objectMeshShape;
 		delete objectHull;
-		
+		delete simplifiedObject;*/
+
+
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
 		m_userPointer.push_back(userPointer);
@@ -289,6 +253,7 @@ namespace Physics
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		userPointer->m_type = TYPE_PLAYER;
+		
 		return userPointer->m_id;
 	}
 
@@ -422,6 +387,14 @@ namespace Physics
 		body->setActivationState(DISABLE_DEACTIVATION);
 		m_dynamicWorld->addRigidBody(body);
 		m_dynamicObjects.push_back(body);
+		body = 0;
+		sphere = 0;
+		motionstate = 0;
+		delete sphere;
+		delete body;
+		delete motionstate;
+
+
 		return m_dynamicObjects.size()-1;
 	}
 
@@ -505,7 +478,18 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
-		return userPointer->m_id;
+
+		/*
+		sphere = 0;
+		motionstate = 0;
+		body = 0;
+		userPointer = 0;
+		delete sphere;
+		delete motionstate;
+		delete body;
+		delete userPointer;*/
+
+		return m_userPointer.back()->m_id;
 	}
 
 	bool RootPhysics::DoesObjectExist( int p_objectIndex )
@@ -553,7 +537,8 @@ namespace Physics
 			gravity.setX(p_gravity[0]);
 			gravity.setY(p_gravity[1]);
 			gravity.setZ(p_gravity[2]);
-			m_dynamicObjects.at(index)->setGravity(gravity);
+			gravity.normalize();
+			m_dynamicObjects.at(index)->setGravity(gravity * 25.0f);
 			m_dynamicObjects.at(index)->applyGravity();
 		}
 	}

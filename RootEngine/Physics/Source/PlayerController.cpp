@@ -30,12 +30,13 @@ PlayerController::PlayerController( void )
 
 PlayerController::~PlayerController( void )
 {
-	delete m_rigidBody;
-	delete m_ghostObject;
+
 }
 void PlayerController::RemovePlayer()
 {
-
+	//Note fix this
+	//delete m_rigidBody;
+	//delete m_ghostObject;
 	m_dynamicWorld->removeRigidBody(m_rigidBody);
 	m_dynamicWorld->removeCollisionObject(m_ghostObject);
 }
@@ -91,10 +92,12 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
-
-	delete indexVertexArray;
-	delete objectMeshShape;
-	delete objectHull;
+	//indexVertexArray = 0;
+	//objectMeshShape = 0;
+	//objectHull = 0;
+	//delete indexVertexArray;
+	//delete objectMeshShape;
+	//delete objectHull;
 }
 
 
