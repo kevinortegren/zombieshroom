@@ -202,6 +202,16 @@ namespace RootEngine
 			return -1;
 		}
 
+
+		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)
+		{
+			m_testBool = true;
+		}
+
+		void guiJSTest::OnMethodCall (Awesomium::WebView *caller, unsigned int remote_object_id, const Awesomium::WebString &method_name, const Awesomium::JSArray &args)
+		{
+			m_testBool = true;
+		}
 	}
 }
 
@@ -210,4 +220,31 @@ RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemShared
 	RootEngine::GUISystem::g_context = p_context;
 
 	return RootEngine::GUISystem::guiInstance::GetInstance();
+}
+
+TEST(GUI, Javascript)
+{
+	RootEngine::GUISystem::guiInstance* instance = RootEngine::GUISystem::guiInstance::GetInstance();
+	RootEngine::GUISystem::guiTest* testInstance = new RootEngine::GUISystem::guiTest();
+	RootEngine::GUISystem::guiJSTest* jsTestInstance = new RootEngine::GUISystem::guiJSTest();
+	testInstance->InitTest();
+	jsTestInstance->InitTest();
+	instance->GetView()->set_load_listener(testInstance);
+	instance->GetView()->set_js_method_handler(jsTestInstance);
+
+	Awesomium::JSValue window = instance->GetView()->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
+	EXPECT_TRUE(window.IsObject());
+	window.ToObject().SetCustomMethod(Awesomium::WSLit("RemoteTest();"), false);
+
+	instance->LoadURL("test.html");
+	while(instance->GetView()->IsLoading())
+	{
+		instance->Update();
+	}
+	Sleep(500);
+	instance->GetView()->ExecuteJavascript(Awesomium::WSLit("Test();"), Awesomium::WSLit(""));
+	Sleep(500);
+	EXPECT_TRUE(testInstance->GetTestResult());
+	EXPECT_TRUE(jsTestInstance->GetTestResult());
+	// Assume correct
 }

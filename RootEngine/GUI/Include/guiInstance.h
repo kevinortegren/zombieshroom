@@ -3,6 +3,7 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <Awesomium/WebCore.h>
 #include <Awesomium/BitmapSurface.h>
+#include <Awesomium/WebViewListener.h>
 #include <string>
 #include <RootEngine/Render/Include/Effect.h>
 #include <SDL2/SDL.h>
@@ -71,6 +72,44 @@ namespace RootEngine
 			void SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
+		};
+
+		//Classes used for testing the gui document load
+		class guiTest : public Awesomium::WebViewListener::Load
+		{
+		public:
+			void OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url);
+
+			void OnBeginLoadingFrame (Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, bool is_error_page){}
+
+			void Awesomium::WebViewListener::Load::OnFailLoadingFrame 	( 	Awesomium::WebView *  	caller,
+				int64  	frame_id,
+				bool  	is_main_frame,
+				const Awesomium::WebURL &  	url,
+				int  	error_code,
+				const Awesomium::WebString &  	error_desc 
+				){}
+
+			void Awesomium::WebViewListener::Load::OnFinishLoadingFrame 	( 	Awesomium::WebView *  	caller,
+				int64  	frame_id,
+				bool  	is_main_frame,
+				const Awesomium::WebURL &  	url 
+				){}
+			void InitTest() { m_testBool = false; }
+			bool GetTestResult() { return m_testBool; }
+		private:
+			bool m_testBool;
+		};
+
+		class guiJSTest : public Awesomium::JSMethodHandler
+		{
+		public:
+			void OnMethodCall (Awesomium::WebView *caller, unsigned int remote_object_id, const Awesomium::WebString &method_name, const Awesomium::JSArray &args);
+			Awesomium::JSValue 	OnMethodCallWithReturnValue (Awesomium::WebView *caller, unsigned int remote_object_id, const Awesomium::WebString &method_name, const Awesomium::JSArray &args){ return Awesomium::JSValue();}
+			void InitTest() { m_testBool = false; }
+			bool GetTestResult() { return m_testBool; }
+		private:
+			bool m_testBool;
 		};
 	}
 
