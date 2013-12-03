@@ -57,7 +57,18 @@ namespace Physics
 
 		
 	};
-
+	struct CustomUserPointer
+	{
+		int m_type;
+		int m_vectorIndex;
+		int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
+		bool m_collided;
+		void* m_collisionFunc(int); // A function from the gamelogic that should be called when a collision (not static or dynamic) object occurs
+		~CustomUserPointer()
+		{
+			delete m_id;
+		}
+	};
 
 	class RootPhysics : public PhysicsInterface
 	{
@@ -99,19 +110,7 @@ namespace Physics
 
 
 	private:
-		struct CustomUserPointer
-		{
-			int m_type;
-			int m_vectorIndex;
-			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
-			bool m_collided;
-			void* m_collisionFunc(int); // A function from the gamelogic that should be called when a collision (not static or dynamic) object occurs
-			~CustomUserPointer()
-			{
-				delete m_id;
-
-			}
-		};
+		
 		void Init();
 		bool DoesObjectExist(int p_objectIndex);
 		RootPhysics();

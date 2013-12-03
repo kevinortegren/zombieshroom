@@ -308,13 +308,15 @@ void Main::Start()
 
 		m_engineContext.m_renderer->Clear();
 
-		// Update Engine systems.
-		m_engineContext.m_physics->Update(dt);
-
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_playerControlSystem->Process();
 		renderingSystem->Process();
+
+		// Update Engine systems.
+		m_engineContext.m_physics->Update(dt);
+
+		
 
 		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
 		m_engineContext.m_physics->GetPlayerPos(*handle, x);
@@ -337,15 +339,9 @@ void Main::Start()
 			m_engineContext.m_physics->SetDynamicObjectVelocity(*handle2, speedup);
 			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
 		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN)
+		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			//speed[2] *= -1;
-		//	glm::vec3 test = guyTransform2->m_orientation.GetFront();
-		//	float* funtime = &test.x;
-		//	m_engineContext.m_physics->PlayerMoveXZ(handle2, funtime);
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
+			
 		}
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
 		{
@@ -376,19 +372,17 @@ void Main::Start()
 		guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
 		//float target[3] = {x[0] - x2[0] , x[1] - x2[1] , x[2] - x2[2]};
 		//m_engineContext.m_physics->SetGravity(*handle2, target);
-		glm::quat test = guyTransform->m_orientation.GetQuaterion();
-
-		orientationPlayer[0] = test.x;
-		orientationPlayer[1] = test.y;
-		orientationPlayer[2] = test.z;
-		orientationPlayer[3] = test.w;
-
-		m_engineContext.m_physics->SetPlayerOrientation(*handle,orientationPlayer);
+		
 		m_engineContext.m_physics->GetObjectOrientation(*handle2, orientation);
 		guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
-		
+		glm::quat test = guyTransform->m_orientation.GetQuaterion();
 
-		m_engineContext.m_physics->Update(dt);
+		orientationPlayer[0] =- test.x;
+		orientationPlayer[1] = -test.y;
+		orientationPlayer[2] = -test.z;
+		orientationPlayer[3] = -test.w;
+		m_engineContext.m_physics->SetPlayerOrientation(*handle,orientationPlayer);
+
 
 		m_engineContext.m_renderer->Render();
 		//m_engineContext.m_renderer->RenderLines();

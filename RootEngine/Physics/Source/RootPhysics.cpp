@@ -11,7 +11,7 @@ namespace Physics
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
 	RootEngine::ResourceManagerInterface* g_resourceManager;
-	const int TYPE_PLAYER = 0;
+	const int TYPE_PLAYER = 2;
 	const int TYPE_ABILITY = 1;
 	
 	RootPhysics::RootPhysics()
@@ -73,7 +73,14 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
-		
+		if(((CustomUserPointer*)p_obj1)->m_type == TYPE_ABILITY || ((CustomUserPointer*)p_obj2)->m_type == TYPE_ABILITY )
+		{
+			
+			int lol = 2;
+			//((CustomUserPointer*)p_obj1)->m_collisionFunc(2);
+			
+		}
+
 		/*
 		Om det är en ability, kalla på den funktionen om den kolliderar med vadsom, skicka in nånslags värde för att säga vad den krockat med
 		Om det är en spelare, kalla på funktionen om det är en Ability, och skicka då nån form av värde för att beskriva vad det är för ability
@@ -149,15 +156,7 @@ namespace Physics
 		//create the body
 		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
 		m_dynamicWorld->addRigidBody(objectBody);
-	/*	indexVertexArray = 0;
-		objectMeshShape = 0;
-		motionstate = 0;
-		objectBody = 0;
-		delete indexVertexArray;
-		delete objectMeshShape;
-		delete motionstate;
-		delete objectBody;
-*/
+
 	}
 	//Done
 	int* RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
@@ -179,10 +178,11 @@ namespace Physics
 			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
 		}	
 		simplifiedObject->recalcLocalAabb();
-		///// WORKING STUFF
+
 		////Set Inertia
 		btVector3 fallInertia =  btVector3(0,0,0);
 		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
+
 		//Set startpos and start rotation and bind them to a motionstate
 		btTransform startTransform;
 		startTransform.setIdentity();
@@ -192,26 +192,15 @@ namespace Physics
 
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
-		//btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,objectMeshShape, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
-		objectBody->setCollisionFlags(objectBody->getCollisionFlags());
+		objectBody->setCollisionFlags(objectBody->getCollisionFlags()| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
 		m_dynamicWorld->addRigidBody(objectBody);
 
 		//add to the dynamic object vector
 		m_dynamicObjects.push_back(objectBody);
-		/////END OF WORKING STUFF
 
-		//indexVertexArray = 0;
-		//objectMeshShape = 0;
-		/*	objectHull = 0;
-		simplifiedObject = 0;
-
-		delete indexVertexArray;
-		delete objectMeshShape;
-		delete objectHull;
-		delete simplifiedObject;*/
 
 
 		CustomUserPointer* userPointer = new CustomUserPointer();
@@ -324,7 +313,6 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
-		//This might be so incredibly broken that i don't even how the compiler lets us do it
  		m_playerObject.at(index)->Knockback(temp * p_pushForce);
 	}
 
@@ -367,7 +355,8 @@ namespace Physics
 
 			for(unsigned int i = p_objectIndex; i < m_userPointer.size(); i++)
 			{
-				*m_userPointer.at(i)->m_id --;
+			
+				m_userPointer.at(i)->m_id[0] --;
 				if(m_userPointer.at(i)->m_type != TYPE_PLAYER)
 				{
 
@@ -448,7 +437,6 @@ namespace Physics
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 		m_playerObject.at(index)->SetOrientation(p_playerOrientation);
-		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "ROTATTIONN : %f %f %f %f",p_playerOrientation[0] ,p_playerOrientation[1], p_playerOrientation[2], p_playerOrientation[3]);
 	}
 
 	int* RootPhysics::AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity)
@@ -493,7 +481,7 @@ namespace Physics
 
 	bool RootPhysics::DoesObjectExist( int p_objectIndex )
 	{
-		if(m_userPointer.size() == 0 || (unsigned int)p_objectIndex >= m_userPointer.size())
+		if(m_userPointer.size() == 0 || (unsigned int)p_objectIndex >= m_userPointer.size() || p_objectIndex < 0)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing user pointer at index %d", p_objectIndex);
 			return false;
@@ -502,7 +490,7 @@ namespace Physics
 		{
 			if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
 			{
-				if(m_playerObject.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObject.size()-1)
+				if(m_playerObject.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObject.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectIndex)->m_vectorIndex);
 					return false;
@@ -510,7 +498,7 @@ namespace Physics
 			}
 			else
 			{
-				if(m_dynamicObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_dynamicObjects.size()-1)
+				if(m_dynamicObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_dynamicObjects.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing dynamic object at index %d", m_userPointer.at(p_objectIndex)->m_vectorIndex);
 					return false;

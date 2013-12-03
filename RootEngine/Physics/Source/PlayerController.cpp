@@ -83,7 +83,7 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_rigidBody->setAngularFactor(0.0f);
 	//Don't enter sleep mode if you stand still for a while
 	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
-	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() );
+	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags());
 	m_dynamicWorld->addRigidBody(m_rigidBody);
 
 	m_ghostObject = new btPairCachingGhostObject();
