@@ -3,7 +3,7 @@
 #include <iostream>
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
-#include "vld.h"
+//#include "vld.h"
 
 namespace Physics
 {
