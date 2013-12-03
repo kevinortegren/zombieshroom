@@ -3,9 +3,9 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
 #if defined(_WINDLL)
-#define SOUND_DLL_EXPORT __declspec(dllexport)
+#define LUA_DLL_EXPORT __declspec(dllexport)
 #else
-#define SOUND_DLL_EXPORT __declspec(dllimport)
+#define LUA_DLL_EXPORT __declspec(dllimport)
 #endif
 
 namespace RootEngine
@@ -18,7 +18,6 @@ namespace RootEngine
 			virtual void DoScript() = 0;
 
 		};
-
 
 		class LUAManager : public LUAInterface
 		{
@@ -41,5 +40,5 @@ namespace RootEngine
 extern "C"
 {
 	typedef RootEngine::LUA::LUAInterface* (*GETSOUNDINTERFACE) (RootEngine::SubsystemSharedContext);
-	SOUND_DLL_EXPORT RootEngine::LUA::LUAInterface* CreateSoundSystem(RootEngine::SubsystemSharedContext p_context);
+	LUA_DLL_EXPORT RootEngine::LUA::LUAInterface* CreateSoundSystem(RootEngine::SubsystemSharedContext p_context);
 }
