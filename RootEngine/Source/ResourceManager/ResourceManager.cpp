@@ -18,7 +18,7 @@ namespace RootEngine
 		m_models.clear();
 
 		/*auto meshitr = m_meshes.begin();
-		for(; meshitr != m_meshes.end(); meshitr++)
+		for(; meshitr != m_meshes.end(); meshitr++)v
 		{
 			delete (*meshitr).second;
 			(*meshitr).second = nullptr;
@@ -53,7 +53,7 @@ namespace RootEngine
 
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_logger->LogText("%s", p_path.c_str());
+		m_logger->LogText("Loading effect: %s", p_path.c_str());
 
 		m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
 
@@ -75,7 +75,26 @@ namespace RootEngine
 
 	Model* ResourceManager::GetModel( std::string p_handle )
 	{
-		return m_models[p_handle];
+		
+		if(m_models.find(p_handle) != m_models.end())
+		{
+			return m_models[p_handle];
+		}
+		else
+		{
+			m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Model has not been loaded: %s", p_handle.c_str());
+			return nullptr;
+		}
+	}
+
+	void ResourceManager::LoadTexture( std::string p_path )
+	{
+
+	}
+
+	Render::Texture* ResourceManager::GetTexture( std::string p_handle )
+	{
+		return nullptr;
 	}
 
 }

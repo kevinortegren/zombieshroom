@@ -8,7 +8,7 @@ namespace Render
 {
 	struct TextureInterface
 	{
-		virtual bool Load(const std::string& filepath) = 0;
+		virtual bool Load(const std::string filepath) = 0;
 		virtual void Enable(unsigned int slot) = 0;
 		virtual unsigned int GetID() = 0;
 		virtual unsigned int GetWidth() = 0;
@@ -23,7 +23,7 @@ namespace Render
 	public:
 		~Texture();
 
-		bool Load(const std::string& filepath);
+		bool Load(const std::string filepath);
 		void Enable(unsigned int slot);
 
 		unsigned int GetID();

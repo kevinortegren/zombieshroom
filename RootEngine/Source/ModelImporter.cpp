@@ -47,6 +47,8 @@ namespace RootEngine
 			InitMesh(i, paiMesh);
 		}
 		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Created %d meshes ",p_scene->mNumMeshes);
+		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Starting to load  %d textures attached to model ",p_scene->mNumMaterials);
+
 		InitMaterials(p_scene, p_filename);
 	}
 
@@ -102,7 +104,47 @@ namespace RootEngine
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
-		
+		// Extract the directory part from the file name
+		std::string::size_type SlashIndex = p_filename.find_last_of("\\");
+		std::string Dir;
+
+		if (SlashIndex == std::string::npos) 
+		{
+			Dir = ".";
+		}
+		else if (SlashIndex == 0) 
+		{
+			Dir = "/";
+		}
+		else 
+		{
+			Dir = p_filename.substr(0, SlashIndex);
+		}
+
+		// Initialize the materials
+		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 
+		{
+			const aiMaterial* pMaterial = p_scene->mMaterials[i];
+
+			if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) 
+			{
+				aiString Path;
+
+				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+					std::string FullPath = Dir + "\\" + Path.data;
+					m_model->m_textures.push_back(m_renderer->CreateTexture());
+
+					if (!m_model->m_textures[i]->Load(FullPath)) 
+					{
+						m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "Error loading texture '%s'\n", FullPath.c_str());
+					}
+					else 
+					{
+						m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'\n", FullPath.c_str());
+					}
+				}
+			}
+		}
 	}
 
 	std::vector<glm::vec3> ModelImporter::GetMeshPoints( std::vector<Render::Vertex1P1N1UV> p_vertices )

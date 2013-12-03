@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -8,6 +9,7 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/Texture.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <memory>
 
@@ -16,9 +18,8 @@ namespace RootEngine
 	struct Model
 	{
 		std::vector<std::shared_ptr<Render::Mesh>> m_meshes;
-		//vector<Texture*> m_textures;
+		std::vector<Render::TextureInterface*> m_textures;
 		//vector<AnimationData*> m_animations;
-		
 		unsigned int numberOfIndices;
 		unsigned int numberOfVertices;
 		unsigned int numberOfFaces;
