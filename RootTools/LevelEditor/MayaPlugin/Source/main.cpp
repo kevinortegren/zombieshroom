@@ -72,14 +72,14 @@ EXPORT MStatus initializePlugin(MObject obj)
 		//Print("TexturePath ", SM.meshList[i].texturePath.c_str());
 		//Print("NormalPath ", SM.meshList[i].normalPath.c_str());
 
-		for(int j = 0; j < maxCount; j++)
-		{
-			Print("v ", SM.meshList[i].vertex[j].x, " ", SM.meshList[i].vertex[j].y," ", SM.meshList[i].vertex[j].z);
-			Print("vn ", SM.meshList[i].normal[j].x, " ", SM.meshList[i].normal[j].y," ", SM.meshList[i].normal[j].z);
-			Print("tt 0 0 0");
-			Print("vt ", SM.meshList[i].UV[j][0], " ", SM.meshList[0].UV[j][1]);
-			nrTotalVertices++;
-		}
+		//for(int j = 0; j < maxCount; j++)
+		//{
+		//	Print("v ", SM.meshList[i].vertex[j].x, " ", SM.meshList[i].vertex[j].y," ", SM.meshList[i].vertex[j].z);
+		//	Print("vn ", SM.meshList[i].normal[j].x, " ", SM.meshList[i].normal[j].y," ", SM.meshList[i].normal[j].z);
+		//	Print("tt 0 0 0");
+		//	Print("vt ", SM.meshList[i].UV[j][0], " ", SM.meshList[0].UV[j][1]);
+		//	nrTotalVertices++;
+		//}
 	}
 
 	Print("Total vertices: ", nrTotalVertices);
@@ -226,11 +226,13 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	mesh.getUVs(U,V,&UVsetName);
 
-	for(int i = 0; i < points_.length(); i++)
-	{
-		Print("Vertex ", i, " X: ", myPoints[i][0]," Y: ", myPoints[i][1], " Z: ", myPoints[i][2]);
-		Print("U: ", U[i], " V: ", V[i]);
-	}
+	//for(int i = 0; i < points_.length(); i++)
+	//{
+	//	Print("Vertex ", i, " X: ", myPoints[i][0]," Y: ", myPoints[i][1], " Z: ", myPoints[i][2]);
+	//	Print("U: ", U[i], " V: ", V[i]);
+	//}
+
+	MayaListToList(node);
 }
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
@@ -524,6 +526,7 @@ void MayaListToList(MObject node)
 
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
+					SM.UpdateSharedMesh(meshIndex, false, true, currNrMeshes);
 				}
 			}
 
@@ -555,7 +558,7 @@ void MayaListToList(MObject node)
 			/*Print(transform.getTranslation(space_transform).x);
 			Print(SM.meshList[meshIndex].transformation.position.x);*/
 
-			SM.UpdateSharedMesh(meshIndex);
+			SM.UpdateSharedMesh(meshIndex, true, false, currNrMeshes);
 
 			if(!alreadyExists)
 				meshIndex++;

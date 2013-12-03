@@ -59,8 +59,8 @@ int ReadMemory::InitalizeSharedMemory()
 
 void ReadMemory::Read()			//read if the active object have changed.
 {
-	MutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(MutexHandle, milliseconds);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
 
 	if(*MeshIdChange != -1)
 	{
@@ -70,13 +70,13 @@ void ReadMemory::Read()			//read if the active object have changed.
 		*MeshIdChange = -1;
 	}
 
-	ReleaseMutex(MutexHandle);
+	ReleaseMutex(IdMutexHandle);
 }
 
 void ReadMemory::ReadMesh(int i)
 {
-	MutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(MutexHandle, milliseconds);
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
 	cout << PmeshList[i]->transformation.name << endl;
 	cout << "NrOfVertices " + to_string(PmeshList[i]->nrOfVertices) << endl;
@@ -96,12 +96,14 @@ void ReadMemory::ReadMesh(int i)
 	cout << "Vertex x,y,z" + to_string(PmeshList[i]->vertex[k].x) + " " + to_string(PmeshList[i]->vertex[k].y) + " " + to_string(PmeshList[i]->vertex[k].z) << endl;
 	}
 
-	ReleaseMutex(MutexHandle);
+	ReleaseMutex(MeshMutexHandle);
 }
 
 int ReadMemory::shutdown()
 {
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
+	//CloseHandle(MeshMutexHandle);
+	//CloseHandle(IdMutexHandle);
 	return 0;
 }

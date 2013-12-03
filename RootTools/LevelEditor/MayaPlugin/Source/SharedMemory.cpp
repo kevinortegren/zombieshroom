@@ -55,40 +55,50 @@ int SharedMemory::InitalizeSharedMemory()
 	return 0;
 }
 
-void SharedMemory::UpdateSharedMesh(int index)			//AINT CALLING FOR SHIET
+void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)			//AINT CALLING FOR SHIET
 {
-	MutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(MutexHandle, milliseconds);
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
-	for(int i = 0; i < meshList[index].nrOfVertices; i ++)
+	if(updateVertex)
 	{
-	PmeshList[index]->vertex[i] = meshList[index].vertex[i];
-	PmeshList[index]->normal[i] = meshList[index].normal[i];
-	PmeshList[index]->UV[i] = meshList[index].UV[i];
-	}
+		for(int i = 0; i < meshList[index].nrOfVertices; i ++)
+		{
+		PmeshList[index]->vertex[i] = meshList[index].vertex[i];
+		PmeshList[index]->normal[i] = meshList[index].normal[i];
+		PmeshList[index]->UV[i] = meshList[index].UV[i];
+		}
 
-	PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
+		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
+	}	
+
+	if(updateTransformation)
+	{
+		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+		PmeshList[index]->transformation.position = meshList[index].transformation.position;
+		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
+		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
+	}
+	
 	PmeshList[index]->texturePath = meshList[index].texturePath;
 	PmeshList[index]->normalPath = meshList[index].normalPath;
-
-	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
-	PmeshList[index]->transformation.position = meshList[index].transformation.position;
-	PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
-	PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
 	
-	ReleaseMutex(MutexHandle);
 
-	MutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(MutexHandle, milliseconds);
+	ReleaseMutex(MeshMutexHandle);
 
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	*NumberOfMeshes = nrOfMeshes;
 	*MeshIdChange = index;
 
-	ReleaseMutex(MutexHandle);
+	ReleaseMutex(IdMutexHandle);
 }
 
 int SharedMemory::shutdown()
 {
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
+	//CloseHandle(MeshMutexHandle);
+	//CloseHandle(IdMutexHandle);
 	return 0;
 }

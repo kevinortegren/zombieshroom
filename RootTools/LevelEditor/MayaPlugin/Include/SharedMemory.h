@@ -13,7 +13,7 @@ class SharedMemory
 public:
 	SharedMemory(void);
 	~SharedMemory(void);
-	void UpdateSharedMesh(int);
+	void UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes);
 	void UpdateSharedCamera(int);
 	void UpdateSharedLight(int);
 	int InitalizeSharedMemory();
@@ -29,7 +29,8 @@ private:
 	
 	int shutdown();
 	//Variables
-	HANDLE MutexHandle;
+	HANDLE MeshMutexHandle;
+	HANDLE IdMutexHandle;
 	DWORD milliseconds;
 	HANDLE shared_memory_handle;
 	unsigned char* raw_data;
