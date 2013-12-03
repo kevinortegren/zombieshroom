@@ -73,14 +73,33 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
-		if(((CustomUserPointer*)p_obj1)->m_type == TYPE_ABILITY || ((CustomUserPointer*)p_obj2)->m_type == TYPE_ABILITY )
+		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
+		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
+		if(pointer1 == nullptr)
+			return false;
+		if(pointer2 == nullptr)
+			return false;
+		int test = ((CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer()))->m_type;
+		int test2 = ((CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer()))->m_type;
+		if (pointer1->m_type == TYPE_PLAYER || pointer2->m_type == TYPE_PLAYER)
 		{
-			
-			int lol = 2;
-			//((CustomUserPointer*)p_obj1)->m_collisionFunc(2);
-			
+			if (pointer2->m_type == TYPE_ABILITY || pointer1->m_type == TYPE_ABILITY)
+			{
+				//Call the functions here	
+			}
 		}
-
+		else if (pointer1->m_type == TYPE_ABILITY)
+		{
+			int asdfahjsdf = 1;
+		}
+		else if (pointer2->m_type == TYPE_ABILITY)
+		{
+			int asdf = 0;
+		}
+		else
+		{
+			//dynamic object which is not ability
+		}
 		/*
 		Om det är en ability, kalla på den funktionen om den kolliderar med vadsom, skicka in nånslags värde för att säga vad den krockat med
 		Om det är en spelare, kalla på funktionen om det är en Ability, och skicka då nån form av värde för att beskriva vad det är för ability
@@ -195,7 +214,7 @@ namespace Physics
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
-		objectBody->setCollisionFlags(objectBody->getCollisionFlags()| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		objectBody->setCollisionFlags(objectBody->getCollisionFlags()| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK );
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
 		m_dynamicWorld->addRigidBody(objectBody);
 
@@ -335,7 +354,7 @@ namespace Physics
 		
 			for(unsigned int i = p_objectIndex; i < m_userPointer.size(); i++)
 			{
-				*m_userPointer.at(i)->m_id --;
+				m_userPointer.at(i)->m_id[0] --;
 				if(m_userPointer.at(i)->m_type == TYPE_PLAYER)
 				{
 					

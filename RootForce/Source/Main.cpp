@@ -138,6 +138,7 @@ void Main::Start()
 	m_playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
 	m_playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
 	m_playerControlSystem->SetKeybindings(keybindings);
+	m_playerControlSystem->SetPhysicsInterface(m_engineContext.m_physics);
 
 
 	RootForce::Renderable::SetTypeId(0);
@@ -272,7 +273,7 @@ void Main::Start()
 	for(int i = 0 ; i < 5; i++)
 	{
 		float ballpos[3] = {0,3 + i * 1.5f, 0};
-		int ballHandle = m_engineContext.m_physics->CreateSphere(i +0.04f, 1.05f,ballpos );
+	//	int ballHandle = m_engineContext.m_physics->CreateSphere(i +0.04f, 1.05f,ballpos );
 	}
 	
 	float ballspeed[3] = {0, 0, 5};
@@ -323,8 +324,7 @@ void Main::Start()
 		
 
 		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
-		m_engineContext.m_physics->GetPlayerPos(*handle, x);
-		m_engineContext.m_physics->GetObjectPos(*handle2, x2);
+	
 
 
 		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
@@ -343,21 +343,8 @@ void Main::Start()
 			m_engineContext.m_physics->SetDynamicObjectVelocity(*handle2, speedup);
 			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
 		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			//speed[2] *= -1;
-			glm::vec3 test = guyTransform->m_orientation.GetFront();
-			float* funtime = &test.x;
-			m_engineContext.m_physics->PlayerMoveXZ(*handle, funtime);
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LSHIFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		
+		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LSHIFT) == RootEngine::InputManager::KeyState::DOWN)
 		{
 			glm::vec3 test = guyTransform->m_orientation.GetFront();
 			float* funtime = &test.x;
@@ -366,12 +353,18 @@ void Main::Start()
 			position[0] += funtime[0];
 			position[1] += 1;
 			position[2] += funtime[2];
-			m_engineContext.m_physics->AddAbilityToWorld(0.8f, x, funtime, 100.0f, 1, 500, gravity );
+			m_engineContext.m_physics->AddAbilityToWorld(0.4f, x, funtime, 100.0f, 1, 500, gravity );
 		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RSHIFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RSHIFT) == RootEngine::InputManager::KeyState::DOWN)
 		{
 			m_engineContext.m_physics->RemoveObject(1, 1);
 		}
+
+
+		
+
+		m_engineContext.m_physics->GetPlayerPos(*handle, x);
+		m_engineContext.m_physics->GetObjectPos(*handle2, x2);
 		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
 		guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
 		//float target[3] = {x[0] - x2[0] , x[1] - x2[1] , x[2] - x2[2]};
@@ -389,7 +382,7 @@ void Main::Start()
 
 
 
-		m_engineContext.m_physics->Update(dt);
+		
 
 		pointLightSystem->Process(); 
 		renderingSystem->Process();
@@ -400,6 +393,8 @@ void Main::Start()
 
 		m_engineContext.m_gui->Update();
 		m_engineContext.m_gui->Render();
+
+		m_engineContext.m_physics->Update(dt);
 
 		m_engineContext.m_renderer->Swap();
 	}

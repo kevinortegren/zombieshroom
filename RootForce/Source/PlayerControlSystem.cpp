@@ -22,14 +22,19 @@ namespace RootForce
 		m_keybindings = keybindings;
 	}
 
-	void PlayerControlSystem::SetLoggingInterface(Logging* logger)
+	void PlayerControlSystem::SetLoggingInterface(Logging* p_logger)
 	{
-		m_logger = logger;
+		m_logger = p_logger;
 	}
 
-	void PlayerControlSystem::SetInputInterface(RootEngine::InputManager::InputInterface* inputManager)
+	void PlayerControlSystem::SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager)
 	{
-		m_inputManager = inputManager;
+		m_inputManager = p_inputManager;
+	}
+
+	void PlayerControlSystem::SetPhysicsInterface(Physics::PhysicsInterface* p_physics)
+	{
+		m_physics = p_physics;
 	}
 
 	void PlayerControlSystem::Process()
@@ -75,19 +80,27 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					transform->m_position += facing * speed * dt;
+					m_physics->PlayerMoveXZ(0, &facing.x);
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
-					transform->m_position -= facing * speed * dt;
+					{
+					glm::vec3 backwards = -facing;
+					m_physics->PlayerMoveXZ(0, &backwards.x);
+
 					break;
+					}
 				case PlayerAction::STRAFE_RIGHT:
-					transform->m_position += right * speed * dt;
+					m_physics->PlayerMoveXZ(0, &right.x);
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
-					transform->m_position -= right * speed * dt;
+					{
+						glm::vec3 left = -right;
+						m_physics->PlayerMoveXZ(0, &left.x);
+						break;
+					}
 					//transform->m_orientation.YawGlobal(90.0f * dt);
-					break;
+					
 				case PlayerAction::ORIENTATE:
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
