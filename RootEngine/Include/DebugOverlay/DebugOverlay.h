@@ -5,6 +5,8 @@
 
 namespace RootEngine
 {
+	
+
 	class DebugOverlay : public DebugOverlayInterface
 	{
 	public:
@@ -12,7 +14,7 @@ namespace RootEngine
 		~DebugOverlay();
 
 		void SetView(Awesomium::WebView* p_view);
-		void AddHTML(const char* p_html, bool p_leftSide = true);
+		void AddHTML(const char* p_html, TextColor::TextColor p_color, bool p_leftSide = true);
 		void Clear();
 
 	private:

@@ -15,7 +15,6 @@ namespace RootEngine
 	namespace InputManager
 	{
 
-
 		class InputInterface abstract : public RootEngine::SubsystemInterface
 		{
 		public:

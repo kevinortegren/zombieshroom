@@ -274,8 +274,7 @@ void Main::Start()
 		old = now;
     
 		m_engineContext.m_debugOverlay->Clear();
-		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
-		
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str());
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
