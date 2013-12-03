@@ -1,7 +1,0 @@
-- name: Color
-  param: foo
-  passes:
-  - name: Color
-    type: vertex
-  - name: Color
-    type: fragment

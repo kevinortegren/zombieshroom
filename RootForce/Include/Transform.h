@@ -1,7 +1,7 @@
 #pragma once
 
-#include <RootForce\Include\ECS/Component.h>
-#include <RootForce\Include\Orientation.h>
+#include <Utility\ECS\Include\Component.h>
+#include <Orientation.h>
 
 #include <glm/glm.hpp>
 

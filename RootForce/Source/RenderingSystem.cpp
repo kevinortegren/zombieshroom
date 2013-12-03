@@ -14,7 +14,7 @@ namespace RootForce
 
 	}
 
-	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity, float dt)
+	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		if(m_renderer && m_logger)
 		{
@@ -54,7 +54,7 @@ namespace RootForce
 
 	void RenderingSystem::End()
 	{
-		m_renderer->Render();
+
 	}
 
 	void RenderingSystem::SetRendererInterface(Render::RendererInterface* p_renderer)

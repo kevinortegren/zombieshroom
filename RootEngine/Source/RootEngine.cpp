@@ -66,7 +66,8 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
-		//m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
+		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
+		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
@@ -104,6 +105,7 @@ namespace RootEngine
 		// Setup the game context
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
+		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
 
@@ -210,7 +212,6 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
-				g_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
 			}
 			else
 			{
@@ -259,3 +260,4 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
+
