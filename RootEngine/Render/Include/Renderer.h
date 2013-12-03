@@ -79,7 +79,7 @@ namespace Render
 		void LightingPass();
 		void BindMaterial(Material* p_material);
 	
-		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
+		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
 
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;

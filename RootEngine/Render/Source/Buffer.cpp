@@ -19,8 +19,8 @@ void Render::Buffer::BufferData(size_t p_elementCount, size_t p_elementSize, voi
 	glBindBuffer(m_type, m_id);
 	glBufferData(m_type, p_elementCount * p_elementSize, p_data, GL_STATIC_DRAW);
 
-	m_numElements += p_elementCount;
-	m_size += p_elementCount * p_elementSize;
+	m_numElements = p_elementCount;
+	m_size = p_elementCount * p_elementSize;
 }
 
 void Render::Buffer::BufferSubData(size_t p_offset, size_t p_length, void* p_data)

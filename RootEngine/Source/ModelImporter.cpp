@@ -1,12 +1,15 @@
 #include <RootEngine/Include/ModelImporter.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace RootEngine
 {
 	
-	ModelImporter::ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer)
+	ModelImporter::ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer, ResourceManager* p_resourceManager)
 	{
 		m_logger	= p_logger;
 		m_renderer	= p_renderer;
+		m_resourceManager = p_resourceManager;
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Model importer initialized!");
 	}
 
 	ModelImporter::~ModelImporter()
@@ -24,15 +27,15 @@ namespace RootEngine
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, 128, NULL, 0);
 
-		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", fileName);
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", fileName);
 		if (aiscene) 
 		{
 			InitFromScene(aiscene, p_fileName);
-			m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
 		{
-			m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
 		}
 
 		return m_model;
@@ -46,7 +49,9 @@ namespace RootEngine
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
 			InitMesh(i, paiMesh);
 		}
-		m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Created %d meshes ",p_scene->mNumMeshes);
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load  %d textures to model", p_scene->mNumMaterials);
+
 		InitMaterials(p_scene, p_filename);
 	}
 
@@ -75,14 +80,14 @@ namespace RootEngine
 			const aiFace& Face = p_aiMesh->mFaces[i];
 			if(Face.mNumIndices != 3)
 			{
-				m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+				m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
 			}
 			indices.push_back(Face.mIndices[0]);
 			indices.push_back(Face.mIndices[1]);
 			indices.push_back(Face.mIndices[2]);
 		}
 		
-		m_logger->LogText(LogTag::RENDER, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
 		std::shared_ptr<Render::Mesh> tempmesh = m_renderer->CreateMesh();
 		tempmesh->m_vertexBuffer = m_renderer->CreateBuffer();
@@ -102,7 +107,45 @@ namespace RootEngine
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
-		
+		// Initialize the materials
+		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 
+		{
+			const aiMaterial* pMaterial = p_scene->mMaterials[i];
+			aiString Path;
+			if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) 
+			{
+				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				{
+					//if load successfull -> add texture handle to model
+					if(m_resourceManager->LoadTexture(Path.data))
+					{
+						m_model->m_textureHandles[0] = Path.data;
+					}
+				}
+			}
+			if (pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) 
+			{
+				if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				{
+					//if load successfull -> add texture handle to model
+					if(m_resourceManager->LoadTexture(Path.data))
+					{
+						m_model->m_textureHandles[1] = Path.data;
+					}
+				}
+			}
+			if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) 
+			{
+				if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				{
+					//if load successfull -> add texture handle to model
+					if(m_resourceManager->LoadTexture(Path.data))
+					{
+						m_model->m_textureHandles[2] = Path.data;
+					}
+				}
+			}
+		}
 	}
 
 	std::vector<glm::vec3> ModelImporter::GetMeshPoints( std::vector<Render::Vertex1P1N1UV> p_vertices )

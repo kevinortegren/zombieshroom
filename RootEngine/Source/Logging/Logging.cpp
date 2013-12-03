@@ -2,7 +2,7 @@
 #include <ctime>
 
 Logging::Logging()
-	:m_verboseLevel(LogLevel::DEBUG_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
+	:m_verboseLevel(LogLevel::INIT_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
 	m_stringTagList.push_back("RENDER");
 	m_stringTagList.push_back("NETWOR");
@@ -15,11 +15,13 @@ Logging::Logging()
 	m_stringTagList.push_back("CMPSYS");
 	m_stringTagList.push_back("GUI   ");
 	m_stringTagList.push_back("INPUT ");
+	m_stringTagList.push_back("RESSYS");
 
 	m_stringLevelList.push_back("FATAL_ERR  ");
 	m_stringLevelList.push_back("NON_FAT_ERR");
 	m_stringLevelList.push_back("WARNING    ");
 	m_stringLevelList.push_back("DEBUG_PRINT");
+	m_stringLevelList.push_back("INIT_PRINT ");
 	m_stringLevelList.push_back("DATA_PRINT ");
 
 	OpenLogStream();
