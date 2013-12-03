@@ -5,7 +5,8 @@
 #include <Utility\ECS\Include\TagManager.h>
 #include <Utility\ECS\Include\GroupManager.h>
 
-#include <yaml-cpp\yaml.h>
+#include <Utility\ECS\Include\EntityImporter.h>
+#include <Utility\ECS\Include\EntityExporter.h>
 
 namespace ECS
 {
@@ -13,27 +14,30 @@ namespace ECS
 	class World
 	{
 	public:
-		typedef void (*COMPEXPORT)(YAML::Emitter& p_emitter, ComponentInterface* p_component, int p_type);
 
-		World() : 
+		World(int p_numComponents) : 
 			m_systemManager(this),
-			m_entityManager(&m_systemManager)
+			m_entityManager(&m_systemManager, p_numComponents),
+			m_exporter(&m_entityManager)
 		{}
 
 		EntityManager* GetEntityManager();
 		EntitySystemManager* GetSystemManager();
 		TagManager* GetTagManager();
 		GroupManager* GetGroupManager();
-		void SetExporter(COMPEXPORT p_exporter);
+		EntityImporter* GetEntityImporter();
+		EntityExporter* GetEntityExporter();
+
 		void SetDelta(float p_dt);
 		float GetDelta();
-		void Export();
+
 	private:
 		EntitySystemManager m_systemManager;
 		EntityManager m_entityManager;
 		TagManager m_tagManager;
 		GroupManager m_groupManager;
+		EntityImporter m_importer;
+		EntityExporter m_exporter;
 		float m_dt;
-		COMPEXPORT m_exporter;
 	};
 }

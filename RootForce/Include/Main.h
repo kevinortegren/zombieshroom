@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <PlayerControlSystem.h>
+#include <RootForce/Include/ComponentExporter.h>
 #include <string>
 
 RootEngine::GameSharedContext g_engineContext;

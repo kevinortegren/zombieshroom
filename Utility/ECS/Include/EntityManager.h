@@ -16,7 +16,10 @@ namespace ECS
 	{
 	public:
 		friend class World;
-		EntityManager(EntitySystemManager* p_systemManager);
+		friend class EntityExporter;
+		friend class EntityImporter;
+
+		EntityManager(EntitySystemManager* p_systemManager, int p_numComponents);
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
