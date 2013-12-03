@@ -43,7 +43,7 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
-		g_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
+		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
 		m_network = nullptr;
 		m_renderer = nullptr;
@@ -95,6 +95,7 @@ namespace RootEngine
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
 		 
+		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -114,7 +115,7 @@ namespace RootEngine
 		m_networkModule = DynamicLoader::LoadSharedLibrary("Network.dll");
 		if (m_networkModule != nullptr)
 		{
-			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
+			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "CreateNetwork");
 			if (libGetNetworkInterface != nullptr)
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);

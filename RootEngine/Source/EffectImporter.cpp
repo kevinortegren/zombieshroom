@@ -6,6 +6,11 @@ extern Logging	g_logger;
 
 namespace RootEngine
 {
+	EffectImporter::EffectImporter( Render::RendererInterface* p_renderer ) : m_renderer(p_renderer)
+	{
+		//g_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Effect importer initialized!");
+	}
+
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
 		Render::EffectInterface* effect = m_renderer->CreateEffect();
@@ -94,4 +99,7 @@ namespace RootEngine
 	{
 		m_workingDirectory = p_workingDirectory;
 	}
+
+	
+
 }
