@@ -26,6 +26,45 @@ TEST(Test, Foo)
 	EXPECT_TRUE(a == 0);
 }
 
+static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_component, int p_type)
+{
+	switch(p_type)
+	{
+		case 0:
+			{
+				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);
+				//TODO: resolve paths.
+			}
+			break;
+		case 1:
+			{
+				RootForce::Transform* transform = static_cast<RootForce::Transform*>(p_component);
+				glm::vec3 position = transform->m_position;
+				glm::vec3 scale = transform->m_scale;
+				glm::vec3 rotation = transform->m_orientation.GetAxis();
+
+				p_emitter << YAML::Key << "Position" << YAML::Value << YAML::Flow << YAML::BeginSeq << position.x << position.y << position.z << YAML::EndSeq;
+				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
+				p_emitter << YAML::Key << "Scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
+			}
+			break;
+		case 2:
+			{
+				RootForce::PointLight* pointLight = static_cast<RootForce::PointLight*>(p_component);
+				glm::vec3 attenuation = pointLight->m_attenuation;
+				glm::vec4 color = pointLight->m_color;
+				float range = pointLight->m_range;
+
+				p_emitter << YAML::Key << "Atenuation" << YAML::Value << YAML::Flow << YAML::BeginSeq << attenuation.x << attenuation.y << attenuation.z << YAML::EndSeq;
+				p_emitter << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << color.x << color.y << color.z << color.w << YAML::EndSeq;
+				p_emitter << YAML::Key << "Range" << YAML::Value << range;
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 int main(int argc, char* argv[]) 
 {
 	std::string path(argv[0]);
@@ -146,6 +185,8 @@ void Main::Start()
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
+
+	m_world.SetExporter(Exporter);
 
 	RootForce::PlayerControlSystem* playerControlSystem = new RootForce::PlayerControlSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::PlayerControlSystem>(playerControlSystem, "PlayerControlSystem");
@@ -289,6 +330,9 @@ void Main::Start()
 
 	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
 	glm::vec3 a = t->m_position;
+
+	m_world.Export();
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

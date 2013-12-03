@@ -178,6 +178,7 @@ namespace Render
 		m_lineMesh.m_vertexBuffer = CreateBuffer();
 		m_lineMesh.m_vertexAttributes = CreateVertexAttributes();
 		m_lineMesh.m_primitive = GL_LINES;
+		m_lineMesh.CreateVertexBuffer1P(0, 0);
 
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
@@ -366,7 +367,7 @@ namespace Render
             lineVertices[i*2+1].m_color = m_lines[i].m_color;
         }
 
-		m_lineMesh.CreateVertexBuffer1P1C(lineVertices, m_lines.size()*2);
+		m_lineMesh.m_vertexBuffer->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
 
         Uniforms uniforms;
         uniforms.m_world = glm::mat4(1.0f);
