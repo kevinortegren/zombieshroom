@@ -9,6 +9,7 @@ namespace RootEngine
 
 	ResourceManager::~ResourceManager()
 	{
+#ifndef COMPILE_LEVEL_EDITOR
 		auto modelitr = m_models.begin();
 		for(; modelitr != m_models.end(); modelitr++)
 		{
@@ -17,13 +18,14 @@ namespace RootEngine
 		}
 		m_models.clear();
 
-		/*auto meshitr = m_meshes.begin();
+		auto meshitr = m_meshes.begin();
 		for(; meshitr != m_meshes.end(); meshitr++)
 		{
 			delete (*meshitr).second;
 			(*meshitr).second = nullptr;
 		}
-		m_meshes.clear();*/
+		m_meshes.clear();
+#endif
 
 		auto effectitr = m_effects.begin();
 		for(; effectitr != m_effects.end(); effectitr++)
@@ -43,39 +45,34 @@ namespace RootEngine
 		m_effectImporter = std::shared_ptr<EffectImporter>(new EffectImporter(p_renderer));
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
 
+#ifndef COMPILE_LEVEL_EDITOR
 		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(m_logger, p_renderer));
+#endif
 	}
 
+#ifndef COMPILE_LEVEL_EDITOR
 	void ResourceManager::LoadCollada(std::string p_path)
 	{
 		m_models[p_path] = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + "\\" + p_path + ".DAE");
 	}
+#endif
 
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_logger->LogText("%s", p_path.c_str());
-
-		m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
-
+		m_effectImporter->Load(m_workingDirectory + "Assets//Effects//" + p_path + ".effect");
 		m_effects[p_path] = m_effectImporter->m_effect;
 	}
 
 	Render::EffectInterface* ResourceManager::GetEffect(std::string p_handle)
 	{
-		if(m_effects.find(p_handle) != m_effects.end())
-		{
-			return m_effects[p_handle];
-		}
-		else
-		{
-			m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
-			return nullptr;
-		}
+		return m_effects[p_handle];
 	}
 
+#ifndef COMPILE_LEVEL_EDITOR
 	Model* ResourceManager::GetModel( std::string p_handle )
 	{
 		return m_models[p_handle];
 	}
+#endif
 
 }

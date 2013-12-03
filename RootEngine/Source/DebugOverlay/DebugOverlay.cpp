@@ -1,5 +1,7 @@
 #include "DebugOverlay/DebugOverlay.h"
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <Awesomium/WebCore.h>
 #include <Awesomium/STLHelpers.h>
 
@@ -42,3 +44,5 @@ namespace RootEngine
 		}
 	}
 }
+
+#endif

@@ -60,6 +60,8 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 
 #ifndef COMPILE_LEVEL_EDITOR
+		DebugOverlay* m_debugOverlay;
+
 		Network::NetworkManager* m_network;
 		GUISystem::GUISystemInterface* m_gui;
 		InputManager::InputInterface* m_inputSys;

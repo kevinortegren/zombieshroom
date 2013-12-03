@@ -44,6 +44,8 @@ namespace RootEngine
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+
+		delete m_debugOverlay;
 #endif
 	}
 
@@ -59,6 +61,9 @@ namespace RootEngine
 		m_gui = nullptr;
 		m_inputSys = nullptr;
 		m_physics = nullptr;
+		m_debugOverlay = nullptr;
+		
+		m_subsystemSharedContext.m_debugOverlay = m_debugOverlay;
 #endif
 
 		m_memTracker = new MemoryTracker(&g_logger);
@@ -66,7 +71,7 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
-		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
+		
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
@@ -104,8 +109,7 @@ namespace RootEngine
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &g_logger;
-		m_gameSharedContext.m_memTracker = m_memTracker;
-		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
+		m_gameSharedContext.m_memTracker = m_memTracker;		
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
 
@@ -115,6 +119,7 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
+		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
 #endif
 	}
 
@@ -222,6 +227,8 @@ namespace RootEngine
 		{
 			g_logger.LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Failed to load GUI subsystem: %s", DynamicLoader::GetLastError());
 		}
+
+		m_debugOverlay = new DebugOverlay();
 	}
 
 	void EngineMain::LoadPhysics()

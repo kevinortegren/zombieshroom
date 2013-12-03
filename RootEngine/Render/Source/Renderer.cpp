@@ -195,7 +195,7 @@ namespace Render
         m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
-		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
+		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0);
 		
 		m_cameraVars.m_projection = m_camera.GetProjection();
 		m_cameraVars.m_view = m_camera.GetView();
@@ -232,7 +232,7 @@ namespace Render
 
 		glViewport(0, 0, p_width, p_height);
 
-		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
+		//m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0);
 	}
 
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)

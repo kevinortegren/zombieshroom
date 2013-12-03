@@ -4,8 +4,8 @@
 #include <RootEngine/Include/Logging/Logging.h>
 
 #include <Utility\ECS\Include\World.h>
-#include <Transform.h>
-#include <Renderable.h>
+#include <RootForce\Include\Transform.h>
+#include <RootForce\Include\Renderable.h>
 
 namespace RootForce
 {

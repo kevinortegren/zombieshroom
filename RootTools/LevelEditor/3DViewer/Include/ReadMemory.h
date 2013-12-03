@@ -1,10 +1,11 @@
 #pragma once
+#include <WinSock2.h>
+#include <windows.h>
 #include "Constants.h"
 
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <windows.h>
 #include <cstdlib>
 
 class ReadMemory

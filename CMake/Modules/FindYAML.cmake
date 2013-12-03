@@ -6,12 +6,12 @@ find_path(YAML_INCLUDE_DIRS
 
 find_library(YAML_LIBRARY
     NAMES libyaml-cppmd
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/Release")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Release")
 
 find_library(YAML_LIBRARY_DEBUG
     NAMES libyaml-cppmdd
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/Debug")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
 	
 find_library(YAML_LIBRARY_DEBUG_64
     NAMES libyaml-cppmdd64
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/Debug")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x64/Debug")

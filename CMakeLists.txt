@@ -101,7 +101,13 @@ endif()
 
 # Copy the runtime dependencies to the output directory when dependency target is built
 # TODO: This is hardcoded to the Debug folder. We cannot use a Release build...
+if (NOT COMPILE_LEVEL_EDITOR)
 add_custom_target(_Dependencies ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
 )
+else()
+add_custom_target(_Dependencies ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+)
+endif()
  
