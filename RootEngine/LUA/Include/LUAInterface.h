@@ -39,6 +39,6 @@ namespace RootEngine
 
 extern "C"
 {
-	typedef RootEngine::LUA::LUAInterface* (*GETSOUNDINTERFACE) (RootEngine::SubsystemSharedContext);
-	LUA_DLL_EXPORT RootEngine::LUA::LUAInterface* CreateSoundSystem(RootEngine::SubsystemSharedContext p_context);
+	typedef RootEngine::LUA::LUAInterface* (*GETLUAINTERFACE) (RootEngine::SubsystemSharedContext);
+	LUA_DLL_EXPORT RootEngine::LUA::LUAInterface* CreateLUASystem(RootEngine::SubsystemSharedContext p_context);
 }
