@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ECS/Entity.h>
-#include <ECS/Component.h>
+#include <RootForce\Include\ECS/Entity.h>
+#include <RootForce\Include\ECS/Component.h>
 #include <memory>
 #include <vector>
 #include <stack>

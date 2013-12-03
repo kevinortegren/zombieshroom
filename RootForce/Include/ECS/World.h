@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ECS/EntityManager.h>
-#include <ECS/ComponentSystemManager.h>
+//change to full path
+#include <RootForce\Include\ECS\World.h>
+#include <RootForce\Include\ECS\ComponentSystemManager.h>
 
 namespace ECS
 {

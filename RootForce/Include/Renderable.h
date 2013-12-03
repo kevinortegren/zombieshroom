@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ECS/Component.h>
+#include <RootForce\Include\ECS/Component.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/Material.h>
 

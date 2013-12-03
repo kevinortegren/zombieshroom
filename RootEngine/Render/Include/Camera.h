@@ -3,30 +3,33 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-class Camera
+namespace Render
 {
-public:
+	class Camera
+	{
+	public:
 	
-	void Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up, float p_fov, float p_near, float p_far);
+		void Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up, float p_fov, float p_near, float p_far);
 
-	const glm::mat4& GetView() const { return m_view; }
-	const glm::mat4& GetProjection() const { return m_projection; }
-	const glm::vec3& GetPosition() const { return m_position; }
-	const glm::vec3& GetTarget() const { return m_target; }
+		const glm::mat4& GetView() const { return m_view; }
+		const glm::mat4& GetProjection() const { return m_projection; }
+		const glm::vec3& GetPosition() const { return m_position; }
+		const glm::vec3& GetTarget() const { return m_target; }
 
-	void SetTarget(glm::vec3 p_target);
-	void SetPosition(glm::vec3 p_position);
+		void SetTarget(glm::vec3 p_target);
+		void SetPosition(glm::vec3 p_position);
 
-	void Update();
+		void Update();
 
-private:
+	private:
 
-	void LookAt();
-	void PerspectiveProjection(float p_fov, float p_near, float p_far);
+		void LookAt();
+		void PerspectiveProjection(float p_fov, float p_near, float p_far);
 
-	glm::mat4 m_view;
-	glm::mat4 m_projection;
-	glm::vec3 m_position;
-	glm::vec3 m_target;
-	glm::vec3 m_up;
-};
+		glm::mat4 m_view;
+		glm::mat4 m_projection;
+		glm::vec3 m_position;
+		glm::vec3 m_target;
+		glm::vec3 m_up;
+	};
+}

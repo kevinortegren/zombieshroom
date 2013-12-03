@@ -1,5 +1,7 @@
 #include <Camera.h>
 
+using namespace Render;
+
 void Camera::Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up,
 		float p_fov, float p_near, float p_far)
 {
