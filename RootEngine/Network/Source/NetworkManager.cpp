@@ -61,10 +61,10 @@ RootEngine::Network::NetworkInterface* CreateNetwork(RootEngine::SubsystemShared
 TEST(NETWORK, NETWORK_SEND)
 {
 	RootEngine::Network::Message testMessage;
-	testMessage.Data = (RootEngine::Network::byte*)"I AM A POTATOE GOD";
+	testMessage.Data = (RootEngine::Network::ubyte*)"I AM A POTATOE GOD";
 	testMessage.DataSize = 19;
 	testMessage.MessageID = 0;
 	testMessage.RecipientID = -1;
-	testMessage.Reliable = true;
+	testMessage.Reliability = PacketReliability::RELIABLE;
 	EXPECT_TRUE(RootEngine::Network::NetworkManager::GetInstance()->GetNetworkSystem()->Send( testMessage ));
 }
