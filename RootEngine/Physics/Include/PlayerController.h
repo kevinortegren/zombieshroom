@@ -21,6 +21,7 @@ public:
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};
 	bool IsOnGround() const {return m_onGround;};
+	void SetUserPointer(void* p_userPointer);
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;
 	btRigidBody* m_rigidBody;

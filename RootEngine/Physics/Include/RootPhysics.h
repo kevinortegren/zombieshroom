@@ -99,9 +99,6 @@ namespace Physics
 
 
 	private:
-		/*const int TERRAIN = 0;
-		const int PLAYER = 1;
-		const int ABILITY = 2;*/
 		struct CustomUserPointer
 		{
 			int m_type;
@@ -112,7 +109,7 @@ namespace Physics
 			~CustomUserPointer()
 			{
 				delete m_id;
-				
+
 			}
 		};
 		void Init();

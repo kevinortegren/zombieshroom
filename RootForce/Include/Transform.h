@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ECS/Component.h>
+#include <Utility\ECS\Include\Component.h>
 #include <Orientation.h>
 
 #include <glm/glm.hpp>

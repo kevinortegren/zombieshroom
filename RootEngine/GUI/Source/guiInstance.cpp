@@ -1,162 +1,107 @@
-#include "guiInstance.h"
-#include "Logging\Logging.h"
-#include <gtest/gtest.h>
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <gtest/gtest.h>
+#include <Awesomium/STLHelpers.h>
+#include <GL/glew.h>
+#include <GL/GL.h>
+#include "guiInstance.h"
+#include "Logging/Logging.h"
+
 namespace RootEngine
 {
 	namespace GUISystem
 	{
 		guiInstance* guiInstance::s_gui = nullptr;
 		RootEngine::SubsystemSharedContext g_context;
+
 		void guiInstance::Startup(void)
 		{
-			m_sysInterface = new guiSysInterface();
-			m_renderInterface = new guiRenderInterface();
-			m_fileInterface = new guiFileInterface();
-
-			m_rootContext = NULL;
-
-			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
+			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
+			g_context.m_logger->LogText(LogTag::GUI, LogLevel::DEBUG_PRINT, "Succesfull startup of GUI");
+			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
+			m_core->set_surface_factory(m_glTexSurfaceFactory);
 		}
 
 
 		void guiInstance::Shutdown(void)
 		{
-			m_rootContext->RemoveReference();
-			Rocket::Core::Shutdown();
-
-			delete m_sysInterface;
-			delete m_renderInterface;
-			delete m_fileInterface;
+			//m_glTexSurfaceFactory->DestroySurface(m_surface);
+			m_view->Destroy();
+			m_core->Shutdown();
 			delete s_gui;
+
+			glDeleteTextures(1, &m_texture);
+			glDeleteVertexArrays(1, &m_vertexArrayBuffer);
+			delete m_glTexSurfaceFactory;
 		}
 
-		void guiInstance::Initalize(float p_width, float p_height)
+		void guiInstance::Initialize( int p_width, int p_height )
 		{
-
-			Rocket::Core::SetSystemInterface(m_sysInterface);
-			m_sysInterface->SetElapsedTime(0.1f);
-
-			Rocket::Core::SetRenderInterface(m_renderInterface);
-			m_renderInterface->SetViewport(p_width,p_height);
-
-			Rocket::Core::SetFileInterface(m_fileInterface);
-
-			Rocket::Core::Initialise();
-
-			Rocket::Core::FontDatabase::LoadFontFace("C://Windows//Fonts//arial.ttf"); //TODO: Remove once testing is completed
-
-			m_rootContext = Rocket::Core::CreateContext("root", Rocket::Core::Vector2i(p_width, p_height));
-			if(m_rootContext == nullptr)
-				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Error: failed to create gui context");
-		}
-
-		std::shared_ptr<Rocket::Core::ElementDocument> guiInstance::AttachDocument(std::string p_path)
-		{
-			std::shared_ptr<Rocket::Core::ElementDocument> document(m_rootContext->LoadDocument((m_workingDir + p_path).c_str()));
-
-			if(document != NULL)
-			{
-				document->Show();
-				return document;
-			}
-
-			g_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "Warning: failed to load document %s", p_path.c_str());
-			return nullptr;
-		}
-
-		void guiInstance::LoadFont(std::string p_path)
-		{
-			if(!Rocket::Core::FontDatabase::LoadFontFace((m_workingDir + p_path).c_str()))
-				g_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "Warning: failed to load Font %s", p_path.c_str());
-		}
-
-		void guiInstance::Update( float p_time )
-		{
-			m_sysInterface->SetElapsedTime(p_time);
-			m_rootContext->Update();
-			m_rootContext->Render();
+			m_width = p_width;
+			m_height = p_height;
+			m_view = m_core->CreateWebView(m_width, m_height);
+			//m_surface = m_glTexSurfaceFactory->CreateSurface(m_view, m_width, m_height);
 			
+			m_view->SetTransparent(true);
+  
+			g_context.m_resourceManager->LoadEffect("2D_GUI");
+			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
+
+			// Prepare a texture for output
+			glActiveTexture(GL_TEXTURE0);
+			glGenTextures(1, &m_texture);
+			glBindTexture(GL_TEXTURE_2D, m_texture);
+
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+			// Prepare a quad for texture output
+			glGenVertexArrays(1, &m_vertexArrayBuffer);
+			glBindVertexArray(m_vertexArrayBuffer);
+			GLuint vertexBufferObject;
+			glGenBuffers(1, &vertexBufferObject);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			float quadVertices[] = {
+				-1.f, 1.f, 0.f, 0.f,
+				-1.f, -1.f, 0.f, 1.f,
+				1.f, 1.f, 1.f, 0.f,
+				1.f, -1.f, 1.f, 1.f
+			};
+			glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(float), quadVertices, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL+2*sizeof(float));
+			// Done, unbind VAO
+			glBindVertexArray(0);
 		}
 
-		void guiInstance::HandleEvent(SDL_Event p_event)
+		void guiInstance::Update()
 		{
-			glm::vec2 mousePos;
-			switch(p_event.type)
-			{
-			case SDL_KEYDOWN:
-					KeyButtonState(MapToRocket(p_event.key.keysym.scancode), true);
-				break;
-			case SDL_KEYUP:
-				KeyButtonState(MapToRocket(p_event.key.keysym.scancode), false);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				MouseButtonState(MapToRocket(p_event.button.button-SDL_BUTTON_LEFT+InputManager::MouseButton::LEFT), true);
-				break;
-			case SDL_MOUSEBUTTONUP:
-				MouseButtonState(MapToRocket(p_event.button.button-SDL_BUTTON_LEFT+InputManager::MouseButton::LEFT), false);
-				break;
-			case SDL_MOUSEMOTION:
-				mousePos.x = static_cast<float>(p_event.motion.x);
-				mousePos.y = static_cast<float>(p_event.motion.y);
-				MouseMovement(mousePos);
-				break;
-			default:
-				g_context.m_logger->LogText(LogTag::GUI, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
-			}
+			m_core->Update();
 		}
 
-		Rocket::Core::Input::KeyIdentifier guiInstance::MapToRocket(SDL_Keycode p_key)
-			{
-			if(p_key >= SDL_Scancode::SDL_SCANCODE_A && p_key <= SDL_Scancode::SDL_SCANCODE_Z)
-				return (Rocket::Core::Input::KeyIdentifier)(p_key + Rocket::Core::Input::KeyIdentifier::KI_A - SDL_Scancode::SDL_SCANCODE_A);
-			else if(p_key >= SDL_Scancode::SDL_SCANCODE_1 && p_key <= SDL_Scancode::SDL_SCANCODE_9)
-				return (Rocket::Core::Input::KeyIdentifier)(p_key + Rocket::Core::Input::KeyIdentifier::KI_1 - SDL_Scancode::SDL_SCANCODE_1);
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_0)
-				return Rocket::Core::Input::KeyIdentifier::KI_0;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_SPACE)
-				return Rocket::Core::Input::KeyIdentifier::KI_SPACE;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN)
-				return Rocket::Core::Input::KeyIdentifier::KI_RETURN;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
-				return Rocket::Core::Input::KeyIdentifier::KI_BACK;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_TAB)
-				return Rocket::Core::Input::KeyIdentifier::KI_TAB;
-			else if(p_key == InputManager::MouseButton::LEFT)
-				return (Rocket::Core::Input::KeyIdentifier)0;
-			else if(p_key == InputManager::MouseButton::RIGHT)
-				return (Rocket::Core::Input::KeyIdentifier)1;
-			else
-				g_context.m_logger->LogText(LogTag::GUI, LogLevel::MASS_DATA_PRINT, "Key %d not mapped for libRocket", p_key);
-		}
-
-		void guiInstance::MouseMovement(glm::vec2 p_pos)
+		void guiInstance::Render()
 		{
-			//m_rootContext->ProcessMouseMove((int)p_pos.x, (int)p_pos.y, 0); //TODO: not sure if the last argument should be 0
-		}
+			m_program->Apply();
 
-		void guiInstance::MouseButtonState(Rocket::Core::Input::KeyIdentifier p_buttonIndex, bool p_isDown)
-		{
-			if(p_isDown) //Button down
-			{
-				m_rootContext->ProcessMouseButtonDown(p_buttonIndex, 0); //TODO: not sure if the last argument should be 0
-			}
-			else //Button up
-			{
-				m_rootContext->ProcessMouseButtonUp(p_buttonIndex, 0); //TODO: not sure if the last argument should be 0
-			}
-		}
+			glBindVertexArray(m_vertexArrayBuffer);
 
-		void guiInstance::KeyButtonState(Rocket::Core::Input::KeyIdentifier p_buttonIndex, bool p_isDown)
-		{
-			if(p_isDown) //Button down
-			{
-				m_rootContext->ProcessKeyDown(p_buttonIndex, 0); //TODO: not sure if the last argument should be 0
-			}
-			else //Button up
-			{
-				m_rootContext->ProcessKeyUp(p_buttonIndex, 0); //TODO: not sure if the last argument should be 0
-			}
+			glActiveTexture(GL_TEXTURE0);
+			SurfaceToTexture((GLTextureSurface*)m_view->surface());
+
+			/*glEnable( GL_BLEND );
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			glDisable(GL_DEPTH_TEST);*/
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+			/*glEnable(GL_DEPTH_TEST);
+			glDisable( GL_BLEND );*/
+
+			glBindVertexArray(0);
 		}
 
 		guiInstance* guiInstance::GetInstance()
@@ -167,7 +112,106 @@ namespace RootEngine
 			return s_gui;
 		}
 
-		
+		void guiInstance::LoadURL( std::string p_path )
+		{
+			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
+
+			m_view->LoadURL(url);
+		}
+
+		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
+		{
+			if(p_surface)
+				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
+
+			/*if(m_view->IsLoading() || p_surface == 0 || !p_surface->is_dirty())
+				return;*/
+
+			//glInvalidateTexImage(m_texture, 0);
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, p_surface->buffer());
+		}
+
+		void guiInstance::HandleEvents( SDL_Event p_event )
+		{
+			Awesomium::WebKeyboardEvent tempEvent;
+			char* temp = new char[20];
+			int keyCheck = 0;
+			switch(p_event.type)
+			{
+			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+				keyCheck = MapToAwesomium(p_event.key.keysym.scancode);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				keyCheck = MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT);
+				break;
+			}
+			if(keyCheck == -1)
+				return;
+			switch(p_event.type)
+			{
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
+					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+					std::strncpy(tempEvent.key_identifier, temp, 20); //TODO: Fix warning with using strncpy
+					if(p_event.type == SDL_KEYDOWN)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
+					if(p_event.type == SDL_KEYUP)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
+					m_view->InjectKeyboardEvent(tempEvent);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					break;
+				case SDL_MOUSEBUTTONUP:
+					m_view->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					break;
+				case SDL_MOUSEMOTION:
+					m_view->InjectMouseMove(p_event.motion.x, p_event.motion.y);
+					break;
+				default:
+					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
+			}
+		}
+
+		int guiInstance::MapToAwesomium( SDL_Keycode p_key )
+		{
+			if(p_key >= SDL_Scancode::SDL_SCANCODE_A && p_key <= SDL_Scancode::SDL_SCANCODE_Z)
+				return (int)(p_key + Awesomium::KeyCodes::AK_A - SDL_Scancode::SDL_SCANCODE_A);
+			else if(p_key >= SDL_Scancode::SDL_SCANCODE_1 && p_key <= SDL_Scancode::SDL_SCANCODE_9)
+				return (int)(p_key + Awesomium::KeyCodes::AK_1 - SDL_Scancode::SDL_SCANCODE_1);
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_0)
+				return Awesomium::KeyCodes::AK_0;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_SPACE)
+				return Awesomium::KeyCodes::AK_SPACE;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN)
+				return Awesomium::KeyCodes::AK_RETURN;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
+				return Awesomium::KeyCodes::AK_BACK;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_TAB)
+				return Awesomium::KeyCodes::AK_TAB;
+			else if(p_key == InputManager::MouseButton::LEFT)
+				return Awesomium::kMouseButton_Left;
+			else if(p_key == InputManager::MouseButton::RIGHT)
+				return Awesomium::kMouseButton_Right;
+			else
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::MASS_DATA_PRINT, "Key %d not mapped for Awesomium", p_key);
+
+			return -1;
+		}
+
+
+		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)
+		{
+			m_testBool = true;
+		}
+
+		void guiJSTest::OnMethodCall (Awesomium::WebView *caller, unsigned int remote_object_id, const Awesomium::WebString &method_name, const Awesomium::JSArray &args)
+		{
+			m_testBool = true;
+		}
 	}
 }
 
@@ -178,9 +222,29 @@ RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemShared
 	return RootEngine::GUISystem::guiInstance::GetInstance();
 }
 
-TEST(GUI, GUITest1)
+TEST(GUI, Javascript)
 {
-	EXPECT_FALSE(RootEngine::GUISystem::guiInstance::GetInstance()->AttachDocument("/errorPath/noFind.rml"));
+	RootEngine::GUISystem::guiInstance* instance = RootEngine::GUISystem::guiInstance::GetInstance();
+	RootEngine::GUISystem::guiTest* testInstance = new RootEngine::GUISystem::guiTest();
+	RootEngine::GUISystem::guiJSTest* jsTestInstance = new RootEngine::GUISystem::guiJSTest();
+	testInstance->InitTest();
+	jsTestInstance->InitTest();
+	instance->GetView()->set_load_listener(testInstance);
+	instance->GetView()->set_js_method_handler(jsTestInstance);
 
-	EXPECT_TRUE(RootEngine::GUISystem::guiInstance::GetInstance()->AttachDocument("Assets/GUI/demo.rml"));
+	Awesomium::JSValue window = instance->GetView()->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
+	EXPECT_TRUE(window.IsObject());
+	window.ToObject().SetCustomMethod(Awesomium::WSLit("RemoteTest();"), false);
+
+	instance->LoadURL("test.html");
+	while(instance->GetView()->IsLoading())
+	{
+		instance->Update();
+	}
+	Sleep(500);
+	instance->GetView()->ExecuteJavascript(Awesomium::WSLit("Test();"), Awesomium::WSLit(""));
+	Sleep(500);
+	EXPECT_TRUE(testInstance->GetTestResult());
+	EXPECT_TRUE(jsTestInstance->GetTestResult());
+	// Assume correct
 }

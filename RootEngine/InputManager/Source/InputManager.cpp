@@ -8,13 +8,13 @@ namespace RootEngine
 		InputManager* InputManager::s_inputSys = nullptr;
 		void InputManager::Startup(void)
 		{
-			m_globMousePos = glm::vec2(0,0);
-			m_deltaMousePos = glm::vec2(0,0);
+			m_globMousePos = glm::ivec2(0, 0);
+			m_deltaMousePos = glm::ivec2(0, 0);
 
 			for(int i = 0; i < MAX_KEYS; i++)
 				m_keyState[i] = KeyState::UP;
 
-			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of InputManager");
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Successful startup of InputManager");
 		}
 
 
@@ -41,10 +41,10 @@ namespace RootEngine
 				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP_EDGE;
 				break;
 			case SDL_MOUSEMOTION:
-				m_deltaMousePos.x += m_globMousePos.x - p_event.motion.x;
-				m_deltaMousePos.y += m_globMousePos.y - p_event.motion.y;
-				m_globMousePos.x = static_cast<float>(p_event.motion.x);
-				m_globMousePos.y = static_cast<float>(p_event.motion.y);
+				m_deltaMousePos.x += p_event.motion.x - m_globMousePos.x;
+				m_deltaMousePos.y += p_event.motion.y - m_globMousePos.y;
+				m_globMousePos.x = p_event.motion.x;
+				m_globMousePos.y = p_event.motion.y;
 				break;
 			default:
 				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
@@ -58,11 +58,13 @@ namespace RootEngine
 				m_keyState[p_key] = KeyState::DOWN;
 				return KeyState::DOWN_EDGE;
 			}
+
 			if(m_keyState[p_key] == KeyState::UP_EDGE)
 			{
 				m_keyState[p_key] = KeyState::UP;
 				return KeyState::UP_EDGE;
 			}
+
 			return m_keyState[p_key];
 		}
 
@@ -71,15 +73,15 @@ namespace RootEngine
 			return GetKeyState((SDL_Scancode)p_button);
 		}
 
-		glm::vec2 InputManager::GetGlobalMousePos()
+		glm::ivec2 InputManager::GetGlobalMousePos()
 		{
 			return m_globMousePos;
 		}
 
-		glm::vec2 InputManager::GetDeltaMousePos()
+		glm::ivec2 InputManager::GetDeltaMousePos()
 		{
-			glm::vec2 temp = m_deltaMousePos;
-			m_deltaMousePos = glm::vec2(0,0);
+			glm::ivec2 temp = m_deltaMousePos;
+			m_deltaMousePos = glm::vec2(0, 0);
 			return temp;
 		}
 
@@ -133,20 +135,20 @@ TEST(INPUT, MOUSETEST)
 	RootEngine::InputManager::InputInterface* ii = RootEngine::InputManager::InputManager::GetInstance();
 
 	SDL_Event falseevent;
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::vec2(0,0));
+	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(0, 0));
 	falseevent.type = SDL_MOUSEMOTION;
 	falseevent.motion.x = 5;
 	falseevent.motion.y = 140;
 	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::vec2(5,140));
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::vec2(5,140));
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::vec2(0,0));
+	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::ivec2(5, 140));
+	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(5, 140));
+	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(0, 0));
 
 	falseevent.motion.x = 100;
 	falseevent.motion.y = 0;
 	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::vec2(100,0));
+	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::ivec2(100, 0));
 	falseevent.motion.y = 20;
 	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::vec2(95,-120));
+	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(95, -120));
 }

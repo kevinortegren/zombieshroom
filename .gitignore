@@ -4,3 +4,7 @@
 # Ignore generated CMake files (from an accidental in-source build)
 CMakeCache.txt
 CMakeFiles
+
+# Ignore diff files
+*.orig
+*.rej

@@ -13,6 +13,7 @@ namespace Physics
 	RootEngine::ResourceManagerInterface* g_resourceManager;
 	const int TYPE_PLAYER = 0;
 	const int TYPE_ABILITY = 1;
+	
 	RootPhysics::RootPhysics()
 	{
 
@@ -29,7 +30,6 @@ namespace Physics
 	}
 	void RootPhysics::Shutdown()
 	{
-		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Shutting down physics");
 		//Magic loop of deleting
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 		{
@@ -74,6 +74,11 @@ namespace Physics
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
 		
+		/*
+		Om det är en ability, kalla på den funktionen om den kolliderar med vadsom, skicka in nånslags värde för att säga vad den krockat med
+		Om det är en spelare, kalla på funktionen om det är en Ability, och skicka då nån form av värde för att beskriva vad det är för ability
+
+		*/
 
 		
 
@@ -123,7 +128,7 @@ namespace Physics
 		}
 		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-		m_dynamicWorld->debugDrawWorld();
+		//m_dynamicWorld->debugDrawWorld();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -215,6 +220,7 @@ namespace Physics
 		userPointer->m_type = TYPE_ABILITY;
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
+		objectBody->setUserPointer((void*)userPointer);
 		return userPointer->m_id;
 		
 	}
@@ -253,7 +259,7 @@ namespace Physics
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		userPointer->m_type = TYPE_PLAYER;
-		
+		player->SetUserPointer((void*)userPointer);
 		return userPointer->m_id;
 	}
 
@@ -478,16 +484,9 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
+		body->setUserPointer((void*)userPointer);
 
-		/*
-		sphere = 0;
-		motionstate = 0;
-		body = 0;
-		userPointer = 0;
-		delete sphere;
-		delete motionstate;
-		delete body;
-		delete userPointer;*/
+
 
 		return m_userPointer.back()->m_id;
 	}

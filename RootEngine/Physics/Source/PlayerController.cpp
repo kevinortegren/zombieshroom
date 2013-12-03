@@ -279,6 +279,11 @@ void PlayerController::SetOrientation( float* p_orientation )
 
 }
 
+void PlayerController::SetUserPointer( void* p_userPointer )
+{
+	m_rigidBody->setUserPointer(p_userPointer);
+}
+
 
 
 

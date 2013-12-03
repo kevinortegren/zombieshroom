@@ -1,25 +1,21 @@
-
 #include <Main.h>
 
 #include <stdexcept>
-
-#include <RootEngine/Include/Logging/Logging.h>
-#include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Render/Include/Vertex.h>
-
-
+#include <exception>
 #include <gtest/gtest.h>
 
-#include <RootForce/Include/RawMeshPrimitives.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
 #include <RenderingSystem.h>
-#include <PlayerControlSystem.h>
+#include <LightSystem.h>
 
-#include <exception>
+#include <RootForce/Include/RawMeshPrimitives.h>
 
 #include <glm/glm.hpp>
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 #undef main
 
@@ -87,15 +83,14 @@ Main::Main(std::string p_workingDirectory)
 			"Root Force",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			1280,
-			720,
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 		SDL_DestroyWindow);
 	if (m_window == nullptr) 
 	{
 		// TODO: Log error and throw exception (?)
 	}
-
 }
 
 Main::~Main() 
@@ -111,43 +106,21 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
+	// Cube mesh.
+	std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
+	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
+	cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
+	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
+	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
+
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
 
-	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight directional;
-	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
-	directional.m_direction = glm::vec3(1, 0, 0);
-
-	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
-
-	Render::PointLight red;
-	red.m_position = glm::vec3(2.0f, 1.0f, 1.0f);
-	red.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	red.m_range = 2.0f;
-	red.m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
-
-	Render::PointLight blue;
-	blue.m_position = glm::vec3(-1.0f, 1.0f, 0.0f);
-	blue.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	blue.m_range = 2.0f;
-	blue.m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
-
-	Render::PointLight green;
-	green.m_position = glm::vec3(0.0f, 1.0f, 1.0f);
-	green.m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	green.m_range = 2.0f;
-	green.m_color = glm::vec4(0.0f, 0.4f, 0.0f, 1.0f);
-
-	m_engineContext.m_renderer->AddPointLight(red, 0);
-	m_engineContext.m_renderer->AddPointLight(blue, 1);
-	m_engineContext.m_renderer->AddPointLight(green, 2);
-
-	Utility::Cube quad(Render::VertexType::VERTEXTYPE_1P);
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
@@ -161,55 +134,106 @@ void Main::Start()
 	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
-	ECS::ComponentSystem* playerControlSystem = m_world.GetSystemManager()->CreateSystem<RootForce::PlayerControlSystem>("PlayerControlSystem");
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetInputInterface(m_engineContext.m_inputSys);
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetLoggingInterface(m_engineContext.m_logger);
-	dynamic_cast<RootForce::PlayerControlSystem*>(playerControlSystem)->SetKeybindings(keybindings);
+	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+	m_playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
+	m_playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
+	m_playerControlSystem->SetKeybindings(keybindings);
+
+
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
 
 	// Initialize the system for rendering the scene.
-	ECS::ComponentSystem* renderingSystem = m_world.GetSystemManager()->CreateSystem<RootForce::RenderingSystem>("RenderingSystem");
-	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetLoggingInterface(m_engineContext.m_logger);
-	reinterpret_cast<RootForce::RenderingSystem*>(renderingSystem)->SetRendererInterface(m_engineContext.m_renderer);
+	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
-	m_world.GetSystemManager()->InitializeSystems();
+	renderingSystem->SetLoggingInterface(m_engineContext.m_logger);
+	renderingSystem->SetRendererInterface(m_engineContext.m_renderer);
 
-	// Setup a dummy player entity and add components to it
-	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
+	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+	// Setup lights.
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
+
+	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
+	
+	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
+	redTrans->m_position = glm::vec3(1.0f, 3.0f, 0.0f);
+	redTrans->m_scale = glm::vec3(0.1f);
+
+	RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
+	redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
+	redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	redPL->m_range = 2.0f;
+
+	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
+	redRender->m_mesh = cubeMesh;
+	redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+
+	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* blueTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(blue);
+	blueTrans->m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
+	blueTrans->m_scale = glm::vec3(0.1f);
+
+	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
+	bluePL->m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
+	bluePL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
+	bluePL->m_range = 2.0f;
+
+	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
+	blueRender->m_mesh = cubeMesh;
+	blueRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+
+	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
+	m_world.GetGroupManager()->RegisterEntity("Lights", red);
 	
 
+	// Setup a dummy player entity and add components to it
+	
+	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
+	
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	
-
-	Render::MeshInterface* mesh = m_engineContext.m_renderer->CreateMesh();
-	mesh->Init(reinterpret_cast<Render::Vertex1P*>(quad.m_vertices), quad.m_numberOfVertices, quad.m_indices, quad.m_numberOfIndices);
-	
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
 	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	//guyRenderable->m_mesh = mesh;
-	
 
 	Render::Material guyMaterial;
-	//guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("DiffuseTexture");
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 	guyRenderable->m_material = guyMaterial;
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
+  
+	m_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	m_engineContext.m_gui->LoadURL("debug.html");
+	m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
 
-
-	
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
 	
 	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
 	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
 	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, -6.0f);
+
 	RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
 	guyRenderable2->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+
 	guyRenderable2->m_material = guyMaterial;
+
 	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
 	guyControl2->speed = 10.0f;
+
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
 	int indicesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
@@ -257,6 +281,16 @@ void Main::Start()
 	//////////////////////////////////////////////////////////////////////////
 
 
+	m_world.GetTagManager()->RegisterEntity("Player", guy);
+	
+	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
+
+	m_world.GetGroupManager()->UnregisterEntity("Lights", red);
+
+	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
+
+	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
+	glm::vec3 a = t->m_position;
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -264,10 +298,23 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
-
+    
+		m_engineContext.m_debugOverlay->Clear();
+		m_world.SetDelta(dt);
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
+
+		m_engineContext.m_renderer->Clear();
+
+		// Update Engine systems.
+		m_engineContext.m_physics->Update(dt);
+
+		// Update Game systems.
+		pointLightSystem->Process();
+		m_playerControlSystem->Process();
+		renderingSystem->Process();
 
 		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
 		m_engineContext.m_physics->GetPlayerPos(*handle, x);
@@ -327,8 +374,8 @@ void Main::Start()
 		}
 		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
 		guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
-		float target[3] = {x[0] - x2[0] , x[1] - x2[1] , x[2] - x2[2]};
-		m_engineContext.m_physics->SetGravity(*handle2, target);
+		//float target[3] = {x[0] - x2[0] , x[1] - x2[1] , x[2] - x2[2]};
+		//m_engineContext.m_physics->SetGravity(*handle2, target);
 		glm::quat test = guyTransform->m_orientation.GetQuaterion();
 
 		orientationPlayer[0] = test.x;
@@ -343,15 +390,12 @@ void Main::Start()
 
 		m_engineContext.m_physics->Update(dt);
 
-		m_engineContext.m_renderer->Clear();
-
-
-
-		playerControlSystem->Process(dt);
-		renderingSystem->Process(dt);
 		m_engineContext.m_renderer->Render();
-		m_engineContext.m_renderer->RenderLines();
+		//m_engineContext.m_renderer->RenderLines();
 
+
+		m_engineContext.m_gui->Update();
+		m_engineContext.m_gui->Render();
 
 		m_engineContext.m_renderer->Swap();
 	}
@@ -371,7 +415,8 @@ void Main::HandleEvents()
 		default:
 			if (m_engineContext.m_inputSys != nullptr)
 				m_engineContext.m_inputSys->HandleInput(event);
+			if(m_engineContext.m_gui != nullptr)
+				m_engineContext.m_gui->HandleEvents(event);
 		}
 	}
 }
-

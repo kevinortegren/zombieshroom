@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ECS/Component.h>
+#include <Utility\ECS\Include\Component.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/Material.h>
 
@@ -10,8 +10,7 @@ namespace RootForce
 {
 	struct Renderable : public ECS::Component<Renderable>
 	{
-		Renderable(){m_mesh = nullptr;}
-		Render::MeshInterface* m_mesh;
+		std::shared_ptr<Render::Mesh> m_mesh;
 		Render::Material m_material;
 	};
 }
