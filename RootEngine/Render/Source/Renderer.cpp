@@ -178,6 +178,7 @@ namespace Render
 		m_lineMesh.m_vertexBuffer = CreateBuffer();
 		m_lineMesh.m_vertexAttributes = CreateVertexAttributes();
 		m_lineMesh.m_primitive = GL_LINES;
+		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
 
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
@@ -186,13 +187,13 @@ namespace Render
 		m_lightingTech = deferred->GetTechniques()[0];
 
 		g_context.m_resourceManager->LoadEffect("Color");
-        auto m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
-        if(m_debugEffect == nullptr)
-        {
-                g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
-        }
-        m_debugTech = m_debugEffect->GetTechniques()[0];
-        m_lightingTech = deferred->GetTechniques()[0];
+		auto m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
+		if(m_debugEffect == nullptr)
+		{
+				g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
+		}
+		m_debugTech = m_debugEffect->GetTechniques()[0];
+		m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -356,31 +357,30 @@ namespace Render
 	}
 
 	void GLRenderer::RenderLines()
-    {
-        Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
-        for(unsigned int i = 0; i < m_lines.size(); i++)
-        {
-            lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
-            lineVertices[i*2].m_color = m_lines[i].m_color;
-            lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
-            lineVertices[i*2+1].m_color = m_lines[i].m_color;
-        }
+	{
+		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+		for(unsigned int i = 0; i < m_lines.size(); i++)
+		{
+			lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+			lineVertices[i*2].m_color = m_lines[i].m_color;
+			lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+			lineVertices[i*2+1].m_color = m_lines[i].m_color;
+		}
 
-		m_lineMesh.CreateVertexBuffer1P1C(lineVertices, m_lines.size()*2);
+		Uniforms uniforms;
+		uniforms.m_world = glm::mat4(1.0f);
 
-        Uniforms uniforms;
-        uniforms.m_world = glm::mat4(1.0f);
+		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+		m_debugTech->GetPrograms()[0]->Apply();
 
-        m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
-        m_debugTech->GetPrograms()[0]->Apply();
+		m_lineMesh.m_vertexBuffer->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
+		m_lineMesh.Bind();
+		m_lineMesh.Draw();
+		m_lineMesh.Unbind();
 
-        m_lineMesh.Bind();
-        m_lineMesh.Draw();
-        m_lineMesh.Unbind();
-
-        delete [] lineVertices;
-        m_lines.clear();
-    }
+		delete [] lineVertices;
+		m_lines.clear();
+	}
 
 	void GLRenderer::BindMaterial(Material* p_material)
 	{
