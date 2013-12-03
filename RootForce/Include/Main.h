@@ -3,7 +3,8 @@
 #include <memory>
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
-#include <ECS/World.h>
+#include <Utility/ECS/Include/World.h>
+#include <PlayerControlSystem.h>
 #include <string>
 
 class Main {
@@ -21,4 +22,5 @@ private:
 	std::shared_ptr<SDL_Window> m_window;
 	RootEngine::GameSharedContext m_engineContext;
 	ECS::World m_world;
+	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 };

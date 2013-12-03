@@ -7,6 +7,7 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
+
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -57,19 +58,14 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_numDirectionalLights(0),
-		m_numPointLights(0)
-	{
-		
-	}
+		m_numPointLights(0) {}
 
 	GLRenderer::~GLRenderer()
 	{
-
 	}
 
 	void GLRenderer::Startup()
 	{
-
 	}
 
 	void GLRenderer::Shutdown()
@@ -87,7 +83,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -146,6 +142,7 @@ namespace Render
 		{
 			g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Available video memory: %i KB", GetAvailableVideoMemory());
 		}
+
 		CheckExtension("NV_texture_multisample");
 
 		// Setup GBuffer.
@@ -171,20 +168,31 @@ namespace Render
 		indices[4] = 1; 
 		indices[5] = 3;
 
-		m_fullscreenQuad.Init(verts, 4, indices, 6);
-		
+		m_fullscreenQuad.m_elementBuffer = CreateBuffer();
+		m_fullscreenQuad.m_vertexBuffer = CreateBuffer();
+		m_fullscreenQuad.m_vertexAttributes = CreateVertexAttributes();
+
+		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
+		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
+
+		m_lineMesh.m_vertexBuffer = CreateBuffer();
+		m_lineMesh.m_vertexAttributes = CreateVertexAttributes();
+		m_lineMesh.m_primitive = GL_LINES;
+
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
 		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
+	
+		m_lightingTech = deferred->GetTechniques()[0];
 
 		g_context.m_resourceManager->LoadEffect("Color");
-		m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
-		if(m_debugEffect == nullptr)
-		{
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
-		}
-		m_debugTech = m_debugEffect->GetTechniques()[0];
-		m_lightingTech = deferred->GetTechniques()[0];
+        auto m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
+        if(m_debugEffect == nullptr)
+        {
+                g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
+        }
+        m_debugTech = m_debugEffect->GetTechniques()[0];
+        m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -206,22 +214,9 @@ namespace Render
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
 
-		glGenFramebuffers(1, &m_debugFbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
-
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
-		glGenTextures(1, &m_testHandle);
-		glBindTexture(GL_TEXTURE_2D, m_testHandle);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_testHandle, 0);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -267,7 +262,6 @@ namespace Render
 		m_lines.push_back(Line(p_fromPoint, p_toPoint, p_color));
 	}
 
-
 	void GLRenderer::Render()
 	{
 		// Buffer Per Frame data.
@@ -276,6 +270,14 @@ namespace Render
 		GeometryPass();
 
 		LightingPass();	
+	}
+
+	void GLRenderer::Clear()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_numDirectionalLights = 0;
+		m_numPointLights = 0;
 	}
 
 	void GLRenderer::Swap()
@@ -296,8 +298,7 @@ namespace Render
 		{
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
-			//m_effect.SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-			
+
 			(*itr).m_mesh->Bind();
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
@@ -313,6 +314,7 @@ namespace Render
 					(*itr).m_mesh->Draw();			
 				}
 			}
+
 			(*itr).m_mesh->Unbind();
 		}
 
@@ -322,50 +324,8 @@ namespace Render
 		m_gbuffer.Read(); // Enable the GBuffer for reads.
 	}
 
-	void GLRenderer::RenderLines()
-	{
-		Mesh lineMesh;
-		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
-		for(unsigned int i = 0; i < m_lines.size(); i++)
-		{
-			lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
-			lineVertices[i*2].m_color = m_lines[i].m_color;
-			lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
-			lineVertices[i*2+1].m_color = m_lines[i].m_color;
-		}
-		lineMesh.Init(lineVertices, m_lines.size()*2, 0, 0);
-		lineMesh.SetPrimitive(Primitive::LINES);
-
-		Uniforms uniforms;
-		uniforms.m_world = glm::mat4(1.0f);
-
-		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
-		m_debugTech->GetPrograms()[0]->Apply();
-
-		lineMesh.Bind();
-		lineMesh.Draw();
-		lineMesh.Unbind();
-
-		delete [] lineVertices;
-		m_lines.clear();
-	}
-
-	void GLRenderer::Clear()
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	}
 	void GLRenderer::LightingPass()
-
 	{
-		//DEBUG
-		/*glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
-
-		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, buffers);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-
 		// Lighting pass.
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -395,6 +355,33 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 	}
 
+	void GLRenderer::RenderLines()
+    {
+        Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+        for(unsigned int i = 0; i < m_lines.size(); i++)
+        {
+            lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+            lineVertices[i*2].m_color = m_lines[i].m_color;
+            lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+            lineVertices[i*2+1].m_color = m_lines[i].m_color;
+        }
+
+		m_lineMesh.CreateVertexBuffer1P1C(lineVertices, m_lines.size()*2);
+
+        Uniforms uniforms;
+        uniforms.m_world = glm::mat4(1.0f);
+
+        m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+        m_debugTech->GetPrograms()[0]->Apply();
+
+        m_lineMesh.Bind();
+        m_lineMesh.Draw();
+        m_lineMesh.Unbind();
+
+        delete [] lineVertices;
+        m_lines.clear();
+    }
+
 	void GLRenderer::BindMaterial(Material* p_material)
 	{
 		/*p_material->m_effect->Apply();
@@ -421,8 +408,6 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
-
-
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

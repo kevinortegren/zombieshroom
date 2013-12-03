@@ -5,6 +5,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 
 Logging	g_logger;
 
@@ -52,6 +53,7 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
+		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
@@ -83,6 +85,7 @@ namespace RootEngine
 		// Setup the game context
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
+		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_inputSys = m_inputSys;
@@ -186,7 +189,6 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
-				g_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
 			}
 			else
 			{

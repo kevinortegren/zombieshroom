@@ -2,6 +2,7 @@
 
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 
 namespace RootEngine
 {
@@ -11,6 +12,7 @@ namespace RootEngine
 	{
 		Logging* m_logger;
 		MemoryTracker* m_memTracker;
+		DebugOverlayInterface* m_debugOverlay;
 		ResourceManagerInterface* m_resourceManager;
 	};
 
