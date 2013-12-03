@@ -295,7 +295,6 @@ void Main::Start()
 		old = now;
     
 		m_engineContext.m_debugOverlay->Clear();
-		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
 
 		m_world.SetDelta(dt);
 
