@@ -7,6 +7,8 @@
         - name: PerObject
           slot: 1
       textures:
+        - name: diffuse
+          slot: 0
       programs:
       - name: Mesh
         shaders:

@@ -185,9 +185,9 @@ void Main::Start()
 	blueTrans->m_scale = glm::vec3(0.1f);
 
 	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
-	bluePL->m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
-	bluePL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	bluePL->m_range = 2.0f;
+	bluePL->m_color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	bluePL->m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	bluePL->m_range = 20.0f;
 
 	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
 	blueRender->m_mesh = cubeMesh;
@@ -209,7 +209,9 @@ void Main::Start()
 
 	Render::Material guyMaterial;
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
 	guyRenderable->m_material = guyMaterial;
+	
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
@@ -293,85 +295,24 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
-    
+	
 		m_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
-
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
-		// TODO: Update game state
-		// TODO: Render and present game
+		
+		m_playerControlSystem->Process();
 
 		m_engineContext.m_renderer->Clear();
 
-		// Update Engine systems.
 		m_engineContext.m_physics->Update(dt);
 
-		// Update Game systems.
-		pointLightSystem->Process();
-		m_playerControlSystem->Process();
+		pointLightSystem->Process(); 
 		renderingSystem->Process();
 
-		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
-		//float x3[3];
-		//m_engineContext.m_physics->GetPlayerPos(handle, x);
-		//m_engineContext.m_physics->GetObjectPos(handle2, x2);
-
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
-		//	m_engineContext.m_physics->PlayerJump(handle, 10.0f);
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
-		//{
-		//	glm::vec3 temp = guyTransform->m_orientation.GetFront();
-		//	speed = &temp.x;
-		//	speed[1] = 4;
-		//	m_engineContext.m_physics->PlayerKnockback(handle, speed, 50.0f);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//{
-		//	//speed[2] *= -1;
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	m_engineContext.m_physics->SetDynamicObjectVelocity(handle2, speedup);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN)
-		//{
-		//	//speed[2] *= -1;
-		////	glm::vec3 test = guyTransform2->m_orientation.GetFront();
-		////	float* funtime = &test.x;
-		////	m_engineContext.m_physics->PlayerMoveXZ(handle2, funtime);
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
-		//{
-		//	//speed[2] *= -1;
-		//	glm::vec3 test = guyTransform->m_orientation.GetFront();
-		//	float* funtime = &test.x;
-		//	m_engineContext.m_physics->PlayerMoveXZ(handle, funtime);
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
-		//guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
-		//
-		//glm::quat test = guyTransform->m_orientation.GetQuaterion();
-
-		//orientationPlayer[0] = test.x;
-		//orientationPlayer[1] = test.y;
-		//orientationPlayer[2] = test.z;
-		//orientationPlayer[3] = test.w;
-
-		//m_engineContext.m_physics->SetPlayerOrientation(handle,orientationPlayer);
-		//m_engineContext.m_physics->GetObjectOrientation(handle2, orientation);
-		//guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
-		
-
-		m_engineContext.m_physics->Update(dt);
-
 		m_engineContext.m_renderer->Render();
-		//m_engineContext.m_renderer->RenderLines();
+		m_engineContext.m_renderer->RenderLines();
 
 
 		m_engineContext.m_gui->Update();

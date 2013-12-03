@@ -18,27 +18,42 @@ namespace RootEngine
 		m_view = p_view;
 	}
 
-	void DebugOverlay::AddHTML(const char* p_html, bool p_leftSide)
+	void DebugOverlay::AddHTML(const char* p_html, TextColor::TextColor p_color, bool p_leftSide)
 	{
-		Awesomium::JSValue window = m_view->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
-
-		if (window.IsObject()) {
-		  Awesomium::JSArray args;
-		  args.Push(Awesomium::JSValue(Awesomium::WSLit(p_html)));
-		  args.Push(Awesomium::JSValue(p_leftSide));
-
-		  window.ToObject().Invoke(Awesomium::WSLit("AddHTML"), args);
+		std::string command; // Compile a string-function call in form of AddHTML(p_html, p_leftSide);
+		command = "AddHTML(\"";
+		switch(p_color)
+		{
+		case TextColor::RED:
+			command += "<a class='red'>";
+			break;
+		case TextColor::YELLOW:
+			command += "<a class='yellow'>";
+			break;
+		case TextColor::WHITE:
+			command += "<a class='white'>";
+			break;
+		case TextColor::GREEN:
+			command += "<a class='green'>";
+			break;
+		case TextColor::GRAY:
+			command += "<a class='gray'>";
+			break;
+		case TextColor::BLACK:
+			command += "<a class='black'>";
+			break;
+		default:
+			command += "<a>";
 		}
+		command += p_html;
+		command += "</a>\", ";
+		command += (p_leftSide?"true":"false");
+		command += ");";
+		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
 	}
 
 	void DebugOverlay::Clear()
 	{
-		Awesomium::JSValue window = m_view->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
-
-		if (window.IsObject()) {
-		  Awesomium::JSArray args;
-
-		  window.ToObject().Invoke(Awesomium::WSLit("Clear"), args);
-		}
+		m_view->ExecuteJavascript(Awesomium::WSLit("Clear();"), Awesomium::WSLit(""));
 	}
 }

@@ -9,7 +9,7 @@ namespace Render
 		glDeleteTextures(1, &m_textureHandle);
 	}
 
-	bool Texture::Load(const std::string& filepath)
+	bool Texture::Load(const std::string filepath)
 	{
 		gli::texture2D texture(gli::loadStorageDDS(filepath));
 		assert(!texture.empty());
