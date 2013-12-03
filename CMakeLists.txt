@@ -18,6 +18,8 @@ find_package(Assimp REQUIRED)
 find_package(GLM REQUIRED)
 find_package(YAML REQUIRED)
 find_package(Awesomium REQUIRED)
+find_package(LUA REQUIRED)
+
 
 
 set(EXTERNAL_INCLUDE_DIRS 
@@ -30,6 +32,7 @@ set(EXTERNAL_INCLUDE_DIRS
     ${GLM_INCLUDE_DIRS}
 	${YAML_INCLUDE_DIRS}
 	${AWESOMIUM_INCLUDE_DIRS}
+	${LUA_INCLUDE_DIRS}		
 )
     
 set(EXTERNAL_LIBRARIES
@@ -44,6 +47,7 @@ set(EXTERNAL_LIBRARIES
 	${LINEARMATH_LIBRARY}
 	${YAML_LIBRARY_DEBUG}
 	${AWESOMIUM_LIBRARY}
+	${LUA_LIBRARY}
 )
 
 # Set global compiler options

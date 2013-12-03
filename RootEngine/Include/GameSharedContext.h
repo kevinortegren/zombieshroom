@@ -8,8 +8,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
-
-
+#include <RootEngine/Script/Include/ScriptManager.h>
 
 namespace RootEngine
 {
@@ -24,6 +23,6 @@ namespace RootEngine
 		GUISystem::GUISystemInterface* m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
-
+		Script::ScriptInterface* m_script;
 	};
 }

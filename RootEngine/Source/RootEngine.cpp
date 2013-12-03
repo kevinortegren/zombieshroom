@@ -6,6 +6,7 @@
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
+#include <RootEngine/Script/Include/ScriptManager.h>
 
 Logging	g_logger;
 
@@ -77,6 +78,10 @@ namespace RootEngine
 		{
 			LoadPhysics();
 		}
+		if((p_flags & SubsystemInit::INIT_SCRIPTING) == SubsystemInit::INIT_SCRIPTING)
+		{
+			//LoadPhysics();
+		}
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
@@ -93,7 +98,8 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		 
+		m_gameSharedContext.m_script = m_script;
+		
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
 
@@ -224,6 +230,32 @@ namespace RootEngine
 			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
+
+	void EngineMain::LoadScriptEngine()
+	{
+		m_scriptModule = DynamicLoader::LoadSharedLibrary("Script.dll");
+		if(m_scriptModule != nullptr)
+		{
+			//CreateScriptSystem libGetScriptEngine = CreateScriptSystem DynamicLoader::LoadProcess(m_scriptModule, "CreateScriptSystem");
+				//I'm here. Working up from bottom. Function by function
+		/*	//CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
+			if(libGetPhysics != nullptr)
+			{
+				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext, m_renderer, &m_resourceManager);
+				m_physics->Startup();
+
+			}
+			else
+			{
+				m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
+		*/}
+		
+	}
 	
 }
 
@@ -237,4 +269,3 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
-

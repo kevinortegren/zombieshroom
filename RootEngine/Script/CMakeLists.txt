@@ -6,15 +6,15 @@ set(PROJECT_NAME Script)
 project(${PROJECT_NAME})
 
 # Set the files used in the target
-file(GLOB_RECURSE SOURCES Source/*.cpp)
-file(GLOB_RECURSE HEADERS Include/*.h)
+file(GLOB_RECURSE SOURCES Sources/ *.cpp)
+file(GLOB_RECURSE HEADERS Headers/ *.h)
 set(LIBRARIES ${EXTERNAL_LIBRARIES})
 
 #message("${SOURCES}")
 #message("${HEADERS}")
 
 # Set search paths
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
+include_directories(Include)
 
 # TODO: Add the target (commented until we actually have a source file
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

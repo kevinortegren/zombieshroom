@@ -21,6 +21,7 @@ namespace RootEngine
 			INIT_RENDER = 4,
 			INIT_GUI = 8,
 			INIT_PHYSICS = 16,
+			INIT_SCRIPTING = 32,
 			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI | INIT_PHYSICS
 		};
 	}
@@ -42,13 +43,15 @@ namespace RootEngine
 
 		//void LoadInputSystem();
 		void LoadPhysics();
-
+		void LoadScriptEngine();
 
 		void* m_networkModule;
 		void* m_renderModule;
 		void* m_guiModule;
 		void* m_inputModule;
 		void* m_physicsModule;
+		void* m_scriptModule;
+
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
 
@@ -60,6 +63,7 @@ namespace RootEngine
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
+		Script::ScriptInterface* m_script;
 
 	};
 }
