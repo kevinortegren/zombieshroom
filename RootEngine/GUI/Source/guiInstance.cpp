@@ -18,24 +18,31 @@ namespace RootEngine
 		{
 			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
+			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
+			m_core->set_surface_factory(m_glTexSurfaceFactory);
+
 		}
 
 
 		void guiInstance::Shutdown(void)
 		{
+			m_view->Stop();
 			m_view->Destroy();
-			m_core->Shutdown();
+			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
 			delete s_gui;
+
+			glDeleteTextures(1, &m_texture);
+			glDeleteVertexArrays(1, &m_vertexArrayBuffer);
+			delete m_glTexSurfaceFactory;
 		}
 
 		void guiInstance::Initialize( int p_width, int p_height )
 		{
 			m_width = p_width;
 			m_height = p_height;
-			m_view = m_core->CreateWebView(p_width, p_height);
+			m_view = m_core->CreateWebView(m_width, m_height);
 			
 			m_view->SetTransparent(true);
-			
   
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
@@ -48,7 +55,7 @@ namespace RootEngine
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
@@ -83,16 +90,16 @@ namespace RootEngine
 			glBindVertexArray(m_vertexArrayBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
-			SurfaceToTexture((Awesomium::BitmapSurface*)m_view->surface());
+			SurfaceToTexture((GLTextureSurface*)m_view->surface());
 
-			glEnable( GL_BLEND );
+			/*glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_DEPTH_TEST);*/
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-			glEnable(GL_DEPTH_TEST);
-			glDisable( GL_BLEND );
+			/*glEnable(GL_DEPTH_TEST);
+			glDisable( GL_BLEND );*/
 
 			glBindVertexArray(0);
 		}
@@ -112,15 +119,16 @@ namespace RootEngine
 			m_view->LoadURL(url);
 		}
 
-		void guiInstance::SurfaceToTexture(Awesomium::BitmapSurface* p_surface)
+		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
 		{
-			glBindTexture(GL_TEXTURE_2D, m_texture);
+			if(p_surface)
+				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
 
-			if(m_view->IsLoading() || p_surface == 0)
-				return;
+			/*if(m_view->IsLoading() || p_surface == 0 || !p_surface->is_dirty())
+				return;*/
 
-			const unsigned char* blargh = p_surface->buffer();
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, blargh);
+			//glInvalidateTexImage(m_texture, 0);
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, p_surface->buffer());
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -194,6 +202,16 @@ namespace RootEngine
 			return -1;
 		}
 
+
+		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)
+		{
+			m_testBool = true;
+		}
+
+		void guiJSTest::OnMethodCall (Awesomium::WebView *caller, unsigned int remote_object_id, const Awesomium::WebString &method_name, const Awesomium::JSArray &args)
+		{
+			m_testBool = true;
+		}
 	}
 }
 
@@ -202,4 +220,31 @@ RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemShared
 	RootEngine::GUISystem::g_context = p_context;
 
 	return RootEngine::GUISystem::guiInstance::GetInstance();
+}
+
+TEST(GUI, Javascript)
+{
+	RootEngine::GUISystem::guiInstance* instance = RootEngine::GUISystem::guiInstance::GetInstance();
+	RootEngine::GUISystem::guiTest* testInstance = new RootEngine::GUISystem::guiTest();
+	RootEngine::GUISystem::guiJSTest* jsTestInstance = new RootEngine::GUISystem::guiJSTest();
+	testInstance->InitTest();
+	jsTestInstance->InitTest();
+	instance->GetView()->set_load_listener(testInstance);
+	instance->GetView()->set_js_method_handler(jsTestInstance);
+
+	Awesomium::JSValue window = instance->GetView()->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
+	EXPECT_TRUE(window.IsObject());
+	window.ToObject().SetCustomMethod(Awesomium::WSLit("RemoteTest();"), false);
+
+	instance->LoadURL("test.html");
+	while(instance->GetView()->IsLoading())
+	{
+		instance->Update();
+	}
+	Sleep(500);
+	instance->GetView()->ExecuteJavascript(Awesomium::WSLit("Test();"), Awesomium::WSLit(""));
+	Sleep(500);
+	EXPECT_TRUE(testInstance->GetTestResult());
+	EXPECT_TRUE(jsTestInstance->GetTestResult());
+	// Assume correct
 }

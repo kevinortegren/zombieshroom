@@ -19,16 +19,16 @@ namespace RootEngine
 			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
 
-			glm::vec2 GetGlobalMousePos();
-			glm::vec2 GetDeltaMousePos();
+			glm::ivec2 GetGlobalMousePos();
+			glm::ivec2 GetDeltaMousePos();
 
 			static InputManager* GetInstance();
 		private:
 
 			KeyState::KeyState m_keyState[MAX_KEYS];
 
-			glm::vec2 m_globMousePos;
-			glm::vec2 m_deltaMousePos;
+			glm::ivec2 m_globMousePos;
+			glm::ivec2 m_deltaMousePos;
 
 			static InputManager* s_inputSys;
 		};

@@ -5,6 +5,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 
 Logging	g_logger;
 

@@ -8,7 +8,6 @@
 #include <RootEngine/Include/RootEngine.h>
 
 #include <RenderingSystem.h>
-#include <PlayerControlSystem.h>
 #include <LightSystem.h>
 
 #include <RootForce/Include/RawMeshPrimitives.h>
@@ -122,14 +121,6 @@ void Main::Start()
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
 
-	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight directional;
-	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
-	directional.m_direction = glm::vec3(1, 0, 0);
-
-	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
-
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
@@ -142,17 +133,16 @@ void Main::Start()
 	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
+	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+	m_playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
+	m_playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
+	m_playerControlSystem->SetKeybindings(keybindings);
+
+
 	RootForce::Renderable::SetTypeId(0);
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
-
-	RootForce::PlayerControlSystem* playerControlSystem = new RootForce::PlayerControlSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::PlayerControlSystem>(playerControlSystem, "PlayerControlSystem");
-
-	playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
-	playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
-	playerControlSystem->SetKeybindings(keybindings);
 
 	// Initialize the system for rendering the scene.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -165,6 +155,13 @@ void Main::Start()
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
 	// Setup lights.
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
+
+	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 	
 	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
 
@@ -299,11 +296,10 @@ void Main::Start()
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
     
-	//	m_engineContext.m_debugOverlay->Clear();
-		//m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
+		m_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
-
+		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		// TODO: Update game state
 		// TODO: Render and present game
@@ -315,7 +311,7 @@ void Main::Start()
 
 		// Update Game systems.
 		pointLightSystem->Process();
-		playerControlSystem->Process();
+		m_playerControlSystem->Process();
 		renderingSystem->Process();
 
 		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
@@ -380,8 +376,8 @@ void Main::Start()
 		//m_engineContext.m_renderer->RenderLines();
 
 
-	//	m_engineContext.m_gui->Update();
-		//m_engineContext.m_gui->Render();
+		m_engineContext.m_gui->Update();
+		m_engineContext.m_gui->Render();
 
 		m_engineContext.m_renderer->Swap();
 	}
