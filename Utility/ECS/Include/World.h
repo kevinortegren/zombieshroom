@@ -4,7 +4,6 @@
 #include <Utility\ECS\Include\EntitySystemManager.h>
 #include <Utility\ECS\Include\TagManager.h>
 #include <Utility\ECS\Include\GroupManager.h>
-
 #include <Utility\ECS\Include\EntityImporter.h>
 #include <Utility\ECS\Include\EntityExporter.h>
 
@@ -18,7 +17,8 @@ namespace ECS
 		World(int p_numComponents) : 
 			m_systemManager(this),
 			m_entityManager(&m_systemManager, p_numComponents),
-			m_exporter(&m_entityManager)
+			m_exporter(this),
+			m_importer(this)
 		{}
 
 		EntityManager* GetEntityManager();

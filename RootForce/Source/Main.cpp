@@ -7,6 +7,9 @@
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 
+#include <RootForce/Include/ComponentExporter.h>
+#include <RootForce/Include/ComponentImporter.h>
+
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
@@ -132,6 +135,7 @@ void Main::Start()
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
 
 	m_world.GetEntityExporter()->SetExporter(Exporter);
+	m_world.GetEntityImporter()->SetImporter(Importer);
 
 	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -157,56 +161,9 @@ void Main::Start()
 
 	g_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 	
-	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
+	// Import world.
+	//m_world.GetEntityImporter()->Import("export.yaml");
 
-	RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
-	redTrans->m_position = glm::vec3(1.0f, 3.0f, 0.0f);
-	redTrans->m_scale = glm::vec3(0.1f);
-
-	RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
-	redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
-	redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	redPL->m_range = 2.0f;
-
-	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
-	redRender->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-
-	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
-
-	RootForce::Transform* blueTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(blue);
-	blueTrans->m_position = glm::vec3(-1.0f, 3.0f, 0.0f);
-	blueTrans->m_scale = glm::vec3(0.1f);
-
-	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
-	bluePL->m_color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	bluePL->m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
-	bluePL->m_range = 20.0f;
-
-	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
-	blueRender->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-
-	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
-	m_world.GetGroupManager()->RegisterEntity("Lights", red);
-	
-
-	// Setup a dummy player entity and add components to it
-	
-	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
-	
-	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
-	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	
-	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
-	guyRenderable->m_model = g_engineContext.m_resourceManager->GetModel("testchar");
-
-	Render::Material guyMaterial;
-	guyMaterial.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-	guyMaterial.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(g_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
-	guyRenderable->m_material = guyMaterial;
-	
-	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-	guyControl->speed = 10.0f;
-  
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	g_engineContext.m_gui->LoadURL("debug.html");
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
@@ -268,22 +225,20 @@ void Main::Start()
 	*/
 	//////////////////////////////////////////////////////////////////////////
 
+	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
+	ECS::Entity* guy3 = m_world.GetEntityManager()->CreateEntity();
 
-	m_world.GetTagManager()->RegisterEntity("Player", guy);
-	
+
+	m_world.GetTagManager()->RegisterEntity("Player", guy2);
+	m_world.GetGroupManager()->RegisterEntity("Lights", guy2);
+	m_world.GetGroupManager()->RegisterEntity("Lights", guy3);
+
+
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
-
-	m_world.GetGroupManager()->UnregisterEntity("Lights", red);
-
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
-
-	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
-	glm::vec3 a = t->m_position;
 
 	m_world.GetEntityExporter()->Export("export.yaml");
-
-	m_world.GetEntityImporter()->Import("export.yaml");
-
+	
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -299,7 +254,7 @@ void Main::Start()
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		
-		m_playerControlSystem->Process();
+		//m_playerControlSystem->Process();
 
 		g_engineContext.m_renderer->Clear();
 

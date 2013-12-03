@@ -1,10 +1,15 @@
 #pragma once
 
-#include <memory>
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <RootForce/Include/ComponentExporter.h>
+
+#include <RootForce/Include/RenderingSystem.h>
+#include <RootForce/Include/LightSystem.h>
+#include <RootForce/Include/PlayerControlSystem.h>
+#include <RootForce/Include/PlayerControlSystem.h>
+
+#include <memory>
 #include <string>
 
 RootEngine::GameSharedContext g_engineContext;
