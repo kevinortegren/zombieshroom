@@ -51,6 +51,30 @@ void ECS::EntityImporter::Import(const std::string& p_filename)
 				m_importer(m_world, type, entitiesMap[id], data[k]);
 			}
 		}
+
+		const YAML::Node& tags = doc[2]["Tags"];
+		for(unsigned int j = 0; j < tags.size(); j++)
+		{
+			int id;
+			tags[j]["Id"] >> id;
+
+			std::string tag;
+			tags[j]["Tag"] >> tag;
+
+			m_world->GetTagManager()->RegisterEntity(tag, entitiesMap[id]);
+		}
+
+		const YAML::Node& groups = doc[3]["Groups"];
+		for(unsigned int j = 0; j < groups.size(); j++)
+		{
+			int id;
+			groups[j]["Id"] >> id;
+
+			std::string group;
+			groups[j]["Group"] >> group;
+
+			m_world->GetGroupManager()->RegisterEntity(group, entitiesMap[id]);
+		}
 	}
 	
 	catch(YAML::ParserException& e) {

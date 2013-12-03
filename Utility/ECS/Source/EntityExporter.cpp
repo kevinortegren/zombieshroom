@@ -60,7 +60,8 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::BeginMap;
 	for(auto itr = m_world->GetTagManager()->m_tags.begin(); itr != m_world->GetTagManager()->m_tags.end(); ++itr)
 	{
-		out << YAML::Key << (*itr).first << YAML::Value << (*itr).second->GetId();
+		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
+		out << YAML::Key << "Tag" << YAML::Value << (*itr).first;
 	}
 	out << YAML::EndMap;
 
@@ -74,7 +75,8 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::BeginMap;
 	for(auto itr = m_world->GetGroupManager()->m_groups.begin(); itr != m_world->GetGroupManager()->m_groups.end(); ++itr)
 	{
-		out << YAML::Key << (*itr).first << YAML::Value << (*itr).second->GetId();
+		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
+		out << YAML::Key << "Group" << YAML::Value << (*itr).first;
 	}
 	out << YAML::EndMap;
 

@@ -158,4 +158,9 @@ namespace RootEngine
 				return (*itr).first;
 		}
 	}
+
+	const std::string& ResourceManager::GetWorkingDirectory()
+	{
+		return m_workingDirectory;
+	}
 }

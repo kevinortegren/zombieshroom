@@ -62,7 +62,6 @@ int main(int argc, char* argv[])
 Main::Main(std::string p_workingDirectory) 
 	: m_running(true), m_world(4)
 {
-
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
@@ -99,9 +98,6 @@ void Main::Start()
 {
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-	g_engineContext.m_resourceManager->LoadEffect("Mesh");
-	g_engineContext.m_resourceManager->LoadCollada("testchar");
-
 	// Cube mesh.
 	std::shared_ptr<Render::Mesh> cubeMesh = g_engineContext.m_renderer->CreateMesh();
 	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
@@ -111,38 +107,41 @@ void Main::Start()
 	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
 	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
 
-	// Initialize the system for controlling the player.
-	std::vector<RootForce::Keybinding> keybindings(4);
-	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
-	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
-	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+	{
+		// Initialize the system for controlling the player.	
+		std::vector<RootForce::Keybinding> keybindings(4);
+		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
+		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
+		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
 
-	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
-	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
-	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
+		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
+		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
 
-	keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
-	keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
-	keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
+		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
+		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
 
-	keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
-	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
-	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
+		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
+		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
-	RootForce::Renderable::SetTypeId(0);
-	RootForce::Transform::SetTypeId(1);
-	RootForce::PointLight::SetTypeId(2);
-	RootForce::PlayerInputControlComponent::SetTypeId(3);
+		RootForce::Renderable::SetTypeId(0);
+		RootForce::Transform::SetTypeId(1);
+		RootForce::PointLight::SetTypeId(2);
+		RootForce::PlayerInputControlComponent::SetTypeId(3);
 
-	m_world.GetEntityExporter()->SetExporter(Exporter);
-	m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
+		m_world.GetEntityImporter()->SetImporter(Importer);
 
-	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
-	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
-	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-	m_playerControlSystem->SetKeybindings(keybindings);
+		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
+		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
+		m_playerControlSystem->SetKeybindings(keybindings);
+	}
 
-	// Initialize the system for rendering the scene.
+	
+	// Initialize render and point light system.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
@@ -152,17 +151,8 @@ void Main::Start()
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
-	// Setup lights.
-	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight directional;
-	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
-	directional.m_direction = glm::vec3(1, 0, 0);
-
-	g_engineContext.m_renderer->AddDirectionalLight(directional, 0);
-	
-	// Import world.
-	//m_world.GetEntityImporter()->Import("export.yaml");
+	// Import test world.
+	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test.world");
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	g_engineContext.m_gui->LoadURL("debug.html");
@@ -225,21 +215,6 @@ void Main::Start()
 	*/
 	//////////////////////////////////////////////////////////////////////////
 
-	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
-	ECS::Entity* guy3 = m_world.GetEntityManager()->CreateEntity();
-
-
-	m_world.GetTagManager()->RegisterEntity("Player", guy2);
-	m_world.GetGroupManager()->RegisterEntity("Lights", guy2);
-	m_world.GetGroupManager()->RegisterEntity("Lights", guy3);
-
-
-	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
-	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
-
-	m_world.GetEntityExporter()->Export("export.yaml");
-	
-
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -254,7 +229,7 @@ void Main::Start()
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		
-		//m_playerControlSystem->Process();
+		m_playerControlSystem->Process();
 
 		g_engineContext.m_renderer->Clear();
 
@@ -265,7 +240,6 @@ void Main::Start()
 
 		g_engineContext.m_renderer->Render();
 		g_engineContext.m_renderer->RenderLines();
-
 
 		g_engineContext.m_gui->Update();
 		g_engineContext.m_gui->Render();

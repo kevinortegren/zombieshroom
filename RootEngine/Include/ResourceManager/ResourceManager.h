@@ -29,6 +29,8 @@ namespace RootEngine
 		virtual const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture) = 0;
 		virtual const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect) = 0;
 		virtual const std::string& ResolveStringFromModel(Model* p_model) = 0;
+
+		virtual const std::string& GetWorkingDirectory() = 0;
 	};
 
 	class ResourceManager : public ResourceManagerInterface
@@ -54,6 +56,8 @@ namespace RootEngine
 		const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture);
 		const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect);
 		const std::string& ResolveStringFromModel(Model* p_model);
+
+		const std::string& GetWorkingDirectory();
 
 	private:
 		//Resources
