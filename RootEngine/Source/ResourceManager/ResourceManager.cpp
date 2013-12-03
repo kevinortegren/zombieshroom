@@ -52,7 +52,7 @@ namespace RootEngine
 	//////////////////////////////////////////////////////////////////////////
 	void ResourceManager::LoadCollada(std::string p_path)
 	{
-		m_models[p_path] = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + "\\" + p_path + ".DAE");
+		m_models[p_path] = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE");
 	}
 
 	void ResourceManager::LoadMesh( std::string p_path )
@@ -71,7 +71,7 @@ namespace RootEngine
 
 	bool ResourceManager::LoadTexture( std::string p_path )
 	{
-		if(m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path))
+		if(m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds"))
 		{
 			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'\n", p_path.c_str());
 			m_textures[p_path] = m_textureImporter->GetTexture();

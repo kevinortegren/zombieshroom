@@ -6,7 +6,7 @@ namespace RootEngine
 	TextureImporter::TextureImporter(Logging* p_logger, Render::RendererInterface* p_renderer)
 	{
 		m_logger	= p_logger;
-		m_texture   = p_renderer->CreateTexture();
+		m_renderer  = p_renderer;
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Texture importer initialized!");
 	}
 
@@ -18,10 +18,11 @@ namespace RootEngine
 
 	bool TextureImporter::LoadTexture( const std::string p_fileName )
 	{
-		if (!m_texture->Load(p_fileName)) 
-			return false;
-		else 
+		m_texture   = m_renderer->CreateTexture();
+		if (m_texture->Load(p_fileName)) 
 			return true;
+		else 
+			return false;
 	}
 
 	Render::TextureInterface* TextureImporter::GetTexture()

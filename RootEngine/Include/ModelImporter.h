@@ -46,6 +46,7 @@ namespace RootEngine
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh);
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		std::vector<glm::vec3> GetMeshPoints(std::vector<Render::Vertex1P1N1UV> p_vertices);
+		std::string GetNameFromPath(std::string p_path);
 
 		ResourceManager* m_resourceManager;
 		Logging*	m_logger;

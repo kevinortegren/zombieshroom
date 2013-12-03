@@ -209,7 +209,8 @@ void Main::Start()
 
 	Render::Material guyMaterial;
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
+	std::string difftex = m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0];
+	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(difftex);
 	guyRenderable->m_material = guyMaterial;
 	
 	
