@@ -8,8 +8,8 @@
 #include <RootEngine/Include/RootEngine.h>
 
 #include <RenderingSystem.h>
-#include <PlayerControlSystem.h>
 #include <LightSystem.h>
+#include <PlayerControlSystem.h>
 
 #include <RootForce/Include/RawMeshPrimitives.h>
 
@@ -32,8 +32,17 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 	{
 		case 0:
 			{
-				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);
-				//TODO: resolve paths.
+				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
+				if(renderable->m_model != nullptr)
+				{
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);
+					p_emitter << YAML::Key << "Model" << YAML::Value << s;
+				}
+				if(renderable->m_material.m_effect != nullptr)
+				{
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material.m_effect);
+					p_emitter << YAML::Key << "Effect" << YAML::Value << s;
+				}				
 			}
 			break;
 		case 1:
@@ -58,6 +67,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Atenuation" << YAML::Value << YAML::Flow << YAML::BeginSeq << attenuation.x << attenuation.y << attenuation.z << YAML::EndSeq;
 				p_emitter << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << color.x << color.y << color.z << color.w << YAML::EndSeq;
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
+			}
+			break;
+		case 3:
+			{
+				RootForce::PlayerInputControlComponent* input = static_cast<RootForce::PlayerInputControlComponent*>(p_component);
+				p_emitter << YAML::Key << "Speed" << YAML::Value << input->speed;
 			}
 			break;
 		default:
@@ -111,7 +126,7 @@ Main::Main(std::string p_workingDirectory)
 
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
 
-	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
+	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 	{
@@ -141,17 +156,17 @@ Main::~Main()
 
 void Main::Start() 
 {
-	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-	m_engineContext.m_resourceManager->LoadEffect("Mesh");
-	m_engineContext.m_resourceManager->LoadCollada("testchar");
+	g_engineContext.m_resourceManager->LoadEffect("Mesh");
+	g_engineContext.m_resourceManager->LoadCollada("testchar");
 
 	// Cube mesh.
-	std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
+	std::shared_ptr<Render::Mesh> cubeMesh = g_engineContext.m_renderer->CreateMesh();
 	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
+	cubeMesh->m_vertexBuffer = g_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_elementBuffer = g_engineContext.m_renderer->CreateBuffer();
+	cubeMesh->m_vertexAttributes = g_engineContext.m_renderer->CreateVertexAttributes();
 	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
 	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
 
@@ -160,14 +175,6 @@ void Main::Start()
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
-
-	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight directional;
-	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
-	directional.m_direction = glm::vec3(1, 0, 0);
-
-	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
@@ -188,24 +195,29 @@ void Main::Start()
 
 	m_world.SetExporter(Exporter);
 
-	RootForce::PlayerControlSystem* playerControlSystem = new RootForce::PlayerControlSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::PlayerControlSystem>(playerControlSystem, "PlayerControlSystem");
-
-	playerControlSystem->SetInputInterface(m_engineContext.m_inputSys);
-	playerControlSystem->SetLoggingInterface(m_engineContext.m_logger);
-	playerControlSystem->SetKeybindings(keybindings);
+	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
+	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_playerControlSystem->SetKeybindings(keybindings);
 
 	// Initialize the system for rendering the scene.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
-	renderingSystem->SetLoggingInterface(m_engineContext.m_logger);
-	renderingSystem->SetRendererInterface(m_engineContext.m_renderer);
+	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
-	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
+	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
 	// Setup lights.
+	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight directional;
+	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_direction = glm::vec3(1, 0, 0);
+
+	g_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 	
 	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
 
@@ -219,8 +231,7 @@ void Main::Start()
 	redPL->m_range = 2.0f;
 
 	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
-	redRender->m_mesh = cubeMesh;
-	redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	redRender->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
 
@@ -229,13 +240,12 @@ void Main::Start()
 	blueTrans->m_scale = glm::vec3(0.1f);
 
 	RootForce::PointLight* bluePL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(blue);
-	bluePL->m_color = glm::vec4(0.0f, 0.0f, 0.4f, 1.0f);
-	bluePL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	bluePL->m_range = 2.0f;
+	bluePL->m_color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	bluePL->m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
+	bluePL->m_range = 20.0f;
 
 	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
-	blueRender->m_mesh = cubeMesh;
-	blueRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	blueRender->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
 	m_world.GetGroupManager()->RegisterEntity("Lights", red);
@@ -249,18 +259,19 @@ void Main::Start()
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
-	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	guyRenderable->m_model = g_engineContext.m_resourceManager->GetModel("testchar");
 
 	Render::Material guyMaterial;
-	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyMaterial.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyMaterial.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(g_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
 	guyRenderable->m_material = guyMaterial;
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
 	guyControl->speed = 10.0f;
   
-	m_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	m_engineContext.m_gui->LoadURL("debug.html");
-	m_engineContext.m_debugOverlay->SetView(m_engineContext.m_gui->GetView());
+	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	g_engineContext.m_gui->LoadURL("debug.html");
+	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
@@ -340,92 +351,30 @@ void Main::Start()
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
-    
-		m_engineContext.m_debugOverlay->Clear();
-		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), false);
+	
+		g_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
-
+		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
-		// TODO: Update game state
-		// TODO: Render and present game
+		
+		m_playerControlSystem->Process();
 
-		m_engineContext.m_renderer->Clear();
+		g_engineContext.m_renderer->Clear();
 
-		// Update Engine systems.
-		m_engineContext.m_physics->Update(dt);
+		g_engineContext.m_physics->Update(dt);
 
-		// Update Game systems.
-		pointLightSystem->Process();
-		playerControlSystem->Process();
+		pointLightSystem->Process(); 
 		renderingSystem->Process();
 
-		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
-		//float x3[3];
-		//m_engineContext.m_physics->GetPlayerPos(handle, x);
-		//m_engineContext.m_physics->GetObjectPos(handle2, x2);
-
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
-		//	m_engineContext.m_physics->PlayerJump(handle, 10.0f);
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
-		//{
-		//	glm::vec3 temp = guyTransform->m_orientation.GetFront();
-		//	speed = &temp.x;
-		//	speed[1] = 4;
-		//	m_engineContext.m_physics->PlayerKnockback(handle, speed, 50.0f);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//{
-		//	//speed[2] *= -1;
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	m_engineContext.m_physics->SetDynamicObjectVelocity(handle2, speedup);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_W) == RootEngine::InputManager::KeyState::DOWN)
-		//{
-		//	//speed[2] *= -1;
-		////	glm::vec3 test = guyTransform2->m_orientation.GetFront();
-		////	float* funtime = &test.x;
-		////	m_engineContext.m_physics->PlayerMoveXZ(handle2, funtime);
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_UP) == RootEngine::InputManager::KeyState::DOWN)
-		//{
-		//	//speed[2] *= -1;
-		//	glm::vec3 test = guyTransform->m_orientation.GetFront();
-		//	float* funtime = &test.x;
-		//	m_engineContext.m_physics->PlayerMoveXZ(handle, funtime);
-		//	//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-		//	//m_engineContext.m_physics->SetDynamicObjectVelocity(ballHandle, ballspeed);
-		//	//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		//}
-		//guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
-		//guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
-		//
-		//glm::quat test = guyTransform->m_orientation.GetQuaterion();
-
-		//orientationPlayer[0] = test.x;
-		//orientationPlayer[1] = test.y;
-		//orientationPlayer[2] = test.z;
-		//orientationPlayer[3] = test.w;
-
-		//m_engineContext.m_physics->SetPlayerOrientation(handle,orientationPlayer);
-		//m_engineContext.m_physics->GetObjectOrientation(handle2, orientation);
-		//guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
-		
-
-		m_engineContext.m_physics->Update(dt);
-
-		m_engineContext.m_renderer->Render();
-		//m_engineContext.m_renderer->RenderLines();
+		g_engineContext.m_renderer->Render();
+		g_engineContext.m_renderer->RenderLines();
 
 
-		m_engineContext.m_gui->Update();
-		m_engineContext.m_gui->Render();
+		g_engineContext.m_gui->Update();
+		g_engineContext.m_gui->Render();
 
-		m_engineContext.m_renderer->Swap();
+		g_engineContext.m_renderer->Swap();
 	}
 }
 
@@ -441,10 +390,10 @@ void Main::HandleEvents()
 			break;
 
 		default:
-			if (m_engineContext.m_inputSys != nullptr)
-				m_engineContext.m_inputSys->HandleInput(event);
-			if(m_engineContext.m_gui != nullptr)
-				m_engineContext.m_gui->HandleEvents(event);
+			if (g_engineContext.m_inputSys != nullptr)
+				g_engineContext.m_inputSys->HandleInput(event);
+			if(g_engineContext.m_gui != nullptr)
+				g_engineContext.m_gui->HandleEvents(event);
 		}
 	}
 }

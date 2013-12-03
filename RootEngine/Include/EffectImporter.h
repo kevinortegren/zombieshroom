@@ -8,8 +8,8 @@ namespace RootEngine
 	class EffectImporter : public RootEngine::YamlParser
 	{
 	public:
-		EffectImporter(Render::RendererInterface* p_renderer)
-			: m_renderer(p_renderer) {}
+		EffectImporter(Render::RendererInterface* p_renderer);
+			
 
 		void Process(const YAML::Node& p_node);
 		void SetWorkingDirectory(std::string p_workingDirectory);

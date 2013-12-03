@@ -26,9 +26,9 @@ namespace RootForce
 				m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no effect", p_entity->GetId());
 				return;
 			}
-			if(renderable->m_mesh == nullptr)
+			if(renderable->m_model == nullptr)
 			{
-				m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no mesh", p_entity->GetId());
+				m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no model", p_entity->GetId());
 				return;
 			}
 
@@ -41,14 +41,15 @@ namespace RootForce
 			uniforms.m_world = glm::scale(uniforms.m_world, transform->m_scale);
 			uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
+			for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)
+			{
+				Render::RenderJob job;
+				job.m_mesh = (*itr);
+				job.m_uniforms = uniforms;
+				job.m_material = &renderable->m_material;
 
-			//todo: add loop for multiple submeshes?
-			Render::RenderJob job;
-			job.m_mesh = renderable->m_mesh;
-			job.m_uniforms = uniforms;
-			job.m_material = &renderable->m_material;
-
-			m_renderer->AddRenderJob(job);
+				m_renderer->AddRenderJob(job);
+			}
 		}
 	}
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -8,17 +9,19 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/Texture.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <memory>
 
 namespace RootEngine
 {
+	class ResourceManager;
+
 	struct Model
 	{
 		std::vector<std::shared_ptr<Render::Mesh>> m_meshes;
-		//vector<Texture*> m_textures;
+		std::string m_textureHandles[3];
 		//vector<AnimationData*> m_animations;
-		
 		unsigned int numberOfIndices;
 		unsigned int numberOfVertices;
 		unsigned int numberOfFaces;
@@ -30,8 +33,9 @@ namespace RootEngine
 	{
 	public:
 		
+		
 
-		ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer);
+		ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer, ResourceManager* p_resourceManager);
 		~ModelImporter();
 
 		Model* LoadModel(const std::string p_fileName);
@@ -43,6 +47,7 @@ namespace RootEngine
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		std::vector<glm::vec3> GetMeshPoints(std::vector<Render::Vertex1P1N1UV> p_vertices);
 
+		ResourceManager* m_resourceManager;
 		Logging*	m_logger;
 		Model*		m_model; 
 		Render::RendererInterface* m_renderer;
