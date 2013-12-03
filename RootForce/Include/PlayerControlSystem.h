@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <Utility\ECS\Include\World.h>
+#include <Utility/ECS/Include/World.h>
 #include <Transform.h>
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
@@ -60,7 +60,7 @@ namespace RootForce
 	private:
 		std::vector<Keybinding> m_keybindings;
 
-		glm::vec2 m_deltaMouseMovement;
+		glm::ivec2 m_deltaMouseMovement;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsCurrentFrame;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsPreviousFrame;
 

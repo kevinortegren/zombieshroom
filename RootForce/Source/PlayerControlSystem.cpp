@@ -50,7 +50,7 @@ namespace RootForce
 
 		// Check if the mouse has been moved this frame.
 		m_deltaMouseMovement = m_inputManager->GetDeltaMousePos();
-		if (m_deltaMouseMovement != glm::vec2(0, 0))
+		if (m_deltaMouseMovement != glm::ivec2(0, 0))
 		{
 			m_inputtedActionsCurrentFrame.push_back(PlayerAction::ORIENTATE);
 		}
@@ -89,7 +89,7 @@ namespace RootForce
 					//transform->m_orientation.YawGlobal(90.0f * dt);
 					break;
 				case PlayerAction::ORIENTATE:
-					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting");
+					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
 					break;
 				case PlayerAction::SELECT_ABILITY:
