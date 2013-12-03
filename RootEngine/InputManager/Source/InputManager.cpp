@@ -14,7 +14,7 @@ namespace RootEngine
 			for(int i = 0; i < MAX_KEYS; i++)
 				m_keyState[i] = KeyState::UP;
 
-			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of InputManager");
+			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::INIT_PRINT, "InputManager subsystem initialized!");
 		}
 
 

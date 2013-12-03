@@ -19,7 +19,8 @@ namespace LogTag
 		GAME,
 		COMPONENT,
 		GUI,
-		INPUT
+		INPUT,
+		RESOURCE
 	};
 }
 
@@ -31,6 +32,7 @@ namespace LogLevel
 		NON_FATAL_ERROR,
 		WARNING,
 		DEBUG_PRINT,
+		INIT_PRINT,
 		MASS_DATA_PRINT
 	};
 }

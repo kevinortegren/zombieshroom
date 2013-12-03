@@ -41,23 +41,64 @@ namespace RootEngine
 		m_workingDirectory	= p_workingDirectory;
 
 		m_effectImporter = std::shared_ptr<EffectImporter>(new EffectImporter(p_renderer));
+		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(m_logger, p_renderer, this));
+		m_textureImporter = std::shared_ptr<TextureImporter>(new TextureImporter(m_logger, p_renderer));
+		
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
-
-		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(m_logger, p_renderer));
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//Load functions
+	//////////////////////////////////////////////////////////////////////////
 	void ResourceManager::LoadCollada(std::string p_path)
 	{
 		m_models[p_path] = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + "\\" + p_path + ".DAE");
 	}
 
+	void ResourceManager::LoadMesh( std::string p_path )
+	{
+		// TODO 
+	}
+
 	void ResourceManager::LoadEffect(std::string p_path)
 	{
-		m_logger->LogText("Loading effect: %s", p_path.c_str());
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading effect: %s", p_path.c_str());
 
 		m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
 
 		m_effects[p_path] = m_effectImporter->m_effect;
+	}
+
+	bool ResourceManager::LoadTexture( std::string p_path )
+	{
+		if(m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path))
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'\n", p_path.c_str());
+			m_textures[p_path] = m_textureImporter->GetTexture();
+			return true;
+		}
+		else
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading texture '%s'\n", p_path.c_str());
+			return false;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//Get functions
+	//////////////////////////////////////////////////////////////////////////
+	Model* ResourceManager::GetModel( std::string p_handle )
+	{
+
+		if(m_models.find(p_handle) != m_models.end())
+		{
+			return m_models[p_handle];
+		}
+		else
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model has not been loaded: %s", p_handle.c_str());
+			return nullptr;
+		}
 	}
 
 	Render::EffectInterface* ResourceManager::GetEffect(std::string p_handle)
@@ -68,33 +109,37 @@ namespace RootEngine
 		}
 		else
 		{
-			m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
 			return nullptr;
 		}
 	}
 
-	Model* ResourceManager::GetModel( std::string p_handle )
+	Render::TextureInterface* ResourceManager::GetTexture( std::string p_handle )
 	{
-		
-		if(m_models.find(p_handle) != m_models.end())
+		if(m_textures.find(p_handle) != m_textures.end())
 		{
-			return m_models[p_handle];
+			return m_textures[p_handle];
 		}
 		else
 		{
-			m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Model has not been loaded: %s", p_handle.c_str());
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture has not been loaded: %s", p_handle.c_str());
 			return nullptr;
 		}
 	}
 
-	void ResourceManager::LoadTexture( std::string p_path )
+	Render::MeshInterface* ResourceManager::GetMesh( std::string p_handle )
 	{
-
+		if(m_meshes.find(p_handle) != m_meshes.end())
+		{
+			return m_meshes[p_handle];
+		}
+		else
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Mesh has not been loaded: %s", p_handle.c_str());
+			return nullptr;
+		}
 	}
 
-	Render::Texture* ResourceManager::GetTexture( std::string p_handle )
-	{
-		return nullptr;
-	}
+	
 
 }

@@ -58,7 +58,10 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_numDirectionalLights(0),
-		m_numPointLights(0) {}
+		m_numPointLights(0) 
+	{
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::INIT_PRINT, "Renderer subsystem initialized!");
+	}
 
 	GLRenderer::~GLRenderer()
 	{
@@ -306,6 +309,13 @@ namespace Render
 				// Bind PerObjects uniforms.
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
+				if((*itr).m_material->m_diffuseMap != nullptr)
+				{
+					// Bind diffuse texture.
+					glActiveTexture(GL_TEXTURE0 + 0);
+					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_diffuseMap->GetHandle());
+				}
+				
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
