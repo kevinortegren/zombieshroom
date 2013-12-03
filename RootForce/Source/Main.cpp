@@ -140,7 +140,6 @@ void Main::Start()
 		m_playerControlSystem->SetKeybindings(keybindings);
 	}
 
-	
 	// Initialize render and point light system.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
