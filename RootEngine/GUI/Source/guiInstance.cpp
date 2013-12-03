@@ -25,9 +25,9 @@ namespace RootEngine
 
 		void guiInstance::Shutdown(void)
 		{
-			//m_glTexSurfaceFactory->DestroySurface(m_surface);
+			m_view->Stop();
 			m_view->Destroy();
-			m_core->Shutdown();
+			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
 			delete s_gui;
 
 			glDeleteTextures(1, &m_texture);
@@ -40,7 +40,6 @@ namespace RootEngine
 			m_width = p_width;
 			m_height = p_height;
 			m_view = m_core->CreateWebView(m_width, m_height);
-			//m_surface = m_glTexSurfaceFactory->CreateSurface(m_view, m_width, m_height);
 			
 			m_view->SetTransparent(true);
   
