@@ -25,12 +25,12 @@ namespace ECS
 		World* m_world;
 	};
 
-	class ComponentSystem : public VoidSystem
+	class EntitySystem : public VoidSystem
 	{
 	public:
-		friend class ComponentSystemManager;
+		friend class EntitySystemManager;
 
-		ComponentSystem(World* p_world)
+		EntitySystem(World* p_world)
 			: VoidSystem(p_world) { }
 
 		template<class T>
@@ -51,13 +51,13 @@ namespace ECS
 		std::set<Entity*> m_activeEntities;
 	};
 
-	class IntervalComponentSystem : ComponentSystem
+	class IntervalEntitySystem : EntitySystem
 	{
 	public:
-		friend class ComponentSystemManager;
+		friend class EntitySystemManager;
 
-		IntervalComponentSystem(World* p_world, float p_interval)
-			: ComponentSystem(p_world), m_interval(p_interval), m_time(0.0f) {}
+		IntervalEntitySystem(World* p_world, float p_interval)
+			: EntitySystem(p_world), m_interval(p_interval), m_time(0.0f) {}
 
 		bool CheckProcessing();
 		void Process();

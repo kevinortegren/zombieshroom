@@ -7,6 +7,7 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
+
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -57,19 +58,14 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_numDirectionalLights(0),
-		m_numPointLights(0)
-	{
-		
-	}
+		m_numPointLights(0) {}
 
 	GLRenderer::~GLRenderer()
 	{
-
 	}
 
 	void GLRenderer::Startup()
 	{
-
 	}
 
 	void GLRenderer::Shutdown()
@@ -87,7 +83,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
@@ -172,8 +168,17 @@ namespace Render
 		indices[4] = 1; 
 		indices[5] = 3;
 
-		m_fullscreenQuad.Init(verts, 4, indices, 6);
-		
+		m_fullscreenQuad.m_elementBuffer = CreateBuffer();
+		m_fullscreenQuad.m_vertexBuffer = CreateBuffer();
+		m_fullscreenQuad.m_vertexAttributes = CreateVertexAttributes();
+
+		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
+		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
+
+		m_lineMesh.m_vertexBuffer = CreateBuffer();
+		m_lineMesh.m_vertexAttributes = CreateVertexAttributes();
+		m_lineMesh.m_primitive = GL_LINES;
+
 		// Load effects.
 		g_context.m_resourceManager->LoadEffect("Deferred");
 		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
@@ -209,23 +214,9 @@ namespace Render
 		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
 
-		
-		glGenFramebuffers(1, &m_debugFbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
-
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
-		glGenTextures(1, &m_testHandle);
-		glBindTexture(GL_TEXTURE_2D, m_testHandle);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_testHandle, 0);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -335,14 +326,6 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		//DEBUG
-		/*glBindFramebuffer(GL_FRAMEBUFFER, m_debugFbo);
-
-		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, buffers);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-
 		// Lighting pass.
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -374,30 +357,29 @@ namespace Render
 
 	void GLRenderer::RenderLines()
     {
-            Mesh lineMesh;
-            Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
-            for(unsigned int i = 0; i < m_lines.size(); i++)
-            {
-                    lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
-                    lineVertices[i*2].m_color = m_lines[i].m_color;
-                    lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
-                    lineVertices[i*2+1].m_color = m_lines[i].m_color;
-            }
-            lineMesh.Init(lineVertices, m_lines.size()*2, 0, 0);
-            lineMesh.SetPrimitive(Primitive::LINES);
+        Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
+        for(unsigned int i = 0; i < m_lines.size(); i++)
+        {
+            lineVertices[i*2].m_pos = m_lines[i].m_fromPoint;
+            lineVertices[i*2].m_color = m_lines[i].m_color;
+            lineVertices[i*2+1].m_pos = m_lines[i].m_toPoint;
+            lineVertices[i*2+1].m_color = m_lines[i].m_color;
+        }
 
-            Uniforms uniforms;
-            uniforms.m_world = glm::mat4(1.0f);
+		m_lineMesh.CreateVertexBuffer1P1C(lineVertices, m_lines.size()*2);
 
-            m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
-            m_debugTech->GetPrograms()[0]->Apply();
+        Uniforms uniforms;
+        uniforms.m_world = glm::mat4(1.0f);
 
-            lineMesh.Bind();
-            lineMesh.Draw();
-            lineMesh.Unbind();
+        m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+        m_debugTech->GetPrograms()[0]->Apply();
 
-            delete [] lineVertices;
-            m_lines.clear();
+        m_lineMesh.Bind();
+        m_lineMesh.Draw();
+        m_lineMesh.Unbind();
+
+        delete [] lineVertices;
+        m_lines.clear();
     }
 
 	void GLRenderer::BindMaterial(Material* p_material)

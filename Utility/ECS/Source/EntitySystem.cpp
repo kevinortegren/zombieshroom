@@ -1,7 +1,7 @@
-#include <Utility\ECS\Include\ComponentSystem.h>
+#include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
 
-void ECS::ComponentSystem::Process()
+void ECS::EntitySystem::Process()
 {
 	Begin();
 
@@ -13,7 +13,7 @@ void ECS::ComponentSystem::Process()
 	End();	
 }
 
-bool ECS::IntervalComponentSystem::CheckProcessing()
+bool ECS::IntervalEntitySystem::CheckProcessing()
 {
 	float dt = m_world->GetDelta();
 	m_time += dt;
@@ -25,7 +25,7 @@ bool ECS::IntervalComponentSystem::CheckProcessing()
 	return false;
 }
 
-void ECS::IntervalComponentSystem::Process()
+void ECS::IntervalEntitySystem::Process()
 {
 	if(CheckProcessing())
 	{

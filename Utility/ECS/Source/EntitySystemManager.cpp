@@ -1,6 +1,6 @@
-#include <Utility\ECS\Include\ComponentSystemManager.h>
+#include <Utility\ECS\Include\EntitySystemManager.h>
 
-ECS::ComponentSystemManager::~ComponentSystemManager()
+ECS::EntitySystemManager::~EntitySystemManager()
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
@@ -8,7 +8,7 @@ ECS::ComponentSystemManager::~ComponentSystemManager()
 	}
 }
 
-void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
+void ECS::EntitySystemManager::AddEntityToSystems(Entity* p_entity)
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{
@@ -30,7 +30,7 @@ void ECS::ComponentSystemManager::AddEntityToSystems(Entity* p_entity)
 	}
 }
 
-void ECS::ComponentSystemManager::RemoveEntityFromSystems(Entity* p_entity)
+void ECS::EntitySystemManager::RemoveEntityFromSystems(Entity* p_entity)
 {
 	for(auto itr = m_systems.begin(); itr != m_systems.end(); ++itr)
 	{

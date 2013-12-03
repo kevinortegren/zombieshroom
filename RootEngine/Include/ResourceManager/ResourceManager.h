@@ -39,7 +39,7 @@ namespace RootEngine
 	private:
 		std::map<std::string, Model*> m_models;
 
-		std::map<std::string, std::shared_ptr<Render::MeshInterface>> m_meshes;
+		std::map<std::string, std::shared_ptr<Render::Mesh>> m_meshes;
 
 		std::map<std::string, Render::EffectInterface*> m_effects;
 		//std::map<std::string, Render::Texture*> m_textures;

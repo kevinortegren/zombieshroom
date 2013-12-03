@@ -13,7 +13,6 @@ namespace RootForce
 		Action = action;
 	}
 
-
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
 		: ECS::VoidSystem(p_world) 
 	{}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ECS/World.h>
+#include <Utility\ECS\Include\EntitySystem.h>
 #include <RootForce/Include/Transform.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <gtest/gtest.h>
@@ -13,10 +13,10 @@ struct Player : public ECS::Component<Player>
 	float m_health;
 };
 
-struct GameLogicSystem : public ECS::ComponentSystem
+struct GameLogicSystem : public ECS::EntitySystem
 {
 	GameLogicSystem(ECS::World* p_world)
-		: ECS::ComponentSystem(p_world) 
+		: ECS::EntitySystem(p_world) 
 	{
 		// Enabling use of Player/Transform components in the system.
 		SetUsage<Player>();

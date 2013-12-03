@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Utility\ECS\Include\ComponentSystem.h>
+#include <Utility\ECS\Include\EntitySystem.h>
 #include <map>
 #include <string>
 #include <memory>
@@ -10,14 +10,14 @@ namespace ECS
 {
 	class World;
 
-	class ComponentSystemManager
+	class EntitySystemManager
 	{
 	public:
 		friend class EntityManager;
 
-		ComponentSystemManager(World* p_world)
+		EntitySystemManager(World* p_world)
 			: m_world(p_world) {}
-		~ComponentSystemManager();
+		~EntitySystemManager();
 
 		template<class T>
 		void AddSystem(T* p_system, const char* p_systemName)
@@ -38,6 +38,6 @@ namespace ECS
 		void RemoveEntityFromSystems(Entity* p_entity);
 
 		World* m_world;
-		std::map<std::string, ComponentSystem*> m_systems;
+		std::map<std::string, EntitySystem*> m_systems;
 	};
 }

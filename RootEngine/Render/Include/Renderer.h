@@ -7,14 +7,9 @@
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/GeometryBuffer.h>
-
 #include <RootEngine/Render/Include/Line.h>
-
-
 #include <RootEngine/Include/SubsystemSharedContext.h>
-
 #include <RootEngine/Render/Include/Light.h>
-
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -31,31 +26,23 @@ namespace Render
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void SetResolution(int p_width, int p_height) = 0;
-
 		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
-
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
-
-
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
-
 		virtual void Render() = 0;
 		virtual void RenderLines() = 0;
-
 		virtual void Swap() = 0;
 
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-
-		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
+		virtual std::shared_ptr<Mesh> CreateMesh() = 0;
 
 		virtual EffectInterface* CreateEffect() = 0;
 		virtual TextureInterface* CreateTexture() = 0;
-
 	};
 
 	class GLRenderer : public RendererInterface
@@ -68,17 +55,12 @@ namespace Render
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
 		void SetResolution(int p_width, int p_height);
-
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
-
 		void SetAmbientLight(const glm::vec4& p_color);
-
-
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
-
 		void Render();
 		void RenderLines();
 		void Swap();
@@ -86,8 +68,8 @@ namespace Render
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
+		std::shared_ptr<Mesh> CreateMesh() { return std::shared_ptr<Mesh>(new Mesh); }
 
-		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); } //Remember to delete
 		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
 		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
 
@@ -95,7 +77,6 @@ namespace Render
 
 		void GeometryPass();
 		void LightingPass();
-
 		void BindMaterial(Material* p_material);
 	
 		int GetAvailableVideoMemory(); //Returns VRAM in kilobytes
@@ -105,7 +86,9 @@ namespace Render
 		SDL_Window* m_window;
 
 		GeometryBuffer m_gbuffer;
+
 		Mesh m_fullscreenQuad;
+		Mesh m_lineMesh;
 
 		std::vector<RenderJob> m_jobs;
 		std::vector<Line> m_lines;
@@ -146,8 +129,6 @@ namespace Render
 		GLuint m_debugFbo;
 		GLuint m_testHandle;
 		//GLuint m_testHandle;
-
-
 	};
 }
 

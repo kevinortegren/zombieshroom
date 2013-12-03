@@ -10,7 +10,7 @@ namespace ECS
 	{
 	public:
 		friend class EntityManager;
-		friend class ComponentSystemManager; 
+		friend class EntitySystemManager; 
 
 		Entity(unsigned int p_id)
 			: m_id(p_id) {}

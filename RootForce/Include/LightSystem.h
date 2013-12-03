@@ -9,11 +9,11 @@
 
 namespace RootForce
 {
-	class PointLightSystem : public ECS::ComponentSystem
+	class PointLightSystem : public ECS::EntitySystem
 	{
 	public:
 		PointLightSystem(ECS::World* p_world, Render::RendererInterface* p_renderer)
-			: ECS::ComponentSystem(p_world), m_renderer(p_renderer)
+			: ECS::EntitySystem(p_world), m_renderer(p_renderer)
 		{
 			SetUsage<PointLight>();
 			SetUsage<Transform>();

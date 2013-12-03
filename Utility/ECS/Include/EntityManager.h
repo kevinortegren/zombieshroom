@@ -10,12 +10,12 @@
 
 namespace ECS
 {
-	class ComponentSystemManager;
+	class EntitySystemManager;
 
 	class EntityManager
 	{
 	public:
-		EntityManager(ComponentSystemManager* p_systemManager);
+		EntityManager(EntitySystemManager* p_systemManager);
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
@@ -97,7 +97,7 @@ namespace ECS
 
 	private:
 
-		ComponentSystemManager* m_systemManager;
+		EntitySystemManager* m_systemManager;
 		int m_nextID;
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		std::stack<int> m_recyledIds;
