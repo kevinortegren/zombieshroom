@@ -67,7 +67,6 @@ namespace RootEngine
 			std::shared_ptr<Render::ProgramInterface> m_program;
 			GLuint m_vertexArrayBuffer;
 			GLTextureSurfaceFactory* m_glTexSurfaceFactory;
-			Awesomium::Surface* m_surface;
 
 			void SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
