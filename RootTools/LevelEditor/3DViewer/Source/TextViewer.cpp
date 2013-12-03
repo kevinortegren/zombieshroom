@@ -15,6 +15,8 @@
 //#include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/EffectImporter.h>
 
+#include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
+
 #undef main
 
 bool m_running;
@@ -87,6 +89,26 @@ int main(int argc, char* argv[])
 			m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 			m_running = true;
 
+			m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
+
+			// Cube mesh.
+			std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
+			Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
+			cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
+			cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
+			cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
+			cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
+			cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
+
+			m_engineContext.m_resourceManager->LoadEffect("Mesh");
+
+			Render::Material material;
+			material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+
+			Render::RenderJob job;
+			job.m_mesh = cubeMesh;
+			job.m_material = &material;
+
 			// Start the main loop
 			uint64_t old = SDL_GetPerformanceCounter();
 			while (m_running)
@@ -98,17 +120,11 @@ int main(int argc, char* argv[])
 				HandleEvents();
 				// TODO: Update game state
 				// TODO: Render and present game
-		
-		
-			//	m_engineContext.m_physics->Update(dt);
-
 				m_engineContext.m_renderer->Clear();
 
-		
-				//playerControlSystem->Process(dt);
-				//renderingSystem->Process(dt);
+				m_engineContext.m_renderer->AddRenderJob(job);
+				m_engineContext.m_renderer->Render();
 
-				//m_engineContext.m_gui->Update(now/(float)SDL_GetPerformanceFrequency());
 				m_engineContext.m_renderer->Swap();
 			}
 
