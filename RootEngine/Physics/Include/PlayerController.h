@@ -14,8 +14,9 @@ public:
 	//Assumes the float* is a float[3]
 	void Walk(float* p_dir);
 	void Jump(float p_jumpforce);
-	void SetVelocity(float* p_velocity);
+	void Knockback(float* p_velocity);
 	void Update();
+	void SetOrientation(float* p_orientation);
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};
 	bool IsOnGround() const {return m_onGround;};

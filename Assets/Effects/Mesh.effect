@@ -1,0 +1,18 @@
+- name: Mesh
+  techniques:
+    - name: Diffuse
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: diffuse
+          slot: 0
+      programs:
+      - name: Mesh
+        shaders:
+          - name: mesh
+            type: vertex
+          - name: mesh
+            type: fragment

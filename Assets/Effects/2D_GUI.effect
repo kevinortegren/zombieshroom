@@ -1,0 +1,14 @@
+- name: 2D_GUI
+  techniques:
+    - name: 2D_GUI
+      uniforms:
+      textures:
+        - name: texSampler
+          slot: 0
+      programs:
+        - name: 2D_GUI
+          shaders:
+            - name: 2D_GUI
+              type: vertex
+            - name: 2D_GUI
+              type: fragment

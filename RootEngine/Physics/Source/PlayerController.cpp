@@ -13,7 +13,7 @@ struct IgnoreBodyAndGhostCast : public btCollisionWorld::ClosestRayResultCallbac
 		Ghost = p_ghostObject;	
 	}
 	//Ignore colliding with self
-	btScalar AddSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
+	btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 	{
 
 		if(p_rayResult.m_collisionObject == Body || p_rayResult.m_collisionObject == Ghost)
@@ -82,7 +82,7 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	m_ghostObject->setUserPointer(this);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 
@@ -198,7 +198,7 @@ void PlayerController::UpdatePosition()
 	//check if we hit something above us
 	IgnoreBodyAndGhostCast rayCallBack_top(m_rigidBody, m_ghostObject);
 	m_dynamicWorld->rayTest(m_rigidBody->getWorldTransform().getOrigin(), 
-		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset, 0.0f), rayCallBack_top);
+		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset + 2.0f, 0.0f), rayCallBack_top);
 	if(rayCallBack_top.hasHit())
 	{
 		m_rigidBody->getWorldTransform().setOrigin(m_previousPosition);
@@ -247,9 +247,27 @@ void PlayerController::Jump( float p_jumpforce )
 	}
 }
 
-void PlayerController::SetVelocity(float* p_velocity )
+void PlayerController::Knockback(float* p_velocity )
 {
-	m_manualVelocity = btVector3(p_velocity[0], p_velocity[1], p_velocity[2]);
+	m_rigidBody->applyCentralImpulse(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+	m_manualVelocity += btVector3(p_velocity[0], p_velocity[1], p_velocity[2]);
+}
+
+void PlayerController::SetOrientation( float* p_orientation )
+{
+
+	float x,y,z, w;
+	x = p_orientation[0];
+	y = p_orientation[1];
+	z = p_orientation[2];
+	w = p_orientation[3];
+	
+	btTransform transform;
+	transform.setIdentity();
+	transform.setRotation(btQuaternion(x,y,z, w));
+	transform.setOrigin(m_rigidBody->getWorldTransform().getOrigin());
+	m_rigidBody->setWorldTransform(transform);
+
 }
 
 

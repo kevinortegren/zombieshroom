@@ -5,6 +5,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 
 Logging	g_logger;
 
@@ -41,7 +42,7 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
-		g_logger.LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Creating Engine Context");
+		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
 		m_network = nullptr;
 		m_renderer = nullptr;
@@ -52,11 +53,17 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
+		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
+		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
+		}
+		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
+		{
+			LoadInput();
 		}
 		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
 		{
@@ -71,19 +78,23 @@ namespace RootEngine
 			LoadPhysics();
 		}
 
-
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
+		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
+		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
+		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
+		m_gameSharedContext.m_inputSys = m_inputSys;
 		 
+		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
 
 	GameSharedContext EngineMain::GetGameSharedContext()
@@ -103,7 +114,7 @@ namespace RootEngine
 		m_networkModule = DynamicLoader::LoadSharedLibrary("Network.dll");
 		if (m_networkModule != nullptr)
 		{
-			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "GetNetworkInterface");
+			GETNETWORKINTERFACE libGetNetworkInterface = (GETNETWORKINTERFACE) DynamicLoader::LoadProcess(m_networkModule, "CreateNetwork");
 			if (libGetNetworkInterface != nullptr)
 			{
 				m_network = (Network::NetworkManager*)libGetNetworkInterface(m_subsystemSharedContext);
@@ -118,6 +129,30 @@ namespace RootEngine
 		else
 		{
 			g_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
+		}
+	}
+
+	void EngineMain::LoadInput()
+	{
+		// Load the input module
+		m_inputModule = DynamicLoader::LoadSharedLibrary("InputManager.dll");
+		if (m_inputModule != nullptr)
+		{
+			CREATEINPUTINTERFACE libCreateInputInterface = (CREATEINPUTINTERFACE) DynamicLoader::LoadProcess(m_inputModule, "CreateInputSystem");
+			if (libCreateInputInterface != nullptr)
+			{
+				m_inputSys = (InputManager::InputInterface*)libCreateInputInterface(m_subsystemSharedContext);
+				m_inputSys->Startup();
+
+			}
+			else
+			{
+				g_logger.LogText(LogTag::INPUT,  LogLevel::FATAL_ERROR, "Failed to load Input subsystem: %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			g_logger.LogText(LogTag::INPUT,  LogLevel::FATAL_ERROR, "Failed to load Input subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -155,7 +190,6 @@ namespace RootEngine
 			{
 				m_gui = (GUISystem::guiInstance*)libGetGUI(m_subsystemSharedContext);
 				m_gui->Startup();
-				g_logger.LogText(LogTag::GUI,  LogLevel::DEBUG_PRINT, "IT WORKS");
 			}
 			else
 			{
@@ -176,7 +210,7 @@ namespace RootEngine
 			CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
 			if(libGetPhysics != nullptr)
 			{
-				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext);
+				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext, m_renderer, &m_resourceManager);
 				m_physics->Startup();
 				
 			}
@@ -203,3 +237,4 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
+
