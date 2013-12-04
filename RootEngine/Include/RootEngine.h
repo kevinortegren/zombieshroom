@@ -63,7 +63,7 @@ namespace RootEngine
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
-		Script::ScriptInterface* m_script;
+		Script::ScriptInterface* m_scriptEngine;
 
 	};
 }

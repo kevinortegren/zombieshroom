@@ -9,6 +9,7 @@ project(${PROJECT_NAME})
 file(GLOB_RECURSE SHADERS Shaders/*)
 file(GLOB_RECURSE EFFECTS Effects/*)
 file(GLOB_RECURSE GUI GUI/*)
+file(GLOB_RECURSE SCRIPTS Scripts/*)
 
 # Add the target
 
@@ -19,3 +20,4 @@ add_custom_target(${PROJECT_NAME} ALL
 source_group("Shaders" FILES ${SHADERS})
 source_group("Effects" FILES ${EFFECTS})
 source_group("GUI" FILES ${GUI})
+source_group("SCRIPTS" FILES ${SCRIPTS})

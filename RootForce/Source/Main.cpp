@@ -101,6 +101,9 @@ Main::~Main()
 
 void Main::Start() 
 {
+//	m_engineContext.m_script->ExecuteScript();
+
+
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");

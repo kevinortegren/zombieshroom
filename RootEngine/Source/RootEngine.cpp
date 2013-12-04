@@ -38,9 +38,9 @@ namespace RootEngine
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
-		if(m_script != nullptr)
+		if(m_scriptEngine != nullptr)
 		{
-			m_script->Shutdown();
+			m_scriptEngine->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_scriptModule);
 		}
 	}
@@ -54,7 +54,7 @@ namespace RootEngine
 		m_renderer = nullptr;
 		m_gui = nullptr;
 		m_physics = nullptr;
-		m_script = nullptr;
+		m_scriptEngine = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
 
@@ -93,6 +93,9 @@ namespace RootEngine
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
+		m_scriptEngine->SetWorkingDir(p_workingDirectory);
+
+
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -106,7 +109,7 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		m_gameSharedContext.m_script = m_script;
+		m_gameSharedContext.m_script = m_scriptEngine;
 		
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
@@ -248,8 +251,8 @@ namespace RootEngine
 
 			if(libGetScriptEngine != nullptr)
 			{
-				m_script = (Script::ScriptInterface*)libGetScriptEngine(m_subsystemSharedContext);
-				m_script->Startup();
+				m_scriptEngine = (Script::ScriptInterface*)libGetScriptEngine(m_subsystemSharedContext);
+				m_scriptEngine->Startup();
 			}
 			else
 			{
