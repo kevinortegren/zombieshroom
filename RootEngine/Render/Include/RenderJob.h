@@ -17,7 +17,7 @@ namespace Render
 
 	struct RenderJob
 	{
-		std::shared_ptr<Mesh> m_mesh;
+		Render::MeshInterface* m_mesh;
 
 		Material* m_material;	
 		Uniforms m_uniforms;
