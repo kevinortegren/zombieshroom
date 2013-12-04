@@ -32,7 +32,9 @@ namespace Render
 			GLint(texture.levels()),
 			GLenum(gli::internal_format(texture.format())),
 			GLsizei(texture.dimensions().x),
-			GLsizei(texture.dimensions().y)); 
+			GLsizei(texture.dimensions().y));
+
+		
 
 		if(gli::is_compressed(texture.format()))
 		{
@@ -65,7 +67,6 @@ namespace Render
 
 		return true;
 	}
-
 
 	void Texture::Enable(unsigned int slot)
 	{

@@ -44,6 +44,13 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					 p_node["Diffuse"] >> diffuse;
 					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(diffuse);
 				 }
+				 const YAML::Node* specularNode = p_node.FindValue("Specular");
+				 if(specularNode != nullptr)
+				 {
+					 std::string specular;
+					 p_node["Specular"] >> specular;
+					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(specular);
+				 }
 			}
 			break;
 		case 1:

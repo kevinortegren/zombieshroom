@@ -307,6 +307,8 @@ namespace Render
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
+				// Static set of uniforms/textures.
+
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 				if((*itr).m_material->m_diffuseMap != nullptr)
@@ -316,6 +318,13 @@ namespace Render
 					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_diffuseMap->GetHandle());
 				}
 				
+				if((*itr).m_material->m_specularMap != nullptr)
+				{
+					// Bind diffuse texture.
+					glActiveTexture(GL_TEXTURE0 + 1);
+					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_specularMap->GetHandle());
+				}
+
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
