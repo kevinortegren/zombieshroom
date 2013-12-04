@@ -1,5 +1,5 @@
 #pragma once
-
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
@@ -58,7 +58,7 @@ namespace Physics
 		virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
 
 		virtual void RemoveObject(int p_objectIndex, int p_type) = 0;
-
+		virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		
 	};
 
@@ -97,7 +97,7 @@ namespace Physics
 		void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 		void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
 		void RemoveObject(int p_objectIndex, int p_type);
-
+		std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
 	private:
 		/*const int TERRAIN = 0;

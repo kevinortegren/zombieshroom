@@ -8,15 +8,15 @@
         - Entity: 0
           Model: sphere
           Effect: Mesh
-          Diffuse: sphere_diffuse.dds
+          Diffuse: sphere_diffuse
         - Entity: 1
           Model: sphere
           Effect: Mesh
-          Diffuse: sphere_diffuse.dds
+          Diffuse: sphere_diffuse
         - Entity: 2
           Model: testchar
           Effect: Mesh
-          Diffuse: v6.dds
+          Diffuse: v6
     - Type: 1
       Data:
         - Entity: 0

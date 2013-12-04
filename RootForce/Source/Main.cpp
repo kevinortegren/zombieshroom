@@ -98,15 +98,6 @@ void Main::Start()
 {
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-	// Cube mesh.
-	std::shared_ptr<Render::Mesh> cubeMesh = g_engineContext.m_renderer->CreateMesh();
-	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	cubeMesh->m_vertexBuffer = g_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_elementBuffer = g_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_vertexAttributes = g_engineContext.m_renderer->CreateVertexAttributes();
-	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
-	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
-
 	{
 		// Initialize the system for controlling the player.	
 		std::vector<RootForce::Keybinding> keybindings(4);
@@ -139,6 +130,11 @@ void Main::Start()
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 	}
+
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
 
 	// Initialize render and point light system.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);

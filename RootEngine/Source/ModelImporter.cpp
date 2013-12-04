@@ -47,7 +47,7 @@ namespace RootEngine
 		for (unsigned int i = 0 ; i < p_scene->mNumMeshes ; i++) 
 		{
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
-			InitMesh(i, paiMesh);
+			InitMesh(i, paiMesh, p_filename);
 		}
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load  %d textures to model", p_scene->mNumMaterials);
@@ -55,7 +55,7 @@ namespace RootEngine
 		InitMaterials(p_scene, p_filename);
 	}
 
-	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh )
+	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
 		std::vector<Render::Vertex1P1N1UV> vertices;
 		std::vector<unsigned int> indices;
@@ -89,20 +89,17 @@ namespace RootEngine
 		
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
-		std::shared_ptr<Render::Mesh> tempmesh = m_renderer->CreateMesh();
-		tempmesh->m_vertexBuffer = m_renderer->CreateBuffer();
-		tempmesh->m_elementBuffer = m_renderer->CreateBuffer();
-		tempmesh->m_vertexAttributes = m_renderer->CreateVertexAttributes();
-		tempmesh->CreateIndexBuffer(&indices[0], indices.size());
-		tempmesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-		tempmesh->m_primitive = GL_TRIANGLES;
+		//Set up the mesh description
+		MESH_DESC desc;
+		desc.handle		= p_filename + std::to_string(p_index); //Filename + index
+		desc.verts		= vertices;
+		desc.indices	= indices;
+		desc.primitive	= GL_TRIANGLES;
+		desc.faces		= p_aiMesh->mNumFaces;
 
-		m_model->m_meshes.push_back(tempmesh);
-		m_model->meshIndices = indices;
-		m_model->meshPoints = GetMeshPoints(vertices);
-		m_model->numberOfFaces = p_aiMesh->mNumFaces;
-		m_model->numberOfIndices = indices.size();
-		m_model->numberOfVertices = vertices.size();
+		//Add the handle to the model
+		m_model->m_meshes.push_back(m_resourceManager->AddRenderMesh(desc));
+		m_model->m_physicsMeshes.push_back(m_resourceManager->AddPhysicsMesh(desc));
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
@@ -111,53 +108,61 @@ namespace RootEngine
 		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 
 		{
 			const aiMaterial* pMaterial = p_scene->mMaterials[i];
-			aiString Path;
+
+			aiString path;
+			std::string texName;
+
 			if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[0] = Path.data;
+						m_model->m_textureHandles[0] = texName;
 					}
 				}
 			}
 			if (pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[1] = Path.data;
+						m_model->m_textureHandles[1] = texName;
 					}
 				}
 			}
 			if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[2] = Path.data;
+						m_model->m_textureHandles[2] = texName;
 					}
 				}
 			}
 		}
 	}
 
-	std::vector<glm::vec3> ModelImporter::GetMeshPoints( std::vector<Render::Vertex1P1N1UV> p_vertices )
+	std::string ModelImporter::GetNameFromPath( std::string p_path )
 	{
-		std::vector<glm::vec3> returnVec;
+		std::string cutPath;
+		std::string::size_type slashIndex, dotIndex;
 
-		for (Render::Vertex1P1N1UV v : p_vertices ) 
-		{
-			returnVec.push_back(v.m_pos);
-		}
-
-		return returnVec;
+		// Extract the file name
+		cutPath		= p_path;
+		slashIndex	= cutPath.find_last_of("/")+1;
+		cutPath		= cutPath.substr(slashIndex, cutPath.size());
+		dotIndex	= cutPath.find_last_of(".");
+		cutPath		= cutPath.substr(0, dotIndex);
+		return cutPath;
 	}
 
 }
