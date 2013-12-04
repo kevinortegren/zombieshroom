@@ -214,7 +214,8 @@ void Main::Start()
 	
 	
 	RootForce::PlayerInputControlComponent* guyControl = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy);
-	guyControl->speed = 10.0f;
+	guyControl->m_speed = 10.0f;
+	guyControl->m_mouseSensitivity = 0.3f;
   
 	m_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	m_engineContext.m_gui->LoadURL("debug.html");

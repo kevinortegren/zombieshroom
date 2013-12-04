@@ -68,7 +68,7 @@ namespace RootForce
 		glm::vec3 right = glm::normalize(glm::cross(facing, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		// Get the speed of the player
-		float speed = controller->speed;
+		float speed = controller->m_speed;
 
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
@@ -86,11 +86,15 @@ namespace RootForce
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					transform->m_position -= right * speed * dt;
-					//transform->m_orientation.YawGlobal(90.0f * dt);
+					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+
 					break;
 				case PlayerAction::ORIENTATE:
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
+					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
+					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+					
 					break;
 				case PlayerAction::SELECT_ABILITY:
 					// TODO: Implement selection of abilities.
