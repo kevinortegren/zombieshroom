@@ -18,10 +18,15 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				 const YAML::Node* effectNode = p_node.FindValue("Effect");
 				 if(effectNode != nullptr)
 				 {
+					 // Load effect.
 					 std::string effect;
 					 p_node["Effect"] >> effect;
 					 g_engineContext.m_resourceManager->LoadEffect(effect);
 					 renderable->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effect);
+
+					 // Allocate memory for this renderables uniforms.
+					renderable->m_material.m_params = g_engineContext.m_renderer->CreateEffectParams();
+					renderable->m_material.m_params->AllocateParams(renderable->m_material.m_effect);
 				 }
 
 				 const YAML::Node* modelNode = p_node.FindValue("Model");

@@ -307,7 +307,6 @@ namespace Render
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
-				// Bind PerObjects uniforms.
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 				if((*itr).m_material->m_diffuseMap != nullptr)

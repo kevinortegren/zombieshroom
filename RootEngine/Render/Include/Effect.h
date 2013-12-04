@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
+
+#include <RootEngine\Render\Include\Semantics.h>
+#include <RootEngine\Render\Include\Buffer.h>
 
 namespace Render
 {
@@ -24,8 +28,8 @@ namespace Render
 	public:
 		virtual void CreateProgram() = 0;
 		virtual GLint AttachShader( GLenum p_shaderType, const char* p_filename ) = 0;
-		virtual GLint Compile( ) = 0;
-		virtual void Apply( ) = 0;
+		virtual GLint Compile() = 0;
+		virtual void Apply() = 0;
 	
 		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
@@ -76,10 +80,15 @@ namespace Render
 	class Technique : public TechniqueInterface
 	{
 	public:
-		//TODO: Move uniforms/samplers here.
-
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
+
+		std::vector<std::pair<int, std::shared_ptr<Render::BufferInterface>>> m_uniforms;
+		std::vector<std::pair<int, GLuint>> m_textures;
+		std::map<Semantic::Semantic, unsigned int> m_data; // offsets.
+		
+		void BindUniforms();
+		void BindTextures();
 
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;
@@ -100,5 +109,15 @@ namespace Render
 
 	private:
 		std::vector<std::shared_ptr<Technique>> m_techniques;
+	};
+
+	struct EffectParamsInterface
+	{
+		virtual void AllocateParams(EffectInterface* p_effect) = 0;
+	};
+
+	struct EffectParams : public EffectParamsInterface
+	{
+		void AllocateParams(EffectInterface* p_effect);
 	};
 }
