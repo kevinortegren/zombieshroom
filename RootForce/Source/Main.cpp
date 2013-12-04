@@ -19,6 +19,8 @@
 
 #undef main
 
+bool g_isRemote = false; //TESTING ONLY! I'm sorry for writing glovar :/
+
 TEST(Test, Foo) 
 {
 	int a = 0;
@@ -32,6 +34,10 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
+		if(argc > 1 && strcmp(argv[1], "-remote") == 0)
+		{
+			g_isRemote = true;
+		}
 		if (argc > 1 && strcmp(argv[1], "-test") == 0)
 		{
 			testing::InitGoogleTest(&argc, argv);
@@ -40,6 +46,7 @@ int main(int argc, char* argv[])
 			std::cin.get();
 			return result;
 		}
+		
 		else
 		{
 			Main m(path);
@@ -106,6 +113,16 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
+	if(g_isRemote)
+	{
+		m_engineContext.m_network->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
+		((RootEngine::Network::RemoteServer*)m_engineContext.m_network->GetNetworkSystem())->ConnectTo("127.0.0.1", 2070);
+	}
+	else
+	{
+		m_engineContext.m_network->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
+		((RootEngine::Network::LocalServer*)m_engineContext.m_network->GetNetworkSystem())->Host(2070, false);
+	}
 	// Cube mesh.
 	std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
 	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
@@ -314,6 +331,28 @@ void Main::Start()
 		m_engineContext.m_renderer->Render();
 		m_engineContext.m_renderer->RenderLines();
 
+		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_0) == RootEngine::InputManager::KeyState::DOWN_EDGE && g_isRemote)
+		{
+			RootEngine::Network::Message message;
+			message.Data = (uint8_t*)"CODE FOR THE CODE GOD!";
+			message.DataSize = 23;
+			message.MessageID = NON_RAKNET_MESSAGE_ID;
+			message.RecipientID = -1;
+			message.Reliability = PacketReliability::RELIABLE_ORDERED;
+			m_engineContext.m_network->GetNetworkSystem()->Send(message);
+		}
+
+		m_engineContext.m_network->GetNetworkSystem()->Update();
+
+		for(RootEngine::Network::Message* message = m_engineContext.m_network->GetNetworkSystem()->PollMessage(); 
+			message; 
+			delete message, message = m_engineContext.m_network->GetNetworkSystem()->PollMessage())
+		{
+			std::string text;
+			for(int i = 0; i < message->DataSize; i++)
+				text += message->Data[i];
+			m_engineContext.m_logger->LogTextToConsole(LogTag::NETWORK, LogLevel::DEBUG_PRINT,text.c_str());
+		}
 
 		m_engineContext.m_gui->Update();
 		m_engineContext.m_gui->Render();
