@@ -571,7 +571,67 @@ namespace Physics
 		}
 	}
 
+	float RootPhysics::GetMass( int p_objectIndex )
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return -1;
+		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		{
+			return m_playerObject.at(index)->GetMass();
+		}
+
+		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+		{
+			return 1/m_dynamicObjects.at(index)->getInvMass();
+		}
 	
+		return -1 ;
+		
+
+	}
+	int RootPhysics::GetType(int p_objectIndex)
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return -1;
+		return m_userPointer.at(p_objectIndex)->m_type;
+
+	}
+
+	float RootPhysics::GetStepHeight( int p_objectIndex )
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return -1;
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+			return m_playerObject.at(index)->GetStepHeight();
+		}
+		return -1;
+	}
+	float RootPhysics::GetMaxSpeed( int p_objectIndex )
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return -1;
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+			return m_playerObject.at(index)->GetMaxSpeed();
+		}
+		return -1;
+	}
+	float RootPhysics::GetModelHeight( int p_objectIndex )
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return -1;
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+			return m_playerObject.at(index)->GetModetHeight();
+		}
+		return -1;
+	}	
 
 }
 }

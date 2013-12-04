@@ -21,7 +21,7 @@ namespace RootForce
 			
 			Transform* transform = m_transforms.Get(p_entity);
 			PhysicsAccessor* accessor = m_physicsAccessor.Get(p_entity);
-			if(accessor == nullptr)
+			if(accessor->m_handle == nullptr)
 			{
 				//m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Entity %i has no physicsaccessor", p_entity->GetId());
 				return;

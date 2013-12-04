@@ -4,7 +4,12 @@
 
 namespace RootEngine
 {
-	class YamlParser
+	class YamlParserInterface
+	{
+		virtual void Load(const std::string& p_filepath) = 0;
+	};
+
+	class YamlParser : public YamlParserInterface
 	{
 	public:
 		void Load(const std::string& p_filepath);

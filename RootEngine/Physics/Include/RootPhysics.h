@@ -1,5 +1,5 @@
 #pragma once
-
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
@@ -18,12 +18,9 @@ namespace RootEngine
 	namespace Physics
 	{
 		
-		
-	
 		class PhysicsInterface : public RootEngine::SubsystemInterface
 		{
 		public:
-		
 			virtual void Init() = 0;
 			virtual void CreatePlane(float* p_normal, float* p_position) = 0;
 			virtual void Update(float p_dt) = 0;
@@ -42,27 +39,33 @@ namespace RootEngine
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
 			virtual int* AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass) = 0;
-			///Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
+			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
 			virtual int* AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass,
 				float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
-
-			///Creates a ability and launches it from a position. It will travel in a direction with a speed. Returns a handle to the physic object
-			virtual int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity) = 0;
-
-			virtual void SetGravity(int p_objectIndex, float* p_gravity) = 0;
-			/// p_playerPos should be of type float[3]
-			virtual void GetPos(int p_objectIndex, float* p_pos) = 0;
+			/// p_Pos should be of type float[3]
+			virtual void GetPos(int p_objectIndex, float* p_pos)= 0;
+			virtual float GetMass(int p_objectIndex) = 0;
+			virtual int GetType(int p_objectIndex) = 0;
+			virtual float GetMaxSpeed(int p_objectIndex) = 0;
+			virtual float GetStepHeight(int p_objectIndex) = 0;
+			virtual float GetModelHeight(int p_objectIndex) = 0;
 
 			virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
+			
+				
 
 			virtual void RemoveObject(int p_objectIndex) = 0;
-
-		
+			virtual std::shared_ptr<Physics::PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		};
 		class RootPhysics;
 		typedef void (RootPhysics::*CollisionFunc)(int);
+		
+		/*const int TERRAIN = 0;
+		const int PLAYER = 1;
+		const int ABILITY = 2;*/
+
 		struct CustomUserPointer
 		{
 			int m_type;
@@ -107,13 +110,17 @@ namespace RootEngine
 
 			int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity);
 			void GetPos(int p_objectIndex, float* p_pos);	/// p_pos should be of type float[3]
-
+			float GetMass(int p_objectIndex);
+			int GetType(int p_objectIndex);
+			float GetMaxSpeed(int p_objectIndex);
+			float GetStepHeight(int p_objectIndex);
+			float GetModelHeight(int p_objectIndex);
 			void SetGravity(int p_objectIndex, float* p_gravity);
 			void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 			void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 			void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
 			void RemoveObject(int p_objectIndex);
-
+			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
 		private:
 		
@@ -131,6 +138,7 @@ namespace RootEngine
 			std::vector<CustomUserPointer*> m_userPointer;
 			std::vector<btRigidBody*> m_dynamicObjects;
 			std::vector<PlayerController*> m_playerObject;
+			
 		};
 	}
 }

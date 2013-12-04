@@ -79,7 +79,6 @@ namespace RootEngine
 			LoadPhysics();
 		}
 
-		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
@@ -94,7 +93,9 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		 
+
+		m_resourceManager.Init(p_workingDirectory, &m_gameSharedContext);
+
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
 

@@ -18,9 +18,13 @@ public:
 	void Update();
 	void SetOrientation(float* p_orientation);
 	void RemovePlayer();
-	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
-	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};
-	btQuaternion GetOrientation() const {return m_rigidBody->getWorldTransform().getRotation();};
+	btVector3 GetPosition() const {return m_motionTransform.getOrigin();}
+	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();}
+	btQuaternion GetOrientation() const {return m_rigidBody->getWorldTransform().getRotation();}
+	float GetMass() const {return 1/m_rigidBody->getInvMass();}
+	float GetMaxSpeed() const {return m_maxSpeed;}
+	float GetStepHeight() const {return m_stepHeight;}
+	float GetModetHeight() const {return m_heightOffset*2;}
 	bool IsOnGround() const {return m_onGround;};
 	void SetUserPointer(void* p_userPointer);
 private:

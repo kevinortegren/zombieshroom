@@ -4,7 +4,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 
 #include <Utility/ECS/Include/World.h>
-#include <Transform.h>
+#include <Utility/ECS/Include/Shared/Transform.h>
 #include <Physics.h>
 
 namespace RootForce
