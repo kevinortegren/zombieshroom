@@ -31,7 +31,7 @@ namespace RootEngine
 		if (aiscene) 
 		{
 			InitFromScene(aiscene, p_fileName);
-			m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Successfully loaded mesh '%s'", fileName);
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded mesh '%s'", fileName);
 		}
 		else 
 		{
