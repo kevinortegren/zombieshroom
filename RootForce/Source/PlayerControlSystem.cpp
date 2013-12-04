@@ -82,7 +82,7 @@ namespace RootForce
 					break;
 				case PlayerAction::STRAFE_RIGHT:
 					transform->m_position += right * speed * dt;
-					//transform->m_orientation.YawGlobal(-90.0f * dt);
+					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					transform->m_position -= right * speed * dt;
