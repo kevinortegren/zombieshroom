@@ -264,7 +264,7 @@ void Main::Start()
 
 	float pos[3] = {3,0,0};
 	float rot[3] = {0,0,0};
-	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5000.0f, 10, 0.2f,0.02f);
+	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
 	float pos2[3] = {0,5,-20};
 	float rot2[3] = {0,0,0};
 	guyPhysics2->m_handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);

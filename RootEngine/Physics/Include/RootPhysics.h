@@ -17,7 +17,8 @@ namespace RootEngine
 
 	namespace Physics
 	{
-
+		
+		
 	
 		class PhysicsInterface : public RootEngine::SubsystemInterface
 		{
@@ -56,17 +57,20 @@ namespace RootEngine
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
 
-			virtual void RemoveObject(int p_objectIndex, int p_type) = 0;
+			virtual void RemoveObject(int p_objectIndex) = 0;
 
 		
 		};
+		class RootPhysics;
+		typedef void (RootPhysics::*CollisionFunc)(int);
 		struct CustomUserPointer
 		{
 			int m_type;
 			int m_vectorIndex;
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			bool m_collided;
-			void* m_collisionFunc(int); // A function from the gamelogic that should be called when a collision (not static or dynamic) object occurs
+			CollisionFunc m_collisionFunc;
+
 			~CustomUserPointer()
 			{
 				delete m_id;
@@ -108,7 +112,7 @@ namespace RootEngine
 			void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 			void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 			void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
-			void RemoveObject(int p_objectIndex, int p_type);
+			void RemoveObject(int p_objectIndex);
 
 
 		private:

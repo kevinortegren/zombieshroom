@@ -86,8 +86,20 @@ namespace Physics
 		int test2 = ((CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer()))->m_type;
 		if (pointer1->m_type == TYPE_PLAYER || pointer2->m_type == TYPE_PLAYER)
 		{
+			
+			
 			if (pointer2->m_type == TYPE_ABILITY || pointer1->m_type == TYPE_ABILITY)
 			{
+				void* x = RootEngine::Physics::RootPhysics::GetInstance();
+				if(pointer1->m_type == TYPE_ABILITY)
+				{
+					
+					((RootPhysics*)x)->RemoveObject(*(pointer1->m_id));
+				}
+				else
+				{
+					((RootPhysics*)x)->RemoveObject(*(pointer2->m_id));
+				}
 				//Call the functions here	
 			}
 		}
@@ -230,6 +242,8 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_type = TYPE_ABILITY;
 		userPointer->m_id = new int();
+		
+		(userPointer->m_collisionFunc) = &RootPhysics::RemoveObject;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		objectBody->setUserPointer((void*)userPointer);
 		return userPointer->m_id;
@@ -331,7 +345,7 @@ namespace Physics
  		m_playerObject.at(index)->Knockback(temp * p_pushForce);
 	}
 
-	void RootPhysics::RemoveObject( int p_objectIndex, int p_type )
+	void RootPhysics::RemoveObject( int p_objectIndex)
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
