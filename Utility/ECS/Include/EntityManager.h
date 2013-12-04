@@ -15,7 +15,11 @@ namespace ECS
 	class EntityManager
 	{
 	public:
-		EntityManager(EntitySystemManager* p_systemManager);
+		friend class World;
+		friend class EntityExporter;
+		friend class EntityImporter;
+
+		EntityManager(EntitySystemManager* p_systemManager, int p_numComponents);
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
@@ -101,6 +105,6 @@ namespace ECS
 		int m_nextID;
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		std::stack<int> m_recyledIds;
-		std::vector<std::vector<std::shared_ptr<ComponentInterface>>> m_components;
+		std::vector<std::vector<std::shared_ptr<ComponentInterface>>> m_components; // CompID, EntityId, CompType.
 	};
 }

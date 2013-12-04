@@ -1,20 +1,33 @@
 #pragma once
-#include "Networker.h"
+#include <vector>
 
 #define MAX_CLIENTS 12
 namespace RootEngine
 {
 	namespace Network
 	{
-		class Server :
-			public Networker
+		typedef unsigned char ubyte;
+		typedef signed char byte;
+
+		struct Message
+		{
+			ubyte MessageID;
+			byte RecipientID;
+			bool Reliable;
+			ubyte DataSize;
+			byte* Data;
+		};
+
+		class Server abstract
 		{
 		public:
 			Server(void);
 			~Server(void);
 
-			void Host( USHORT p_port = DEFAULT_PORT );
-			void ProcessPacket( RakNet::Packet* p_packet );
+			virtual bool Send(Message p_message) = 0;
+			Message* PollMessage();
+		protected:
+			std::vector<Message> m_message;
 		};
 	}
 }

@@ -8,7 +8,7 @@
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
-#include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
+#include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
 #endif
 

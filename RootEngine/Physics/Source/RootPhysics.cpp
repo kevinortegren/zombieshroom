@@ -82,7 +82,7 @@ namespace Physics
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
 		gContactAddedCallback = &CallbackFunc;
-		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Physics subsystem loaded");
+		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		m_debugDrawer = new DebugDrawer();
 		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawAabb | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);

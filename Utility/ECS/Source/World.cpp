@@ -25,3 +25,14 @@ float ECS::World::GetDelta()
 	return m_dt;
 }
 
+ECS::EntityImporter* ECS::World::GetEntityImporter()
+{
+	return &m_importer;
+}
+
+ECS::EntityExporter* ECS::World::GetEntityExporter()
+{
+	return &m_exporter;
+}
+
+

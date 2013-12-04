@@ -1,10 +1,10 @@
 #pragma once
 
 #include <map>
-#include <Utility/ECS/Include/World.h>
-#include <RootForce\Include\Transform.h>
-#include <RootEngine/InputManager/Include/InputInterface.h>
-#include <RootEngine/Include/Logging/Logging.h>
+#include <Utility\ECS\Include\World.h>
+#include <Utility\ECS\Include\Shared\Transform.h>
+#include <RootEngine\InputManager\Include\InputInterface.h>
+#include <RootEngine\Include\Logging\Logging.h>
 
 namespace RootForce
 {
