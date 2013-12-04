@@ -150,37 +150,59 @@ int main(int argc, char* argv[])
 			
 			int numberMeshes;
 
+			Render::Vertex1P1N1UV* m_vertices;
+			m_vertices = new Render::Vertex1P1N1UV[g_maxVerticesPerMesh];
+
 			//Load existing objects
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 			numberMeshes = *RM.NumberOfMeshes;
+			*RM.MeshIdChange = -1;
 
 			ReleaseMutex(RM.IdMutexHandle);
 
 			for(int i = 0; i < numberMeshes; i++)
 			{
-				Render::Vertex* m_vertices;
+				//Render::Vertex* m_vertices;
 				Entities.push_back(CreateEntity(&m_world));
 				
 				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
-				m_vertices = new Render::Vertex1P[RM.PmeshList[i]->nrOfVertices];
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_position = RM.PmeshList[i]->transformation.position;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_scale = RM.PmeshList[i]->transformation.scale;
+
+				glm::quat rotation;
+				rotation.x = RM.PmeshList[i]->transformation.rotation.x;
+				rotation.y = RM.PmeshList[i]->transformation.rotation.y;
+				rotation.z = RM.PmeshList[i]->transformation.rotation.z;
+				rotation.w = RM.PmeshList[i]->transformation.rotation.w;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_orientation.SetOrientation(rotation);
+
+				//m_vertices = new Render::Vertex1P[RM.PmeshList[i]->nrOfVertices];
+
+				//m_vertices = new Render::Vertex1P1N1UV[RM.PmeshList[i]->nrOfVertices];
 
 				for(int j = 0; j < RM.PmeshList[i]->nrOfVertices; j++)
 				{
 					m_vertices[j].m_pos = RM.PmeshList[i]->vertex[j];
+					m_vertices[j].m_normal = RM.PmeshList[i]->normal[j];
+					m_vertices[j].m_UV = RM.PmeshList[i]->UV[j];
+
 				}
 
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
+				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = material;
 
 				ReleaseMutex(RM.MeshMutexHandle);
 
 			}
+
+
 
 			// Start the main loop
 			uint64_t old = SDL_GetPerformanceCounter();
@@ -197,50 +219,52 @@ int main(int argc, char* argv[])
 				*RM.MeshIdChange = -1;
 				ReleaseMutex(RM.IdMutexHandle);
 
-				/*if(MeshIndex != -1)
+				if(MeshIndex != -1)
 				{
+					//Render::Vertex* m_vertices;
+					if(MeshIndex > Entities.size()-1)
+					{
+						Entities.push_back(CreateEntity(&m_world));
+					}
 				
-				Render::Vertex* m_vertices;
-				if(MeshIndex > Entities.size())
-				{
-					Entities.push_back(CreateEntity(&m_world));
-				}
+					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
+
+					glm::quat rotation;
+					rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
+					rotation.y = RM.PmeshList[MeshIndex]->transformation.rotation.y;
+					rotation.z = RM.PmeshList[MeshIndex]->transformation.rotation.z;
+					rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;
 				
-				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_orientation.Rotate(rotation);
 
-				m_vertices = new Render::Vertex1P[RM.PmeshList[MeshIndex]->nrOfVertices];
+					//m_vertices = new Render::Vertex1P[RM.PmeshList[MeshIndex]->nrOfVertices];
+					for(int j = 0; j < RM.PmeshList[MeshIndex]->nrOfVertices; j++)
+					{
+						m_vertices[j].m_pos = RM.PmeshList[MeshIndex]->vertex[j];
+						m_vertices[j].m_normal = RM.PmeshList[MeshIndex]->normal[j];
+						m_vertices[j].m_UV = RM.PmeshList[MeshIndex]->UV[j];
 
-				for(int j = 0; j < RM.PmeshList[MeshIndex]->nrOfVertices; j++)
-				{
-					m_vertices[j].m_pos = RM.PmeshList[MeshIndex]->vertex[j];
+					}
+
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = material;
+
+					//delete [] m_vertices;
+					ReleaseMutex(RM.MeshMutexHandle);
+
 				}
-
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = material;
-
-				ReleaseMutex(RM.MeshMutexHandle);
-
-				}*/
 
 				HandleEvents();
 
 				m_engineContext.m_renderer->Clear();
 
 				renderingSystem->Process();
-				
-				//for(int i = 0; i < numberMeshes; i ++)
-				//{
-				//	if(Mesh[i]->m_vertexBuffer != nullptr)
-				//	{
-				//		job[i].m_mesh = Mesh[i];
-				//		job[i].m_material = &material;
-
-				//		m_engineContext.m_renderer->AddRenderJob(job[i]);
-				//	}
-				//}
 
 				m_engineContext.m_renderer->Render();
 

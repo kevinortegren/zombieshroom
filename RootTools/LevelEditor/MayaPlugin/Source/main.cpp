@@ -433,6 +433,8 @@ void MayaListToList(MObject node)
 	if (node.hasFn(MFn::kMesh))
 	{
 		MFnMesh mesh = node;
+		bool updateTrans = false;
+		bool updateMesh = false;
 
 		int numVertices = mesh.numVertices();
 		//SM.meshList[meshIndex].nrOfVertices = numVertices;
@@ -526,7 +528,7 @@ void MayaListToList(MObject node)
 
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
-					SM.UpdateSharedMesh(meshIndex, false, true, currNrMeshes);
+					updateMesh = true;
 				}
 			}
 
@@ -538,7 +540,7 @@ void MayaListToList(MObject node)
 			MFnTransform transform = mesh.parent(0, &status);
 
 			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, space_local);
 
 			SM.meshList[meshIndex].transformation.position.x = transform.getTranslation(space_transform).x;
 			SM.meshList[meshIndex].transformation.position.y = transform.getTranslation(space_transform).y;
@@ -551,6 +553,7 @@ void MayaListToList(MObject node)
 			SM.meshList[meshIndex].transformation.rotation.x = rotX;
 			SM.meshList[meshIndex].transformation.rotation.y = rotY;
 			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
+			SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
 			//MString tempString = SM.meshList[meshIndex].transformation.name.c_str();			
 			//Print("Mesh ", tempString, " has been addedd to list at index ", meshIndex);
@@ -558,11 +561,14 @@ void MayaListToList(MObject node)
 			/*Print(transform.getTranslation(space_transform).x);
 			Print(SM.meshList[meshIndex].transformation.position.x);*/
 
-			SM.UpdateSharedMesh(meshIndex, true, false, currNrMeshes);
-
-			if(!alreadyExists)
-				meshIndex++;
+			updateTrans = true;
 		}
+
+		if(updateMesh || updateTrans)
+			SM.UpdateSharedMesh(meshIndex, updateTrans, updateMesh, currNrMeshes);
+
+		if(!alreadyExists)
+			meshIndex++;
 	}
 	///////////////////////	LIGHT
 	else if(node.hasFn(MFn::kLight))

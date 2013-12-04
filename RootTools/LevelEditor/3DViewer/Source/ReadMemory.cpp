@@ -103,7 +103,7 @@ int ReadMemory::shutdown()
 {
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
-	//CloseHandle(MeshMutexHandle);
-	//CloseHandle(IdMutexHandle);
+	CloseHandle(MeshMutexHandle);
+	CloseHandle(IdMutexHandle);
 	return 0;
 }

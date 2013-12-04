@@ -15,7 +15,7 @@ struct Transform
 {
 	char name[30];
 	glm::vec3 position;
-	glm::vec3 rotation;
+	glm::vec4 rotation;
 	glm::vec3 scale;
 };
 
