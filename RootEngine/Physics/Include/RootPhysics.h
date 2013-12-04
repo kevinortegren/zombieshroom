@@ -50,9 +50,7 @@ namespace RootEngine
 
 			virtual void SetGravity(int p_objectIndex, float* p_gravity) = 0;
 			/// p_playerPos should be of type float[3]
-			virtual void GetPlayerPos(int p_objectIndex, float* p_playerPos)= 0;
-			/// p_objectPos should be of type float[3]
-			virtual void GetObjectPos(int p_objectIndex, float* p_objectPos) = 0;
+			virtual void GetPos(int p_objectIndex, float* p_pos) = 0;
 
 			virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
@@ -104,8 +102,7 @@ namespace RootEngine
 										float* p_position, float* p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
 
 			int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity);
-			void GetPlayerPos(int p_objectIndex, float* p_playerPos);	/// p_playerPos should be of type float[3]	
-			void GetObjectPos(int p_objectIndex, float* p_objectPos);/// p_objectPos should be of type float[3]
+			void GetPos(int p_objectIndex, float* p_pos);	/// p_pos should be of type float[3]
 
 			void SetGravity(int p_objectIndex, float* p_gravity);
 			void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);

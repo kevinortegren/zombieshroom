@@ -9,6 +9,7 @@
 
 #include <RenderingSystem.h>
 #include <LightSystem.h>
+#include <PhysicsSystem.h>
 
 #include <RootForce/Include/RawMeshPrimitives.h>
 
@@ -140,11 +141,17 @@ void Main::Start()
 	m_playerControlSystem->SetKeybindings(keybindings);
 	m_playerControlSystem->SetPhysicsInterface(m_engineContext.m_physics);
 
+	// Initialize physics system
+	RootForce::PhysicsSystem* m_physicsSystem = new RootForce::PhysicsSystem(&m_world);
+	m_physicsSystem->SetPhysicsInterface(m_engineContext.m_physics);
+	m_physicsSystem->SetLoggingInterface(m_engineContext.m_logger);
+	m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
 	RootForce::Renderable::SetTypeId(0);
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::PhysicsAccessor::SetTypeId(4);
 
 	// Initialize the system for rendering the scene.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -157,10 +164,10 @@ void Main::Start()
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
 	// Setup lights.
-	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
 	Render::DirectionalLight directional;
-	directional.m_color = glm::vec4(0.2f,0.2f,0.1f,1);
+	directional.m_color = glm::vec4(0.2f,0.2f,1.0f,1);
 	directional.m_direction = glm::vec3(1, 0, 0);
 
 	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
@@ -174,7 +181,7 @@ void Main::Start()
 	RootForce::PointLight* redPL = m_world.GetEntityManager()->CreateComponent<RootForce::PointLight>(red);
 	redPL->m_color = glm::vec4(0.4f, 0.0f, 0.0f, 1.0f);
 	redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
-	redPL->m_range = 2.0f;
+	redPL->m_range = 20.0f;
 
 	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
 	redRender->m_mesh = cubeMesh;
@@ -228,7 +235,7 @@ void Main::Start()
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
 	
-	/*ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
+	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
 	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
 	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	RootForce::PhysicsAccessor* guyPhysics2 = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(guy2);
@@ -240,7 +247,7 @@ void Main::Start()
 	guyRenderable2->m_material = guyMaterial2;
 
 	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
-	guyControl2->speed = 10.0f;*/
+	guyControl2->speed = 10.0f;
 
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
@@ -250,17 +257,17 @@ void Main::Start()
 	{
 		tempVertices[i*3] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].x;  // 0, 3, 6, 9
 		tempVertices[i*3 + 1] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].y; //1, 4, 7, 10
-		tempVertices[i*3 + 2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2,5,8,11   
+		tempVertices[i*3 + 2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2, 5, 8, 11
 	}
 	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
 	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
 
 	float pos[3] = {3,0,0};
 	float rot[3] = {0,0,0};
-	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
+	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5000.0f, 10, 0.2f,0.02f);
 	float pos2[3] = {0,5,-20};
 	float rot2[3] = {0,0,0};
-	//guyPhysics2->m_handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
+	guyPhysics2->m_handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
 	
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
@@ -291,6 +298,7 @@ void Main::Start()
 
 	m_world.GetTagManager()->RegisterEntity("Player", guy);
 
+
 	
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
 
@@ -314,85 +322,17 @@ void Main::Start()
 		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		
-
+		
 		m_engineContext.m_renderer->Clear();
 
 
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_playerControlSystem->Process();
+		m_physicsSystem->Process();
 		renderingSystem->Process();
 
 		// Update Engine systems.
-		
-
-		
-
-		/////// PHYSICS TESTING CODE, UNCOMMENT FOR AMAZING PHYSICS
-	
-
-
-/*
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_SPACE) == RootEngine::InputManager::KeyState::DOWN)
-			m_engineContext.m_physics->PlayerJump(*handle, 10.0f);
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE )
-		{
-			glm::vec3 temp = guyTransform->m_orientation.GetFront();
-			speed = &temp.x;
-			speed[1] = 4;
-			m_engineContext.m_physics->PlayerKnockback(*handle, speed, 50.0f);
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RCTRL) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			//speed[2] *= -1;
-			//m_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Collisionshape x: %f y: %f z: %f", x[0], x[1], x[2]);
-			m_engineContext.m_physics->SetDynamicObjectVelocity(*handle2, speedup);
-			//m_engineContext.m_logger->LogText(  LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Orientation %f %f %f", orientation[0], orientation[1], orientation[2]);
-		}
-		
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_LSHIFT) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			glm::vec3 test = guyTransform->m_orientation.GetFront();
-			float* funtime = &test.x;
-			float gravity[3] = {0,0,0};
-			float* position = x;
-			position[0] += funtime[0];
-			position[1] += 1;
-			position[2] += funtime[2];
-			m_engineContext.m_physics->AddAbilityToWorld(0.4f, x, funtime, 100.0f, 1, 500, gravity );
-		}
-		if(m_engineContext.m_inputSys->GetKeyState(SDL_Scancode::SDL_SCANCODE_RSHIFT) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			m_engineContext.m_physics->RemoveObject(1, 1);
-		}
-
-
-		
-
-		m_engineContext.m_physics->GetPlayerPos(*handle, x);
-		m_engineContext.m_physics->GetObjectPos(*handle2, x2);
-		guyTransform->m_position = glm::vec3(x[0], x[1], x[2]);
-		guyTransform2->m_position = glm::vec3(x2[0], x2[1], x2[2]);
-		//float target[3] = {x[0] - x2[0] , x[1] - x2[1] , x[2] - x2[2]};
-		//m_engineContext.m_physics->SetGravity(*handle2, target);
-		
-		m_engineContext.m_physics->GetObjectOrientation(*handle2, orientation);
-		guyTransform2->m_orientation.SetOrientation(glm::quat(orientation[0], orientation[1], orientation[2], orientation[3]));
-		glm::quat test = guyTransform->m_orientation.GetQuaterion();
-
-		orientationPlayer[0] =- test.x;
-		orientationPlayer[1] = -test.y;
-		orientationPlayer[2] = -test.z;
-		orientationPlayer[3] = -test.w;
-		m_engineContext.m_physics->SetPlayerOrientation(*handle,orientationPlayer);
-*/
-
-
-
-		
-
-
-
 		m_engineContext.m_renderer->Render();
 		m_engineContext.m_renderer->RenderLines();
 

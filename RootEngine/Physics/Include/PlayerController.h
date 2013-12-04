@@ -20,6 +20,7 @@ public:
 	void RemovePlayer();
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();};
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();};
+	btQuaternion GetOrientation() const {return m_rigidBody->getWorldTransform().getRotation();};
 	bool IsOnGround() const {return m_onGround;};
 	void SetUserPointer(void* p_userPointer);
 private:

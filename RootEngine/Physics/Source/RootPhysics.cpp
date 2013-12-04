@@ -292,30 +292,23 @@ namespace Physics
 		m_playerObject.at(index)->Jump(p_jumpForce);
 	}
 
-	void RootPhysics::GetPlayerPos( int p_objectIndex, float* p_playerPos )
+	void RootPhysics::GetPos( int p_objectIndex, float* p_pos )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		btVector3 temp = m_playerObject.at(index)->GetPosition();
-		p_playerPos[0] = temp.getX();
-		p_playerPos[1] = temp.getY();
-		p_playerPos[2] = temp.getZ();
+
+		btVector3 temp;
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+			temp = m_playerObject.at(index)->GetPosition();
+		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
+		p_pos[0] = temp.getX();
+		p_pos[1] = temp.getY();
+		p_pos[2] = temp.getZ();
 
 
-	}
-	void RootPhysics::GetObjectPos(int p_objectIndex, float* p_objectPos)
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		btVector3 temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-		p_objectPos[0] = temp.getX();
-		p_objectPos[1] = temp.getY();
-		p_objectPos[2] = temp.getZ();
-		
 	}
 
 	RootPhysics* RootPhysics::GetInstance()
@@ -421,19 +414,31 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+
+		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		{
+			btQuaternion temp = m_playerObject.at(index)->GetOrientation();
+			p_objectOrientation[0] = temp.x();
+			p_objectOrientation[1] = temp.y();
+			p_objectOrientation[2] = temp.z();
+			p_objectOrientation[3] = temp.w();
+		}
 		
-		btRigidBody* body = m_dynamicObjects.at(index);
-		btTransform transform;
-		transform = body->getWorldTransform();
-		
-		p_objectOrientation[0] = transform.getRotation().w();
-		p_objectOrientation[1] = transform.getRotation().x();
-		p_objectOrientation[2] = transform.getRotation().y();
-		p_objectOrientation[3] = transform.getRotation().z();
-			/*p_objectOrientation[0] = body->getOrientation().x();
-			p_objectOrientation[1] = body->getOrientation().y();
-			p_objectOrientation[2] = body->getOrientation().z();
-			p_objectOrientation[3] = body->getOrientation().w();*/
+		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+		{
+			btRigidBody* body = m_dynamicObjects.at(index);
+			btTransform transform;
+			transform = body->getWorldTransform();
+			
+			p_objectOrientation[0] = transform.getRotation().x();
+			p_objectOrientation[1] = transform.getRotation().y();
+			p_objectOrientation[2] = transform.getRotation().z();
+			p_objectOrientation[3] = transform.getRotation().w();
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	void RootPhysics::SetObjectOrientation( int p_objectIndex, float* p_objectOrientation )

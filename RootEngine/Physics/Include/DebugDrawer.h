@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Bullet/LinearMath/btIDebugDraw.h>
 #include <vector>
 #include <RootEngine/Render/Include/Renderer.h>
