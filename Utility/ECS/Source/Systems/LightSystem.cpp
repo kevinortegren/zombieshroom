@@ -1,4 +1,4 @@
-#include <RootForce\Include\LightSystem.h>
+#include <Utility\ECS\Include\Shared\LightSystem.h>
 
 namespace RootForce
 {	
@@ -31,6 +31,6 @@ namespace RootForce
 
 	void PointLightSystem::End()
 	{
-		m_lightCount = 0;
+		
 	}
 }

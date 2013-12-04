@@ -1,14 +1,18 @@
 #pragma once
 
 #include <Utility\ECS\Include\World.h>
-
-#include <Light.h>
-#include <Transform.h>
-
-#include <RootEngine/Render/Include/Renderer.h>
+#include <Utility\ECS\Include\Shared\Transform.h>
+#include <RootEngine\Render\Include\Renderer.h>
 
 namespace RootForce
 {
+	struct PointLight : public ECS::Component<PointLight>
+	{
+		glm::vec4 m_color;
+		glm::vec3 m_attenuation;
+		float m_range;
+	};
+
 	class PointLightSystem : public ECS::EntitySystem
 	{
 	public:

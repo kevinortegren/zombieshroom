@@ -1,0 +1,16 @@
+- name: Light
+  techniques:
+    - name: Light
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+      programs:
+      - name: light
+        shaders:
+          - name: light
+            type: vertex
+          - name: light
+            type: fragment
