@@ -87,4 +87,45 @@ namespace Render
 	{
 		glDrawElementsInstanced(GL_TRIANGLES, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
 	}
+
+	GLenum Mesh::GetPrimitiveType()
+	{
+		return m_primitive;
+	}
+
+	void Mesh::SetPrimitiveType( GLenum p_type )
+	{
+		m_primitive = p_type;
+	}
+
+	void Mesh::SetElementBuffer(std::shared_ptr<BufferInterface> p_buffer)
+	{
+		m_elementBuffer = p_buffer;
+	}
+
+	void Mesh::SetVertexBuffer(std::shared_ptr<BufferInterface> p_buffer)
+	{
+		m_vertexBuffer = p_buffer;
+	}
+
+	void Mesh::SetVertexAttribute(std::shared_ptr<VertexAttributesInterface> p_attribute)
+	{
+		m_vertexAttributes = p_attribute;
+	}
+
+	std::shared_ptr<BufferInterface> Mesh::GetVertexBuffer()
+	{
+		return m_vertexBuffer;
+	}
+
+	std::shared_ptr<BufferInterface> Mesh::GetElementBuffer()
+	{
+		return m_elementBuffer;
+	}
+
+	std::shared_ptr<VertexAttributesInterface> Mesh::GetVertexAttribute()
+	{
+		return m_vertexAttributes;
+	}
+
 }

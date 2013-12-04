@@ -106,15 +106,6 @@ void Main::Start()
 	m_engineContext.m_resourceManager->LoadEffect("Mesh");
 	m_engineContext.m_resourceManager->LoadCollada("testchar");
 
-	// Cube mesh.
-	std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
-	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
-	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
-	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
-
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -174,10 +165,6 @@ void Main::Start()
 	redPL->m_attenuation = glm::vec3(0.0f, 0.0f, 1.0f);
 	redPL->m_range = 2.0f;
 
-	RootForce::Renderable* redRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(red);
-	redRender->m_mesh = cubeMesh;
-	redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-
 	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Transform* blueTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(blue);
@@ -188,10 +175,6 @@ void Main::Start()
 	bluePL->m_color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	bluePL->m_attenuation = glm::vec3(0.0f, 0.2f, 0.0f);
 	bluePL->m_range = 20.0f;
-
-	RootForce::Renderable* blueRender = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(blue);
-	blueRender->m_mesh = cubeMesh;
-	blueRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 
 	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
 	m_world.GetGroupManager()->RegisterEntity("Lights", red);
@@ -204,12 +187,15 @@ void Main::Start()
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
 	guyTransform->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	
+	std::string difftex = m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0];
+	std::string meshHandle = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshHandles[0];
+
 	RootForce::Renderable* guyRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy);
-	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
+	guyRenderable->m_mesh = m_engineContext.m_resourceManager->GetMesh(meshHandle);
 
 	Render::Material guyMaterial;
 	guyMaterial.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-	std::string difftex = m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0];
+
 	guyMaterial.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(difftex);
 	guyRenderable->m_material = guyMaterial;
 	

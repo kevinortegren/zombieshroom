@@ -20,7 +20,8 @@ namespace LogTag
 		COMPONENT,
 		GUI,
 		INPUT,
-		RESOURCE
+		RESOURCE,
+		SCRIPT
 	};
 }
 

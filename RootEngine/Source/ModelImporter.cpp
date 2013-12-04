@@ -89,20 +89,19 @@ namespace RootEngine
 		
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
 
-		std::shared_ptr<Render::Mesh> tempmesh = m_renderer->CreateMesh();
-		tempmesh->m_vertexBuffer = m_renderer->CreateBuffer();
-		tempmesh->m_elementBuffer = m_renderer->CreateBuffer();
-		tempmesh->m_vertexAttributes = m_renderer->CreateVertexAttributes();
-		tempmesh->CreateIndexBuffer(&indices[0], indices.size());
-		tempmesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-		tempmesh->m_primitive = GL_TRIANGLES;
+		//Set up the mesh description
+		MESH_DESC desc;
+		desc.handle		= "mesh" + std::to_string(p_index); //Name + mesh + index
+		desc.verts		= vertices;
+		desc.indices	= indices;
+		desc.primitive	= GL_TRIANGLES;
+		desc.faces		= p_aiMesh->mNumFaces;
 
-		m_model->m_meshes.push_back(tempmesh);
-		m_model->meshIndices = indices;
-		m_model->meshPoints = GetMeshPoints(vertices);
-		m_model->numberOfFaces = p_aiMesh->mNumFaces;
-		m_model->numberOfIndices = indices.size();
-		m_model->numberOfVertices = vertices.size();
+		//Create and add the mesh to the resource manager
+		m_resourceManager->AddMesh(desc);
+
+		//Add the handle to the model
+		m_model->m_meshHandles.push_back(desc.handle);
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
@@ -152,18 +151,6 @@ namespace RootEngine
 				}
 			}
 		}
-	}
-
-	std::vector<glm::vec3> ModelImporter::GetMeshPoints( std::vector<Render::Vertex1P1N1UV> p_vertices )
-	{
-		std::vector<glm::vec3> returnVec;
-
-		for (Render::Vertex1P1N1UV v : p_vertices ) 
-		{
-			returnVec.push_back(v.m_pos);
-		}
-
-		return returnVec;
 	}
 
 	std::string ModelImporter::GetNameFromPath( std::string p_path )

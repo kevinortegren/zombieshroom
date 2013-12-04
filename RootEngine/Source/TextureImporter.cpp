@@ -16,20 +16,12 @@ namespace RootEngine
 			delete m_texture;
 	}
 
-	bool TextureImporter::LoadTexture( const std::string p_fileName )
+	Render::TextureInterface* TextureImporter::LoadTexture( const std::string p_fileName )
 	{
-		m_texture   = m_renderer->CreateTexture();
+		m_texture = m_renderer->CreateTexture();
 		if (m_texture->Load(p_fileName)) 
-			return true;
-		else 
-			return false;
+			return m_texture;
+		else
+			return nullptr;
 	}
-
-	Render::TextureInterface* TextureImporter::GetTexture()
-	{
-		return m_texture;
-	}
-
-
-
 }

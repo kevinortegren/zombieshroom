@@ -19,14 +19,9 @@ namespace RootEngine
 
 	struct Model
 	{
-		std::vector<std::shared_ptr<Render::Mesh>> m_meshes;
+		std::vector<std::string> m_meshHandles;
 		std::string m_textureHandles[3];
 		//vector<AnimationData*> m_animations;
-		unsigned int numberOfIndices;
-		unsigned int numberOfVertices;
-		unsigned int numberOfFaces;
-		std::vector<glm::vec3> meshPoints;
-		std::vector<unsigned int> meshIndices;
 	};
 
 	class ModelImporter
@@ -45,7 +40,6 @@ namespace RootEngine
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh);
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
-		std::vector<glm::vec3> GetMeshPoints(std::vector<Render::Vertex1P1N1UV> p_vertices);
 		std::string GetNameFromPath(std::string p_path);
 
 		ResourceManager* m_resourceManager;
