@@ -288,6 +288,16 @@ void Main::Start()
 
 	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
 	glm::vec3 a = t->m_position;
+
+
+	// Start server either local or remote
+	// Host or connect
+
+	// Poll messages every frame
+	// Server to client messages passed to ClientParserSystem
+	// Client to server messages passed to ServerParserSystem
+
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

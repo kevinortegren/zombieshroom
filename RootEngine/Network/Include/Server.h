@@ -24,6 +24,8 @@ namespace RootEngine
 			uint8_t* Data;
 		};
 
+		const int8_t RECIPIENT_BROADCAST = -1;
+
 		class Server abstract
 		{
 		public:

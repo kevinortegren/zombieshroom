@@ -14,7 +14,8 @@ namespace RootForce
 			enum MessageType
 			{
 				GameStateSnapshot,
-				Chat,
+				ChatToServer,
+				ChatToClient,
 				UserConnected,
 				UserDisconnected,
 				UserInfo,
@@ -94,43 +95,4 @@ namespace RootForce
 			uint8_t Slot;
 		};
 	}
-}
-
-TEST(NetworkMessage, SerializeOverlay)
-{
-	RootForce::Network::MessageChat m;
-	m.Type = RootForce::Network::MessageChat::TYPE_SERVER_MESSAGE;
-	m.SenderID = 10;
-	m.Message = "Hello world";
-
-	unsigned char* serializedData = (unsigned char*) &m;
-	RootForce::Network::MessageChat m2 = *((RootForce::Network::MessageChat*) serializedData);
-
-	EXPECT_TRUE(m.Type == m2.Type);
-	EXPECT_TRUE(m.SenderID == m2.SenderID);
-	EXPECT_TRUE(strcmp(m.Message, m2.Message) == 0);
-}
-
-
-TEST(NetworkMessage, SerializeCopy)
-{
-	RootForce::Network::MessageChat m;
-	m.Type = RootForce::Network::MessageChat::TYPE_SERVER_MESSAGE;
-	m.SenderID = 10;
-	m.Message = "Hello world";
-	
-	size_t size = 0;
-	size += sizeof(m.Type);
-	size += sizeof(m.SenderID);
-	size += strlen(m.Message);
-
-	unsigned char* serializedData = new unsigned char[size];
-	memcpy(serializedData, &m, size);
-
-	RootForce::Network::MessageChat m2;
-	memcpy(&m2, serializedData, size);
-
-	EXPECT_TRUE(m.Type == m2.Type);
-	EXPECT_TRUE(m.SenderID == m2.SenderID);
-	EXPECT_TRUE(strcmp(m.Message, m2.Message) == 0);
 }
