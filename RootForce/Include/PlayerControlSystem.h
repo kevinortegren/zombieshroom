@@ -57,7 +57,7 @@ namespace RootForce
 		void SetKeybindings(const std::vector<Keybinding>& keybindings);
 		void SetLoggingInterface(Logging* p_logger);
 		void SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager);
-		void SetPhysicsInterface(Physics::PhysicsInterface* p_physics);
+		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		
 		void Process();
 	private:
@@ -69,6 +69,6 @@ namespace RootForce
 
 		Logging* m_logger;
 		RootEngine::InputManager::InputInterface* m_inputManager;
-		Physics::PhysicsInterface* m_physics;
+		RootEngine::Physics::PhysicsInterface* m_physics;
 	};
 }

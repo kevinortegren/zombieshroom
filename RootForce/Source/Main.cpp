@@ -200,7 +200,8 @@ void Main::Start()
 	
 
 	// Setup a dummy player entity and add components to it
-	
+
+
 	ECS::Entity* guy = m_world.GetEntityManager()->CreateEntity();
 	
 	RootForce::Transform* guyTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy);
@@ -227,17 +228,19 @@ void Main::Start()
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
 	
-	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
+	/*ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
 	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
-	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, -6.0f);
-
+	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	RootForce::PhysicsAccessor* guyPhysics2 = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(guy2);
 	RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
 	guyRenderable2->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-
-	guyRenderable2->m_material = guyMaterial;
+	Render::Material guyMaterial2;
+	guyMaterial2.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+	guyMaterial2.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(m_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
+	guyRenderable2->m_material = guyMaterial2;
 
 	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
-	guyControl2->speed = 10.0f;
+	guyControl2->speed = 10.0f;*/
 
 	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
 	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
@@ -257,7 +260,7 @@ void Main::Start()
 	guyPhysics->m_handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
 	float pos2[3] = {0,5,-20};
 	float rot2[3] = {0,0,0};
-	int* handle2 = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
+	//guyPhysics2->m_handle = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
 	
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
@@ -269,7 +272,7 @@ void Main::Start()
 	float position3[3] = {0, 0, 4};
 	m_engineContext.m_physics->CreatePlane(normal3, position3);
 	//float speed[3] = {0, 5, -5};
-	float* speed;
+	
 	float speedup[3] = {0, 10 , 0};
 	float x[3], x2[3];
 	for(int i = 0 ; i < 5; i++)
@@ -287,6 +290,7 @@ void Main::Start()
 
 
 	m_world.GetTagManager()->RegisterEntity("Player", guy);
+
 	
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
 
@@ -310,7 +314,6 @@ void Main::Start()
 		m_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		
-		m_playerControlSystem->Process();
 
 		m_engineContext.m_renderer->Clear();
 
@@ -388,8 +391,7 @@ void Main::Start()
 
 		
 
-		pointLightSystem->Process(); 
-		renderingSystem->Process();
+
 
 		m_engineContext.m_renderer->Render();
 		m_engineContext.m_renderer->RenderLines();

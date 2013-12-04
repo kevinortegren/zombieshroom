@@ -4,6 +4,9 @@
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
 //#include "vld.h"
+namespace RootEngine
+{
+
 
 namespace Physics
 {
@@ -178,7 +181,6 @@ namespace Physics
 		m_dynamicWorld->addRigidBody(objectBody);
 
 	}
-	//Done
 	int* RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
 	{
 		
@@ -553,11 +555,12 @@ namespace Physics
 	
 
 }
+}
 
-Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer , RootEngine::ResourceManagerInterface* p_resourceManager)
+RootEngine::Physics::PhysicsInterface* CreatePhysics( RootEngine::SubsystemSharedContext p_context, Render::RendererInterface* p_renderer , RootEngine::ResourceManagerInterface* p_resourceManager)
 {
-	Physics::g_context = p_context;
-	Physics::g_renderer = p_renderer;
-	Physics::g_resourceManager = p_resourceManager;
-	return Physics::RootPhysics::GetInstance();
+	RootEngine::Physics::g_context = p_context;
+	RootEngine::Physics::g_renderer = p_renderer;
+	RootEngine::Physics::g_resourceManager = p_resourceManager;
+	return RootEngine::Physics::RootPhysics::GetInstance();
 }

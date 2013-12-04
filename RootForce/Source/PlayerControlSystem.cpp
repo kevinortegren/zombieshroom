@@ -32,7 +32,7 @@ namespace RootForce
 		m_inputManager = p_inputManager;
 	}
 
-	void PlayerControlSystem::SetPhysicsInterface(Physics::PhysicsInterface* p_physics)
+	void PlayerControlSystem::SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics)
 	{
 		m_physics = p_physics;
 	}
