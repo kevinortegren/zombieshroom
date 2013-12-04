@@ -155,6 +155,7 @@ namespace RootEngine
 				case SDL_KEYUP:
 					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
 					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+
 					std::strncpy(tempEvent.key_identifier, temp, 20); //TODO: Fix warning with using strncpy
 					if(p_event.type == SDL_KEYDOWN)
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;

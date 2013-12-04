@@ -9,6 +9,8 @@
 #include <SDL2/SDL.h>
 #include "gl_texture_surface.h"
 
+#pragma warning(disable: 4996)//Temporary solution
+
 #if defined(_WINDLL)
     #define SUBSYSTEM_DLL_EXPORT __declspec(dllexport)
 #else
