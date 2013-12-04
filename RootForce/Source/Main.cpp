@@ -96,46 +96,39 @@ Main::~Main()
 
 void Main::Start() 
 {
-	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-	{
-		// Initialize the system for controlling the player.	
-		std::vector<RootForce::Keybinding> keybindings(4);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
-		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
-
-		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
-		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
-		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
-
-		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
-		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
-		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
-
-		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
-		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
-		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
-
-		RootForce::Renderable::SetTypeId(0);
-		RootForce::Transform::SetTypeId(1);
-		RootForce::PointLight::SetTypeId(2);
-		RootForce::PlayerInputControlComponent::SetTypeId(3);
-
-		m_world.GetEntityExporter()->SetExporter(Exporter);
-		m_world.GetEntityImporter()->SetImporter(Importer);
-
-		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
-		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
-		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-		m_playerControlSystem->SetKeybindings(keybindings);
-	}
-
 	RootForce::Renderable::SetTypeId(0);
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
 
+	m_world.GetEntityExporter()->SetExporter(Exporter);
+	m_world.GetEntityImporter()->SetImporter(Importer);
+
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+	// Initialize the system for controlling the player.	
+	std::vector<RootForce::Keybinding> keybindings(4);
+	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
+	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
+	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+
+	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
+	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
+	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+
+	keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
+	keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
+	keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+
+	keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
+	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
+	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+
+	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
+	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_playerControlSystem->SetKeybindings(keybindings);
+	
 	// Initialize render and point light system.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");

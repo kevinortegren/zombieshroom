@@ -31,6 +31,11 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				{
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_specularMap);
 					p_emitter << YAML::Key << "Specular" << YAML::Value << s;
+				}
+				if(renderable->m_material.m_normalMap != nullptr)
+				{
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_normalMap);
+					p_emitter << YAML::Key << "Normal" << YAML::Value << s;
 				}	
 			}
 			break;

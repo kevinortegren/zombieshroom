@@ -28,7 +28,6 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					renderable->m_material.m_params = g_engineContext.m_renderer->CreateEffectParams();
 					renderable->m_material.m_params->AllocateParams(renderable->m_material.m_effect);
 				 }
-
 				 const YAML::Node* modelNode = p_node.FindValue("Model");
 				 if(modelNode != nullptr)
 				 {
@@ -50,6 +49,13 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					 std::string specular;
 					 p_node["Specular"] >> specular;
 					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(specular);
+				 }
+				 const YAML::Node* normalNode = p_node.FindValue("Normal");
+				 if(specularNode != nullptr)
+				 {
+					 std::string normal;
+					 p_node["Normal"] >> normal;
+					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture(normal);
 				 }
 			}
 			break;

@@ -18,6 +18,7 @@
           Effect: Mesh
           Diffuse: v6
           Specular: SpecularV1
+          Normal: BumpV1
     - Type: 1
       Data:
         - Entity: 0

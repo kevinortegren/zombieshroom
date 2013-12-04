@@ -15,8 +15,6 @@
           slot: 1 
         - name: g_Depth
           slot: 2
-        - name: g_Pos
-          slot: 3
       programs:
         - name: ambient
           shaders:
