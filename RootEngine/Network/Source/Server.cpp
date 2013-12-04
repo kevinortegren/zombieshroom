@@ -15,6 +15,8 @@ namespace RootEngine
 
 		Message* Server::PollMessage()
 		{
+			if(m_message.size() < 1)
+				return nullptr;
 			Message* message = *(m_message.end()-1);
 			m_message.pop_back();
 			return message;
@@ -38,6 +40,20 @@ namespace RootEngine
 				numBytesSent = m_peerInterface->Send( &bitstream, HIGH_PRIORITY, p_message.Reliability, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 			return numBytesSent == p_message.DataSize + 8 + 1 + 1 + 1;
+		}
+
+		void Server::ParseNonRaknetPacket( RakNet::Packet* p_packet )
+		{
+			Message* message = new Message;
+			RakNet::BitStream bitstream(p_packet->data, p_packet->length, false);
+			bitstream.IgnoreBytes(1); // skip reading data[0] again
+			bitstream.Read(message->RecipientID);
+			bitstream.Read(message->MessageID);
+			bitstream.Read(message->DataSize);
+			message->Data = (uint8_t*)malloc(message->DataSize);
+			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
+
+			m_message.push_back(message);
 		}
 
 	}

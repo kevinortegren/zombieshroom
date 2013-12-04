@@ -12,32 +12,49 @@ namespace RootEngine
 	namespace Network
 	{
 		extern SubsystemSharedContext g_context;
-		typedef unsigned char ubyte;
-		typedef signed char byte;
+
+		namespace InnerMessageID
+		{
+			enum InnerMessageID
+			{
+				CONNECT = 254,
+				DISCONNECT
+			};
+		}
 
 		struct Message
 		{
 			uint8_t MessageID;
 			int8_t RecipientID;
 			PacketReliability Reliability;
-			uint64_t DataSize;
+			uint32_t DataSize;
 			uint8_t* Data;
+			Message() {Data=nullptr;}
+			~Message() {delete Data;}
+		};
+		class ServerInterface abstract
+		{
+			virtual void Update() = 0;
+			virtual bool Send(Message p_message) = 0;
+			virtual Message* PollMessage() = 0;
 		};
 
 		const int8_t RECIPIENT_BROADCAST = -1;
 
-		class Server abstract
+		class Server abstract : public ServerInterface
 		{
 		public:
 			Server(void);
 			~Server(void);
-
+			virtual void Update() = 0;
 			virtual bool Send(Message p_message) = 0;
 			Message* PollMessage();
 		protected:
 			std::vector<Message*> m_message;
 			bool Transmit(Message p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
 			RakNet::RakPeerInterface* m_peerInterface;
+
+			void ParseNonRaknetPacket(RakNet::Packet* p_packet);
 		};
 	}
 }

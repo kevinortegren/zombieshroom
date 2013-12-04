@@ -4,15 +4,19 @@ namespace RootEngine
 {
 	namespace Network
 	{
-		class RemoteServer : public Server
+		class RemoteServerInterface abstract
+		{
+			virtual bool ConnectTo( const char* p_ip , USHORT p_port) = 0;
+		};
+
+		class RemoteServer : public Server , public RemoteServerInterface
 		{
 		public:
 			RemoteServer();
 			~RemoteServer();
-			 bool Send( Message p_message );
-			 bool ConnectTo( const char* p_ip , USHORT p_port);
-		private:
-			RakNet::RakPeerInterface* m_peerInterface;
+			void Update();
+			bool Send( Message p_message );
+			bool ConnectTo( const char* p_ip , USHORT p_port);
 		};
 	}
 }

@@ -4,6 +4,7 @@ namespace RootEngine
 {
 	namespace Network
 	{
+		typedef void (*PacketCallback)(int8_t p_userID, uint8_t p_packetID );
 		struct Client
 		{
 			bool IsRemote;
@@ -11,16 +12,21 @@ namespace RootEngine
 			RakNet::RakNetGUID GUID;
 		};
 
-		class LocalServer : public Server
+		class LocalServerInterface abstract
+		{
+			virtual void Host( USHORT p_port, bool p_isDedicated = true) = 0;
+		};
+
+		class LocalServer : public Server, public LocalServerInterface
 		{
 		public:
 			LocalServer();
 			~LocalServer();
 			bool Send(Message p_message);
-			void Host( USHORT p_port);
+			void Host( USHORT p_port, bool p_isDedicated = true);
 			void Update();
 		private:
-			Client* m_client[MAX_CLIENTS];
+			Client* m_client[MAX_CLIENTS+1]; // 0 is not to be used, as ID 0 equals server
 			uint8_t m_numClients;
 		};
 	}
