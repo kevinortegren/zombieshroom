@@ -9,8 +9,9 @@ namespace RootEngine
 		public:
 			RemoteServer();
 			~RemoteServer();
-			 bool Send( Message p_message );
-			 bool ConnectTo( const char* p_ip , USHORT p_port);
+			void Update();
+			bool Send( Message p_message );
+			bool ConnectTo( const char* p_ip , USHORT p_port);
 		private:
 			RakNet::RakPeerInterface* m_peerInterface;
 		};

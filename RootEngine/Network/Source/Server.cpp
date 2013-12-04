@@ -40,5 +40,18 @@ namespace RootEngine
 			return numBytesSent == p_message.DataSize + 8 + 1 + 1 + 1;
 		}
 
+		void Server::ParseNonRaknetPacket( RakNet::Packet* p_packet )
+		{
+			Message* message = new Message;
+			RakNet::BitStream bitstream(p_packet->data, p_packet->length, false);
+			bitstream.IgnoreBytes(1); // skip reading data[0] again
+			bitstream.Read(message->RecipientID);
+			bitstream.Read(message->MessageID);
+			bitstream.Read(message->DataSize);
+			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
+
+			m_message.push_back(message);
+		}
+
 	}
 }

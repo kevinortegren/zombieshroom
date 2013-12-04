@@ -1,3 +1,4 @@
+#include <External/Include/RakNet/MessageIdentifiers.h>
 #include "RemoteServer.h"
 
 namespace RootEngine
@@ -27,5 +28,36 @@ namespace RootEngine
 				return true;
 			return false;
 		}
+
+		void RemoteServer::Update()
+		{
+			RakNet::Packet* packet;
+
+			for(packet = m_peerInterface->Receive();
+				packet;
+				m_peerInterface->DeallocatePacket(packet), packet = m_peerInterface->Receive())
+			{
+
+				switch( packet->data[0] )
+				{
+				case NON_RAKNET_MESSAGE_ID:
+					ParseNonRaknetPacket(packet);
+					break;
+				case ID_DISCONNECTION_NOTIFICATION:
+					// A client decided to quit. A TRAITOR!
+				case ID_CONNECTION_LOST:
+					Message* message = new Message;
+					message->MessageID = InnerMessageID::DISCONNECT;
+					message->RecipientID = 0;
+					message->Reliability = PacketReliability::RELIABLE_ORDERED;
+					message->Data = (uint8_t*)malloc(1);
+					message->Data[0] = 0;
+					message->DataSize = 1;
+					m_message.push_back(message);
+					break;
+				}
+			}
+		}
+
 	}
 }
