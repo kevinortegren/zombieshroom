@@ -30,8 +30,14 @@ namespace RootEngine
 			uint64_t DataSize;
 			uint8_t* Data;
 		};
+		class ServerInterface abstract
+		{
+			virtual void Update() = 0;
+			virtual bool Send(Message p_message) = 0;
+			virtual Message* PollMessage() = 0;
+		};
 
-		class Server abstract
+		class Server abstract : public ServerInterface
 		{
 		public:
 			Server(void);

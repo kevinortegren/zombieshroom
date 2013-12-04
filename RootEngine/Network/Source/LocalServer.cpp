@@ -31,7 +31,7 @@ namespace RootEngine
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Starting server on port %u.", p_port);
 			m_numClients = 0;
 			RakNet::SocketDescriptor sd(p_port, 0);
-
+			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
 			m_peerInterface->Startup(MAX_CLIENTS, &sd, 1);
 			m_peerInterface->SetMaximumIncomingConnections(MAX_CLIENTS);
 
@@ -41,7 +41,8 @@ namespace RootEngine
 				client->IsRemote = false;
 				client->GUID = m_peerInterface->GetGuidFromSystemAddress(sd.hostAddress);
 				client->SysAddress = sd.hostAddress;
-				m_client[0] = client;
+				m_client[1] = client;
+				m_numClients++;
 			}
 		}
 
@@ -54,7 +55,7 @@ namespace RootEngine
 				m_peerInterface->DeallocatePacket(packet), packet = m_peerInterface->Receive())
 			{
 				int8_t clientID = 1;
-				for(; clientID < MAX_CLIENTS; clientID++)
+				for(; clientID < MAX_CLIENTS+1; clientID++)
 					if(packet->guid == m_client[clientID]->GUID)
 						break;
 
@@ -68,14 +69,15 @@ namespace RootEngine
 					}
 					else
 					{
-						int id = 0;
-						for(; id < MAX_CLIENTS; id++)
+						int id = 1;
+						for(; id < MAX_CLIENTS+1; id++)
 							if(m_client[id] == nullptr)
 								break;
 						m_client[id] = new Client();
 						m_client[id]->GUID = packet->guid;
 						m_client[id]->IsRemote = true;
 						m_client[id]->SysAddress = packet->systemAddress;
+						m_numClients++;
 
 						Message* message = new Message;
 						message->MessageID = InnerMessageID::CONNECT;
@@ -97,6 +99,7 @@ namespace RootEngine
 					{
 						delete m_client[clientID];
 						m_client[clientID] = nullptr;
+						m_numClients--;
 
 						Message* message = new Message;
 						message->MessageID = InnerMessageID::DISCONNECT;

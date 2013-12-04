@@ -15,6 +15,8 @@ namespace RootEngine
 
 		Message* Server::PollMessage()
 		{
+			if(m_message.size() < 1)
+				return nullptr;
 			Message* message = *(m_message.end()-1);
 			m_message.pop_back();
 			return message;

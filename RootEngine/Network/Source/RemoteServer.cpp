@@ -20,6 +20,7 @@ namespace RootEngine
 		bool RemoteServer::ConnectTo( const char* p_ip , USHORT p_port)
 		{
 			RakNet::SocketDescriptor sd;
+			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
 			m_peerInterface->Startup(1, &sd, 1);
 
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Connecting to: %s:%u", p_ip, p_port);
