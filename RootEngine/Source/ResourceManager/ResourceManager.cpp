@@ -107,7 +107,7 @@ namespace RootEngine
 
 			if(tex)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'", p_path.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Successfully loaded texture '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
 				return m_textures[p_path].get();
 			}

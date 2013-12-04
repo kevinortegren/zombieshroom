@@ -1,9 +1,13 @@
 #include "Logging/Logging.h"
 #include <ctime>
-
+#include <RootForce/Include/CMDColor.h>
+#include <iostream>
 Logging::Logging()
 	:m_verboseLevel(LogLevel::INIT_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
+	ColorCMD::ConsoleColorInit();
+	SetConsoleTitle(L"RootLog");
+
 	m_stringTagList.push_back("RENDER");
 	m_stringTagList.push_back("NETWOR");
 	m_stringTagList.push_back("GNERAL");
@@ -21,6 +25,7 @@ Logging::Logging()
 	m_stringLevelList.push_back("FATAL_ERR  ");
 	m_stringLevelList.push_back("NON_FAT_ERR");
 	m_stringLevelList.push_back("WARNING    ");
+	m_stringLevelList.push_back("SUCCESS    ");
 	m_stringLevelList.push_back("DEBUG_PRINT");
 	m_stringLevelList.push_back("INIT_PRINT ");
 	m_stringLevelList.push_back("DATA_PRINT ");
@@ -181,6 +186,54 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 {
 	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  + "\n";
 
+	switch (p_vLevel)
+	{
+	case LogLevel::FATAL_ERROR:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::RED, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::NON_FATAL_ERROR:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::RED, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::WARNING:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::YELLOW, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::SUCCESS:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::GREEN, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::DEBUG_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::INIT_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::BLUE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::MASS_DATA_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	default:
+		break;
+	}
+	
 	vprintf(output.c_str(), p_args);
 }
 

@@ -146,6 +146,9 @@ void Main::Start()
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
+	RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
+	m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
+
 	// Import test world.
 	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test.world");
 
@@ -225,7 +228,7 @@ void Main::Start()
 		HandleEvents();
 		
 		m_playerControlSystem->Process();
-
+		abilitySystem->Process();
 		g_engineContext.m_renderer->Clear();
 
 		g_engineContext.m_physics->Update(dt);

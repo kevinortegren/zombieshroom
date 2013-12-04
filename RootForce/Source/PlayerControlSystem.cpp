@@ -87,7 +87,6 @@ namespace RootForce
 				case PlayerAction::STRAFE_LEFT:
 					transform->m_position -= right * speed * dt;
 					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
-
 					break;
 				case PlayerAction::ORIENTATE:
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
