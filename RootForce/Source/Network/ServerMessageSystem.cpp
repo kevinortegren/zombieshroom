@@ -7,6 +7,7 @@ namespace RootForce
 	{
 		ServerMessageSystem::ServerMessageSystem(ECS::World* p_world, Logging* p_logger)
 			: ECS::EntitySystem(p_world)
+			, m_logger(p_logger)
 		{
 
 		}

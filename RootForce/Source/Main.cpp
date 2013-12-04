@@ -14,6 +14,8 @@
 
 #include <glm/glm.hpp>
 
+#include <Network/Messages.h>
+
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
@@ -290,12 +292,31 @@ void Main::Start()
 	glm::vec3 a = t->m_position;
 
 
-	// Start server either local or remote
-	// Host or connect
+	
+	// Initialize the network system
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network, RootForce::Network::MessageHandler::LOCAL, 5567));
+	
+	// Test message sending
+	{
+		RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
+		chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
+		chat->SenderID = 0;
+		chat->Message = "Hello world of doom";
 
-	// Poll messages every frame
-	// Server to client messages passed to ClientParserSystem
-	// Client to server messages passed to ServerParserSystem
+		size_t size = 0;
+		size += sizeof(chat->Type);
+		size += sizeof(chat->SenderID);
+		size += strlen(chat->Message);
+
+		RootEngine::Network::Message m;
+		m.MessageID = RootForce::Network::MessageType::ChatToServer;
+		m.RecipientID = 1;
+		m.Reliability = RELIABLE;
+		m.DataSize = size;
+		m.Data = (uint8_t*) chat;
+
+		m_engineContext.m_network->GetNetworkSystem()->Send(m);
+	}
 
 
 	// Start the main loop
@@ -313,6 +334,7 @@ void Main::Start()
 		HandleEvents();
 		
 		m_playerControlSystem->Process();
+		m_networkHandler->Update();
 
 		m_engineContext.m_renderer->Clear();
 

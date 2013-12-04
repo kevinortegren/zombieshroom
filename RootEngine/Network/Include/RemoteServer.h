@@ -15,7 +15,7 @@ namespace RootEngine
 			RemoteServer();
 			~RemoteServer();
 			void Update();
-			bool Send( Message p_message );
+			bool Send( const Message& p_message );
 			bool ConnectTo( const char* p_ip , USHORT p_port);
 		};
 	}

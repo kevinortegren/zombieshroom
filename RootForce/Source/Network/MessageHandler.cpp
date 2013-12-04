@@ -8,39 +8,45 @@ namespace RootForce
 	namespace Network
 	{
 		MessageHandler::MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface, ServerType p_type, int16_t port, const char* address)
-			: m_logger(p_logger)
+			: m_world(p_world)
+			, m_logger(p_logger)
 		{
 			switch (p_type)
 			{
 				case MessageHandler::LOCAL:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port);
+					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, false);
 					
-					m_clientMessageSystem = std::shared_ptr<ClientMessageSystem>(new ClientMessageSystem(p_world, m_logger));
-					m_serverMessageSystem = std::shared_ptr<ServerMessageSystem>(new ServerMessageSystem(p_world, m_logger));
+					m_clientMessageSystem = new ClientMessageSystem(p_world, m_logger);
+					m_serverMessageSystem = new ServerMessageSystem(p_world, m_logger);
 					break;
 				case MessageHandler::REMOTE:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
 					dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
 
-					m_clientMessageSystem = std::shared_ptr<ClientMessageSystem>(new ClientMessageSystem(p_world, m_logger));
+					m_clientMessageSystem = new ClientMessageSystem(p_world, m_logger);
 					break;
 				case MessageHandler::DEDICATED:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port);
+					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
 
-					m_serverMessageSystem = std::shared_ptr<ServerMessageSystem>(new ServerMessageSystem(p_world, m_logger));
+					m_serverMessageSystem = new ServerMessageSystem(p_world, m_logger);
 					break;
 				default:
 					m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Invalid server type");
 			}
+
+			if (m_clientMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ClientMessageSystem>(m_clientMessageSystem, "ClientMessageSystem");
+			if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
 		}
 
 		void MessageHandler::Update()
 		{
+			m_server->Update();
+
 			RootEngine::Network::Message* message = nullptr;
 			while ((message = m_server->PollMessage()) != nullptr)
 			{
@@ -75,7 +81,27 @@ namespace RootForce
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
 						break;
 
-					// TODO: Handle internal messages
+					case RootEngine::Network::InnerMessageID::CONNECT:
+					{
+						uint8_t slot = *(uint8_t*)message->Data;
+
+						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+						NetworkPlayerComponent* comp = m_world->GetEntityManager()->CreateComponent<NetworkPlayerComponent>(entity);
+						comp->PlayerSlot = slot;
+
+						m_playerEntities[slot] = entity;
+
+						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u connected", slot);
+					} break;
+
+					case RootEngine::Network::InnerMessageID::DISCONNECT:
+					{
+						uint8_t slot = *(uint8_t*)message->Data;
+						
+						m_world->GetEntityManager()->RemoveEntity(m_playerEntities[slot]);
+
+						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u disconnected", slot);
+					} break;
 
 					default:
 						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "Unrecognized message ID: %d", message->MessageID);

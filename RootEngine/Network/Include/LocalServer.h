@@ -22,7 +22,7 @@ namespace RootEngine
 		public:
 			LocalServer();
 			~LocalServer();
-			bool Send(Message p_message);
+			bool Send(const Message& p_message);
 			void Host( USHORT p_port, bool p_isDedicated = true);
 			void Update();
 		private:

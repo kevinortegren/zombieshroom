@@ -9,6 +9,11 @@ namespace RootForce
 {
 	namespace Network
 	{
+		struct NetworkPlayerComponent : public ECS::Component<NetworkPlayerComponent>
+		{
+			int PlayerSlot;
+		};
+
 		class MessageHandler
 		{
 		public:
@@ -23,10 +28,14 @@ namespace RootForce
 
 			void Update();
 		private:
+			ECS::World* m_world;
 			Logging* m_logger;
 			RootEngine::Network::Server* m_server;
-			std::shared_ptr<ClientMessageSystem> m_clientMessageSystem;
-			std::shared_ptr<ServerMessageSystem> m_serverMessageSystem;
+			ClientMessageSystem* m_clientMessageSystem;
+			ServerMessageSystem* m_serverMessageSystem;
+
+			// Might change to all dynamic objects
+			std::map<uint8_t, ECS::Entity*> m_playerEntities;
 		};
 	}
 }

@@ -16,7 +16,7 @@ namespace RootEngine
 			delete[] &m_client;
 		}
 
-		bool LocalServer::Send( Message p_message )
+		bool LocalServer::Send( const Message& p_message )
 		{
 			if(p_message.RecipientID == -1)
 			{
@@ -42,10 +42,19 @@ namespace RootEngine
 			{
 				Client* client = new Client;
 				client->IsRemote = false;
-				client->GUID = m_peerInterface->GetGuidFromSystemAddress(sd.hostAddress);
+				client->GUID = m_peerInterface->GetMyGUID(); //m_peerInterface->GetGuidFromSystemAddress("127.0.0.1");
 				client->SysAddress = sd.hostAddress;
 				m_client[1] = client;
 				m_numClients++;
+				
+				Message* message = new Message;
+				message->MessageID = InnerMessageID::CONNECT;
+				message->RecipientID = 0;
+				message->Reliability = PacketReliability::RELIABLE_ORDERED;
+				message->Data = (uint8_t*)malloc(1); // TODO: Change maybe, perhaps. Problems...
+				message->Data[0] = 1;
+				message->DataSize = 1;
+				m_message.push_back(message);
 			}
 		}
 

@@ -5,6 +5,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
 #include <PlayerControlSystem.h>
+#include <Network/MessageHandler.h>
 #include <string>
 
 class Main {
@@ -23,4 +24,5 @@ private:
 	RootEngine::GameSharedContext m_engineContext;
 	ECS::World m_world;
 	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
+	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 };

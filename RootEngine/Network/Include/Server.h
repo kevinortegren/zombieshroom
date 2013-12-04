@@ -35,7 +35,7 @@ namespace RootEngine
 		class ServerInterface abstract
 		{
 			virtual void Update() = 0;
-			virtual bool Send(Message p_message) = 0;
+			virtual bool Send(const Message& p_message) = 0;
 			virtual Message* PollMessage() = 0;
 		};
 
@@ -47,11 +47,11 @@ namespace RootEngine
 			Server(void);
 			~Server(void);
 			virtual void Update() = 0;
-			virtual bool Send(Message p_message) = 0;
+			virtual bool Send(const Message& p_message) = 0;
 			Message* PollMessage();
 		protected:
 			std::vector<Message*> m_message;
-			bool Transmit(Message p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
+			bool Transmit(const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
 			RakNet::RakPeerInterface* m_peerInterface;
 
 			void ParseNonRaknetPacket(RakNet::Packet* p_packet);

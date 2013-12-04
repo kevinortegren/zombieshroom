@@ -12,7 +12,7 @@ namespace RootEngine
 		{
 		}
 
-		bool RemoteServer::Send(Message p_message)
+		bool RemoteServer::Send(const Message& p_message)
 		{
 			return Transmit(p_message, RakNet::UNASSIGNED_RAKNET_GUID, true);
 		}

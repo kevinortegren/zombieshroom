@@ -14,7 +14,7 @@ namespace RootEngine
 		{
 		}
 
-		bool Client::Send( Message p_message )
+		bool Client::Send( const Message& p_message )
 		{
 			if(p_message.DataSize > UINT_MAX)
 				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Attempting to send package with size higher than uint32. Package splitting not yet implemented.");
