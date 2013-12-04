@@ -11,6 +11,7 @@ namespace RootEngine
 		NetworkManager* NetworkManager::s_networkManager = nullptr;
 		void NetworkManager::Startup()
 		{
+			m_networkSys = nullptr;
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
 		}
 

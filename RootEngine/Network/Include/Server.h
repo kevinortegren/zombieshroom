@@ -27,8 +27,10 @@ namespace RootEngine
 			uint8_t MessageID;
 			int8_t RecipientID;
 			PacketReliability Reliability;
-			uint64_t DataSize;
+			uint32_t DataSize;
 			uint8_t* Data;
+			Message() {Data=nullptr;}
+			~Message() {delete Data;}
 		};
 		class ServerInterface abstract
 		{

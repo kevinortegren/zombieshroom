@@ -29,7 +29,6 @@ namespace RootEngine
 			m_view->Stop();
 			m_view->Destroy();
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
-			delete s_gui;
 
 			glDeleteTextures(1, &m_texture);
 			glDeleteVertexArrays(1, &m_vertexArrayBuffer);

@@ -8,9 +8,12 @@ namespace RootEngine
 	{
 		LocalServer::LocalServer()
 		{
+			for(int i = 0; i < MAX_CLIENTS + 1; i++)
+				m_client[i] = nullptr;
 		}
 		LocalServer::~LocalServer()
 		{
+			delete[] &m_client;
 		}
 
 		bool LocalServer::Send( Message p_message )
@@ -56,7 +59,7 @@ namespace RootEngine
 			{
 				int8_t clientID = 1;
 				for(; clientID < MAX_CLIENTS+1; clientID++)
-					if(packet->guid == m_client[clientID]->GUID)
+					if(m_client[clientID] && packet->guid == m_client[clientID]->GUID)
 						break;
 
 				switch( packet->data[0] )
@@ -66,6 +69,12 @@ namespace RootEngine
 					if( m_numClients >= MAX_CLIENTS )
 					{
 						// server full
+						g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Client refused: server full. Client IP: %u.%u.%u.%u:%u.",
+							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b1,
+							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b2,
+							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b3,
+							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b4,
+							packet->systemAddress.address.addr4.sin_port);
 					}
 					else
 					{
@@ -88,6 +97,7 @@ namespace RootEngine
 						message->DataSize = 1;
 						m_message.push_back(message);
 					}
+					break;
 				case NON_RAKNET_MESSAGE_ID:
 				// This is our own message, create a message struct from it and store in the buffer
 					ParseNonRaknetPacket(packet);

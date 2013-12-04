@@ -50,6 +50,7 @@ namespace RootEngine
 			bitstream.Read(message->RecipientID);
 			bitstream.Read(message->MessageID);
 			bitstream.Read(message->DataSize);
+			message->Data = (uint8_t*)malloc(message->DataSize);
 			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
 
 			m_message.push_back(message);
