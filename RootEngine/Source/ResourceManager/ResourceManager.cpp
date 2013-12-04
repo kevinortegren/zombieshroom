@@ -107,13 +107,13 @@ namespace RootEngine
 
 			if(tex)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'\n", p_path.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
 				return m_textures[p_path].get();
 			}
 			else
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading texture '%s'\n", p_path.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading texture '%s'", p_path.c_str());
 				return nullptr;
 			}
 		}
