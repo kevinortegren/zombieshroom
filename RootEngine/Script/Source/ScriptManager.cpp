@@ -81,7 +81,7 @@ namespace RootEngine
 	}
 }
 
-RootEngine::Script::ScriptInterface* CREATESCRIPTSYSTEM(RootEngine::SubsystemSharedContext p_context)
+RootEngine::Script::ScriptInterface* CreateScriptInterface(RootEngine::SubsystemSharedContext p_context)
 { 
 	RootEngine::Script::g_context = p_context;
 

@@ -1,12 +1,11 @@
 #pragma once
 
 #include <RootEngine/Include/SubsystemSharedContext.h>
-//#include 
 
 #if defined(_WINDLL)
-#define LUA_DLL_EXPORT __declspec(dllexport)
+#define SCRIPT_DLL_EXPORT __declspec(dllexport)
 #else
-#define LUA_DLL_EXPORT __declspec(dllimport)
+#define SCRIPT_DLL_EXPORT __declspec(dllimport)
 #endif
 
 namespace RootEngine
@@ -35,11 +34,10 @@ namespace RootEngine
 			static ScriptManager* s_scriptManager;
 		};
 	}
-
 }
 
 extern "C"
 {
-	typedef RootEngine::Script::ScriptInterface* (*GETSCRIPTINTERFACE) (RootEngine::SubsystemSharedContext);
-	LUA_DLL_EXPORT RootEngine::Script::ScriptInterface* CreateScriptSystem(RootEngine::SubsystemSharedContext p_context);
+	typedef RootEngine::Script::ScriptInterface* (*CREATESCRIPTINTERFACE) (RootEngine::SubsystemSharedContext);
+	SCRIPT_DLL_EXPORT RootEngine::Script::ScriptInterface* CreateScriptInterface(RootEngine::SubsystemSharedContext p_context);
 }

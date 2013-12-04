@@ -38,6 +38,11 @@ namespace RootEngine
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+		if(m_script != nullptr)
+		{
+			m_script->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_scriptModule);
+		}
 	}
 
 
@@ -48,6 +53,8 @@ namespace RootEngine
 		m_network = nullptr;
 		m_renderer = nullptr;
 		m_gui = nullptr;
+		m_physics = nullptr;
+		m_script = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
 
@@ -80,8 +87,9 @@ namespace RootEngine
 		}
 		if((p_flags & SubsystemInit::INIT_SCRIPTING) == SubsystemInit::INIT_SCRIPTING)
 		{
-			//LoadPhysics();
+			LoadScriptEngine();
 		}
+		
 
 		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
 		m_gui->SetWorkingDir(p_workingDirectory);
@@ -173,7 +181,7 @@ namespace RootEngine
 			{
 				m_renderer = (Render::GLRenderer*)libGetRenderer(m_subsystemSharedContext);
 				m_renderer->Startup();
-			
+
 			}
 			else
 			{
@@ -236,24 +244,22 @@ namespace RootEngine
 		m_scriptModule = DynamicLoader::LoadSharedLibrary("Script.dll");
 		if(m_scriptModule != nullptr)
 		{
-			//CreateScriptSystem libGetScriptEngine = CreateScriptSystem DynamicLoader::LoadProcess(m_scriptModule, "CreateScriptSystem");
-				//I'm here. Working up from bottom. Function by function
-		/*	//CREATEPHYSICS libGetPhysics = (CREATEPHYSICS) DynamicLoader::LoadProcess(m_physicsModule, "CreatePhysics");
-			if(libGetPhysics != nullptr)
-			{
-				m_physics = (Physics::RootPhysics*)libGetPhysics(m_subsystemSharedContext, m_renderer, &m_resourceManager);
-				m_physics->Startup();
+			CREATESCRIPTINTERFACE libGetScriptEngine = (CREATESCRIPTINTERFACE) DynamicLoader::LoadProcess(m_scriptModule, "CreateScriptInterface");
 
+			if(libGetScriptEngine != nullptr)
+			{
+				m_script = (Script::ScriptInterface*)libGetScriptEngine(m_subsystemSharedContext);
+				m_script->Startup();
 			}
 			else
 			{
-				m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
-		*/}
+			m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
+		}
 		
 	}
 	
