@@ -111,37 +111,43 @@ namespace RootEngine
 		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 
 		{
 			const aiMaterial* pMaterial = p_scene->mMaterials[i];
-			aiString Path;
+
+			aiString path;
+			std::string texName;
+
 			if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[0] = Path.data;
+						m_model->m_textureHandles[0] = texName;
 					}
 				}
 			}
 			if (pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[1] = Path.data;
+						m_model->m_textureHandles[1] = texName;
 					}
 				}
 			}
 			if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) 
 			{
-				if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
+				if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) 
 				{
+					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(Path.data))
+					if(m_resourceManager->LoadTexture(texName))
 					{
-						m_model->m_textureHandles[2] = Path.data;
+						m_model->m_textureHandles[2] = texName;
 					}
 				}
 			}
@@ -158,6 +164,20 @@ namespace RootEngine
 		}
 
 		return returnVec;
+	}
+
+	std::string ModelImporter::GetNameFromPath( std::string p_path )
+	{
+		std::string cutPath;
+		std::string::size_type slashIndex, dotIndex;
+
+		// Extract the file name
+		cutPath		= p_path;
+		slashIndex	= cutPath.find_last_of("/")+1;
+		cutPath		= cutPath.substr(slashIndex, cutPath.size());
+		dotIndex	= cutPath.find_last_of(".");
+		cutPath		= cutPath.substr(0, dotIndex);
+		return cutPath;
 	}
 
 }
