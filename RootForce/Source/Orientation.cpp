@@ -193,7 +193,26 @@ namespace RootForce
 	void Orientation::LookAt(glm::vec3 p_direction, glm::vec3 p_upVector)
 	{
 		m_orientation = quat(1.0f, 0.0f, 0.0f, 0.0f);
+		vec3 direction = normalize(p_direction);
+		vec3 up = normalize(p_upVector);
+		vec3 axis = glm::cross(direction, vec3(0.0f, 0.0f, 1.0f));
+		if(glm::length(axis) == 0)
+		{
+			axis = vec3(1.0f, 0.0f, 0.0f);
+		}
+		float angle = glm::degrees(glm::acos(glm::dot(direction, vec3(0.0f, 0.0f, 1.0f))));
+		vec3 third = glm::cross(axis, vec3(0.0f, 0.0f, 1.0f));
+		if (glm::dot(third, direction) < 0)
+		{
+			angle = -angle;
+		}
+		Rotate(angle, axis);
 
+		//vec3 side1 = glm::cross(direction, GetUp());
+		//vec3 side2 = glm::cross(direction, up);
+		//vec3 newUp = glm::cross(side2, direction);
+		//float angle2 = glm::degrees(glm::acos(glm::dot(side2, side1)));
+		//RollGlobal(angle2);
 	}
 
 	glm::quat Orientation::GetQuaterion()
