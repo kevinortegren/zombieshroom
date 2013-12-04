@@ -34,8 +34,6 @@ namespace Render
 			GLsizei(texture.dimensions().x),
 			GLsizei(texture.dimensions().y));
 
-		
-
 		if(gli::is_compressed(texture.format()))
 		{
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)

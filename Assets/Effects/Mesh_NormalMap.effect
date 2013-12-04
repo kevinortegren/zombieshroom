@@ -1,6 +1,6 @@
-- name: Mesh
+- name: Mesh_Normal
   techniques:
-    - name: Mesh
+    - name: Mesh_Normal
       uniforms:
         - name: PerFrame
           slot: 0
@@ -14,10 +14,12 @@
           slot: 0
         - name: g_Specular
           slot: 1
+        - name: g_Normal
+          slot: 2
       programs:
-        - name: Mesh
+        - name: Mesh_Normal
           shaders:
-            - name: mesh
+            - name: mesh_normal
               type: vertex
-            - name: mesh
+            - name: mesh_normal
               type: fragment
