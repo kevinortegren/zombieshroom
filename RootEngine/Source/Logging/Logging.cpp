@@ -1,7 +1,8 @@
 #include "Logging/Logging.h"
 #include <ctime>
-#include <RootForce/Include/CMDColor.h>
+#include <RootEngine/Include/Logging/CMDColor.h>
 #include <iostream>
+
 Logging::Logging()
 	:m_verboseLevel(LogLevel::INIT_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
