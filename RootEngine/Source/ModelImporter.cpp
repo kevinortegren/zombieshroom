@@ -85,7 +85,7 @@ namespace RootEngine
 				positions.push_back(v.m_pos);
 			}
 
-			//mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
+			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
 		}
 		else
 		{
