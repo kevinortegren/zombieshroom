@@ -1,15 +1,12 @@
 #include <RootEngine/Include/ModelImporter.h>
-#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <RootEngine/Include/GameSharedContext.h>
 
 namespace RootEngine
 {
-	
-	ModelImporter::ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer, ResourceManager* p_resourceManager)
+	ModelImporter::ModelImporter(GameSharedContext* p_context)
+		: m_context(p_context)
 	{
-		m_logger	= p_logger;
-		m_renderer	= p_renderer;
-		m_resourceManager = p_resourceManager;
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Model importer initialized!");
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Model importer initialized!");
 	}
 
 	ModelImporter::~ModelImporter()
@@ -27,15 +24,15 @@ namespace RootEngine
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
 		{
 			InitFromScene(aiscene, p_fileName);
-			m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded mesh '%s'", fileName);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
 		{
-			m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
 		}
 
 		return m_model;
@@ -49,57 +46,104 @@ namespace RootEngine
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
 			InitMesh(i, paiMesh, p_filename);
 		}
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load  %d textures to model", p_scene->mNumMaterials);
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load  %d textures to model", p_scene->mNumMaterials);
 
 		InitMaterials(p_scene, p_filename);
 	}
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
-		std::vector<Render::Vertex1P1N1UV> vertices;
-		std::vector<unsigned int> indices;
-
 		const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-		for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
-			const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
-			const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
-			const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+		std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
 
-			Render::Vertex1P1N1UV v;
-			v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
-			v.m_normal	= glm::vec3(pNormal->x, pNormal->y, pNormal->z);
-			v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
+		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
+		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
+		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
-			vertices.push_back(v);
-		}
-
-		for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
+		std::vector<glm::vec3> positions;
+		if(p_aiMesh->HasTangentsAndBitangents())
 		{
-			const aiFace& Face = p_aiMesh->mFaces[i];
-			if(Face.mNumIndices != 3)
-			{
-				m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+			std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
+
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
+				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
+				const aiVector3D* pTangent   = &(p_aiMesh->mTangents[i]);
+				const aiVector3D* pBitangent   = &(p_aiMesh->mBitangents[i]);
+				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+				Render::Vertex1P1N1UV1T1BT v;
+				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
+				v.m_normal	= glm::vec3(pNormal->x, pNormal->y, pNormal->z);
+				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
+				v.m_tangent = glm::vec3(pTangent->x, pTangent->y, pTangent->z);
+				v.m_bitangent = glm::vec3(pBitangent->x, pBitangent->y, pBitangent->z);
+
+				vertices.push_back(v);
+				positions.push_back(v.m_pos);
 			}
-			indices.push_back(Face.mIndices[0]);
-			indices.push_back(Face.mIndices[1]);
-			indices.push_back(Face.mIndices[2]);
+
+			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
+		}
+		else
+		{
+			std::vector<Render::Vertex1P1N1UV> vertices;
+
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
+				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
+				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+				Render::Vertex1P1N1UV v;
+				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
+				v.m_normal	= glm::vec3(pNormal->x, pNormal->y, pNormal->z);
+				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
+
+				vertices.push_back(v);
+				positions.push_back(v.m_pos);
+			}
+
+			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
 		}
 		
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
+		if(p_aiMesh->HasFaces())
+		{
+			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
 
-		//Set up the mesh description
-		MESH_DESC desc;
-		desc.handle		= GetNameFromPath(p_filename) + std::to_string(p_index); //Filename + index
-		desc.verts		= vertices;
-		desc.indices	= indices;
-		desc.primitive	= GL_TRIANGLES;
-		desc.faces		= p_aiMesh->mNumFaces;
+			std::vector<unsigned int> indices;
+			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
+			{
+				const aiFace& Face = p_aiMesh->mFaces[i];
+				if(Face.mNumIndices != 3)
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+				}
+				indices.push_back(Face.mIndices[0]);
+				indices.push_back(Face.mIndices[1]);
+				indices.push_back(Face.mIndices[2]);
+			}
+		
+			mesh->CreateIndexBuffer(&indices[0], indices.size());
 
-		//Add the handle to the model
-		m_model->m_meshes.push_back(m_resourceManager->AddRenderMesh(desc));
-		m_model->m_physicsMeshes.push_back(m_resourceManager->AddPhysicsMesh(desc));
+			// Create physics mesh.
+			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+
+			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+
+			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+			m_model->m_physicsMeshes.push_back(pmesh.get());
+		}
+
+		mesh->SetPrimitiveType(GL_TRIANGLES);
+
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
+
+		m_context->m_resourceManager->m_meshes[handle] = mesh;
+
+		m_model->m_meshes.push_back(mesh.get());
+
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
@@ -118,7 +162,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName))
 					{
 						m_model->m_textureHandles[0] = texName;
 					}
@@ -130,7 +174,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName))
 					{
 						m_model->m_textureHandles[1] = texName;
 					}
@@ -142,7 +186,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName))
 					{
 						m_model->m_textureHandles[2] = texName;
 					}

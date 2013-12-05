@@ -1,6 +1,6 @@
 - name: Mesh
   techniques:
-    - name: Diffuse
+    - name: Mesh
       uniforms:
         - name: PerFrame
           slot: 0
@@ -10,12 +10,14 @@
           - sem: WORLD
             type: mat4
       textures:
-        - name: diffuse
+        - name: g_Diffuse
           slot: 0
+        - name: g_Specular
+          slot: 1
       programs:
-      - name: Mesh
-        shaders:
-          - name: mesh
-            type: vertex
-          - name: mesh
-            type: fragment
+        - name: Mesh
+          shaders:
+            - name: mesh
+              type: vertex
+            - name: mesh
+              type: fragment

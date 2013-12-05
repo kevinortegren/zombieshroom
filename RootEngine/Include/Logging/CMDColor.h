@@ -73,7 +73,12 @@ namespace ColorCMD
 	inline void ConsoleColorInit()
 	{
 		std_con_out = GetStdHandle(STD_OUTPUT_HANDLE);
-		ShowWindow( GetConsoleWindow() , SW_MAXIMIZE);
+		//ShowWindow( GetConsoleWindow() , SW_MAXIMIZE);
+		COORD t;
+		t.X = 900;
+		t.Y = 900;
+		SetConsoleScreenBufferSize(std_con_out, t);
+		SetWindowPos(GetConsoleWindow(), HWND_NOTOPMOST, 0, 0, 900, 800, SWP_SHOWWINDOW);
 		UpdateColors();
 		deftextcol = textcol;
 		defbackcol = backcol;

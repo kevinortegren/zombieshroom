@@ -33,14 +33,6 @@ namespace Render
 	
 		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
-
-		/*virtual void SetUniformInt( const char* p_varname, int p_val ) = 0;
-		virtual void SetUniformFloat( const char* p_varname, float p_val ) = 0;
-		virtual void SetUniformVector( const char* p_varname, glm::vec3& p_val ) = 0;
-		virtual void SetUniformVector( const char* p_varname, glm::vec4& p_val ) = 0;
-		virtual void SetUniformMatrix( const char* p_varname, glm::mat3& p_val ) = 0;
-		virtual void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val ) = 0;*/
-
 	};
 
 	class Program : public ProgramInterface
@@ -59,14 +51,6 @@ namespace Render
 		void BindTexture(const std::string& textureName, unsigned int slot);
 
 	private:
-
-		/*void SetUniformInt( const char* p_varname, int p_val );
-		void SetUniformFloat( const char* p_varname, float p_val );
-		void SetUniformVector( const char* p_varname, glm::vec3& p_val );
-		void SetUniformVector( const char* p_varname, glm::vec4& p_val );
-		void SetUniformMatrix( const char* p_varname, glm::mat3& p_val );
-		void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val );*/
-
 		GLuint m_glHandle;
 	};
 

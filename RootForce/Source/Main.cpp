@@ -96,23 +96,20 @@ Main::Main(std::string p_workingDirectory)
 
 Main::~Main() 
 {
-	m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_21.world");
+	m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 	SDL_Quit();
 	DynamicLoader::FreeSharedLibrary(m_engineModule);
 }
 
 void Main::Start() 
 {
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-
-g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-RootForce::Renderable::SetTypeId(0);
-RootForce::Transform::SetTypeId(1);
-RootForce::PointLight::SetTypeId(2);
-RootForce::PlayerInputControlComponent::SetTypeId(3);
-RootForce::PhysicsAccessor::SetTypeId(4);
-
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::PhysicsAccessor::SetTypeId(4);
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -145,7 +142,6 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 	m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 
@@ -159,13 +155,11 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
-
 	RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
 
-
 	// Import test world.
-	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_21.world");
+	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
 	//RootForce::PhysicsAccessor* physaccessor = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(m_world.GetTagManager()->GetEntityByTag("Player"));
 	//int temp[1] = {0};
@@ -178,7 +172,6 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 
 
-	
 	//Plane at bottom
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
@@ -220,7 +213,6 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
-
 		g_engineContext.m_physics->Update(dt);
 
 		// Update Game systems.
@@ -229,18 +221,13 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 		renderingSystem->Process();
 
 		// Update Engine systems.
-
 		g_engineContext.m_renderer->Render();
 		g_engineContext.m_renderer->RenderLines();
-
 
 		g_engineContext.m_gui->Update();
 		g_engineContext.m_gui->Render();
 
-
-
 		g_engineContext.m_renderer->Swap();
-
 	}
 }
 

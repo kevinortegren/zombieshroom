@@ -9,8 +9,6 @@
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
 
-
-
 namespace RootEngine
 {
 	struct GameSharedContext
