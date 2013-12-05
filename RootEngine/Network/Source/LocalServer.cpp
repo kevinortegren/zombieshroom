@@ -109,7 +109,7 @@ namespace RootEngine
 					break;
 				case NON_RAKNET_MESSAGE_ID:
 				// This is our own message, create a message struct from it and store in the buffer
-					ParseNonRaknetPacket(packet);
+					ParseNonRaknetPacket(packet, clientID);
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 				// A client decided to quit. A TRAITOR!

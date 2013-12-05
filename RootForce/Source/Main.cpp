@@ -241,7 +241,7 @@ void Main::Start()
 	//////////////////////////////////////////////////////////////////////////
 	
 	// Initialize the network system
-	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::LOCAL, 5567));
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::REMOTE, 5567, "127.0.0.1"));
 	
 	// Test message sending
 	{
