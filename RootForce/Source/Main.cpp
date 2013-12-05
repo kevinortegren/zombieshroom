@@ -102,16 +102,13 @@ Main::~Main()
 
 void Main::Start() 
 {
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-
-g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-RootForce::Renderable::SetTypeId(0);
-RootForce::Transform::SetTypeId(1);
-RootForce::PointLight::SetTypeId(2);
-RootForce::PlayerInputControlComponent::SetTypeId(3);
-RootForce::PhysicsAccessor::SetTypeId(4);
-
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::PhysicsAccessor::SetTypeId(4);
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -144,7 +141,6 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 	m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 
@@ -158,10 +154,8 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
-
 	RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
-
 
 	// Import test world.
 	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
@@ -175,7 +169,6 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	g_engineContext.m_gui->LoadURL("debug.html");
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
-
 
 	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
 
@@ -261,29 +254,21 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
-
 		g_engineContext.m_physics->Update(dt);
-
 
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_physicsSystem->Process();
 		renderingSystem->Process();
 
-
 		// Update Engine systems.
-
 		g_engineContext.m_renderer->Render();
 		g_engineContext.m_renderer->RenderLines();
-
 
 		g_engineContext.m_gui->Update();
 		g_engineContext.m_gui->Render();
 
-
-
 		g_engineContext.m_renderer->Swap();
-
 	}
 }
 

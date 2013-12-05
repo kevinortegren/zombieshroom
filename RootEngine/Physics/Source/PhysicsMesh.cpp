@@ -1,5 +1,7 @@
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
 
+namespace RootEngine
+{
 namespace Physics
 {
 	PhysicsMesh::PhysicsMesh()
@@ -58,6 +60,7 @@ namespace Physics
 		return m_nrOfFaces;
 	}
 
+}
 }
 
 

@@ -1,10 +1,12 @@
 #pragma once
-#include <RootEngine/Physics/Include/PhysicsMesh.h>
+
 #include <vector>
 #include "PlayerController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
+
 #if defined(_WINDLL)
 #define PHYSICS_DLL_EXPORT __declspec(dllexport)
 #else
@@ -13,11 +15,8 @@
 
 namespace RootEngine
 {
-
-
 	namespace Physics
-	{
-		
+	{	
 		namespace PhysicsType
 		{
 			enum PhysicsType
@@ -65,10 +64,8 @@ namespace RootEngine
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
 			
-				
-
 			virtual void RemoveObject(int p_objectIndex) = 0;
-			virtual std::shared_ptr<Physics::PhysicsMeshInterface> CreatePhysicsMesh() = 0;
+			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		};
 		class RootPhysics;
 		typedef void (RootPhysics::*CollisionFunc)(int);
