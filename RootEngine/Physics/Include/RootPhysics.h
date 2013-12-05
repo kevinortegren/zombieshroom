@@ -18,6 +18,17 @@ namespace RootEngine
 	namespace Physics
 	{
 		
+		namespace PhysicsType
+		{
+			enum PhysicsType
+			{
+				TYPE_STATIC,
+				TYPE_ABILITY,
+				TYPE_DYNAMIC,
+				TYPE_PLAYER
+			};
+		}
+
 		class PhysicsInterface : public RootEngine::SubsystemInterface
 		{
 		public:
@@ -35,13 +46,13 @@ namespace RootEngine
 			virtual void SetDynamicObjectVelocity(int p_objectIndex, float* p_velocity) = 0;
 			virtual void SetObjectMass(int p_objectIndex, float p_mass) = 0;
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			virtual void AddStaticObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation) = 0;
+			virtual void AddStaticObjectToWorld(std::string p_modelHandle,  float* p_position, float* p_rotation) = 0;
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-			virtual int* AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass) = 0;
+			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle,  float* p_position, float* p_rotation, float p_mass) = 0;
 			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			virtual int* AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass,
-				float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+			virtual int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity) = 0;
 			/// p_Pos should be of type float[3]
 			virtual void GetPos(int p_objectIndex, float* p_pos)= 0;
 			virtual float GetMass(int p_objectIndex) = 0;
@@ -49,7 +60,7 @@ namespace RootEngine
 			virtual float GetMaxSpeed(int p_objectIndex) = 0;
 			virtual float GetStepHeight(int p_objectIndex) = 0;
 			virtual float GetModelHeight(int p_objectIndex) = 0;
-
+			virtual std::string GetPhysicsModelHandle(int p_objectIndex) = 0;
 			virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
@@ -72,6 +83,7 @@ namespace RootEngine
 			int m_vectorIndex;
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			bool m_collided;
+			std::string m_modelHandle;
 			CollisionFunc m_collisionFunc;
 
 			~CustomUserPointer()
@@ -100,13 +112,12 @@ namespace RootEngine
 			void SetObjectMass(int p_objectIndex, float p_mass);
 		
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			void AddStaticObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation);
+			void AddStaticObjectToWorld(std::string p_modelHandle,  float* p_position, float* p_rotation);
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-			int* AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass);
+			int* AddDynamicObjectToWorld(std::string p_modelHandle,  float* p_position, float* p_rotation, float p_mass);
 			///Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			int* AddPlayerObjectToWorld(int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride,
-										float* p_position, float* p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
+			int* AddPlayerObjectToWorld(std::string p_modelHandle, float* p_position, float* p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
 
 			int* AddAbilityToWorld(float p_radius, float* p_position, float* p_direction, float p_speed, int p_type /*, void* p_collideFunc */ , float p_mass, float* p_gravity);
 			void GetPos(int p_objectIndex, float* p_pos);	/// p_pos should be of type float[3]
@@ -115,6 +126,7 @@ namespace RootEngine
 			float GetMaxSpeed(int p_objectIndex);
 			float GetStepHeight(int p_objectIndex);
 			float GetModelHeight(int p_objectIndex);
+			std::string GetPhysicsModelHandle(int p_objectIndex);
 			void SetGravity(int p_objectIndex, float* p_gravity);
 			void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
 			void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);

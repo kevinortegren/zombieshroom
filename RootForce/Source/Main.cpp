@@ -160,10 +160,10 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 
 
 	// Import test world.
-	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test.world");
+	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
 	//RootForce::PhysicsAccessor* physaccessor = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(m_world.GetTagManager()->GetEntityByTag("Player"));
-//	int temp[1] = {0};
+	//int temp[1] = {0};
 	//physaccessor->m_handle = temp;
 	
 	//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
@@ -252,7 +252,7 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 		HandleEvents();
 		
 
-		m_playerControlSystem->Process();
+//		m_playerControlSystem->Process();
 
 		g_engineContext.m_renderer->Clear();
 

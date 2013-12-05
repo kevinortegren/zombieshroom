@@ -14,8 +14,6 @@ namespace Physics
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
 	RootEngine::ResourceManagerInterface* g_resourceManager;
-	const int TYPE_PLAYER = 2;
-	const int TYPE_ABILITY = 1;
 	
 	RootPhysics::RootPhysics()
 	{
@@ -84,14 +82,14 @@ namespace Physics
 			return false;
 		int test = ((CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer()))->m_type;
 		int test2 = ((CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer()))->m_type;
-		if (pointer1->m_type == TYPE_PLAYER || pointer2->m_type == TYPE_PLAYER)
+		if (pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			
 			
-			if (pointer2->m_type == TYPE_ABILITY || pointer1->m_type == TYPE_ABILITY)
+			if (pointer2->m_type == PhysicsType::TYPE_ABILITY || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			{
-				void* x = RootEngine::Physics::RootPhysics::GetInstance();
-				if(pointer1->m_type == TYPE_ABILITY)
+				void* x = RootPhysics::GetInstance();
+				if(pointer1->m_type == PhysicsType::TYPE_ABILITY)
 				{
 					
 					((RootPhysics*)x)->RemoveObject(*(pointer1->m_id));
@@ -103,11 +101,11 @@ namespace Physics
 				//Call the functions here	
 			}
 		}
-		else if (pointer1->m_type == TYPE_ABILITY)
+		else if (pointer1->m_type == PhysicsType::TYPE_ABILITY)
 		{
 			int asdfahjsdf = 1;
 		}
-		else if (pointer2->m_type == TYPE_ABILITY)
+		else if (pointer2->m_type == PhysicsType::TYPE_ABILITY)
 		{
 			int asdf = 0;
 		}
@@ -174,10 +172,11 @@ namespace Physics
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-	void RootPhysics::AddStaticObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation )
+	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, float* p_position, float* p_rotation )
 	{
 		//TODO if time and need to improve performance: Use compundshapes
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
+		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
+		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		btScalar mass = 0; //mass is always 0 for static objects
 		btCollisionShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
 
@@ -193,11 +192,12 @@ namespace Physics
 		m_dynamicWorld->addRigidBody(objectBody);
 
 	}
-	int* RootPhysics::AddDynamicObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation , float p_mass )
+	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle,  float* p_position, float* p_rotation , float p_mass )
 	{
 		
 		//creates the mesh shape
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices ,  p_vertexBuffer, p_vertexStride);
+		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
+		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		
 		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
 		//Cull unneccesary vertices to improve performance 
@@ -240,8 +240,9 @@ namespace Physics
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
 		m_userPointer.push_back(userPointer);
-		userPointer->m_type = TYPE_ABILITY;
+		userPointer->m_type = PhysicsType::TYPE_DYNAMIC;
 		userPointer->m_id = new int();
+		userPointer->m_modelHandle = p_modelHandle;
 		
 		(userPointer->m_collisionFunc) = &RootPhysics::RemoveObject;
 		*(userPointer->m_id) = m_userPointer.size()-1;
@@ -268,13 +269,12 @@ namespace Physics
 		m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, float* p_vertexBuffer, 
-											int p_vertexStride, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 	{
+		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		PlayerController* player = new PlayerController();
-		player->Init(m_dynamicWorld, p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices, p_vertexBuffer
-			, p_vertexStride, p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
-
+		player->Init(m_dynamicWorld, tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), 
+			tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
 		
 		m_playerObject.push_back(player);
@@ -283,7 +283,8 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
-		userPointer->m_type = TYPE_PLAYER;
+		userPointer->m_type = PhysicsType::TYPE_PLAYER;
+		userPointer->m_modelHandle = p_modelHandle;
 		player->SetUserPointer((void*)userPointer);
 		return userPointer->m_id;
 	}
@@ -314,9 +315,9 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 
 		btVector3 temp;
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 			temp = m_playerObject.at(index)->GetPosition();
-		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
 		p_pos[0] = temp.getX();
 		p_pos[1] = temp.getY();
@@ -351,7 +352,7 @@ namespace Physics
 			return;
 
 		CustomUserPointer* userPointer = m_userPointer.at(p_objectIndex);
-		if(userPointer->m_type == TYPE_PLAYER)
+		if(userPointer->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned int removedIndex = userPointer->m_vectorIndex;
 			m_playerObject.at(removedIndex)->RemovePlayer();
@@ -364,7 +365,7 @@ namespace Physics
 			for(unsigned int i = p_objectIndex; i < m_userPointer.size(); i++)
 			{
 				m_userPointer.at(i)->m_id[0] --;
-				if(m_userPointer.at(i)->m_type == TYPE_PLAYER)
+				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER)
 				{
 					
 						m_userPointer.at(i)->m_vectorIndex--;
@@ -386,7 +387,7 @@ namespace Physics
 			{
 			
 				m_userPointer.at(i)->m_id[0] --;
-				if(m_userPointer.at(i)->m_type != TYPE_PLAYER)
+				if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER)
 				{
 
 					m_userPointer.at(i)->m_vectorIndex--;
@@ -429,7 +430,7 @@ namespace Physics
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			btQuaternion temp = m_playerObject.at(index)->GetOrientation();
 			p_objectOrientation[0] = temp.x();
@@ -438,7 +439,7 @@ namespace Physics
 			p_objectOrientation[3] = temp.w();
 		}
 		
-		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 			btRigidBody* body = m_dynamicObjects.at(index);
 			btTransform transform;
@@ -509,7 +510,7 @@ namespace Physics
 		m_dynamicObjects.push_back(body);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
-		userPointer->m_type = TYPE_ABILITY;
+		userPointer->m_type = PhysicsType::TYPE_ABILITY;
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
@@ -529,7 +530,7 @@ namespace Physics
 		}
 		else
 		{
-			if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+			if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 			{
 				if(m_playerObject.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObject.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
 				{
@@ -553,7 +554,7 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			//Implement later, not as cool as abilitys
 			int lol = 2;
@@ -577,12 +578,12 @@ namespace Physics
 			return -1;
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			return m_playerObject.at(index)->GetMass();
 		}
 
-		else if(m_userPointer.at(p_objectIndex)->m_type == TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 			return 1/m_dynamicObjects.at(index)->getInvMass();
 		}
@@ -603,7 +604,7 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 			return m_playerObject.at(index)->GetStepHeight();
@@ -614,7 +615,7 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 			return m_playerObject.at(index)->GetMaxSpeed();
@@ -625,13 +626,21 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == TYPE_PLAYER)
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 			return m_playerObject.at(index)->GetModetHeight();
 		}
 		return -1;
 	}	
+
+	std::string RootPhysics::GetPhysicsModelHandle( int p_objectIndex )
+	{
+		if(!DoesObjectExist(p_objectIndex))
+			return "";
+		return m_userPointer.at(p_objectIndex)->m_modelHandle;
+		
+	}
 
 }
 }

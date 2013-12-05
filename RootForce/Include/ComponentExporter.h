@@ -64,10 +64,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				RootForce::PhysicsAccessor* accessor = static_cast<RootForce::PhysicsAccessor*>(p_component);
 				int type = g_engineContext.m_physics->GetType(*(accessor->m_handle));
 				float mass = g_engineContext.m_physics->GetMass(*(accessor->m_handle));
+				std::string modelHandle = g_engineContext.m_physics->GetPhysicsModelHandle(*(accessor->m_handle));
 				p_emitter << YAML::Key << "Type" << YAML::Value << type;
 				p_emitter << YAML::Key << "Mass" << YAML::Value << mass;
+				p_emitter << YAML::Key << "ModelHandle" << YAML::Key << modelHandle;
 				
-				if (type == 2) //THIS IS PLAYER TYPE!!11ONE!1
+				if (type == RootEngine::Physics::PhysicsType::TYPE_PLAYER) 
 				{
 					float stepHeight = g_engineContext.m_physics->GetStepHeight(*(accessor->m_handle));
 					float modelHeight =g_engineContext.m_physics->GetModelHeight(*(accessor->m_handle));

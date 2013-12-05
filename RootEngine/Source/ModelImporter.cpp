@@ -91,7 +91,7 @@ namespace RootEngine
 
 		//Set up the mesh description
 		MESH_DESC desc;
-		desc.handle		= p_filename + std::to_string(p_index); //Filename + index
+		desc.handle		= GetNameFromPath(p_filename) + std::to_string(p_index); //Filename + index
 		desc.verts		= vertices;
 		desc.indices	= indices;
 		desc.primitive	= GL_TRIANGLES;
