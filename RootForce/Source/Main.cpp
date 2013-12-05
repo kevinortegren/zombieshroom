@@ -142,8 +142,6 @@ void Main::Start()
 	// Import test world.
 	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test.world");
 
-	m_world.GetEntityExporter()->Export("asd");
-
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	g_engineContext.m_gui->LoadURL("debug.html");
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());

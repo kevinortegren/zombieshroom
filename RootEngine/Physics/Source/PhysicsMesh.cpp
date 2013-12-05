@@ -12,14 +12,14 @@ namespace Physics
 
 	}
 
-	void PhysicsMesh::Init(std::vector<Render::Vertex1P1N1UV> p_pointData, int p_nrOfPoints, std::vector<unsigned int> p_indexData, int p_nrOfIndices, int p_faces)
+	void PhysicsMesh::Init(std::vector<glm::vec3> p_pointData, int p_nrOfPoints, std::vector<unsigned int> p_indexData, int p_nrOfIndices, int p_faces)
 	{
 		m_points = new float[p_nrOfPoints*3];
 		for(int i = 0; i < p_nrOfPoints; i++)
 		{
-			m_points[(i*3)]		= p_pointData[i].m_pos.x;
-			m_points[(i*3)+1]	= p_pointData[i].m_pos.y;
-			m_points[(i*3)+2]	= p_pointData[i].m_pos.z;
+			m_points[(i*3)]		= p_pointData[i].x;
+			m_points[(i*3)+1]	= p_pointData[i].y;
+			m_points[(i*3)+2]	= p_pointData[i].z;
 		}
 
 		m_indices = new int[p_nrOfIndices];

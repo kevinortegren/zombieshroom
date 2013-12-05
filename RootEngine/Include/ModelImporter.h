@@ -16,7 +16,7 @@
 
 namespace RootEngine
 {
-	class ResourceManager;
+	struct GameSharedContext;
 
 	struct Model
 	{
@@ -31,9 +31,7 @@ namespace RootEngine
 	{
 	public:
 		
-		
-
-		ModelImporter(Logging* p_logger, Render::RendererInterface* p_renderer, ResourceManager* p_resourceManager);
+		ModelImporter(GameSharedContext* p_context);
 		~ModelImporter();
 
 		Model* LoadModel(const std::string p_fileName);
@@ -45,9 +43,7 @@ namespace RootEngine
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		std::string GetNameFromPath(std::string p_path);
 
-		ResourceManager* m_resourceManager;
-		Logging*	m_logger;
+		GameSharedContext* m_context;
 		Model*		m_model; 
-		Render::RendererInterface* m_renderer;
 	};
 }
