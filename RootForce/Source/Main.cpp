@@ -165,13 +165,6 @@ void Main::Start()
 	//int temp[1] = {0};
 	//physaccessor->m_handle = temp;
 	
-
-
-	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	g_engineContext.m_gui->LoadURL("debug.html");
-	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
-
-
 	//Plane at bottom
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
@@ -195,20 +188,25 @@ void Main::Start()
 	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
 	g_engineContext.m_physics->AddAbilityToWorld(test);
 
+
+	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	g_engineContext.m_gui->LoadURL("debug.html");
+	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
-	{
+	{	
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
-	
+		
 		g_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(1.0f/dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
-
+		g_engineContext.m_profiler->Update(dt);
 		m_playerControlSystem->Process();
 		abilitySystem->Process();
 
