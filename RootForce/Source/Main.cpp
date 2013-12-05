@@ -96,6 +96,7 @@ Main::Main(std::string p_workingDirectory)
 
 Main::~Main() 
 {
+	m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 	SDL_Quit();
 	DynamicLoader::FreeSharedLibrary(m_engineModule);
 }
@@ -170,79 +171,19 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	//int temp[1] = {0};
 	//physaccessor->m_handle = temp;
 	
-	//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	g_engineContext.m_gui->LoadURL("debug.html");
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 
 
-	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
-
-	//
-	//ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
-	//RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
-	//guyTransform2->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	//RootForce::PhysicsAccessor* guyPhysics2 = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(guy2);
-	//RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
-	//guyRenderable2->m_mesh = g_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	//Render::Material guyMaterial2;
-	//guyMaterial2.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-	//guyMaterial2.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(g_engineContext.m_resourceManager->GetModel("testchar")->m_textureHandles[0]);
-	//guyRenderable2->m_material = guyMaterial2;
-
-	//RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
-	//guyControl2->speed = 10.0f;
-
-	//int facesTotal = g_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
-	//int verticesTotal = g_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
-	//int indicesTotal = g_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
-	//float* tempVertices = (float*)malloc(verticesTotal * 3 * sizeof(float));
-	//for(int i = 0; i < verticesTotal; i ++)
-	//{
-	//	tempVertices[i*3] = g_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].x;  // 0, 3, 6, 9
-	//	tempVertices[i*3 + 1] = g_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].y; //1, 4, 7, 10
-	//	tempVertices[i*3 + 2] = g_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2, 5, 8, 11
-	//}
-	//int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
-	//tempIndices = (int*)&g_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
-
-	//float pos[3] = {3,0,0};
-	//float rot[3] = {0,0,0};
-	//guyPhysics->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
-	//float pos2[3] = {0,5,-20};
-	//float rot2[3] = {0,0,0};
-	//guyPhysics2->m_handle = g_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
-	//
-	//float normal[3] = {0,1,0};
-	//float position[3] = {0, -2, 0};
-	//g_engineContext.m_physics->CreatePlane(normal, position);
-	//float normal2[3] = {0,0,1};
-	//float position2[3] = {0, 0, -60};
-	//g_engineContext.m_physics->CreatePlane(normal2, position2);
-	//float normal3[3] = {0,0,-1};
-	//float position3[3] = {0, 0, 4};
-	//g_engineContext.m_physics->CreatePlane(normal3, position3);
-	////float speed[3] = {0, 5, -5};
-	//
-	//float speedup[3] = {0, 10 , 0};
-	//float x[3], x2[3];
-	//for(int i = 0 ; i < 5; i++)
-	//{
-	//	float ballpos[3] = {0,3 + i * 1.5f, 0};
-	////	int ballHandle = g_engineContext.m_physics->CreateSphere(i +0.04f, 1.05f,ballpos );
-	//}
-	//
-	//float ballspeed[3] = {0, 0, 5};
-	//float orientationPlayer[4] = {0,0,0, 0};
-	//float orientation[4] = {0,0,0, 0};
-	//float yaw = 0;
-	//
-	//////////////////////////////////////////////////////////////////////////
-
+	
+	//Plane at bottom
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
 	g_engineContext.m_physics->CreatePlane(normal, position);
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -294,7 +235,7 @@ void Main::HandleEvents()
 	{
 		switch(event.type) 
 		{
-		case SDL_QUIT:
+		case SDL_QUIT: 
 			m_running = false;
 			break;
 
