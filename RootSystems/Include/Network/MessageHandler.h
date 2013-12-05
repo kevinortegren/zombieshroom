@@ -14,6 +14,11 @@ namespace RootForce
 			int PlayerSlot;
 		};
 
+		struct NetworkComponent : public ECS::Component<NetworkComponent>
+		{
+			// TODO: Add an ID?
+			bool IsPlayerEntity;
+		};
 		
 
 		class MessageHandler

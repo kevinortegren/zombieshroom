@@ -76,14 +76,13 @@ namespace RootForce
 					case Network::MessageType::UserCommandPickUpAbility:
 					case Network::MessageType::UserCommandJump:
 					case Network::MessageType::UserCommandStopJumping:
+					case RootEngine::Network::InnerMessageID::CONNECT:
 						if (m_serverMessageSystem != nullptr)
 							m_serverMessageSystem->HandleServerMessage(message);
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
 						break;
 
-					case RootEngine::Network::InnerMessageID::CONNECT:
-					{
 						/*
 						uint8_t slot = *(uint8_t*)message->Data;
 
@@ -95,10 +94,14 @@ namespace RootForce
 
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u connected", slot);
 						*/
-					} break;
 
 					case RootEngine::Network::InnerMessageID::DISCONNECT:
-					{
+						// This can either be a client or a server timing out or disconnecting
+						if (m_serverMessageSystem != nullptr)
+							m_serverMessageSystem->HandleServerMessage(message);
+						if (m_clientMessageSystem != nullptr)
+							m_clientMessageSystem->HandleClientMessage(message);
+
 						/*
 						uint8_t slot = *(uint8_t*)message->Data;
 						
@@ -106,7 +109,7 @@ namespace RootForce
 
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u disconnected", slot);
 						*/
-					} break;
+						break;
 
 					default:
 						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "Unrecognized message ID: %d", message->MessageID);

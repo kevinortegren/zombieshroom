@@ -73,6 +73,10 @@ namespace RootForce
 					break;
 				case MessageType::UserCommandStopJumping:
 					break;
+				case RootEngine::Network::InnerMessageID::CONNECT:
+					break;
+				case RootEngine::Network::InnerMessageID::DISCONNECT:
+					break;
 			}
 		}
 

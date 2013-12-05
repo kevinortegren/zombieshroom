@@ -36,7 +36,20 @@ namespace RootForce
 
 		void ClientMessageSystem::HandleClientMessage(RootEngine::Network::Message* p_message)
 		{
-
+			switch (p_message->MessageID)
+			{
+				case MessageType::GameStateSnapshot:
+					break;
+				case MessageType::ChatToClient:
+					break;
+				case MessageType::UserConnected:
+					break;
+				case MessageType::UserDisconnected:
+					break;
+				case RootEngine::Network::InnerMessageID::DISCONNECT:
+					
+					break;
+			}
 		}
 
 		void ClientMessageSystem::HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message)
