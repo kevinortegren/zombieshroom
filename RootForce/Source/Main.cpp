@@ -9,6 +9,7 @@
 
 #include <RenderingSystem.h>
 #include <LightSystem.h>
+#include <CameraSystem.h>
 
 #include <RootForce/Include/RawMeshPrimitives.h>
 
@@ -143,6 +144,7 @@ void Main::Start()
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::Camera::SetTypeId(4);
 
 	// Initialize the system for rendering the scene.
 	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -154,6 +156,9 @@ void Main::Start()
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
+	RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+
 	// Setup lights.
 	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
@@ -163,6 +168,9 @@ void Main::Start()
 
 	m_engineContext.m_renderer->AddDirectionalLight(directional, 0);
 	
+	//////////////////////////////////////////////////////////////////////////
+	//CREATE RED LIGHT
+	//////////////////////////////////////////////////////////////////////////
 	ECS::Entity* red = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Transform* redTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(red);
@@ -178,6 +186,9 @@ void Main::Start()
 	redRender->m_mesh = cubeMesh;
 	redRender->m_material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 
+	//////////////////////////////////////////////////////////////////////////
+	//CREATE BLUE LIGHT
+	//////////////////////////////////////////////////////////////////////////
 	ECS::Entity* blue = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Transform* blueTrans = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(blue);
@@ -195,7 +206,19 @@ void Main::Start()
 
 	m_world.GetGroupManager()->RegisterEntity("Lights", blue);
 	m_world.GetGroupManager()->RegisterEntity("Lights", red);
-	
+
+	//////////////////////////////////////////////////////////////////////////
+	//CREATE CAMERA
+	//////////////////////////////////////////////////////////////////////////
+
+	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+	cameraTransform->m_position = glm::vec3(0.0f, 0.0f, 10.0f);
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
+	camera->m_near = 0.1f;
+	camera->m_far = 1000.0f;
+	camera->m_fov = 75.0f;
+	m_world.GetGroupManager()->RegisterEntity("Camera", cameraEntity);
 
 	// Setup a dummy player entity and add components to it
 	
@@ -288,6 +311,8 @@ void Main::Start()
 
 	m_world.GetGroupManager()->PrintEntitiesInGroup("Lights");
 
+	m_world.GetGroupManager()->PrintEntitiesInGroup("Camera");
+
 	RootForce::Transform* t = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Player"));
 	glm::vec3 a = t->m_position;
 	// Start the main loop
@@ -312,6 +337,7 @@ void Main::Start()
 
 		pointLightSystem->Process(); 
 		renderingSystem->Process();
+		cameraSystem->Process();
 
 		m_engineContext.m_renderer->Render();
 		m_engineContext.m_renderer->RenderLines();

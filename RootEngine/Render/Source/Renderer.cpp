@@ -199,10 +199,10 @@ namespace Render
 		m_lightingTech = deferred->GetTechniques()[0];
 
 		// Setup camera.
-		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
-		
-		m_cameraVars.m_projection = m_camera.GetProjection();
-		m_cameraVars.m_view = m_camera.GetView();
+		//m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
+	
+		m_cameraVars.m_view = glm::mat4(1.0f);
+		m_cameraVars.m_projection = glm::perspectiveFov<float>(75.0f, width, height, 0.1f, 1000.0f);
 		
 		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
@@ -229,14 +229,15 @@ namespace Render
 		int width;
 		int height;
 		SDL_GetWindowSize(m_window, &width, &height);*/
-
+		m_width = p_width;
+		m_height = p_height;
 		SDL_SetWindowSize(m_window, p_width, p_height);
 		
 		m_gbuffer.Resize(p_width, p_height);
 
 		glViewport(0, 0, p_width, p_height);
 
-		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
+		//Change projection!
 	}
 
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)
@@ -269,6 +270,7 @@ namespace Render
 	void GLRenderer::Render()
 	{
 		// Buffer Per Frame data.
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
 		GeometryPass();
@@ -418,6 +420,29 @@ namespace Render
 
 		return cur_avail_mem_kb;
 	}
+
+	void GLRenderer::SetViewMatrix( glm::mat4 p_viewMatrix )
+	{
+		m_cameraVars.m_view = p_viewMatrix;
+		m_cameraVars.m_invView = glm::inverse(p_viewMatrix);
+	}
+
+	void GLRenderer::SetProjectionMatrix( glm::mat4 p_projectionMatrix )
+	{
+		m_cameraVars.m_projection = p_projectionMatrix;
+		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	int GLRenderer::GetWidth()
+	{
+		return m_width;
+	}
+
+	int GLRenderer::GetHeight()
+	{
+		return m_height;
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
