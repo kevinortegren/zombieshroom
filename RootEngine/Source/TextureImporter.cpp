@@ -6,7 +6,8 @@ namespace RootEngine
 	TextureImporter::TextureImporter(Logging* p_logger, Render::RendererInterface* p_renderer)
 	{
 		m_logger	= p_logger;
-		m_texture   = p_renderer->CreateTexture();
+		if(p_renderer)
+			m_texture   = p_renderer->CreateTexture();
 		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Texture importer initialized!");
 	}
 
