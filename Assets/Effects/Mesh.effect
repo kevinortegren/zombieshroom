@@ -6,6 +6,9 @@
           slot: 0
         - name: PerObject
           slot: 1
+      PerObject:
+          - sem: WORLD
+            type: mat4
       textures:
         - name: diffuse
           slot: 0

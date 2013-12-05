@@ -21,7 +21,7 @@ namespace Render
 
 	void Camera::PerspectiveProjection(float p_fov, float p_near, float p_far, int p_width, int p_height)
 	{
-		m_projection = glm::perspectiveFov<float>(p_fov, p_width, p_height, p_near, p_far);
+		m_projection = glm::perspectiveFov<float>(p_fov, (float)p_width, (float)p_height, p_near, p_far);
 	}
 
 	void Camera::Update()

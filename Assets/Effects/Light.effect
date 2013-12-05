@@ -1,0 +1,14 @@
+- name: Light
+  techniques:
+    - name: Light
+      uniforms:
+        - name: PerObject
+          slot: 0
+      textures:
+      programs:
+      - name: light
+        shaders:
+          - name: light
+            type: vertex
+          - name: light
+            type: fragment

@@ -27,16 +27,17 @@ namespace RootEngine
 			m_renderer->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_renderModule);
 		}
-		if(m_gui != nullptr)
-		{
-			m_gui->Shutdown();
-			DynamicLoader::FreeSharedLibrary(m_guiModule);
-		}
 		if(m_physics != nullptr)
 		{
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+		if(m_gui != nullptr)
+		{
+			m_gui->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_guiModule);
+		}
+		
 	}
 
 
@@ -72,14 +73,13 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
 		{
 			LoadGUI();
+			m_gui->SetWorkingDir(p_workingDirectory);
 		}
 		if((p_flags & SubsystemInit::INIT_PHYSICS) == SubsystemInit::INIT_PHYSICS)
 		{
 			LoadPhysics();
 		}
 
-		m_resourceManager.Init(p_workingDirectory, m_renderer, &g_logger);
-		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -93,7 +93,9 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		 
+
+		m_resourceManager.Init(p_workingDirectory, &m_gameSharedContext);
+
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
 

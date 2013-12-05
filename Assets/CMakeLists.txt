@@ -9,13 +9,15 @@ project(${PROJECT_NAME})
 file(GLOB_RECURSE SHADERS Shaders/*)
 file(GLOB_RECURSE EFFECTS Effects/*)
 file(GLOB_RECURSE GUI GUI/*)
+file(GLOB_RECURSE LEVELS Levels/*)
 
 # Add the target
 
 add_custom_target(${PROJECT_NAME} ALL
-	SOURCES ${SHADERS} ${EFFECTS}
+	SOURCES ${SHADERS} ${EFFECTS} ${LEVELS}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Assets)
 
 source_group("Shaders" FILES ${SHADERS})
 source_group("Effects" FILES ${EFFECTS})
+source_group("Levels" FILES ${LEVELS})
 source_group("GUI" FILES ${GUI})

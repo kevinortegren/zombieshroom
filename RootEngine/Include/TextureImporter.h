@@ -17,12 +17,10 @@ namespace RootEngine
 		TextureImporter(Logging* p_logger, Render::RendererInterface* p_renderer);
 		~TextureImporter();
 
-		bool LoadTexture(const std::string p_fileName);
-		Render::TextureInterface* GetTexture();
+		std::shared_ptr<Render::TextureInterface> LoadTexture(const std::string p_fileName);
 
 	private:
 		Logging*					m_logger;
-		Render::TextureInterface*	m_texture; 
 		Render::RendererInterface*	m_renderer;
 	};
 }

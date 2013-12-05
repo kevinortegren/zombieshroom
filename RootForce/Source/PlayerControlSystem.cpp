@@ -22,14 +22,19 @@ namespace RootForce
 		m_keybindings = keybindings;
 	}
 
-	void PlayerControlSystem::SetLoggingInterface(Logging* logger)
+	void PlayerControlSystem::SetLoggingInterface(Logging* p_logger)
 	{
-		m_logger = logger;
+		m_logger = p_logger;
 	}
 
-	void PlayerControlSystem::SetInputInterface(RootEngine::InputManager::InputInterface* inputManager)
+	void PlayerControlSystem::SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager)
 	{
-		m_inputManager = inputManager;
+		m_inputManager = p_inputManager;
+	}
+
+	void PlayerControlSystem::SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics)
+	{
+		m_physics = p_physics;
 	}
 
 	void PlayerControlSystem::Process()
@@ -62,35 +67,47 @@ namespace RootForce
 		float dt = m_world->GetDelta();
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		PlayerInputControlComponent* controller = m_world->GetEntityManager()->GetComponent<PlayerInputControlComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
-
+		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = glm::normalize(glm::cross(facing, glm::vec3(0.0f, 1.0f, 0.0f)));
-
+		
 		// Get the speed of the player
-		float speed = controller->speed;
+		float speed = controller->m_speed;
 
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					transform->m_position += facing * speed * dt;
+					m_physics->PlayerMoveXZ(*(physAcc->m_handle), &facing.x);
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
-					transform->m_position -= facing * speed * dt;
+					{
+						glm::vec3 backwards = -facing;
+						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &backwards.x);
+					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					transform->m_position += right * speed * dt;
+					m_physics->PlayerMoveXZ(*(physAcc->m_handle), &right.x);
+					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
-					transform->m_position -= right * speed * dt;
-					//transform->m_orientation.YawGlobal(90.0f * dt);
+
+					{
+						glm::vec3 left = -right;
+						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &left.x);
+						transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+					}
 					break;
 				case PlayerAction::ORIENTATE:
+					//m_physics->SetPlayerOrientation(playerID, orientation);
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
+					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
+					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+					
 					break;
 				case PlayerAction::SELECT_ABILITY:
 					// TODO: Implement selection of abilities.
