@@ -1,3 +1,1 @@
-function lel ()
-	print("hej")
-end
+print("[LUA] This is a printout from LUA.")

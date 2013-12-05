@@ -6,7 +6,7 @@
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
-#include <RootEngine/Script/Include/ScriptManager.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 Logging	g_logger;
 
