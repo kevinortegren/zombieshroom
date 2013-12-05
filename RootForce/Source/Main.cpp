@@ -240,7 +240,9 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	//
 	//////////////////////////////////////////////////////////////////////////
 
-
+	float normal[3] = {0,1,0};
+	float position[3] = {0, -2, 0};
+	g_engineContext.m_physics->CreatePlane(normal, position);
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
