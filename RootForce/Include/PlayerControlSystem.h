@@ -2,16 +2,20 @@
 
 #include <map>
 #include <Utility/ECS/Include/World.h>
-#include <Transform.h>
+#include <RootForce/Include/Physics.h>
+#include <Utility\ECS\Include\Shared\Transform.h>
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
+
 
 namespace RootForce
 {
 	/** Component owned by a player entity that will be controlled via input. */
 	struct PlayerInputControlComponent : public ECS::Component<PlayerInputControlComponent>
 	{
-		float speed;
+		float m_speed;
+		float m_mouseSensitivity;
 	};
 
 
@@ -55,7 +59,8 @@ namespace RootForce
 		void SetKeybindings(const std::vector<Keybinding>& keybindings);
 		void SetLoggingInterface(Logging* p_logger);
 		void SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager);
-
+		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
+		
 		void Process();
 	private:
 		std::vector<Keybinding> m_keybindings;
@@ -66,5 +71,6 @@ namespace RootForce
 
 		Logging* m_logger;
 		RootEngine::InputManager::InputInterface* m_inputManager;
+		RootEngine::Physics::PhysicsInterface* m_physics;
 	};
 }

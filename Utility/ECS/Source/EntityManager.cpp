@@ -1,10 +1,10 @@
 #include <Utility\ECS\Include\EntityManager.h>
 #include <Utility\ECS\Include\EntitySystemManager.h>
 
-ECS::EntityManager::EntityManager(EntitySystemManager* p_systemManager)
-	: m_nextID(0), m_systemManager(p_systemManager) 
+ECS::EntityManager::EntityManager(EntitySystemManager* p_systemManager, int p_numComponents)
+	: m_nextID(0), m_systemManager(p_systemManager)
 {
-	m_components.resize(32);	
+	m_components.resize(p_numComponents);	
 }
 
 ECS::Entity* ECS::EntityManager::CreateEntity()

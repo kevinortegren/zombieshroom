@@ -55,6 +55,5 @@ namespace RootEngine
 
 			m_message.push_back(message);
 		}
-
 	}
 }

@@ -3,6 +3,7 @@
 #include <RootEngine/Render/Include/RenderExtern.h>
 #include <cstdio>
 #include <fstream>
+#include <iostream>
 
 namespace Render
 {
@@ -163,6 +164,23 @@ namespace Render
 		return m_program;
 	}
 
+	void Technique::BindUniforms()
+	{
+		for(auto itr = m_uniforms.begin(); itr != m_uniforms.end(); ++itr)
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, (*itr).first, (*itr).second->GetBufferId());
+		}
+	}
+
+	void Technique::BindTextures()
+	{
+		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+		{
+			glActiveTexture(GL_TEXTURE0 + (*itr).first);
+			glBindTexture(GL_TEXTURE_2D, (*itr).second);
+		}
+	}
+
 	std::shared_ptr<Technique> Effect::CreateTechnique()
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);
@@ -175,7 +193,17 @@ namespace Render
 		return m_techniques;
 	}
 
-	
+	void EffectParams::AllocateParams(EffectInterface* p_effect)
+	{
+		for(auto itr = p_effect->GetTechniques().begin(); itr != p_effect->GetTechniques().end(); ++itr)
+		{
+			for(auto itrD = (*itr)->m_data.begin(); itrD != (*itr)->m_data.end(); ++itrD)
+			{
+				//std::cout << "SEM: " << (*itrD).first << " Size: " << (*itrD).second << std::endl;
+			}
+		}
+	}
+
 	/*GLint GetLocation( GLuint p_handle, const char* p_name );
 
 	void Effect::SetUniformInt( const char* _name, int _val )

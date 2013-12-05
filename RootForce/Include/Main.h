@@ -1,12 +1,17 @@
 #pragma once
 
-#include <memory>
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <PlayerControlSystem.h>
-#include <Network/MessageHandler.h>
+#include <Utility/ECS/Include/Shared/RenderingSystem.h>
+#include <Utility/ECS/Include/Shared/LightSystem.h>
+#include "PlayerControlSystem.h"
+#include "AbilitySystem.h"
+#include "Network/MessageHandler.h"
+#include <memory>
 #include <string>
+
+RootEngine::GameSharedContext g_engineContext;
 
 class Main {
 public:
@@ -21,7 +26,7 @@ private:
 	bool m_running;
 	void* m_engineModule;
 	std::shared_ptr<SDL_Window> m_window;
-	RootEngine::GameSharedContext m_engineContext;
+	
 	ECS::World m_world;
 	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;

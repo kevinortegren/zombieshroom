@@ -20,6 +20,7 @@ private:
 	bool m_running;
 	void* m_engineModule;
 	RootEngine::GameSharedContext m_engineContext;
+
 	ECS::World m_world;
-	std::shared_ptr<RootForce::Network::MessageHandlerInterface> m_networkHandler;
+	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 };

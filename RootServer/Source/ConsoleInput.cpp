@@ -44,7 +44,7 @@ namespace RootServer
 			}
 
 			std::cout << "Command received";
-			for( int i = 0; i < command.size(); i++ )
+			for( uint32_t i = 0; i < command.size(); i++ )
 			{
 				std::cout << " " << command[i];
 			}
