@@ -58,6 +58,7 @@ include_directories(${EXTERNAL_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_subdirectory(RootEngine)
+add_subdirectory(RootSystems)
 add_subdirectory(RootForce)
 add_subdirectory(RootServer)
 add_subdirectory(RootTools)

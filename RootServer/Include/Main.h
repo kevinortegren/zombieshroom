@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <Network/MessageHandler.h>
+#include <RootSystems/Include/Network/MessageHandler.h>
 #include <string>
 
 class Main {

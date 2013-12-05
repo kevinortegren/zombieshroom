@@ -1,4 +1,4 @@
-#include <Utility\ECS\Include\Shared\RenderingSystem.h>
+#include <RootSystems/Include/RenderingSystem.h>
 
 namespace RootForce
 {

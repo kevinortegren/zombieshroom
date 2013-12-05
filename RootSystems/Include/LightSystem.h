@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Utility\ECS\Include\World.h>
-#include <Utility\ECS\Include\Shared\Transform.h>
+#include "Transform.h"
 #include <RootEngine\Render\Include\Renderer.h>
 
 namespace RootForce

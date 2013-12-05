@@ -7,13 +7,13 @@
 
 //#include <RenderingSystem.h>
 //#include <LightSystem.h>
-#include <PhysicsSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
 
 
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 
-#include <Network/Messages.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
@@ -104,15 +104,13 @@ Main::~Main()
 
 void Main::Start() 
 {
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-
-g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-RootForce::Renderable::SetTypeId(0);
-RootForce::Transform::SetTypeId(1);
-RootForce::PointLight::SetTypeId(2);
-RootForce::PlayerInputControlComponent::SetTypeId(3);
-RootForce::PhysicsAccessor::SetTypeId(4);
+	RootForce::Renderable::SetTypeId(0);
+	RootForce::Transform::SetTypeId(1);
+	RootForce::PointLight::SetTypeId(2);
+	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::PhysicsAccessor::SetTypeId(4);
 
 
 	// Initialize the system for controlling the player.

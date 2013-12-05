@@ -5,7 +5,7 @@
 #include <RootEngine\Include\Logging\Logging.h>
 
 #include <Utility\ECS\Include\World.h>
-#include <Utility\ECS\Include\Shared\Transform.h>
+#include "Transform.h"
 
 namespace RootForce
 {

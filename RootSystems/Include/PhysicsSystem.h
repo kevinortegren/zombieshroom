@@ -4,8 +4,8 @@
 #include <RootEngine/Include/Logging/Logging.h>
 
 #include <Utility/ECS/Include/World.h>
-#include <Utility/ECS/Include/Shared/Transform.h>
-#include <Physics.h>
+#include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/Physics.h>
 
 namespace RootForce
 {

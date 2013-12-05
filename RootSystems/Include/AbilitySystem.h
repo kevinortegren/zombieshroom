@@ -2,7 +2,7 @@
 
 #include <map>
 #include <Utility\ECS\Include\World.h>
-#include <Utility\ECS\Include\Shared\Transform.h>
+#include "Transform.h"
 #include <RootEngine\Render\Include\Renderer.h>
 #include <RootEngine\Include\Logging\Logging.h>
 

@@ -3,11 +3,11 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <Utility/ECS/Include/Shared/RenderingSystem.h>
-#include <Utility/ECS/Include/Shared/LightSystem.h>
-#include "PlayerControlSystem.h"
-#include "AbilitySystem.h"
-#include "Network/MessageHandler.h"
+#include <RootSystems/Include/RenderingSystem.h>
+#include <RootSystems/Include/LightSystem.h>
+#include <RootSystems/Include/PlayerControlSystem.h>
+#include <RootSystems/Include/AbilitySystem.h>
+#include <RootSystems/Include/Network/MessageHandler.h>
 #include <memory>
 #include <string>
 
