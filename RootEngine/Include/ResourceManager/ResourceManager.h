@@ -9,6 +9,8 @@
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
 
+#pragma warning(disable: 4715)//Temporary solution
+
 namespace Physics 
 {
 	class PhysicsInterface;
