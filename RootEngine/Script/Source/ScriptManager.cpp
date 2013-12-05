@@ -61,7 +61,7 @@ namespace RootEngine
 			lua_close(l_luaState);
 		}
 
-		void ScriptManager::ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags)
+		void ScriptManager::ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName)
 		{
 			// Create LUA state
 			lua_State* l_luaState;
@@ -72,6 +72,10 @@ namespace RootEngine
 
 			// Execute the script
 			luaL_dofile(l_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+
+			// Execute specific function
+			lua_getglobal(l_luaState, p_functionName.c_str());			
+			lua_call(l_luaState, 0, 0);
 
 			lua_close(l_luaState);
 		}

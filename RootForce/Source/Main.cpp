@@ -101,8 +101,9 @@ Main::~Main()
 
 void Main::Start() 
 {
-	//int jajs = (int)RootEngine::Script::LuaLibraryInit::INIT_BASE | RootEngine::Script::LuaLibraryInit::INIT_IO;
 	m_engineContext.m_script->ExecuteWholeScript("script1.lua", RootEngine::Script::LuaLibraryInit::INIT_ALL);
+	m_engineContext.m_script->ExecuteScriptWithFunction("script2.lua", RootEngine::Script::LuaLibraryInit::INIT_ALL, "PrintSomeData");
+
 
 
 	m_engineContext.m_renderer->SetupSDLContext(m_window.get());

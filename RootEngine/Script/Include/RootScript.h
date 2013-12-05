@@ -35,7 +35,7 @@ namespace RootEngine
 			virtual void SetWorkingDir(std::string p_path) = 0;
 
 			virtual void ExecuteWholeScript(std::string p_scriptPath, int p_flags) = 0;
-			virtual void ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags) = 0;
+			virtual void ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName) = 0;
 
 		};
 	}

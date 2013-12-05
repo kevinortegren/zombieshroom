@@ -17,7 +17,7 @@ namespace RootEngine
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
 			void ExecuteWholeScript(std::string p_scriptPath, int p_flags);
-			void ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags);
+			void ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName);
 
 			static ScriptManager* GetInstance();
 
