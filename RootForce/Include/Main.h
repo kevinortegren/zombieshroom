@@ -6,6 +6,7 @@
 #include <Utility\ECS\Include\Shared\RenderingSystem.h>
 #include <Utility\ECS\Include\Shared\LightSystem.h>
 #include <RootForce\Include\PlayerControlSystem.h>
+#include <RootForce\Include\AbilitySystem.h>
 #include <memory>
 #include <string>
 

@@ -80,7 +80,7 @@ namespace RootEngine
 
 			if(tex)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded texture '%s'", p_path.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded texture '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
 				return m_textures[p_path].get();
 			}
@@ -160,7 +160,15 @@ namespace RootEngine
 
 	Physics::PhysicsMeshInterface* ResourceManager::GetPhysicsMesh( std::string p_handle )
 	{
-		return nullptr;
+		if(m_physicMeshes.find(p_handle) != m_physicMeshes.end())
+		{
+			return m_physicMeshes[p_handle].get();
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Physics mesh has not been loaded: %s", p_handle.c_str());
+			return nullptr;
+		}
 	}
 
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)

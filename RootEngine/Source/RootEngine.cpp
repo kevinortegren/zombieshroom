@@ -27,16 +27,17 @@ namespace RootEngine
 			m_renderer->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_renderModule);
 		}
-		if(m_gui != nullptr)
-		{
-			m_gui->Shutdown();
-			DynamicLoader::FreeSharedLibrary(m_guiModule);
-		}
 		if(m_physics != nullptr)
 		{
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+		if(m_gui != nullptr)
+		{
+			m_gui->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_guiModule);
+		}
+		
 	}
 
 
