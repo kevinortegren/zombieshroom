@@ -14,6 +14,8 @@ namespace RootForce
 			int PlayerSlot;
 		};
 
+		
+
 		class MessageHandler
 		{
 		public:
@@ -30,6 +32,7 @@ namespace RootForce
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
+
 			RootEngine::Network::Server* m_server;
 			ClientMessageSystem* m_clientMessageSystem;
 			ServerMessageSystem* m_serverMessageSystem;

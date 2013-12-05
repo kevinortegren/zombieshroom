@@ -83,6 +83,7 @@ namespace RootForce
 
 					case RootEngine::Network::InnerMessageID::CONNECT:
 					{
+						/*
 						uint8_t slot = *(uint8_t*)message->Data;
 
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
@@ -92,15 +93,18 @@ namespace RootForce
 						m_playerEntities[slot] = entity;
 
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u connected", slot);
+						*/
 					} break;
 
 					case RootEngine::Network::InnerMessageID::DISCONNECT:
 					{
+						/*
 						uint8_t slot = *(uint8_t*)message->Data;
 						
 						m_world->GetEntityManager()->RemoveEntity(m_playerEntities[slot]);
 
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u disconnected", slot);
+						*/
 					} break;
 
 					default:
