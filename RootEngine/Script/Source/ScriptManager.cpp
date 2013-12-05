@@ -62,6 +62,10 @@ namespace RootEngine
 		}
 
 		void ScriptManager::ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName)
+			/*
+				I'm here.
+				Make VA_LIST HERE yes. Next step :>
+			*/
 		{
 			// Create LUA state
 			lua_State* l_luaState;
@@ -89,7 +93,7 @@ namespace RootEngine
 			l_luaLibrary++;
 
 			if((p_flags & LuaLibraryInit::INIT_OS) == LuaLibraryInit::INIT_OS)
-					LuaLoadLib(p_luaState, l_luaLibrary);
+				LuaLoadLib(p_luaState, l_luaLibrary);
 			l_luaLibrary++;
 
 			if((p_flags & LuaLibraryInit::INIT_STRING) == LuaLibraryInit::INIT_STRING)
@@ -115,8 +119,8 @@ namespace RootEngine
 
 		void ScriptManager::LuaLoadLib(lua_State* p_luaState, const luaL_Reg* p_luaLibrary)
 		{
-			p_luaLibrary->func(p_luaState);
-			//luaL_requiref(p_luaState, p_luaLibrary->name, p_luaLibrary->func, 1);,
+			//p_luaLibrary->func(p_luaState);
+			luaL_requiref(p_luaState, p_luaLibrary->name, p_luaLibrary->func, 1);
 			lua_settop(p_luaState, 0);
 		}
 	}
