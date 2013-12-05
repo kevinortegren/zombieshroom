@@ -82,7 +82,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 		//}
 	}
 
-	Print("Total vertices: ", nrTotalVertices);
+	//Print("Total vertices: ", nrTotalVertices);
 	return status;
 }
 
@@ -132,7 +132,7 @@ void printLists()
 	for(int i = 0; i < currNrMeshes; i++)
 	{
 		MFnMesh tempMesh = g_mayaMeshList[i];
-		Print(tempMesh.fullPathName());
+		//Print(tempMesh.fullPathName());
 		
 	}
 
@@ -140,7 +140,7 @@ void printLists()
 	for(int i = 0; i < currNrCameras; i++)
 	{
 		MFnCamera tempCamera = g_mayaCameraList[i];
-		Print(tempCamera.fullPathName());
+		//Print(tempCamera.fullPathName());
 		
 	}
 
@@ -148,7 +148,7 @@ void printLists()
 	for(int i = 0; i < currNrLights; i++)
 	{
 		MFnLight tempLight = g_mayaLightList[i];
-		Print(tempLight.fullPathName());
+		//Print(tempLight.fullPathName());
 		
 	}
 
@@ -218,7 +218,7 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 	float myPoints[g_maxVerticesPerMesh][4];
 
 	
-	Print("Full pathname: ", mesh.fullPathName());
+	//Print("Full pathname: ", mesh.fullPathName());
 
 	mesh.getPoints(points_, world_space);
 
@@ -266,7 +266,7 @@ void NodeAddedCB(MObject &node, void *clientData)
 {
 	checkForNewCameras(node, clientData);
 	checkForNewLights(node, clientData);
-	printLists();
+	//printLists();
 }
 
 // MESHES
@@ -295,7 +295,7 @@ void checkForNewMeshes(bool made, MObject source, MObject destination)
 		MFnMesh mesh = destination;
 		g_mayaMeshList[currNrMeshes] = destination;
 
-		Print("Added ", mesh.fullPathName());
+		//Print("Added ", mesh.fullPathName());
 		id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaMeshList[currNrMeshes], dirtyMeshNodeCB, nullptr, &status);
 		AddCallbackID(status, id);
 
@@ -531,7 +531,6 @@ void MayaListToList(MObject node)
 					updateMesh = true;
 				}
 			}
-
 		}
 
 		///////////////////////	MESH TRANSFORM
@@ -555,24 +554,38 @@ void MayaListToList(MObject node)
 			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
 			SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
-			//MString tempString = SM.meshList[meshIndex].transformation.name.c_str();			
-			//Print("Mesh ", tempString, " has been addedd to list at index ", meshIndex);
-
-			/*Print(transform.getTranslation(space_transform).x);
-			Print(SM.meshList[meshIndex].transformation.position.x);*/
-
 			updateTrans = true;
 		}
 
 		if(updateMesh || updateTrans)
-			SM.UpdateSharedMesh(meshIndex, updateTrans, updateMesh, currNrMeshes);
-
-		if(!alreadyExists)
+			{
+			if(!alreadyExists)
 			meshIndex++;
+			SM.UpdateSharedMesh(meshIndex, updateTrans, updateMesh, currNrMeshes);
+			}
+
+		updateMesh, updateTrans = false;
+
+		// ID : 2 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
+		// ID : 3 // 
 	}
 	///////////////////////	LIGHT
 	else if(node.hasFn(MFn::kLight))
 	{
+		bool updateTrans = false;
+		bool updateLight = false;
+
 		MFnLight light = node;
 		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
@@ -597,11 +610,10 @@ void MayaListToList(MObject node)
 			SM.lightList[lightIndex].transformation.rotation.y = rotY;
 			SM.lightList[lightIndex].transformation.rotation.z = rotZ;
 
-			//MString tempString = SM.lightList[lightIndex].transformation.name.c_str();			
-			//Print("Light ", tempString, " has been addedd to list at index ", lightIndex);
 
 			if(!alreadyExists)
-				lightIndex++;
+			lightIndex++;
+			SM.UpdateSharedLight(lightIndex, currNrLights);
 		}
 	}
 	///////////////////////	CAMERA

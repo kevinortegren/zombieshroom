@@ -3,6 +3,7 @@
 SharedMemory::SharedMemory()
 {
 	NumberOfMeshes = nullptr;
+	NumberOfLights = nullptr;
 	InitalizeSharedMemory();
 }
 
@@ -17,7 +18,7 @@ int SharedMemory::InitalizeSharedMemory()
 	
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	//total_memory_size += sizeof(Camera) * g_maxCameras;
-	//total_memory_size += sizeof(Light) * g_maxLights;
+	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(int) * 3;
 
 
@@ -40,6 +41,10 @@ int SharedMemory::InitalizeSharedMemory()
 	{
 		PmeshList[i] = ((Mesh*)raw_data) + i ;
 	}
+	for(int i = 0; i < g_maxLights; i++)			//ADDED
+	{
+		PlightList[i] = ((Light*)raw_data) + i ;
+	}
 
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
@@ -47,6 +52,10 @@ int SharedMemory::InitalizeSharedMemory()
 	MeshIdChange = (int*)(mem + sizeof(int));
 	CameraIdChange = (int*)(MeshIdChange + sizeof(int));
 	LightIdChange = (int*)(CameraIdChange + sizeof(int));
+	unsigned char* mem2 = (unsigned char*)LightIdChange;
+	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
+	mem2 = (unsigned char*)NumberOfLights;
+	//NumberOfLights = (int*)(LightIdChange + sizeof(Light) * g_maxLights);
 
 	if(first_process)
 	{
@@ -55,8 +64,37 @@ int SharedMemory::InitalizeSharedMemory()
 	return 0;
 }
 
+void SharedMemory::UpdateSharedLight(int index, int nrOfLights)			//AINT CALLING FOR SHIET
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+
+	*NumberOfLights = nrOfLights;	//UNABLE TO READ MEMORY
+	*LightIdChange = index;
+
+	ReleaseMutex(IdMutexHandle);
+
+	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(LightMutexHandle, milliseconds);
+
+		memcpy(PlightList[index]->transformation.name, lightList[index].transformation.name, 50); //CANT READ CHARACTER OF STRING ON ALL BELOW, MIGHT BE MEMORY SHIET!
+		PlightList[index]->transformation.position = lightList[index].transformation.position;
+		PlightList[index]->transformation.scale = lightList[index].transformation.scale;
+		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
+
+	ReleaseMutex(LightMutexHandle);
+}
+
 void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)			//AINT CALLING FOR SHIET
 {
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	*NumberOfMeshes = nrOfMeshes;
+	*MeshIdChange = index;	//Moved this codeblock up, didnt change shit.
+
+	ReleaseMutex(IdMutexHandle);
+
+
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
@@ -85,13 +123,6 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 	
 
 	ReleaseMutex(MeshMutexHandle);
-
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-	*NumberOfMeshes = nrOfMeshes;
-	*MeshIdChange = index;
-
-	ReleaseMutex(IdMutexHandle);
 }
 
 int SharedMemory::shutdown()
@@ -100,5 +131,6 @@ int SharedMemory::shutdown()
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
 	CloseHandle(IdMutexHandle);
+	CloseHandle(LightMutexHandle);
 	return 0;
 }

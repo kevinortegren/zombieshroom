@@ -49,8 +49,27 @@ void HandleEvents()
 		}
 	}
 }
+ECS::Entity* CreateLightEntity(ECS::World* p_world)	
+{
+	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
-ECS::Entity* CreateEntity(ECS::World* p_world)
+	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
+	
+	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
+
+	RootForce::PointLight* pl = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(lightEntity);
+	pl->m_color.a = 1;
+	pl->m_color.r = 1;
+	pl->m_color.b = 1;
+	pl->m_color.g = 1;
+	pl->m_range = 1000;
+	pl->m_attenuation = glm::vec3(0,0,0.5);
+
+	return lightEntity;
+}
+
+
+ECS::Entity* CreateMeshEntity(ECS::World* p_world)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
@@ -62,6 +81,11 @@ ECS::Entity* CreateEntity(ECS::World* p_world)
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
 	return entity;
+}
+
+void UpdateMeshes()
+{
+
 }
 
 int main(int argc, char* argv[]) 
@@ -120,6 +144,11 @@ int main(int argc, char* argv[])
 			m_running = true;
 
 			m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
+			Render::DirectionalLight dl;
+			dl.m_color = glm::vec4(0,0,1,1);
+			dl.m_direction = glm::vec3(0,0,-1);
+			//m_engineContext.m_renderer->AddDirectionalLight(dl,0);
+
 
 			// Initialize systems.
 			RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -127,6 +156,10 @@ int main(int argc, char* argv[])
 			renderingSystem->SetRendererInterface(m_engineContext.m_renderer);
 			m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
+			RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
+			m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+			std::vector<ECS::Entity*> LightEntities;
 			std::vector<ECS::Entity*> Entities;
 
 			/*Entities.push_back(CreateEntity(&m_world));*/
@@ -149,11 +182,15 @@ int main(int argc, char* argv[])
 			material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 			
 			int numberMeshes;
+			int numberLights;
 
 			Render::Vertex1P1N1UV* m_vertices;
 			m_vertices = new Render::Vertex1P1N1UV[g_maxVerticesPerMesh];
 
+
 			//Load existing objects
+
+			///////////////////////LOAD MESHES////////////////////////////////
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -162,10 +199,11 @@ int main(int argc, char* argv[])
 
 			ReleaseMutex(RM.IdMutexHandle);
 
+			
 			for(int i = 0; i < numberMeshes; i++)
 			{
 				//Render::Vertex* m_vertices;
-				Entities.push_back(CreateEntity(&m_world));
+				Entities.push_back(CreateMeshEntity(&m_world));
 				
 				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -202,6 +240,42 @@ int main(int argc, char* argv[])
 
 			}
 
+			///////////////////////Load Lights////////////////////////////////
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+			numberLights = *RM.NumberOfLights;
+			*RM.LightIdChange = -1;
+
+			ReleaseMutex(RM.IdMutexHandle);
+
+			
+			for(int i = 0; i < numberLights; i++)
+			{
+				//Render::Vertex* m_vertices;
+				LightEntities.push_back(CreateLightEntity(&m_world));
+				
+				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_position = RM.PlightList[i]->transformation.position;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_scale = RM.PlightList[i]->transformation.scale;
+
+				glm::quat rotation;
+				rotation.x = RM.PlightList[i]->transformation.rotation.x;
+				rotation.y = RM.PlightList[i]->transformation.rotation.y;
+				rotation.z = RM.PlightList[i]->transformation.rotation.z;
+				rotation.w = RM.PlightList[i]->transformation.rotation.w;
+
+				//m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_orientation.SetOrientation(rotation);
+
+				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
+				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
+				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
+				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = material;
+
+				ReleaseMutex(RM.MeshMutexHandle);
+			}
 
 
 			// Start the main loop
@@ -219,15 +293,17 @@ int main(int argc, char* argv[])
 				*RM.MeshIdChange = -1;
 				ReleaseMutex(RM.IdMutexHandle);
 
-				if(MeshIndex != -1)
+				///////////////////////UPDATE MESHES////////////////////////////////
+				if(MeshIndex != -1)					
 				{
-					//Render::Vertex* m_vertices;
-					if(MeshIndex > Entities.size()-1)
+					//Render::Vertex* m_vertices
+					int size = Entities.size()-1;
+					if(MeshIndex > size)
 					{
-						Entities.push_back(CreateEntity(&m_world));
+						Entities.push_back(CreateMeshEntity(&m_world));		//Blir konstigt här om man inte kör första sattsen, för den kommer vara index noll i storlek noll.
 					}
 				
-					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		//Verkar bli nåt fel med att pmeshlist med rätt index blir fel när vi lägger till en modell.
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
@@ -260,10 +336,45 @@ int main(int argc, char* argv[])
 
 				}
 
+				///////////////////////UPDATE LIGHTS////////////////////////////////
+				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+				int LightIndex = *RM.LightIdChange;
+				*RM.LightIdChange = -1;
+				ReleaseMutex(RM.IdMutexHandle);
+
+				if(LightIndex != -1)					
+				{
+					//Render::Vertex* m_vertices
+					int size = LightEntities.size()-1;
+					if(LightIndex > size)
+					{
+						LightEntities.push_back(CreateLightEntity(&m_world));		//Blir konstigt här om man inte kör första sattsen, för den kommer vara index noll i storlek noll.
+					}
+				
+					RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");		//Verkar bli nåt fel med att pmeshlist med rätt index blir fel när vi lägger till en modell.
+					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
+
+					glm::quat rotation;
+					rotation.x = RM.PlightList[LightIndex]->transformation.rotation.x;
+					rotation.y = RM.PlightList[LightIndex]->transformation.rotation.y;
+					rotation.z = RM.PlightList[LightIndex]->transformation.rotation.z;
+					rotation.w = RM.PlightList[LightIndex]->transformation.rotation.w;
+
+					//delete [] m_vertices;
+					ReleaseMutex(RM.LightMutexHandle);
+
+				}
+
 				HandleEvents();
 
 				m_engineContext.m_renderer->Clear();
 
+				pointLightSystem->Process();
 				renderingSystem->Process();
 
 				m_engineContext.m_renderer->Render();

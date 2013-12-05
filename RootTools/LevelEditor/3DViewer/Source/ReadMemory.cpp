@@ -3,6 +3,7 @@
 ReadMemory::ReadMemory()
 {
 	NumberOfMeshes = nullptr;
+	NumberOfLights = nullptr;
 	InitalizeSharedMemory();
 }
 
@@ -17,7 +18,7 @@ int ReadMemory::InitalizeSharedMemory()
 	
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	//total_memory_size += sizeof(Camera) * g_maxCameras;
-	//total_memory_size += sizeof(Light) * g_maxLights;
+	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(int) * 3;
 
 
@@ -40,13 +41,28 @@ int ReadMemory::InitalizeSharedMemory()
 	{
 		PmeshList[i] = ((Mesh*)raw_data) + i ;
 	}
+	for(int i = 0; i < g_maxLights; i++)			//ADDED
+	{
+		PlightList[i] = ((Light*)raw_data) + i ;
+	}
 
+	//unsigned char* mem = (unsigned char*)raw_data;
+	//NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
+	//mem = (unsigned char*)NumberOfMeshes;
+	//MeshIdChange = (int*)(mem + sizeof(int));
+	//CameraIdChange = (int*)(MeshIdChange + sizeof(int));
+	//LightIdChange = (int*)(CameraIdChange + sizeof(int));
+	//NumberOfLights = (LightIdChange + sizeof(Light) * g_maxLights);
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
 	mem = (unsigned char*)NumberOfMeshes;
 	MeshIdChange = (int*)(mem + sizeof(int));
 	CameraIdChange = (int*)(MeshIdChange + sizeof(int));
 	LightIdChange = (int*)(CameraIdChange + sizeof(int));
+	unsigned char* mem2 = (unsigned char*)LightIdChange;
+	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
+	mem2 = (unsigned char*)NumberOfLights;
+	
 
 	if(first_process)
 	{
@@ -99,11 +115,14 @@ void ReadMemory::ReadMesh(int i)
 	ReleaseMutex(MeshMutexHandle);
 }
 
+
+
 int ReadMemory::shutdown()
 {
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
 	CloseHandle(IdMutexHandle);
+	CloseHandle(LightMutexHandle);
 	return 0;
 }

@@ -15,7 +15,7 @@ public:
 	~SharedMemory(void);
 	void UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes);
 	void UpdateSharedCamera(int);
-	void UpdateSharedLight(int);
+	void UpdateSharedLight(int, int);
 	int InitalizeSharedMemory();
 
 	//Variables
@@ -23,6 +23,7 @@ public:
 	Light lightList[g_maxLights];
 	Camera cameraList[g_maxCameras];
 	int* NumberOfMeshes;
+	int* NumberOfLights;
 
 private:
 	//Functions
@@ -31,6 +32,7 @@ private:
 	//Variables
 	HANDLE MeshMutexHandle;
 	HANDLE IdMutexHandle;
+	HANDLE LightMutexHandle;
 	DWORD milliseconds;
 	HANDLE shared_memory_handle;
 	unsigned char* raw_data;

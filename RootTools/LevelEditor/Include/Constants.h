@@ -13,7 +13,8 @@ const int g_maxVerticesPerMesh = 10000;
 
 struct Transform
 {
-	char name[30];
+	int index;
+	char name[50];
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
@@ -28,7 +29,7 @@ struct Mesh
 	glm::vec3 normal[g_maxVerticesPerMesh];
 	string texturePath;
 	string normalPath;
-	int indices[g_maxVerticesPerMesh*3];
+	//int indices[g_maxVerticesPerMesh*3];
 };
 
 struct Camera
