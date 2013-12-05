@@ -67,7 +67,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				std::string modelHandle = g_engineContext.m_physics->GetPhysicsModelHandle(*(accessor->m_handle));
 				p_emitter << YAML::Key << "Type" << YAML::Value << type;
 				p_emitter << YAML::Key << "Mass" << YAML::Value << mass;
-				p_emitter << YAML::Key << "ModelHandle" << YAML::Key << modelHandle;
+				p_emitter << YAML::Key << "ModelHandle" << YAML::Value << modelHandle;
 				
 				if (type == RootEngine::Physics::PhysicsType::TYPE_PLAYER) 
 				{

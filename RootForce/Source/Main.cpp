@@ -96,7 +96,7 @@ Main::Main(std::string p_workingDirectory)
 
 Main::~Main() 
 {
-	m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+	m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_21.world");
 	SDL_Quit();
 	DynamicLoader::FreeSharedLibrary(m_engineModule);
 }
@@ -165,7 +165,7 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 
 
 	// Import test world.
-	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_21.world");
 
 	//RootForce::PhysicsAccessor* physaccessor = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(m_world.GetTagManager()->GetEntityByTag("Player"));
 	//int temp[1] = {0};
@@ -182,7 +182,25 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 	//Plane at bottom
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
+	float dir[3] = {0,0,-1};
+	float grav[3] = {0,0,0};
+	float pos[3] = {0,1,-1};
+	float rot[4] = {0,-1,1,-1};
 	g_engineContext.m_physics->CreatePlane(normal, position);
+	RootEngine::Physics::AbilityPhysicsInfo test;
+	test.m_collidesWorld = true;
+	test.m_direction = dir;
+	test.m_entityId = -1;
+	test.m_gravity = grav;
+	test.m_height = 1;
+	test.m_mass = 1;
+	test.m_position = pos;
+	test.m_radius = 1;
+	test.m_orientation = rot;
+	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
+	test.m_speed = 1;
+	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
+	g_engineContext.m_physics->AddAbilityToWorld(test);
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -205,12 +223,10 @@ RootForce::PhysicsAccessor::SetTypeId(4);
 
 		g_engineContext.m_physics->Update(dt);
 
-
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_physicsSystem->Process();
 		renderingSystem->Process();
-
 
 		// Update Engine systems.
 
