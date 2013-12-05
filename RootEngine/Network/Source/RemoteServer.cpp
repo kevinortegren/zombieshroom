@@ -42,7 +42,7 @@ namespace RootEngine
 				switch( packet->data[0] )
 				{
 				case NON_RAKNET_MESSAGE_ID:
-					ParseNonRaknetPacket(packet);
+					ParseNonRaknetPacket(packet, 0);
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 					// A client decided to quit. A TRAITOR!

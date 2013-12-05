@@ -9,7 +9,7 @@
 
 #include "ConsoleInput.h"
 
-//#include <Network/Messages.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 #undef main
 
@@ -88,31 +88,8 @@ void Main::Start()
 	//cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
 
 	// Initialize the network system
-	//m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler());
-	//m_networkHandler->Init(&m_world, m_engineContext.m_logger, m_engineContext.m_network, RootForce::Network::ServerType::LOCAL, 5567);
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network, RootForce::Network::MessageHandler::DEDICATED, 5567));
 	
-	// Test message sending
-	/*{
-		RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
-		chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
-		chat->SenderID = 0;
-		chat->Message = "Hello world of doom";
-
-		size_t size = 0;
-		size += sizeof(chat->Type);
-		size += sizeof(chat->SenderID);
-		size += strlen(chat->Message);
-
-		RootEngine::Network::Message m;
-		m.MessageID = RootForce::Network::MessageType::ChatToServer;
-		m.RecipientID = 1;
-		m.Reliability = RELIABLE;
-		m.DataSize = size;
-		m.Data = (uint8_t*) chat;
-
-		m_engineContext.m_network->GetNetworkSystem()->Send(m);
-	}*/
-
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );
 
@@ -127,7 +104,10 @@ void Main::Start()
 		m_world.SetDelta(dt);
 		
 		//m_playerControlSystem->Process();
-		//m_networkHandler->Update();
+		m_networkHandler->Update();
+		m_engineContext.m_physics->Update(dt);
+
+
 		std::vector<std::string> command;
 		while( command = m_console.PollCommand(), command.size() > 0 )
 		{
@@ -137,8 +117,6 @@ void Main::Start()
 				m_running = false;
 			}
 		}
-
-		m_engineContext.m_physics->Update(dt);
 	}
 
 	m_console.Shutdown();

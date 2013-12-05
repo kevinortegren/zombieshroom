@@ -26,6 +26,7 @@ namespace RootEngine
 		{
 			uint8_t MessageID;
 			int8_t RecipientID;
+			uint8_t SenderID;
 			PacketReliability Reliability;
 			uint32_t DataSize;
 			uint8_t* Data;
@@ -54,7 +55,7 @@ namespace RootEngine
 			bool Transmit(const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
 			RakNet::RakPeerInterface* m_peerInterface;
 
-			void ParseNonRaknetPacket(RakNet::Packet* p_packet);
+			void ParseNonRaknetPacket(RakNet::Packet* p_packet, uint8_t p_clientID);
 		};
 	}
 }
