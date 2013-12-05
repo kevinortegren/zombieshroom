@@ -206,7 +206,7 @@ void Main::Start()
 		g_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
-		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		g_engineContext.m_debugOverlay->AddHTML(std::to_string(1.0f/dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 
 		m_playerControlSystem->Process();
