@@ -31,7 +31,6 @@ namespace RootEngine
 
 		void LocalServer::Host( USHORT p_port, bool p_isDedicated )
 		{
-			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Starting server on port %u.", p_port);
 			m_numClients = 0;
 			RakNet::SocketDescriptor sd(p_port, 0);
 			m_peerInterface = RakNet::RakPeerInterface::GetInstance();

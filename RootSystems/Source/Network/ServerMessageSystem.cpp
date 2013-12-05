@@ -45,15 +45,23 @@ namespace RootForce
 					HandleUserInfoMessage(p_message);
 					break;
 				case MessageType::UserCommandMoveForward:
+					// Validate if the player can move in the current state
+					// Use physics to cause player entity to move
 					HandleUserCommandMessage(p_message, PlayerAction::MOVE_FORWARDS);
 					break;
 				case MessageType::UserCommandMoveBackward:
+					// Validate if the player can move in the current state
+					// Use physics to cause player entity to move
 					HandleUserCommandMessage(p_message, PlayerAction::MOVE_BACKWARDS);
 					break;
 				case MessageType::UserCommandStrafeRight:
+					// Validate if the player can move in the current state
+					// Use physics to cause player entity to move
 					HandleUserCommandMessage(p_message, PlayerAction::STRAFE_RIGHT);
 					break;
 				case MessageType::UserCommandStrafeLeft:
+					// Validate if the player can move in the current state
+					// Use physics to cause player entity to move
 					HandleUserCommandMessage(p_message, PlayerAction::STRAFE_LEFT);
 					break;
 				case MessageType::UserCommandOrient:
@@ -63,19 +71,34 @@ namespace RootForce
 					HandleUserCommandMessage(p_message, PlayerAction::SELECT_ABILITY);
 					break;
 				case MessageType::UserCommandActivateAbility:
+					// Validate if the player can use an ability in the current state
+					// Validate if the player has an ability selected
+					// Update the game logic
 					HandleUserCommandMessage(p_message, PlayerAction::ACTIVATE_ABILITY);
 					break;
 				case MessageType::UserCommandDeactivateAbility:
+					// Validate if the player has an ability active
+					// Update the game logic
 					break;
 				case MessageType::UserCommandPickUpAbility:
+					// Validate if the player can pick up an ability in the current state
+					// Validate if the player is near an ability
+					// Update the player abilities
 					break;
 				case MessageType::UserCommandJump:
+					// Validate if the player can jump in the current state
+					// Use physics to cause player entity to jump
 					break;
 				case MessageType::UserCommandStopJumping:
+					// TODO: Decide if we will use this
 					break;
 				case RootEngine::Network::InnerMessageID::CONNECT:
+					// Create an entity for the remote player
+					// Notify all other connected clients through a UserConnected message
 					break;
 				case RootEngine::Network::InnerMessageID::DISCONNECT:
+					// Remove the entity for the remote player
+					// Notify all other connected clients through a UserDisconnected message
 					break;
 			}
 		}

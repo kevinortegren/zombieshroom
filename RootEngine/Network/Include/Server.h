@@ -17,7 +17,9 @@ namespace RootEngine
 		{
 			enum InnerMessageID
 			{
-				CONNECT = 254,
+				CONNECTION_REFUSED = 252,
+				CONNECTION_ACCEPTED,
+				CONNECT,
 				DISCONNECT
 			};
 		}

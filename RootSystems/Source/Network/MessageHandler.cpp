@@ -21,6 +21,8 @@ namespace RootForce
 					
 					m_clientMessageSystem = new ClientMessageSystem(p_world, m_logger);
 					m_serverMessageSystem = new ServerMessageSystem(p_world, m_logger);
+
+					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started local server on port: %u", port);
 					break;
 				case MessageHandler::REMOTE:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
@@ -28,6 +30,8 @@ namespace RootForce
 					dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
 
 					m_clientMessageSystem = new ClientMessageSystem(p_world, m_logger);
+
+					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server connection to: %s:%u", address, port);
 					break;
 				case MessageHandler::DEDICATED:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
@@ -35,21 +39,23 @@ namespace RootForce
 					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
 
 					m_serverMessageSystem = new ServerMessageSystem(p_world, m_logger);
+
+					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started dedicated local server on port: %u", port);
 					break;
 				default:
 					m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Invalid server type");
 			}
 
-			if (m_clientMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ClientMessageSystem>(m_clientMessageSystem, "ClientMessageSystem");
-			if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
+			//if (m_clientMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ClientMessageSystem>(m_clientMessageSystem, "ClientMessageSystem");
+			//if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
 		}
 
 		void MessageHandler::Update()
 		{
 			m_server->Update();
 
-			RootEngine::Network::Message* message = nullptr;
-			while ((message = m_server->PollMessage()) != nullptr)
+			std::shared_ptr<RootEngine::Network::Message> message = nullptr;
+			while ((message = std::shared_ptr<RootEngine::Network::Message>(m_server->PollMessage())) != nullptr)
 			{
 				switch (message->MessageID)
 				{
@@ -57,8 +63,10 @@ namespace RootForce
 					case Network::MessageType::ChatToClient:
 					case Network::MessageType::UserConnected:
 					case Network::MessageType::UserDisconnected:
+					case RootEngine::Network::InnerMessageID::CONNECTION_ACCEPTED:
+					case RootEngine::Network::InnerMessageID::CONNECTION_REFUSED:
 						if (m_clientMessageSystem != nullptr)
-							m_clientMessageSystem->HandleClientMessage(message);
+							m_clientMessageSystem->HandleClientMessage(message.get());
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "Received client message as a dedicated server");
 						break;
@@ -78,7 +86,7 @@ namespace RootForce
 					case Network::MessageType::UserCommandStopJumping:
 					case RootEngine::Network::InnerMessageID::CONNECT:
 						if (m_serverMessageSystem != nullptr)
-							m_serverMessageSystem->HandleServerMessage(message);
+							m_serverMessageSystem->HandleServerMessage(message.get());
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
 						break;
@@ -98,9 +106,9 @@ namespace RootForce
 					case RootEngine::Network::InnerMessageID::DISCONNECT:
 						// This can either be a client or a server timing out or disconnecting
 						if (m_serverMessageSystem != nullptr)
-							m_serverMessageSystem->HandleServerMessage(message);
+							m_serverMessageSystem->HandleServerMessage(message.get());
 						if (m_clientMessageSystem != nullptr)
-							m_clientMessageSystem->HandleClientMessage(message);
+							m_clientMessageSystem->HandleClientMessage(message.get());
 
 						/*
 						uint8_t slot = *(uint8_t*)message->Data;
