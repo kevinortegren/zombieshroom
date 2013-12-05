@@ -25,13 +25,13 @@ namespace RootEngine
 		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
 		char fileName[128];
-		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, 128, NULL, 0);
+		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
-		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh    '%s'", fileName);
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
 		{
 			InitFromScene(aiscene, p_fileName);
-			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded mesh '%s'", fileName);
 		}
 		else 
 		{
@@ -159,6 +159,8 @@ namespace RootEngine
 		// Extract the file name
 		cutPath		= p_path;
 		slashIndex	= cutPath.find_last_of("/")+1;
+		if(slashIndex == 0)
+			slashIndex	= cutPath.find_last_of("\\")+1;
 		cutPath		= cutPath.substr(slashIndex, cutPath.size());
 		dotIndex	= cutPath.find_last_of(".");
 		cutPath		= cutPath.substr(0, dotIndex);
