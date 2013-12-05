@@ -158,6 +158,7 @@ void Main::Start()
 
 	RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+	cameraSystem->SetRendererInterface(m_engineContext.m_renderer);
 
 	// Setup lights.
 	m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
