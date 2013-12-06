@@ -22,14 +22,19 @@ public:
 	Camera cameraList[g_maxCameras];
 	int* NumberOfMeshes;
 	int* NumberOfLights;
+	int* NumberOfCameras;
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
+	Camera* PcameraList[g_maxCameras];
 	int* MeshIdChange;
 	int* CameraIdChange;
 	int* LightIdChange;
 	HANDLE MeshMutexHandle;
-	HANDLE IdMutexHandle;
+	HANDLE MeshIdMutexHandle;
+	HANDLE LightIdMutexHandle;
+	HANDLE CameraIdMutexHandle;
 	HANDLE LightMutexHandle;
+	HANDLE CameraMutexHandle;
 	DWORD milliseconds;
 
 private:
@@ -42,9 +47,5 @@ private:
 	//Variables
 
 	HANDLE shared_memory_handle;
-	unsigned char* raw_data;
-
-	Camera* PcameraList[g_maxCameras];
-	
-
+	unsigned char* raw_data;	
 };

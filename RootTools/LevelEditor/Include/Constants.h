@@ -14,7 +14,7 @@ const int g_maxVerticesPerMesh = 10000;
 struct Transform
 {
 	int index;
-	char name[50];
+	char name[30];
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
@@ -27,8 +27,9 @@ struct Mesh
 	glm::vec3 vertex[g_maxVerticesPerMesh];
 	glm::vec2 UV[g_maxVerticesPerMesh];
 	glm::vec3 normal[g_maxVerticesPerMesh];
-	string texturePath;
-	string normalPath;
+	char texturePath[100];
+	char normalPath[100];
+	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
 	//int indices[g_maxVerticesPerMesh*3];
 };
 

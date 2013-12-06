@@ -24,6 +24,8 @@ public:
 	Camera cameraList[g_maxCameras];
 	int* NumberOfMeshes;
 	int* NumberOfLights;
+	int* NumberOfCameras;
+	//int* NumberOfCameras;
 
 private:
 	//Functions
@@ -31,8 +33,11 @@ private:
 	int shutdown();
 	//Variables
 	HANDLE MeshMutexHandle;
-	HANDLE IdMutexHandle;
+	HANDLE MeshIdMutexHandle;
+	HANDLE LightIdMutexHandle;
+	HANDLE CameraIdMutexHandle;
 	HANDLE LightMutexHandle;
+	HANDLE CameraMutexHandle;
 	DWORD milliseconds;
 	HANDLE shared_memory_handle;
 	unsigned char* raw_data;

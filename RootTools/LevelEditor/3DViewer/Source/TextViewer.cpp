@@ -59,15 +59,15 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 
 	RootForce::PointLight* pl = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(lightEntity);
 	pl->m_color.a = 1;
-	pl->m_color.r = 1;
-	pl->m_color.b = 1;
-	pl->m_color.g = 1;
+	pl->m_color.r = 0.5;
+	pl->m_color.b = 0.5;
+	pl->m_color.g = 0.5;
 	pl->m_range = 1000;
-	pl->m_attenuation = glm::vec3(0,0,0.5);
+	pl->m_attenuation = glm::vec3(0,0,0.01);
 
 	return lightEntity;
 }
-
+//CREATE CAMERA ENTITY
 
 ECS::Entity* CreateMeshEntity(ECS::World* p_world)
 {
@@ -83,11 +83,21 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world)
 	return entity;
 }
 
-void UpdateMeshes()
-{
+std::string GetNameFromPath( std::string p_path )
+ {
+  std::string cutPath;
+  std::string::size_type slashIndex, dotIndex;
 
-}
-
+  // Extract the file name
+  cutPath  = p_path;
+  slashIndex = cutPath.find_last_of("/")+1;
+  if(slashIndex == 0)
+   slashIndex = cutPath.find_last_of("\\")+1;
+  cutPath  = cutPath.substr(slashIndex, cutPath.size());
+  dotIndex = cutPath.find_last_of(".");
+  cutPath  = cutPath.substr(0, dotIndex);
+  return cutPath;
+ } 
 int main(int argc, char* argv[]) 
 {
 	// Enable components to use.
@@ -146,9 +156,6 @@ int main(int argc, char* argv[])
 			m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
 			Render::DirectionalLight dl;
 			dl.m_color = glm::vec4(0,0,1,1);
-			dl.m_direction = glm::vec3(0,0,-1);
-			//m_engineContext.m_renderer->AddDirectionalLight(dl,0);
-
 
 			// Initialize systems.
 			RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -177,9 +184,11 @@ int main(int argc, char* argv[])
 
 			m_engineContext.m_resourceManager->LoadTexture("sphere_diffuse.dds");
 
-			Render::Material material;
-			material.m_diffuseMap = m_engineContext.m_resourceManager->GetTexture("sphere_diffuse.dds");
-			material.m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+			//Render::Material material;
+			Render::Material* materials;
+			materials = new Render::Material[10];	//Satte ett fast väre på 10 här.
+			materials[0].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture("sphere_diffuse.dds");
+			materials[0].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 			
 			int numberMeshes;
 			int numberLights;
@@ -191,14 +200,16 @@ int main(int argc, char* argv[])
 			//Load existing objects
 
 			///////////////////////LOAD MESHES////////////////////////////////
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+			RM.MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.MeshIdMutexHandle, RM.milliseconds);
 
 			numberMeshes = *RM.NumberOfMeshes;
 			*RM.MeshIdChange = -1;
+			std::string OldtempTexName;
+			std::string tempTexName;
+			int numberOfMaterials = 1;
 
-			ReleaseMutex(RM.IdMutexHandle);
-
+			ReleaseMutex(RM.MeshIdMutexHandle);
 			
 			for(int i = 0; i < numberMeshes; i++)
 			{
@@ -210,6 +221,20 @@ int main(int argc, char* argv[])
 
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_position = RM.PmeshList[i]->transformation.position;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_scale = RM.PmeshList[i]->transformation.scale;
+
+				tempTexName = GetNameFromPath(RM.PmeshList[i]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
+				if(tempTexName == "NONE.dds")
+				{
+				RM.PmeshList[i]->MaterialID = 0;
+				}
+				else
+				{
+				m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+				materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+				materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+				numberOfMaterials ++;
+				RM.PmeshList[i]->MaterialID = numberOfMaterials;
+				}
 
 				glm::quat rotation;
 				rotation.x = RM.PmeshList[i]->transformation.rotation.x;
@@ -234,20 +259,20 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = material;
+				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = materials[RM.PmeshList[i]->MaterialID];
 
 				ReleaseMutex(RM.MeshMutexHandle);
 
 			}
 
 			///////////////////////Load Lights////////////////////////////////
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+			RM.LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.LightIdMutexHandle, RM.milliseconds);
 
 			numberLights = *RM.NumberOfLights;
 			*RM.LightIdChange = -1;
 
-			ReleaseMutex(RM.IdMutexHandle);
+			ReleaseMutex(RM.LightIdMutexHandle);
 
 			
 			for(int i = 0; i < numberLights; i++)
@@ -255,26 +280,19 @@ int main(int argc, char* argv[])
 				//Render::Vertex* m_vertices;
 				LightEntities.push_back(CreateLightEntity(&m_world));
 				
-				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+				RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+				WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
 
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_position = RM.PlightList[i]->transformation.position;
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_scale = RM.PlightList[i]->transformation.scale;
+				//m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_scale = RM.PlightList[i]->transformation.scale;
 
-				glm::quat rotation;
-				rotation.x = RM.PlightList[i]->transformation.rotation.x;
-				rotation.y = RM.PlightList[i]->transformation.rotation.y;
-				rotation.z = RM.PlightList[i]->transformation.rotation.z;
-				rotation.w = RM.PlightList[i]->transformation.rotation.w;
+				//glm::quat rotation;
+				//rotation.x = RM.PlightList[i]->transformation.rotation.x;
+				//rotation.y = RM.PlightList[i]->transformation.rotation.y;
+				//rotation.z = RM.PlightList[i]->transformation.rotation.z;
+				//rotation.w = RM.PlightList[i]->transformation.rotation.w;
 
-				//m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[i])->m_orientation.SetOrientation(rotation);
-
-				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
-				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
-				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = material;
-
-				ReleaseMutex(RM.MeshMutexHandle);
+				ReleaseMutex(RM.LightMutexHandle);
 			}
 
 
@@ -286,28 +304,43 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				RM.MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.MeshIdMutexHandle, RM.milliseconds);
 
 				int MeshIndex = *RM.MeshIdChange;
 				*RM.MeshIdChange = -1;
-				ReleaseMutex(RM.IdMutexHandle);
+				ReleaseMutex(RM.MeshIdMutexHandle);
 
 				///////////////////////UPDATE MESHES////////////////////////////////
 				if(MeshIndex != -1)					
 				{
+					bool newMaterial = false;
 					//Render::Vertex* m_vertices
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
 					{
-						Entities.push_back(CreateMeshEntity(&m_world));		//Blir konstigt här om man inte kör första sattsen, för den kommer vara index noll i storlek noll.
+						Entities.push_back(CreateMeshEntity(&m_world));
 					}
 				
-					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		//Verkar bli nåt fel med att pmeshlist med rätt index blir fel när vi lägger till en modell.
+					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
+
+					tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
+						if(tempTexName == "NONE.dds")
+						{
+						RM.PmeshList[MeshIndex]->MaterialID = 0;
+						}
+						else
+						{
+						m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+						materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+						materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+						numberOfMaterials ++;
+						RM.PmeshList[MeshIndex]->MaterialID = numberOfMaterials;
+					}
 
 					glm::quat rotation;
 					rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
@@ -329,7 +362,7 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = material;
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = materials[RM.PmeshList[MeshIndex]->MaterialID];	////SÄTTER DET SÅ DET ÄR ETT MATERIAL PER MESH
 
 					//delete [] m_vertices;
 					ReleaseMutex(RM.MeshMutexHandle);
@@ -337,12 +370,12 @@ int main(int argc, char* argv[])
 				}
 
 				///////////////////////UPDATE LIGHTS////////////////////////////////
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				RM.LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.LightIdMutexHandle, RM.milliseconds);
 
 				int LightIndex = *RM.LightIdChange;
 				*RM.LightIdChange = -1;
-				ReleaseMutex(RM.IdMutexHandle);
+				ReleaseMutex(RM.LightIdMutexHandle);
 
 				if(LightIndex != -1)					
 				{
@@ -350,10 +383,10 @@ int main(int argc, char* argv[])
 					int size = LightEntities.size()-1;
 					if(LightIndex > size)
 					{
-						LightEntities.push_back(CreateLightEntity(&m_world));		//Blir konstigt här om man inte kör första sattsen, för den kommer vara index noll i storlek noll.
+						LightEntities.push_back(CreateLightEntity(&m_world));
 					}
 				
-					RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");		//Verkar bli nåt fel med att pmeshlist med rätt index blir fel när vi lägger till en modell.
+					RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;

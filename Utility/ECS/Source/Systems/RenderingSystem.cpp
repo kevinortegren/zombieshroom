@@ -22,12 +22,12 @@ namespace RootForce
 
 			if(renderable->m_material.m_effect == nullptr)
 			{
-				m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no effect", p_entity->GetId());
+				m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
 				return;
 			}
 			if(renderable->m_model == nullptr)
 			{
-				m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Renderable of Entity %i has no model", p_entity->GetId());
+				m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no model", p_entity->GetId());
 				return;
 			}
 

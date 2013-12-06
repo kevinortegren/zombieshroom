@@ -4,6 +4,7 @@ ReadMemory::ReadMemory()
 {
 	NumberOfMeshes = nullptr;
 	NumberOfLights = nullptr;
+	NumberOfCameras = nullptr;
 	InitalizeSharedMemory();
 }
 
@@ -17,8 +18,8 @@ int ReadMemory::InitalizeSharedMemory()
 	int total_memory_size = 0;
 	
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
-	//total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Light) * g_maxLights;
+	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(int) * 3;
 
 
@@ -45,14 +46,11 @@ int ReadMemory::InitalizeSharedMemory()
 	{
 		PlightList[i] = ((Light*)raw_data) + i ;
 	}
+	for(int i = 0; i < g_maxCameras; i++)			//ADDED
+	{
+		PcameraList[i] = ((Camera*)raw_data) + i ;
+	}
 
-	//unsigned char* mem = (unsigned char*)raw_data;
-	//NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
-	//mem = (unsigned char*)NumberOfMeshes;
-	//MeshIdChange = (int*)(mem + sizeof(int));
-	//CameraIdChange = (int*)(MeshIdChange + sizeof(int));
-	//LightIdChange = (int*)(CameraIdChange + sizeof(int));
-	//NumberOfLights = (LightIdChange + sizeof(Light) * g_maxLights);
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
 	mem = (unsigned char*)NumberOfMeshes;
@@ -62,7 +60,9 @@ int ReadMemory::InitalizeSharedMemory()
 	unsigned char* mem2 = (unsigned char*)LightIdChange;
 	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
 	mem2 = (unsigned char*)NumberOfLights;
-	
+	unsigned char* mem3 = (unsigned char*)CameraIdChange;
+	NumberOfCameras = (int*)(mem3 + sizeof(Camera) * g_maxCameras);
+	mem3 = (unsigned char*)NumberOfCameras;
 
 	if(first_process)
 	{
@@ -75,8 +75,8 @@ int ReadMemory::InitalizeSharedMemory()
 
 void ReadMemory::Read()			//read if the active object have changed.
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
+	MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(MeshIdMutexHandle, milliseconds);
 
 	if(*MeshIdChange != -1)
 	{
@@ -86,7 +86,7 @@ void ReadMemory::Read()			//read if the active object have changed.
 		*MeshIdChange = -1;
 	}
 
-	ReleaseMutex(IdMutexHandle);
+	ReleaseMutex(MeshIdMutexHandle);
 }
 
 void ReadMemory::ReadMesh(int i)
@@ -122,7 +122,8 @@ int ReadMemory::shutdown()
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
-	CloseHandle(IdMutexHandle);
+	CloseHandle(MeshIdMutexHandle);
 	CloseHandle(LightMutexHandle);
+	CloseHandle(CameraMutexHandle);
 	return 0;
 }

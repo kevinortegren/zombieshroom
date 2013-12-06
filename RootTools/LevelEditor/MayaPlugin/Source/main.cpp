@@ -377,7 +377,7 @@ bool nodeExists(MObject node)
 				meshIndex = i;
 				answer = true;
 				break;
-			}
+			} 
 		}	
 	}
 
@@ -450,8 +450,10 @@ void MayaListToList(MObject node)
 
 		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth);
 
-		SM.meshList[meshIndex].texturePath = texturepath.asChar();
-		SM.meshList[meshIndex].normalPath = normalpath.asChar();
+		memcpy(SM.meshList[meshIndex].texturePath, texturepath.asChar(), texturepath.numChars());
+		memcpy(SM.meshList[meshIndex].normalPath, normalpath.asChar(),normalpath.numChars());
+		//SM.meshList[meshIndex].texturePath = texturepath.asChar();
+		//SM.meshList[meshIndex].normalPath = normalpath.asChar();
 
 		//Get and set mesh name
 		memcpy(SM.meshList[meshIndex].transformation.name, mesh.fullPathName().asChar(), mesh.fullPathName().numChars());
@@ -562,9 +564,11 @@ void MayaListToList(MObject node)
 			if(!alreadyExists)
 			meshIndex++;
 			SM.UpdateSharedMesh(meshIndex, updateTrans, updateMesh, currNrMeshes);
+			Print("Mindex sent to sharedmemory: ", meshIndex);
+			updateMesh, updateTrans = false;
 			}
 
-		updateMesh, updateTrans = false;
+		
 
 		// ID : 2 // 
 		// ID : 3 // 
@@ -614,6 +618,7 @@ void MayaListToList(MObject node)
 			if(!alreadyExists)
 			lightIndex++;
 			SM.UpdateSharedLight(lightIndex, currNrLights);
+			Print("Lindex sent to sharedmemory: ",lightIndex);
 		}
 	}
 	///////////////////////	CAMERA
@@ -669,9 +674,10 @@ void MayaListToList(MObject node)
 
 			//MString tempString = SM.cameraList[cameraIndex].transformation.name.c_str();			
 			//Print("Camera ", tempString, " has been addedd to list at index ", cameraIndex);
-
 			if(!alreadyExists)
-				cameraIndex++;
+			cameraIndex++;
+			SM.UpdateSharedCamera(cameraIndex);
+			Print("Cindex sent to sharedmemory: ",cameraIndex);
 		}
 	}
 }

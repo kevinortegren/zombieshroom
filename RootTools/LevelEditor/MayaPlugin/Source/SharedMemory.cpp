@@ -3,7 +3,8 @@
 SharedMemory::SharedMemory()
 {
 	NumberOfMeshes = nullptr;
-	NumberOfLights = nullptr;
+	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
+	NumberOfCameras = nullptr;
 	InitalizeSharedMemory();
 }
 
@@ -17,8 +18,8 @@ int SharedMemory::InitalizeSharedMemory()
 	int total_memory_size = 0;
 	
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
-	//total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Light) * g_maxLights;
+	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(int) * 3;
 
 
@@ -45,6 +46,10 @@ int SharedMemory::InitalizeSharedMemory()
 	{
 		PlightList[i] = ((Light*)raw_data) + i ;
 	}
+	for(int i = 0; i < g_maxCameras; i++)			//ADDED
+	{
+		PcameraList[i] = ((Camera*)raw_data) + i ;
+	}
 
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
@@ -55,7 +60,9 @@ int SharedMemory::InitalizeSharedMemory()
 	unsigned char* mem2 = (unsigned char*)LightIdChange;
 	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
 	mem2 = (unsigned char*)NumberOfLights;
-	//NumberOfLights = (int*)(LightIdChange + sizeof(Light) * g_maxLights);
+	unsigned char* mem3 = (unsigned char*)CameraIdChange;
+	NumberOfCameras = (int*)(mem3 + sizeof(Camera) * g_maxCameras);
+	mem3 = (unsigned char*)NumberOfCameras;
 
 	if(first_process)
 	{
@@ -64,20 +71,20 @@ int SharedMemory::InitalizeSharedMemory()
 	return 0;
 }
 
-void SharedMemory::UpdateSharedLight(int index, int nrOfLights)			//AINT CALLING FOR SHIET
+void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
+	LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(LightIdMutexHandle, milliseconds);
 
-	*NumberOfLights = nrOfLights;	//UNABLE TO READ MEMORY
+	*NumberOfLights = nrOfLights;
 	*LightIdChange = index;
 
-	ReleaseMutex(IdMutexHandle);
+	ReleaseMutex(LightIdMutexHandle);
 
 	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 	WaitForSingleObject(LightMutexHandle, milliseconds);
 
-		memcpy(PlightList[index]->transformation.name, lightList[index].transformation.name, 50); //CANT READ CHARACTER OF STRING ON ALL BELOW, MIGHT BE MEMORY SHIET!
+		memcpy(PlightList[index]->transformation.name, lightList[index].transformation.name, 50);
 		PlightList[index]->transformation.position = lightList[index].transformation.position;
 		PlightList[index]->transformation.scale = lightList[index].transformation.scale;
 		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
@@ -85,15 +92,33 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)			//AINT CALLING
 	ReleaseMutex(LightMutexHandle);
 }
 
-void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)			//AINT CALLING FOR SHIET
+void SharedMemory::UpdateSharedCamera(int index)		
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
+	CameraIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(CameraIdMutexHandle, milliseconds);
+
+	*CameraIdChange = index;
+
+	ReleaseMutex(CameraIdMutexHandle);
+
+	CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+	WaitForSingleObject(CameraMutexHandle, milliseconds);
+
+		memcpy(PcameraList[index]->transformation.name, cameraList[index].transformation.name, 50); 
+		PcameraList[index]->transformation.position = cameraList[index].transformation.position;
+		PcameraList[index]->transformation.rotation = cameraList[index].transformation.rotation;
+
+	ReleaseMutex(CameraMutexHandle);
+}
+
+void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)
+{
+	MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(MeshIdMutexHandle, milliseconds);
 	*NumberOfMeshes = nrOfMeshes;
 	*MeshIdChange = index;	//Moved this codeblock up, didnt change shit.
 
-	ReleaseMutex(IdMutexHandle);
-
+	ReleaseMutex(MeshIdMutexHandle);
 
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
@@ -117,9 +142,10 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
 	}
-	
-	PmeshList[index]->texturePath = meshList[index].texturePath;
-	PmeshList[index]->normalPath = meshList[index].normalPath;
+	memcpy(PmeshList[index]->texturePath, meshList[index].texturePath, 100);		//Ligger pointlight här av någon annledning. DERRRP.
+	memcpy(PmeshList[index]->normalPath, meshList[index].normalPath, 100);
+	//PmeshList[index]->texturePath = meshList[index].texturePath;
+	//PmeshList[index]->normalPath = meshList[index].normalPath;
 	
 
 	ReleaseMutex(MeshMutexHandle);
@@ -130,7 +156,8 @@ int SharedMemory::shutdown()
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
-	CloseHandle(IdMutexHandle);
+	CloseHandle(MeshIdMutexHandle);
 	CloseHandle(LightMutexHandle);
+	CloseHandle(CameraMutexHandle);
 	return 0;
 }
