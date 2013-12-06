@@ -2,11 +2,13 @@
 
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Network/Include/NetworkManager.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 namespace RootForce
 {
 	namespace Network
 	{
+		// TODO: Change name to ServerMessageHandler
 		class ClientMessageSystem : public ECS::EntitySystem
 		{
 		public:

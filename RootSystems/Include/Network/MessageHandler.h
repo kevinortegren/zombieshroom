@@ -4,18 +4,12 @@
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/Network/ClientMessageSystem.h>
 #include <RootSystems/Include/Network/ServerMessageSystem.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 namespace RootForce
 {
 	namespace Network
 	{
-		struct NetworkPlayerComponent : public ECS::Component<NetworkPlayerComponent>
-		{
-			int PlayerSlot;
-		};
-
-		
-
 		class MessageHandler
 		{
 		public:

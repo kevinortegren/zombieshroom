@@ -36,7 +36,28 @@ namespace RootForce
 
 		void ClientMessageSystem::HandleClientMessage(RootEngine::Network::Message* p_message)
 		{
+			switch (p_message->MessageID)
+			{
+				case MessageType::GameStateSnapshot:
+					break;
+				case MessageType::ChatToClient:
+					break;
+				case MessageType::UserConnected:
+					break;
+				case MessageType::UserDisconnected:
+					break;
+				case RootEngine::Network::InnerMessageID::CONNECTION_ACCEPTED:
+					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "Connection to server established");
 
+					// TODO: Send a user info message and await a user connected message (add a connection refused message to the protocol?)
+					break;
+				case RootEngine::Network::InnerMessageID::CONNECTION_REFUSED:
+					m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Connection to server refused");
+					// TODO: Bail. Run for it. They're on to you.
+					break;
+				case RootEngine::Network::InnerMessageID::DISCONNECT:
+					break;
+			}
 		}
 
 		void ClientMessageSystem::HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message)
