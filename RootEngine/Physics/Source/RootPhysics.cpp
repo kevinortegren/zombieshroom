@@ -142,7 +142,7 @@ namespace Physics
 		{
 			m_playerObjects.at(i)->Update();
 		}
-		m_dynamicWorld->stepSimulation(1/60.0f,10);
+		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
 	}

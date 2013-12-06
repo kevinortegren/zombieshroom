@@ -51,7 +51,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(specular);
 				 }
 				 const YAML::Node* normalNode = p_node.FindValue("Normal");
-				 if(specularNode != nullptr)
+				 if(normalNode != nullptr)
 				 {
 					 std::string normal;
 					 p_node["Normal"] >> normal;

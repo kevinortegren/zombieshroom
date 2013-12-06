@@ -280,7 +280,7 @@ namespace Render
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_numDirectionalLights = 0;
+		//m_numDirectionalLights = 0;
 		m_numPointLights = 0;
 	}
 

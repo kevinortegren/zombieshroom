@@ -152,6 +152,12 @@ void Main::Start()
 	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+	Render::DirectionalLight dl;
+	dl.m_color = glm::vec4(1,0,1,1);
+	dl.m_direction = glm::vec3(0,0,-1);
+
+	g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
+
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
@@ -163,6 +169,13 @@ void Main::Start()
 
 
 	
+	//Plane at bottom
+	float normal[3] = {0,1,0};
+	float position[3] = {0, -2, 0};
+	
+	g_engineContext.m_physics->CreatePlane(normal, position);
+
+
 
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -170,43 +183,63 @@ void Main::Start()
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 
 
-	//Plane at bottom
-	float normal[3] = {0,1,0};
-	float position[3] = {0, -2, 0};
-	
-	g_engineContext.m_physics->CreatePlane(normal, position);
-	
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
-	{
+	{	
+		
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
-	
+		
 		g_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
-		HandleEvents();
-
-		m_playerControlSystem->Process();
+		
+		{
+			PROFILE("Handle Events", g_engineContext.m_profiler);
+			HandleEvents();
+		}
+		{
+			PROFILE("Player control system", g_engineContext.m_profiler);
+			m_playerControlSystem->Process();
+		}
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
-		g_engineContext.m_physics->Update(dt);
+
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
+			g_engineContext.m_physics->Update(dt);
+		}
 
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_physicsSystem->Process();
 		renderingSystem->Process();
+		
+		{
+			PROFILE("Render", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
 
 		// Update Engine systems.
-		g_engineContext.m_renderer->Render();
-		g_engineContext.m_renderer->RenderLines();
-
-		g_engineContext.m_gui->Update();
-		g_engineContext.m_gui->Render();
+		{
+			PROFILE("RenderLines", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->RenderLines();
+		}
+		
+		{
+			PROFILE("Profiler", g_engineContext.m_profiler);
+			g_engineContext.m_profiler->Update(dt);
+		}
+		
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);
+			g_engineContext.m_gui->Update();
+			g_engineContext.m_gui->Render();
+		}
 
 		g_engineContext.m_renderer->Swap();
 	}
