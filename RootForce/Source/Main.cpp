@@ -117,7 +117,6 @@ void Main::Start()
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
 
-
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
@@ -235,6 +234,9 @@ void Main::Start()
 		renderingSystem->Process();
 
 		// Update Engine systems.
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
+			g_engineContext.m_renderer->DisplayNormals(false);
+
 		g_engineContext.m_renderer->Render();
 		//g_engineContext.m_renderer->RenderLines();
 

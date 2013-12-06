@@ -334,9 +334,11 @@ namespace Render
 				}
 
 				// Debug.
-				auto normal = m_normalTech->GetPrograms()[0];
-				normal->Apply();	
-				(*itr).m_mesh->Draw();			
+				if(m_displayNormals)
+				{
+					m_normalTech->GetPrograms()[0]->Apply();	
+					(*itr).m_mesh->Draw();	
+				}
 			}
 
 			(*itr).m_mesh->Unbind();

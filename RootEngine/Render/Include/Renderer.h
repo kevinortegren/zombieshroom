@@ -34,6 +34,8 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void RenderLines() = 0;
 		virtual void Swap() = 0;
+		virtual void DisplayNormals(bool p_display) = 0;
+
 
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
@@ -63,6 +65,7 @@ namespace Render
 		void Render();
 		void RenderLines();
 		void Swap();
+		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		bool CheckExtension(const char* p_extension);
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
@@ -129,6 +132,8 @@ namespace Render
 		GLuint m_debugFbo;
 		GLuint m_testHandle;
 		//GLuint m_testHandle;
+
+		bool m_displayNormals;
 	};
 }
 
