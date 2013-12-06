@@ -105,11 +105,7 @@ namespace RootEngine
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
 			
-			//Best conflict ever
-// <<<<<<< HEAD
-// 		
-// =======
-// >>>>>>> 4a674b62a86cff39358cc2383b8a4ccee0d43c66
+
 			virtual void RemoveObject(int p_objectIndex) = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		};

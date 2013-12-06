@@ -69,6 +69,8 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
 	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
+	//btCollisionShape* simplifiedObject = new btCapsuleShape(0.5, 2);
+	
 	//Set startpos and start rotation and bind them to a motionstate
 	btTransform startTransform;
 	startTransform.setIdentity();
@@ -81,21 +83,20 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	objectBodyInfo.m_friction = 0.0f;
 	objectBodyInfo.m_restitution = 0.0f;
 	objectBodyInfo.m_linearDamping = 0.0f;
-
 	m_rigidBody = new btRigidBody(objectBodyInfo);
 	//Keep upright
 	m_rigidBody->setAngularFactor(0.0f);
 	//Don't enter sleep mode if you stand still for a while
 	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
-	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK /*| btCollisionObject::CF_NO_CONTACT_RESPONSE */);
+	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK |btCollisionObject::CF_CHARACTER_OBJECT /*| btCollisionObject::CF_NO_CONTACT_RESPONSE */);
 	m_dynamicWorld->addRigidBody(m_rigidBody);
 
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	//m_ghostObject->setUserPointer(this);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(m_ghostObject->getCollisionFlags()   | btCollisionObject::CF_NO_CONTACT_RESPONSE );
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  /*btBroadphaseProxy::StaticFilter |*/ btBroadphaseProxy::DefaultFilter);
+	m_ghostObject->setCollisionFlags(m_ghostObject->getCollisionFlags() |btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter, /* btBroadphaseProxy::StaticFilter |*/ btBroadphaseProxy::DefaultFilter);
 	//indexVertexArray = 0;
 	//objectMeshShape = 0;
 	//objectHull = 0;
@@ -103,6 +104,7 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 
 	//delete objectMeshShape;
 	//delete objectHull;
+	
 }
 
 
@@ -110,6 +112,7 @@ void PlayerController::Walk(float* p_dir)
 {
 	float x = p_dir[0] + m_manualVelocity.x();
 	float z = p_dir[2] + m_manualVelocity.z();
+
 	float speed = btSqrt(x*x + z*z);
 
 	if(speed > m_maxSpeed)
@@ -124,10 +127,9 @@ void PlayerController::Walk(float* p_dir)
 
 void PlayerController::Update()
 {
+
 	m_ghostObject->setWorldTransform(m_rigidBody->getWorldTransform());
-
 	m_motionState->getWorldTransform(m_motionTransform);
-
 	m_onGround = false;
 
 	ParseGhostContacts();
@@ -205,7 +207,7 @@ void PlayerController::UpdatePosition()
 	if(rayCallBack_bottom.hasHit())
 	{
 		float previousY = m_rigidBody->getWorldTransform().getOrigin().getY();
-		m_rigidBody->getWorldTransform().getOrigin().setY(previousY + (m_heightOffset + m_stepHeight) * (1.0f - rayCallBack_bottom.m_closestHitFraction));
+		m_rigidBody->getWorldTransform().getOrigin().setY(previousY + (m_heightOffset + m_stepHeight ) * (1.0f - rayCallBack_bottom.m_closestHitFraction));
 
 		btVector3 vel(m_rigidBody->getLinearVelocity());
 		vel.setY(0.0f);
@@ -217,7 +219,7 @@ void PlayerController::UpdatePosition()
 	//check if we hit something above us
 	IgnoreBodyAndGhostCast rayCallBack_top(m_rigidBody, m_ghostObject);
 	m_dynamicWorld->rayTest(m_rigidBody->getWorldTransform().getOrigin(), 
-		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset + 2.0f, 0.0f), rayCallBack_top); //vad är 2:an?? - Jo min herre min herre, den är en temporär lösning då 0 punkten är i fötterna och bör tas bort då denna punkten hamnar i mitten av karaktären
+		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset + 0.5f, 0.0f), rayCallBack_top); //vad är 2:an?? - Jo min herre min herre, den är en temporär lösning då 0 punkten är i fötterna och bör tas bort då denna punkten hamnar i mitten av karaktären
 	if(rayCallBack_top.hasHit())
 	{
 		m_rigidBody->getWorldTransform().setOrigin(m_previousPosition);
@@ -237,20 +239,21 @@ void PlayerController::UpdateVelocity()
 	//Deaccelerate
 	if(m_onGround)
 	{
-
+		
 		m_manualVelocity -= m_manualVelocity * 0.5f; // The constant will need to be fine tuned later and should be a define or constant
 					
 	}
 	if(m_hittingWall)
 	{
+		
 		for(unsigned int i = 0, size = m_surfaceHitNormals.size(); i < size; i++)
 		{
 			//Projects m_manualVelocity onto m_surfaceHitNormals
 			btVector3 temp = (m_manualVelocity.dot(m_surfaceHitNormals.at(i))/(m_surfaceHitNormals.at(i).norm() * m_surfaceHitNormals.at(i).norm()) )*(m_surfaceHitNormals.at(i));
 			temp.normalize();
-			if(temp.y() > 4)
-				int lol = 2;
-			m_manualVelocity -= temp * 1.05f; //MAGIC NUMBERS ARE C00L
+			m_manualVelocity -= temp * 1.05f; //MAGIC NUMBERS ARE C00l
+			m_manualVelocity.setY(0);
+			m_rigidBody->setLinearVelocity(m_manualVelocity);
 		}
 
 		//(manul x S/|S|^2) * S
@@ -296,6 +299,11 @@ void PlayerController::SetOrientation( float* p_orientation )
 void PlayerController::SetUserPointer( void* p_userPointer )
 {
 	m_rigidBody->setUserPointer(p_userPointer);
+}
+
+void PlayerController::SetPrevVelocity()
+{
+	m_rigidBody->setLinearVelocity(m_manualVelocity);
 }
 
 

@@ -81,6 +81,7 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
+
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
 		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
@@ -120,7 +121,7 @@ namespace Physics
 		btDefaultMotionState* planeMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(p_position[0],p_position[1],p_position[2])));
 		btRigidBody::btRigidBodyConstructionInfo planeRigidbodyCI(0, planeMotionState, plane, btVector3(0, 0, 0));
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
-		planeBody->setCollisionFlags(planeBody->getCollisionFlags() | btRigidBody::CF_DISABLE_VISUALIZE_OBJECT);
+		planeBody->setCollisionFlags(planeBody->getCollisionFlags() /*| btRigidBody::CF_DISABLE_VISUALIZE_OBJECT*/);
 		m_dynamicWorld->addRigidBody(planeBody);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
@@ -145,6 +146,7 @@ namespace Physics
 		m_dynamicWorld->stepSimulation(p_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
+		
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -402,7 +404,7 @@ namespace Physics
 	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, float* p_position, float* p_rotation, float p_mass )
 	{
 		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
-	
+		
 		btVector3 pos;
 		pos.setX( p_position[0]);
 		pos.setY( p_position[1]);

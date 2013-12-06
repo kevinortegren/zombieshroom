@@ -18,6 +18,7 @@ public:
 	void Update();
 	void SetOrientation(float* p_orientation);
 	void RemovePlayer();
+	void SetPrevVelocity();
 	btVector3 GetPosition() const {return m_motionTransform.getOrigin();}
 	btVector3 GetVelocity() const {return m_rigidBody->getLinearVelocity();}
 	btQuaternion GetOrientation() const {return m_rigidBody->getWorldTransform().getRotation();}

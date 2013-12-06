@@ -175,7 +175,33 @@ void Main::Start()
 	
 	g_engineContext.m_physics->CreatePlane(normal, position);
 
-
+	float dir[3] = {1,0,0};
+	float grav[3] = {0,-1,0};
+	float pos[3] = {-6,1,-6};
+	float rot[4] = {0,0,0,1};
+	RootEngine::Physics::AbilityPhysicsInfo test;
+	test.m_collidesWorld = true;
+	test.m_direction = dir;
+	test.m_entityId = -1;
+	test.m_gravity = grav;
+	test.m_height = 2.f;
+	test.m_mass = 1;
+	test.m_position = pos;
+	test.m_radius = 0.5f;
+	test.m_orientation = rot;
+	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_SPHERE;
+	test.m_speed = 0.03;
+	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
+	g_engineContext.m_physics->AddAbilityToWorld(test);
+	float pos1[3] = {0, -2, 0};
+	float dir1[3] = {-1,0,0};
+	test.m_position = pos1;
+	test.m_direction = dir1;
+	test.m_radius = 10;
+	test.m_mass = 0;
+	test.m_collidesWorld = true;
+	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
+	g_engineContext.m_physics->AddAbilityToWorld(test);
 
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -230,10 +256,9 @@ void Main::Start()
 			g_engineContext.m_renderer->RenderLines();
 		}
 		
-		{
-			PROFILE("Profiler", g_engineContext.m_profiler);
+	
 			g_engineContext.m_profiler->Update(dt);
-		}
+		
 		
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
