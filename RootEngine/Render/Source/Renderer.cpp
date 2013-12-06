@@ -184,19 +184,15 @@ namespace Render
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
 
 		// Load effects.
-		g_context.m_resourceManager->LoadEffect("Deferred");
-		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
-	
+		
+		auto deferred = g_context.m_resourceManager->LoadEffect("Deferred");
 		m_lightingTech = deferred->GetTechniques()[0];
 
-		g_context.m_resourceManager->LoadEffect("Color");
-		auto m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
-		if(m_debugEffect == nullptr)
-		{
-				g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
-		}
+		auto m_debugEffect = g_context.m_resourceManager->LoadEffect("Color");
 		m_debugTech = m_debugEffect->GetTechniques()[0];
-		m_lightingTech = deferred->GetTechniques()[0];
+
+		auto m_normalEffect = g_context.m_resourceManager->LoadEffect("Normals");
+		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		// Setup camera.
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -334,9 +330,13 @@ namespace Render
 				{
 					// Apply program.
 					(*itrP)->Apply();
-
 					(*itr).m_mesh->Draw();			
 				}
+
+				// Debug.
+				auto normal = m_normalTech->GetPrograms()[0];
+				normal->Apply();	
+				(*itr).m_mesh->Draw();			
 			}
 
 			(*itr).m_mesh->Unbind();

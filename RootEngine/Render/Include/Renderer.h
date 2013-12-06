@@ -122,6 +122,7 @@ namespace Render
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
 		std::shared_ptr<TechniqueInterface> m_debugTech;
+		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		//debug
 

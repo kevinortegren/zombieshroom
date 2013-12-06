@@ -1,0 +1,41 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+layout(triangles) in;
+layout(line_strip, max_vertices = 9) out;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+};
+
+layout(std140) uniform PerObject
+{
+	mat4 modelMatrix;
+	mat4 normalMatrix;
+};
+
+in vec3 vert_normal[];
+
+out vec4 gs_Color;
+
+void main() 
+{
+	for(int i = 0; i < gl_VerticesIn; ++i)
+	{
+		gl_Position = projectionMatrix * viewMatrix * gl_in[i].gl_Position;
+		gs_Color = vec4(1,0,0,1);
+		EmitVertex();
+
+		gl_Position = projectionMatrix * viewMatrix * (gl_in[i].gl_Position + vec4(vert_normal[i], 0.0f) * 0.1f);
+		gs_Color = vec4(1,0,0,1);
+		EmitVertex();
+
+		gl_Position = projectionMatrix * viewMatrix * gl_in[i].gl_Position;
+		gs_Color = vec4(1,0,0,1);
+		EmitVertex();
+
+		EndPrimitive();
+	}
+}
