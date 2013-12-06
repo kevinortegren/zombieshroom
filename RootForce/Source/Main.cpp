@@ -1,7 +1,6 @@
 #include <Main.h>
 #include <stdexcept>
 #include <exception>
-#include <gtest/gtest.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
@@ -23,12 +22,6 @@
 
 #undef main
 
-TEST(Test, Foo) 
-{
-	int a = 0;
-	EXPECT_TRUE(a == 0);
-}
-
 int main(int argc, char* argv[]) 
 {
 	std::string path(argv[0]);
@@ -36,30 +29,18 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
-		if (argc > 1 && strcmp(argv[1], "-test") == 0)
-		{
-			testing::InitGoogleTest(&argc, argv);
-
-			int result = RUN_ALL_TESTS();
-			std::cin.get();
-			return result;
-		}
-		else
-		{
-			Main m(path);
-			m.Start();
-		}
+		Main m(path);
+		m.Start();
 	} 
 	catch (std::exception& e) 
 	{
-		// TODO: Log exception message
-		std::cout << e.what() << "\n";
+		std::cout << e.what() << std::endl;
 		std::cin.get();
 		return 1;
 	} 
 	catch (...) 
 	{
-		// TODO: Log unknown exception message
+		std::cout << "Unknown exception" << std::endl;
 		std::cin.get();
 		return 1;
 	}
@@ -241,29 +222,9 @@ void Main::Start()
 	//////////////////////////////////////////////////////////////////////////
 	
 	// Initialize the network system
-	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::LOCAL, 5567, "127.0.0.1"));
+	RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 	
-	// Test message sending
-	//{
-	//	RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
-	//	chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
-	//	chat->SenderID = 0;
-	//	chat->Message = "Hello world of doom";
-
-	//	size_t size = 0;
-	//	size += sizeof(chat->Type);
-	//	size += sizeof(chat->SenderID);
-	//	size += strlen(chat->Message);
-
-	//	RootEngine::Network::Message m;
-	//	m.MessageID = RootForce::Network::MessageType::ChatToServer;
-	//	m.RecipientID = 1;
-	//	m.Reliability = RELIABLE;
-	//	m.DataSize = size;
-	//	m.Data = (uint8_t*) chat;
-
-	//	g_engineContext.m_network->GetNetworkSystem()->Send(m);
-	//}
 
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};

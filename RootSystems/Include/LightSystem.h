@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Utility\ECS\Include\World.h>
-#include "Transform.h"
-#include <RootEngine\Render\Include\Renderer.h>
+#include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/Transform.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootForce
 {

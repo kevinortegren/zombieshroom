@@ -1,4 +1,4 @@
-#include <RootSystems/Include/LightSystem.h>
+#include <LightSystem.h>
 
 namespace RootForce
 {	

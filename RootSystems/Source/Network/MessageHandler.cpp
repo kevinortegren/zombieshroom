@@ -2,7 +2,6 @@
 #include <Network/Messages.h>
 #include <RootEngine/Network/Include/LocalServer.h>
 #include <RootEngine/Network/Include/RemoteServer.h>
-#include <gtest/gtest.h>
 
 namespace RootForce
 {
@@ -128,7 +127,7 @@ namespace RootForce
 }
 
 
-
+/*
 TEST(NetworkMessage, SerializeOverlay)
 {
 	RootForce::Network::MessageChat m;
@@ -167,3 +166,4 @@ TEST(NetworkMessage, SerializeCopy)
 	EXPECT_TRUE(m.SenderID == m2.SenderID);
 	EXPECT_TRUE(strcmp(m.Message, m2.Message) == 0);
 }
+*/

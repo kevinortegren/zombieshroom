@@ -1,5 +1,4 @@
 #include <PlayerControlSystem.h>
-#include <gtest/gtest.h>
 
 namespace RootForce
 {

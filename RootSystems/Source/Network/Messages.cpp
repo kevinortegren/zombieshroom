@@ -1,17 +1,10 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <cstring>
-#include <gtest/gtest.h>
 
 namespace RootForce
 {
 	namespace Network
 	{
-		/*
-			int size = 0;
-			uint8_t* buffer = new uint8_t[size];
-			return buffer;
-		*/
-
 		int MessageChat::GetSerializedSize() const
 		{
 			int size = 0;
@@ -117,6 +110,7 @@ namespace RootForce
 	}
 }
 
+/*
 TEST(Messages, Serialize)
 {
 	RootForce::Network::MessageChat m;
@@ -133,3 +127,4 @@ TEST(Messages, Serialize)
 	EXPECT_TRUE(m.SenderID == m2.SenderID);
 	EXPECT_TRUE(m.Message == m2.Message);
 }
+*/

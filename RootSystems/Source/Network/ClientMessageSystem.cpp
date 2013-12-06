@@ -33,7 +33,8 @@ namespace RootForce
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection to server established");
 
-					// Create a user info message and send it
+					// TODO: Create a user info message and send it
+					/*
 					RootForce::Network::MessageUserInfo* userInfoContents = new RootForce::Network::MessageUserInfo;
 					userInfoContents->PlayerName = "john doe";
 
@@ -46,6 +47,7 @@ namespace RootForce
 					memcpy(userInfoMessage.Data, userInfoContents, userInfoMessage.DataSize);
 
 					m_server->Send(userInfoMessage);
+					*/
 				} break;
 				case RootEngine::Network::InnerMessageID::CONNECTION_REFUSED:
 					m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Connection to server refused");
