@@ -2,7 +2,7 @@
 #extension GL_EXT_geometry_shader4 : enable  
 
 layout(triangles) in;
-layout(line_strip, max_vertices = 9) out;
+layout(line_strip, max_vertices = 6) out;
 
 layout(std140) uniform PerFrame
 {
@@ -18,22 +18,18 @@ layout(std140) uniform PerObject
 
 in vec3 vert_normal[];
 
-out vec4 gs_Color;
+out vec4 vert_color;
 
 void main() 
 {
 	for(int i = 0; i < gl_VerticesIn; ++i)
 	{
 		gl_Position = projectionMatrix * viewMatrix * gl_in[i].gl_Position;
-		gs_Color = vec4(1,0,0,1);
+		vert_color = vec4(1,0,0,1);
 		EmitVertex();
 
 		gl_Position = projectionMatrix * viewMatrix * (gl_in[i].gl_Position + vec4(vert_normal[i], 0.0f) * 0.1f);
-		gs_Color = vec4(1,0,0,1);
-		EmitVertex();
-
-		gl_Position = projectionMatrix * viewMatrix * gl_in[i].gl_Position;
-		gs_Color = vec4(1,0,0,1);
+		vert_color = vec4(1,0,0,1);
 		EmitVertex();
 
 		EndPrimitive();

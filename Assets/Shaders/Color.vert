@@ -14,13 +14,10 @@ layout(std140) uniform PerObject
 	mat4 modelMatrix;
 };
 
-out Fragment
-{
-	out vec4 color;
-} fragment;
+out vec4 vert_color;
 
 void main()
 {
-	fragment.color = in_color;
+	vert_color = in_color;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 }
