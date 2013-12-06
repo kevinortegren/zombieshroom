@@ -304,7 +304,7 @@ namespace Physics
 		btVector3 temp;
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 			temp = m_playerObjects.at(index)->GetPosition();
-		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_DYNAMIC )
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
 		p_pos[0] = temp.getX();
 		p_pos[1] = temp.getY();

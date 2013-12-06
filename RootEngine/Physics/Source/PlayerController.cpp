@@ -15,9 +15,10 @@ struct IgnoreBodyAndGhostCast : public btCollisionWorld::ClosestRayResultCallbac
 	//Ignore colliding with self
 	btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 	{
-
+		//Don't collide with ourself
 		if(p_rayResult.m_collisionObject == Body || p_rayResult.m_collisionObject == Ghost)
 			return 1.0f;
+		//Do this to avoid getting stuck in non collide object, such as aoe abilitys
 		if((p_rayResult.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
 			return 1.0f;
 		
@@ -25,6 +26,7 @@ struct IgnoreBodyAndGhostCast : public btCollisionWorld::ClosestRayResultCallbac
 	}
 
 };
+
 PlayerController::PlayerController( void )
 {
 	
@@ -85,14 +87,14 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_rigidBody->setAngularFactor(0.0f);
 	//Don't enter sleep mode if you stand still for a while
 	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
-	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK/* | btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK /*| btCollisionObject::CF_NO_CONTACT_RESPONSE */);
 	m_dynamicWorld->addRigidBody(m_rigidBody);
 
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	//m_ghostObject->setUserPointer(this);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(m_ghostObject->getCollisionFlags()  |  btCollisionObject::CF_NO_CONTACT_RESPONSE );
+	m_ghostObject->setCollisionFlags(m_ghostObject->getCollisionFlags()   | btCollisionObject::CF_NO_CONTACT_RESPONSE );
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  /*btBroadphaseProxy::StaticFilter |*/ btBroadphaseProxy::DefaultFilter);
 	//indexVertexArray = 0;
 	//objectMeshShape = 0;
@@ -168,10 +170,6 @@ void PlayerController::ParseGhostContacts()
 			if(pManifold->getBody1() == m_ghostObject)
 				if((pManifold->getBody0()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
 					continue;
-			/*if((pManifold->getBody0()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
-				continue;
-			if((pManifold->getBody1()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
-				continue;*/
 			
 			for(int k = 0; k < pManifold->getNumContacts(); k++)
 			{
@@ -180,10 +178,8 @@ void PlayerController::ParseGhostContacts()
 
 				if(point.getDistance() < 0.0f)
 				{
-					//const btVector3& ptA = point.getPositionWorldOnA();
 					const btVector3& ptB = point.getPositionWorldOnB();
 					
-					//const btVector3& normalOnB = point.m_normalWorldOnB();
 					//Check if on ground
 					if(ptB.getY() < m_motionTransform.getOrigin().getY() - m_heightOffset /*Offset to get under ground*/ - 0.01f)
 						m_onGround = true;
@@ -221,7 +217,7 @@ void PlayerController::UpdatePosition()
 	//check if we hit something above us
 	IgnoreBodyAndGhostCast rayCallBack_top(m_rigidBody, m_ghostObject);
 	m_dynamicWorld->rayTest(m_rigidBody->getWorldTransform().getOrigin(), 
-		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset + 2.0f, 0.0f), rayCallBack_top);
+		m_rigidBody->getWorldTransform().getOrigin() + btVector3(0.0f , m_heightOffset + 2.0f, 0.0f), rayCallBack_top); //vad är 2:an?? - Jo min herre min herre, den är en temporär lösning då 0 punkten är i fötterna och bör tas bort då denna punkten hamnar i mitten av karaktären
 	if(rayCallBack_top.hasHit())
 	{
 		m_rigidBody->getWorldTransform().setOrigin(m_previousPosition);
@@ -243,17 +239,21 @@ void PlayerController::UpdateVelocity()
 	{
 
 		m_manualVelocity -= m_manualVelocity * 0.5f; // The constant will need to be fine tuned later and should be a define or constant
-
+					
 	}
 	if(m_hittingWall)
 	{
 		for(unsigned int i = 0, size = m_surfaceHitNormals.size(); i < size; i++)
 		{
 			//Projects m_manualVelocity onto m_surfaceHitNormals
-			btVector3 temp = (m_manualVelocity.dot(m_surfaceHitNormals.at(i))/(m_surfaceHitNormals.at(i).norm() *m_surfaceHitNormals.at(i).norm()) ) * m_surfaceHitNormals.at(i);	
+			btVector3 temp = (m_manualVelocity.dot(m_surfaceHitNormals.at(i))/(m_surfaceHitNormals.at(i).norm() * m_surfaceHitNormals.at(i).norm()) )*(m_surfaceHitNormals.at(i));
+			temp.normalize();
+			if(temp.y() > 4)
+				int lol = 2;
 			m_manualVelocity -= temp * 1.05f; //MAGIC NUMBERS ARE C00L
 		}
 
+		//(manul x S/|S|^2) * S
 	}
 }
 
