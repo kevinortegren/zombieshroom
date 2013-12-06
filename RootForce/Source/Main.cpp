@@ -241,29 +241,29 @@ void Main::Start()
 	//////////////////////////////////////////////////////////////////////////
 	
 	// Initialize the network system
-	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::REMOTE, 5567, "127.0.0.1"));
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::LOCAL, 5567, "127.0.0.1"));
 	
 	// Test message sending
-	{
-		RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
-		chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
-		chat->SenderID = 0;
-		chat->Message = "Hello world of doom";
+	//{
+	//	RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
+	//	chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
+	//	chat->SenderID = 0;
+	//	chat->Message = "Hello world of doom";
 
-		size_t size = 0;
-		size += sizeof(chat->Type);
-		size += sizeof(chat->SenderID);
-		size += strlen(chat->Message);
+	//	size_t size = 0;
+	//	size += sizeof(chat->Type);
+	//	size += sizeof(chat->SenderID);
+	//	size += strlen(chat->Message);
 
-		RootEngine::Network::Message m;
-		m.MessageID = RootForce::Network::MessageType::ChatToServer;
-		m.RecipientID = 1;
-		m.Reliability = RELIABLE;
-		m.DataSize = size;
-		m.Data = (uint8_t*) chat;
+	//	RootEngine::Network::Message m;
+	//	m.MessageID = RootForce::Network::MessageType::ChatToServer;
+	//	m.RecipientID = 1;
+	//	m.Reliability = RELIABLE;
+	//	m.DataSize = size;
+	//	m.Data = (uint8_t*) chat;
 
-		g_engineContext.m_network->GetNetworkSystem()->Send(m);
-	}
+	//	g_engineContext.m_network->GetNetworkSystem()->Send(m);
+	//}
 
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};

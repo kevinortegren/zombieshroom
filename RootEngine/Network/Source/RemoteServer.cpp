@@ -74,7 +74,7 @@ namespace RootEngine
 						message->MessageID = InnerMessageID::DISCONNECT;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->Data = (uint8_t*)malloc(1);
+						message->Data = new uint8_t[1];
 						message->Data[0] = 0;
 						message->DataSize = 1;
 						m_message.push_back(message);
