@@ -38,8 +38,9 @@ namespace RootEngine
 	//////////////////////////////////////////////////////////////////////////
 	struct AutoProfile
 	{
-		AutoProfile(std::string p_name)
+		AutoProfile(std::string p_name, ProfilingInterface* p_profiling)
 		{
+			m_profiling = p_profiling;
 			m_name = p_name;
 			QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
 		}
@@ -50,13 +51,14 @@ namespace RootEngine
 
 			__int64 elapsedTime = endTime -	m_startTime;
 
-			//Profiling::StoreSample(m_name, elapsedTime);
+			m_profiling->StoreSample(m_name, elapsedTime);
 		}
 
 		std::string m_name;
 		__int64		m_startTime;
+		ProfilingInterface* m_profiling;
 
 	};
 
-	#define PROFILE AutoProfile p(__FUNCTION__);
+	#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
 }
