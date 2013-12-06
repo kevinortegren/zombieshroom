@@ -163,16 +163,20 @@ void Main::Start()
 				}
 			}
 		}
-
-		std::vector<std::string> command;
-		while( command = m_console.PollCommand(), command.size() > 0 )
-		{
-			if( command[0].compare("quit") == 0
-				|| command[0].compare("exit") == 0 )
-			{
-				m_running = false;
-			}
-		}
+		m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "dt: \t%f", dt);
+		//std::vector<std::string> command;
+		//while((command = m_console.PollCommand()).size() > 0)
+		//{
+		//	// First parse commands specific to the dedicated server, such as the exit message
+		//	if( command[0].compare("quit") == 0
+		//		|| command[0].compare("exit") == 0 )
+		//	{
+		//		m_running = false;
+		//	}
+		//	else
+		//		m_commandHandler->ExecuteCommand(command);
+		//}
+		//m_networkHandler->HandleInternalMessage();
 	}
 
 	m_console.Shutdown();

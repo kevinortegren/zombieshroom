@@ -38,7 +38,7 @@ namespace RootSystems
 			MaxPlayers = 12;
 			Port = 5567;
 			Password = "";
-			LevelFile = "level.lev"; // ToDo: Set to correct value
+			LevelFile = "test.world"; // ToDo: Set to correct value
 			GameMode = GameMode::DEATHMATCH;
 			GameTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory
