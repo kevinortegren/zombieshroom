@@ -6,10 +6,12 @@
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
+#include <yaml-cpp/yaml.h>
 
 #include "ConsoleInput.h"
 
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/ServerConfig.h>
 
 #undef main
 
@@ -66,6 +68,8 @@ Main::Main(std::string p_workingDirectory)
 	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
 
 	m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL ^ RootEngine::SubsystemInit::INIT_GUI ^ RootEngine::SubsystemInit::INIT_RENDER, p_workingDirectory);
+	
+	m_workingDir = p_workingDirectory;
 }
 
 Main::~Main() 
@@ -106,7 +110,59 @@ void Main::Start()
 		//m_playerControlSystem->Process();
 		m_networkHandler->Update();
 		m_engineContext.m_physics->Update(dt);
+		
+		// Load the server config file
+		RootSystems::ServerConfig conf;
+		{
+			std::ifstream file(m_workingDir + "server.conf", std::ifstream::in);
+			if(file.good())
+			{
+				try
+				{
+					YAML::Parser parser(file);
+					
+					YAML::Node node;
+					parser.GetNextDocument(node);
 
+					unsigned utmp;
+					if(node.FindValue("MaxPlayers"))
+					{
+						node["MaxPlayers"] >> utmp;
+						conf.MaxPlayers = (uint8_t)utmp;
+					}
+					if(node.FindValue("Port"))
+					{
+						node["Port"] >> utmp;
+						conf.Port = (uint16_t)utmp;
+					}
+					if(node.FindValue("Password"))
+						node["Password"]  >> conf.Password;
+					if(node.FindValue("LevelFile"))
+						node["LevelFile"]  >> conf.LevelFile;
+					if(node.FindValue("GameMode"))
+					{
+						node["GameMode"]  >> utmp;
+						conf.GameMode = (RootSystems::GameMode::GameMode)utmp;
+					}
+					if(node.FindValue("GameTime"))
+					{
+						node["GameTime"] >> utmp;
+						conf.GameTime = (uint32_t)utmp;
+					}
+					if(node.FindValue("KillCount"))
+					{
+						node["KillCount"] >> utmp;
+						conf.KillCount = (uint32_t)utmp;
+					}
+				}
+				catch(YAML::ParserException& e) {
+					m_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::NON_FATAL_ERROR, "Failed to load server config. %s", e.what());
+				}
+				catch(std::exception e) {
+					e;
+				}
+			}
+		}
 
 		std::vector<std::string> command;
 		while( command = m_console.PollCommand(), command.size() > 0 )

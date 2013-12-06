@@ -247,7 +247,7 @@ void Main::Start()
 	{
 		RootForce::Network::MessageChat* chat = new RootForce::Network::MessageChat;
 		chat->Type = RootForce::Network::MessageChat::TYPE_CHAT;
-		chat->SenderID = 0;
+		chat->SenderID = 1;
 		chat->Message = "Hello world of doom";
 
 		size_t size = 0;
@@ -257,7 +257,7 @@ void Main::Start()
 
 		RootEngine::Network::Message m;
 		m.MessageID = RootForce::Network::MessageType::ChatToServer;
-		m.RecipientID = 1;
+		m.RecipientID = 0;
 		m.Reliability = RELIABLE;
 		m.DataSize = size;
 		m.Data = (uint8_t*) chat;

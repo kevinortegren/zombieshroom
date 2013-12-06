@@ -23,4 +23,6 @@ private:
 
 	ECS::World m_world;
 	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
+
+	std::string m_workingDir;
 };

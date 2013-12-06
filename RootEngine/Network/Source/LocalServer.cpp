@@ -31,7 +31,6 @@ namespace RootEngine
 
 		void LocalServer::Host( USHORT p_port, bool p_isDedicated )
 		{
-			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Starting server on port %u.", p_port);
 			m_numClients = 0;
 			RakNet::SocketDescriptor sd(p_port, 0);
 			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
@@ -56,6 +55,7 @@ namespace RootEngine
 				message->DataSize = 1;
 				m_message.push_back(message);
 			}
+			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server started on port %u.", p_port);
 		}
 
 		void LocalServer::Update()
@@ -87,14 +87,13 @@ namespace RootEngine
 					}
 					else
 					{
-						int id = 1;
-						for(; id < MAX_CLIENTS+1; id++)
-							if(m_client[id] == nullptr)
+						for(clientID = 1; clientID < MAX_CLIENTS+1; clientID++)
+							if(m_client[clientID] == nullptr)
 								break;
-						m_client[id] = new Client();
-						m_client[id]->GUID = packet->guid;
-						m_client[id]->IsRemote = true;
-						m_client[id]->SysAddress = packet->systemAddress;
+						m_client[clientID] = new Client();
+						m_client[clientID]->GUID = packet->guid;
+						m_client[clientID]->IsRemote = true;
+						m_client[clientID]->SysAddress = packet->systemAddress;
 						m_numClients++;
 
 						Message* message = new Message;
@@ -102,6 +101,7 @@ namespace RootEngine
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
 						message->Data = (uint8_t*)malloc(1);
+						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;
 						m_message.push_back(message);
@@ -125,6 +125,7 @@ namespace RootEngine
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
 						message->Data = (uint8_t*)malloc(1);
+						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;
 						m_message.push_back(message);
