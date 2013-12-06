@@ -28,9 +28,11 @@ namespace RootEngine
 				collectedTime += t;
 			}
 			//Calculate average time
-			__int64 averageTime = collectedTime/itr->second.size();
-			//Create output string (Name + average time + number of samples)
-			std::string output	= itr->first + ": " + std::to_string(averageTime) + "  Samples: " + std::to_string(itr->second.size());
+			__int64 qfreq;
+			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
+			double sample = (collectedTime/itr->second.size()) / (double)qfreq;
+
+			std::string output	= "<div style='min-width: 200px; display: inline-block;'>" + itr->first + " :</div>" + "Time: " + std::to_string(sample) + " Samples: " + std::to_string(itr->second.size());
 			//Store output in vector for presenting 
 			m_ouputList.push_back(output);
 
@@ -61,5 +63,4 @@ namespace RootEngine
 	{
 		m_debugOverlay = p_debugOverlay;
 	}
-
 }

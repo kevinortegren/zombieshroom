@@ -197,6 +197,7 @@ void Main::Start()
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
 	{	
+		
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
@@ -204,27 +205,48 @@ void Main::Start()
 		g_engineContext.m_debugOverlay->Clear();
 
 		m_world.SetDelta(dt);
-		g_engineContext.m_debugOverlay->AddHTML(std::to_string(1.0f/dt).c_str(), RootEngine::TextColor::GRAY, false);
-		HandleEvents();
-		g_engineContext.m_profiler->Update(dt);
-		m_playerControlSystem->Process();
+		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		
+		{
+			PROFILE("Handle Events", g_engineContext.m_profiler);
+			HandleEvents();
+		}
+		{
+			PROFILE("Player control system", g_engineContext.m_profiler);
+			m_playerControlSystem->Process();
+		}
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
-		g_engineContext.m_physics->Update(dt);
+
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
+			g_engineContext.m_physics->Update(dt);
+		}
 
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_physicsSystem->Process();
 		renderingSystem->Process();
+		
+		{
+			PROFILE("Render", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
 
 		// Update Engine systems.
-		g_engineContext.m_renderer->Render();
-		g_engineContext.m_renderer->RenderLines();
-
-		g_engineContext.m_gui->Update();
-		g_engineContext.m_gui->Render();
-
+		{
+			PROFILE("RenderLines", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->RenderLines();
+		}
+		
+		g_engineContext.m_profiler->Update(dt);
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);
+			g_engineContext.m_gui->Update();
+			g_engineContext.m_gui->Render();
+		}
+		
 		g_engineContext.m_renderer->Swap();
 	}
 }

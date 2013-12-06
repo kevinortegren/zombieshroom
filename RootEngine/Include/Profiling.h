@@ -26,7 +26,6 @@ namespace RootEngine
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 	private:
 		void Present();
-
 		std::map<std::string, std::vector<__int64>> m_sampleMap;
 		std::vector<std::string> m_ouputList;
 		DebugOverlayInterface* m_debugOverlay;
@@ -50,14 +49,13 @@ namespace RootEngine
 			QueryPerformanceCounter((LARGE_INTEGER*)&endTime);
 
 			__int64 elapsedTime = endTime -	m_startTime;
-
+		
 			m_profiling->StoreSample(m_name, elapsedTime);
 		}
 
 		std::string m_name;
 		__int64		m_startTime;
 		ProfilingInterface* m_profiling;
-
 	};
 
 	#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
