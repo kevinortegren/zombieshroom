@@ -9,6 +9,7 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
 

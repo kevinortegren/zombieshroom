@@ -2,6 +2,7 @@
 // URL: https://gist.github.com/princeofcode/5133370 (02-12-2013)
 #pragma once
 
+#include <WinSock2.h>
 #include <Awesomium/Surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>

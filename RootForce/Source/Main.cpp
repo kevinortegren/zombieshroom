@@ -93,6 +93,8 @@ void Main::Start()
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
 	RootForce::PhysicsAccessor::SetTypeId(4);
+	RootForce::Network::NetworkClientComponent::SetTypeId(5);
+	RootForce::Network::NetworkComponent::SetTypeId(6);
 
 
 	// Initialize the system for controlling the player.
@@ -221,10 +223,7 @@ void Main::Start()
 			g_engineContext.m_renderer->RenderLines();
 		}
 		
-		{
-			PROFILE("Profiler", g_engineContext.m_profiler);
-			g_engineContext.m_profiler->Update(dt);
-		}
+		g_engineContext.m_profiler->Update(dt);
 		
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
