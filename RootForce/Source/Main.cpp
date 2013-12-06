@@ -152,6 +152,12 @@ void Main::Start()
 	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+	Render::DirectionalLight dl;
+	dl.m_color = glm::vec4(1,0,1,1);
+	dl.m_direction = glm::vec3(0,0,-1);
+
+	g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
+
 	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
@@ -246,7 +252,7 @@ void Main::Start()
 			g_engineContext.m_gui->Update();
 			g_engineContext.m_gui->Render();
 		}
-		
+
 		g_engineContext.m_renderer->Swap();
 	}
 }
