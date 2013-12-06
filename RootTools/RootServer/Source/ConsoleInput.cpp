@@ -7,29 +7,6 @@
 
 namespace RootServer
 {
-	void ParseWord(EventData& p_ev, std::stringstream& p_ss)
-	{
-		if(p_ss.eof())
-			return;
-
-		std::string name;
-		std::getline(p_ss, name, ' ');
-		p_ev.Data = (uint8_t*)new char[name.size()];
-		memcpy(p_ev.Data, name.data(), name.size());
-		p_ev.DataSize = name.size();
-	}
-
-	void ParseRemaining(EventData& p_ev, std::stringstream& p_ss)
-	{
-		if(p_ss.eof())
-			return;
-
-		std::string name = p_ss.str();
-		p_ev.Data = (uint8_t*)new char[name.size()];
-		memcpy(p_ev.Data, name.data(), name.size());
-		p_ev.DataSize = name.size();
-	}
-
 	void ConsoleInput::Startup()
 	{
 		m_shouldExit = false;
@@ -77,27 +54,91 @@ namespace RootServer
 			{
 				ev.EventType = ServerEvents::RESET_SERVER;
 			}
+			else if(evtyp.compare("set_maxplayers") == 0)
+			{
+				ev.EventType = ServerEvents::SET_MAXPLAYERS;
+				ParseInt<uint8_t>(ev, ss);
+			}
+			else if(evtyp.compare("set_password") == 0)
+			{
+				ev.EventType = ServerEvents::SET_PASSWORD;
+				ParseWord(ev, ss);
+			}
+			else if(evtyp.compare("set_map") == 0)
+			{
+				ev.EventType = ServerEvents::SET_MAP;
+				ParseWord(ev, ss);
+			}
+			else if(evtyp.compare("set_gamemode") == 0)
+			{
+				ev.EventType = ServerEvents::SET_GAMEMODE;
+				ParseInt<uint8_t>(ev, ss);
+			}
+			else if(evtyp.compare("set_matchtime") == 0)
+			{
+				ev.EventType = ServerEvents::SET_MATCHTIME;
+				ParseInt<uint32_t>(ev, ss);
+			}
+			else if(evtyp.compare("set_killcount") == 0)
+			{
+				ev.EventType = ServerEvents::SET_KILLCOUNT;
+				ParseInt<uint32_t>(ev, ss);
+			}
+			else if(evtyp.compare("shutdown") == 0)
+			{
+				ev.EventType = ServerEvents::SHUTDOWN;
+			}
+			else if(evtyp.compare("pancakesocks") == 0)
+			{
+				ev.EventType = ServerEvents::CHEATMODE;
+				ParseWord(ev, ss);
+			}
 			else
 			{
 				std::cout << "Unknown command!" << std::endl;
 				continue;
 			}
 
-			/*while( !ss.eof() )
-			{
-				std::string tmp;
-				std::getline(ss, tmp, ' ');
-				ev.push_back(tmp);
-			}*/
-
-			std::cout << std::endl;
 			m_eventBuffer.push_back( ev );
 			
-			if( command[0].compare("quit") == 0
-				|| command[0].compare("exit") == 0 )
+			if(ev.EventType == ServerEvents::CHEATMODE)
 			{
 				m_shouldExit = true;
 			}
 		}
+	}
+	
+	void ConsoleInput::ParseWord(EventData& p_ev, std::stringstream& p_ss)
+	{
+		if(p_ss.eof())
+			return;
+
+		std::string name;
+		std::getline(p_ss, name, ' ');
+		p_ev.Data = (uint8_t*)new char[name.size()];
+		memcpy(p_ev.Data, name.data(), name.size());
+		p_ev.DataSize = name.size();
+	}
+
+	void ConsoleInput::ParseRemaining(EventData& p_ev, std::stringstream& p_ss)
+	{
+		if(p_ss.eof())
+			return;
+
+		std::string name = p_ss.str();
+		p_ev.Data = (uint8_t*)new char[name.size()];
+		memcpy(p_ev.Data, name.data(), name.size());
+		p_ev.DataSize = name.size();
+	}
+
+	template<class T>
+	void ConsoleInput::ParseInt(EventData& p_ev, std::stringstream& p_ss)
+	{
+		if(p_ss.eof())
+			return;
+
+		p_ev.Data = (uint8_t*)new T;
+		p_ss >> *(T*)p_ev.Data;
+		p_ev.DataSize = sizeof(T);
 	}
 }

@@ -18,5 +18,10 @@ namespace RootServer
 		bool m_shouldExit;
 
 		void Process();
+		
+		void ParseWord(EventData& p_ev, std::stringstream& p_ss);
+		void ParseRemaining(EventData& p_ev, std::stringstream& p_ss);
+		template<class T>
+		void ParseInt(EventData& p_ev, std::stringstream& p_ss);
 	};
 }
