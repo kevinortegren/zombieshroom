@@ -14,21 +14,23 @@
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 2
-          Model: testchar
-          Effect: Mesh
+          Model: testchar_t
+          Effect: Mesh_NormalMap
           Diffuse: v6
+          Specular: SpecularV1
+          Normal: bump_test
     - Type: 1
       Data:
         - Entity: 0
-          Position: [1, 3, 0]
+          Position: [1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 1
-          Position: [-1, 3, 0]
+          Position: [-1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [0, 0, 0]
+          Position: [0, 19, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
@@ -50,7 +52,7 @@
         - Entity: 2
           Type: 3
           Mass: 5
-          ModelHandle: testchar0
+          ModelHandle: testchar_t0
           StepHeight: 0.1
           ModelHeight: 0.0
           MaxSpeed: 10.0

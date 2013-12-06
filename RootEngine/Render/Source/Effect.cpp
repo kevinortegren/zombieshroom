@@ -59,7 +59,7 @@ namespace Render
 		glGetShaderiv( m_glHandle, GL_COMPILE_STATUS, &result );
 		if( result != GL_TRUE )
 		{
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Compiling shader type %d ! [%s, line %d]", p_shaderType, __FUNCTION__, __LINE__ );
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Compiling shader %s ! [%s, line %d]", p_filename, __FUNCTION__, __LINE__ );
 			int length = 0;
 			glGetShaderiv( m_glHandle, GL_INFO_LOG_LENGTH, &length );
 			if( length > 0 )

@@ -6,6 +6,7 @@
 #include <Awesomium/WebViewListener.h>
 #include <string>
 #include <RootEngine/Render/Include/Effect.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include "gl_texture_surface.h"
 

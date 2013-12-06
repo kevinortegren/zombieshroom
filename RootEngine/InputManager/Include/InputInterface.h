@@ -1,5 +1,6 @@
 #pragma once
 //#include <Windows.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include "KeyStateMouseEnum.h"

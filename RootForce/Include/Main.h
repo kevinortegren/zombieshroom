@@ -1,5 +1,6 @@
 #pragma once
 
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
