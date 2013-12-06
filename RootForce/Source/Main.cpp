@@ -246,7 +246,11 @@ void Main::Start()
 			g_engineContext.m_renderer->RenderLines();
 		}
 		
-		g_engineContext.m_profiler->Update(dt);
+		{
+			PROFILE("Profiler", g_engineContext.m_profiler);
+			g_engineContext.m_profiler->Update(dt);
+		}
+		
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
 			g_engineContext.m_gui->Update();

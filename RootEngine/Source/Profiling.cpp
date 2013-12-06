@@ -23,16 +23,19 @@ namespace RootEngine
 		for(auto itr = m_sampleMap.begin(); itr != m_sampleMap.end(); itr++)
 		{
 			__int64 collectedTime = 0;
+			__int64 maxTime = 0;
 			for (__int64 t : itr->second) 
 			{
 				collectedTime += t;
+				if(t > maxTime)
+					maxTime = t;
 			}
 			//Calculate average time
 			__int64 qfreq;
 			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
-			double sample = (collectedTime/itr->second.size()) / (double)qfreq;
-
-			std::string output	= "<div style='min-width: 200px; display: inline-block;'>" + itr->first + " :</div>" + "Time: " + std::to_string(sample) + " Samples: " + std::to_string(itr->second.size());
+			double averageSample	= (collectedTime/itr->second.size()) / (double)qfreq;
+			double maxSample		= maxTime / (double)qfreq;
+			std::string output	= "<div style='min-width: 200px; display: inline-block;'>" + itr->first + " :</div>" + "Time: " + std::to_string(averageSample) + " <div style='color: #FFFFFF; display: inline-block;'> MaxTime: "+ std::to_string(maxSample) + "</div> Samples: " + std::to_string(itr->second.size());
 			//Store output in vector for presenting 
 			m_ouputList.push_back(output);
 
