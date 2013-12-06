@@ -155,7 +155,7 @@ void Main::Start()
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
 
 	Render::DirectionalLight dl;
-	dl.m_color = glm::vec4(1,0,1,1);
+	dl.m_color = glm::vec4(0.3f,0.3f,0.3f,1);
 	dl.m_direction = glm::vec3(0,0,-1);
 
 	g_engineContext.m_renderer->AddDirectionalLight(dl, 0);

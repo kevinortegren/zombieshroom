@@ -26,5 +26,5 @@ void main()
 	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
 
 	vert_texcoord = in_position.xyz;
-	vert_texcoord.z = -vert_texcoord.z;
+	//vert_texcoord.z = -vert_texcoord.z;
 }
