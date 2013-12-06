@@ -283,4 +283,3 @@ std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
 }
 
 
-
