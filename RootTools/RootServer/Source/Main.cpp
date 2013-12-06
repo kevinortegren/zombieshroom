@@ -82,7 +82,10 @@ void Main::Start()
 	
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );
-
+		
+	// Load the server config file
+	RootSystems::ServerConfig conf = RootServer::ConfigLoader(m_engineContext.m_logger).Load(m_workingDir + "server.conf");
+	
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
@@ -96,11 +99,76 @@ void Main::Start()
 		//m_playerControlSystem->Process();
 		m_networkHandler->Update();
 		m_engineContext.m_physics->Update(dt);
-		
-		// Load the server config file
-		RootSystems::ServerConfig conf = RootServer::ConfigLoader(m_engineContext.m_logger).Load(m_workingDir + "server.conf");
-		
 
+		// ToDo: Move event handling to shared server-logic class
+		RootServer::EventData consoleEvent = m_console.PollEvent();
+		switch(consoleEvent.EventType)
+		{
+		case RootServer::ServerEvents::NEW_PLAYER:
+			// TODO: 
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "NEW_PLAYER not yet implemented.");
+			break;
+		case RootServer::ServerEvents::REMOVE_PLAYER:
+			// TODO
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "REMOVE_PLAYER not yet implemented.");
+			break;
+		case RootServer::ServerEvents::KICK_PLAYER:
+			// TODO
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "KICK_PLAYER not yet implemented.");
+			break;
+		case RootServer::ServerEvents::BROADCAST_MESSAGE:
+			// TODO
+			//Message m;
+			//m.messageID = CHAT_TO_CLIENT;
+			//m_networkHandler->Send(m);
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "say not yet implemented.");
+			break;
+		case RootServer::ServerEvents::RESET_SERVER:
+			// TODO: How to handle server reset?
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "reset not yet implemented.");
+			break;
+		case RootServer::ServerEvents::SET_MAXPLAYERS:
+			if(consoleEvent.DataSize == sizeof(uint8_t))
+				conf.MaxPlayers = *consoleEvent.Data;
+			// TODO: Call the network to change limit of accepted connections
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_maxplayers not yet implemented.");
+			break;
+		case RootServer::ServerEvents::SET_PASSWORD:
+			if(consoleEvent.DataSize > 0)
+				conf.Password = std::string((char*)consoleEvent.Data, consoleEvent.DataSize);
+			// TODO: Call the network to change the password required for the connection
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_password not yet implemented.");
+			break;
+		case RootServer::ServerEvents::SET_MAP:
+			if(consoleEvent.DataSize > 0)
+				conf.LevelFile = std::string((const char*)consoleEvent.Data, consoleEvent.DataSize);
+			// TODO: Reset the server with a new map loaded
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_map not yet implemented.");
+			break;
+		case RootServer::ServerEvents::SET_GAMEMODE:
+			if(consoleEvent.DataSize == sizeof(uint8_t))
+				conf.GameMode = (RootSystems::GameMode::GameMode)*consoleEvent.Data;
+			// TODO: Reset the server with a different gamemode
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_gamemode not yet implemented.");
+			break;
+		case RootServer::ServerEvents::SET_MATCHTIME:
+			if(consoleEvent.DataSize == sizeof(uint32_t))
+				conf.MatchTime = *(uint32_t*)consoleEvent.Data;
+			break;
+		case RootServer::ServerEvents::SET_KILLCOUNT:
+			if(consoleEvent.DataSize == sizeof(uint32_t))
+				conf.MatchTime = *(uint32_t*)consoleEvent.Data;
+			break;
+		case RootServer::ServerEvents::SHUTDOWN:
+			m_running = false;
+			break;
+		case RootServer::ServerEvents::CHEATMODE:
+			// TODO: Unleash your wildest imagination!
+			m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "Secret cheatmode not yet secretly implemented.");
+			break;
+		default:
+			break;
+		}
 	}
 
 	m_console.Shutdown();

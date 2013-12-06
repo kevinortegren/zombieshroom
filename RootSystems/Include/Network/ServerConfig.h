@@ -40,7 +40,7 @@ namespace RootSystems
 			Password = "";
 			LevelFile = "test.world"; // ToDo: Set to correct value
 			GameMode = GameMode::DEATHMATCH;
-			GameTime = 15*60; // 15 min
+			MatchTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory
 		}
 	};

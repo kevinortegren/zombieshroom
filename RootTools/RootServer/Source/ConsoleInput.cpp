@@ -101,7 +101,7 @@ namespace RootServer
 
 			m_eventBuffer.push_back( ev );
 			
-			if(ev.EventType == ServerEvents::CHEATMODE)
+			if(ev.EventType == ServerEvents::SHUTDOWN)
 			{
 				m_shouldExit = true;
 			}
@@ -138,7 +138,14 @@ namespace RootServer
 			return;
 
 		p_ev.Data = (uint8_t*)new T;
-		p_ss >> *(T*)p_ev.Data;
+		if(typeid(T) == typeid(uint8_t))
+		{
+			uint16_t tmp;
+			p_ss >> tmp;
+			*(T*)p_ev.Data = (uint8_t)tmp;
+		}
+		else
+			p_ss >> *(T*)p_ev.Data;
 		p_ev.DataSize = sizeof(T);
 	}
 }

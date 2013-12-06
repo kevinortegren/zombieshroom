@@ -56,7 +56,7 @@ namespace RootServer
 			catch(std::exception e) {
 				m_logger->LogText(LogTag::TOOLS, LogLevel::NON_FATAL_ERROR, "Failed to load server config. %s", e.what());
 			}
-			return conf;
 		}
+		return conf;
 	}
 }
