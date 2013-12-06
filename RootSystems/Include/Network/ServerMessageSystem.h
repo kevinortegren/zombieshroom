@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
@@ -20,8 +21,9 @@ namespace RootForce
 		class ServerClientSystem : public ECS::EntitySystem
 		{
 		public:
-			ServerClientSystem(ECS::World* p_world)
+			ServerClientSystem(ECS::World* p_world, Logging* p_logger)
 				: ECS::EntitySystem(p_world)
+				, m_logger(p_logger)
 			{
 				SetUsage<NetworkClientComponent>();
 			}
@@ -31,7 +33,14 @@ namespace RootForce
 			void ProcessEntity(ECS::Entity* p_entity);
 			void End();
 
-			
+			void HandleUserConnectMessage(RootEngine::Network::Message* p_message);
+			void HandleUserDisconnectMessage(RootEngine::Network::Message* p_message);
+			void HandleUserInfo(RootEngine::Network::Message* p_message);
+		private:
+			Logging* m_logger;
+			std::vector<RootEngine::Network::Message> m_messages;
+
+			ECS::ComponentMapper<NetworkClientComponent> m_networkClientComponentMapper;
 		};
 
 
@@ -66,22 +75,19 @@ namespace RootForce
 
 
 		// TODO: Change name to ServerMessageHandler
-		class ServerMessageSystem : public ECS::EntitySystem
+		class ServerMessageHandler
 		{
 		public:
-			ServerMessageSystem(ECS::World* p_world, Logging* p_logger);
-
-			void Init();
-			void Begin();
-			void ProcessEntity(ECS::Entity* p_entity);
-			void End();
+			ServerMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::Server* p_server);
 
 			void HandleServerMessage(RootEngine::Network::Message* p_message);
 		private:
+			ECS::World* m_world;
 			Logging* m_logger;
+			RootEngine::Network::Server* m_server;
+			ServerClientSystem* m_serverClientSystem;
 
 			void HandleChatToServerMessage(RootEngine::Network::Message* p_message);
-			void HandleUserInfoMessage(RootEngine::Network::Message* p_message);
 			void HandleUserCommandMessage(RootEngine::Network::Message* p_message, RootForce::PlayerAction::PlayerAction p_action);
 		};
 	}

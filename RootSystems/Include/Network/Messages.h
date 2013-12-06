@@ -60,12 +60,19 @@ namespace RootForce
 			MessageType Type;
 			int8_t SenderID;
 			const char* Message;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
+			//void Deserialize(uint8_t* buffer);
 		};
 		
 		/** Sent to the server when connecting (in order to identify yourself). Also sent from the server as part of the MessageUserConnected message. */
 		struct MessageUserInfo
 		{
 			const char* PlayerName;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
 		};
 
 		/** Sent to all connected clients when a client connects. Also sent to the connecting client for each connected client. */
@@ -73,6 +80,9 @@ namespace RootForce
 		{
 			int8_t UserID;
 			MessageUserInfo UserInfo;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
 		};
 
 
@@ -80,18 +90,27 @@ namespace RootForce
 		struct MessageUserDisconnected
 		{
 			int8_t UserID;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
 		};
 
 		/** Sent to the server when the player reorients the character. */
 		struct MessageUserCommandOrient
 		{
 			glm::quat Orientation;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
 		};
 
 		/** Sent to the server when the player selects a new ability. */
 		struct MessageUserCommandSelectAbility
 		{
 			uint8_t Slot;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
 		};
 	}
 }

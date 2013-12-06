@@ -1,6 +1,7 @@
 #include <Server.h>
 #include <External/Include/RakNet/BitStream.h>
 #include <External/Include/RakNet/RakNetTypes.h>
+
 namespace RootEngine
 {
 	namespace Network
@@ -50,7 +51,7 @@ namespace RootEngine
 			bitstream.Read(message->RecipientID);
 			bitstream.Read(message->MessageID);
 			bitstream.Read(message->DataSize);
-			message->Data = (uint8_t*)malloc(message->DataSize);
+			message->Data = new uint8_t[message->DataSize];
 			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
 
 			message->SenderID = p_clientID;

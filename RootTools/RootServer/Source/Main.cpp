@@ -2,7 +2,6 @@
 
 #include <stdexcept>
 #include <exception>
-#include <gtest/gtest.h>
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
@@ -13,11 +12,12 @@
 
 #undef main
 
+/*
 TEST(Test, Foo) 
 {
 	int a = 0;
 	EXPECT_TRUE(a == 0);
-}
+}*/
 
 int main(int argc, char* argv[]) 
 {
@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
+		/*
 		if (argc > 1 && strcmp(argv[1], "-test") == 0)
 		{
 			testing::InitGoogleTest(&argc, argv);
@@ -35,10 +36,10 @@ int main(int argc, char* argv[])
 			return result;
 		}
 		else
-		{
+		{*/
 			Main m(path);
 			m.Start();
-		}
+		//}
 	} 
 	catch (std::exception& e) 
 	{

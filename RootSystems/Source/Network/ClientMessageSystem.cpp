@@ -5,79 +5,78 @@ namespace RootForce
 {
 	namespace Network
 	{
-		ClientMessageSystem::ClientMessageSystem(ECS::World* p_world, Logging* p_logger)
-			: ECS::EntitySystem(p_world)
+		ClientMessageHandler::ClientMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::Server* p_server)
+			: m_world(p_world)
 			, m_logger(p_logger)
+			, m_server(p_server)
 		{
 
 		}
 
 
-		void ClientMessageSystem::Init()
-		{
-
-		}
-
-		void ClientMessageSystem::Begin()
-		{
-
-		}
-
-		void ClientMessageSystem::ProcessEntity(ECS::Entity* p_entity)
-		{
-
-		}
-
-		void ClientMessageSystem::End()
-		{
-
-		}
-
-
-		void ClientMessageSystem::HandleClientMessage(RootEngine::Network::Message* p_message)
+		void ClientMessageHandler::HandleClientMessage(RootEngine::Network::Message* p_message)
 		{
 			switch (p_message->MessageID)
 			{
 				case MessageType::GameStateSnapshot:
 					break;
 				case MessageType::ChatToClient:
+					HandleChatToClientMessage(p_message);
 					break;
 				case MessageType::UserConnected:
+					HandleUserConnectedMessage(p_message);
 					break;
 				case MessageType::UserDisconnected:
+					HandleUserDisconnectedMessage(p_message);
 					break;
 				case RootEngine::Network::InnerMessageID::CONNECTION_ACCEPTED:
-					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "Connection to server established");
+				{
+					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection to server established");
 
-					// TODO: Send a user info message and await a user connected message (add a connection refused message to the protocol?)
-					break;
+					// TODO: Create a user info message and send it
+					/*
+					RootForce::Network::MessageUserInfo* userInfoContents = new RootForce::Network::MessageUserInfo;
+					userInfoContents->PlayerName = "john doe";
+
+					RootEngine::Network::Message userInfoMessage;
+					userInfoMessage.MessageID = MessageType::UserInfo;
+					userInfoMessage.RecipientID = 0;
+					userInfoMessage.Reliability = RELIABLE;
+					userInfoMessage.DataSize = strlen(userInfoContents->PlayerName) + 1;
+					userInfoMessage.Data = new uint8_t[userInfoMessage.DataSize];
+					memcpy(userInfoMessage.Data, userInfoContents, userInfoMessage.DataSize);
+
+					m_server->Send(userInfoMessage);
+					*/
+				} break;
 				case RootEngine::Network::InnerMessageID::CONNECTION_REFUSED:
 					m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Connection to server refused");
 					// TODO: Bail. Run for it. They're on to you.
 					break;
 				case RootEngine::Network::InnerMessageID::DISCONNECT:
+					// TODO: Remove entity associated with the given player
 					break;
 			}
 		}
 
-		void ClientMessageSystem::HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message)
+		void ClientMessageHandler::HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message)
 		{
 
 		}
 
-		void ClientMessageSystem::HandleChatToClientMessage(RootEngine::Network::Message* p_message)
+		void ClientMessageHandler::HandleChatToClientMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageChat* header = (MessageChat*) p_message->Data;
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client %d: %s", header->SenderID, header->Message);
 		}
 
-		void ClientMessageSystem::HandleUserConnectedMessage(RootEngine::Network::Message* p_message)
+		void ClientMessageHandler::HandleUserConnectedMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageUserConnected* header = (MessageUserConnected*) p_message->Data;
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d (%s) connected", header->UserID, header->UserInfo.PlayerName);
 		}
 
-		void ClientMessageSystem::HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message)
+		void ClientMessageHandler::HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageUserDisconnected* header = (MessageUserDisconnected*) p_message->Data;
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d connected", header->UserID);

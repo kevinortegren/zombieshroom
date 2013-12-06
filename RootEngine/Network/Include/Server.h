@@ -32,9 +32,42 @@ namespace RootEngine
 			PacketReliability Reliability;
 			uint32_t DataSize;
 			uint8_t* Data;
-			Message() {Data=nullptr;}
-			~Message() {delete Data;}
+
+			Message() 
+			{ 
+				Data = nullptr; 
+			}
+			
+			Message(const Message& p_copy)
+			{
+				MessageID = p_copy.MessageID;
+				RecipientID = p_copy.RecipientID;
+				SenderID = p_copy.SenderID;
+				Reliability = p_copy.Reliability;
+				DataSize = p_copy.DataSize;
+				Data = new uint8_t[DataSize];
+				memcpy(Data, p_copy.Data, DataSize);
+			}
+
+			~Message() 
+			{ 
+				delete [] Data; 
+			}
+
+			Message& operator=(const Message& p_copy)
+			{
+				MessageID = p_copy.MessageID;
+				RecipientID = p_copy.RecipientID;
+				SenderID = p_copy.SenderID;
+				Reliability = p_copy.Reliability;
+				DataSize = p_copy.DataSize;
+				Data = new uint8_t[DataSize];
+				memcpy(Data, p_copy.Data, DataSize);
+
+				return (*this);
+			}
 		};
+
 		class ServerInterface abstract
 		{
 			virtual void Update() = 0;

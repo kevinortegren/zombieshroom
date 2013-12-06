@@ -28,8 +28,8 @@ namespace RootForce
 			Logging* m_logger;
 
 			RootEngine::Network::Server* m_server;
-			ClientMessageSystem* m_clientMessageSystem;
-			ServerMessageSystem* m_serverMessageSystem;
+			ClientMessageHandler* m_clientMessageHandler;
+			ServerMessageHandler* m_serverMessageHandler;
 
 			// Might change to all dynamic objects
 			std::map<uint8_t, ECS::Entity*> m_playerEntities;

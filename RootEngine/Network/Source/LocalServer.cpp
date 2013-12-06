@@ -22,6 +22,10 @@ namespace RootEngine
 			{
 				return Transmit(p_message, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
+			else if (p_message.RecipientID == 0)
+			{
+				m_message.push_back(new Message(p_message));
+			}
 			else
 			{
 				return Transmit(p_message, m_client[p_message.RecipientID]->GUID, false);
@@ -50,9 +54,17 @@ namespace RootEngine
 				message->MessageID = InnerMessageID::CONNECT;
 				message->RecipientID = 0;
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
-				message->Data = (uint8_t*)malloc(1); // TODO: Change maybe, perhaps. Problems...
+				message->Data = new uint8_t[1];
 				message->Data[0] = 1;
 				message->DataSize = 1;
+				m_message.push_back(message);
+
+				message = new Message;
+				message->MessageID = InnerMessageID::CONNECTION_ACCEPTED;
+				message->RecipientID = 0;
+				message->Reliability = PacketReliability::RELIABLE_ORDERED;
+				message->Data = nullptr;
+				message->DataSize = 0;
 				m_message.push_back(message);
 			}
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server started on port %u.", p_port);
@@ -100,8 +112,8 @@ namespace RootEngine
 						message->MessageID = InnerMessageID::CONNECT;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->Data = (uint8_t*)malloc(1);
 						message->SenderID = clientID;
+						message->Data = new uint8_t[1];
 						message->Data[0] = clientID;
 						message->DataSize = 1;
 						m_message.push_back(message);
@@ -124,7 +136,7 @@ namespace RootEngine
 						message->MessageID = InnerMessageID::DISCONNECT;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->Data = (uint8_t*)malloc(1);
+						message->Data = new uint8_t[1];
 						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;

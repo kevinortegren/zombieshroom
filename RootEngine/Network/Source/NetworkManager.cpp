@@ -2,7 +2,7 @@
 #include "LocalServer.h"
 #include "RemoteServer.h"
 #include <iostream>
-#include <gtest/gtest.h>
+
 namespace RootEngine
 {
 	namespace Network
@@ -59,13 +59,4 @@ RootEngine::Network::NetworkInterface* CreateNetwork(RootEngine::SubsystemShared
 	return RootEngine::Network::NetworkManager::GetInstance();
 }
 
-TEST(NETWORK, NETWORK_SEND)
-{
-	RootEngine::Network::Message testMessage;
-	testMessage.Data = (uint8_t*)"I AM A POTATOE GOD";
-	testMessage.DataSize = 19;
-	testMessage.MessageID = 0;
-	testMessage.RecipientID = -1;
-	testMessage.Reliability = PacketReliability::RELIABLE;
-	EXPECT_TRUE(RootEngine::Network::NetworkManager::GetInstance()->GetNetworkSystem()->Send( testMessage ));
-}
+

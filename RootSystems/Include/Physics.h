@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Utility\ECS\Include\Component.h>
+#include <Utility/ECS/Include/Component.h>
 
 namespace RootForce
 {
