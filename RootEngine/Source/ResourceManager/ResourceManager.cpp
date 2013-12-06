@@ -25,37 +25,10 @@ namespace RootEngine
 		m_workingDirectory	= p_workingDirectory;
 
 		m_effectImporter = std::shared_ptr<EffectImporter>(new EffectImporter(m_context->m_renderer));
-		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(m_context->m_logger, m_context->m_renderer, this));
+		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(p_context));
 		m_textureImporter = std::shared_ptr<TextureImporter>(new TextureImporter(m_context->m_logger, m_context->m_renderer));
 		
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
-	}
-
-	Render::MeshInterface* ResourceManager::AddRenderMesh( MESH_DESC p_desc )
-	{
-		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
-
-		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-		mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
-		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		mesh->CreateIndexBuffer(&p_desc.indices[0], p_desc.indices.size());
-		mesh->CreateVertexBuffer1P1N1UV(&p_desc.verts[0], p_desc.verts.size());
-		mesh->SetPrimitiveType(p_desc.primitive);
-
-		//Check if mesh init correctly
-		m_meshes[p_desc.handle]	= mesh;
-		return mesh.get();
-	}
-
-	Physics::PhysicsMeshInterface* ResourceManager::AddPhysicsMesh( MESH_DESC p_desc )
-	{
-		std::shared_ptr<Physics::PhysicsMeshInterface> pmesh	= m_context->m_physics->CreatePhysicsMesh();
-
-		pmesh->Init(p_desc.verts, (int)p_desc.verts.size(), p_desc.indices, (int)p_desc.indices.size(), p_desc.faces);
-
-		//Check if mesh init correctly
-		m_physicMeshes[p_desc.handle]	= pmesh;
-		return pmesh.get();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

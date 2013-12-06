@@ -9,6 +9,8 @@
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
 
+#pragma warning(disable: 4715)//Temporary solution
+
 namespace Physics 
 {
 	class PhysicsInterface;
@@ -32,6 +34,7 @@ namespace RootEngine
 	{
 		
 	public:
+
 		//Load functions
 		virtual Model*						LoadCollada(std::string p_path) = 0;
 		virtual Render::EffectInterface*	LoadEffect(std::string p_path) = 0;
@@ -57,14 +60,12 @@ namespace RootEngine
 	class ResourceManager : public ResourceManagerInterface
 	{
 	public:
+		friend class ModelImporter;
+
 		ResourceManager();
 		~ResourceManager();
 		
 		void Init(std::string p_workingDirectory, GameSharedContext* p_context );
-
-		//Add functions
-		Render::MeshInterface*		   AddRenderMesh(MESH_DESC p_desc);
-		Physics::PhysicsMeshInterface* AddPhysicsMesh(MESH_DESC p_desc);
 
 		//Load functions
 		Model*						LoadCollada(std::string p_path);
