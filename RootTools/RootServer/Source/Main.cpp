@@ -6,12 +6,10 @@
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
-#include <yaml-cpp/yaml.h>
-
-#include "ConsoleInput.h"
 
 #include <RootSystems/Include/Network/Messages.h>
-#include <RootSystems/Include/Network/ServerConfig.h>
+#include "ConfigLoader.h"
+#include "ConsoleInput.h"
 
 #undef main
 
@@ -79,18 +77,6 @@ Main::~Main()
 
 void Main::Start() 
 {
-	//m_engineContext.m_resourceManager->LoadEffect("Mesh");
-	//m_engineContext.m_resourceManager->LoadCollada("testchar");
-
-	//// Cube mesh.
-	//std::shared_ptr<Render::Mesh> cubeMesh = m_engineContext.m_renderer->CreateMesh();
-	//Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	//cubeMesh->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-	//cubeMesh->m_elementBuffer = m_engineContext.m_renderer->CreateBuffer();
-	//cubeMesh->m_vertexAttributes = m_engineContext.m_renderer->CreateVertexAttributes();
-	//cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
-	//cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
-
 	// Initialize the network system
 	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network, RootForce::Network::MessageHandler::DEDICATED, 5567));
 	
@@ -112,71 +98,9 @@ void Main::Start()
 		m_engineContext.m_physics->Update(dt);
 		
 		// Load the server config file
-		RootSystems::ServerConfig conf;
-		{
-			std::ifstream file(m_workingDir + "server.conf", std::ifstream::in);
-			if(file.good())
-			{
-				try
-				{
-					YAML::Parser parser(file);
-					
-					YAML::Node node;
-					parser.GetNextDocument(node);
+		RootSystems::ServerConfig conf = RootServer::ConfigLoader(m_engineContext.m_logger).Load(m_workingDir + "server.conf");
+		
 
-					unsigned utmp;
-					if(node.FindValue("MaxPlayers"))
-					{
-						node["MaxPlayers"] >> utmp;
-						conf.MaxPlayers = (uint8_t)utmp;
-					}
-					if(node.FindValue("Port"))
-					{
-						node["Port"] >> utmp;
-						conf.Port = (uint16_t)utmp;
-					}
-					if(node.FindValue("Password"))
-						node["Password"]  >> conf.Password;
-					if(node.FindValue("LevelFile"))
-						node["LevelFile"]  >> conf.LevelFile;
-					if(node.FindValue("GameMode"))
-					{
-						node["GameMode"]  >> utmp;
-						conf.GameMode = (RootSystems::GameMode::GameMode)utmp;
-					}
-					if(node.FindValue("GameTime"))
-					{
-						node["GameTime"] >> utmp;
-						conf.GameTime = (uint32_t)utmp;
-					}
-					if(node.FindValue("KillCount"))
-					{
-						node["KillCount"] >> utmp;
-						conf.KillCount = (uint32_t)utmp;
-					}
-				}
-				catch(YAML::ParserException& e) {
-					m_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::NON_FATAL_ERROR, "Failed to load server config. %s", e.what());
-				}
-				catch(std::exception e) {
-					e;
-				}
-			}
-		}
-		m_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "dt: \t%f", dt);
-		//std::vector<std::string> command;
-		//while((command = m_console.PollCommand()).size() > 0)
-		//{
-		//	// First parse commands specific to the dedicated server, such as the exit message
-		//	if( command[0].compare("quit") == 0
-		//		|| command[0].compare("exit") == 0 )
-		//	{
-		//		m_running = false;
-		//	}
-		//	else
-		//		m_commandHandler->ExecuteCommand(command);
-		//}
-		//m_networkHandler->HandleInternalMessage();
 	}
 
 	m_console.Shutdown();

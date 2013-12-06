@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <thread>
+#include "ServerEvents.h"
 
 namespace RootServer
 {
@@ -10,9 +11,9 @@ namespace RootServer
 		void Startup();
 		void Shutdown();
 
-		std::vector<std::string> PollCommand();
+		EventData PollEvent();
 	private:
-		std::vector<std::vector<std::string>> m_commandBuffer;
+		std::vector<EventData> m_eventBuffer;
 		std::thread* m_thread;
 		bool m_shouldExit;
 

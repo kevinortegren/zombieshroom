@@ -29,7 +29,7 @@ namespace RootSystems
 		// Game mode, see enum for details
 		GameMode::GameMode GameMode;
 		// Match length in seconds
-		uint32_t GameTime;
+		uint32_t MatchTime;
 		// Victory condition on kill count; 0 = no kill-based victory condition
 		uint32_t KillCount;
 

@@ -5,7 +5,6 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Network/MessageHandler.h>
-#include <RootSystems/Include/Network/CommandHandler.h>
 #include <string>
 
 class Main {
@@ -26,5 +25,4 @@ private:
 	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 
 	std::string m_workingDir;
-	std::shared_ptr<RootSystems::CommandHandler> m_commandHandler;
 };
