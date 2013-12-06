@@ -13,22 +13,24 @@ namespace Render
 		gli::texture2D texture(gli::loadStorageDDS(filepath));
 		assert(!texture.empty());
 
+		m_target = GL_TEXTURE_2D;
+
 		m_textureWidth = texture.dimensions().x;
 		m_textureHeight = texture.dimensions().y;
 
 		glGenTextures(1, &m_textureHandle);
-		glBindTexture(GL_TEXTURE_2D, m_textureHandle);
+		glBindTexture(m_target, m_textureHandle);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(texture.levels() - 1)); 
+		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(texture.levels() - 1)); 
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-		glTexStorage2D(GL_TEXTURE_2D,
+		glTexStorage2D(m_target,
 			GLint(texture.levels()),
 			GLenum(gli::internal_format(texture.format())),
 			GLsizei(texture.dimensions().x),
@@ -38,7 +40,7 @@ namespace Render
 		{
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)
 			{
-				 glCompressedTexSubImage2D(GL_TEXTURE_2D,
+				 glCompressedTexSubImage2D(m_target,
 					GLint(Level),
 					0, 0,
 					GLsizei(texture[Level].dimensions().x),
@@ -52,7 +54,7 @@ namespace Render
 		{
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)
 			{
-				 glTexSubImage2D(GL_TEXTURE_2D,
+				 glTexSubImage2D(m_target,
 					GLint(Level),
 					0, 0,
 					GLsizei(texture[Level].dimensions().x),
@@ -66,10 +68,53 @@ namespace Render
 		return true;
 	}
 
+	bool Texture::LoadCubeMap(const std::string& filepath)
+	{
+		gli::textureCube cube(gli::loadStorageDDS(filepath));
+		assert(!cube.empty());
+
+		m_target = GL_TEXTURE_CUBE_MAP;
+
+		glGenTextures(1, &m_textureHandle);
+		glBindTexture(m_target, m_textureHandle);
+
+		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(cube.levels() - 1)); 
+
+		glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+		//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+
+		GLenum faces[] = { 
+			GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		};
+
+		for(int i = 0; i < cube.faces(); i++)  {
+
+			 glCompressedTexImage2D(faces[i],
+				0,
+				GLenum(gli::internal_format(cube.format())),
+				cube[i].dimensions().x,
+				cube[i].dimensions().y,
+				0,
+				GLsizei(cube[i].size()),
+				cube[i].data()); 
+		}
+
+		return true;
+	}
+
 	void Texture::Enable(unsigned int slot)
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, m_textureHandle);
+		glBindTexture(m_target, m_textureHandle);
 	}
 
 	unsigned int Texture::GetID()
@@ -95,6 +140,11 @@ namespace Render
 	GLuint Texture::GetHandle() const
 	{
 		return m_textureHandle;
+	}
+
+	GLenum Texture::GetTarget() const
+	{
+		return m_target;
 	}
 
 	glm::vec2 Texture::GetInverseTextureSize() const

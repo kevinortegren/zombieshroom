@@ -116,10 +116,10 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		glFrontFace(GL_CCW);
+		//glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -291,8 +291,6 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
 		glDisable(GL_BLEND);
 
 		// Bind GBuffer.
@@ -315,21 +313,21 @@ namespace Render
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 0);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_diffuseMap->GetHandle());
+					glBindTexture((*itr).m_material->m_diffuseMap->GetTarget(), (*itr).m_material->m_diffuseMap->GetHandle());
 				}
 				
 				if((*itr).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 1);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_specularMap->GetHandle());
+					glBindTexture((*itr).m_material->m_specularMap->GetTarget(), (*itr).m_material->m_specularMap->GetHandle());
 				}
 
 				if((*itr).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 2);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_normalMap->GetHandle());
+					glBindTexture((*itr).m_material->m_normalMap->GetTarget(), (*itr).m_material->m_normalMap->GetHandle());
 				}
 
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
@@ -352,8 +350,6 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		// Lighting pass.
-		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 

@@ -63,6 +63,28 @@ namespace RootEngine
 					program->AttachShader(glType, shader.c_str());
 
 				}
+
+
+
+				if(programs[i].FindValue("blend"))
+				{
+					int blendType;
+					programs[i]["blend"] >> blendType;
+					program->m_blendState = (Render::Program::BlendState)blendType;
+				}
+
+				
+				if(programs[i].FindValue("depth"))
+				{
+					int depthWrite;
+					programs[i]["depth"]["write"] >> depthWrite;			
+					program->m_depthState.depthWrite = (bool)depthWrite;
+					
+					int depthTest;
+					programs[i]["depth"]["test"] >> depthTest;		
+					program->m_depthState.depthTest = (bool)depthTest;
+				}
+
 				program->Compile();
 				program->Apply();
 
@@ -102,6 +124,8 @@ namespace RootEngine
 						std::string type;
 						perObjects[k]["type"] >> type;
 
+						// Test.
+
 						// Allocate based on type.
 						unsigned int size = sizeof(glm::mat4);
 
@@ -120,7 +144,6 @@ namespace RootEngine
 					texture[j]["slot"] >> slot;
 
 					program->BindTexture(name, slot);
-
 				}
 			}
 		}

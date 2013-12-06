@@ -1,0 +1,22 @@
+- name: Skybox
+  techniques:
+    - name: Skybox
+      textures:
+        - name: CubeMap
+          slot: 0
+      uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      programs:
+        - name: skybox
+          shaders:
+            - name: skybox
+              type: vertex
+            - name: skybox
+              type: fragment
+          blend: 0
+          depth:
+            write: 1
+            test: 0

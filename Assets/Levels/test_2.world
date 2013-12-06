@@ -2,30 +2,34 @@
     - 0
     - 1
     - 2
+    - 3
 - Components:
     - Type: 0
       Data:
         - Entity: 0
-          Model: sphere
+          Model: Primitives/sphere
           Effect: Mesh
           Diffuse: sphere_diffuse
-        - Entity: 1
-          Model: sphere
+        - Entity: 3
+          Model: Primitives/sphere
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 2
-          Model: testchar_t
+          Model: testchar
           Effect: Mesh_NormalMap
-          Diffuse: v6
+          Diffuse: DiffuseV1
           Specular: SpecularV1
-          Normal: bump_test
+          Normal: BumpV1
+        - Entity: 1
+          Model: Primitives/box
+          Effect: Skybox
     - Type: 1
       Data:
         - Entity: 0
           Position: [1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 1
+        - Entity: 3
           Position: [-1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
@@ -33,13 +37,17 @@
           Position: [0, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
+        - Entity: 1
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [100, 100, 100]
     - Type: 2
       Data:
         - Entity: 0
           Attenuation: [0, 0, 1]
           Color: [0.4, 0, 0, 1]
           Range: 2
-        - Entity: 1
+        - Entity: 3
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
@@ -52,13 +60,17 @@
         - Entity: 2
           Type: 3
           Mass: 5
-          ModelHandle: testchar_t0
+          ModelHandle: testchar0
           StepHeight: 0.1
           ModelHeight: 0.0
           MaxSpeed: 10.0
 - Tags:
     - Id: 2
       Tag: Player
+    - Id: 1
+      Tag: Skybox
 - Groups:
     - Id: 0
+      Group: Lights
+    - Id: 3
       Group: Lights

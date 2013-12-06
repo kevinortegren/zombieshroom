@@ -152,6 +152,8 @@ void Main::Start()
 	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
+
 	Render::DirectionalLight dl;
 	dl.m_color = glm::vec4(1,0,1,1);
 	dl.m_direction = glm::vec3(0,0,-1);
@@ -171,6 +173,12 @@ void Main::Start()
 	//int temp[1] = {0};
 	//physaccessor->m_handle = temp;
 	
+
+	// Setup the skybox.
+	auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
+	auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
+	r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
+		"rnl_cross", Render::TextureType::TEXTURE_CUBEMAP);
 
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
