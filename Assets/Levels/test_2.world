@@ -28,7 +28,7 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [0, 0, 0]
+          Position: [0, 19, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2

@@ -48,9 +48,9 @@ namespace Physics
 			m_dynamicWorld->removeCollisionObject( obj );
 			delete obj;
 		}
-		for(unsigned int i = 0; i < m_playerObject.size(); i++)
+		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			PlayerController* temp = m_playerObject[i];
+			PlayerController* temp = m_playerObjects[i];
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
@@ -59,7 +59,7 @@ namespace Physics
 			delete temp;
 		}
 		m_dynamicObjects.clear();
-		m_playerObject.clear();
+		m_playerObjects.clear();
 		m_userPointer.clear();
 		delete m_debugDrawer;
 		delete m_dynamicWorld;
@@ -74,16 +74,21 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
+		
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
-		if(pointer1 == nullptr)
+		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
 			return false;
-		if(pointer2 == nullptr)
+		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
 		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
 			pointer2->m_collidedEntityId.push_back(pointer1->m_entityId);
+
+		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
+			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
+				int lol = 2;
 
 		return false;
 	}
@@ -100,7 +105,7 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints |btIDebugDraw::DBG_DrawAabb);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		
@@ -117,6 +122,14 @@ namespace Physics
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
 		planeBody->setCollisionFlags(planeBody->getCollisionFlags() | btRigidBody::CF_DISABLE_VISUALIZE_OBJECT);
 		m_dynamicWorld->addRigidBody(planeBody);
+		CustomUserPointer* userPointer = new CustomUserPointer();
+		userPointer->m_vectorIndex = -1;
+		m_userPointer.push_back(userPointer);
+		userPointer->m_type = PhysicsType::TYPE_STATIC;
+		userPointer->m_id = new int();
+		userPointer->m_entityId = -1;
+		*(userPointer->m_id) = m_userPointer.size()-1;
+		planeBody->setUserPointer((void*)userPointer);
 
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -125,11 +138,11 @@ namespace Physics
 	{
 		
 		
-		for(unsigned int i = 0; i < m_playerObject.size(); i++)
+		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			m_playerObject.at(i)->Update();
+			m_playerObjects.at(i)->Update();
 		}
-		m_dynamicWorld->stepSimulation(p_dt,10);
+		m_dynamicWorld->stepSimulation(1/60.0f,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
 	}
@@ -154,7 +167,7 @@ namespace Physics
 		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
 		m_dynamicWorld->addRigidBody(objectBody);
 		CustomUserPointer* userPointer = new CustomUserPointer();
-		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
+		userPointer->m_vectorIndex = -1;
 		m_userPointer.push_back(userPointer);
 		userPointer->m_type = PhysicsType::TYPE_STATIC;
 		userPointer->m_id = new int();
@@ -250,9 +263,9 @@ namespace Physics
 			tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
 		
-		m_playerObject.push_back(player);
+		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
-		userPointer->m_vectorIndex =  m_playerObject.size()-1;
+		userPointer->m_vectorIndex =  m_playerObjects.size()-1;
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
@@ -269,7 +282,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObject.at(index)->Walk(p_direction);
+		m_playerObjects.at(index)->Walk(p_direction);
 	}
 
 	void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
@@ -278,7 +291,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObject.at(index)->Jump(p_jumpForce);
+		m_playerObjects.at(index)->Jump(p_jumpForce);
 	}
 
 	void RootPhysics::GetPos( int p_objectIndex, float* p_pos )
@@ -290,7 +303,7 @@ namespace Physics
 
 		btVector3 temp;
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-			temp = m_playerObject.at(index)->GetPosition();
+			temp = m_playerObjects.at(index)->GetPosition();
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
 		p_pos[0] = temp.getX();
@@ -317,7 +330,7 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
- 		m_playerObject.at(index)->Knockback(temp * p_pushForce);
+ 		m_playerObjects.at(index)->Knockback(temp * p_pushForce);
 	}
 
 	void RootPhysics::RemoveObject( int p_objectIndex)
@@ -329,9 +342,9 @@ namespace Physics
 		if(userPointer->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned int removedIndex = userPointer->m_vectorIndex;
-			m_playerObject.at(removedIndex)->RemovePlayer();
-			delete m_playerObject.at(removedIndex);
-			m_playerObject.erase(m_playerObject.begin() + removedIndex);
+			m_playerObjects.at(removedIndex)->RemovePlayer();
+			delete m_playerObjects.at(removedIndex);
+			m_playerObjects.erase(m_playerObjects.begin() + removedIndex);
 
 			delete userPointer;
 			m_userPointer.erase(m_userPointer.begin() + p_objectIndex);
@@ -429,7 +442,7 @@ namespace Physics
 
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			btQuaternion temp = m_playerObject.at(index)->GetOrientation();
+			btQuaternion temp = m_playerObjects.at(index)->GetOrientation();
 			p_objectOrientation[0] = temp.x();
 			p_objectOrientation[1] = temp.y();
 			p_objectOrientation[2] = temp.z();
@@ -475,7 +488,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObject.at(index)->SetOrientation(p_playerOrientation);
+		m_playerObjects.at(index)->SetOrientation(p_playerOrientation);
 	}
 
 	int* RootPhysics::AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo)
@@ -490,7 +503,7 @@ namespace Physics
 		gravity.setY(p_abilityInfo.m_gravity[1]);
 		gravity.setZ(p_abilityInfo.m_gravity[2]);
 		
-		//btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+
 		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_SPHERE)
 			body = CreateSphere(p_abilityInfo.m_radius, p_abilityInfo.m_mass, p_abilityInfo.m_position);
 		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
@@ -510,17 +523,21 @@ namespace Physics
 
 		
 
-		if(p_abilityInfo.m_collidesWorld)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-		else
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		
 
 		body->setLinearVelocity(velocity);
 		body->setFlags(BT_DISABLE_WORLD_GRAVITY);
 		body->setGravity(gravity);
 		body->applyGravity();
 		body->setActivationState(DISABLE_DEACTIVATION);
-
+		if(p_abilityInfo.m_collidesWorld)
+		{
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		}
+		else
+		{
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		}
 		m_dynamicWorld->addRigidBody(body);
 		m_dynamicObjects.push_back(body);
 		CustomUserPointer* userPointer = new CustomUserPointer();
@@ -548,7 +565,7 @@ namespace Physics
 		{
 			if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 			{
-				if(m_playerObject.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObject.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
+				if(m_playerObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectIndex)->m_vectorIndex);
 					return false;
@@ -596,7 +613,7 @@ namespace Physics
 
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			return m_playerObject.at(index)->GetMass();
+			return m_playerObjects.at(index)->GetMass();
 		}
 
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
@@ -623,7 +640,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObject.at(index)->GetStepHeight();
+			return m_playerObjects.at(index)->GetStepHeight();
 		}
 		return -1;
 	}
@@ -634,7 +651,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObject.at(index)->GetMaxSpeed();
+			return m_playerObjects.at(index)->GetMaxSpeed();
 		}
 		return -1;
 	}
@@ -645,7 +662,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObject.at(index)->GetModetHeight();
+			return m_playerObjects.at(index)->GetModetHeight();
 		}
 		return -1;
 	}	

@@ -18,6 +18,8 @@ struct IgnoreBodyAndGhostCast : public btCollisionWorld::ClosestRayResultCallbac
 
 		if(p_rayResult.m_collisionObject == Body || p_rayResult.m_collisionObject == Ghost)
 			return 1.0f;
+		if((p_rayResult.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
+			return 1.0f;
 		
 		return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
 	}
@@ -83,19 +85,20 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	m_rigidBody->setAngularFactor(0.0f);
 	//Don't enter sleep mode if you stand still for a while
 	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
-	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags());
+	m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK/* | btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 	m_dynamicWorld->addRigidBody(m_rigidBody);
 
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
-	m_ghostObject->setUserPointer(this);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+	//m_ghostObject->setUserPointer(this);
+	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
+	m_ghostObject->setCollisionFlags(m_ghostObject->getCollisionFlags()  |  btCollisionObject::CF_NO_CONTACT_RESPONSE );
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter,  /*btBroadphaseProxy::StaticFilter |*/ btBroadphaseProxy::DefaultFilter);
 	//indexVertexArray = 0;
 	//objectMeshShape = 0;
 	//objectHull = 0;
 	//delete indexVertexArray;
+
 	//delete objectMeshShape;
 	//delete objectHull;
 }
@@ -159,10 +162,21 @@ void PlayerController::ParseGhostContacts()
 			//Skip the rigid body that the ghost monitors
 			if(pManifold->getBody0() == m_rigidBody)
 				continue;
-
+			if(pManifold->getBody0() == m_ghostObject)
+				if((pManifold->getBody1()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
+					continue;
+			if(pManifold->getBody1() == m_ghostObject)
+				if((pManifold->getBody0()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
+					continue;
+			/*if((pManifold->getBody0()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
+				continue;
+			if((pManifold->getBody1()->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) == btCollisionObject::CF_NO_CONTACT_RESPONSE)
+				continue;*/
+			
 			for(int k = 0; k < pManifold->getNumContacts(); k++)
 			{
 				const btManifoldPoint& point = pManifold->getContactPoint(k);
+				
 
 				if(point.getDistance() < 0.0f)
 				{

@@ -175,26 +175,33 @@ void Main::Start()
 	//Plane at bottom
 	float normal[3] = {0,1,0};
 	float position[3] = {0, -2, 0};
-	float dir[3] = {0,0,-1};
+	float dir[3] = {1,0,0};
 	float grav[3] = {0,0,0};
-	float pos[3] = {0,1,-1};
+	float pos[3] = {-6,1,-6};
 	float rot[4] = {0,-1,1,-1};
 	g_engineContext.m_physics->CreatePlane(normal, position);
 	RootEngine::Physics::AbilityPhysicsInfo test;
-	test.m_collidesWorld = true;
+	test.m_collidesWorld = false;
 	test.m_direction = dir;
 	test.m_entityId = -1;
 	test.m_gravity = grav;
-	test.m_height = 1;
+	test.m_height = 2;
 	test.m_mass = 1;
 	test.m_position = pos;
-	test.m_radius = 1;
+	test.m_radius = 2;
 	test.m_orientation = rot;
-	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
-	test.m_speed = 1;
+	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_SPHERE;
+	test.m_speed = 0.03;
 	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
 	g_engineContext.m_physics->AddAbilityToWorld(test);
-
+	float pos1[3] = {6, 1, -6};
+	float dir1[3] = {-1,0,0};
+	test.m_position = pos1;
+	test.m_direction = dir1;
+	test.m_mass = 1;
+	test.m_collidesWorld = true;
+	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CYLINDER;
+	g_engineContext.m_physics->AddAbilityToWorld(test);
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

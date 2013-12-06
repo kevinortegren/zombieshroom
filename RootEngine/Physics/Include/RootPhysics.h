@@ -63,7 +63,7 @@ namespace RootEngine
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			bool m_collided;
 			std::string m_modelHandle;
-
+			bool m_isGhostObject;
 			~CustomUserPointer()
 			{
 				delete m_id;
@@ -176,7 +176,7 @@ namespace RootEngine
 			static RootPhysics* s_physicsInstance;
 			std::vector<CustomUserPointer*> m_userPointer;
 			std::vector<btRigidBody*> m_dynamicObjects;
-			std::vector<PlayerController*> m_playerObject;
+			std::vector<PlayerController*> m_playerObjects;
 			
 		};
 	}
