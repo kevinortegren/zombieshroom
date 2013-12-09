@@ -48,7 +48,7 @@ namespace RootEngine
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
 						message->Data = nullptr;
 						message->DataSize = 0;
-						m_message.push_back(message);
+						m_message.push(message);
 					} break;
 
 					case ID_CONNECTION_ATTEMPT_FAILED:
@@ -59,7 +59,7 @@ namespace RootEngine
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
 						message->Data = nullptr;
 						message->DataSize = 0;
-						m_message.push_back(message);
+						m_message.push(message);
 					} break;
 
 					case NON_RAKNET_MESSAGE_ID:
@@ -77,7 +77,7 @@ namespace RootEngine
 						message->Data = new uint8_t[1];
 						message->Data[0] = 0;
 						message->DataSize = 1;
-						m_message.push_back(message);
+						m_message.push(message);
 						break;
 					}
 				}

@@ -18,8 +18,8 @@ namespace RootEngine
 		{
 			if(m_message.size() < 1)
 				return nullptr;
-			Message* message = *(m_message.end()-1);
-			m_message.pop_back();
+			Message* message = m_message.back();
+			m_message.pop();
 			return message;
 		}
 
@@ -56,7 +56,7 @@ namespace RootEngine
 
 			message->SenderID = p_clientID;
 
-			m_message.push_back(message);
+			m_message.push(message);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <External/Include/RakNet/RakPeerInterface.h>
 #include <External/Include/RakNet/PacketPriority.h>
-#include <vector>
+#include <queue>
 #include <stdint.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
@@ -86,7 +86,7 @@ namespace RootEngine
 			virtual bool Send(const Message& p_message) = 0;
 			Message* PollMessage();
 		protected:
-			std::vector<Message*> m_message;
+			std::queue<Message*> m_message;
 			bool Transmit(const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
 			RakNet::RakPeerInterface* m_peerInterface;
 

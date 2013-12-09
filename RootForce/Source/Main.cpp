@@ -165,9 +165,8 @@ void Main::Start()
 
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	g_engineContext.m_gui->LoadURL("debug.html");
-	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
-
+	m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 	// Initialize the network system
 	RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
@@ -175,6 +174,7 @@ void Main::Start()
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
+	
 	while (m_running)
 	{	
 		
@@ -196,7 +196,10 @@ void Main::Start()
 			m_playerControlSystem->Process();
 		}
 
+		_ASSERTE(_CrtCheckMemory());
 		m_networkHandler->Update();
+		_ASSERTE(_CrtCheckMemory());
+
 
 		abilitySystem->Process();
 

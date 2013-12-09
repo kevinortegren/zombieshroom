@@ -52,7 +52,7 @@ namespace RootForce
 		void MessageHandler::Update()
 		{
 			m_server->Update();
-
+			_ASSERTE(_CrtCheckMemory());
 			std::shared_ptr<RootEngine::Network::Message> message = nullptr;
 			while ((message = std::shared_ptr<RootEngine::Network::Message>(m_server->PollMessage())) != nullptr)
 			{
@@ -68,6 +68,7 @@ namespace RootForce
 							m_clientMessageHandler->HandleClientMessage(message.get());
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "Received client message as a dedicated server");
+						_ASSERTE(_CrtCheckMemory());
 						break;
 
 					case Network::MessageType::ChatToServer:
@@ -88,6 +89,7 @@ namespace RootForce
 							m_serverMessageHandler->HandleServerMessage(message.get());
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
+						_ASSERTE(_CrtCheckMemory());
 						break;
 						/*
 						uint8_t slot = message->SenderID;
@@ -113,12 +115,14 @@ namespace RootForce
 						m_world->GetEntityManager()->RemoveEntity(m_playerEntities[slot]);
 
 						*/
+						_ASSERTE(_CrtCheckMemory());
 						break;
 
 					default:
 						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "Unrecognized message ID: %d", message->MessageID);
 				}
 			}
+			_ASSERTE(_CrtCheckMemory());
 		}
 	}
 }
