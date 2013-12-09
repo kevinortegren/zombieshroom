@@ -65,19 +65,47 @@ namespace RootForce
 		void ClientMessageHandler::HandleChatToClientMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageChat* header = (MessageChat*) p_message->Data;
+			m_chatSystem->JSAddMessage( "#" + std::to_string(header->SenderID) + ": " + header->Message );
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client %d: %s", header->SenderID, header->Message);
 		}
 
 		void ClientMessageHandler::HandleUserConnectedMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageUserConnected* header = (MessageUserConnected*) p_message->Data;
+			m_chatSystem->JSAddMessage(std::string("User Connected: ") + header->UserInfo.PlayerName + " #" + std::to_string(header->UserID));
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d (%s) connected", header->UserID, header->UserInfo.PlayerName);
 		}
 
 		void ClientMessageHandler::HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message)
 		{
 			MessageUserDisconnected* header = (MessageUserDisconnected*) p_message->Data;
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d connected", header->UserID);
+			m_chatSystem->JSAddMessage(std::string("User disconnected: #") + std::to_string(header->UserID) );
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d disconnected", header->UserID);
+		}
+
+		void ClientMessageHandler::Update()
+		{
+			if(m_chatSystem == nullptr)
+				return;
+
+			std::string chatmsg;
+			while((chatmsg = m_chatSystem->PollMessage()).compare("") != 0)
+			{
+				RootEngine::Network::Message netmsg;
+				RootForce::Network::MessageChat netmsgchat;
+				netmsgchat.SenderID = -1;
+				netmsgchat.Type = RootForce::Network::MessageChat::MessageType::TYPE_CHAT;
+				netmsgchat.Message = new char[chatmsg.size()];
+				memcpy((void*)netmsgchat.Message, chatmsg.data(), chatmsg.size());
+				netmsg.MessageID = RootForce::Network::MessageType::ChatToServer;
+				netmsg.RecipientID = 0;
+				netmsg.Reliability = PacketReliability::RELIABLE_ORDERED;
+				netmsg.SenderID = -1; // TODO: Fix own sender ID to first player connected ID received
+				netmsg.Data = new uint8_t[chatmsg.size()+sizeof(netmsgchat.Type)+sizeof(netmsgchat.SenderID)];
+				netmsgchat.Serialize(netmsg.Data);
+				netmsg.DataSize = chatmsg.size()+sizeof(netmsgchat.Type)+sizeof(netmsgchat.SenderID);
+				m_server->Send(netmsg);
+			}
 		}
 
 	}

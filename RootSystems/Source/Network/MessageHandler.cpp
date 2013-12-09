@@ -51,6 +51,8 @@ namespace RootForce
 
 		void MessageHandler::Update()
 		{
+			m_clientMessageHandler->Update();
+			 
 			m_server->Update();
 			std::shared_ptr<RootEngine::Network::Message> message = nullptr;
 			while ((message = std::shared_ptr<RootEngine::Network::Message>(m_server->PollMessage())) != nullptr)
@@ -119,6 +121,13 @@ namespace RootForce
 				}
 			}
 		}
+
+		void MessageHandler::SetChatSystem( ChatSystemInterface* p_chatSystem )
+		{
+			if(m_clientMessageHandler != nullptr)
+				m_clientMessageHandler->SetChatSystem(p_chatSystem);
+		}
+
 	}
 }
 

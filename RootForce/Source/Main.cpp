@@ -169,9 +169,11 @@ void Main::Start()
 	m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
+
 	// Initialize the network system
 	RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+	m_networkHandler->SetChatSystem(&m_chat);
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();

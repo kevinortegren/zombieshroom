@@ -159,7 +159,7 @@ namespace RootForce
 
 		void ServerMessageHandler::HandleChatToServerMessage(RootEngine::Network::Message* p_message)
 		{
-			MessageChat* header = (MessageChat*) p_message->Data;
+			MessageChat* header = (MessageChat*) p_message->Data; // Thou shalt not cast a struct which containeth pointers!
 			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "SERVER: Chat message sent to server from %d to %d: %s", header->SenderID, p_message->RecipientID, header->Message);
 
 			// TODO: Might add team chat

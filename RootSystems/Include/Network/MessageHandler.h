@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/ServerMessageSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 
+
 namespace RootForce
 {
 	namespace Network
@@ -23,6 +24,8 @@ namespace RootForce
 			MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface, ServerType p_type, int16_t port, const char* address = "");
 
 			void Update();
+			void SetChatSystem(ChatSystemInterface* p_chatSystem);
+
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;

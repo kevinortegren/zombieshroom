@@ -23,6 +23,11 @@ namespace RootForce
 		m_view->Focus();
 	}
 
+	void RootForce::ChatSystem::JSAddMessage( std::string p_message )
+	{
+		JSAddMessage(p_message.c_str());
+	}
+
 	void RootForce::ChatSystem::JSAddMessage( const char* p_message )
 	{
 		std::string command; // Compile a string-function call in form of AddMessage(p_message);
@@ -46,6 +51,8 @@ namespace RootForce
 
 	std::string ChatSystem::PollMessage()
 	{
+		if(m_messageBuffer.size() < 1)
+			return "";
 		std::string temp = m_messageBuffer.at(0); 
 		m_messageBuffer.erase(m_messageBuffer.begin());
 		return temp;
