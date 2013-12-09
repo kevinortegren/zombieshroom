@@ -8,6 +8,8 @@ namespace ECS
 	class GroupManager
 	{
 	public:
+		friend class EntityImporter;
+		friend class EntityExporter;
 		typedef std::pair<std::multimap<std::string, ECS::Entity*>::iterator, std::multimap<std::string, ECS::Entity*>::iterator> GroupRange;
 
 		void RegisterEntity(const std::string& p_group, ECS::Entity* p_entity);

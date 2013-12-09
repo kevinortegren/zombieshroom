@@ -3,7 +3,6 @@
 
 namespace Render
 {
-
 	Texture::~Texture()
 	{
 		glDeleteTextures(1, &m_textureHandle);
@@ -26,14 +25,14 @@ namespace Render
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-		 glTexStorage2D(GL_TEXTURE_2D,
+		glTexStorage2D(GL_TEXTURE_2D,
 			GLint(texture.levels()),
 			GLenum(gli::internal_format(texture.format())),
 			GLsizei(texture.dimensions().x),
-			GLsizei(texture.dimensions().y)); 
+			GLsizei(texture.dimensions().y));
 
 		if(gli::is_compressed(texture.format()))
 		{
@@ -66,7 +65,6 @@ namespace Render
 
 		return true;
 	}
-
 
 	void Texture::Enable(unsigned int slot)
 	{

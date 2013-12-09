@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Networker.h"
+#include "Server.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
 #if defined(_WINDLL)
@@ -9,17 +9,19 @@
 #define NETSYS_DLL_EXPORT __declspec(dllimport)
 #endif
 
+
 namespace RootEngine
 {
 	namespace Network
 	{
+	
 		// Peer type is used to specify whether to initialize the networking instance as a client or server
 		namespace PeerType
 		{
 			enum PeerType
 			{
-				CLIENT,
-				SERVER
+				REMOTESERVER,
+				LOCALSERVER
 			};
 		}
 
@@ -30,7 +32,7 @@ namespace RootEngine
 			// Initializes the network socket as either server or client
 			virtual void Initialize(PeerType::PeerType p_peerType) = 0;
 			// Returns the network interface
-			virtual Networker* GetNetworkSystem() = 0;
+			virtual Server* GetNetworkSystem() = 0;
 		};
 
 		class NetworkManager : public NetworkInterface
@@ -40,11 +42,11 @@ namespace RootEngine
 			void Shutdown();
 
 			void Initialize(PeerType::PeerType p_peerType);
-			Networker* GetNetworkSystem() { return m_networkSys; }
+			Server* GetNetworkSystem() { return m_networkSys; }
 			static NetworkManager* GetInstance();
 
 		private:
-			Networker* m_networkSys;
+			Server* m_networkSys;
 			static NetworkManager* s_networkManager;
 
 		};

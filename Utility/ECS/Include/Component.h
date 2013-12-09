@@ -2,6 +2,7 @@
 
 namespace ECS
 {
+
 	class ComponentInterface {};
 
 	template<class T>

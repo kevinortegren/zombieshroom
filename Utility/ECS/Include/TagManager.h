@@ -9,6 +9,8 @@ namespace ECS
 	class TagManager
 	{
 	public:
+		friend class EntityImporter;
+		friend class EntityExporter;
 		void RegisterEntity(const std::string& p_tag, Entity* p_entity);
 		void Unregister(const std::string& p_tag);
 
