@@ -55,6 +55,9 @@ namespace RootEngine
 		Logging m_logger;
 		MemoryTracker*	m_memTracker;
 		ResourceManager m_resourceManager;
+		DebugOverlay m_debugOverlay;
+		Profiling m_profiler;
+
 		Network::NetworkManager*		m_network;
 		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;

@@ -185,51 +185,9 @@ namespace RootForce
 			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 			old = now;
 	
-			g_engineContext.m_debugOverlay->Clear();
-
 			m_world.SetDelta(dt);
-			g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
-		
-			{
-				PROFILE("Handle Events", g_engineContext.m_profiler);
-			HandleEvents();
-			}
-			{
-				PROFILE("Player control system", g_engineContext.m_profiler);
-				m_playerControlSystem->Process();
-			}
 
-			m_networkHandler->Update();
-
-			abilitySystem->Process();
-
-			g_engineContext.m_renderer->Clear();
-
-			{
-				PROFILE("Physics", g_engineContext.m_profiler);
-			g_engineContext.m_physics->Update(dt);
-			}
-
-			// Update Game systems.
-			pointLightSystem->Process();
-			m_physicsSystem->Process();
-			renderingSystem->Process();
-		
-			{
-				PROFILE("Render", g_engineContext.m_profiler);
-				g_engineContext.m_renderer->Render();
-			}
-
-			// Update Engine systems.
-			{
-				PROFILE("RenderLines", g_engineContext.m_profiler);
-				g_engineContext.m_renderer->RenderLines();
-			}
-		
-			g_engineContext.m_profiler->Update(dt);
-		
-			{
-				PROFILE("GUI", g_engineContext.m_profiler);
+			// Toggle rendering of normals.
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
 			{
 				if(m_displayNormals)
@@ -244,11 +202,50 @@ namespace RootForce
 				}
 			}
 
-			g_engineContext.m_renderer->Render();
-			//g_engineContext.m_renderer->RenderLines();
+			// Toggle Profiling overlay.
 
-			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render();
+
+			g_engineContext.m_debugOverlay->Clear();
+			//g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		
+			{
+				PROFILE("Handle Events", g_engineContext.m_profiler);
+				HandleEvents();
+			}
+
+			{
+				PROFILE("Player control system", g_engineContext.m_profiler);
+				m_playerControlSystem->Process();
+			}
+
+			m_networkHandler->Update();
+
+			// Update game systems.
+			abilitySystem->Process();
+			pointLightSystem->Process();
+			m_physicsSystem->Process();
+			renderingSystem->Process();
+
+			{
+				PROFILE("Physics", g_engineContext.m_profiler);
+				g_engineContext.m_physics->Update(dt);
+			}
+
+			g_engineContext.m_renderer->Clear();
+	
+			{
+				PROFILE("Render", g_engineContext.m_profiler);
+				g_engineContext.m_renderer->Render();
+				g_engineContext.m_renderer->RenderLines();
+			}
+		
+			g_engineContext.m_profiler->Update(dt);
+		
+			{
+				PROFILE("GUI", g_engineContext.m_profiler);
+
+				g_engineContext.m_gui->Update();
+				g_engineContext.m_gui->Render();
 			}
 
 			g_engineContext.m_renderer->Swap();

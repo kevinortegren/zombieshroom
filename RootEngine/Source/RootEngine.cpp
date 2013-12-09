@@ -41,8 +41,7 @@ namespace RootEngine
 		{
 			m_gui->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_guiModule);
-		}
-		
+		}	
 	}
 
 
@@ -59,9 +58,9 @@ namespace RootEngine
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
-		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
+		m_subsystemSharedContext.m_debugOverlay = &m_debugOverlay;
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
-		
+		m_subsystemSharedContext.m_profiler = &m_profiler;
 		
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -89,7 +88,7 @@ namespace RootEngine
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
-		m_gameSharedContext.m_profiler =  new Profiling();
+		m_gameSharedContext.m_profiler = &m_profiler;
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;

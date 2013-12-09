@@ -183,8 +183,7 @@ namespace Render
 		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
 
-		// Load effects.
-		
+		// Load effects.	
 		auto deferred = g_context.m_resourceManager->LoadEffect("Deferred");
 		m_lightingTech = deferred->GetTechniques()[0];
 
@@ -264,12 +263,15 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		// Buffer Per Frame data.
-		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+		{
+			PROFILE("GeometryPass", g_context.m_profiler);
+			GeometryPass();
+		}
 
-		GeometryPass();
-
-		LightingPass();	
+		{
+			PROFILE("LightingPass", g_context.m_profiler);
+			LightingPass();	
+		}
 	}
 
 	void GLRenderer::Clear()
@@ -287,6 +289,9 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
+		// Buffer Per Frame data.
+		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+
 		glDisable(GL_BLEND);
 
 		// Bind GBuffer.
