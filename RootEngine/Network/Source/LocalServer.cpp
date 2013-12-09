@@ -52,6 +52,7 @@ namespace RootEngine
 				
 				Message* message = new Message;
 				message->MessageID = InnerMessageID::CONNECT;
+				message->SenderID = 1;
 				message->RecipientID = 0;
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
 				message->Data = new uint8_t[1];
@@ -61,6 +62,7 @@ namespace RootEngine
 
 				message = new Message;
 				message->MessageID = InnerMessageID::CONNECTION_ACCEPTED;
+				message->SenderID = 0;
 				message->RecipientID = 0;
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
 				message->Data = nullptr;
@@ -110,9 +112,9 @@ namespace RootEngine
 
 						Message* message = new Message;
 						message->MessageID = InnerMessageID::CONNECT;
+						message->SenderID = 0;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->SenderID = clientID;
 						message->Data = new uint8_t[1];
 						message->Data[0] = clientID;
 						message->DataSize = 1;
@@ -136,8 +138,8 @@ namespace RootEngine
 						message->MessageID = InnerMessageID::DISCONNECT;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
+						message->SenderID = 0;
 						message->Data = new uint8_t[1];
-						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;
 						m_message.push_back(message);
@@ -147,6 +149,11 @@ namespace RootEngine
 					break;
 				}
 			}
+		}
+
+		bool LocalServer::IsClientLocal(size_t p_index) const
+		{
+			return !m_client[p_index]->IsRemote;
 		}
 
 	}

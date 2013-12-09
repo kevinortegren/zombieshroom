@@ -19,7 +19,7 @@ namespace RootForce
 					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, false);
 					
 					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
-					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, m_server);
+					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
 
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started local server on port: %u", port);
 					break;
@@ -37,7 +37,7 @@ namespace RootForce
 					m_server = p_networkInterface->GetNetworkSystem();
 					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
 
-					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, m_server);
+					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
 
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started dedicated local server on port: %u", port);
 					break;

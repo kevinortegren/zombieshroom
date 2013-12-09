@@ -63,7 +63,6 @@ namespace RootForce
 
 			int GetSerializedSize() const;
 			void Serialize(uint8_t* buffer) const;
-			//void Deserialize(uint8_t* buffer);
 		};
 		
 		/** Sent to the server when connecting (in order to identify yourself). Also sent from the server as part of the MessageUserConnected message. */
