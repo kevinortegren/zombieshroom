@@ -193,8 +193,8 @@ void Main::Start()
 	test.m_speed = 0.03;
 	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
 	g_engineContext.m_physics->AddAbilityToWorld(test);
-	float pos1[3] = {0, -2, 0};
-	float dir1[3] = {-1,0,0};
+	float pos1[3] = {0, -1, 0};
+	float dir1[3] = {-1,-1,0};
 	test.m_position = pos1;
 	test.m_direction = dir1;
 	test.m_radius = 10;

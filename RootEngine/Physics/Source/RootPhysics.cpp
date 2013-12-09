@@ -50,7 +50,7 @@ namespace Physics
 		}
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			PlayerController* temp = m_playerObjects[i];
+			KinematicController* temp = m_playerObjects[i];
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
@@ -110,7 +110,7 @@ namespace Physics
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		
-
+		
 	}
 
 
@@ -138,12 +138,12 @@ namespace Physics
 	void RootPhysics::Update(float p_dt)
 	{
 		
-		
+		m_dt = p_dt;
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			m_playerObjects.at(i)->Update();
+			m_playerObjects.at(i)->Update(m_dt);
 		}
-		m_dynamicWorld->stepSimulation(p_dt,10);
+		m_dynamicWorld->stepSimulation(m_dt,10);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
 		
@@ -260,7 +260,8 @@ namespace Physics
 	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
-		PlayerController* player = new PlayerController();
+		KinematicController* player = new KinematicController();
+		
 		player->Init(m_dynamicWorld, tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), 
 			tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
@@ -274,7 +275,8 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
-		player->SetUserPointer((void*)userPointer);
+		//player->SetUserPointer((void*)userPointer);
+		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
 	}
 
@@ -284,7 +286,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Walk(p_direction);
+		m_playerObjects.at(index)->Walk(p_direction, m_dt); //SADFJAKSJDGKLAS
 	}
 
 	void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
@@ -293,7 +295,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Jump(p_jumpForce);
+		m_playerObjects.at(index)->Jump();
 	}
 
 	void RootPhysics::GetPos( int p_objectIndex, float* p_pos )
@@ -615,7 +617,7 @@ namespace Physics
 
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			return m_playerObjects.at(index)->GetMass();
+			//return m_playerObjects.at(index)->GetMass();
 		}
 
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
@@ -642,7 +644,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetStepHeight();
+			//return m_playerObjects.at(index)->GetStepHeight();
 		}
 		return -1;
 	}
@@ -653,7 +655,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetMaxSpeed();
+			//return m_playerObjects.at(index)->GetMaxSpeed();
 		}
 		return -1;
 	}
@@ -664,7 +666,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetModetHeight();
+			//return m_playerObjects.at(index)->GetModetHeight();
 		}
 		return -1;
 	}	

@@ -1,6 +1,7 @@
 #include "PlayerController.h"
 #include "Bullet/BulletCollision/CollisionShapes/btShapeHull.h"
 
+
 struct IgnoreBodyAndGhostCast : public btCollisionWorld::ClosestRayResultCallback
 {
 	btRigidBody* Body;
@@ -105,6 +106,7 @@ void PlayerController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles
 	//delete objectMeshShape;
 	//delete objectHull;
 	
+	
 }
 
 
@@ -184,11 +186,13 @@ void PlayerController::ParseGhostContacts()
 					
 					//Check if on ground
 					if(ptB.getY() < m_motionTransform.getOrigin().getY() - m_heightOffset /*Offset to get under ground*/ - 0.01f)
+					{
 						m_onGround = true;
+					}
 					else
 					{
 						m_hittingWall = true;
-						m_surfaceHitNormals.push_back((point.m_normalWorldOnB)); //Was const before point stuff
+						m_surfaceHitNormals.push_back(point.m_normalWorldOnB); //Was const before point stuff
 					}
 				}
 			}
@@ -214,6 +218,10 @@ void PlayerController::UpdatePosition()
 
 		m_rigidBody->setLinearVelocity(vel);
 		m_onGround = true;
+// 		if(rayCallBack_bottom.m_hitNormalWorld.angle(btVector3(0,1,0)) > 0.1)
+// 		{
+// 			m_rigidBody->setLinearVelocity(btVector3(0,0,0));
+// 		}
 	}
 
 	//check if we hit something above us
@@ -239,7 +247,6 @@ void PlayerController::UpdateVelocity()
 	//Deaccelerate
 	if(m_onGround)
 	{
-		
 		m_manualVelocity -= m_manualVelocity * 0.5f; // The constant will need to be fine tuned later and should be a define or constant
 					
 	}
