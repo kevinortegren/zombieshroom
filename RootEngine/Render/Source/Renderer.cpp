@@ -171,16 +171,16 @@ namespace Render
 		indices[4] = 1; 
 		indices[5] = 3;
 
-		m_fullscreenQuad.m_elementBuffer = CreateBuffer();
-		m_fullscreenQuad.m_vertexBuffer = CreateBuffer();
-		m_fullscreenQuad.m_vertexAttributes = CreateVertexAttributes();
+		m_fullscreenQuad.SetVertexBuffer(CreateBuffer());
+		m_fullscreenQuad.SetElementBuffer(CreateBuffer());
+		m_fullscreenQuad.SetVertexAttribute(CreateVertexAttributes());
 
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
-		m_lineMesh.m_vertexBuffer = CreateBuffer();
-		m_lineMesh.m_vertexAttributes = CreateVertexAttributes();
-		m_lineMesh.m_primitive = GL_LINES;
+		m_lineMesh.SetVertexBuffer(CreateBuffer());
+		m_lineMesh.SetVertexAttribute(CreateVertexAttributes());
+		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
 
 		// Load effects.
@@ -280,7 +280,7 @@ namespace Render
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_numDirectionalLights = 0;
+		//m_numDirectionalLights = 0;
 		m_numPointLights = 0;
 	}
 
@@ -307,7 +307,8 @@ namespace Render
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
-				// Bind PerObjects uniforms.
+				//TEMP Static set of uniforms/textures.
+
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 				if((*itr).m_material->m_diffuseMap != nullptr)
@@ -317,6 +318,20 @@ namespace Render
 					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_diffuseMap->GetHandle());
 				}
 				
+				if((*itr).m_material->m_specularMap != nullptr)
+				{
+					// Bind diffuse texture.
+					glActiveTexture(GL_TEXTURE0 + 1);
+					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_specularMap->GetHandle());
+				}
+
+				if((*itr).m_material->m_normalMap != nullptr)
+				{
+					// Bind diffuse texture.
+					glActiveTexture(GL_TEXTURE0 + 2);
+					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_normalMap->GetHandle());
+				}
+
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
@@ -383,7 +398,7 @@ namespace Render
 		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
 		m_debugTech->GetPrograms()[0]->Apply();
 
-		m_lineMesh.m_vertexBuffer->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
+		m_lineMesh.GetVertexBuffer()->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
 		m_lineMesh.Bind();
 		m_lineMesh.Draw();
 		m_lineMesh.Unbind();

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+
 namespace LogTag
 {
 	enum LogTag
@@ -32,13 +33,12 @@ namespace LogLevel
 		FATAL_ERROR,
 		NON_FATAL_ERROR,
 		WARNING,
+		SUCCESS,
 		DEBUG_PRINT,
 		INIT_PRINT,
 		MASS_DATA_PRINT
 	};
 }
- 
-
 
 class LoggingInterface
 {

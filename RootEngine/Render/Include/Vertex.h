@@ -45,4 +45,10 @@ namespace Render
 		glm::vec3 m_normal;
 		glm::vec2 m_UV;
 	};
+
+	struct Vertex1P1N1UV1T1BT : public Vertex1P1N1UV
+	{
+		glm::vec3 m_tangent;
+		glm::vec3 m_bitangent;
+	};
 }

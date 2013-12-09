@@ -1,5 +1,4 @@
 #pragma once
-
 #include <RootEngine/Render/Include/Buffer.h>
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/VertexAttributes.h>
@@ -10,6 +9,7 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -39,10 +39,10 @@ namespace Render
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-		virtual std::shared_ptr<Mesh> CreateMesh() = 0;
-
-		virtual EffectInterface* CreateEffect() = 0;
-		virtual TextureInterface* CreateTexture() = 0;
+		virtual std::shared_ptr<EffectParams> CreateEffectParams() = 0;
+		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
+		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
+		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -68,10 +68,10 @@ namespace Render
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-		std::shared_ptr<Mesh> CreateMesh() { return std::shared_ptr<Mesh>(new Mesh); }
-
-		EffectInterface* CreateEffect() { return new Effect; } //Remember to delete
-		TextureInterface* CreateTexture() { return new Texture; } //Remember to delete
+		std::shared_ptr<EffectParams> CreateEffectParams() { return std::shared_ptr<EffectParams>(new EffectParams); }
+		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
+		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
+		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 
 	private:
 

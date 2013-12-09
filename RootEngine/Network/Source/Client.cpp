@@ -1,11 +1,12 @@
 #include <Client.h>
+#include <External/Include/RakNet/BitStream.h>
 namespace RootEngine
 {
 	namespace Network
 	{
-		Client::Client(void)
+		Client::Client(RakNet::SystemAddress p_sysAddress)
 		{
-			m_isServer = false;
+			m_sysAddress = p_sysAddress;
 		}
 
 
@@ -13,26 +14,25 @@ namespace RootEngine
 		{
 		}
 
-		void Client::ConnectTo( const char* p_ip, USHORT p_port )
+		bool Client::Send( const Message& p_message )
 		{
-			RakNet::SocketDescriptor sd;
-			m_peer->Startup( 1, &sd, 1 );
+			if(p_message.DataSize > UINT_MAX)
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Attempting to send package with size higher than uint32. Package splitting not yet implemented.");
 
-			printf( "Connecting to %s:%u...\n", p_ip, p_port );
-			m_peer->Connect( p_ip, p_port, 0, 0 );
-		}
-
-		void Client::ProcessPacket( RakNet::Packet* p_packet )
-		{
-			switch( p_packet->data[0] )
+			uint32_t numBytesSent = 0;
+			if(p_message.DataSize > 0)
 			{
-			case 29: // Custom chat
-				printf( "User sent a message: %.*s", p_packet->length-1, &p_packet->data[1] );
-				break;
-			default:
-				printf( "Unknown packet ID: %u", p_packet->data[0] );
-				break;
+				RakNet::BitStream bitstream;
+				bitstream.Write((RakNet::MessageID)39);
+				bitstream.Write(p_message.RecipientID);
+				bitstream.Write(p_message.MessageID);
+				bitstream.Write(p_message.DataSize);
+				bitstream.Write((const char*)p_message.Data, (unsigned int)p_message.DataSize);
+
+				numBytesSent = m_peerInterface->Send( &bitstream, HIGH_PRIORITY, p_message.Reliability, 0, m_sysAddress, true);
 			}
+			return numBytesSent == p_message.DataSize + 8 + 1 + 1 + 1;
 		}
+
 	}
 }
