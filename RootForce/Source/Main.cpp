@@ -180,12 +180,13 @@ namespace RootForce
 		uint64_t old = SDL_GetPerformanceCounter();
 		while (m_running)
 		{	
-		
 			uint64_t now = SDL_GetPerformanceCounter();
 			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 			old = now;
 	
 			m_world.SetDelta(dt);
+
+			g_engineContext.m_renderer->Clear();
 
 			// Toggle rendering of normals.
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
@@ -228,7 +229,7 @@ namespace RootForce
 				g_engineContext.m_physics->Update(dt);
 			}
 
-			g_engineContext.m_renderer->Clear();
+			
 			g_engineContext.m_renderer->Render();
 	
 			{
