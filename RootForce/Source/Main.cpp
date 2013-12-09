@@ -86,10 +86,6 @@ Main::~Main()
 
 void Main::Start() 
 {
-
-	m_engineContext.m_script->ExecuteWholeScript("script1.lua", RootEngine::Script::LuaLibraryInit::INIT_ALL);
-	m_engineContext.m_script->ExecuteScriptWithFunction("script2.lua", RootEngine::Script::LuaLibraryInit::INIT_ALL, "PrintSomeData");
-
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 
@@ -195,6 +191,18 @@ void Main::Start()
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			m_playerControlSystem->Process();
+		}
+
+		// Code for testing scripts
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_Q) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			g_engineContext.m_script->SetScriptWithFunction("script3.lua", "PrintSomeData");
+
+			g_engineContext.m_script->AddParameterBoolean(true);
+			g_engineContext.m_script->AddParameterNumber(2.0);
+			g_engineContext.m_script->AddParameterString("Test");
+
+			g_engineContext.m_script->ExecuteScript();
 		}
 
 		m_networkHandler->Update();

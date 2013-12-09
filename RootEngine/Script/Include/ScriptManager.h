@@ -13,11 +13,15 @@ namespace RootEngine
 		public:
 			void Startup();
 			void Shutdown();
-			void Initialize();
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
-			void ExecuteWholeScript(std::string p_scriptPath, int p_flags);
-			void ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName);
+			void ExecuteWholeScript(std::string p_scriptPath);
+			void SetScriptWithFunction(std::string p_scriptPath, std::string p_functionName);
+			void ExecuteScript();
+			
+			void AddParameterString(std::string p_string);
+			void AddParameterNumber(double p_double);
+			void AddParameterBoolean(bool p_bool);
 
 			static ScriptManager* GetInstance();
 
@@ -25,18 +29,10 @@ namespace RootEngine
 			static ScriptManager* s_scriptManager;
 
 			std::string m_workingDir;
+			lua_State* m_luaState;
 
-			void SetupLibrariesForLua(lua_State* p_luaState, int p_flags);
-			void LuaLoadLib(lua_State* p_luaState, const luaL_Reg* p_luaLibrary);
+			int m_parameterCount;
 			
 		};
 	}
 }
-
-/*
-extern "C"
-{
-	typedef RootEngine::Script::ScriptInterface* (*CREATESCRIPTINTERFACE) (RootEngine::SubsystemSharedContext);
-	SCRIPT_DLL_EXPORT RootEngine::Script::ScriptInterface* CreateScriptInterface(RootEngine::SubsystemSharedContext p_context);
-}
-*/

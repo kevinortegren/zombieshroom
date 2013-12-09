@@ -5,36 +5,22 @@ namespace RootEngine
 {
 	namespace Script
 	{
-		static const luaL_Reg g_luaLibrary[] =
-		{
-			{ "base", luaopen_base },		
-			{ "io", luaopen_io },
-			{ "os", luaopen_os },
-			{ "string", luaopen_string },
-			{ "math", luaopen_math },
-			{ "debug", luaopen_debug },
-			{ "base", luaopen_package },
-			{ "bit32", luaopen_bit32 },
-			{ "coroutine", luaopen_coroutine },
-			{ NULL, NULL}
-		};
 
 		SubsystemSharedContext g_context;
 		ScriptManager* ScriptManager::s_scriptManager = nullptr;
 
 		void ScriptManager::Startup()
 		{
-			g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Succesfull startup of the scripting system");
+			m_luaState = luaL_newstate();
+			luaL_openlibs(m_luaState);
+			m_parameterCount = 0;
+			g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::INIT_PRINT, "Succesfull startup of the scripting system");
 		}
 
 		void ScriptManager::Shutdown()
 		{
-			delete s_scriptManager;
-		}
-
-		void ScriptManager::Initialize()
-		{
-			g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "LUA engine succesfully initialized");
+			lua_close(m_luaState);
+			delete s_scriptManager;			
 		}
 
 		ScriptManager* ScriptManager::GetInstance()
@@ -45,87 +31,44 @@ namespace RootEngine
 			return s_scriptManager;
 		}
 
-		void ScriptManager::ExecuteWholeScript(std::string p_scriptPath, int p_flags)
+		void ScriptManager::ExecuteWholeScript(std::string p_scriptPath)
 		{
-			// Create LUA state
-			lua_State* l_luaState;
-			l_luaState = luaL_newstate();
-
-			// Setup needed libraries
-			SetupLibrariesForLua(l_luaState, p_flags);
-
 			// Execute the script
-			luaL_dofile(l_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 
-			// Close LUA
-			lua_close(l_luaState);
 		}
 
-		void ScriptManager::ExecuteScriptWithFunction(std::string p_scriptPath, int p_flags, std::string p_functionName)
-			/*
-				I'm here.
-				Make VA_LIST HERE yes. Next step :>
-			*/
+		void ScriptManager::SetScriptWithFunction(std::string p_scriptPath, std::string p_functionName)
 		{
-			// Create LUA state
-			lua_State* l_luaState;
-			l_luaState = luaL_newstate();
-
-			// Setup needed libraries
-			SetupLibrariesForLua(l_luaState, p_flags);
-
 			// Execute the script
-			luaL_dofile(l_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 
 			// Execute specific function
-			lua_getglobal(l_luaState, p_functionName.c_str());			
-			lua_call(l_luaState, 0, 0);
-
-			lua_close(l_luaState);
+			lua_getglobal(m_luaState, p_functionName.c_str());
 		}
 
-		void ScriptManager::SetupLibrariesForLua(lua_State* p_luaState, int p_flags)
+		void ScriptManager::ExecuteScript()
 		{
-			const luaL_Reg* l_luaLibrary = g_luaLibrary;
-
-			if((p_flags & LuaLibraryInit::INIT_BASE) == LuaLibraryInit::INIT_BASE)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_IO) == LuaLibraryInit::INIT_IO)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_OS) == LuaLibraryInit::INIT_OS)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_STRING) == LuaLibraryInit::INIT_STRING)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_MATH) == LuaLibraryInit::INIT_MATH)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_DEBUG) == LuaLibraryInit::INIT_DEBUG)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_BIT32) == LuaLibraryInit::INIT_BIT32)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;
-
-			if((p_flags & LuaLibraryInit::INIT_COROUTINE) == LuaLibraryInit::INIT_COROUTINE)
-				LuaLoadLib(p_luaState, l_luaLibrary);
-			l_luaLibrary++;			
+			lua_call(m_luaState, m_parameterCount, 0);
+			m_parameterCount = 0;
 		}
 
-		void ScriptManager::LuaLoadLib(lua_State* p_luaState, const luaL_Reg* p_luaLibrary)
+		void ScriptManager::AddParameterString(std::string p_string)
 		{
-			//p_luaLibrary->func(p_luaState);
-			luaL_requiref(p_luaState, p_luaLibrary->name, p_luaLibrary->func, 1);
-			lua_settop(p_luaState, 0);
+			lua_pushlstring(m_luaState, p_string.c_str(), p_string.length());
+			m_parameterCount++;
+		}
+
+		void ScriptManager::AddParameterNumber(double p_double)
+		{
+			lua_pushinteger(m_luaState, (int)p_double);
+			m_parameterCount++;
+		}
+
+		void ScriptManager::AddParameterBoolean(bool p_bool)
+		{
+			lua_pushboolean(m_luaState, p_bool);
+			m_parameterCount++;
 		}
 	}
 }
