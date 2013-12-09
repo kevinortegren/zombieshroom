@@ -49,6 +49,8 @@ namespace RootEngine
 	{
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
+		m_configManager.LoadConfig("config.yaml");
+
 		m_network = nullptr;
 		m_renderer = nullptr;
 		m_gui = nullptr;
@@ -61,6 +63,7 @@ namespace RootEngine
 		m_subsystemSharedContext.m_debugOverlay = &m_debugOverlay;
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
 		m_subsystemSharedContext.m_profiler = &m_profiler;
+		m_subsystemSharedContext.m_configManager = &m_configManager;
 		
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -92,6 +95,7 @@ namespace RootEngine
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
+		m_gameSharedContext.m_configManager = &m_configManager;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_inputSys = m_inputSys;

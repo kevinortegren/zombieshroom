@@ -68,6 +68,8 @@ namespace RootForce
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
+		float a = g_engineContext.m_configManager->GetConfigValueAsFloat("Test");
+
 		if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 		{
 			// TODO: Log error and throw exception (?)
@@ -78,8 +80,8 @@ namespace RootForce
 				"Root Force",
 				SDL_WINDOWPOS_UNDEFINED,
 				SDL_WINDOWPOS_UNDEFINED,
-				WINDOW_WIDTH,
-				WINDOW_HEIGHT,
+				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"),
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 			SDL_DestroyWindow);
 		if (m_window == nullptr) 

@@ -3,7 +3,7 @@
 #include <RootEngine/Render/Include/Semantics.h>
 
 #include <RootEngine/Include/Logging/Logging.h>
-extern Logging	g_logger;
+extern Logging g_logger;
 
 namespace RootEngine
 {
