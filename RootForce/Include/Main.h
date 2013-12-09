@@ -27,5 +27,5 @@ private:
 	std::shared_ptr<SDL_Window> m_window;
 	
 	ECS::World m_world;
-	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
+	std::shared_ptr<RootForce::PlayerControlSystem> m_PlayerControlSystem;
 };

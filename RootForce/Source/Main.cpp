@@ -108,9 +108,11 @@ void Main::Start()
 	RootForce::Renderable::SetTypeId(0);
 	RootForce::Transform::SetTypeId(1);
 	RootForce::PointLight::SetTypeId(2);
-	RootForce::PlayerInputControlComponent::SetTypeId(3);
+	RootForce::PlayerControl::SetTypeId(3);
 	RootForce::PhysicsAccessor::SetTypeId(4);
 	RootForce::Camera::SetTypeId(5);
+	RootForce::LookAtBehavior::SetTypeId(6);
+	RootForce::ThirdPersonBehavior::SetTypeId(7);
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -131,17 +133,17 @@ void Main::Start()
 	keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 	keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
-	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
-	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
-	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-	m_playerControlSystem->SetKeybindings(keybindings);
-	m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+	m_PlayerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
+	m_PlayerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
+	m_PlayerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_PlayerControlSystem->SetKeybindings(keybindings);
+	m_PlayerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
 	// Initialize physics system
-	RootForce::PhysicsSystem* m_physicsSystem = new RootForce::PhysicsSystem(&m_world);
-	m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
-	m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
-	m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
+	RootForce::PhysicsSystem* physicsSystem = new RootForce::PhysicsSystem(&m_world);
+	physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
+	physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(physicsSystem, "PhysicsSystem");
 
 
 
@@ -162,7 +164,12 @@ void Main::Start()
 
 	RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
-	cameraSystem->SetRendererInterface(g_engineContext.m_renderer);
+
+	RootForce::LookAtSystem* lookAtSystem = new RootForce::LookAtSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::LookAtSystem>(lookAtSystem, "LookAtSystem");
+
+	RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
 	// Setup lights.
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
@@ -230,7 +237,12 @@ void Main::Start()
 	camera->m_near = 0.1f;
 	camera->m_far = 1000.0f;
 	camera->m_fov = 75.0f;
-	m_world.GetGroupManager()->RegisterEntity("Camera", cameraEntity);
+	m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+	cameraLookAt->m_targetTag = "Player";
+	RootForce::ThirdPersonBehavior* cameraThirdPersonBehavior = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+	cameraThirdPersonBehavior->m_targetTag = "Player";
+	cameraThirdPersonBehavior->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
 
 	//Plane at bottom
 	float normal[3] = {0,1,0};
@@ -277,7 +289,7 @@ void Main::Start()
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		HandleEvents();
 		
-		m_playerControlSystem->Process();
+		m_PlayerControlSystem->Process();
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
@@ -285,7 +297,9 @@ void Main::Start()
 
 		// Update Game systems.
 		pointLightSystem->Process();
-		m_physicsSystem->Process();
+		physicsSystem->Process();
+		thirdPersonBehaviorSystem->Process();
+		lookAtSystem->Process();
 		renderingSystem->Process();
 		cameraSystem->Process();
 

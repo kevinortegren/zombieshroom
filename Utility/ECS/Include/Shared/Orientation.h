@@ -24,6 +24,7 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		//Seldom useful outside Orientation class
 		//////////////////////////////////////////////////////////////////////////
+		void SetOrientation(const glm::mat3& p_rotationMatrix);
 		void SetOrientation(float p_rotationX, float p_rotationY, float p_rotationZ);
 		void SetOrientation(float p_angle, glm::vec3 p_axis);
 		void SetOrientation(glm::quat p_orientation);

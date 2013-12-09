@@ -66,11 +66,11 @@ namespace RootForce
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PlayerInputControlComponent* controller = m_world->GetEntityManager()->GetComponent<PlayerInputControlComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
+		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
-		glm::vec3 right = glm::normalize(glm::cross(facing, glm::vec3(0.0f, 1.0f, 0.0f)));
+		glm::vec3 right = transform->m_orientation.GetRight();
 		
 		// Get the speed of the player
 		float speed = controller->m_speed;
@@ -90,15 +90,13 @@ namespace RootForce
 					break;
 				case PlayerAction::STRAFE_RIGHT:
 					m_physics->PlayerMoveXZ(*(physAcc->m_handle), &right.x);
-					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
-
 					{
 						glm::vec3 left = -right;
 						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &left.x);
-						transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+
 					}
 					break;
 				case PlayerAction::ORIENTATE:
@@ -113,7 +111,7 @@ namespace RootForce
 					// TODO: Implement selection of abilities.
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
-					// TODO: Implement activation of abilities.
+					
 					break;
 				default:
 					break;

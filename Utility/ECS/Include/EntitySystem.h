@@ -42,9 +42,9 @@ namespace ECS
 		void Process();
 
 		virtual void Init() = 0;
-		virtual void Begin() = 0;
+		virtual void Begin(){}
 		virtual void ProcessEntity(Entity* p_entity) = 0;
-		virtual void End() = 0;
+		virtual void End(){}
 
 	protected:
 		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;

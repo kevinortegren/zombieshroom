@@ -12,12 +12,11 @@
 namespace RootForce
 {
 	/** Component owned by a player entity that will be controlled via input. */
-	struct PlayerInputControlComponent : public ECS::Component<PlayerInputControlComponent>
+	struct PlayerControl : public ECS::Component<PlayerControl>
 	{
 		float m_speed;
 		float m_mouseSensitivity;
 	};
-
 
 	/** 
 		Enumerate all the actions a player can do via input.

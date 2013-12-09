@@ -101,7 +101,8 @@ namespace Render
 		int width, height;
 		SDL_GetWindowSize(p_window, &width, &height);
 		glViewport(0, 0, width, height);
-
+		m_width = width;
+		m_height = height;
 		// Init GLEW.
 		glewExperimental = GL_TRUE; 
 		GLenum err = glewInit();
