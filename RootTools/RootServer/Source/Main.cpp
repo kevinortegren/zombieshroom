@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 }
 
 Main::Main(std::string p_workingDirectory) 
-	: m_running(true), m_world(5)
+	: m_running(true)
 {
 
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");

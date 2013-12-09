@@ -116,10 +116,10 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		glFrontFace(GL_CCW);
+		//glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -183,20 +183,15 @@ namespace Render
 		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
 
-		// Load effects.
-		g_context.m_resourceManager->LoadEffect("Deferred");
-		EffectInterface* deferred = g_context.m_resourceManager->GetEffect("Deferred");
-	
+		// Load effects.	
+		auto deferred = g_context.m_resourceManager->LoadEffect("Deferred");
 		m_lightingTech = deferred->GetTechniques()[0];
 
-		g_context.m_resourceManager->LoadEffect("Color");
-		auto m_debugEffect = g_context.m_resourceManager->GetEffect("Color");
-		if(m_debugEffect == nullptr)
-		{
-				g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Debug effect has not been loaded!");
-		}
+		auto m_debugEffect = g_context.m_resourceManager->LoadEffect("Color");
 		m_debugTech = m_debugEffect->GetTechniques()[0];
-		m_lightingTech = deferred->GetTechniques()[0];
+
+		auto m_normalEffect = g_context.m_resourceManager->LoadEffect("Normals");
+		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		// Setup camera.
 		m_camera.Initialize(glm::vec3(0,0,10), glm::vec3(0), glm::vec3(0,1,0), 45.0f, 1.0f, 100.0, width, height);
@@ -268,12 +263,15 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		// Buffer Per Frame data.
-		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+		{
+			PROFILE("Geometry Pass", g_context.m_profiler);
+			GeometryPass();
+		}
 
-		GeometryPass();
-
-		LightingPass();	
+		{
+			PROFILE("Lighting Pass", g_context.m_profiler);
+			LightingPass();	
+		}
 	}
 
 	void GLRenderer::Clear()
@@ -291,8 +289,9 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		// Buffer Per Frame data.
+		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+
 		glDisable(GL_BLEND);
 
 		// Bind GBuffer.
@@ -315,29 +314,35 @@ namespace Render
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 0);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_diffuseMap->GetHandle());
+					glBindTexture((*itr).m_material->m_diffuseMap->GetTarget(), (*itr).m_material->m_diffuseMap->GetHandle());
 				}
 				
 				if((*itr).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 1);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_specularMap->GetHandle());
+					glBindTexture((*itr).m_material->m_specularMap->GetTarget(), (*itr).m_material->m_specularMap->GetHandle());
 				}
 
 				if((*itr).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
 					glActiveTexture(GL_TEXTURE0 + 2);
-					glBindTexture(GL_TEXTURE_2D, (*itr).m_material->m_normalMap->GetHandle());
+					glBindTexture((*itr).m_material->m_normalMap->GetTarget(), (*itr).m_material->m_normalMap->GetHandle());
 				}
 
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
 					(*itrP)->Apply();
-
 					(*itr).m_mesh->Draw();			
+				}
+
+				// Debug.
+				if(m_displayNormals)
+				{
+					m_normalTech->GetPrograms()[0]->Apply();	
+					(*itr).m_mesh->Draw();	
 				}
 			}
 
@@ -352,8 +357,6 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		// Lighting pass.
-		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 

@@ -38,7 +38,7 @@ namespace RootEngine
 		//Load functions
 		virtual Model*						LoadCollada(std::string p_path) = 0;
 		virtual Render::EffectInterface*	LoadEffect(std::string p_path) = 0;
-		virtual Render::TextureInterface*	LoadTexture(std::string p_path) = 0;
+		virtual Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type) = 0;
 
 		//Get functions
 
@@ -70,7 +70,7 @@ namespace RootEngine
 		//Load functions
 		Model*						LoadCollada(std::string p_path);
 		Render::EffectInterface*	LoadEffect(std::string p_path);
-		Render::TextureInterface*	LoadTexture(std::string p_path);
+		Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type);
 
 		//Get functions
 		Model*							GetModel(std::string p_handle);
