@@ -2,7 +2,7 @@
 
 #include <Awesomium/WebView.h>
 #include <RootEngine/GUI/Include/Dispatcher.h>
-#include <queue>
+#include <vector>
 namespace RootForce
 {
 
@@ -21,7 +21,7 @@ namespace RootForce
 		void SetFocus(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void ProcessMessage(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		Awesomium::WebView* m_view;
-		std::queue<std::string> m_messageBuffer;
+		std::vector<std::string> m_messageBuffer;
 		bool m_hasFocus;
 	};
 }

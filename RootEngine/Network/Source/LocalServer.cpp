@@ -24,7 +24,7 @@ namespace RootEngine
 			}
 			else if (p_message.RecipientID == 0)
 			{
-				m_message.push(new Message(p_message));
+				m_message.push_back(new Message(p_message));
 			}
 			else
 			{
@@ -57,7 +57,7 @@ namespace RootEngine
 				message->Data = new uint8_t[1];
 				message->Data[0] = 1;
 				message->DataSize = 1;
-				m_message.push(message);
+				m_message.push_back(message);
 
 				message = new Message;
 				message->MessageID = InnerMessageID::CONNECTION_ACCEPTED;
@@ -65,7 +65,7 @@ namespace RootEngine
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
 				message->Data = nullptr;
 				message->DataSize = 0;
-				m_message.push(message);
+				m_message.push_back(message);
 			}
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server started on port %u.", p_port);
 		}
@@ -116,7 +116,7 @@ namespace RootEngine
 						message->Data = new uint8_t[1];
 						message->Data[0] = clientID;
 						message->DataSize = 1;
-						m_message.push(message);
+						m_message.push_back(message);
 					}
 					break;
 				case NON_RAKNET_MESSAGE_ID:
@@ -140,7 +140,7 @@ namespace RootEngine
 						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;
-						m_message.push(message);
+						m_message.push_back(message);
 					}
 					break;
 				default:

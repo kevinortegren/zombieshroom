@@ -41,13 +41,13 @@ namespace RootForce
 	{
 		//JSAddMessage(Awesomium::ToString(p_array[0].ToString()).c_str()); //This line of code sounds retardeded :/
 
-		m_messageBuffer.push(Awesomium::ToString(p_array[0].ToString()));
+		m_messageBuffer.push_back(Awesomium::ToString(p_array[0].ToString()));
 	}
 
 	std::string ChatSystem::PollMessage()
 	{
-		std::string temp = m_messageBuffer.back(); 
-		m_messageBuffer.pop();
+		std::string temp = m_messageBuffer.at(0); 
+		m_messageBuffer.erase(m_messageBuffer.begin());
 		return temp;
 	}
 	
