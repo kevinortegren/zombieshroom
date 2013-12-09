@@ -38,6 +38,16 @@ namespace Render
 	class Program : public ProgramInterface
 	{
 	public:
+
+		enum BlendState { BLEND_NONE, BLEND_ALPHA, BLEND_ADDITIVE };
+
+		enum FillMode { FILL_SOLID, FILL_WIREFRAME };
+
+		struct DepthState {		
+			bool depthTest;
+			bool depthWrite;
+		};
+
 		Program();
 		~Program();
 		void CreateProgram();
@@ -49,6 +59,10 @@ namespace Render
 
 		void BindUniformBuffer(const std::string& bufferName, unsigned int slot);
 		void BindTexture(const std::string& textureName, unsigned int slot);
+
+		BlendState m_blendState;
+		DepthState m_depthState;
+		FillMode m_fillMode;
 
 	private:
 		GLuint m_glHandle;

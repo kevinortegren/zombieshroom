@@ -1,6 +1,7 @@
 #pragma once
 #pragma once
 #include "InputInterface.h"
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 
 #define MAX_KEYS SDL_NUM_SCANCODES

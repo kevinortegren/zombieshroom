@@ -1,6 +1,5 @@
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
-#include <gtest/gtest.h>
 #include <Awesomium/STLHelpers.h>
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -29,7 +28,6 @@ namespace RootEngine
 			m_view->Stop();
 			m_view->Destroy();
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
-			delete s_gui;
 
 			glDeleteTextures(1, &m_texture);
 			glDeleteVertexArrays(1, &m_vertexArrayBuffer);
@@ -224,29 +222,4 @@ RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemShared
 	return RootEngine::GUISystem::guiInstance::GetInstance();
 }
 
-TEST(GUI, Javascript)
-{
-	RootEngine::GUISystem::guiInstance* instance = RootEngine::GUISystem::guiInstance::GetInstance();
-	RootEngine::GUISystem::guiTest* testInstance = new RootEngine::GUISystem::guiTest();
-	RootEngine::GUISystem::guiJSTest* jsTestInstance = new RootEngine::GUISystem::guiJSTest();
-	testInstance->InitTest();
-	jsTestInstance->InitTest();
-	instance->GetView()->set_load_listener(testInstance);
-	instance->GetView()->set_js_method_handler(jsTestInstance);
 
-	Awesomium::JSValue window = instance->GetView()->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
-	EXPECT_TRUE(window.IsObject());
-	window.ToObject().SetCustomMethod(Awesomium::WSLit("RemoteTest();"), false);
-
-	instance->LoadURL("test.html");
-	while(instance->GetView()->IsLoading())
-	{
-		instance->Update();
-	}
-	Sleep(500);
-	instance->GetView()->ExecuteJavascript(Awesomium::WSLit("Test();"), Awesomium::WSLit(""));
-	Sleep(500);
-	EXPECT_TRUE(testInstance->GetTestResult());
-	EXPECT_TRUE(jsTestInstance->GetTestResult());
-	// Assume correct
-}

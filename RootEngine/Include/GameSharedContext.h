@@ -1,5 +1,5 @@
 #pragma once
-
+#include <RootEngine/Include/Profiling.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Render/Include/Renderer.h>
@@ -15,6 +15,7 @@ namespace RootEngine
 	{
 		Logging* m_logger;
 		MemoryTracker* m_memTracker;
+		ProfilingInterface* m_profiler;
 		DebugOverlayInterface* m_debugOverlay;
 		ResourceManager* m_resourceManager;
 		Render::RendererInterface* m_renderer;

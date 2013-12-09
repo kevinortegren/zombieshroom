@@ -3,6 +3,24 @@
 #include<windows.h>
 #include<iosfwd>
 
+RECT secondaryRect = {0,0,0,0};
+
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdc1, LPRECT lprcMonitor, LPARAM data)        
+{
+	RECT rc = *lprcMonitor;
+
+	MONITORINFOEX mInfo;
+	mInfo.cbSize = sizeof(mInfo);
+	::GetMonitorInfo(hMonitor, &mInfo);
+
+	if (mInfo.dwFlags != MONITORINFOF_PRIMARY)
+	{
+		secondaryRect = mInfo.rcWork;
+		return 0;
+	}
+	return 1;
+}
+
 namespace ColorCMD
 {
 	enum ConsoleColor
@@ -38,6 +56,8 @@ namespace ColorCMD
 
 	ConsoleColor textcol, backcol, deftextcol, defbackcol;
 
+	RECT m_secondaryRect;
+
 	inline void UpdateColors()
 	{
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -69,16 +89,37 @@ namespace ColorCMD
 		unsigned short wAttributes=((unsigned int)backcol<<4) | (unsigned int)textcol;
 		SetConsoleTextAttribute(std_con_out,wAttributes);
 	}
+	inline void UseSecondaryMonitor() 
+	{
+		// init the memebr rectangle
+		m_secondaryRect. top = 0;
+		m_secondaryRect. left = 0;
+		m_secondaryRect. right = 0;
+		m_secondaryRect. bottom = 0;
+		// enumerate
+		::EnumDisplayMonitors(NULL, NULL, ::MonitorEnumProc, 0);
+		// store the secondary monitor's rectangle in our member rectangle
+		m_secondaryRect = secondaryRect;
+	}
 
 	inline void ConsoleColorInit()
 	{
 		std_con_out = GetStdHandle(STD_OUTPUT_HANDLE);
-		//ShowWindow( GetConsoleWindow() , SW_MAXIMIZE);
+
 		COORD t;
 		t.X = 900;
 		t.Y = 900;
 		SetConsoleScreenBufferSize(std_con_out, t);
-		SetWindowPos(GetConsoleWindow(), HWND_NOTOPMOST, 0, 0, 900, 800, SWP_SHOWWINDOW);
+
+		UseSecondaryMonitor();
+		if (((m_secondaryRect.right - m_secondaryRect.left)  + (m_secondaryRect.bottom - m_secondaryRect.top)) == 0)
+		{
+			SetWindowPos(GetConsoleWindow(), HWND_NOTOPMOST, 0, 0, 900, 800, SWP_SHOWWINDOW);
+		}
+		else
+		{
+			SetWindowPos(GetConsoleWindow(), HWND_NOTOPMOST, m_secondaryRect.left, m_secondaryRect.top, (m_secondaryRect.right - m_secondaryRect.left), (m_secondaryRect.bottom - m_secondaryRect.top), SWP_SHOWWINDOW);
+		}
 		UpdateColors();
 		deftextcol = textcol;
 		defbackcol = backcol;
@@ -100,5 +141,7 @@ namespace ColorCMD
 		SetTextColor(p_col);
 		return is;
 	}
+
 }
+
 

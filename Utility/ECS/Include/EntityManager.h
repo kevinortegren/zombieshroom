@@ -19,7 +19,7 @@ namespace ECS
 		friend class EntityExporter;
 		friend class EntityImporter;
 
-		EntityManager(EntitySystemManager* p_systemManager, int p_numComponents);
+		EntityManager(EntitySystemManager* p_systemManager);
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
@@ -82,6 +82,9 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
+			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
+				return nullptr;
+
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());
 		}
 

@@ -9,6 +9,7 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -36,6 +37,8 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void RenderLines() = 0;
 		virtual void Swap() = 0;
+		virtual void DisplayNormals(bool p_display) = 0;
+
 
 		virtual int GetWidth() = 0;
 		virtual int GetHeight() = 0;
@@ -70,6 +73,7 @@ namespace Render
 		void Render();
 		void RenderLines();
 		void Swap();
+		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		bool CheckExtension(const char* p_extension);
 
 		virtual int GetWidth();
@@ -132,12 +136,15 @@ namespace Render
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
 		std::shared_ptr<TechniqueInterface> m_debugTech;
+		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		//debug
 
 		GLuint m_debugFbo;
 		GLuint m_testHandle;
 		//GLuint m_testHandle;
+
+		bool m_displayNormals;
 	};
 }
 
