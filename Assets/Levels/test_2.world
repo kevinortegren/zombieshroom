@@ -14,11 +14,11 @@
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 2
-          Model: testchar_t
+          Model: V2
           Effect: Mesh_NormalMap
-          Diffuse: v6
-          Specular: SpecularV1
-          Normal: bump_test
+          Diffuse: WStexture
+          Specular: WSspecular
+          Normal: WSnormal
     - Type: 1
       Data:
         - Entity: 0
@@ -52,7 +52,7 @@
         - Entity: 2
           Type: 3
           Mass: 5
-          ModelHandle: testchar_t0
+          ModelHandle: V20
           StepHeight: 0.1
           ModelHeight: 0.0
           MaxSpeed: 10.0

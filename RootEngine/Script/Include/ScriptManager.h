@@ -17,9 +17,9 @@ namespace RootEngine
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
 			void ExecuteWholeScript(std::string p_scriptPath);
-			void SetScript(std::string p_scriptPath, std::string p_functionName);
+			void SetFunction(std::string p_functionName);
 			void ExecuteScript();
-			
+			void LoadScript(std::string p_scriptPath);
 			void AddParameterString(std::string p_string);
 			void AddParameterNumber(double p_double);
 			void AddParameterBoolean(bool p_bool);

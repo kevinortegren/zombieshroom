@@ -17,7 +17,7 @@ namespace RootEngine
 		{
 			//g_world->GetEntityManager()->
 			//g_world->GetEntityManager()->
-			g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Trying to create");
+			//g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Trying to create");
 			return 0;
 		}
 

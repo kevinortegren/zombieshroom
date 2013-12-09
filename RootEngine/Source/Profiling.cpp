@@ -30,6 +30,8 @@ namespace RootEngine
 				if(t > maxTime)
 					maxTime = t;
 			}
+			if(itr->second.size() == 0)
+				continue;
 			//Calculate average time
 			__int64 qfreq;
 			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);

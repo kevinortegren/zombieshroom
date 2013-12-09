@@ -37,7 +37,6 @@ namespace RootEngine
 
 			return s_scriptManager;
 		}
-		
 
 		void ScriptManager::ExecuteWholeScript(std::string p_scriptPath)
 		{
@@ -45,11 +44,8 @@ namespace RootEngine
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 		}
 
-		void ScriptManager::SetScript(std::string p_scriptPath, std::string p_functionName)
+		void ScriptManager::SetFunction(std::string p_functionName)
 		{
-			// Execute the script
-			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
-
 			// Execute specific function
 			lua_getglobal(m_luaState, p_functionName.c_str());
 		}
@@ -81,6 +77,12 @@ namespace RootEngine
 		void ScriptManager::RegisterFunctions()
 		{
 			lua_register(m_luaState, "CreateThing", CreateThing);
+		}
+
+		void ScriptManager::LoadScript( std::string p_scriptPath )
+		{
+			// Execute the script
+			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 		}
 
 	}

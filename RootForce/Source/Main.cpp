@@ -86,7 +86,8 @@ Main::~Main()
 
 void Main::Start() 
 {
-
+	
+	
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 	RootForce::Renderable::SetTypeId(0);
@@ -194,14 +195,14 @@ void Main::Start()
 		}
 
 		// Code for testing scripts
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_Q) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_Q) == RootEngine::InputManager::KeyState::DOWN)
 		{
-			g_engineContext.m_script->SetScript("script3.lua", "PrintSomeData");
-
+			PROFILE("SCRIPTTEST", g_engineContext.m_profiler);
+			g_engineContext.m_script->LoadScript("script3.lua");
+			g_engineContext.m_script->SetFunction("PrintSomeData");
 			g_engineContext.m_script->AddParameterBoolean(true);
 			g_engineContext.m_script->AddParameterNumber(2.0);
 			g_engineContext.m_script->AddParameterString("Test");
-
 			g_engineContext.m_script->ExecuteScript();
 		}
 
