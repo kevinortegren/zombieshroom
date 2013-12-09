@@ -22,15 +22,6 @@ namespace RootForce
 			memcpy(buffer + sizeof(Type) + sizeof(SenderID), Message, strlen(Message) + 1);
 		}
 
-		/*
-		void MessageChat::Deserialize(uint8_t* buffer)
-		{
-			memcpy(&Type, buffer, sizeof(Type));
-			memcpy(&SenderID, buffer + sizeof(Type), sizeof(SenderID));
-			
-		}
-		*/
-
 
 
 		int MessageUserInfo::GetSerializedSize() const

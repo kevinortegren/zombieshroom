@@ -8,6 +8,7 @@ namespace RootForce
 {
 	namespace Network
 	{
+		/** Handles messages to a client (on either a remote or a local system). */
 		class ClientMessageHandler
 		{
 		public:

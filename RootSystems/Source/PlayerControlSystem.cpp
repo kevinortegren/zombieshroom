@@ -38,6 +38,11 @@ namespace RootForce
 
 	void PlayerControlSystem::Process()
 	{
+		// Do not run if the player is non-existant
+		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+		if (player == nullptr)
+			return;
+
 		// Check what keys have been pressed this frame and update the action list.
 		m_inputtedActionsCurrentFrame.clear();
 		for (Keybinding kb : m_keybindings)
@@ -64,9 +69,9 @@ namespace RootForce
 
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PlayerInputControlComponent* controller = m_world->GetEntityManager()->GetComponent<PlayerInputControlComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+		PlayerInputControlComponent* controller = m_world->GetEntityManager()->GetComponent<PlayerInputControlComponent>(player);
+		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(player);
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = glm::normalize(glm::cross(facing, glm::vec3(0.0f, 1.0f, 0.0f)));

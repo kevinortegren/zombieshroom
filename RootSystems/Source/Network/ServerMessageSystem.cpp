@@ -52,10 +52,13 @@ namespace RootForce
 			m_messages.clear();
 		}
 
-		void ServerClientSystem::HandleUserConnectMessage(RootEngine::Network::Message* p_message)
+		void ServerClientSystem::HandleUserConnectMessage(RootEngine::Network::Message* p_message, bool p_local)
 		{
 			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 			NetworkClientComponent* newPlayerNetworkClientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
+
+			// TODO: Add physics component
+			//m_world->GetEntityManager()->CreateEntity(
 
 			newPlayerNetworkClientComponent->UserID = p_message->Data[0];
 			newPlayerNetworkClientComponent->Name = "Unknown Player";
@@ -77,7 +80,7 @@ namespace RootForce
 
 
 
-		ServerMessageHandler::ServerMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::Server* p_server)
+		ServerMessageHandler::ServerMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::LocalServer* p_server)
 			: m_world(p_world) 
 			, m_logger(p_logger)
 			, m_server(p_server)
@@ -146,7 +149,7 @@ namespace RootForce
 					// TODO: Decide if we will use this
 					break;
 				case RootEngine::Network::InnerMessageID::CONNECT:
-					m_serverClientSystem->HandleUserConnectMessage(p_message);
+					m_serverClientSystem->HandleUserConnectMessage(p_message, m_server->IsClientLocal(p_message->SenderID));
 					break;
 				case RootEngine::Network::InnerMessageID::DISCONNECT:
 					m_serverClientSystem->HandleUserDisconnectMessage(p_message);

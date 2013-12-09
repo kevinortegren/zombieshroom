@@ -33,7 +33,7 @@ namespace RootForce
 			void ProcessEntity(ECS::Entity* p_entity);
 			void End();
 
-			void HandleUserConnectMessage(RootEngine::Network::Message* p_message);
+			void HandleUserConnectMessage(RootEngine::Network::Message* p_message, bool p_local);
 			void HandleUserDisconnectMessage(RootEngine::Network::Message* p_message);
 			void HandleUserInfo(RootEngine::Network::Message* p_message);
 		private:
@@ -74,17 +74,17 @@ namespace RootForce
 
 
 
-		// TODO: Change name to ServerMessageHandler
+		/** Handles messages to a local/dedicated server. */
 		class ServerMessageHandler
 		{
 		public:
-			ServerMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::Server* p_server);
+			ServerMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::LocalServer* p_server);
 
 			void HandleServerMessage(RootEngine::Network::Message* p_message);
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
-			RootEngine::Network::Server* m_server;
+			RootEngine::Network::LocalServer* m_server;
 			ServerClientSystem* m_serverClientSystem;
 
 			void HandleChatToServerMessage(RootEngine::Network::Message* p_message);
