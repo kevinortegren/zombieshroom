@@ -1,8 +1,7 @@
 #pragma once
 
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\Shared\Orientation.h>
-
+#include <Utility/ECS/Include/Component.h>
+#include <RootSystems/Include/Orientation.h>
 #include <glm/glm.hpp>
 
 namespace RootForce

@@ -216,5 +216,4 @@ namespace RootEngine
 		cutPath		= cutPath.substr(0, dotIndex);
 		return cutPath;
 	}
-
 }

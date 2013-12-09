@@ -1,17 +1,18 @@
 #include <Main.h>
 #include <stdexcept>
 #include <exception>
-#include <gtest/gtest.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
 //#include <RenderingSystem.h>
 //#include <LightSystem.h>
-#include <PhysicsSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
 
 
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
+
+#include <RootSystems/Include/Network/Messages.h>
 
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
@@ -21,12 +22,6 @@
 
 #undef main
 
-TEST(Test, Foo) 
-{
-	int a = 0;
-	EXPECT_TRUE(a == 0);
-}
-
 int main(int argc, char* argv[]) 
 {
 	std::string path(argv[0]);
@@ -34,30 +29,18 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
-		if (argc > 1 && strcmp(argv[1], "-test") == 0)
-		{
-			testing::InitGoogleTest(&argc, argv);
-
-			int result = RUN_ALL_TESTS();
-			std::cin.get();
-			return result;
-		}
-		else
-		{
 			Main m(path);
 			m.Start();
-		}
 	} 
 	catch (std::exception& e) 
 	{
-		// TODO: Log exception message
-		std::cout << e.what() << "\n";
+		std::cout << e.what() << std::endl;
 		std::cin.get();
 		return 1;
 	} 
 	catch (...) 
 	{
-		// TODO: Log unknown exception message
+		std::cout << "Unknown exception" << std::endl;
 		std::cin.get();
 		return 1;
 	}
@@ -110,6 +93,9 @@ void Main::Start()
 	RootForce::PointLight::SetTypeId(2);
 	RootForce::PlayerInputControlComponent::SetTypeId(3);
 	RootForce::PhysicsAccessor::SetTypeId(4);
+	RootForce::Network::NetworkClientComponent::SetTypeId(5);
+	RootForce::Network::NetworkComponent::SetTypeId(6);
+
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -168,10 +154,13 @@ void Main::Start()
 	// Import test world.
 	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
-	//RootForce::PhysicsAccessor* physaccessor = m_world.GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(m_world.GetTagManager()->GetEntityByTag("Player"));
-	//int temp[1] = {0};
-	//physaccessor->m_handle = temp;
+
 	
+	//Plane at bottom
+	float normal[3] = {0,1,0};
+	float position[3] = {0, -2, 0};
+	
+	g_engineContext.m_physics->CreatePlane(normal, position);
 
 	// Setup the skybox.
 	auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
@@ -185,33 +174,15 @@ void Main::Start()
 	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 
 
-	//Plane at bottom
-	float normal[3] = {0,1,0};
-	float position[3] = {0, -2, 0};
-	float dir[3] = {0,0,-1};
-	float grav[3] = {0,0,0};
-	float pos[3] = {0,1,-1};
-	float rot[4] = {0,-1,1,-1};
-	g_engineContext.m_physics->CreatePlane(normal, position);
-	RootEngine::Physics::AbilityPhysicsInfo test;
-	test.m_collidesWorld = true;
-	test.m_direction = dir;
-	test.m_entityId = -1;
-	test.m_gravity = grav;
-	test.m_height = 1;
-	test.m_mass = 1;
-	test.m_position = pos;
-	test.m_radius = 1;
-	test.m_orientation = rot;
-	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
-	test.m_speed = 1;
-	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
-	g_engineContext.m_physics->AddAbilityToWorld(test);
+	// Initialize the network system
+	RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)
-	{
+	{	
+		
 		uint64_t now = SDL_GetPerformanceCounter();
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
@@ -220,20 +191,47 @@ void Main::Start()
 
 		m_world.SetDelta(dt);
 		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		
+		{
+			PROFILE("Handle Events", g_engineContext.m_profiler);
 		HandleEvents();
+		}
+		{
+			PROFILE("Player control system", g_engineContext.m_profiler);
+			m_playerControlSystem->Process();
+		}
 
-		m_playerControlSystem->Process();
+		m_networkHandler->Update();
+
 		abilitySystem->Process();
 
 		g_engineContext.m_renderer->Clear();
+
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
 		g_engineContext.m_physics->Update(dt);
+		}
 
 		// Update Game systems.
 		pointLightSystem->Process();
 		m_physicsSystem->Process();
 		renderingSystem->Process();
+		
+		{
+			PROFILE("Render", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
 
 		// Update Engine systems.
+		{
+			PROFILE("RenderLines", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->RenderLines();
+		}
+		
+		g_engineContext.m_profiler->Update(dt);
+		
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
 		{
 			if(m_displayNormals)
@@ -253,6 +251,7 @@ void Main::Start()
 
 		g_engineContext.m_gui->Update();
 		g_engineContext.m_gui->Render();
+		}
 
 		g_engineContext.m_renderer->Swap();
 	}

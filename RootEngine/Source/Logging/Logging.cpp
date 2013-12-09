@@ -9,19 +9,19 @@ Logging::Logging()
 	ColorCMD::ConsoleColorInit();
 	SetConsoleTitle(L"RootLog");
 
-	m_stringTagList.push_back("RENDER");
-	m_stringTagList.push_back("NETWOR");
-	m_stringTagList.push_back("GNERAL");
-	m_stringTagList.push_back("NOTAG ");
-	m_stringTagList.push_back("PHYSIC");
-	m_stringTagList.push_back("TOOLS ");
-	m_stringTagList.push_back("SOUND ");
-	m_stringTagList.push_back("GAME  ");
-	m_stringTagList.push_back("CMPSYS");
-	m_stringTagList.push_back("GUI   ");
-	m_stringTagList.push_back("INPUT ");
-	m_stringTagList.push_back("RESSYS");
-	m_stringTagList.push_back("SCRIPT");
+	m_stringTagList.push_back("RENDER ");
+	m_stringTagList.push_back("NETWORK");
+	m_stringTagList.push_back("GENERAL");
+	m_stringTagList.push_back("NOTAG  ");
+	m_stringTagList.push_back("PHYSICS");
+	m_stringTagList.push_back("TOOLS  ");
+	m_stringTagList.push_back("SOUND  ");
+	m_stringTagList.push_back("GAME   ");
+	m_stringTagList.push_back("COMPSYS");
+	m_stringTagList.push_back("GUI    ");
+	m_stringTagList.push_back("INPUT  ");
+	m_stringTagList.push_back("RESSYS ");
+	m_stringTagList.push_back("SCRIPT ");
 
 	m_stringLevelList.push_back("FATAL_ERR  ");
 	m_stringLevelList.push_back("NON_FAT_ERR");
@@ -236,6 +236,9 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 	}
 	
 	vprintf(output.c_str(), p_args);
+
+	ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
+	std::cout<<"";
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -281,6 +284,5 @@ std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
 {
 	return m_stringLevelList.at(p_level);
 }
-
 
 

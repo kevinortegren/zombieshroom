@@ -1,5 +1,4 @@
-#include <RootForce/Include/AbilitySystem.h>
-#include <gtest/gtest.h>
+#include <AbilitySystem.h>
 
 namespace RootForce
 {

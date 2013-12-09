@@ -6,6 +6,11 @@
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
+#include <RootEngine/Include/Profiling.h>
+
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 Logging	g_logger;
 
@@ -50,13 +55,14 @@ namespace RootEngine
 		m_gui = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
-
+		
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
 		m_subsystemSharedContext.m_debugOverlay = new DebugOverlay();
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
-
+		
+		
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
@@ -73,16 +79,17 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
 		{
 			LoadGUI();
+			m_gui->SetWorkingDir(p_workingDirectory);
 		}
 		if((p_flags & SubsystemInit::INIT_PHYSICS) == SubsystemInit::INIT_PHYSICS)
 		{
 			LoadPhysics();
 		}
 
-		m_gui->SetWorkingDir(p_workingDirectory);
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
+		m_gameSharedContext.m_profiler =  new Profiling();
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
@@ -94,6 +101,7 @@ namespace RootEngine
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
 
+		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
 		m_resourceManager.Init(p_workingDirectory, &m_gameSharedContext);
 
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");

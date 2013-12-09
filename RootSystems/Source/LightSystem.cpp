@@ -1,4 +1,4 @@
-#include <Utility\ECS\Include\Shared\LightSystem.h>
+#include <LightSystem.h>
 
 namespace RootForce
 {	
