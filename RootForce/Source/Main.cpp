@@ -235,7 +235,18 @@ void Main::Start()
 
 		// Update Engine systems.
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
-			g_engineContext.m_renderer->DisplayNormals(false);
+		{
+			if(m_displayNormals)
+			{
+				m_displayNormals = false;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+			}
+			else
+			{
+				m_displayNormals = true;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+			}
+		}
 
 		g_engineContext.m_renderer->Render();
 		//g_engineContext.m_renderer->RenderLines();

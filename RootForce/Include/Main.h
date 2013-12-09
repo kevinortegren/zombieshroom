@@ -28,4 +28,5 @@ private:
 	
 	ECS::World m_world;
 	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
+	bool m_displayNormals;
 };
