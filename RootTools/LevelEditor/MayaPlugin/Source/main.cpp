@@ -16,6 +16,7 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
+void NodeRemovedCB(MObject &node, void *clientData);
 
 void checkForNewMeshes(bool made, MObject source, MObject destination);
 void checkForNewCameras(MObject &node, void *clientData);
@@ -28,7 +29,7 @@ void MayaListToList(MObject node);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 
-int meshIndex, cameraIndex, lightIndex;
+int meshIndex = 0, cameraIndex = 0, lightIndex = 0;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -60,6 +61,8 @@ EXPORT MStatus initializePlugin(MObject obj)
 		id = MDGMessage::addNodeAddedCallback(NodeAddedCB, "dependNode", nullptr, &status);
 		AddCallbackID(status, id);
 
+		id = MDGMessage::addNodeRemovedCallback(NodeRemovedCB, "dependNode", nullptr, &status);
+		AddCallbackID(status, id);
 	}
 
 	int nrTotalVertices = 0;
@@ -175,6 +178,8 @@ void loadScene()
 			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaMeshList[i], dirtyMeshNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 		}
+
+		//MayaListToList(g_mayaMeshList[i]);
 	}
 	//Light transformation CB
 	for(int i = 0; i < currNrLights; i++)
@@ -187,6 +192,8 @@ void loadScene()
 			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 		}
+
+		//MayaListToList(g_mayaLightList[i]);
 	}
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
@@ -199,6 +206,8 @@ void loadScene()
 			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 		}
+
+		//MayaListToList(g_mayaCameraList[i]);
 	}
 
 }
@@ -267,6 +276,28 @@ void NodeAddedCB(MObject &node, void *clientData)
 	checkForNewCameras(node, clientData);
 	checkForNewLights(node, clientData);
 	//printLists();
+}
+
+void NodeRemovedCB(MObject &node, void *clientData)
+{
+	Print("Removed a object!");
+
+	if(node.hasFn(MFn::kMesh))
+	{
+		MFnMesh mesh = node;
+
+		if(mesh.fullPathName() != "")
+		{
+			for(int i = 0; i < currNrMeshes; i++)
+			{
+				MFnMesh listMesh = g_mayaMeshList[i];
+				if(listMesh.fullPathName() == mesh.fullPathName())
+				{
+					Print("Mesh ", mesh.fullPathName(), " at index ", i);
+				}
+			}
+		}
+	}
 }
 
 // MESHES
@@ -517,7 +548,7 @@ void MayaListToList(MObject node)
 					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
 					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					mesh.getVertexNormal(localIndex[j],false, normal, space_local);
+					mesh.getVertexNormal(triangleVertices[j],false, normal, space_local);
 					SM.meshList[meshIndex].normal[count].x = normal.x;
 					SM.meshList[meshIndex].normal[count].y = normal.y;
 					SM.meshList[meshIndex].normal[count].z = normal.z;
@@ -566,6 +597,7 @@ void MayaListToList(MObject node)
 			SM.UpdateSharedMesh(meshIndex, updateTrans, updateMesh, currNrMeshes);
 			Print("Mindex sent to sharedmemory: ", meshIndex);
 			updateMesh, updateTrans = false;
+
 			}
 
 		
@@ -616,7 +648,8 @@ void MayaListToList(MObject node)
 
 
 			if(!alreadyExists)
-			lightIndex++;
+				lightIndex++;
+
 			SM.UpdateSharedLight(lightIndex, currNrLights);
 			Print("Lindex sent to sharedmemory: ",lightIndex);
 		}
@@ -845,6 +878,7 @@ MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle )
 }
 
 
+
 ////////////////////////////	UNINITALIZE PLUGIN //////////////////////////////////////////
 // Avinitiera pluginet.
 EXPORT MStatus uninitializePlugin(MObject obj)
@@ -855,6 +889,7 @@ EXPORT MStatus uninitializePlugin(MObject obj)
 	// Ta bort alla registrerade callbacks innan plug-in:et stängs!
 	// Maya kraschar förmodligen annars!
 	MMessage::removeCallbacks(g_callback_ids);
+
 
 	return MS::kSuccess;
 }

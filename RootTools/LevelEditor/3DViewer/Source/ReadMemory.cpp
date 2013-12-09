@@ -75,8 +75,8 @@ int ReadMemory::InitalizeSharedMemory()
 
 void ReadMemory::Read()			//read if the active object have changed.
 {
-	MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(MeshIdMutexHandle, milliseconds);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
 
 	if(*MeshIdChange != -1)
 	{
@@ -86,7 +86,7 @@ void ReadMemory::Read()			//read if the active object have changed.
 		*MeshIdChange = -1;
 	}
 
-	ReleaseMutex(MeshIdMutexHandle);
+	ReleaseMutex(IdMutexHandle);
 }
 
 void ReadMemory::ReadMesh(int i)
@@ -122,7 +122,7 @@ int ReadMemory::shutdown()
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
-	CloseHandle(MeshIdMutexHandle);
+	CloseHandle(IdMutexHandle);
 	CloseHandle(LightMutexHandle);
 	CloseHandle(CameraMutexHandle);
 	return 0;

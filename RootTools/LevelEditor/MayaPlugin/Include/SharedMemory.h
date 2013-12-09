@@ -33,9 +33,7 @@ private:
 	int shutdown();
 	//Variables
 	HANDLE MeshMutexHandle;
-	HANDLE MeshIdMutexHandle;
-	HANDLE LightIdMutexHandle;
-	HANDLE CameraIdMutexHandle;
+	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
 	DWORD milliseconds;

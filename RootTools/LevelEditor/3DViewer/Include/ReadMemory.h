@@ -30,9 +30,7 @@ public:
 	int* CameraIdChange;
 	int* LightIdChange;
 	HANDLE MeshMutexHandle;
-	HANDLE MeshIdMutexHandle;
-	HANDLE LightIdMutexHandle;
-	HANDLE CameraIdMutexHandle;
+	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
 	DWORD milliseconds;

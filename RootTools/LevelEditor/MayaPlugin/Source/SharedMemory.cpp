@@ -64,22 +64,22 @@ int SharedMemory::InitalizeSharedMemory()
 	NumberOfCameras = (int*)(mem3 + sizeof(Camera) * g_maxCameras);
 	mem3 = (unsigned char*)NumberOfCameras;
 
-	if(first_process)
-	{
+	//if(first_process)
+	//{
 		memset(raw_data,0,total_memory_size);
-	}
+	//}
 	return 0;
 }
 
 void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
 {
-	LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(LightIdMutexHandle, milliseconds);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
 
 	*NumberOfLights = nrOfLights;
 	*LightIdChange = index;
 
-	ReleaseMutex(LightIdMutexHandle);
+	ReleaseMutex(IdMutexHandle);
 
 	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 	WaitForSingleObject(LightMutexHandle, milliseconds);
@@ -94,12 +94,12 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)
 
 void SharedMemory::UpdateSharedCamera(int index)		
 {
-	CameraIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(CameraIdMutexHandle, milliseconds);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
 
 	*CameraIdChange = index;
 
-	ReleaseMutex(CameraIdMutexHandle);
+	ReleaseMutex(IdMutexHandle);
 
 	CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
 	WaitForSingleObject(CameraMutexHandle, milliseconds);
@@ -113,12 +113,12 @@ void SharedMemory::UpdateSharedCamera(int index)
 
 void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)
 {
-	MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(MeshIdMutexHandle, milliseconds);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
 	*NumberOfMeshes = nrOfMeshes;
 	*MeshIdChange = index;	//Moved this codeblock up, didnt change shit.
 
-	ReleaseMutex(MeshIdMutexHandle);
+	ReleaseMutex(IdMutexHandle);
 
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
@@ -156,7 +156,7 @@ int SharedMemory::shutdown()
 	UnmapViewOfFile(raw_data);
 	CloseHandle(shared_memory_handle);
 	CloseHandle(MeshMutexHandle);
-	CloseHandle(MeshIdMutexHandle);
+	CloseHandle(IdMutexHandle);
 	CloseHandle(LightMutexHandle);
 	CloseHandle(CameraMutexHandle);
 	return 0;

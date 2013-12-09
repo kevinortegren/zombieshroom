@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 
 			//Render::Material material;
 			Render::Material* materials;
-			materials = new Render::Material[10];	//Satte ett fast väre på 10 här.
+			materials = new Render::Material[100];	//Satte ett fast värde på 100 HÄR
 			materials[0].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture("sphere_diffuse.dds");
 			materials[0].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 			
@@ -200,8 +200,8 @@ int main(int argc, char* argv[])
 			//Load existing objects
 
 			///////////////////////LOAD MESHES////////////////////////////////
-			RM.MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.MeshIdMutexHandle, RM.milliseconds);
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
 			numberMeshes = *RM.NumberOfMeshes;
 			*RM.MeshIdChange = -1;
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 			std::string tempTexName;
 			int numberOfMaterials = 1;
 
-			ReleaseMutex(RM.MeshIdMutexHandle);
+			ReleaseMutex(RM.IdMutexHandle);
 			
 			for(int i = 0; i < numberMeshes; i++)
 			{
@@ -225,15 +225,15 @@ int main(int argc, char* argv[])
 				tempTexName = GetNameFromPath(RM.PmeshList[i]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
 				if(tempTexName == "NONE.dds")
 				{
-				RM.PmeshList[i]->MaterialID = 0;
+					RM.PmeshList[i]->MaterialID = 0;
 				}
 				else
 				{
-				m_engineContext.m_resourceManager->LoadTexture(tempTexName);
-				materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
-				materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-				numberOfMaterials ++;
-				RM.PmeshList[i]->MaterialID = numberOfMaterials;
+					m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+					materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+					materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+					numberOfMaterials ++;
+					RM.PmeshList[i]->MaterialID = numberOfMaterials;
 				}
 
 				glm::quat rotation;
@@ -266,13 +266,13 @@ int main(int argc, char* argv[])
 			}
 
 			///////////////////////Load Lights////////////////////////////////
-			RM.LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.LightIdMutexHandle, RM.milliseconds);
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
 			numberLights = *RM.NumberOfLights;
 			*RM.LightIdChange = -1;
 
-			ReleaseMutex(RM.LightIdMutexHandle);
+			ReleaseMutex(RM.IdMutexHandle);
 
 			
 			for(int i = 0; i < numberLights; i++)
@@ -304,12 +304,12 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
-				RM.MeshIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.MeshIdMutexHandle, RM.milliseconds);
+				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
 				int MeshIndex = *RM.MeshIdChange;
 				*RM.MeshIdChange = -1;
-				ReleaseMutex(RM.MeshIdMutexHandle);
+				ReleaseMutex(RM.IdMutexHandle);
 
 				///////////////////////UPDATE MESHES////////////////////////////////
 				if(MeshIndex != -1)					
@@ -328,19 +328,19 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
-					tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
-						if(tempTexName == "NONE.dds")
-						{
-						RM.PmeshList[MeshIndex]->MaterialID = 0;
-						}
-						else
-						{
-						m_engineContext.m_resourceManager->LoadTexture(tempTexName);
-						materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
-						materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-						numberOfMaterials ++;
-						RM.PmeshList[MeshIndex]->MaterialID = numberOfMaterials;
-					}
+					//tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
+					//	if(tempTexName == "NONE.dds")
+					//	{
+					//	RM.PmeshList[MeshIndex]->MaterialID = 0;
+					//	}
+					//	else
+					//	{
+					//	m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+					//	materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+					//	materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+					//	numberOfMaterials ++;
+					//	RM.PmeshList[MeshIndex]->MaterialID = numberOfMaterials;
+					//}
 
 					glm::quat rotation;
 					rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
@@ -348,7 +348,7 @@ int main(int argc, char* argv[])
 					rotation.z = RM.PmeshList[MeshIndex]->transformation.rotation.z;
 					rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;
 				
-					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_orientation.Rotate(rotation);
+					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_orientation.SetOrientation(rotation);
 
 					//m_vertices = new Render::Vertex1P[RM.PmeshList[MeshIndex]->nrOfVertices];
 					for(int j = 0; j < RM.PmeshList[MeshIndex]->nrOfVertices; j++)
@@ -370,12 +370,12 @@ int main(int argc, char* argv[])
 				}
 
 				///////////////////////UPDATE LIGHTS////////////////////////////////
-				RM.LightIdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.LightIdMutexHandle, RM.milliseconds);
+				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
 				int LightIndex = *RM.LightIdChange;
 				*RM.LightIdChange = -1;
-				ReleaseMutex(RM.LightIdMutexHandle);
+				ReleaseMutex(RM.IdMutexHandle);
 
 				if(LightIndex != -1)					
 				{
