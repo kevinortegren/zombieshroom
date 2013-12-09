@@ -66,27 +66,6 @@ EXPORT MStatus initializePlugin(MObject obj)
 		AddCallbackID(status, id);
 	}
 
-	int nrTotalVertices = 0;
-
-	for(int i = 0; i < currNrMeshes; i++)
-	{
-		
-		int maxCount = SM.meshList[i].nrOfVertices;
-		//Print("MeshName ", SM.meshList[i].transformation.name.c_str());
-		//Print("TexturePath ", SM.meshList[i].texturePath.c_str());
-		//Print("NormalPath ", SM.meshList[i].normalPath.c_str());
-
-		//for(int j = 0; j < maxCount; j++)
-		//{
-		//	Print("v ", SM.meshList[i].vertex[j].x, " ", SM.meshList[i].vertex[j].y," ", SM.meshList[i].vertex[j].z);
-		//	Print("vn ", SM.meshList[i].normal[j].x, " ", SM.meshList[i].normal[j].y," ", SM.meshList[i].normal[j].z);
-		//	Print("tt 0 0 0");
-		//	Print("vt ", SM.meshList[i].UV[j][0], " ", SM.meshList[0].UV[j][1]);
-		//	nrTotalVertices++;
-		//}
-	}
-
-	//Print("Total vertices: ", nrTotalVertices);
 	return status;
 }
 
@@ -137,7 +116,7 @@ void printLists()
 	for(int i = 0; i < currNrMeshes; i++)
 	{
 		MFnMesh tempMesh = g_mayaMeshList[i];
-		//Print(tempMesh.fullPathName());
+		Print(tempMesh.fullPathName());
 		
 	}
 
@@ -145,7 +124,7 @@ void printLists()
 	for(int i = 0; i < currNrCameras; i++)
 	{
 		MFnCamera tempCamera = g_mayaCameraList[i];
-		//Print(tempCamera.fullPathName());
+		Print(tempCamera.fullPathName());
 		
 	}
 
@@ -153,7 +132,7 @@ void printLists()
 	for(int i = 0; i < currNrLights; i++)
 	{
 		MFnLight tempLight = g_mayaLightList[i];
-		//Print(tempLight.fullPathName());
+		Print(tempLight.fullPathName());
 		
 	}
 
@@ -310,23 +289,33 @@ void NodeAddedCB(MObject &node, void *clientData)
 
 void NodeRemovedCB(MObject &node, void *clientData)
 {
-	Print("Removed a object!");
-
+	int removeID = 0;
 	if(node.hasFn(MFn::kMesh))
 	{
+		Print("Removed a mesh!");
+
 		MFnMesh mesh = node;
 
-		if(mesh.fullPathName() != "")
+		for(int i = 0; i < currNrMeshes; i++)
 		{
-			for(int i = 0; i < currNrMeshes; i++)
+			MFnMesh listMesh = g_mayaMeshList[i];
+			if(listMesh.name() == mesh.name())
 			{
-				MFnMesh listMesh = g_mayaMeshList[i];
-				if(listMesh.fullPathName() == mesh.fullPathName())
+				Print("Mesh ", mesh.name(), " at index ", i);
+				removeID = i;
+				for(int j = i; j < currNrMeshes; j++)
 				{
-					Print("Mesh ", mesh.fullPathName(), " at index ", i);
+					g_mayaMeshList[j] = g_mayaMeshList[j+1];
+					MayaMeshToList(g_mayaMeshList[j], j);
+					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);
 				}
+																					//Will crash if it reaches g_maxMeshes
+				currNrMeshes--;
+				SM.RemoveMesh(removeID, currNrMeshes);
 			}
-		}
+		}	
+
+		printLists();
 	}
 }
 

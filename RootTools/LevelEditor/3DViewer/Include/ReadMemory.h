@@ -26,9 +26,9 @@ public:
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
-	int* MeshIdChange;
-	int* CameraIdChange;
-	int* LightIdChange;
+	glm::vec2* MeshIdChange;
+	glm::vec2* CameraIdChange;
+	glm::vec2* LightIdChange;
 	HANDLE MeshMutexHandle;
 	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;

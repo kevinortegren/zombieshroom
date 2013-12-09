@@ -20,7 +20,7 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
-	total_memory_size += sizeof(int) * 3;
+	total_memory_size += sizeof(glm::vec2) * 3;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -54,9 +54,9 @@ int ReadMemory::InitalizeSharedMemory()
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
 	mem = (unsigned char*)NumberOfMeshes;
-	MeshIdChange = (int*)(mem + sizeof(int));
-	CameraIdChange = (int*)(MeshIdChange + sizeof(int));
-	LightIdChange = (int*)(CameraIdChange + sizeof(int));
+	MeshIdChange = (glm::vec2*)(mem + sizeof(int));
+	CameraIdChange = (glm::vec2*)(MeshIdChange + sizeof(glm::vec2));
+	LightIdChange = (glm::vec2*)(CameraIdChange + sizeof(glm::vec2));
 	unsigned char* mem2 = (unsigned char*)LightIdChange;
 	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
 	mem2 = (unsigned char*)NumberOfLights;
@@ -73,47 +73,47 @@ int ReadMemory::InitalizeSharedMemory()
 
 
 
-void ReadMemory::Read()			//read if the active object have changed.
-{
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-
-	if(*MeshIdChange != -1)
-	{
-		system("cls");
-		cout << "ID: " + to_string(*MeshIdChange) << endl;
-		ReadMesh(*MeshIdChange);
-		*MeshIdChange = -1;
-	}
-
-	ReleaseMutex(IdMutexHandle);
-}
-
-void ReadMemory::ReadMesh(int i)
-{
-	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(MeshMutexHandle, milliseconds);
-
-	cout << PmeshList[i]->transformation.name << endl;
-	cout << "NrOfVertices " + to_string(PmeshList[i]->nrOfVertices) << endl;
-	cout << "TransPosXYZ " + to_string(PmeshList[i]->transformation.position.x) + " "
-							+ to_string(PmeshList[i]->transformation.position.y) + " "
-							+ to_string(PmeshList[i]->transformation.position.z)<< endl;
-
-	cout << "ScaleXYZ " + to_string(PmeshList[i]->transformation.scale.x) + " "
-							+ to_string(PmeshList[i]->transformation.scale.y) + " "
-							+ to_string(PmeshList[i]->transformation.scale.z)<< endl;
-	
-	cout << "RotationXYZ " + to_string(PmeshList[i]->transformation.rotation.x) + " "
-							+ to_string(PmeshList[i]->transformation.rotation.y) + " "
-							+ to_string(PmeshList[i]->transformation.rotation.z)<< endl;
-	for(int k = 0; k < PmeshList[i]->nrOfVertices; k++)
-	{
-	cout << "Vertex x,y,z" + to_string(PmeshList[i]->vertex[k].x) + " " + to_string(PmeshList[i]->vertex[k].y) + " " + to_string(PmeshList[i]->vertex[k].z) << endl;
-	}
-
-	ReleaseMutex(MeshMutexHandle);
-}
+//void ReadMemory::Read()			//read if the active object have changed.
+//{
+//	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+//	WaitForSingleObject(IdMutexHandle, milliseconds);
+//
+//	if(*MeshIdChange != -1)
+//	{
+//		system("cls");
+//		cout << "ID: " + to_string(*MeshIdChange) << endl;
+//		ReadMesh(*MeshIdChange);
+//		*MeshIdChange = -1;
+//	}
+//
+//	ReleaseMutex(IdMutexHandle);
+//}
+//
+//void ReadMemory::ReadMesh(int i)
+//{
+//	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+//	WaitForSingleObject(MeshMutexHandle, milliseconds);
+//
+//	cout << PmeshList[i]->transformation.name << endl;
+//	cout << "NrOfVertices " + to_string(PmeshList[i]->nrOfVertices) << endl;
+//	cout << "TransPosXYZ " + to_string(PmeshList[i]->transformation.position.x) + " "
+//							+ to_string(PmeshList[i]->transformation.position.y) + " "
+//							+ to_string(PmeshList[i]->transformation.position.z)<< endl;
+//
+//	cout << "ScaleXYZ " + to_string(PmeshList[i]->transformation.scale.x) + " "
+//							+ to_string(PmeshList[i]->transformation.scale.y) + " "
+//							+ to_string(PmeshList[i]->transformation.scale.z)<< endl;
+//	
+//	cout << "RotationXYZ " + to_string(PmeshList[i]->transformation.rotation.x) + " "
+//							+ to_string(PmeshList[i]->transformation.rotation.y) + " "
+//							+ to_string(PmeshList[i]->transformation.rotation.z)<< endl;
+//	for(int k = 0; k < PmeshList[i]->nrOfVertices; k++)
+//	{
+//	cout << "Vertex x,y,z" + to_string(PmeshList[i]->vertex[k].x) + " " + to_string(PmeshList[i]->vertex[k].y) + " " + to_string(PmeshList[i]->vertex[k].z) << endl;
+//	}
+//
+//	ReleaseMutex(MeshMutexHandle);
+//}
 
 
 

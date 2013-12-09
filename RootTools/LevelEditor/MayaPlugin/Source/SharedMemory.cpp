@@ -20,7 +20,7 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
-	total_memory_size += sizeof(int) * 3;
+	total_memory_size += sizeof(glm::vec2) * 3;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -54,9 +54,9 @@ int SharedMemory::InitalizeSharedMemory()
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
 	mem = (unsigned char*)NumberOfMeshes;
-	MeshIdChange = (int*)(mem + sizeof(int));
-	CameraIdChange = (int*)(MeshIdChange + sizeof(int));
-	LightIdChange = (int*)(CameraIdChange + sizeof(int));
+	MeshIdChange = (glm::vec2*)(mem + sizeof(int));
+	CameraIdChange = (glm::vec2*)(MeshIdChange + sizeof(glm::vec2));
+	LightIdChange = (glm::vec2*)(CameraIdChange + sizeof(glm::vec2));
 	unsigned char* mem2 = (unsigned char*)LightIdChange;
 	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
 	mem2 = (unsigned char*)NumberOfLights;
@@ -77,7 +77,7 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 
 	*NumberOfLights = nrOfLights;
-	*LightIdChange = index;
+	*LightIdChange = glm::vec2(index,-1);
 
 	ReleaseMutex(IdMutexHandle);
 
@@ -97,7 +97,7 @@ void SharedMemory::UpdateSharedCamera(int index)
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 
-	*CameraIdChange = index;
+	*CameraIdChange = glm::vec2(index,-1);
 
 	ReleaseMutex(IdMutexHandle);
 
@@ -116,7 +116,7 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 	*NumberOfMeshes = nrOfMeshes;
-	*MeshIdChange = index;	//Moved this codeblock up, didnt change shit.
+	MeshIdChange->x = index;	//Moved this codeblock up, didnt change shit.
 
 	ReleaseMutex(IdMutexHandle);
 
@@ -149,6 +149,16 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 	
 
 	ReleaseMutex(MeshMutexHandle);
+}
+void SharedMemory::RemoveMesh(int id, int nrOfMeshes)
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+
+	MeshIdChange->y = id;
+	*NumberOfMeshes = nrOfMeshes;
+
+	ReleaseMutex(IdMutexHandle);
 }
 
 int SharedMemory::shutdown()

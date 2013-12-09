@@ -16,6 +16,7 @@ public:
 	void UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes);
 	void UpdateSharedCamera(int index);
 	void UpdateSharedLight(int index, int nrOfLights);
+	void RemoveMesh(int id, int nrOfMeshes);
 	int InitalizeSharedMemory();
 
 	//Variables
@@ -25,7 +26,9 @@ public:
 	int* NumberOfMeshes;
 	int* NumberOfLights;
 	int* NumberOfCameras;
-	//int* NumberOfCameras;
+	glm::vec2* MeshIdChange;
+	glm::vec2* CameraIdChange;
+	glm::vec2* LightIdChange;
 
 private:
 	//Functions
@@ -42,7 +45,5 @@ private:
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
-	int* MeshIdChange;
-	int* CameraIdChange;
-	int* LightIdChange;
+
 };
