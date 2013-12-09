@@ -13,10 +13,11 @@ namespace RootEngine
 		public:
 			void Startup();
 			void Shutdown();
+			void Initialize(ECS::World* p_world);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
 			void ExecuteWholeScript(std::string p_scriptPath);
-			void SetScriptWithFunction(std::string p_scriptPath, std::string p_functionName);
+			void SetScript(std::string p_scriptPath, std::string p_functionName);
 			void ExecuteScript();
 			
 			void AddParameterString(std::string p_string);
@@ -26,13 +27,13 @@ namespace RootEngine
 			static ScriptManager* GetInstance();
 
 		private:
-			static ScriptManager* s_scriptManager;
+			void RegisterFunctions();
+			
 
 			std::string m_workingDir;
 			lua_State* m_luaState;
-
 			int m_parameterCount;
-			
+			static ScriptManager* s_scriptManager;
 		};
 	}
 }

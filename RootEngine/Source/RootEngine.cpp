@@ -96,11 +96,9 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_SCRIPTING) == SubsystemInit::INIT_SCRIPTING)
 		{
 			LoadScriptEngine();
+			m_scriptEngine->SetWorkingDir(p_workingDirectory);
 		}
-
-		m_gui->SetWorkingDir(p_workingDirectory);
-		m_scriptEngine->SetWorkingDir(p_workingDirectory);
-
+	
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context

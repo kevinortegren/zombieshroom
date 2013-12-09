@@ -1,18 +1,19 @@
-#include "ScriptManager.h"
+#include <RootEngine/Script/Include/ScriptManager.h>
+#include <RootEngine/Script/Include/ScriptAPI.h>
+#include <RootEngine/Include/GameSharedContext.h>
 #include <iostream>
 
 namespace RootEngine
 {
 	namespace Script
 	{
-
-		SubsystemSharedContext g_context;
 		ScriptManager* ScriptManager::s_scriptManager = nullptr;
 
 		void ScriptManager::Startup()
 		{
 			m_luaState = luaL_newstate();
 			luaL_openlibs(m_luaState);
+			RegisterFunctions();
 			m_parameterCount = 0;
 			g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::INIT_PRINT, "Succesfull startup of the scripting system");
 		}
@@ -20,9 +21,15 @@ namespace RootEngine
 		void ScriptManager::Shutdown()
 		{
 			lua_close(m_luaState);
-			delete s_scriptManager;			
+			//delete s_scriptManager;			
 		}
 
+		void ScriptManager::Initialize( ECS::World* p_world )
+		{
+			g_world = p_world;
+		}
+
+		
 		ScriptManager* ScriptManager::GetInstance()
 		{
 			if(!s_scriptManager)
@@ -30,15 +37,15 @@ namespace RootEngine
 
 			return s_scriptManager;
 		}
+		
 
 		void ScriptManager::ExecuteWholeScript(std::string p_scriptPath)
 		{
 			// Execute the script
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
-
 		}
 
-		void ScriptManager::SetScriptWithFunction(std::string p_scriptPath, std::string p_functionName)
+		void ScriptManager::SetScript(std::string p_scriptPath, std::string p_functionName)
 		{
 			// Execute the script
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
@@ -70,6 +77,12 @@ namespace RootEngine
 			lua_pushboolean(m_luaState, p_bool);
 			m_parameterCount++;
 		}
+
+		void ScriptManager::RegisterFunctions()
+		{
+			lua_register(m_luaState, "CreateThing", CreateThing);
+		}
+
 	}
 }
 
