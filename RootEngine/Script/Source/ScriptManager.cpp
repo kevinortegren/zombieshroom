@@ -92,6 +92,10 @@ namespace RootEngine
 				LuaLoadLib(p_luaState, l_luaLibrary);
 			l_luaLibrary++;
 
+			if((p_flags & LuaLibraryInit::INIT_IO) == LuaLibraryInit::INIT_IO)
+				LuaLoadLib(p_luaState, l_luaLibrary);
+			l_luaLibrary++;
+
 			if((p_flags & LuaLibraryInit::INIT_OS) == LuaLibraryInit::INIT_OS)
 				LuaLoadLib(p_luaState, l_luaLibrary);
 			l_luaLibrary++;
