@@ -196,7 +196,10 @@ void Main::Start()
 			m_playerControlSystem->Process();
 		}
 
-		m_networkHandler->Update();
+		{
+			PROFILE("Network message handler", g_engineContext.m_profiler);
+			m_networkHandler->Update();
+		}
 
 		abilitySystem->Process();
 
