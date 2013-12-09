@@ -1,38 +1,62 @@
 #include <Server.h>
+#include <External/Include/RakNet/BitStream.h>
+#include <External/Include/RakNet/RakNetTypes.h>
+
 namespace RootEngine
 {
 	namespace Network
 	{
 		Server::Server(void)
 		{
-			m_isServer = true;
 		}
 
 		Server::~Server(void)
 		{
 		}
 
-		void Server::Host( USHORT p_port )
+		Message* Server::PollMessage()
 		{
-			printf( "Starting server.\n" );
-			RakNet::SocketDescriptor sd( p_port, 0 );
-			m_peer->Startup( MAX_CLIENTS, &sd, 1 );
-
-			m_peer->SetMaximumIncomingConnections( MAX_CLIENTS );
+			if(m_message.size() < 1)
+				return nullptr;
+			Message* message = *(m_message.end()-1);
+			m_message.pop_back();
+			return message;
 		}
 
-		void Server::ProcessPacket( RakNet::Packet* p_packet )
+		bool Server::Transmit( const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast )
 		{
-			switch( p_packet->data[0] )
+			if(p_message.DataSize > UINT_MAX)
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Attempting to send package with size higher than uint32. Package splitting not yet implemented.");
+
+			uint32_t numBytesSent = 0;
+			if(p_message.DataSize > 0)
 			{
-			case 29: // Custom chat
-				printf( "User sent a message: %.*s", p_packet->length - 1, &p_packet->data[1] );
-				Send( std::string( (const char*)(p_packet->data + 1), (const char*)(p_packet->data + p_packet->length) ) );
-				break;
-			default:
-				printf( "Unknown packet ID: %u", p_packet->data[0] );
-				break;
+				RakNet::BitStream bitstream;
+				bitstream.Write(NON_RAKNET_MESSAGE_ID);
+				bitstream.Write(p_message.RecipientID);
+				bitstream.Write(p_message.MessageID);
+				bitstream.Write(p_message.DataSize);
+				bitstream.Write((const char*)p_message.Data, (unsigned int)p_message.DataSize);
+
+				numBytesSent = m_peerInterface->Send( &bitstream, HIGH_PRIORITY, p_message.Reliability, 0, p_guid, p_broadcast);
 			}
+			return numBytesSent == (p_message.DataSize + 8 + 1 + 1 + 1);
+		}
+
+		void Server::ParseNonRaknetPacket( RakNet::Packet* p_packet, uint8_t p_clientID )
+		{
+			Message* message = new Message;
+			RakNet::BitStream bitstream(p_packet->data, p_packet->length, false);
+			bitstream.IgnoreBytes(1); // skip reading data[0] again
+			bitstream.Read(message->RecipientID);
+			bitstream.Read(message->MessageID);
+			bitstream.Read(message->DataSize);
+			message->Data = new uint8_t[message->DataSize];
+			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
+
+			message->SenderID = p_clientID;
+
+			m_message.push_back(message);
 		}
 	}
 }

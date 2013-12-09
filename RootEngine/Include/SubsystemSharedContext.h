@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RootEngine/Include/Profiling.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
@@ -11,6 +12,7 @@ namespace RootEngine
 	struct SubsystemSharedContext
 	{
 		Logging* m_logger;
+		ProfilingInterface* m_profiler;
 		MemoryTracker* m_memTracker;
 		DebugOverlayInterface* m_debugOverlay;
 		ResourceManagerInterface* m_resourceManager;

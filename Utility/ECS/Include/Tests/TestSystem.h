@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Utility\ECS\Include\EntitySystem.h>
-#include <RootForce/Include/Transform.h>
+#include <Utility/ECS/Include/EntitySystem.h>
+#include <Utility\ECS\Include\Shared\Transform.h>
 #include <RootEngine/Include/Logging/Logging.h>
-#include <gtest/gtest.h>
 
 using RootForce::Transform;
 
@@ -58,48 +57,7 @@ struct GameLogicSystem : public ECS::EntitySystem
 	}
 };
 
-class ECSTest : public testing::Test
-{
-protected:
-	void SetUp()
-	{
-		a = 1;
-	}
 
-	void TearDown()
-	{
-
-	}
-
-	ECS::World m_world;
-	int a;
-	ECS::Entity* m_entity1;
-};
-
-TEST_F(ECSTest, CreateEntity) 
-{
-	ECS::Entity* m_entity1 = m_world.GetEntityManager()->CreateEntity();
-
-	ASSERT_TRUE(m_entity1 != NULL);
-	EXPECT_EQ(0, m_entity1 ->GetId());
-	EXPECT_EQ(1, this->m_world.GetEntityManager()->GetNumEntities());
-
-	ECS::Entity*m_entity2 = m_world.GetEntityManager()->CreateEntity();
-
-	ASSERT_TRUE(m_entity2 != NULL);
-	EXPECT_EQ(1, m_entity2->GetId());
-	EXPECT_EQ(2, this->m_world.GetEntityManager()->GetNumEntities());
-
-	EXPECT_EQ(1, this->a);
-}
-
-TEST_F(ECSTest, RemoveEntity) 
-{
-	ECS::Entity* m_entity1 = m_world.GetEntityManager()->CreateEntity();
-
-	this->m_world.GetEntityManager()->RemoveEntity(m_entity1);
-	EXPECT_EQ(0, this->m_world.GetEntityManager()->GetNumEntities());
-}
 
 /*
 //ECS::ComponentSystem* gameLogic = m_engineContext->GetWorld()->GetSystemManager()->CreateSystem<GameLogicSystem>("GameLogic");

@@ -58,7 +58,7 @@ namespace YAML
 				output = std::numeric_limits<T>::infinity();
 				return true;
 			} else if(IsNegativeInfinity(input)) {
-				output = -std::numeric_limits<T>::infinity();
+				output = std::numeric_limits<T>::infinity();// Was: output = -std::numeric_limits<T>::infinity();
 				return true;
 			}
 		}

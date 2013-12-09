@@ -1,18 +1,20 @@
 #pragma once
-#include "Networker.h"
+#include <External/Include/RakNet/RakPeerInterface.h>
+#include "Server.h"
 namespace RootEngine
 {
 	namespace Network
 	{
-		class Client :
-			public Networker
+		class Client
 		{
 		public:
-			Client(void);
+			Client(RakNet::SystemAddress p_sysAddress);
 			~Client(void);
-
-			void ConnectTo( const char* p_ip, USHORT p_port = DEFAULT_PORT );
-			void ProcessPacket( RakNet::Packet* p_packet );
+			bool Send( const Message& p_message );
+			bool IsRemote() { return m_peerInterface != nullptr; }
+		private:
+			RakNet::RakPeerInterface* m_peerInterface;
+			RakNet::SystemAddress m_sysAddress;
 		};
 	}
 }

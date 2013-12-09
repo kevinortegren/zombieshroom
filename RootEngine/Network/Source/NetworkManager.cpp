@@ -1,8 +1,8 @@
 #include "NetworkManager.h"
-#include "Client.h"
-#include "Server.h"
+#include "LocalServer.h"
+#include "RemoteServer.h"
 #include <iostream>
-#include <gtest/gtest.h>
+
 namespace RootEngine
 {
 	namespace Network
@@ -11,7 +11,8 @@ namespace RootEngine
 		NetworkManager* NetworkManager::s_networkManager = nullptr;
 		void NetworkManager::Startup()
 		{
-			g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
+			m_networkSys = nullptr;
+			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
 		}
 
 		void NetworkManager::Shutdown()
@@ -24,16 +25,16 @@ namespace RootEngine
 		{
 			switch( p_peerType )
 			{
-			case PeerType::SERVER:
-				m_networkSys = new Server();
-				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Server created successfully");
+			case PeerType::LOCALSERVER:
+				m_networkSys = new LocalServer();
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Local Server created successfully");
 				break;
-			case PeerType::CLIENT:
-				m_networkSys = new Client();
-				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Client created successfully");
+			case PeerType::REMOTESERVER:
+				m_networkSys = new RemoteServer();
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Remote Server created successfully");
 				break;
 			default:
-				// Log error
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Network manager was fed undefined peerType, no network created");
 				break;
 			}
 		}
@@ -58,7 +59,4 @@ RootEngine::Network::NetworkInterface* CreateNetwork(RootEngine::SubsystemShared
 	return RootEngine::Network::NetworkManager::GetInstance();
 }
 
-TEST(NETWORK, NETWORK_SEND)
-{
-	EXPECT_TRUE(RootEngine::Network::NetworkManager::GetInstance()->GetNetworkSystem()->Send( "I AM A TEST/POTATOE GOD" ));
-}
+

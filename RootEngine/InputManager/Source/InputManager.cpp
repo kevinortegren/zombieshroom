@@ -1,5 +1,5 @@
 #include "InputManager.h"
-#include <gtest/gtest.h>
+
 namespace RootEngine
 {
 	namespace InputManager
@@ -105,50 +105,4 @@ RootEngine::InputManager::InputInterface* CreateInputSystem(RootEngine::Subsyste
 	return RootEngine::InputManager::InputManager::GetInstance();
 }
 
-TEST(INPUT, KEYTEST)
-{
-	RootEngine::InputManager::InputInterface* ii = RootEngine::InputManager::InputManager::GetInstance();
-	
-	SDL_Scancode randkey = (SDL_Scancode) (rand() % 512);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP);
-	SDL_Event falseevent;
-	falseevent.type = SDL_KEYDOWN;
-	falseevent.key.repeat = false;
-	falseevent.key.keysym.scancode = (SDL_Scancode)randkey;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::DOWN_EDGE);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::DOWN);
-	falseevent.type = SDL_KEYUP;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP_EDGE);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP);
-	falseevent.type = SDL_KEYDOWN;
-	ii->HandleInput(falseevent);
-	falseevent.type = SDL_KEYUP;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP_EDGE);
-	EXPECT_TRUE(ii->GetKeyState( randkey ) == RootEngine::InputManager::KeyState::UP);
-}
 
-TEST(INPUT, MOUSETEST)
-{
-	RootEngine::InputManager::InputInterface* ii = RootEngine::InputManager::InputManager::GetInstance();
-
-	SDL_Event falseevent;
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(0, 0));
-	falseevent.type = SDL_MOUSEMOTION;
-	falseevent.motion.x = 5;
-	falseevent.motion.y = 140;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::ivec2(5, 140));
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(5, 140));
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(0, 0));
-
-	falseevent.motion.x = 100;
-	falseevent.motion.y = 0;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetGlobalMousePos() == glm::ivec2(100, 0));
-	falseevent.motion.y = 20;
-	ii->HandleInput(falseevent);
-	EXPECT_TRUE(ii->GetDeltaMousePos() == glm::ivec2(95, -120));
-}
