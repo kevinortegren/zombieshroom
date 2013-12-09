@@ -19,7 +19,7 @@ namespace ECS
 		friend class EntityExporter;
 		friend class EntityImporter;
 
-		EntityManager(EntitySystemManager* p_systemManager, int p_numComponents);
+		EntityManager(EntitySystemManager* p_systemManager);
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
