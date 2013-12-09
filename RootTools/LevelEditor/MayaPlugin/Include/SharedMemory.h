@@ -14,8 +14,8 @@ public:
 	SharedMemory(void);
 	~SharedMemory(void);
 	void UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes);
-	void UpdateSharedCamera(int);
-	void UpdateSharedLight(int, int);
+	void UpdateSharedCamera(int index);
+	void UpdateSharedLight(int index, int nrOfLights);
 	int InitalizeSharedMemory();
 
 	//Variables
