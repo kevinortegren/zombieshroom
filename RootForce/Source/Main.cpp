@@ -92,7 +92,7 @@ namespace RootForce
 
 	Main::~Main() 
 	{
-		m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}
@@ -204,6 +204,7 @@ namespace RootForce
 					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
 				}
 			}
+			
 			g_engineContext.m_debugOverlay->Clear();
 			//g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
@@ -266,7 +267,7 @@ namespace RootForce
 			default:
 				if (g_engineContext.m_inputSys != nullptr)
 					g_engineContext.m_inputSys->HandleInput(event);
-				if(g_engineContext.m_gui != nullptr)
+				if (g_engineContext.m_gui != nullptr)
 					g_engineContext.m_gui->HandleEvents(event);
 			}
 		}

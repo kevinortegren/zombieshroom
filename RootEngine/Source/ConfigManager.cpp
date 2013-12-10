@@ -26,8 +26,6 @@ namespace RootEngine
 
 			Parse(doc, "ScreenWidth");
 			Parse(doc, "ScreenHeight");
-			Parse(doc, "Test");
-
 		}
 		catch(YAML::ParserException& e) {
 			g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Config parser error: %s", e.what());
@@ -51,23 +49,22 @@ namespace RootEngine
 
 	void ConfigManager::CreateDefaultConfig()
 	{
+		// Default values.
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
-		m_values["Test"] = "23.9";
-
 	}
 
 	bool ConfigManager::GetConfigValueAsBool(const std::string& p_key)
 	{
 		if(m_values.find(p_key) == m_values.end())
 			if( m_values[p_key] == "True" || m_values[p_key] == "true" || m_values[p_key] == "1" )
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 	}
 
 	int ConfigManager::GetConfigValueAsInteger(const std::string& p_key)
@@ -103,5 +100,4 @@ namespace RootEngine
 		if(p_node.FindValue(p_key) != nullptr)
 			p_node[p_key] >> m_values[p_key];
 	}
-
 }
