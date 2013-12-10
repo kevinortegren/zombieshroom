@@ -11,6 +11,8 @@ namespace RootForce
 			: m_world(p_world)
 			, m_logger(p_logger)
 		{
+			//m_world->GetEntityManager()->GetComponentList(
+
 			switch (p_type)
 			{
 				case MessageHandler::LOCAL:

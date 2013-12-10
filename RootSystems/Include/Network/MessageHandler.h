@@ -13,7 +13,7 @@ namespace RootForce
 		class NetworkEntityMap
 		{
 		public:
-			//void AddUnconfirmedEntity(
+			
 		private:
 			std::map<uint32_t, unsigned int> m_entityMap;
 		};

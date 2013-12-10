@@ -41,6 +41,25 @@ namespace RootForce
 		struct MessageUserCommandSelectAbility;
 
 
+		struct EntityCreated
+		{
+			uint16_t TemporaryID;
+			uint16_t SynchronizedID;
+		};
+
+		struct EntityRemoved
+		{
+			uint16_t SynchronizedID;
+		};
+
+		struct UpdatedComponent
+		{
+			uint16_t SynchronizedID;
+			unsigned int ComponentTypeID;
+			uint8_t* ComponentData;
+		};
+
+
 		/** Header for the game state snapshot message. Following in the data stream is the actual updated components. */
 		struct MessageGameStateSnapshot
 		{
