@@ -10,6 +10,16 @@ namespace RootForce
 {
 	namespace Network
 	{
+		class NetworkEntityMap
+		{
+		public:
+			//void AddUnconfirmedEntity(
+		private:
+			std::map<uint32_t, unsigned int> m_entityMap;
+		};
+
+
+
 		class MessageHandler
 		{
 		public:
@@ -30,9 +40,6 @@ namespace RootForce
 			RootEngine::Network::Server* m_server;
 			ClientMessageHandler* m_clientMessageHandler;
 			ServerMessageHandler* m_serverMessageHandler;
-
-			// Might change to all dynamic objects
-			std::map<uint8_t, ECS::Entity*> m_playerEntities;
 		};
 	}
 }

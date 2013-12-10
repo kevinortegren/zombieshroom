@@ -19,7 +19,6 @@ namespace RootEngine
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
 			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
 			m_core->set_surface_factory(m_glTexSurfaceFactory);
-
 		}
 
 
@@ -132,7 +131,7 @@ namespace RootEngine
 		void guiInstance::HandleEvents( SDL_Event p_event )
 		{
 			Awesomium::WebKeyboardEvent tempEvent;
-			char* temp = new char[20];
+			
 			int keyCheck = 0;
 			switch(p_event.type)
 			{
@@ -151,17 +150,19 @@ namespace RootEngine
 			{
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
+				{
+					char temp[20];
 					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
-					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, (char**)&temp);
 
 					memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
-
+		
 					if(p_event.type == SDL_KEYDOWN)
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
 					if(p_event.type == SDL_KEYUP)
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
 					m_view->InjectKeyboardEvent(tempEvent);
-					break;
+				} break;
 				case SDL_MOUSEBUTTONDOWN:
 					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
