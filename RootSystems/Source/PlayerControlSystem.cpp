@@ -69,7 +69,7 @@ namespace RootForce
 		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
-		glm::vec3 right = glm::normalize(glm::cross(facing, glm::vec3(0.0f, 1.0f, 0.0f)));
+		glm::vec3 right = transform->m_orientation.GetRight();
 		
 		// Get the speed of the player
 		float speed = controller->m_speed;
