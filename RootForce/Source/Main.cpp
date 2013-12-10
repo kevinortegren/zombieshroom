@@ -228,8 +228,7 @@ namespace RootForce
 				}
 			}
 			
-			g_engineContext.m_debugOverlay->Clear();
-			//g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
 			{
 				PROFILE("Handle Events", g_engineContext.m_profiler);
@@ -275,7 +274,7 @@ namespace RootForce
 				g_engineContext.m_gui->Update();
 				g_engineContext.m_gui->Render();
 			}
-
+			g_engineContext.m_debugOverlay->RenderOverlay();
 			g_engineContext.m_renderer->Swap();
 		}
 	}
