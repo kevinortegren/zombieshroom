@@ -30,6 +30,7 @@ namespace RootEngine
 		std::vector<std::string> m_ouputList;
 		DebugOverlayInterface* m_debugOverlay;
 		float m_time;
+		int m_frames;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

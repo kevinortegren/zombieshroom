@@ -12,7 +12,7 @@ namespace RootEngine
 		void NetworkManager::Startup()
 		{
 			m_networkSys = nullptr;
-			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
+			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::INIT_PRINT, "Network subsystem initialized!");
 		}
 
 		void NetworkManager::Shutdown()

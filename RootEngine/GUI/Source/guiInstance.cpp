@@ -132,7 +132,7 @@ namespace RootEngine
 		void guiInstance::HandleEvents( SDL_Event p_event )
 		{
 			Awesomium::WebKeyboardEvent tempEvent;
-			char* temp = new char[20];
+			
 			int keyCheck = 0;
 			switch(p_event.type)
 			{
@@ -151,17 +151,25 @@ namespace RootEngine
 			{
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
-					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
-					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+					{
 
-					memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
+						tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
+					
+						char* temp = new char[20];
+						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
 
-					if(p_event.type == SDL_KEYDOWN)
-						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
-					if(p_event.type == SDL_KEYUP)
-						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
-					m_view->InjectKeyboardEvent(tempEvent);
-					break;
+						memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
+
+						if(p_event.type == SDL_KEYDOWN)
+							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
+						if(p_event.type == SDL_KEYUP)
+							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
+
+						m_view->InjectKeyboardEvent(tempEvent);
+						delete temp;
+		
+						break;
+					}
 				case SDL_MOUSEBUTTONDOWN:
 					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;

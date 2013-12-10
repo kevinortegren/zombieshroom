@@ -112,7 +112,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 			break;
 		case 3:
 			{
-				RootForce::PlayerInputControlComponent* input = p_world->GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(p_entity);
+				RootForce::PlayerControl* input = p_world->GetEntityManager()->CreateComponent<RootForce::PlayerControl>(p_entity);
 				p_node["Speed"] >> input->m_speed;
 			}
 			break;

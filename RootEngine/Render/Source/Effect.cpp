@@ -79,7 +79,9 @@ namespace Render
 
 	Program::Program(void)
 	{
-
+		m_blendState = BLEND_ALPHA;
+		m_depthState.depthTest = true;
+		m_depthState.depthWrite = true;
 	}
 
 	Program::~Program(void)
@@ -135,6 +137,25 @@ namespace Render
 
 	void Program::Apply( )
 	{
+		if(m_depthState.depthWrite)
+		{
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
+		}
+		else
+		{
+			glDepthMask(GL_FALSE);
+		}
+
+		if(m_depthState.depthTest)
+		{
+			glEnable(GL_DEPTH_TEST);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+
 		glUseProgram( m_glHandle );
 	}
 
@@ -168,7 +189,7 @@ namespace Render
 	{
 		for(auto itr = m_uniforms.begin(); itr != m_uniforms.end(); ++itr)
 		{
-			glBindBufferBase(GL_UNIFORM_BUFFER, (*itr).first, (*itr).second->GetBufferId());
+			//glBindBufferBase(GL_UNIFORM_BUFFER, (*itr).first, (*itr).second->GetBufferId());
 		}
 	}
 
@@ -176,8 +197,8 @@ namespace Render
 	{
 		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
 		{
-			glActiveTexture(GL_TEXTURE0 + (*itr).first);
-			glBindTexture(GL_TEXTURE_2D, (*itr).second);
+			//glActiveTexture(GL_TEXTURE0 + (*itr).first);
+			//glBindTexture(GL_TEXTURE_2D, (*itr).second);
 		}
 	}
 

@@ -11,6 +11,12 @@
 
 namespace ECS
 {
+	struct CompareById {
+		bool operator()(const Entity* lhs, const Entity* rhs) {
+			return lhs->GetId() < rhs->GetId();
+		}
+	};
+
 	class World;
 
 	class VoidSystem
@@ -42,13 +48,13 @@ namespace ECS
 		void Process();
 
 		virtual void Init() = 0;
-		virtual void Begin() = 0;
+		virtual void Begin(){}
 		virtual void ProcessEntity(Entity* p_entity) = 0;
-		virtual void End() = 0;
+		virtual void End(){}
 
 	protected:
 		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;
-		std::set<Entity*> m_activeEntities;
+		std::set<Entity*, CompareById> m_activeEntities;
 	};
 
 	class IntervalEntitySystem : EntitySystem

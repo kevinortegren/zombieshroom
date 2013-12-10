@@ -4,6 +4,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
+#include <RootEngine/Include/ConfigManager.h>
 
 namespace RootEngine
 {
@@ -15,6 +16,7 @@ namespace RootEngine
 		ProfilingInterface* m_profiler;
 		MemoryTracker* m_memTracker;
 		DebugOverlayInterface* m_debugOverlay;
+		ConfigManagerInterface* m_configManager;
 		ResourceManagerInterface* m_resourceManager;
 	};
 

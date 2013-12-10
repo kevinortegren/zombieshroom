@@ -3,7 +3,7 @@
 namespace RootEngine
 {
 	Profiling::Profiling()
-		: m_time(0.0f)
+		: m_time(0.0f), m_frames(0)
 	{
 
 	}
@@ -15,10 +15,12 @@ namespace RootEngine
 
 	void Profiling::Present()
 	{
-		m_time = 0.0f;
 		//Clear output list
 		m_ouputList.clear();
 		m_ouputList.shrink_to_fit();
+
+		std::string output	= "FPS: " + std::to_string(m_frames);
+		m_ouputList.push_back(output);
 
 		for(auto itr = m_sampleMap.begin(); itr != m_sampleMap.end(); itr++)
 		{
@@ -35,9 +37,11 @@ namespace RootEngine
 			//Calculate average time
 			__int64 qfreq;
 			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
-			double averageSample	= (collectedTime/itr->second.size()) / (double)qfreq;
-			double maxSample		= maxTime / (double)qfreq;
+			double averageSample	= (collectedTime/itr->second.size()) / ((double)qfreq/1000.0f);
+			double maxSample		= maxTime / ((double)qfreq/1000.0f);
+			
 			std::string output	= "<div style='min-width: 200px; display: inline-block;'>" + itr->first + " :</div>" + "Time: " + std::to_string(averageSample) + " <div style='color: #FFFFFF; display: inline-block;'> MaxTime: "+ std::to_string(maxSample) + "</div> Samples: " + std::to_string(itr->second.size());
+
 			//Store output in vector for presenting 
 			m_ouputList.push_back(output);
 
@@ -45,17 +49,24 @@ namespace RootEngine
 			itr->second.clear();
 			itr->second.shrink_to_fit();
 		}
+
 	}
 
 	void Profiling::Update( float p_dt )
 	{
 		m_time += p_dt;
+		m_frames += 1;
+
 		if(m_time >= 1.0f)
+		{
 			Present();
+			m_frames = 0;
+			m_time = 0;
+		}
 
 		for(std::string s : m_ouputList)
 		{
-			m_debugOverlay->AddHTML(s.c_str(), TextColor::GREEN, true);
+			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
 		}
 	}
 

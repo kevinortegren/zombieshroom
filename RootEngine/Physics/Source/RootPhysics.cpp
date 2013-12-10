@@ -50,7 +50,7 @@ namespace Physics
 		}
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			PlayerController* temp = m_playerObjects[i];
+			KinematicController* temp = m_playerObjects[i];
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
@@ -81,6 +81,7 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
+
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
 		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
@@ -109,7 +110,7 @@ namespace Physics
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		
-
+		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 	}
 
 
@@ -120,7 +121,7 @@ namespace Physics
 		btDefaultMotionState* planeMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(p_position[0],p_position[1],p_position[2])));
 		btRigidBody::btRigidBodyConstructionInfo planeRigidbodyCI(0, planeMotionState, plane, btVector3(0, 0, 0));
 		btRigidBody* planeBody = new btRigidBody(planeRigidbodyCI);
-		planeBody->setCollisionFlags(planeBody->getCollisionFlags() | btRigidBody::CF_DISABLE_VISUALIZE_OBJECT);
+		planeBody->setCollisionFlags(planeBody->getCollisionFlags() /*| btRigidBody::CF_DISABLE_VISUALIZE_OBJECT*/);
 		m_dynamicWorld->addRigidBody(planeBody);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
@@ -137,14 +138,15 @@ namespace Physics
 	void RootPhysics::Update(float p_dt)
 	{
 		
-		
+		m_dt = p_dt;
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
-			m_playerObjects.at(i)->Update();
+			m_playerObjects.at(i)->Update(m_dt);
 		}
-		m_dynamicWorld->stepSimulation(p_dt,10);
+		m_dynamicWorld->stepSimulation(m_dt,1);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
+		
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
@@ -258,7 +260,8 @@ namespace Physics
 	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
-		PlayerController* player = new PlayerController();
+		KinematicController* player = new KinematicController();
+		
 		player->Init(m_dynamicWorld, tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), 
 			tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
@@ -273,6 +276,7 @@ namespace Physics
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
 		player->SetUserPointer((void*)userPointer);
+		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
 	}
 
@@ -282,7 +286,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Walk(p_direction);
+		m_playerObjects.at(index)->Walk(p_direction, m_dt); //SADFJAKSJDGKLAS
 	}
 
 	void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
@@ -291,7 +295,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Jump(p_jumpForce);
+		m_playerObjects.at(index)->Jump();
 	}
 
 	void RootPhysics::GetPos( int p_objectIndex, float* p_pos )
@@ -330,7 +334,7 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
- 		m_playerObjects.at(index)->Knockback(temp * p_pushForce);
+ 		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
 	}
 
 	void RootPhysics::RemoveObject( int p_objectIndex)
@@ -402,7 +406,7 @@ namespace Physics
 	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, float* p_position, float* p_rotation, float p_mass )
 	{
 		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
-	
+		
 		btVector3 pos;
 		pos.setX( p_position[0]);
 		pos.setY( p_position[1]);
@@ -662,7 +666,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetModetHeight();
+			return m_playerObjects.at(index)->GetModelHeight();
 		}
 		return -1;
 	}	
@@ -679,10 +683,6 @@ namespace Physics
 	{
 		return &(m_userPointer.at(p_objectIndex)->m_collidedEntityId);
 	}
-
-	
-
-
 
 }
 }

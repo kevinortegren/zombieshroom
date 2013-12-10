@@ -14,9 +14,9 @@ namespace ECS
 	{
 	public:
 
-		World(int p_numComponents) : 
+		World() : 
 			m_systemManager(this),
-			m_entityManager(&m_systemManager, p_numComponents),
+			m_entityManager(&m_systemManager),
 			m_exporter(this),
 			m_importer(this)
 		{}

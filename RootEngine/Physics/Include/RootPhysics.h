@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "PlayerController.h"
+#include "KinematicController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
@@ -105,6 +106,7 @@ namespace RootEngine
 			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
 			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
 			
+
 			virtual void RemoveObject(int p_objectIndex) = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		};
@@ -170,7 +172,8 @@ namespace RootEngine
 			static RootPhysics* s_physicsInstance;
 			std::vector<CustomUserPointer*> m_userPointer;
 			std::vector<btRigidBody*> m_dynamicObjects;
-			std::vector<PlayerController*> m_playerObjects;
+			std::vector<KinematicController*> m_playerObjects;
+			float m_dt;
 			
 		};
 	}
