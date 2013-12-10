@@ -176,9 +176,10 @@ namespace RootEngine
                 case SDL_TEXTINPUT:
 				{
 					char temp[20];
+					char* t = temp;
 
 					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
-					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, (char**)&temp);
+					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &t);
 
 					memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
 
@@ -206,7 +207,7 @@ namespace RootEngine
 						// Use the first character of the text as the 'key code'
 						tempEvent.virtual_key_code = (wchar16)p_event.text.text[0];
 						tempEvent.native_key_code = (wchar16)p_event.text.text[0];
-						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &t);
 					}
 					if(p_event.type == SDL_KEYUP)
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
