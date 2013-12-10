@@ -18,7 +18,6 @@ namespace Physics
 
 namespace RootEngine
 {
-	
 	struct GameSharedContext;
 
 	struct MESH_DESC 
@@ -35,26 +34,25 @@ namespace RootEngine
 		
 	public:
 
-		//Load functions
-		virtual Model*						LoadCollada(std::string p_path) = 0;
+
+		#ifndef COMPILE_LEVEL_EDITOR
+			virtual Model*	LoadCollada(std::string p_path) = 0;
+			virtual Physics::PhysicsMeshInterface* GetPhysicsMesh(std::string p_handle) = 0;
+		#endif
+
+		virtual Render::MeshInterface*	GetMesh(std::string p_handle) = 0;
 		virtual Render::EffectInterface*	LoadEffect(std::string p_path) = 0;
 		virtual Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type) = 0;
 
-		//Get functions
-
-		// Resolve functions.
 		virtual const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture) = 0;
 		virtual const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect) = 0;
-		virtual const std::string& ResolveStringFromModel(Model* p_model) = 0;
 
 		virtual const std::string& GetWorkingDirectory() = 0;
+		virtual const std::string& ResolveStringFromModel(Model* p_model) = 0;
 
 		virtual Model*								GetModel(std::string p_handle) = 0;
 		virtual Render::EffectInterface*			GetEffect(std::string p_handle) = 0;
 		virtual Render::TextureInterface*			GetTexture(std::string p_handle) = 0;
-		virtual Render::MeshInterface*				GetMesh(std::string p_handle) = 0;
-		virtual Physics::PhysicsMeshInterface*		GetPhysicsMesh(std::string p_handle) = 0;
-
 	};
 
 	class ResourceManager : public ResourceManagerInterface
@@ -67,17 +65,19 @@ namespace RootEngine
 		
 		void Init(std::string p_workingDirectory, GameSharedContext* p_context );
 
-		//Load functions
-		Model*						LoadCollada(std::string p_path);
+
+		#ifndef COMPILE_LEVEL_EDITOR
+			Model*	LoadCollada(std::string p_path);
+			Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
+		#endif
+
+		Render::MeshInterface*		GetMesh(std::string p_handle);
 		Render::EffectInterface*	LoadEffect(std::string p_path);
 		Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type);
 
-		//Get functions
 		Model*							GetModel(std::string p_handle);
 		Render::EffectInterface*		GetEffect(std::string p_handle);
 		Render::TextureInterface*		GetTexture(std::string p_handle);
-		Render::MeshInterface*			GetMesh(std::string p_handle);
-		Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
 
 		const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture);
 		const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect);
@@ -94,7 +94,10 @@ namespace RootEngine
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>>	m_physicMeshes;
 
 		//Importers
+#ifndef COMPILE_LEVEL_EDITOR
 		std::shared_ptr<ModelImporter>		m_modelImporter;
+#endif
+
 		std::shared_ptr<EffectImporter>		m_effectImporter;
 		std::shared_ptr<TextureImporter>	m_textureImporter;
 

@@ -1,6 +1,8 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 namespace RootEngine
 {
 	ModelImporter::ModelImporter(GameSharedContext* p_context)
@@ -217,3 +219,5 @@ namespace RootEngine
 		return cutPath;
 	}
 }
+
+#endif
