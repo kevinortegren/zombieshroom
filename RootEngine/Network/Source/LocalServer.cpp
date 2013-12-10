@@ -20,15 +20,24 @@ namespace RootEngine
 		{
 			if(p_message.RecipientID == -1)
 			{
+				if(!m_client[1]->IsRemote)
+					m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
 				return Transmit(p_message, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 			else if (p_message.RecipientID == 0)
 			{
 				m_message.push_back(new Message(p_message));
+				return true;
 			}
 			else
 			{
-				return Transmit(p_message, m_client[p_message.RecipientID]->GUID, false);
+				if(!m_client[p_message.RecipientID]->IsRemote)
+				{
+					m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
+					return true;
+				}
+				else
+					return Transmit(p_message, m_client[p_message.RecipientID]->GUID, false);
 			}
 			return false;
 		}

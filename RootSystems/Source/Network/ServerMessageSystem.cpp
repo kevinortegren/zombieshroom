@@ -52,7 +52,7 @@ namespace RootForce
 			m_messages.clear();
 		}
 
-		void ServerClientSystem::HandleUserConnectMessage(RootEngine::Network::Message* p_message, bool p_local)
+		void ServerClientSystem::HandleUserConnectMessage(RootEngine::Network::Message* p_message)
 		{
 			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 			NetworkClientComponent* newPlayerNetworkClientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
@@ -149,7 +149,7 @@ namespace RootForce
 					// TODO: Decide if we will use this
 					break;
 				case RootEngine::Network::InnerMessageID::CONNECT:
-					m_serverClientSystem->HandleUserConnectMessage(p_message, m_server->IsClientLocal(p_message->SenderID));
+					m_serverClientSystem->HandleUserConnectMessage(p_message);
 					break;
 				case RootEngine::Network::InnerMessageID::DISCONNECT:
 					m_serverClientSystem->HandleUserDisconnectMessage(p_message);
@@ -159,18 +159,24 @@ namespace RootForce
 
 		void ServerMessageHandler::HandleChatToServerMessage(RootEngine::Network::Message* p_message)
 		{
-			MessageChat* header = (MessageChat*) p_message->Data;
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "SERVER: Chat message sent to server from %d to %d: %s", header->SenderID, p_message->RecipientID, header->Message);
+			MessageChat header;
+			header.Deserialize(p_message->Data);
 
-			// TODO: Might add team chat
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "SERVER: Chat message sent to server from %d to %d: %s", header.SenderID, p_message->RecipientID, header.Message);
+
+			RootEngine::Network::Message msg = *p_message;
+			msg.MessageID = MessageType::ChatToClient; //Set the new message type so that they are forwarded to the clients
+			msg.Reliability = PacketReliability::RELIABLE_ORDERED; //Set a new reliability since this is not sent over the network
+			
 			if (p_message->RecipientID == RootEngine::Network::RECIPIENT_BROADCAST)
 			{
-				m_server->Send(*p_message);
+				m_server->Send(msg);
 			}
 			else
 			{
-				m_server->Send(*p_message);
+				m_server->Send(msg);
 			}
+			
 		}
 
 		void ServerMessageHandler::HandleUserCommandMessage(RootEngine::Network::Message* p_message, RootForce::PlayerAction::PlayerAction p_action)

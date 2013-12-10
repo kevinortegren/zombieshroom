@@ -3,7 +3,7 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
-
+#include <RootForce/Include/ChatSystem.h>
 namespace RootForce
 {
 	namespace Network
@@ -14,11 +14,14 @@ namespace RootForce
 		public:
 			ClientMessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::Server* p_server);
 
+			void Update();
 			void HandleClientMessage(RootEngine::Network::Message* p_message);
+			void SetChatSystem(ChatSystemInterface* p_chatSystem) { m_chatSystem = p_chatSystem; }
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
 			RootEngine::Network::Server* m_server;
+			ChatSystemInterface* m_chatSystem;
 
 			void HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message);
 			void HandleChatToClientMessage(RootEngine::Network::Message* p_message);

@@ -53,7 +53,7 @@ namespace RootEngine
 
 		for(std::string s : m_ouputList)
 		{
-			m_debugOverlay->AddHTML(s.c_str(), TextColor::GREEN, true);
+			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
 		}
 	}
 

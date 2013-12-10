@@ -33,7 +33,7 @@ namespace RootForce
 			void ProcessEntity(ECS::Entity* p_entity);
 			void End();
 
-			void HandleUserConnectMessage(RootEngine::Network::Message* p_message, bool p_local);
+			void HandleUserConnectMessage(RootEngine::Network::Message* p_message);
 			void HandleUserDisconnectMessage(RootEngine::Network::Message* p_message);
 			void HandleUserInfo(RootEngine::Network::Message* p_message);
 		private:

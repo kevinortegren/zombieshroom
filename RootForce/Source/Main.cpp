@@ -166,16 +166,18 @@ void Main::Start()
 
 
 	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	g_engineContext.m_gui->LoadURL("debug.html");
-	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+	m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 
 	// Initialize the network system
 	RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+	m_networkHandler->SetChatSystem(&m_chat);
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
+	
 	while (m_running)
 	{	
 		
@@ -183,10 +185,8 @@ void Main::Start()
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
 		
-		g_engineContext.m_debugOverlay->Clear();
-
 		m_world.SetDelta(dt);
-		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
 		{
 			PROFILE("Handle Events", g_engineContext.m_profiler);
@@ -235,6 +235,7 @@ void Main::Start()
 			g_engineContext.m_gui->Render();
 		}
 
+		g_engineContext.m_debugOverlay->RenderOverlay();
 		g_engineContext.m_renderer->Swap();
 	}
 }

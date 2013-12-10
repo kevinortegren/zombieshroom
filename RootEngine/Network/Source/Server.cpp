@@ -18,8 +18,8 @@ namespace RootEngine
 		{
 			if(m_message.size() < 1)
 				return nullptr;
-			Message* message = *(m_message.end()-1);
-			m_message.pop_back();
+			Message* message = m_message.at(0);
+			m_message.erase(m_message.begin());
 			return message;
 		}
 

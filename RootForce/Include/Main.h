@@ -11,6 +11,7 @@
 #include <RootSystems/Include/Network/MessageHandler.h>
 #include <memory>
 #include <string>
+#include "ChatSystem.h"
 
 RootEngine::GameSharedContext g_engineContext;
 
@@ -27,6 +28,7 @@ private:
 	bool m_running;
 	void* m_engineModule;
 	std::shared_ptr<SDL_Window> m_window;
+	RootForce::ChatSystem m_chat;
 	
 	ECS::World m_world;
 	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
