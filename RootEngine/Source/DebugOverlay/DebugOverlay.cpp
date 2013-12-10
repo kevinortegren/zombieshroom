@@ -1,5 +1,7 @@
 #include "DebugOverlay/DebugOverlay.h"
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <Awesomium/WebCore.h>
 #include <Awesomium/STLHelpers.h>
 
@@ -18,9 +20,10 @@ namespace RootEngine
 		m_view = p_view;
 	}
 
-	void DebugOverlay::AddHTMLToBuffer( const char* p_html, TextColor::TextColor p_color, bool p_leftSide /*= true*/ )
+	void DebugOverlay::AddHTML(const char* p_html, TextColor::TextColor p_color, bool p_leftSide)
 	{
 		std::string command; // Compile a string-function call in form of AddHTML(p_html, p_leftSide);
+		command = "AddHTML(\"";
 		switch(p_color)
 		{
 		case TextColor::RED:
@@ -45,29 +48,16 @@ namespace RootEngine
 			command += "<a>";
 		}
 		command += p_html;
-		command += "</a> <br /> ";
-
-		if(p_leftSide)
-			m_leftOverlay += command;
-		else
-			m_rightOverlay += command;
+		command += "</a>\", ";
+		command += (p_leftSide?"true":"false");
+		command += ");";
+		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
 	}
 
-	void DebugOverlay::RenderOverlay()
+	void DebugOverlay::Clear()
 	{
-		std::string command; // Compile a string-function call in form of AddHTML(p_html, p_leftSide);
-		command = "AddHTML(\"";
-		command += m_leftOverlay;
-		command += "\",true);";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
-
-		command = "AddHTML(\"";
-		command += m_rightOverlay;
-		command += "\",false);";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
-
-		m_leftOverlay = "";
-		m_rightOverlay = "";
+		m_view->ExecuteJavascript(Awesomium::WSLit("Clear();"), Awesomium::WSLit(""));
 	}
-
 }
+
+#endif

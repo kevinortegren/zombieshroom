@@ -16,14 +16,25 @@ set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader)
 # Set search paths
 include_directories(Include)
 
+# Check if we are compiling the editor or the game.
+if (NOT COMPILE_LEVEL_EDITOR)
+	# Add subdirectories
+	add_subdirectory(Network)
+	add_subdirectory(Physics)
+	add_subdirectory(InputManager)
+	add_subdirectory(Render)
+	add_subdirectory(GUI)
+	add_subdirectory(Script)
+else()
+	# Add defines
+	add_definitions(-DCOMPILING_LEVEL_EDITOR)
+
+	# Add subdirectories
+	add_subdirectory(Render)
+endif()
+
 # Add the target
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
-# Add subdirectories
-add_subdirectory(Network)
-add_subdirectory(Physics)
-add_subdirectory(InputManager)
-add_subdirectory(Render)
-add_subdirectory(GUI)
-add_subdirectory(Script)

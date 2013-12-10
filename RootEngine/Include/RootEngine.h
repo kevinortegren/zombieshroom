@@ -36,14 +36,16 @@ namespace RootEngine
 		GameSharedContext GetGameSharedContext();
 		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
+		void LoadRender();
+#ifndef COMPILE_LEVEL_EDITOR
 		void LoadNetwork();
 		void LoadInput();
-		void LoadRender();
 		void LoadGUI();
-
 		//void LoadInputSystem();
 		void LoadPhysics();
+
 		void LoadScriptEngine();
+#endif
 
 		void* m_networkModule;
 		void* m_renderModule;
@@ -56,18 +58,20 @@ namespace RootEngine
 		GameSharedContext m_gameSharedContext;
 
 		Logging m_logger;
-		MemoryTracker*	m_memTracker;
+		MemoryTracker* m_memTracker;
 		ResourceManager m_resourceManager;
-		DebugOverlay m_debugOverlay;
 		Profiling m_profiler;
+		Render::RendererInterface* m_renderer;
 		ConfigManager m_configManager;
-
+#ifndef COMPILE_LEVEL_EDITOR
+		DebugOverlay m_debugOverlay;
 		Network::NetworkManager*		m_network;
-		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
 		Script::ScriptInterface* m_scriptEngine;
+#endif
+
 	};
 }
 

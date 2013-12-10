@@ -1,5 +1,9 @@
 # CMake settings
 cmake_minimum_required(VERSION 2.8)
 
-# TODO: Add subdirectories for tools
-add_subdirectory(RootServer)
+# Add subdirectories for tools
+if (NOT COMPILE_LEVEL_EDITOR)
+	add_subdirectory(RootServer)
+else()
+	add_subdirectory(LevelEditor)
+endif()
