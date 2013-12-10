@@ -2,10 +2,8 @@
   techniques:
     - name: Light
       uniforms:
-        - name: PerFrame
-          slot: 0
         - name: PerObject
-          slot: 1
+          slot: 0
       textures:
       programs:
       - name: light

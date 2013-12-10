@@ -1,5 +1,5 @@
 #pragma once
-
+#include <RootEngine/Include/Profiling.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Render/Include/Renderer.h>
@@ -10,6 +10,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
+#include <RootEngine/Include/ConfigManager.h>
 #endif
 
 namespace RootEngine
@@ -18,6 +19,8 @@ namespace RootEngine
 	{
 		Logging* m_logger;
 		MemoryTracker* m_memTracker;
+		ProfilingInterface* m_profiler;
+		ConfigManagerInterface* m_configManager;
 		ResourceManager* m_resourceManager;
 		Render::RendererInterface* m_renderer;
 #ifndef COMPILE_LEVEL_EDITOR

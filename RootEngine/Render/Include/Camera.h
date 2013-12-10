@@ -9,7 +9,8 @@ namespace Render
 	{
 	public:
 	
-		void Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up, float p_fov, float p_near, float p_far);
+		void Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up,
+                        float p_fov, float p_near, float p_far, int p_width, int p_height);
 
 		const glm::mat4& GetView() const { return m_view; }
 		const glm::mat4& GetProjection() const { return m_projection; }
@@ -24,7 +25,7 @@ namespace Render
 	private:
 
 		void LookAt();
-		void PerspectiveProjection(float p_fov, float p_near, float p_far);
+		void PerspectiveProjection(float p_fov, float p_near, float p_far,  int p_width, int p_height);
 
 		glm::mat4 m_view;
 		glm::mat4 m_projection;

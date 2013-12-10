@@ -63,7 +63,7 @@ else()
 		${GLM_INCLUDE_DIRS}
 		${YAML_INCLUDE_DIRS}
 	)
-    
+
 	set(EXTERNAL_LIBRARIES
 		${SDL2_LIBRARY_64}
 		${OPENGL_LIBRARIES}
@@ -79,6 +79,8 @@ message("${EXTERNAL_LIBRARIES}")
 # Set global compiler options
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
+add_definitions(-DWIN32_LEAN_AND_MEAN)
+add_definitions(/wd4005)    # Disable macro redefinition warning
 
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -90,11 +92,13 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	add_subdirectory(RootEngine)
 	add_subdirectory(RootForce)
 	add_subdirectory(RootTools)
+	add_subdirectory(RootSystems)
 	add_subdirectory(Utility)
 	add_subdirectory(Assets)
 else()
 	add_subdirectory(RootEngine)
 	add_subdirectory(RootTools)
+	add_subdirectory(RootSystems)
 	add_subdirectory(Utility)
 	add_subdirectory(Assets)
 endif()

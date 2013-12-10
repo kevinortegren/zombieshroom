@@ -1,57 +1,56 @@
 #include <Main.h>
 #include <stdexcept>
 #include <exception>
-#include <gtest/gtest.h>
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
+
+//#include <RenderingSystem.h>
+//#include <LightSystem.h>
+#include <RootForce/Include/CameraSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
+
+
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 
+#include <RootSystems/Include/Network/Messages.h>
+
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
-
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#include <RootSystems/Include/Components.h>
 
 #undef main
 
-TEST(Test, Foo) 
-{
-	int a = 0;
-	EXPECT_TRUE(a == 0);
-}
-
 int main(int argc, char* argv[]) 
 {
+	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
+	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::FPSCONTROL);
+	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
+	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
+	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
+	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
+	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
+
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
-		if (argc > 1 && strcmp(argv[1], "-test") == 0)
-		{
-			testing::InitGoogleTest(&argc, argv);
-
-			int result = RUN_ALL_TESTS();
-			std::cin.get();
-			return result;
-		}
-		else
-		{
-			Main m(path);
+			RootForce::Main m(path);
 			m.Start();
-		}
 	} 
 	catch (std::exception& e) 
 	{
-		// TODO: Log exception message
-		std::cout << e.what() << "\n";
+		std::cout << e.what() << std::endl;
 		std::cin.get();
 		return 1;
 	} 
 	catch (...) 
 	{
-		// TODO: Log unknown exception message
+		std::cout << "Unknown exception" << std::endl;
 		std::cin.get();
 		return 1;
 	}
@@ -59,56 +58,49 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-Main::Main(std::string p_workingDirectory) 
-	: m_running(true), m_world(4)
+namespace RootForce
 {
-	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
-
-	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
-
-	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
-
-	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
+	Main::Main(std::string p_workingDirectory) 
+		: m_running(true)
 	{
-		// TODO: Log error and throw exception (?)
+		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+
+		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+
+		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
+
+		if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
+		{
+			// TODO: Log error and throw exception (?)
+		}
+
+		// TODO: Make these parameters more configurable.
+		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
+				"Root Force",
+				SDL_WINDOWPOS_UNDEFINED,
+				SDL_WINDOWPOS_UNDEFINED,
+				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"),
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
+			SDL_DestroyWindow);
+		if (m_window == nullptr) 
+		{
+			// TODO: Log error and throw exception (?)
+		}
 	}
 
-	// TODO: Make these parameters more configurable.
-	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
-			"Root Force",
-			SDL_WINDOWPOS_UNDEFINED,
-			SDL_WINDOWPOS_UNDEFINED,
-			WINDOW_WIDTH,
-			WINDOW_HEIGHT,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
-		SDL_DestroyWindow);
-	if (m_window == nullptr) 
+	Main::~Main() 
 	{
-		// TODO: Log error and throw exception (?)
+		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		SDL_Quit();
+		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}
-}
 
-Main::~Main() 
-{
-	SDL_Quit();
-	DynamicLoader::FreeSharedLibrary(m_engineModule);
-}
-
-void Main::Start() 
-{
-	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-	// Cube mesh.
-	std::shared_ptr<Render::Mesh> cubeMesh = g_engineContext.m_renderer->CreateMesh();
-	Utility::Cube cube(Render::VertexType::VERTEXTYPE_1P);
-	cubeMesh->m_vertexBuffer = g_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_elementBuffer = g_engineContext.m_renderer->CreateBuffer();
-	cubeMesh->m_vertexAttributes = g_engineContext.m_renderer->CreateVertexAttributes();
-	cubeMesh->CreateIndexBuffer(cube.m_indices, cube.m_numberOfIndices);
-	cubeMesh->CreateVertexBuffer1P(reinterpret_cast<Render::Vertex1P*>(cube.m_vertices), cube.m_numberOfVertices);
-
+	void Main::Start() 
 	{
-		// Initialize the system for controlling the player.	
+		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(4);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
@@ -126,143 +118,185 @@ void Main::Start()
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
-		RootForce::Renderable::SetTypeId(0);
-		RootForce::Transform::SetTypeId(1);
-		RootForce::PointLight::SetTypeId(2);
-		RootForce::PlayerInputControlComponent::SetTypeId(3);
-
-		m_world.GetEntityExporter()->SetExporter(Exporter);
-		m_world.GetEntityImporter()->SetImporter(Importer);
-
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
-	}
+		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-	// Initialize render and point light system.
-	RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
+		// Initialize physics system
+		RootForce::PhysicsSystem* m_physicsSystem = new RootForce::PhysicsSystem(&m_world);
+		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
+		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
+		m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
-	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+		m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
 
-	RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
-	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+		// Initialize render and point light system.
+		RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
-	// Import test world.
-	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test.world");
+		renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+		renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
-	g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	g_engineContext.m_gui->LoadURL("debug.html");
-	g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+		RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+		RootForce::LookAtSystem* lookAtSystem = new RootForce::LookAtSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::LookAtSystem>(lookAtSystem, "LookAtSystem");
+		RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-	////////////////////////////////////////////////////////////////////////// AMAZING PHYSICS TEST CODE
+		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
 
-	/*
-	ECS::Entity* guy2 = m_world.GetEntityManager()->CreateEntity();
-	RootForce::Transform* guyTransform2 = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(guy2);
-	guyTransform2->m_position = glm::vec3(0.0f, 0.0f, -6.0f);
-	RootForce::Renderable* guyRenderable2 = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(guy2);
-	guyRenderable2->m_mesh = m_engineContext.m_resourceManager->GetModel("testchar")->m_meshes[0];
-	guyRenderable2->m_material = guyMaterial;
-	RootForce::PlayerInputControlComponent* guyControl2 = m_world.GetEntityManager()->CreateComponent<RootForce::PlayerInputControlComponent>(guy2);
-	guyControl2->speed = 10.0f;
-	int facesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfFaces;
-	int verticesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfVertices;
-	int indicesTotal = m_engineContext.m_resourceManager->GetModel("testchar")->numberOfIndices;
-	float* tempVertices = (float*)malloc(verticesTotal * 3 * sizeof(float));
-	for(int i = 0; i < verticesTotal; i ++)
-	{
-		tempVertices[i*3] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].x;  // 0, 3, 6, 9
-		tempVertices[i*3 + 1] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].y; //1, 4, 7, 10
-		tempVertices[i*3 + 2] = m_engineContext.m_resourceManager->GetModel("testchar")->meshPoints[i].z;  //2,5,8,11   
-	}
-	int* tempIndices = (int*)malloc(indicesTotal * sizeof(int));
-	tempIndices = (int*)&m_engineContext.m_resourceManager->GetModel("testchar")->meshIndices[0];
+		Render::DirectionalLight dl;
+		dl.m_color = glm::vec4(0.3f,0.3f,0.3f,1);
+		dl.m_direction = glm::vec3(0,0,-1);
 
-	float pos[3] = {3,0,0};
-	float rot[3] = {0,0,0};
-	int handle = m_engineContext.m_physics->AddPlayerObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos, rot,5.0f, 10, 0.2f,0.02f);
-	float pos2[3] = {0,5,-20};
-	float rot2[3] = {0,0,0};
-	int handle2 = m_engineContext.m_physics->AddDynamicObjectToWorld(facesTotal, &tempIndices[0], 3 * sizeof(int), verticesTotal, &tempVertices[0], 3*sizeof(float), pos2, rot2,5.0f);
+		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
+
+		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+		m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+		RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
+		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
+
+		// Import test world.
+		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+
+		//Create camera
+		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
+		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
+		camera->m_near = 0.1f;
+		camera->m_far = 1000.0f;
+		camera->m_fov = 75.0f;
+		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+		cameraLookAt->m_targetTag = "Player";
+		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+		cameraThirdPerson->m_targetTag = "Player";
+		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
+
+		//Plane at bottom
+
+		float normal[3] = {0,1,0};
+		float position[3] = {0, -2, 0};
 	
-	float normal[3] = {0,1,0};
-	float position[3] = {0, -2, 0};
-	m_engineContext.m_physics->CreatePlane(normal, position);
-	float normal2[3] = {0,0,1};
-	float position2[3] = {0, 0, -60};
-	m_engineContext.m_physics->CreatePlane(normal2, position2);
-	float normal3[3] = {0,0,-1};
-	float position3[3] = {0, 0, 4};
-	m_engineContext.m_physics->CreatePlane(normal3, position3);
-	//float speed[3] = {0, 5, -5};
-	float* speed;
-	float speedup[3] = {0, 10 , 0};
-	float x[3], x2[3];
-	for(int i = 0 ; i < 10; i++)
-	{
-		float ballpos[3] = {0,3 + i * 1.5f, 0};
-		int ballHandle = m_engineContext.m_physics->CreateSphere(1, 1.05f,ballpos );
-	}
-	
-	float ballspeed[3] = {0, 0, 5};
-	float orientationPlayer[4] = {0,0,0, 0};
-	float orientation[4] = {0,0,0, 0};
-	float yaw = 0;
-	*/
-	//////////////////////////////////////////////////////////////////////////
+		g_engineContext.m_physics->CreatePlane(normal, position);
 
-	// Start the main loop
-	uint64_t old = SDL_GetPerformanceCounter();
-	while (m_running)
-	{
-		uint64_t now = SDL_GetPerformanceCounter();
-		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
-		old = now;
-	
-		g_engineContext.m_debugOverlay->Clear();
+		// Setup the skybox.
+		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
+		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
+		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
+			"rnl_cross", Render::TextureType::TEXTURE_CUBEMAP);
 
-		m_world.SetDelta(dt);
-		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
-		HandleEvents();
+		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+
+		g_engineContext.m_gui->LoadURL("debug.html");
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+
+		// Initialize the network system
+		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
+		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+
+		// Start the main loop
+		uint64_t old = SDL_GetPerformanceCounter();
+		while (m_running)
+		{	
+			uint64_t now = SDL_GetPerformanceCounter();
+			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+			old = now;
+	
+			m_world.SetDelta(dt);
+
+			g_engineContext.m_renderer->Clear();
+
+			// Toggle rendering of normals.
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
+			{
+				if(m_displayNormals)
+				{
+					m_displayNormals = false;
+					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+				}
+				else
+				{
+					m_displayNormals = true;
+					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+				}
+			}
+			
+			g_engineContext.m_debugOverlay->Clear();
+			//g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
-		m_playerControlSystem->Process();
+			{
+				PROFILE("Handle Events", g_engineContext.m_profiler);
+				HandleEvents();
+			}
 
-		g_engineContext.m_renderer->Clear();
+			{
+				PROFILE("Entity Systems", g_engineContext.m_profiler);
+				m_playerControlSystem->Process();
+				abilitySystem->Process();
 
-		g_engineContext.m_physics->Update(dt);
+			}
 
-		pointLightSystem->Process(); 
-		renderingSystem->Process();
+			{
+				PROFILE("Network message handler", g_engineContext.m_profiler);
+				m_networkHandler->Update();
+			}
 
-		g_engineContext.m_renderer->Render();
-		g_engineContext.m_renderer->RenderLines();
+			{
+				PROFILE("Physics", g_engineContext.m_profiler);
+				m_physicsSystem->Process();
+				g_engineContext.m_physics->Update(dt);
+				
+			}
 
-		g_engineContext.m_gui->Update();
-		g_engineContext.m_gui->Render();
+			thirdPersonBehaviorSystem->Process();
+			lookAtSystem->Process();
+			cameraSystem->Process();
+			pointLightSystem->Process();
+			renderingSystem->Process();
+			g_engineContext.m_renderer->Render();
+	
+			{
+				PROFILE("Render Lines", g_engineContext.m_profiler);
+				g_engineContext.m_renderer->RenderLines();
+			}
+		
+			g_engineContext.m_profiler->Update(dt);
+		
+			{
+				PROFILE("GUI", g_engineContext.m_profiler);
 
-		g_engineContext.m_renderer->Swap();
+				g_engineContext.m_gui->Update();
+				g_engineContext.m_gui->Render();
+			}
+
+			g_engineContext.m_renderer->Swap();
+		}
 	}
-}
 
-void Main::HandleEvents()
-{
-	SDL_Event event;
-	while(SDL_PollEvent(&event))
+	void Main::HandleEvents()
 	{
-		switch(event.type) 
+		SDL_Event event;
+		while(SDL_PollEvent(&event))
 		{
-		case SDL_QUIT:
-			m_running = false;
-			break;
+			switch(event.type) 
+			{
+			case SDL_QUIT: 
+				m_running = false;
+				break;
 
-		default:
-			if (g_engineContext.m_inputSys != nullptr)
-				g_engineContext.m_inputSys->HandleInput(event);
-			if(g_engineContext.m_gui != nullptr)
-				g_engineContext.m_gui->HandleEvents(event);
+			default:
+				if (g_engineContext.m_inputSys != nullptr)
+					g_engineContext.m_inputSys->HandleInput(event);
+				if (g_engineContext.m_gui != nullptr)
+					g_engineContext.m_gui->HandleEvents(event);
+			}
 		}
 	}
 }

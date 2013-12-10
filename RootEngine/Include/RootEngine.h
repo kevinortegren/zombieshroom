@@ -40,12 +40,9 @@ namespace RootEngine
 		void LoadNetwork();
 		void LoadInput();
 		void LoadGUI();
-
 		//void LoadInputSystem();
 		void LoadPhysics();
 #endif
-
-
 		void* m_networkModule;
 		void* m_renderModule;
 		void* m_guiModule;
@@ -57,13 +54,13 @@ namespace RootEngine
 		Logging m_logger;
 		MemoryTracker* m_memTracker;
 		ResourceManager m_resourceManager;
+		Profiling m_profiler;
 		Render::RendererInterface* m_renderer;
-
+		ConfigManager m_configManager;
 #ifndef COMPILE_LEVEL_EDITOR
-		DebugOverlay* m_debugOverlay;
-
-		Network::NetworkManager* m_network;
-		GUISystem::GUISystemInterface* m_gui;
+		DebugOverlay m_debugOverlay;
+		Network::NetworkManager*		m_network;
+		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
 #endif

@@ -46,8 +46,7 @@ void ECS::EntityImporter::Import(const std::string& p_filename)
 			{
 				int id;
 				data[k]["Entity"] >> id;
-				std::cout << id;
-
+		
 				m_importer(m_world, type, entitiesMap[id], data[k]);
 			}
 		}

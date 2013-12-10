@@ -8,9 +8,11 @@
 #include <glm/glm.hpp>
 #include <memory>
 
+#include <RootSystems\Include\RenderingSystem.h>
+#include <RootSystems\Include\LightSystem.h>
+#include <RootSystems\Include\CameraSystem.h>
+
 #include <Utility\ECS\Include\World.h>
-#include <Utility\ECS\Include\Shared\RenderingSystem.h>
-#include <Utility\ECS\Include\Shared\LightSystem.h>
 
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
@@ -18,10 +20,11 @@
 
 #undef main
 
-bool m_running;
-void* m_engineModule;
-std::shared_ptr<SDL_Window> m_window;
-RootEngine::GameSharedContext m_engineContext;
+bool g_running;
+void* g_engineModule;
+std::shared_ptr<SDL_Window> g_window;
+RootEngine::GameSharedContext g_engineContext;
+std::vector<std::shared_ptr<Render::MeshInterface>> g_meshes;
 
 
 ReadMemory RM;
@@ -38,7 +41,7 @@ void HandleEvents()
 		switch(event.type) 
 		{
 		case SDL_QUIT:
-			m_running = false;
+			g_running = false;
 			break;
 
 		//default:
@@ -76,8 +79,10 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world)
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 	renderable->m_model = new RootEngine::Model;
 	renderable->m_model->m_meshes.resize(1);
-	renderable->m_model->m_meshes[0] = m_engineContext.m_renderer->CreateMesh();
 	
+	g_meshes.push_back(g_engineContext.m_renderer->CreateMesh());
+	renderable->m_model->m_meshes[0] = g_meshes[g_meshes.size() - 1].get();
+
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
 	return entity;
@@ -104,9 +109,10 @@ int main(int argc, char* argv[])
 	RootForce::Renderable::SetTypeId(0);
     RootForce::Transform::SetTypeId(1);
     RootForce::PointLight::SetTypeId(2);
+    RootForce::Camera::SetTypeId(3);
 
 	// Setup world.
-	ECS::World m_world(3);
+	ECS::World m_world;
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Level3DViewer.exe";
@@ -125,11 +131,11 @@ int main(int argc, char* argv[])
 		{
 			RM.InitalizeSharedMemory();
 
-			m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+			g_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
-			INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+			INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(g_engineModule, "InitializeEngine");
 
-			m_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, path);
+			g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, path);
 
 			if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 			{
@@ -137,7 +143,7 @@ int main(int argc, char* argv[])
 			}
 
 			// TODO: Make these parameters more configurable.
-			m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
+			g_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 					"Root Force",
 					SDL_WINDOWPOS_UNDEFINED,
 					SDL_WINDOWPOS_UNDEFINED,
@@ -145,29 +151,41 @@ int main(int argc, char* argv[])
 					720,
 					SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 				SDL_DestroyWindow);
-			if (m_window == nullptr) 
+			if (g_window == nullptr) 
 			{
 				// TODO: Log error and throw exception (?)
 			}
 
-			m_engineContext.m_renderer->SetupSDLContext(m_window.get());
-			m_running = true;
+			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
+			g_running = true;
 
-			m_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
 			Render::DirectionalLight dl;
 			dl.m_color = glm::vec4(0,0,1,1);
 
 			// Initialize systems.
 			RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
-			renderingSystem->SetLoggingInterface(m_engineContext.m_logger);
-			renderingSystem->SetRendererInterface(m_engineContext.m_renderer);
+			renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+			renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 			m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
 
-			RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, m_engineContext.m_renderer);
+			RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 			m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
+			RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
+			m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+
+			std::vector<ECS::Entity*> cameras;
 			std::vector<ECS::Entity*> LightEntities;
 			std::vector<ECS::Entity*> Entities;
+
+			//cameras.push_back(m_world.GetEntityManager()->CreateEntity());
+			//RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
+			//RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
+			//camera->m_near = 0.1f;
+			//camera->m_far = 1000.0f;
+			//camera->m_fov = 75.0f;
+			//m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
 
 			/*Entities.push_back(CreateEntity(&m_world));*/
 
@@ -180,16 +198,16 @@ int main(int argc, char* argv[])
 
 			//Render::RenderJob job[g_maxMeshes];		
 
-			m_engineContext.m_resourceManager->LoadEffect("Mesh");
+			g_engineContext.m_resourceManager->LoadEffect("Mesh");
 
-			m_engineContext.m_resourceManager->LoadTexture("sphere_diffuse.dds");
+			g_engineContext.m_resourceManager->LoadTexture("sphere_diffuse", Render::TextureType::TEXTURE_2D);
 
 			//Render::Material material;
 			Render::Material* materials;
 			materials = new Render::Material[g_maxMeshes];	//Satte ett fast värde på 100 HÄR
 
-			materials[0].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture("sphere_diffuse.dds");
-			materials[0].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+			materials[0].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("sphere_diffuse");
+			materials[0].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
 			
 			int numberMeshes;
 			int numberLights;
@@ -269,8 +287,13 @@ int main(int argc, char* argv[])
 
 				}
 
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
+				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
+				auto mesh = model->m_meshes[0];
+				auto buffer = g_engineContext.m_renderer->CreateBuffer();
+				mesh->SetVertexBuffer(buffer);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
+				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices); 
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = materials[RM.PmeshList[i]->MaterialID];
 
@@ -311,7 +334,7 @@ int main(int argc, char* argv[])
 
 			// Start the main loop
 			uint64_t old = SDL_GetPerformanceCounter();
-			while (m_running)
+			while (g_running)
 			{
 				uint64_t now = SDL_GetPerformanceCounter();
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
@@ -373,8 +396,8 @@ int main(int argc, char* argv[])
 
 					}
 
-					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexBuffer = m_engineContext.m_renderer->CreateBuffer();
-					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->m_vertexAttributes =  m_engineContext.m_renderer->CreateVertexAttributes();
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
+					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = materials[RM.PmeshList[MeshIndex]->MaterialID];	////SÄTTER DET SÅ DET ÄR ETT MATERIAL PER MESH
 
@@ -427,14 +450,14 @@ int main(int argc, char* argv[])
 
 				HandleEvents();
 
-				m_engineContext.m_renderer->Clear();
+				g_engineContext.m_renderer->Clear();
 
 				pointLightSystem->Process();
 				renderingSystem->Process();
 
-				m_engineContext.m_renderer->Render();
+				g_engineContext.m_renderer->Render();
 
-				m_engineContext.m_renderer->Swap();
+				g_engineContext.m_renderer->Swap();
 			}
 
 		}
@@ -454,7 +477,7 @@ int main(int argc, char* argv[])
 	}
 	
 	SDL_Quit();
-	DynamicLoader::FreeSharedLibrary(m_engineModule);
+	DynamicLoader::FreeSharedLibrary(g_engineModule);
 
 	return 0;
 }

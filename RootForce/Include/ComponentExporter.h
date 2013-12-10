@@ -23,9 +23,19 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 					p_emitter << YAML::Key << "Effect" << YAML::Value << s;
 				}			
 				if(renderable->m_material.m_diffuseMap != nullptr)
-				{
+				{				
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_diffuseMap);
 					p_emitter << YAML::Key << "Diffuse" << YAML::Value << s;
+				}	
+				if(renderable->m_material.m_specularMap != nullptr)
+				{
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_specularMap);
+					p_emitter << YAML::Key << "Specular" << YAML::Value << s;
+				}
+				if(renderable->m_material.m_normalMap != nullptr)
+				{
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_normalMap);
+					p_emitter << YAML::Key << "Normal" << YAML::Value << s;
 				}	
 			}
 			break;
@@ -55,8 +65,30 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			break;
 		case 3:
 			{
-				RootForce::PlayerInputControlComponent* input = static_cast<RootForce::PlayerInputControlComponent*>(p_component);
-				p_emitter << YAML::Key << "Speed" << YAML::Value << input->speed;
+				RootForce::PlayerControl* input = static_cast<RootForce::PlayerControl*>(p_component);
+				p_emitter << YAML::Key << "Speed" << YAML::Value << input->m_speed;
+			}
+			break;
+		case 4:
+			{
+				RootForce::PhysicsAccessor* accessor = static_cast<RootForce::PhysicsAccessor*>(p_component);
+				int type = g_engineContext.m_physics->GetType(*(accessor->m_handle));
+				float mass = g_engineContext.m_physics->GetMass(*(accessor->m_handle));
+				std::string modelHandle = g_engineContext.m_physics->GetPhysicsModelHandle(*(accessor->m_handle));
+				p_emitter << YAML::Key << "Type" << YAML::Value << type;
+				p_emitter << YAML::Key << "Mass" << YAML::Value << mass;
+				p_emitter << YAML::Key << "ModelHandle" << YAML::Value << modelHandle;
+				
+				if (type == RootEngine::Physics::PhysicsType::TYPE_PLAYER) 
+				{
+					float stepHeight = g_engineContext.m_physics->GetStepHeight(*(accessor->m_handle));
+					float modelHeight =g_engineContext.m_physics->GetModelHeight(*(accessor->m_handle));
+					float maxSpeed = g_engineContext.m_physics->GetMaxSpeed(*(accessor->m_handle));
+					p_emitter << YAML::Key << "StepHeight" << YAML::Value << stepHeight;
+					p_emitter << YAML::Key << "ModelHeight" << YAML::Value << modelHeight;
+					p_emitter << YAML::Key << "MaxSpeed" << YAML::Value << maxSpeed;
+				}
+
 			}
 			break;
 		default:

@@ -2,7 +2,6 @@
 
 namespace RootEngine
 {
-	
 	TextureImporter::TextureImporter(Logging* p_logger, Render::RendererInterface* p_renderer)
 	{
 		m_logger	= p_logger;
@@ -12,25 +11,26 @@ namespace RootEngine
 
 	TextureImporter::~TextureImporter()
 	{
-		if(m_texture)
-			delete m_texture;
+
 	}
 
-	bool TextureImporter::LoadTexture( const std::string p_fileName )
+	std::shared_ptr<Render::TextureInterface> TextureImporter::LoadTexture( const std::string p_fileName )
 	{
-		m_texture = m_renderer->CreateTexture();
+		std::shared_ptr<Render::TextureInterface> texture = m_renderer->CreateTexture();
 
-		if (!m_texture->Load(p_fileName)) 
-			return false;
-		else 
-			return true;
+		if (texture->Load(p_fileName)) 
+			return texture;
+		else
+			return nullptr;
 	}
 
-	Render::TextureInterface* TextureImporter::GetTexture()
+	std::shared_ptr<Render::TextureInterface> TextureImporter::LoadCubeTexture( const std::string p_fileName )
 	{
-		return m_texture;
+		std::shared_ptr<Render::TextureInterface> texture = m_renderer->CreateTexture();
+
+		if (texture->LoadCubeMap(p_fileName)) 
+			return texture;
+		else
+			return nullptr;
 	}
-
-
-
 }

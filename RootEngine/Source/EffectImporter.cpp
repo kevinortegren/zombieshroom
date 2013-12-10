@@ -1,8 +1,9 @@
 #include <RootEngine/Include/EffectImporter.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Render/Include/Semantics.h>
 
 #include <RootEngine/Include/Logging/Logging.h>
-extern Logging	g_logger;
+extern Logging g_logger;
 
 namespace RootEngine
 {
@@ -13,7 +14,7 @@ namespace RootEngine
 
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
-		Render::EffectInterface* effect = m_renderer->CreateEffect();
+		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
 
 		std::string techName;
 
@@ -28,6 +29,7 @@ namespace RootEngine
 			std::string techniqueName;
 			techniques[i]["name"] >> techniqueName;
 
+			// Create programs and link shaders.
 			const YAML::Node& programs = techniques[i]["programs"];
 			for(size_t j = 0; j < programs.size(); ++j)
 			{
@@ -56,14 +58,42 @@ namespace RootEngine
 						glType = GL_FRAGMENT_SHADER;
 						extension = ".frag";
 					}
+					else if(type == "geometry")
+					{
+						glType = GL_GEOMETRY_SHADER;
+						extension = ".geometry";
+					}
 
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());
 
 				}
+
+
+
+				if(programs[i].FindValue("blend"))
+				{
+					int blendType;
+					programs[i]["blend"] >> blendType;
+					program->m_blendState = (Render::Program::BlendState)blendType;
+				}
+
+				
+				if(programs[i].FindValue("depth"))
+				{
+					int depthWrite;
+					programs[i]["depth"]["write"] >> depthWrite;			
+					program->m_depthState.depthWrite = (bool)depthWrite;
+					
+					int depthTest;
+					programs[i]["depth"]["test"] >> depthTest;		
+					program->m_depthState.depthTest = (bool)depthTest;
+				}
+
 				program->Compile();
 				program->Apply();
 
+				// Create uniform buffer for this technique.
 				const YAML::Node& uniforms = techniques[i]["uniforms"];
 				for(size_t j = 0; j < uniforms.size(); ++j)
 				{
@@ -73,8 +103,40 @@ namespace RootEngine
 					int slot;
 					uniforms[j]["slot"] >> slot;
 
+					// Bind shader name to slot.
 					program->BindUniformBuffer(name, slot);
 
+					// Create the buffer.
+					std::pair<int, std::shared_ptr<Render::BufferInterface>> bufferPair;
+
+					std::shared_ptr<Render::BufferInterface> buffer = m_renderer->CreateBuffer();
+					buffer->Init(GL_UNIFORM_BUFFER);
+
+					bufferPair.first = slot;
+					bufferPair.second = buffer;
+
+					technique->m_uniforms.push_back(bufferPair);
+				}
+		
+				if(techniques[i].FindValue("PerObject") != nullptr)
+				{
+					const YAML::Node& perObjects = techniques[i]["PerObject"];
+					for(size_t k = 0; k < perObjects.size(); ++k)
+					{
+						std::string sem;
+						perObjects[k]["sem"] >> sem;
+					
+						std::string type;
+						perObjects[k]["type"] >> type;
+
+						// Test.
+
+						// Allocate based on type.
+						unsigned int size = sizeof(glm::mat4);
+
+						// Store the space based on semantic.
+						technique->m_data[Render::Semantic::WORLD] = size;
+					}
 				}
 
 				const YAML::Node& texture = techniques[i]["textures"];
@@ -87,7 +149,6 @@ namespace RootEngine
 					texture[j]["slot"] >> slot;
 
 					program->BindTexture(name, slot);
-
 				}
 			}
 		}

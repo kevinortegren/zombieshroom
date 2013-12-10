@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Server.h"
+#include "LocalServer.h"
+#include "RemoteServer.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 
 #if defined(_WINDLL)

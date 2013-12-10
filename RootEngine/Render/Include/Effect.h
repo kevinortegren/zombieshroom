@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
+
+#include <RootEngine\Render\Include\Semantics.h>
+#include <RootEngine\Render\Include\Buffer.h>
 
 namespace Render
 {
@@ -24,24 +28,26 @@ namespace Render
 	public:
 		virtual void CreateProgram() = 0;
 		virtual GLint AttachShader( GLenum p_shaderType, const char* p_filename ) = 0;
-		virtual GLint Compile( ) = 0;
-		virtual void Apply( ) = 0;
+		virtual GLint Compile() = 0;
+		virtual void Apply() = 0;
 	
 		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
-
-		/*virtual void SetUniformInt( const char* p_varname, int p_val ) = 0;
-		virtual void SetUniformFloat( const char* p_varname, float p_val ) = 0;
-		virtual void SetUniformVector( const char* p_varname, glm::vec3& p_val ) = 0;
-		virtual void SetUniformVector( const char* p_varname, glm::vec4& p_val ) = 0;
-		virtual void SetUniformMatrix( const char* p_varname, glm::mat3& p_val ) = 0;
-		virtual void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val ) = 0;*/
-
 	};
 
 	class Program : public ProgramInterface
 	{
 	public:
+
+		enum BlendState { BLEND_NONE, BLEND_ALPHA, BLEND_ADDITIVE };
+
+		enum FillMode { FILL_SOLID, FILL_WIREFRAME };
+
+		struct DepthState {		
+			bool depthTest;
+			bool depthWrite;
+		};
+
 		Program();
 		~Program();
 		void CreateProgram();
@@ -54,15 +60,11 @@ namespace Render
 		void BindUniformBuffer(const std::string& bufferName, unsigned int slot);
 		void BindTexture(const std::string& textureName, unsigned int slot);
 
+		BlendState m_blendState;
+		DepthState m_depthState;
+		FillMode m_fillMode;
+
 	private:
-
-		/*void SetUniformInt( const char* p_varname, int p_val );
-		void SetUniformFloat( const char* p_varname, float p_val );
-		void SetUniformVector( const char* p_varname, glm::vec3& p_val );
-		void SetUniformVector( const char* p_varname, glm::vec4& p_val );
-		void SetUniformMatrix( const char* p_varname, glm::mat3& p_val );
-		void SetUniformMatrix( const char* p_varname, const glm::mat4& p_val );*/
-
 		GLuint m_glHandle;
 	};
 
@@ -76,10 +78,15 @@ namespace Render
 	class Technique : public TechniqueInterface
 	{
 	public:
-		//TODO: Move uniforms/samplers here.
-
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
+
+		std::vector<std::pair<int, std::shared_ptr<Render::BufferInterface>>> m_uniforms;
+		std::vector<std::pair<int, GLuint>> m_textures;
+		std::map<Semantic::Semantic, unsigned int> m_data; // offsets.
+		
+		void BindUniforms();
+		void BindTextures();
 
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;
@@ -100,5 +107,15 @@ namespace Render
 
 	private:
 		std::vector<std::shared_ptr<Technique>> m_techniques;
+	};
+
+	struct EffectParamsInterface
+	{
+		virtual void AllocateParams(EffectInterface* p_effect) = 0;
+	};
+
+	struct EffectParams : public EffectParamsInterface
+	{
+		void AllocateParams(EffectInterface* p_effect);
 	};
 }

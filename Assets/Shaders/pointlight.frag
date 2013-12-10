@@ -47,7 +47,10 @@ vec3 GetVSPositionFromDepth()
 
 void main() {
 
-	vec3 diffuse = texture(g_Diffuse, ex_TexCoord).xyz;
+	vec4 rt0 = texture(g_Diffuse, ex_TexCoord);
+
+	vec3 diffuse = rt0.xyz;
+	float specTerm = rt0.w;
 	vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
 
 	vec3 normal = normalize(vert_normal.xyz*2-1); 
@@ -64,7 +67,7 @@ void main() {
 	vec3 light = vec3(0);
 	if(dist <= ex_Light.Range)
 	{
-		vec3 spec_color = vec3(1) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
+		vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
 		vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
 		light = diffuse_color + spec_color;

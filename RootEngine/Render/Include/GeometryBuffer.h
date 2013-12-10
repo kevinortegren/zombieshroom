@@ -21,8 +21,8 @@ namespace Render
 	private:
 		GLuint m_fbo;
 
-		GLuint m_depthHandle;
-		GLuint m_diffuseHandle; // 24bit Diffuse 8bit Empty
+		GLuint m_depthHandle;	// 32bit Depth.
+		GLuint m_diffuseHandle; // 24bit Diffuse 8bit Specular;
 		GLuint m_normalsHandle;// 24bit ViewSpaceNormals 8bit Empty.
 	};
 }
