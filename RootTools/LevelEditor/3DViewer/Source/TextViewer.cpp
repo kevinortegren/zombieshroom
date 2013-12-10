@@ -452,7 +452,7 @@ int main(int argc, char* argv[])
 
 				g_engineContext.m_renderer->Clear();
 
-				//pointLightSystem->Process();
+				pointLightSystem->Process();
 				renderingSystem->Process();
 
 				g_engineContext.m_renderer->Render();

@@ -96,7 +96,7 @@ namespace Render
 			g_context.m_logger->LogText("%s", SDL_GetError());
 		}
 
-		SDL_GL_SetSwapInterval(1);
+		SDL_GL_SetSwapInterval(0);
 
 		int width, height;
 		SDL_GetWindowSize(p_window, &width, &height);
@@ -272,6 +272,7 @@ namespace Render
 
 	void GLRenderer::Clear()
 	{
+		glDepthMask(GL_TRUE);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//m_numDirectionalLights = 0;
@@ -290,8 +291,6 @@ namespace Render
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
 		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
 
 		// Bind GBuffer.
 		m_gbuffer.Bind();
@@ -340,8 +339,8 @@ namespace Render
 				// Debug.
 				if(m_displayNormals)
 				{
-					//m_normalTech->GetPrograms()[0]->Apply();	
-					//(*itr).m_mesh->Draw();	
+					m_normalTech->GetPrograms()[0]->Apply();	
+					(*itr).m_mesh->Draw();	
 				}
 			}
 
@@ -358,7 +357,6 @@ namespace Render
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		glDisable(GL_DEPTH_TEST);
 
 		// Buffer light data.
 		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
