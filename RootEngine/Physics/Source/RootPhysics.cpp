@@ -275,7 +275,7 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
-		//player->SetUserPointer((void*)userPointer);
+		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
 	}
@@ -617,7 +617,7 @@ namespace Physics
 
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			//return m_playerObjects.at(index)->GetMass();
+			return m_playerObjects.at(index)->GetMass();
 		}
 
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
@@ -644,7 +644,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			//return m_playerObjects.at(index)->GetStepHeight();
+			return m_playerObjects.at(index)->GetStepHeight();
 		}
 		return -1;
 	}
@@ -655,7 +655,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			//return m_playerObjects.at(index)->GetMaxSpeed();
+			return m_playerObjects.at(index)->GetMaxSpeed();
 		}
 		return -1;
 	}
@@ -666,7 +666,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			//return m_playerObjects.at(index)->GetModetHeight();
+			return m_playerObjects.at(index)->GetModelHeight();
 		}
 		return -1;
 	}	
@@ -683,10 +683,6 @@ namespace Physics
 	{
 		return &(m_userPointer.at(p_objectIndex)->m_collidedEntityId);
 	}
-
-	
-
-
 
 }
 }

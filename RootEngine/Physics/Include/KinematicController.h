@@ -23,8 +23,12 @@ public:
 	void SetUserPointer(void* p_userPointer);
 	void SetDebugDrawer(DebugDrawer* p_drawer) const {m_kinController->debugDraw(p_drawer);}
 
+	float GetMass() const {return m_mass;}
+	float GetMaxSpeed() const {return m_maxSpeed;}
+	float GetStepHeight() const {return m_stepHeight;}
+	float GetModelHeight() const {return m_heightOffset;}
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
-	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();};
+	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
 
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;

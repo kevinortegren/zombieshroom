@@ -77,7 +77,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_hasBeenKnockbacked = false;
 	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
-	m_dynamicWorld->addAction(m_kinController);
+	//m_dynamicWorld->addAction(m_kinController);
 
 }
 
@@ -87,10 +87,10 @@ void KinematicController::Walk(float* p_dir, float p_dt)
 	btVector3 temp = btVector3(p_dir[0], p_dir[1], p_dir[2]);
 	temp.normalize();
 	m_kinController->setVelocityForTimeInterval(temp*m_maxSpeed, p_dt);
-	if(!m_kinController->IsKnockbacked() && !m_hasStepped)
+	if(!m_kinController->IsKnockbacked())// && !m_hasStepped)
 	{
 		m_kinController->playerStep(m_dynamicWorld, p_dt);
-		m_hasStepped = true;
+		//m_hasStepped = true;
 	}
 	
 	//m_kinController->setWalkDirection(temp*p_dt);
@@ -100,7 +100,7 @@ void KinematicController::Walk(float* p_dir, float p_dt)
 void KinematicController::Update(float p_dt)
 {
 	
-	m_hasStepped = false;
+	//m_hasStepped = false;
 	m_kinController->updateAction(m_dynamicWorld, p_dt);
 	m_kinController->setWalkDirection(btVector3(0,0,0));
 
