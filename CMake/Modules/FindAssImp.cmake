@@ -6,4 +6,4 @@ find_path(ASSIMP_INCLUDE_DIRS
 
 find_library(ASSIMP_LIBRARY
     NAMES assimp
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")

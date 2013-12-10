@@ -6,7 +6,7 @@
 
 //#include <RenderingSystem.h>
 //#include <LightSystem.h>
-#include <RootForce/Include/CameraSystem.h>
+#include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 
 #include <RootForce/Include/LuaAPI.h>
