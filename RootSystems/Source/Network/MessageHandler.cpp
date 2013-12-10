@@ -29,6 +29,7 @@ namespace RootForce
 					dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
 
 					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
+					m_serverMessageHandler = nullptr;
 
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server connection to: %s:%u", address, port);
 					break;
@@ -37,6 +38,7 @@ namespace RootForce
 					m_server = p_networkInterface->GetNetworkSystem();
 					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
 
+					m_clientMessageHandler = nullptr;
 					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
 
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started dedicated local server on port: %u", port);
@@ -51,7 +53,8 @@ namespace RootForce
 
 		void MessageHandler::Update()
 		{
-			m_clientMessageHandler->Update();
+			if(m_clientMessageHandler != nullptr)
+				m_clientMessageHandler->Update();
 			 
 			m_server->Update();
 			std::shared_ptr<RootEngine::Network::Message> message = nullptr;

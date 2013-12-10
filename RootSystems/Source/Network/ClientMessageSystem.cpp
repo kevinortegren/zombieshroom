@@ -64,9 +64,11 @@ namespace RootForce
 
 		void ClientMessageHandler::HandleChatToClientMessage(RootEngine::Network::Message* p_message)
 		{
-			MessageChat* header = (MessageChat*) p_message->Data;
-			m_chatSystem->JSAddMessage( "#" + std::to_string(header->SenderID) + ": " + header->Message );
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client %d: %s", header->SenderID, header->Message);
+			//MessageChat* header = (MessageChat*) p_message->Data;
+			MessageChat header;
+			header.Deserialize(p_message->Data);
+			m_chatSystem->JSAddMessage( "#" + std::to_string(header.SenderID) + ": " + header.Message );
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client %d: %s", header.SenderID, header.Message);
 		}
 
 		void ClientMessageHandler::HandleUserConnectedMessage(RootEngine::Network::Message* p_message)
@@ -93,17 +95,18 @@ namespace RootForce
 			{
 				RootEngine::Network::Message netmsg;
 				RootForce::Network::MessageChat netmsgchat;
-				netmsgchat.SenderID = -1;
-				netmsgchat.Type = RootForce::Network::MessageChat::MessageType::TYPE_CHAT;
-				netmsgchat.Message = new char[chatmsg.size()];
-				memcpy((void*)netmsgchat.Message, chatmsg.data(), chatmsg.size());
+				netmsgchat.SenderID = -1; // TODO: Fix own sender ID to first player connected ID received
+				netmsgchat.Type = RootForce::Network::MessageChat::TYPE_DEBUG;
+				netmsgchat.Message = new char[chatmsg.size()+1];
+				std::strcpy(netmsgchat.Message, chatmsg.c_str());
+
 				netmsg.MessageID = RootForce::Network::MessageType::ChatToServer;
-				netmsg.RecipientID = 0;
+				netmsg.RecipientID = RootEngine::Network::RECIPIENT_BROADCAST;
 				netmsg.Reliability = PacketReliability::RELIABLE_ORDERED;
 				netmsg.SenderID = -1; // TODO: Fix own sender ID to first player connected ID received
-				netmsg.Data = new uint8_t[chatmsg.size()+sizeof(netmsgchat.Type)+sizeof(netmsgchat.SenderID)];
+				netmsg.DataSize = netmsgchat.GetSerializedSize();
+				netmsg.Data = new uint8_t[netmsg.DataSize];
 				netmsgchat.Serialize(netmsg.Data);
-				netmsg.DataSize = chatmsg.size()+sizeof(netmsgchat.Type)+sizeof(netmsgchat.SenderID);
 				m_server->Send(netmsg);
 			}
 		}

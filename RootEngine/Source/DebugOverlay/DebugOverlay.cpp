@@ -49,11 +49,11 @@ namespace RootEngine
 		command += "</a>\", ";
 		command += (p_leftSide?"true":"false");
 		command += ");";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
+		//m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
 	}
 
 	void DebugOverlay::Clear()
 	{
-		m_view->ExecuteJavascript(Awesomium::WSLit("Clear();"), Awesomium::WSLit(""));
+		//m_view->ExecuteJavascript(Awesomium::WSLit("Clear();"), Awesomium::WSLit(""));
 	}
 }
