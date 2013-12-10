@@ -196,7 +196,7 @@ namespace Render
 		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
-		m_cameraVars.m_projection = glm::perspectiveFov<float>(75.0f, width, height, 0.1f, 1000.0f);
+		m_cameraVars.m_projection = glm::perspectiveFov<float>(75.0f, (float)width, (float)height, 0.1f, 1000.0f);
 
 		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);

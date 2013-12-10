@@ -222,7 +222,7 @@ namespace RootForce
 			g_engineContext.m_renderer->Clear();
 
 			// Toggle rendering of normals.
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				if(m_displayNormals)
 				{

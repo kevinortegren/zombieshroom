@@ -3,13 +3,13 @@ function FireballOnActivate ()
 	local entity 		= CreateEntity();
 	local transcomp 	= CreateTransformation(entity);
 	local rendercomp 	= CreateRenderable(entity);
-	SetRenderableModel("sphere", "Mesh", rendercomp);
+	SetRenderableModel("Primitives/sphere", "Mesh", rendercomp);
 	local physiccomp	= CreatePhysicsAccessor(entity);
 	SetPhysicsAccessorInfo(physiccomp, 
 		true, --collideWorld
 		0, --dirx
-		1, --diry
-		-1, --dirz
+		0, --diry
+		1, --dirz
 		0, --gravx
 		-9, --gravy
 		0, --gravz
