@@ -57,13 +57,13 @@ namespace RootEngine
 		ResourceManager m_resourceManager;
 		DebugOverlay m_debugOverlay;
 		Profiling m_profiler;
+		ConfigManager m_configManager;
 
 		Network::NetworkManager*		m_network;
 		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
-
 	};
 }
 
