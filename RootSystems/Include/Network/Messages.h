@@ -2,6 +2,7 @@
 
 #include <glm/gtc/quaternion.hpp>
 #include <stdint.h>
+#include <vector>
 
 namespace RootForce
 {
@@ -45,25 +46,43 @@ namespace RootForce
 		{
 			uint16_t TemporaryID;
 			uint16_t SynchronizedID;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
+			void Deserialize(uint8_t* buffer);
 		};
 
 		struct EntityRemoved
 		{
 			uint16_t SynchronizedID;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
+			void Deserialize(uint8_t* buffer);
 		};
 
-		struct UpdatedComponent
+		struct ComponentUpdated
 		{
 			uint16_t SynchronizedID;
 			unsigned int ComponentTypeID;
 			uint8_t* ComponentData;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
+			void Deserialize(uint8_t* buffer);
 		};
 
 
 		/** Header for the game state snapshot message. Following in the data stream is the actual updated components. */
 		struct MessageGameStateSnapshot
 		{
-			// TODO: This needs to be developed in conjunction with the game logic.
+			std::vector<EntityCreated> CreatedEntities;
+			std::vector<EntityRemoved> RemovedEntities;
+			std::vector<ComponentUpdated> UpdatedComponents;
+
+			int GetSerializedSize() const;
+			void Serialize(uint8_t* buffer) const;
+			void Deserialize(uint8_t* buffer);
 		};
 
 		/** Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. */

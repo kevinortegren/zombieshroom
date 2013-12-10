@@ -5,6 +5,87 @@ namespace RootForce
 {
 	namespace Network
 	{
+		int EntityCreated::GetSerializedSize() const
+		{
+			int size = 0;
+			size += sizeof(TemporaryID);
+			size += sizeof(SynchronizedID);
+
+			return size;
+		}
+
+		void EntityCreated::Serialize(uint8_t* buffer) const
+		{
+			memcpy(buffer, &TemporaryID, sizeof(TemporaryID));
+			memcpy(buffer + sizeof(TemporaryID), &SynchronizedID, sizeof(SynchronizedID));
+		}
+
+		void EntityCreated::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&TemporaryID, buffer, sizeof(TemporaryID));
+			memcpy(&SynchronizedID, buffer + sizeof(TemporaryID), sizeof(SynchronizedID));
+		}
+
+
+
+		int EntityRemoved::GetSerializedSize() const
+		{
+			int size = 0;
+			size += sizeof(SynchronizedID);
+
+			return size;
+		}
+
+		void EntityRemoved::Serialize(uint8_t* buffer) const
+		{
+			memcpy(buffer, &SynchronizedID, sizeof(SynchronizedID));
+		}
+
+		void EntityRemoved::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&SynchronizedID, buffer, sizeof(SynchronizedID));
+		}
+
+
+
+		int ComponentUpdated::GetSerializedSize() const
+		{
+			int size = 0;
+			size += sizeof(SynchronizedID);
+			size += sizeof(ComponentTypeID);
+
+			return size;
+		}
+
+		void ComponentUpdated::Serialize(uint8_t* buffer) const
+		{
+
+		}
+
+		void ComponentUpdated::Deserialize(uint8_t* buffer)
+		{
+
+		}
+
+
+
+		int MessageGameStateSnapshot::GetSerializedSize() const
+		{
+
+		}
+
+		void MessageGameStateSnapshot::Serialize(uint8_t* buffer) const
+		{
+
+		}
+
+		void MessageGameStateSnapshot::Deserialize(uint8_t* buffer)
+		{
+
+		}
+
+
+
 		int MessageChat::GetSerializedSize() const
 		{
 			int size = 0;
