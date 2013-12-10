@@ -185,10 +185,8 @@ void Main::Start()
 		float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 		old = now;
 		
-		g_engineContext.m_debugOverlay->Clear();
-
 		m_world.SetDelta(dt);
-		g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+		g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
 		{
 			PROFILE("Handle Events", g_engineContext.m_profiler);
@@ -237,6 +235,7 @@ void Main::Start()
 			g_engineContext.m_gui->Render();
 		}
 
+		g_engineContext.m_debugOverlay->RenderOverlay();
 		g_engineContext.m_renderer->Swap();
 	}
 }
