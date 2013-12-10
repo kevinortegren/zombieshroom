@@ -2,7 +2,7 @@
 #include <Bullet/btBulletDynamicsCommon.h>
 #include <Bullet/btBulletCollisionCommon.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
-#include <Bullet/BulletDynamics/Character/btKinematicCharacterController.h>
+#include <RootEngine/Physics/Include/BulletCharacter.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
 #include <vector>
 class KinematicController 
@@ -16,11 +16,10 @@ public:
 	//Assumes the float* is a float[3]
 	void Walk(float* p_dir, float p_dt);
 	void Jump();
-	void Knockback(float* p_velocity);
+	void Knockback(float* p_velocity, float p_dt);
 	void Update(float p_dt);
 	void SetOrientation(float* p_orientation);
 	void RemovePlayer();
-	bool IsOnGround() const {return m_onGround;};
 	void SetUserPointer(void* p_userPointer);
 	void SetDebugDrawer(DebugDrawer* p_drawer) const {m_kinController->debugDraw(p_drawer);}
 
@@ -31,20 +30,13 @@ private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;
 	btPairCachingGhostObject* m_ghostObject;
 	btMotionState* m_motionState;
-	btTransform m_motionTransform;
-	btKinematicCharacterController* m_kinController;
-	bool m_onGround;
-	bool m_hittingWall;
+	BulletCharacter* m_kinController;
+	bool m_hasStepped;
 	float m_maxSpeed;
 	float m_stepHeight;
 	float m_heightOffset;
-	std::vector<btVector3> m_surfaceHitNormals;
-	btVector3 m_knockbackVelocity;
-	btVector3 m_previousPosition;
+	float m_mass;
 	bool m_hasBeenKnockbacked;
-	void ParseGhostContacts();
-	void UpdatePosition();
-	void UpdateVelocity();
 
 };
 

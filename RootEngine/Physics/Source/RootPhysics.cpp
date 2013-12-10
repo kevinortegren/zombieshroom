@@ -110,7 +110,7 @@ namespace Physics
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		
-		
+		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 	}
 
 
@@ -143,7 +143,7 @@ namespace Physics
 		{
 			m_playerObjects.at(i)->Update(m_dt);
 		}
-		m_dynamicWorld->stepSimulation(m_dt,10);
+		m_dynamicWorld->stepSimulation(m_dt,1);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		m_dynamicWorld->debugDrawWorld();
 		
@@ -334,7 +334,7 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
  		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
- 		m_playerObjects.at(index)->Knockback(temp * p_pushForce);
+ 		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
 	}
 
 	void RootPhysics::RemoveObject( int p_objectIndex)

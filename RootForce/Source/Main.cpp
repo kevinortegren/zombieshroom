@@ -190,7 +190,7 @@ void Main::Start()
 	test.m_radius = 0.5f;
 	test.m_orientation = rot;
 	test.m_shape = RootEngine::Physics::AbilityShape::SHAPE_SPHERE;
-	test.m_speed = 0.03;
+	test.m_speed = 0.03f;
 	test.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
 	g_engineContext.m_physics->AddAbilityToWorld(test);
 	float pos1[3] = {0, -1, 0};

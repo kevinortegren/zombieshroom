@@ -13,6 +13,7 @@ KinematicController::~KinematicController( void )
 }
 void KinematicController::RemovePlayer()
 {
+
 }
 
 void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
@@ -22,8 +23,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_heightOffset = p_modelHeight / 2.0f;
 	m_stepHeight = p_stepHeight;
 	m_maxSpeed = p_maxSpeed;
-	m_previousPosition = btVector3(p_position[0],p_position[1],p_position[2]);
-	m_knockbackVelocity = btVector3(0.0f,0.0f,0.0f);
+	m_mass = p_mass;
 
 	//Shape
 	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
@@ -60,6 +60,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject->setCollisionFlags(/*m_ghostObject->getCollisionFlags() | */btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
 	
 	
+
 	//indexVertexArray = 0;
 	//objectMeshShape = 0;
 	//objectHull = 0;
@@ -68,12 +69,13 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	//delete objectMeshShape;
 	//delete objectHull;
 
-	m_kinController = new btKinematicCharacterController(m_ghostObject, simplifiedObject, p_stepHeight);
+	m_kinController = new BulletCharacter(m_ghostObject, simplifiedObject, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f);
 	m_kinController->setJumpSpeed(5);
-	
 
+	m_hasBeenKnockbacked = false;
+	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 	m_dynamicWorld->addAction(m_kinController);
 
@@ -85,14 +87,23 @@ void KinematicController::Walk(float* p_dir, float p_dt)
 	btVector3 temp = btVector3(p_dir[0], p_dir[1], p_dir[2]);
 	temp.normalize();
 	m_kinController->setVelocityForTimeInterval(temp*m_maxSpeed, p_dt);
-	m_kinController->playerStep(m_dynamicWorld, p_dt);
+	if(!m_kinController->IsKnockbacked() && !m_hasStepped)
+	{
+		m_kinController->playerStep(m_dynamicWorld, p_dt);
+		m_hasStepped = true;
+	}
+	
 	//m_kinController->setWalkDirection(temp*p_dt);
+	//m_kinController->playerStep(m_dynamicWorld, p_dt);
 }
 
 void KinematicController::Update(float p_dt)
 {
-	int bajs = 0;
 	
+	m_hasStepped = false;
+	m_kinController->updateAction(m_dynamicWorld, p_dt);
+	m_kinController->setWalkDirection(btVector3(0,0,0));
+
 	/*if (!m_kinController->onGround())
 	{
 		Walk(&m_knockbackVelocity[0], p_dt);
@@ -102,16 +113,6 @@ void KinematicController::Update(float p_dt)
 		m_hasBeenKnockbacked = false;
 	}*/
 	//m_kinController->updateAction(m_dynamicWorld, p_dt);
-}
-
-
-void KinematicController::UpdatePosition()
-{
-	
-}
-
-void KinematicController::UpdateVelocity()
-{
 	
 }
 
@@ -121,19 +122,19 @@ void KinematicController::Jump()
 		m_kinController->jump();
 }
 
-void KinematicController::Knockback(float* p_velocity )
+void KinematicController::Knockback(float* p_velocity, float p_power )
 {
 	
-	/*m_knockbackVelocity = btVector3(p_velocity[0], p_velocity[1], p_velocity[2]);
-	m_hasBeenKnockbacked = true;
-	m_kinController->warp(btVector3(m_kinController->getGhostObject()->getWorldTransform().getOrigin().x(), 
-									m_kinController->getGhostObject()->getWorldTransform().getOrigin().y() + 0.1f,
-									m_kinController->getGhostObject()->getWorldTransform().getOrigin().z()));*/
+	m_kinController->Knockback(p_velocity, p_power);
 	
-	Jump();
 }
 
 void KinematicController::SetOrientation( float* p_orientation )
 {
 	m_kinController->getGhostObject()->getWorldTransform().setRotation(btQuaternion(p_orientation[0], p_orientation[1], p_orientation[2], p_orientation[3]));
+}
+
+void KinematicController::SetUserPointer( void* p_userPointer )
+{
+	m_ghostObject->setUserPointer(p_userPointer);
 }

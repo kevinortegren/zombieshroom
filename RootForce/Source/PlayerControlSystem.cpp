@@ -84,8 +84,9 @@ namespace RootForce
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						glm::vec3 backwards = glm::vec3(0,20,-20);//-facing;
-						m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
+						glm::vec3 backwards = /*glm::vec3(0,20,-20);//*/-facing;
+						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &backwards.x);
+						//m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
