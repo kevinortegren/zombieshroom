@@ -86,7 +86,7 @@ Main::~Main()
 
 void Main::Start() 
 {
-	
+	g_engineContext.m_script->LoadScript("script3.lua");
 	
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
@@ -198,7 +198,7 @@ void Main::Start()
 		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_Q) == RootEngine::InputManager::KeyState::DOWN)
 		{
 			PROFILE("SCRIPTTEST", g_engineContext.m_profiler);
-			g_engineContext.m_script->LoadScript("script3.lua");
+			
 			g_engineContext.m_script->SetFunction("PrintSomeData");
 			g_engineContext.m_script->AddParameterBoolean(true);
 			g_engineContext.m_script->AddParameterNumber(2.0);
