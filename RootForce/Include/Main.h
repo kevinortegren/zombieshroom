@@ -13,6 +13,7 @@
 #include <string>
 
 RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
 
 class Main {
 public:
@@ -27,7 +28,7 @@ private:
 	bool m_running;
 	void* m_engineModule;
 	std::shared_ptr<SDL_Window> m_window;
-	
+
 	ECS::World m_world;
 	std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;

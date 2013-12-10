@@ -1,5 +1,4 @@
 #include <RootEngine/Script/Include/ScriptManager.h>
-#include <RootEngine/Script/Include/ScriptAPI.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <iostream>
 
@@ -7,13 +6,13 @@ namespace RootEngine
 {
 	namespace Script
 	{
+		SubsystemSharedContext g_context;
 		ScriptManager* ScriptManager::s_scriptManager = nullptr;
 
 		void ScriptManager::Startup()
 		{
 			m_luaState = luaL_newstate();
 			luaL_openlibs(m_luaState);
-			RegisterFunctions();
 			m_parameterCount = 0;
 			g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::INIT_PRINT, "Succesfull startup of the scripting system");
 		}
@@ -21,15 +20,9 @@ namespace RootEngine
 		void ScriptManager::Shutdown()
 		{
 			lua_close(m_luaState);
-			//delete s_scriptManager;			
+			delete s_scriptManager;			
 		}
 
-		void ScriptManager::Initialize( ECS::World* p_world )
-		{
-			g_world = p_world;
-		}
-
-		
 		ScriptManager* ScriptManager::GetInstance()
 		{
 			if(!s_scriptManager)
@@ -74,9 +67,9 @@ namespace RootEngine
 			m_parameterCount++;
 		}
 
-		void ScriptManager::RegisterFunctions()
+		void ScriptManager::RegisterFunction(std::string p_funcName, lua_CFunction p_func)
 		{
-			lua_register(m_luaState, "CreateThing", CreateThing);
+			lua_register(m_luaState, p_funcName.c_str(), p_func);
 		}
 
 		void ScriptManager::LoadScript( std::string p_scriptPath )

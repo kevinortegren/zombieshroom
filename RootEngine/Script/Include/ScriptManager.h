@@ -1,8 +1,8 @@
 #pragma once
-
 #include "RootScript.h"
 #include <Lua/lua.hpp>
-#include <../../Utility/ECS/Include/World.h>
+
+
 
 namespace RootEngine
 {
@@ -13,7 +13,6 @@ namespace RootEngine
 		public:
 			void Startup();
 			void Shutdown();
-			void Initialize(ECS::World* p_world);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
 			void ExecuteWholeScript(std::string p_scriptPath);
@@ -23,11 +22,11 @@ namespace RootEngine
 			void AddParameterString(std::string p_string);
 			void AddParameterNumber(double p_double);
 			void AddParameterBoolean(bool p_bool);
-
+			void RegisterFunction(std::string p_funcName, lua_CFunction p_func);
 			static ScriptManager* GetInstance();
 
 		private:
-			void RegisterFunctions();
+			
 			
 
 			std::string m_workingDir;

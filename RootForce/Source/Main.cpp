@@ -8,7 +8,7 @@
 //#include <LightSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 
-
+#include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 
@@ -86,8 +86,6 @@ Main::~Main()
 
 void Main::Start() 
 {
-	g_engineContext.m_script->LoadScript("script3.lua");
-	
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 	RootForce::Renderable::SetTypeId(0);
@@ -98,6 +96,16 @@ void Main::Start()
 	RootForce::Network::NetworkClientComponent::SetTypeId(5);
 	RootForce::Network::NetworkComponent::SetTypeId(6);
 
+	
+	g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
+	g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
+	g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
+	g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
+	g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
+	g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);
+	
+	
+	g_world = &m_world;
 
 	// Initialize the system for controlling the player.
 	std::vector<RootForce::Keybinding> keybindings(4);
@@ -195,14 +203,10 @@ void Main::Start()
 		}
 
 		// Code for testing scripts
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_Q) == RootEngine::InputManager::KeyState::DOWN)
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			PROFILE("SCRIPTTEST", g_engineContext.m_profiler);
-			
-			g_engineContext.m_script->SetFunction("PrintSomeData");
-			g_engineContext.m_script->AddParameterBoolean(true);
-			g_engineContext.m_script->AddParameterNumber(2.0);
-			g_engineContext.m_script->AddParameterString("Test");
+			g_engineContext.m_script->LoadScript("fireball.lua");
+			g_engineContext.m_script->SetFunction("FireballOnActivate");
 			g_engineContext.m_script->ExecuteScript();
 		}
 

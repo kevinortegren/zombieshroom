@@ -1,7 +1,6 @@
 #pragma once
-
 #include <RootEngine/Include/SubsystemSharedContext.h>
-#include <../../Utility/ECS/Include/World.h>
+#include <Lua/lua.hpp>
 
 #if defined(_WINDLL)
 #define SCRIPT_DLL_EXPORT __declspec(dllexport)
@@ -17,7 +16,6 @@ namespace RootEngine
 		class ScriptInterface : public RootEngine::SubsystemInterface
 		{
 		public:
-			virtual void Initialize(ECS::World* p_world) = 0;
 			virtual void SetWorkingDir(std::string p_path) = 0;
 
 
@@ -37,6 +35,7 @@ namespace RootEngine
 			virtual void AddParameterString(std::string p_string) = 0;
 			virtual void AddParameterNumber(double p_double) = 0;
 			virtual void AddParameterBoolean(bool p_bool) = 0;
+			virtual void RegisterFunction(std::string p_funcName, lua_CFunction p_func) = 0;
 		};
 	}
 }
