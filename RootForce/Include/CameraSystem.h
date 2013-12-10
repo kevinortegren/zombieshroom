@@ -3,7 +3,7 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <Utility/ECS/Include/World.h>
 #include <Camera.h>
-#include <Utility/ECS/Include/Shared/Transform.h>
+#include <RootSystems/Include/Transform.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -31,6 +31,9 @@ namespace RootForce
 			{
 				Transform* transform = m_transforms.Get(p_entity);
 				Camera* camera = m_cameras.Get(p_entity);
+
+				ECS::Entity* skybox = m_world->GetTagManager()->GetEntityByTag("Skybox");
+				m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
 
 				Orientation tempOrientation = transform->m_orientation;
 				tempOrientation.Yaw(180.0f);

@@ -288,6 +288,7 @@ namespace Render
 	void GLRenderer::GeometryPass()
 	{
 		// Buffer Per Frame data.
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
 		glDisable(GL_BLEND);

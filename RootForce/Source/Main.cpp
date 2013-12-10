@@ -6,6 +6,7 @@
 
 //#include <RenderingSystem.h>
 //#include <LightSystem.h>
+#include <RootForce/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 
 
@@ -32,6 +33,9 @@ int main(int argc, char* argv[])
 	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
+	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
+	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -90,7 +94,7 @@ namespace RootForce
 
 	Main::~Main() 
 	{
-		m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}
@@ -139,6 +143,13 @@ namespace RootForce
 		renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+		RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+		RootForce::LookAtSystem* lookAtSystem = new RootForce::LookAtSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::LookAtSystem>(lookAtSystem, "LookAtSystem");
+		RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
+
 		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
 
 		Render::DirectionalLight dl;
@@ -155,6 +166,20 @@ namespace RootForce
 
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+
+		//Create camera
+		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
+		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
+		camera->m_near = 0.1f;
+		camera->m_far = 1000.0f;
+		camera->m_fov = 75.0f;
+		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+		cameraLookAt->m_targetTag = "Player";
+		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+		cameraThirdPerson->m_targetTag = "Player";
+		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
 
 		//Plane at bottom
 		float normal[3] = {0,1,0};
@@ -214,9 +239,7 @@ namespace RootForce
 				PROFILE("Entity Systems", g_engineContext.m_profiler);
 				m_playerControlSystem->Process();
 				abilitySystem->Process();
-				pointLightSystem->Process();
-				m_physicsSystem->Process();
-				renderingSystem->Process();
+
 			}
 
 			{
@@ -226,10 +249,16 @@ namespace RootForce
 
 			{
 				PROFILE("Physics", g_engineContext.m_profiler);
+				m_physicsSystem->Process();
 				g_engineContext.m_physics->Update(dt);
+				
 			}
 
-			
+			thirdPersonBehaviorSystem->Process();
+			lookAtSystem->Process();
+			cameraSystem->Process();
+			pointLightSystem->Process();
+			renderingSystem->Process();
 			g_engineContext.m_renderer->Render();
 	
 			{
