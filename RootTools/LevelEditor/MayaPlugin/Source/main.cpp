@@ -10,7 +10,7 @@ MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights];
-int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0;
+int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
@@ -29,7 +29,7 @@ void GetMaterial(MObject node);
 void MayaMeshToList(MObject node, int id);
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 
 // Lägger till ett callback-id i callback-arrayen.
@@ -490,12 +490,43 @@ void MayaMeshToList(MObject node, int meshIndex)
 		//Get, set texturepaths
 		MString texturepath = "";
 		MString normalpath = "";
+		MString materialName = "";
 		float bumpdepth;
+		MFnDependencyNode material_node;
+																								////NEW STUFFS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node);
+		materialName = material_node.name();
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth);
+		//if(material_node.typeName() == "lambert")
+		//{
+		//	Print("LAMBERT FOUND");
+		//	Print(material_node.name());
+		//	Print(material_node.pluginName());
+		//}
 
-		memcpy(SM.meshList[meshIndex].texturePath, texturepath.asChar(), texturepath.numChars());
-		memcpy(SM.meshList[meshIndex].normalPath, normalpath.asChar(),normalpath.numChars());
+		//memcpy(SM.meshList[meshIndex].texturePath, texturepath.asChar(), texturepath.numChars());
+		//memcpy(SM.meshList[meshIndex].normalPath, normalpath.asChar(),normalpath.numChars());
+
+		//memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
+
+		//bool materialExists = false;
+		//for(int i = 0; i < currNrMaterials; i++)
+		//{
+		//	if(SM.materialList[i].materialName != materialName.asChar())
+		//	{
+		//		materialExists = true;
+		//	}
+		//}
+
+		//if(!materialExists)
+		//{
+		//	memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
+		//	memcpy(SM.meshList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
+		//	memcpy(SM.meshList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+		//	currNrMaterials++;
+		//	SM.UpdateSharedMaterials(currNrMaterials);
+		//}
+		
 
 		//Get and set mesh name
 		memcpy(SM.meshList[meshIndex].transformation.name, mesh.fullPathName().asChar(), mesh.fullPathName().numChars());
@@ -811,7 +842,7 @@ void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float
 	}
 }
 
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -826,11 +857,9 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		
 		for(int j = 0; j < shaders.length(); j++)
 		{
-			MFnDependencyNode material_node;
-
 			GetMaterialNode(shaders[j], material_node);
 			ExtractColor(material_node, out_color_path);
-			ExtractBump(material_node, out_bump_path, out_bump_depth);
+			ExtractBump(material_node, out_bump_path, out_bump_depth);			
 		}
 	}
 }

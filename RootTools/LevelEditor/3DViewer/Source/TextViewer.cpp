@@ -186,7 +186,8 @@ int main(int argc, char* argv[])
 
 			//Render::Material material;
 			Render::Material* materials;
-			materials = new Render::Material[100];	//Satte ett fast värde på 100 HÄR
+			materials = new Render::Material[g_maxMeshes];	//Satte ett fast värde på 100 HÄR
+
 			materials[0].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture("sphere_diffuse.dds");
 			materials[0].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
 			
@@ -207,35 +208,46 @@ int main(int argc, char* argv[])
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
 			std::string tempTexName;
-			int numberOfMaterials = 1;
+			
 
 			ReleaseMutex(RM.IdMutexHandle);
-			
+
+			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+			//int renderNrOfMaterials = *RM.NumberOfMaterials;
+
+			//for(int i = 0; i < renderNrOfMaterials; i++)
+			//{
+			//	materials[i].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->texturePath);
+			//	//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
+			//	materials[i].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+			//}
+
 			for(int i = 0; i < numberMeshes; i++)
 			{
 				//Render::Vertex* m_vertices;
-				Entities.push_back(CreateMeshEntity(&m_world));
-				
-				RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-				WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+				Entities.push_back(CreateMeshEntity(&m_world));	
+
 
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_position = RM.PmeshList[i]->transformation.position;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_scale = RM.PmeshList[i]->transformation.scale;
 
-				tempTexName = GetNameFromPath(RM.PmeshList[i]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
-				if(tempTexName == "NONE.dds")
-				{
-					RM.PmeshList[i]->MaterialID = 0;
-				}
-				else
-				{
-					m_engineContext.m_resourceManager->LoadTexture(tempTexName);
-					materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
-					materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-					RM.PmeshList[i]->MaterialID = numberOfMaterials;
-					numberOfMaterials ++;
-					
-				}
+
+				//tempTexName = GetNameFromPath(RM.PmeshList[i]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
+				//if(tempTexName == "NONE.dds")
+				//{
+				//	RM.PmeshList[i]->MaterialID = 0;
+				//}
+				//else
+				//{
+				//	m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+				//	materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+				//	materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+				//	RM.PmeshList[i]->MaterialID = numberOfMaterials;
+				//	numberOfMaterials ++;
+				//	
+				//}
 
 				glm::quat rotation;
 				rotation.x = RM.PmeshList[i]->transformation.rotation.x;
@@ -330,19 +342,19 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
-					tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
-					if(tempTexName == "NONE.dds")
-					{
-						RM.PmeshList[MeshIndex]->MaterialID = 0;
-					}
-					else
-					{
-						m_engineContext.m_resourceManager->LoadTexture(tempTexName);
-						materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
-						materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
-						RM.PmeshList[MeshIndex]->MaterialID = numberOfMaterials;
-						numberOfMaterials ++;
-					}
+					//tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
+					//if(tempTexName == "NONE.dds")
+					//{
+					//	RM.PmeshList[MeshIndex]->MaterialID = 0;
+					//}
+					//else
+					//{
+					//	m_engineContext.m_resourceManager->LoadTexture(tempTexName);
+					//	materials[numberOfMaterials].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(tempTexName);
+					//	materials[numberOfMaterials].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+					//	RM.PmeshList[MeshIndex]->MaterialID = numberOfMaterials;
+					//	numberOfMaterials ++;
+					//}
 
 					glm::quat rotation;
 					rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;

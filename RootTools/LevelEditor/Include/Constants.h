@@ -31,6 +31,14 @@ struct Mesh
 	char normalPath[100];
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
 	//int indices[g_maxVerticesPerMesh*3];
+	char materialName[30];
+};
+
+struct Material
+{
+	char materialName[30];
+	char texturePath[100];
+	char normalPath[100];	
 };
 
 struct Camera

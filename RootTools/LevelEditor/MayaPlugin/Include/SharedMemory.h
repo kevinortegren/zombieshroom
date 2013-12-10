@@ -18,7 +18,8 @@ public:
 	void UpdateSharedLight(int index, int nrOfLights);
 	void RemoveMesh(int id, int nrOfMeshes);
 	int InitalizeSharedMemory();
-
+	void UpdateSharedMaterials(int nrOfMaterials);
+	
 	//Variables
 	Mesh meshList[g_maxMeshes];
 	Light lightList[g_maxLights];
@@ -29,6 +30,9 @@ public:
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
+
+	Material materialList[g_maxMeshes];
+	int* NumberOfMaterials;
 
 private:
 	//Functions
@@ -45,5 +49,6 @@ private:
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
+	Material* PmaterialList[g_maxMeshes];
 
 };

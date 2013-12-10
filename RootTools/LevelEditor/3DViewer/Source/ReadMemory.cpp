@@ -15,12 +15,14 @@ ReadMemory::~ReadMemory()
 
 int ReadMemory::InitalizeSharedMemory()
 {
-	int total_memory_size = 0;
+		int total_memory_size = 0;
 	
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
+	//total_memory_size += sizeof(Material) * g_maxMeshes;
 	total_memory_size += sizeof(glm::vec2) * 3;
+	
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -42,27 +44,37 @@ int ReadMemory::InitalizeSharedMemory()
 	{
 		PmeshList[i] = ((Mesh*)raw_data) + i ;
 	}
-	for(int i = 0; i < g_maxLights; i++)			//ADDED
+	for(int i = 0; i < g_maxLights; i++)
 	{
 		PlightList[i] = ((Light*)raw_data) + i ;
 	}
-	for(int i = 0; i < g_maxCameras; i++)			//ADDED
+	for(int i = 0; i < g_maxCameras; i++)
 	{
 		PcameraList[i] = ((Camera*)raw_data) + i ;
 	}
+	//for(int i = 0; i < g_maxMeshes; i++)
+	//{
+	//	PmaterialList[i] = ((Material*)raw_data) + i ;
+	//}
 
 	unsigned char* mem = (unsigned char*)raw_data;
 	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
 	mem = (unsigned char*)NumberOfMeshes;
 	MeshIdChange = (glm::vec2*)(mem + sizeof(int));
-	CameraIdChange = (glm::vec2*)(MeshIdChange + sizeof(glm::vec2));
-	LightIdChange = (glm::vec2*)(CameraIdChange + sizeof(glm::vec2));
-	unsigned char* mem2 = (unsigned char*)LightIdChange;
-	NumberOfLights = (int*)(mem2 + sizeof(Light) * g_maxLights);
-	mem2 = (unsigned char*)NumberOfLights;
-	unsigned char* mem3 = (unsigned char*)CameraIdChange;
-	NumberOfCameras = (int*)(mem3 + sizeof(Camera) * g_maxCameras);
-	mem3 = (unsigned char*)NumberOfCameras;
+	mem = (unsigned char*)MeshIdChange;
+	CameraIdChange = (glm::vec2*)(mem + sizeof(glm::vec2));
+	mem = (unsigned char*)CameraIdChange;
+	LightIdChange = (glm::vec2*)(mem + sizeof(glm::vec2));
+	mem = (unsigned char*)LightIdChange;
+
+	NumberOfLights = (int*)(mem + sizeof(Light) * g_maxLights);
+	mem = (unsigned char*)NumberOfLights;
+	NumberOfCameras = (int*)(mem + sizeof(Camera) * g_maxCameras);
+	mem = (unsigned char*)NumberOfCameras;
+
+	//NumberOfMaterials = (int*)(mem + sizeof(Material) * g_maxMeshes);
+	//mem = (unsigned char*)NumberOfMaterials;
+	
 
 	if(first_process)
 	{

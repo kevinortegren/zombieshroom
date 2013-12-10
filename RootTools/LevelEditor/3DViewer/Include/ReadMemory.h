@@ -26,6 +26,9 @@ public:
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
+	Material* PmaterialList[g_maxMeshes];
+	int* NumberOfMaterials;
+
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
@@ -34,7 +37,9 @@ public:
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
 	DWORD milliseconds;
+	
 
+	//ALOT OF DIFFRENCE HERE COMPARED TO SharedMemory why?
 private:
 	//Functions
 	int shutdown();
