@@ -101,13 +101,14 @@ namespace RootForce
 					}
 					break;
 				case PlayerAction::ORIENTATE:
+				{
 					//m_physics->SetPlayerOrientation(playerID, orientation);
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
 					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
 					
-					break;
+				} break;
 				case PlayerAction::SELECT_ABILITY:
 					// TODO: Implement selection of abilities.
 					break;
