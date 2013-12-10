@@ -1,6 +1,5 @@
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
-#include <gtest/gtest.h>
 #include <Awesomium/STLHelpers.h>
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -29,7 +28,6 @@ namespace RootEngine
 			m_view->Stop();
 			m_view->Destroy();
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
-			delete s_gui;
 
 			glDeleteTextures(1, &m_texture);
 			glDeleteVertexArrays(1, &m_vertexArrayBuffer);
@@ -134,7 +132,7 @@ namespace RootEngine
 		void guiInstance::HandleEvents( SDL_Event p_event )
 		{
 			Awesomium::WebKeyboardEvent tempEvent;
-			char* temp = new char[20];
+			
 			int keyCheck = 0;
 			switch(p_event.type)
 			{
@@ -153,17 +151,25 @@ namespace RootEngine
 			{
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
-					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
-					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
+					{
 
-					memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
+						tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
+					
+						char* temp = new char[20];
+						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
 
-					if(p_event.type == SDL_KEYDOWN)
-						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
-					if(p_event.type == SDL_KEYUP)
-						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
-					m_view->InjectKeyboardEvent(tempEvent);
-					break;
+						memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
+
+						if(p_event.type == SDL_KEYDOWN)
+							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
+						if(p_event.type == SDL_KEYUP)
+							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
+
+						m_view->InjectKeyboardEvent(tempEvent);
+						delete temp;
+		
+						break;
+					}
 				case SDL_MOUSEBUTTONDOWN:
 					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
@@ -224,29 +230,4 @@ RootEngine::GUISystem::GUISystemInterface* CreateGUI(RootEngine::SubsystemShared
 	return RootEngine::GUISystem::guiInstance::GetInstance();
 }
 
-TEST(GUI, Javascript)
-{
-	RootEngine::GUISystem::guiInstance* instance = RootEngine::GUISystem::guiInstance::GetInstance();
-	RootEngine::GUISystem::guiTest* testInstance = new RootEngine::GUISystem::guiTest();
-	RootEngine::GUISystem::guiJSTest* jsTestInstance = new RootEngine::GUISystem::guiJSTest();
-	testInstance->InitTest();
-	jsTestInstance->InitTest();
-	instance->GetView()->set_load_listener(testInstance);
-	instance->GetView()->set_js_method_handler(jsTestInstance);
 
-	Awesomium::JSValue window = instance->GetView()->ExecuteJavascriptWithResult(Awesomium::WSLit("window"), Awesomium::WSLit(""));
-	EXPECT_TRUE(window.IsObject());
-	window.ToObject().SetCustomMethod(Awesomium::WSLit("RemoteTest();"), false);
-
-	instance->LoadURL("test.html");
-	while(instance->GetView()->IsLoading())
-	{
-		instance->Update();
-	}
-	Sleep(500);
-	instance->GetView()->ExecuteJavascript(Awesomium::WSLit("Test();"), Awesomium::WSLit(""));
-	Sleep(500);
-	EXPECT_TRUE(testInstance->GetTestResult());
-	EXPECT_TRUE(jsTestInstance->GetTestResult());
-	// Assume correct
-}

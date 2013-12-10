@@ -72,11 +72,19 @@ namespace RootEngine
 		return m_effects[p_path].get();
 	}
 
-	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path )
+	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			std::shared_ptr<Render::TextureInterface> tex;
+			if(p_type == Render::TextureType::TEXTURE_2D)
+			{
+				tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			}
+			else if(p_type == Render::TextureType::TEXTURE_CUBEMAP)
+			{
+				tex = m_textureImporter->LoadCubeTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			}
 
 			if(tex)
 			{

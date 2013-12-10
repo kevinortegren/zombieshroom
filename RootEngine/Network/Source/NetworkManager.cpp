@@ -2,7 +2,7 @@
 #include "LocalServer.h"
 #include "RemoteServer.h"
 #include <iostream>
-#include <gtest/gtest.h>
+
 namespace RootEngine
 {
 	namespace Network
@@ -11,7 +11,8 @@ namespace RootEngine
 		NetworkManager* NetworkManager::s_networkManager = nullptr;
 		void NetworkManager::Startup()
 		{
-			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Succesfull startup of Network");
+			m_networkSys = nullptr;
+			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::INIT_PRINT, "Network subsystem initialized!");
 		}
 
 		void NetworkManager::Shutdown()
@@ -58,13 +59,4 @@ RootEngine::Network::NetworkInterface* CreateNetwork(RootEngine::SubsystemShared
 	return RootEngine::Network::NetworkManager::GetInstance();
 }
 
-TEST(NETWORK, NETWORK_SEND)
-{
-	RootEngine::Network::Message testMessage;
-	testMessage.Data = (RootEngine::Network::byte*)"I AM A POTATOE GOD";
-	testMessage.DataSize = 19;
-	testMessage.MessageID = 0;
-	testMessage.RecipientID = -1;
-	testMessage.Reliable = true;
-	EXPECT_TRUE(RootEngine::Network::NetworkManager::GetInstance()->GetNetworkSystem()->Send( testMessage ));
-}
+

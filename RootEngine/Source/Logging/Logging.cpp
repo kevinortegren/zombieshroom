@@ -236,6 +236,9 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 	}
 	
 	vprintf(output.c_str(), p_args);
+
+	ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
+	std::cout<<"";
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -22,7 +22,6 @@ find_package(Awesomium REQUIRED)
 
 set(EXTERNAL_INCLUDE_DIRS 
     ${SDL2_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
     ${RAKNET_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIRS}
@@ -34,7 +33,6 @@ set(EXTERNAL_INCLUDE_DIRS
     
 set(EXTERNAL_LIBRARIES
     ${SDL2_LIBRARY}
-    ${GTEST_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARY}
     ${RAKNET_LIBRARY}
@@ -50,6 +48,8 @@ set(EXTERNAL_LIBRARIES
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+add_definitions(-DWIN32_LEAN_AND_MEAN)
+add_definitions(/wd4005)    # Disable macro redefinition warning
 
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -58,6 +58,7 @@ include_directories(${EXTERNAL_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_subdirectory(RootEngine)
+add_subdirectory(RootSystems)
 add_subdirectory(RootForce)
 add_subdirectory(RootTools)
 add_subdirectory(Utility)

@@ -2,63 +2,75 @@
     - 0
     - 1
     - 2
+    - 3
 - Components:
     - Type: 0
       Data:
         - Entity: 0
-          Model: sphere
-          Effect: Mesh
-          Diffuse: sphere_diffuse
+          Model: Primitives/box
+          Effect: Skybox
         - Entity: 1
-          Model: sphere
+          Model: Primitives/sphere
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 2
-          Model: testchar_t
+          Model: Primitives/sphere
+          Effect: Mesh
+          Diffuse: sphere_diffuse
+        - Entity: 3
+          Model: testchar
           Effect: Mesh_NormalMap
-          Diffuse: v6
+          Diffuse: DiffuseV1
           Specular: SpecularV1
-          Normal: bump_test
+          Normal: BumpV1
     - Type: 1
       Data:
         - Entity: 0
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [100, 100, 100]
+        - Entity: 1
           Position: [1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 1
+        - Entity: 2
           Position: [-1, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 2
+        - Entity: 3
           Position: [0, 19, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 0
+        - Entity: 1
           Attenuation: [0, 0, 1]
           Color: [0.4, 0, 0, 1]
           Range: 2
-        - Entity: 1
+        - Entity: 2
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
     - Type: 3
       Data:
-        - Entity: 2
+        - Entity: 3
           Speed: 10
     - Type: 4
       Data:
-        - Entity: 2
+        - Entity: 3
           Type: 3
           Mass: 5
-          ModelHandle: testchar_t0
+          ModelHandle: testchar0
           StepHeight: 0.1
           ModelHeight: 0.0
           MaxSpeed: 10.0
 - Tags:
-    - Id: 2
+    - Id: 0
+      Tag: Skybox
+    - Id: 3
       Tag: Player
 - Groups:
-    - Id: 0
+    - Id: 1
+      Group: Lights
+    - Id: 2
       Group: Lights

@@ -9,6 +9,7 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
 
@@ -27,6 +28,8 @@ namespace Render
 		virtual void SetResolution(int p_width, int p_height) = 0;
 		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
+		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
+		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
@@ -34,6 +37,11 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void RenderLines() = 0;
 		virtual void Swap() = 0;
+		virtual void DisplayNormals(bool p_display) = 0;
+
+
+		virtual int GetWidth() = 0;
+		virtual int GetHeight() = 0;
 
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
@@ -56,6 +64,8 @@ namespace Render
 		void SetResolution(int p_width, int p_height);
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
+		void SetViewMatrix(glm::mat4 p_viewMatrix);
+		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
 		void SetAmbientLight(const glm::vec4& p_color);
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
@@ -63,7 +73,11 @@ namespace Render
 		void Render();
 		void RenderLines();
 		void Swap();
+		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		bool CheckExtension(const char* p_extension);
+
+		virtual int GetWidth();
+		virtual int GetHeight();
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
@@ -83,6 +97,8 @@ namespace Render
 		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
+		int m_width;
+		int m_height;
 
 		GeometryBuffer m_gbuffer;
 
@@ -95,8 +111,6 @@ namespace Render
 		Buffer m_uniforms;
 		Buffer m_lights;
 		Buffer m_cameraBuffer;
-
-		Camera m_camera;
 	
 		struct
 		{
@@ -122,12 +136,15 @@ namespace Render
 
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
 		std::shared_ptr<TechniqueInterface> m_debugTech;
+		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		//debug
 
 		GLuint m_debugFbo;
 		GLuint m_testHandle;
 		//GLuint m_testHandle;
+
+		bool m_displayNormals;
 	};
 }
 

@@ -2,6 +2,7 @@
 
 namespace ECS
 {
+	static unsigned int s_numComponents;
 
 	class ComponentInterface {};
 
@@ -26,5 +27,8 @@ namespace ECS
 	void Component<T>::SetTypeId(unsigned int p_id)
 	{
 		Component<T>::s_typeId = p_id;
+
+		if(p_id > s_numComponents)
+			s_numComponents = p_id;
 	}
 }

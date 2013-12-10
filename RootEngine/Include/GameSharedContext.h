@@ -8,6 +8,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
+#include <RootEngine/Include/ConfigManager.h>
 
 namespace RootEngine
 {
@@ -17,6 +18,7 @@ namespace RootEngine
 		MemoryTracker* m_memTracker;
 		ProfilingInterface* m_profiler;
 		DebugOverlayInterface* m_debugOverlay;
+		ConfigManagerInterface* m_configManager;
 		ResourceManager* m_resourceManager;
 		Render::RendererInterface* m_renderer;
 		Network::NetworkInterface* m_network;
