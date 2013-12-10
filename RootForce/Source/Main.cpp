@@ -18,9 +18,6 @@
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
-
 #undef main
 
 int main(int argc, char* argv[]) 
@@ -67,8 +64,6 @@ namespace RootForce
 		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
-
-		float a = g_engineContext.m_configManager->GetConfigValueAsFloat("Test");
 
 		if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 		{
@@ -158,7 +153,7 @@ namespace RootForce
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
-		//Plane at bottom
+		// Plane at bottom
 		float normal[3] = {0,1,0};
 		float position[3] = {0, -2, 0};
 	
@@ -170,7 +165,9 @@ namespace RootForce
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"rnl_cross", Render::TextureType::TEXTURE_CUBEMAP);
 
-		g_engineContext.m_gui->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+
 		g_engineContext.m_gui->LoadURL("debug.html");
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
 

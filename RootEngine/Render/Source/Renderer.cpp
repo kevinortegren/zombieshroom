@@ -116,10 +116,10 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		//glFrontFace(GL_CCW);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -224,13 +224,9 @@ namespace Render
 		int width;
 		int height;
 		SDL_GetWindowSize(m_window, &width, &height);*/
-
-		SDL_SetWindowSize(m_window, p_width, p_height);
-		
+		SDL_SetWindowSize(m_window, p_width, p_height);		
 		m_gbuffer.Resize(p_width, p_height);
-
 		glViewport(0, 0, p_width, p_height);
-
 		m_camera.PerspectiveProjection(45.0f, 1.0f, 100.0, p_width, p_height);
 	}
 
