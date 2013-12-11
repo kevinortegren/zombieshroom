@@ -9,15 +9,19 @@ KinematicController::KinematicController( void )
 
 KinematicController::~KinematicController( void )
 {
-
+	delete m_kinController;
 }
 void KinematicController::RemovePlayer()
 {
-
+	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+	delete m_motionState;
+	delete m_ghostObject->getCollisionShape();
+	delete m_ghostObject;
+	delete this;
 }
 
 void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
-							float* p_vertexBuffer, int p_vertexStride, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+							float* p_vertexBuffer, int p_vertexStride, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 {
 	m_dynamicWorld = p_world;
 	m_heightOffset = p_modelHeight / 2.0f;
@@ -49,7 +53,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	btTransform startTransform;
 	startTransform.setIdentity();
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 	m_motionState = new btDefaultMotionState(startTransform);
 
 	
@@ -77,12 +81,12 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_hasBeenKnockbacked = false;
 	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
-	//m_dynamicWorld->addAction(m_kinController);
+	
 
 }
 
 
-void KinematicController::Walk(float* p_dir, float p_dt)
+void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 {
 	btVector3 temp = btVector3(p_dir[0], p_dir[1], p_dir[2]);
 	temp.normalize();
@@ -122,14 +126,14 @@ void KinematicController::Jump()
 		m_kinController->jump();
 }
 
-void KinematicController::Knockback(float* p_velocity, float p_power )
+void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
 {
-	
+
 	m_kinController->Knockback(p_velocity, p_power);
 	
 }
 
-void KinematicController::SetOrientation( float* p_orientation )
+void KinematicController::SetOrientation( glm::quat p_orientation )
 {
 	m_kinController->getGhostObject()->getWorldTransform().setRotation(btQuaternion(p_orientation[0], p_orientation[1], p_orientation[2], p_orientation[3]));
 }

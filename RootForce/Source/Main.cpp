@@ -191,8 +191,8 @@ namespace RootForce
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
 
 		//Plane at bottom
-		float normal[3] = {0,1,0};
-		float position[3] = {0, -2, 0};
+		glm::vec3 normal (0,1,0);
+		glm::vec3 position (0, -2, 0);
 	
 		g_engineContext.m_physics->CreatePlane(normal, position);
 
@@ -211,6 +211,8 @@ namespace RootForce
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+
+		
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
