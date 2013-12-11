@@ -84,6 +84,7 @@ namespace RootEngine
 			///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
 			
+			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 			virtual void AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , glm::vec3 p_position, glm::quat p_rotation) = 0;
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
@@ -132,7 +133,7 @@ namespace RootEngine
 			void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); ///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 
-			
+			void EnableDebugDraw(bool p_enabled);
 		
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 			void AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation);
@@ -180,6 +181,7 @@ namespace RootEngine
 			std::vector<btRigidBody*> m_dynamicObjects;
 			std::vector<KinematicController*> m_playerObjects;
 			float m_dt;
+			bool m_debugDrawEnabled;
 			
 		};
 	}

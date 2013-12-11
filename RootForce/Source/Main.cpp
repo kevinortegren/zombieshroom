@@ -238,6 +238,21 @@ namespace RootForce
 				}
 			}
 
+			// Toggle physics debug draw
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				if(m_displayPhysicsDebug)
+				{
+					m_displayPhysicsDebug = false;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+				}
+				else
+				{
+					m_displayPhysicsDebug = true;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+				}
+			}
+
 			// Code for testing scripts
 			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{

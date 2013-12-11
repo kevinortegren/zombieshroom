@@ -109,7 +109,7 @@ namespace Physics
 		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints |btIDebugDraw::DBG_DrawAabb);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
-		
+		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 	}
 
@@ -126,7 +126,8 @@ namespace Physics
 		}
 		m_dynamicWorld->stepSimulation(m_dt,1);
 		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-		m_dynamicWorld->debugDrawWorld();
+		if(m_debugDrawEnabled)
+			m_dynamicWorld->debugDrawWorld();
 		
 	}
 	void RootPhysics::RemoveObject( int p_objectHandle)
@@ -743,6 +744,12 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
 	}
+
+	void RootPhysics::EnableDebugDraw( bool p_enabled )
+	{
+		m_debugDrawEnabled = p_enabled;
+	}
+
 }
 }
 
