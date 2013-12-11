@@ -14,19 +14,24 @@
 ---------- shape -> 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 ---------- type  -> 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 
-
-function AbilityTestOnActivate ()
-	local entity 		= Entity.New();
-	local renderComp 	= Renderable.New(entity);
-	
+--[[
 	print( type(renderComp) )
 
 	local meta = getmetatable(renderComp)
 	for k,v in pairs(meta) do
 	  print("    ", k, v)
 	end
+--]]
+
+AbilityTest = {}
+AbilityTest.cooldown = 5.0;
+
+function AbilityTest.OnActivate (self)
+	local entity 		= Entity.New();
+	local renderComp 	= Renderable.New(entity);
+	local transform 	= Transformation.New(entity);
+
+	print(self.cooldown);
 
 	renderComp:SetModel("Primitives/sphere", "Mesh");
-
-	--renderComp.SetModel("Primitives/sphere", "Mesh");
 end

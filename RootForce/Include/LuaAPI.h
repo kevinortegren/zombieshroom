@@ -28,29 +28,25 @@ namespace RootForce
 		{
 			// Allocate memory for a pointer to to object
 			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
-			//ECS::Entity** e = (ECS::Entity*)lua_topointer(p_luaState, 1);
 			
 			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
 
-			//luaL_getmetatable(p_luaState, "RenderableMeta"); // Use global table 'RenderCompMeta' as metatable
-			//luaL_setmetatable(p_luaState, "Renderable");  
-			
-			luaL_getmetatable(p_luaState, "Renderable");
-
-			// Set user data for Sprite to use this metatable
-			lua_setmetatable(p_luaState, -2);       
-    
-			// Set field '__self' of instance table to the sprite user data
-			//lua_setfield(p_luaState, -2, "__self");  
-
+			luaL_setmetatable(p_luaState, "Renderable");
 			//Userdata already on stack
 			return 1;
 		}
 
 		static int CreateTransformation(lua_State* p_luaState)
 		{
-			lua_pushlightuserdata(p_luaState, g_world->GetEntityManager()->CreateComponent<RootForce::Transform>((ECS::Entity*)lua_topointer(p_luaState, 1)));
+			// Allocate memory for a pointer to to object
+			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
+			
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+
+			luaL_setmetatable(p_luaState, "Transformation");
+			//Userdata already on stack
 			return 1;
 		}
 
@@ -62,7 +58,7 @@ namespace RootForce
 
 		static int SetRenderableModel(lua_State* p_luaState)
 		{
-			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "RenderCompMeta");
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
 
 			std::string handle = lua_tostring(p_luaState, 2);
 			std::string effecthandle = lua_tostring(p_luaState, 3);
@@ -122,6 +118,17 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg transformation_f [] = {
+			{"New", CreateTransformation},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg transformation_m [] = {
+			{"SetModel", SetRenderableModel},
+			{"SetMaterial", SetRenderableMaterial},
+			{NULL, NULL}
+		};
+
 		static int LuaOpenEntity(lua_State* p_luaState)
 		{
 			luaL_newlib(p_luaState, RootForce::LuaAPI::entity_f);
@@ -132,12 +139,26 @@ namespace RootForce
 
 		static int LuaOpenRenderable(lua_State* p_luaState)
 		{
-			luaL_newmetatable(p_luaState, "Renderable");			// metatable.--index = metatable			lua_pushvalue(p_luaState, -1);			lua_setfield(p_luaState, -2, "__index");
-
+			luaL_newmetatable(p_luaState, "Renderable");			int meta_id = lua_gettop(p_luaState);						// metatable.--index = metatable			//lua_pushvalue(p_luaState, -1);			//lua_setfield(p_luaState, -2, "__index");
 			luaL_setfuncs(p_luaState, renderable_m, 0);
+			lua_setfield(p_luaState, meta_id, "__index");  
 
 			luaL_newlib(p_luaState, renderable_f);
+
 			lua_setglobal(p_luaState, "Renderable");
+
+			return 1;
+		}
+
+		static int LuaOpenTransformation(lua_State* p_luaState)
+		{
+			luaL_newmetatable(p_luaState, "Transformation");			int meta_id = lua_gettop(p_luaState);		
+			luaL_setfuncs(p_luaState, transformation_m, 0);
+			lua_setfield(p_luaState, meta_id, "__index");  
+
+			luaL_newlib(p_luaState, transformation_f);
+
+			lua_setglobal(p_luaState, "Transformation");
 
 			return 1;
 		}

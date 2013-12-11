@@ -102,10 +102,9 @@ namespace RootForce
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		RootForce::LuaAPI::LuaOpenRenderable(g_engineContext.m_script->GetLuaState());
 		RootForce::LuaAPI::LuaOpenEntity(g_engineContext.m_script->GetLuaState());
-
-
+		RootForce::LuaAPI::LuaOpenRenderable(g_engineContext.m_script->GetLuaState());
+		RootForce::LuaAPI::LuaOpenTransformation(g_engineContext.m_script->GetLuaState());
 
 		/*
 		// Create a new table for the functions to register.
@@ -269,7 +268,7 @@ namespace RootForce
 			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTestOnActivate", "OnActivate");
+				g_engineContext.m_script->SetFunction("AbilityTest", "OnActivate");
 				g_engineContext.m_script->ExecuteScript();
 			}
 
