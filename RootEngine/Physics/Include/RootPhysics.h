@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "PlayerController.h"
 #include "KinematicController.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
