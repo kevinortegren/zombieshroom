@@ -51,6 +51,7 @@ namespace Physics
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			KinematicController* temp = m_playerObjects[i];
+			temp->RemovePlayer();
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
