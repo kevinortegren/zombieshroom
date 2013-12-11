@@ -239,8 +239,8 @@ namespace RootForce
 			// Code for testing scripts
 			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
-				g_engineContext.m_script->LoadScript("fireball.lua");
-				g_engineContext.m_script->SetFunction("FireballOnActivate");
+				g_engineContext.m_script->LoadScript("AbilityTest.lua");
+				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
 				g_engineContext.m_script->ExecuteScript();
 			}
 
