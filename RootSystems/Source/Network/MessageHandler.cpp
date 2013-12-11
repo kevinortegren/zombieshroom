@@ -7,6 +7,41 @@ namespace RootForce
 {
 	namespace Network
 	{
+		NetworkEntityMap::NetworkEntityMap(ECS::World* p_world)
+			: m_world(p_world)
+		{}
+
+		ECS::Entity* NetworkEntityMap::AddTemporaryEntity(int16_t& p_temporaryId)
+		{
+			m_worl
+		}
+
+		ECS::Entity* NetworkEntityMap::AddSynchronizedEntity(int16_t& p_synchronizedId)
+		{
+
+		}
+
+		void NetworkEntityMap::SetSynchronizedId(int16_t p_temporaryId, int16_t p_synchronizedId)
+		{
+
+		}
+
+
+		int16_t NetworkEntityMap::GetSynchronizedId(ECS::Entity* p_entity) const
+		{
+
+		}
+
+		int16_t NetworkEntityMap::GetTemporaryId(ECS::Entity* p_entity) const
+		{
+
+		}
+
+
+
+
+
+
 		MessageHandler::MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface, ServerType p_type, int16_t port, const char* address)
 			: m_world(p_world)
 			, m_logger(p_logger)

@@ -14,9 +14,18 @@ namespace RootForce
 		class NetworkEntityMap
 		{
 		public:
-			
+			NetworkEntityMap(ECS::World* p_world);
+
+			ECS::Entity* AddTemporaryEntity(int16_t& p_temporaryId);
+			ECS::Entity* AddSynchronizedEntity(int16_t& p_synchronizedId);
+			void SetSynchronizedId(int16_t p_temporaryId, int16_t p_synchronizedId);
+
+			int16_t GetSynchronizedId(ECS::Entity* p_entity) const;
+			int16_t GetTemporaryId(ECS::Entity* p_entity) const;
 		private:
-			std::map<uint32_t, unsigned int> m_entityMap;
+			ECS::World* m_world;
+
+			std::map<int32_t, unsigned int> m_entityMap;
 		};
 
 
