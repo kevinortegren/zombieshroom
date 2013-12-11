@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Camera.h>
 #include <RootSystems/Include/Transform.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
@@ -47,7 +48,6 @@ namespace RootForce
 
 				g_engineContext.m_renderer->SetViewMatrix(viewMatrix);
 				g_engineContext.m_renderer->SetProjectionMatrix(projectionMatrix);
-
 			}
 		}
 

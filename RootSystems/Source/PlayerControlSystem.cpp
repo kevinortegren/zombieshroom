@@ -67,6 +67,7 @@ namespace RootForce
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
+
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
@@ -106,12 +107,14 @@ namespace RootForce
 					//m_physics->SetPlayerOrientation(playerID, orientation);
 					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
 					// TODO: Update a camera controller with m_deltaMouseMovement.
-					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
-					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+					transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
+					transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+					//m_physics->SetPlayerOrientation(*(physAcc->m_handle), &(transform->m_orientation.GetQuaterion()).w); 
 					
 				} break;
 				case PlayerAction::SELECT_ABILITY:
 					// TODO: Implement selection of abilities.
+
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 					// TODO: Implement activation of abilities.

@@ -18,7 +18,6 @@ namespace RootForce
 		float m_mouseSensitivity;
 	};
 
-
 	/** 
 		Enumerate all the actions a player can do via input.
 

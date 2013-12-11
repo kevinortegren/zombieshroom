@@ -26,13 +26,15 @@ int main(int argc, char* argv[])
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::FPSCONTROL);
+	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
 	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
+	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -126,6 +128,9 @@ namespace RootForce
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new PlayerSystem(&m_world));
+		m_playerSystem->CreatePlayer();
+
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -160,7 +165,6 @@ namespace RootForce
 		Render::DirectionalLight dl;
 		dl.m_color = glm::vec4(0.3f,0.3f,0.3f,1);
 		dl.m_direction = glm::vec3(0,0,-1);
-
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
 		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
@@ -187,7 +191,6 @@ namespace RootForce
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
 
 		//Plane at bottom
-
 		float normal[3] = {0,1,0};
 		float position[3] = {0, -2, 0};
 	
@@ -253,9 +256,9 @@ namespace RootForce
 
 			{
 				PROFILE("Entity Systems", g_engineContext.m_profiler);
+				m_playerSystem->Process();
 				m_playerControlSystem->Process();
 				abilitySystem->Process();
-
 			}
 
 			{
