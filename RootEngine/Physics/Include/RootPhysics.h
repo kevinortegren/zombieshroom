@@ -61,7 +61,6 @@ namespace RootEngine
 			unsigned int m_entityId; //My entity id
 			std::vector<unsigned int> m_collidedEntityId; //List of all entities collided with since last update
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
-			bool m_collided;
 			std::string m_modelHandle;
 			~CustomUserPointer()
 			{
@@ -108,6 +107,7 @@ namespace RootEngine
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
 			virtual void SetMass(int p_objectHandle, float p_mass) = 0;
 			virtual void SetGravity(int p_objectHandle, glm::vec3 p_gravity) = 0;
+			virtual void SetPosition(int p_objectHandle , glm::vec3 p_position) = 0;
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
@@ -158,7 +158,7 @@ namespace RootEngine
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
 			void SetMass(int p_objectHandle, float p_mass);
 			void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation);
-			//void SetPlayerOrientation(int p_objectHandle, glm::quat p_playerOrientation);
+			void SetPosition(int p_objectHandle , glm::vec3 p_position);
 			void RemoveObject(int p_objectHandle);
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 

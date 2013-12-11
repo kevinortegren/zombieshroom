@@ -17,7 +17,7 @@ void KinematicController::RemovePlayer()
 	delete m_motionState;
 	delete m_ghostObject->getCollisionShape();
 	delete m_ghostObject;
-	delete this;
+	
 }
 
 void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
@@ -47,7 +47,6 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
 	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
-	//btCollisionShape* simplifiedObject = new btCapsuleShape(0.5, 2);
 
 	//Set startpos and start rotation and bind them to a motionstate
 	btTransform startTransform;
@@ -59,19 +58,9 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
-	//m_ghostObject->setUserPointer(this);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
 	m_ghostObject->setCollisionFlags(/*m_ghostObject->getCollisionFlags() | */btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
 	
-	
-
-	//indexVertexArray = 0;
-	//objectMeshShape = 0;
-	//objectHull = 0;
-	//delete indexVertexArray;
-
-	//delete objectMeshShape;
-	//delete objectHull;
 
 	m_kinController = new BulletCharacter(m_ghostObject, simplifiedObject, p_stepHeight);
 	
@@ -97,8 +86,7 @@ void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 		//m_hasStepped = true;
 	}
 	
-	//m_kinController->setWalkDirection(temp*p_dt);
-	//m_kinController->playerStep(m_dynamicWorld, p_dt);
+
 }
 
 void KinematicController::Update(float p_dt)
@@ -108,15 +96,7 @@ void KinematicController::Update(float p_dt)
 	m_kinController->updateAction(m_dynamicWorld, p_dt);
 	m_kinController->setWalkDirection(btVector3(0,0,0));
 
-	/*if (!m_kinController->onGround())
-	{
-		Walk(&m_knockbackVelocity[0], p_dt);
-	}
-	else
-	{
-		m_hasBeenKnockbacked = false;
-	}*/
-	//m_kinController->updateAction(m_dynamicWorld, p_dt);
+	
 	
 }
 
@@ -151,4 +131,9 @@ void KinematicController::SetMass( float p_mass )
 void KinematicController::SetGravity( float p_gravity )
 {
 	m_kinController->setGravity(p_gravity);
+}
+
+void KinematicController::SetPosition(const btVector3& p_position )
+{
+	m_ghostObject->getWorldTransform().setOrigin(p_position);
 }

@@ -51,6 +51,7 @@ namespace Physics
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			KinematicController* temp = m_playerObjects[i];
+			temp->RemovePlayer();
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
@@ -125,7 +126,6 @@ namespace Physics
 			m_playerObjects.at(i)->Update(m_dt);
 		}
 		m_dynamicWorld->stepSimulation(m_dt,1);
-		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
 		if(m_debugDrawEnabled)
 			m_dynamicWorld->debugDrawWorld();
 		
@@ -496,9 +496,8 @@ namespace Physics
 		if(p_enabled == true)
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw on ");
 		else
-		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw off");
-		}
+		
 		m_debugDrawEnabled = p_enabled;
 	}
 
@@ -640,7 +639,7 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			//No
+			//No, player doesn't have a constant velocity, and im gonna go ahead and guess that ability controllers won't either
 			return glm::vec3(0,0,0);
 		}
 		else
@@ -673,7 +672,7 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_ABILITY)
 		{
-			//Change if abilitys becomes controllerz
+			//Change if abilities becomes controllerz
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
 		else
@@ -703,7 +702,7 @@ namespace Physics
 			z = p_objectOrientation[2];
 			w = p_objectOrientation[3];
 			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-			//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+			
 		}
 	}
 
@@ -753,7 +752,29 @@ namespace Physics
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			return;
+		}
+		else
+			m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+	}
+
+	void RootPhysics::SetPosition( int p_objectHandle , glm::vec3 p_position )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		btVector3 temp (p_position[0], p_position[1], p_position[2]);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->SetPosition(temp);
+		}
+		else
+		{
+			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
 	}
 
 }
