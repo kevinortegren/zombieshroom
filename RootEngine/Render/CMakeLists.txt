@@ -16,6 +16,6 @@ set(LIBRARIES ${EXTERNAL_LIBRARIES})
 # Set search paths
 include_directories(Include)
 
-# TODO: Add the target (commented until we actually have a source file
+# Add the target
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})

@@ -50,7 +50,7 @@ void main() {
 	vec3 viewDir = -normalize(position);
 	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-	vec3 spec_color = vec3(1) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
+	vec3 spec_color = vec3(0) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
     out_Color = vec4(diffuse_color + spec_color, 1.0f);

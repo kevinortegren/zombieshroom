@@ -41,8 +41,8 @@ namespace RootEngine
 				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP_EDGE;
 				break;
 			case SDL_MOUSEMOTION:
-				m_deltaMousePos.x += p_event.motion.x - m_globMousePos.x;
-				m_deltaMousePos.y += p_event.motion.y - m_globMousePos.y;
+				m_deltaMousePos.x = p_event.motion.x - m_globMousePos.x;
+				m_deltaMousePos.y = p_event.motion.y - m_globMousePos.y;
 				m_globMousePos.x = p_event.motion.x;
 				m_globMousePos.y = p_event.motion.y;
 				break;
@@ -81,7 +81,7 @@ namespace RootEngine
 		glm::ivec2 InputManager::GetDeltaMousePos()
 		{
 			glm::ivec2 temp = m_deltaMousePos;
-			m_deltaMousePos = glm::vec2(0, 0);
+			//m_deltaMousePos = glm::vec2(0, 0);
 			return temp;
 		}
 
@@ -91,6 +91,11 @@ namespace RootEngine
 				s_inputSys = new InputManager();
 
 				return s_inputSys;
+		}
+
+		void InputManager::Reset()
+		{
+			m_deltaMousePos = glm::vec2(0, 0);
 		}
 
 		

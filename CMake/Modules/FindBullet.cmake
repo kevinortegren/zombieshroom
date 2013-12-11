@@ -6,10 +6,10 @@ find_path(BULLET_INCLUDE_DIRS
 
 find_library(BULLETCOLLISION_LIBRARY
     NAMES BulletCollision_vs2010_debug
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")
 find_library(BULLETDYNAMICS_LIBRARY
     NAMES BulletDynamics_vs2010_debug
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")
 find_library(LINEARMATH_LIBRARY
     NAMES LinearMath_vs2010_debug
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")

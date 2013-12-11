@@ -61,9 +61,9 @@
       };
       function AddHTML(p_html, p_leftSide)
       {
-        document.getElementById( p_leftSide?"left":"right" ).innerHTML += p_html + "<br />";
+        document.getElementById( p_leftSide?"left":"right" ).innerHTML = p_html + "<br />";
       };
-	</script>
+    </script>
   </head>
   <body>
 		<div id="right">Call DebugOverlay->Clear() and DebugOverlay->AddHTML(...) to add content to this debug overlay</div>

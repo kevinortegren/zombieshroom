@@ -16,6 +16,7 @@ namespace RootEngine
 			void Startup(void);
 			void Shutdown(void);
 			void HandleInput(SDL_Event& p_event);
+			void Reset();
 
 			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);

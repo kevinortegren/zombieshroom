@@ -13,6 +13,7 @@
 #include <string>
 
 RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
 
 namespace RootForce
 {
@@ -36,3 +37,4 @@ namespace RootForce
 		bool m_displayNormals;
 	};
 }
+

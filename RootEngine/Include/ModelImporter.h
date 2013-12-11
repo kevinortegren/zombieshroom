@@ -1,18 +1,21 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#ifndef COMPILE_LEVEL_EDITOR
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
-#include <glm/glm.hpp>
+#endif
+
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
 #include <RootEngine/Render/Include/Vertex.h>
 #include <RootEngine/Render/Include/Renderer.h>
-#include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/Texture.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Render/Include/Mesh.h>
+#include <glm/glm.hpp>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace RootEngine
 {
@@ -23,10 +26,12 @@ namespace RootEngine
 		std::vector<Render::MeshInterface*> m_meshes;
 		std::vector<Physics::PhysicsMeshInterface*> m_physicsMeshes;
 
+
 		std::string m_textureHandles[3];
 		//vector<AnimationData*> m_animations;
 	};
 
+#ifndef COMPILE_LEVEL_EDITOR
 	class ModelImporter
 	{
 	public:
@@ -46,4 +51,7 @@ namespace RootEngine
 		GameSharedContext* m_context;
 		Model*		m_model; 
 	};
+#endif
 }
+
+

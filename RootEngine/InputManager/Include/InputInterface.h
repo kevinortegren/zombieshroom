@@ -22,6 +22,7 @@ namespace RootEngine
 			// Called from the loop calling SDL_PollEvent for events of types SDL_KEYDOWN, SDL_KEYUP, SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP
 			// Updates the internal input status data, later polled with the functions available below
 			virtual void HandleInput(SDL_Event& p_event) = 0;
+			virtual void Reset() = 0;
 
 			// Returns the key state of a specific keyboard key (SDL_SCANCODE_XXX) or mouse button
 			virtual KeyState::KeyState GetKeyState(SDL_Scancode p_key) = 0;

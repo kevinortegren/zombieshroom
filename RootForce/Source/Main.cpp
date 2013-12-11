@@ -6,10 +6,10 @@
 
 //#include <RenderingSystem.h>
 //#include <LightSystem.h>
-#include <RootForce/Include/CameraSystem.h>
+#include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 
-
+#include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 
@@ -73,7 +73,6 @@ namespace RootForce
 		{
 			// TODO: Log error and throw exception (?)
 		}
-
 		// TODO: Make these parameters more configurable.
 		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 				"Root Force",
@@ -99,6 +98,15 @@ namespace RootForce
 	void Main::Start() 
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
+		g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
+		g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
+		g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
+		g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
+		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);
+		
+		g_world = &m_world;
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(4);
@@ -202,6 +210,8 @@ namespace RootForce
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 
+		
+
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
 		while (m_running)
@@ -215,7 +225,7 @@ namespace RootForce
 			g_engineContext.m_renderer->Clear();
 
 			// Toggle rendering of normals.
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN)
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				if(m_displayNormals)
 				{
@@ -228,9 +238,16 @@ namespace RootForce
 					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
 				}
 			}
-			
-			g_engineContext.m_debugOverlay->Clear();
-			//g_engineContext.m_debugOverlay->AddHTML(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+
+			// Code for testing scripts
+			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				g_engineContext.m_script->LoadScript("AbilityTest.lua");
+				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
+				g_engineContext.m_script->ExecuteScript();
+			}
+
+			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
 			{
 				PROFILE("Handle Events", g_engineContext.m_profiler);
@@ -268,7 +285,9 @@ namespace RootForce
 				g_engineContext.m_renderer->RenderLines();
 			}
 		
+	
 			g_engineContext.m_profiler->Update(dt);
+		
 		
 			{
 				PROFILE("GUI", g_engineContext.m_profiler);
@@ -276,13 +295,15 @@ namespace RootForce
 				g_engineContext.m_gui->Update();
 				g_engineContext.m_gui->Render();
 			}
-
+			g_engineContext.m_debugOverlay->RenderOverlay();
 			g_engineContext.m_renderer->Swap();
 		}
 	}
 
 	void Main::HandleEvents()
 	{
+		if (g_engineContext.m_inputSys != nullptr)
+			g_engineContext.m_inputSys->Reset();
 		SDL_Event event;
 		while(SDL_PollEvent(&event))
 		{

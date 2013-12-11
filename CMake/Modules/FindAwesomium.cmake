@@ -6,4 +6,4 @@ find_path(AWESOMIUM_INCLUDE_DIRS
 
 find_library(AWESOMIUM_LIBRARY
     NAMES awesomium
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")
