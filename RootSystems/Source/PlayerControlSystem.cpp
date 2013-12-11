@@ -89,13 +89,11 @@ namespace RootForce
 					break;
 				case PlayerAction::STRAFE_RIGHT:
 					m_physics->PlayerMoveXZ(*(physAcc->m_handle), right);
-					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
 						m_physics->PlayerMoveXZ(*(physAcc->m_handle), -right);
-						transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					}
 					break;
 				case PlayerAction::ORIENTATE:
@@ -104,7 +102,8 @@ namespace RootForce
 					// TODO: Update a camera controller with m_deltaMouseMovement.
 					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 					{
-						transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+						transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x);
+						m_physics->SetObjectOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
 					}
 					break;
 				case PlayerAction::SELECT_ABILITY:
