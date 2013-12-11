@@ -24,6 +24,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	add_subdirectory(InputManager)
 	add_subdirectory(Render)
 	add_subdirectory(GUI)
+	add_subdirectory(Script)
 else()
 	# Add defines
 	add_definitions(-DCOMPILING_LEVEL_EDITOR)
@@ -34,4 +35,6 @@ endif()
 
 # Add the target
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+

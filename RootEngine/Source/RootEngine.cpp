@@ -3,6 +3,7 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Include/Profiling.h>
 
 #ifndef COMPILING_LEVEL_EDITOR
@@ -38,13 +39,20 @@ namespace RootEngine
 			m_physics->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_physicsModule);
 		}
+
+		if(m_scriptEngine != nullptr)
+		{
+			m_scriptEngine->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_scriptModule);
+		}
+
 		if(m_gui != nullptr)
 		{
 			m_gui->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_guiModule);
-		}	
+		}
+		
 #endif
-
 		if(m_renderer != nullptr)
 		{
 			m_renderer->Shutdown();
@@ -57,6 +65,12 @@ namespace RootEngine
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
 		m_configManager.LoadConfig("config.yaml");
+
+		m_network = nullptr;
+		m_renderer = nullptr;
+		m_gui = nullptr;
+		m_physics = nullptr;
+		m_scriptEngine = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
 		
@@ -94,8 +108,13 @@ namespace RootEngine
 		{
 			LoadPhysics();
 		}
-#endif
 
+		if((p_flags & SubsystemInit::INIT_SCRIPTING) == SubsystemInit::INIT_SCRIPTING)
+		{
+			LoadScriptEngine();
+			m_scriptEngine->SetWorkingDir(p_workingDirectory);
+		}
+#endif
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
@@ -112,6 +131,7 @@ namespace RootEngine
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
+		m_gameSharedContext.m_script = m_scriptEngine;
 #endif
 
 		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
@@ -249,6 +269,30 @@ namespace RootEngine
 			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
+
+	void EngineMain::LoadScriptEngine()
+	{
+		m_scriptModule = DynamicLoader::LoadSharedLibrary("Script.dll");
+		if(m_scriptModule != nullptr)
+		{
+			CREATESCRIPTINTERFACE libGetScriptEngine = (CREATESCRIPTINTERFACE) DynamicLoader::LoadProcess(m_scriptModule, "CreateScriptInterface");
+
+			if(libGetScriptEngine != nullptr)
+			{
+				m_scriptEngine = (Script::ScriptInterface*)libGetScriptEngine(m_subsystemSharedContext);
+				m_scriptEngine->Startup();
+			}
+			else
+			{
+				m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
+		}
+		
+	}
 	
 #endif
 
@@ -264,4 +308,3 @@ RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workin
 	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }
-

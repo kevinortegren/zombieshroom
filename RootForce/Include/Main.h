@@ -13,6 +13,7 @@
 #include <string>
 
 RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
 
 namespace RootForce
 {
@@ -34,5 +35,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 		bool m_displayNormals;
+		bool m_displayPhysicsDebug;
 	};
 }
+

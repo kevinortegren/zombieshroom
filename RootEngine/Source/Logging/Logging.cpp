@@ -53,7 +53,7 @@ bool Logging::OpenLogStream()
 	std::string commaName = fileName + ".rlog";
 	//Open log file stream
 	fopen_s(&m_logFile, logName.c_str(), "w");
-	fopen_s(&m_commaFile, commaName.c_str(), "w");
+	//fopen_s(&m_commaFile, commaName.c_str(), "w");
 
 	return true;
 }
@@ -65,11 +65,11 @@ bool Logging::CloseLogStream()
 		fclose(m_logFile);
 		return true;
 	}
-	if(m_commaFile)
-	{   //Close stream
-		fclose(m_commaFile);
-		return true;
-	}
+	//if(m_commaFile)
+	//{   //Close stream
+	//	fclose(m_commaFile);
+	//	return true;
+	//}
 
 	return false;
 }
@@ -175,17 +175,17 @@ void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, 
 {
 	
 	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
-	std::string commaOutput = GetTimeFormatString() + ";;" + GetStringFromTag(p_tag) + ";;" + GetStringFromLevel(p_vLevel) +  ";;" + p_format + ";;" + p_func + ";;" + std::to_string(p_line) + "\n";
+	//std::string commaOutput = GetTimeFormatString() + ";;" + GetStringFromTag(p_tag) + ";;" + GetStringFromLevel(p_vLevel) +  ";;" + p_format + ";;" + p_func + ";;" + std::to_string(p_line) + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
-	vfprintf (m_commaFile, commaOutput.c_str(), p_args);
+	//vfprintf (m_commaFile, commaOutput.c_str(), p_args);
 	fflush(m_logFile);
-	fflush(m_commaFile);
+	//fflush(m_commaFile);
 }
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )
 {
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  + "\n";
+	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  +"\n";
 
 	switch (p_vLevel)
 	{
@@ -235,7 +235,11 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 		break;
 	}
 	
+	
 	vprintf(output.c_str(), p_args);
+	//std::cout<<"     ";
+	//ColorCMD::SetColor(ColorCMD::ConsoleColor::GRAY, ColorCMD::BLACK);
+	//std::cout << "[" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
 	std::cout<<"";

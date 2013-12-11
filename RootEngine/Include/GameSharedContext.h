@@ -10,8 +10,10 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
+#include <RootEngine/Script/Include/ScriptManager.h>
 #include <RootEngine/Include/ConfigManager.h>
 #endif
+
 
 namespace RootEngine
 {
@@ -29,7 +31,10 @@ namespace RootEngine
 		DebugOverlayInterface* m_debugOverlay;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
+		Script::ScriptInterface* m_script;
+
 #endif
+
 
 	};
 }

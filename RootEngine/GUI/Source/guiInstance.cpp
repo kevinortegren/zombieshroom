@@ -182,6 +182,7 @@ namespace RootEngine
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
 			}
+			
 		}
 
 		int guiInstance::MapToAwesomium( SDL_Keycode p_key )
