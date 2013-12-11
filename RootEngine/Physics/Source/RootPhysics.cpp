@@ -115,7 +115,7 @@ namespace Physics
 
 
 	//Creates an impassable plane
-	void RootPhysics::CreatePlane(float* p_normal, float* p_position)
+	void RootPhysics::CreatePlane(glm::vec3 p_normal, glm::vec3 p_position)
 	{
 		btCollisionShape* plane = new btStaticPlaneShape(btVector3(p_normal[0],p_normal[1],p_normal[2]), 0);
 		btDefaultMotionState* planeMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(p_position[0],p_position[1],p_position[2])));
@@ -150,7 +150,7 @@ namespace Physics
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, float* p_position, float* p_rotation )
+	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
 	{
 		//TODO if time and need to improve performance: Use compundshapes
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
@@ -162,7 +162,7 @@ namespace Physics
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		//Create a motionstate
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 		//create the body
@@ -180,7 +180,7 @@ namespace Physics
 
 
 	}
-	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  float* p_position, float* p_rotation , float p_mass )
+	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
 	{
 		
 		//creates the mesh shape
@@ -209,7 +209,7 @@ namespace Physics
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],1));
+		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 
 		//create a body
@@ -239,25 +239,26 @@ namespace Physics
 		
 	}
 
-	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, float* p_velocity )
+	//TODO :Remake to work for all objecttypes
+	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, glm::vec3 p_velocity )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
-
-		m_dynamicObjects.at(p_objectIndex)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
 	}
-
+	//TODO : Remake to work for all objecttypes
 	void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
-
+		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 		btVector3 fallInertia =  btVector3(0,0,0);
-		m_dynamicObjects.at(p_objectIndex)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
-		m_dynamicObjects.at(p_objectIndex)->setMassProps(p_mass, fallInertia);
+		m_dynamicObjects.at(index)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
+		m_dynamicObjects.at(index)->setMassProps(p_mass, fallInertia);
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
@@ -279,8 +280,8 @@ namespace Physics
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
 	}
-
-	void RootPhysics::PlayerMoveXZ( int p_objectIndex, float* p_direction )
+	//TODO : remake so it wokrs for all types of controller, second TODO: implement differetn types of controllers
+	void RootPhysics::PlayerMoveXZ( int p_objectIndex, glm::vec3 p_direction )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
@@ -297,23 +298,24 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 		m_playerObjects.at(index)->Jump();
 	}
-
-	void RootPhysics::GetPos( int p_objectIndex, float* p_pos )
+	
+	glm::vec3 RootPhysics::GetPos(int p_objectIndex)
 	{
 		if(!DoesObjectExist(p_objectIndex))
-			return;
+			return glm::vec3(0,0,0);
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-
+		
 		btVector3 temp;
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 			temp = m_playerObjects.at(index)->GetPosition();
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_DYNAMIC )
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-		p_pos[0] = temp.getX();
-		p_pos[1] = temp.getY();
-		p_pos[2] = temp.getZ();
-
+		glm::vec3 retVal;
+		retVal[0] = temp.getX();
+		retVal[1] = temp.getY();
+		retVal[2] = temp.getZ();
+		return retVal;
 
 	}
 
@@ -326,7 +328,7 @@ namespace Physics
 		return s_physicsInstance;
 	}
 
- 	void RootPhysics::PlayerKnockback( int p_objectIndex, float* p_pushDirection, float p_pushForce )
+ 	void RootPhysics::PlayerKnockback( int p_objectIndex, glm::vec3 p_pushDirection, float p_pushForce )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
@@ -388,7 +390,7 @@ namespace Physics
 	}
 
 
-	btRigidBody* RootPhysics::CreateSphere( float p_radius, float p_mass, float* p_position)
+	btRigidBody* RootPhysics::CreateSphere( float p_radius, float p_mass, glm::vec3 p_position)
 	{
 		btCollisionShape* sphere = new btSphereShape(p_radius);
 		btVector3 pos;
@@ -403,7 +405,7 @@ namespace Physics
 		body->setActivationState(DISABLE_DEACTIVATION);
 		return body;
 	}
-	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, float* p_position, float* p_rotation, float p_mass )
+	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
 	{
 		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
 		
@@ -420,7 +422,7 @@ namespace Physics
 		body->setActivationState(DISABLE_DEACTIVATION);
 		return body;
 	}
-	btRigidBody* RootPhysics::CreateCone(float p_radius, float p_height, float* p_position,float* p_rotation, float p_mass)
+	btRigidBody* RootPhysics::CreateCone(float p_radius, float p_height, glm::vec3 p_position,glm::quat p_rotation, float p_mass)
 	{
 		btCollisionShape* cone = new btConeShape(p_radius, p_height);
 		btVector3 pos;
@@ -437,20 +439,21 @@ namespace Physics
 		return body;
 	}
 
-	void RootPhysics::GetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
+	glm::quat RootPhysics::GetObjectOrientation( int p_objectIndex)
 	{
 		if(!DoesObjectExist(p_objectIndex))
-			return;
+			return glm::quat(0,0,0,0);
 
 		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-
+		glm::quat retVal;
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			btQuaternion temp = m_playerObjects.at(index)->GetOrientation();
-			p_objectOrientation[0] = temp.x();
-			p_objectOrientation[1] = temp.y();
-			p_objectOrientation[2] = temp.z();
-			p_objectOrientation[3] = temp.w();
+			retVal[0] = temp.x();
+			retVal[1] = temp.y();
+			retVal[2] = temp.z();
+			retVal[3] = temp.w();
+			
 		}
 		
 		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
@@ -459,41 +462,43 @@ namespace Physics
 			btTransform transform;
 			transform = body->getWorldTransform();
 			
-			p_objectOrientation[0] = transform.getRotation().x();
-			p_objectOrientation[1] = transform.getRotation().y();
-			p_objectOrientation[2] = transform.getRotation().z();
-			p_objectOrientation[3] = transform.getRotation().w();
+			retVal[0] = transform.getRotation().x();
+			retVal[1] = transform.getRotation().y();
+			retVal[2] = transform.getRotation().z();
+			retVal[3] = transform.getRotation().w();
 		}
 		else
 		{
+			return glm::quat(0,0,0,0);
+		}
+		return retVal;
+	}
+
+	void RootPhysics::SetObjectOrientation( int p_objectIndex, glm::quat p_objectOrientation )
+	{
+		if(!DoesObjectExist(p_objectIndex))
 			return;
+
+		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+		
+		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->SetOrientation(p_objectOrientation);
+		}
+		else
+		{
+			float x,y,z, w;
+			btRigidBody* body = m_dynamicObjects.at(index);
+		
+			x = p_objectOrientation[0];
+			y = p_objectOrientation[1];
+			z = p_objectOrientation[2];
+			w = p_objectOrientation[3];
+			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+			//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 		}
 	}
 
-	void RootPhysics::SetObjectOrientation( int p_objectIndex, float* p_objectOrientation )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		btRigidBody* body = m_dynamicObjects.at(index);
-		float x,y,z, w;
-		x = p_objectOrientation[0];
-		y = p_objectOrientation[1];
-		z = p_objectOrientation[2];
-		w = p_objectOrientation[3];
-		body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-		//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-	}
-
-	void RootPhysics::SetPlayerOrientation( int p_objectIndex, float* p_playerOrientation )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->SetOrientation(p_playerOrientation);
-	}
 
 	int* RootPhysics::AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo)
 	{
@@ -594,24 +599,25 @@ namespace Physics
 		return true;
 	}
 
-	void RootPhysics::SetGravity( int p_objectIndex, float* p_gravity )
+	void RootPhysics::SetGravity( int p_objectIndex, glm::vec3 p_gravity )
 	{
 		if(!DoesObjectExist(p_objectIndex))
 			return;
+		int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
 		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			//Implement later, not as cool as abilitys
-			int lol = 2;
+		//	m_playerObjects.at(index)->setGravity(p_gravity);
+			
 		}
 		else
 		{
-			int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
+			
 			btVector3 gravity;
 			gravity.setX(p_gravity[0]);
 			gravity.setY(p_gravity[1]);
 			gravity.setZ(p_gravity[2]);
-			gravity.normalize();
-			m_dynamicObjects.at(index)->setGravity(gravity * 25.0f);
+			m_dynamicObjects.at(index)->setGravity(gravity);
 			m_dynamicObjects.at(index)->applyGravity();
 		}
 	}

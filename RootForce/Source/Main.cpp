@@ -188,8 +188,8 @@ namespace RootForce
 
 		//Plane at bottom
 
-		float normal[3] = {0,1,0};
-		float position[3] = {0, -2, 0};
+		glm::vec3 normal (0,1,0);
+		glm::vec3 position (0, -2, 0);
 	
 		g_engineContext.m_physics->CreatePlane(normal, position);
 
