@@ -114,7 +114,7 @@ void BulletCharacter::playerStep( btCollisionWorld* collisionWorld, btScalar dt 
 	m_ghostObject->setWorldTransform (xform);
 }
 
-void BulletCharacter::Knockback( float* p_direction, float p_power )
+void BulletCharacter::Knockback( const btVector3& p_direction, float p_power )
 {
 	btVector3 temp = btVector3(p_direction[0], p_direction[1], p_direction[2]);
 	m_knockbackVelocity = temp.normalize()*p_power;
