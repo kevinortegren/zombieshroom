@@ -111,7 +111,7 @@ namespace RootForce
 		g_world = &m_world;
 
 		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(4);
+		std::vector<RootForce::Keybinding> keybindings(5);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
@@ -128,8 +128,11 @@ namespace RootForce
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
+		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
+		keybindings[4].Edge = true;
+		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+
 		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new PlayerSystem(&m_world));
-		m_playerSystem->CreatePlayer();
 
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -175,6 +178,9 @@ namespace RootForce
 
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+
+		// Create player.
+		m_playerSystem->CreatePlayer();
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
@@ -239,14 +245,6 @@ namespace RootForce
 					m_displayNormals = true;
 					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
 				}
-			}
-
-			// Code for testing scripts
-			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			{
-				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
-				g_engineContext.m_script->ExecuteScript();
 			}
 
 			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);

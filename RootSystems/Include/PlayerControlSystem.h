@@ -4,10 +4,10 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Physics.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/PlayerSystem.h>
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
-
 
 namespace RootForce
 {
@@ -43,6 +43,7 @@ namespace RootForce
 	{
 		PlayerAction::PlayerAction Action;
 		std::vector<SDL_Scancode> Bindings;
+		bool Edge;
 
 		Keybinding();
 		Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action);

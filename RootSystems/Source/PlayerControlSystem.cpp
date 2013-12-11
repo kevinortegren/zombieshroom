@@ -1,9 +1,12 @@
 #include <PlayerControlSystem.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	Keybinding::Keybinding()
-		: Action(PlayerAction::NONE)
+		: Action(PlayerAction::NONE), Edge(false)
 	{}
 
 	Keybinding::Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action)
@@ -44,10 +47,21 @@ namespace RootForce
 		{
 			for (SDL_Scancode sc : kb.Bindings)
 			{
-				if (m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN)
+				if(kb.Edge)
 				{
-					m_inputtedActionsCurrentFrame.push_back(kb.Action);
-					break;
+					if (m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.Action);
+						break;
+					}
+				}
+				else
+				{
+					if(m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.Action);
+						break;
+					}	
 				}
 			}
 		}
@@ -64,9 +78,13 @@ namespace RootForce
 
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
+
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
+
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
+		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(entity);
+		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
 
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -115,7 +133,14 @@ namespace RootForce
 
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
-					// TODO: Implement activation of abilities.
+		
+					if(player->m_selectedAbility == Abilitiy::ABILITY_TEST)
+					{
+						g_engineContext.m_script->LoadScript("AbilityTest.lua");
+						g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
+						g_engineContext.m_script->ExecuteScript();
+					}
+
 					break;
 				default:
 					break;
