@@ -58,8 +58,9 @@ namespace RootForce
 
 	struct LookAtBehavior : public ECS::Component<LookAtBehavior>
 	{
-		LookAtBehavior(){ m_targetTag = ""; }
+		LookAtBehavior(){ m_targetTag = ""; m_displacement = glm::vec3(0.0f); }
 		std::string m_targetTag;
+		glm::vec3 m_displacement;
 	};
 
 	class LookAtSystem : public ECS::EntitySystem
@@ -93,7 +94,11 @@ namespace RootForce
 					Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(target);
 					if(targetTransform)
 					{
-						transform->m_orientation.LookAt(targetTransform->m_position - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
+						glm::vec3 targetPosition;
+						Orientation* tOr = &targetTransform->m_orientation;
+						targetPosition = targetTransform->m_position;
+						targetPosition += tOr->GetRight() * -lookAtBehavior->m_displacement.x + tOr->GetUp() * lookAtBehavior->m_displacement.y + tOr->GetFront() * lookAtBehavior->m_displacement.z;
+						transform->m_orientation.LookAt(targetPosition - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
 					}
 					else
 					{
@@ -110,8 +115,10 @@ namespace RootForce
 	
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 1.0f; }
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
+		float m_distance;
 	};
 
 	class ThirdPersonBehaviorSystem : public ECS::EntitySystem
@@ -148,9 +155,12 @@ namespace RootForce
 						//Move the entity
 						glm::vec3 targetPosition = targetTransform->m_position;
 						Orientation tOrientation = targetTransform->m_orientation;
+						glm::vec3 localDisplacement(0.0f);
+						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
-						worldDisplacement = tOrientation.GetRight() * -thirdPersonBehavior->m_displacement.x + tOrientation.GetUp() * thirdPersonBehavior->m_displacement.y + tOrientation.GetFront() * thirdPersonBehavior->m_displacement.z;
+						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
 						transform->m_position = targetPosition + worldDisplacement;
+
 					}
 					else
 					{

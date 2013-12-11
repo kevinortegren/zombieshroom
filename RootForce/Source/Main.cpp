@@ -174,6 +174,7 @@ namespace RootForce
 		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		cameraLookAt->m_targetTag = "Player";
+		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		cameraThirdPerson->m_targetTag = "Player";
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
