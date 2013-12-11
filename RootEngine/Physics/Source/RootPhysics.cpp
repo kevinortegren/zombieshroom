@@ -31,7 +31,7 @@ namespace Physics
 	}
 	void RootPhysics::Shutdown()
 	{
-		//Magic loop of deleting
+		//Magic loop of deleting, might not work with ghostobjects(players). Check this before release.
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 		{
 			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
@@ -506,7 +506,14 @@ namespace Physics
 		gravity.setX(p_abilityInfo.m_gravity[0]);
 		gravity.setY(p_abilityInfo.m_gravity[1]);
 		gravity.setZ(p_abilityInfo.m_gravity[2]);
-		
+
+		//Don't allow a orientation of {0,0,0,0} since that breaks bullet
+		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CYLINDER ||p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
+			if(p_abilityInfo.m_orientation[0] == 0 && p_abilityInfo.m_orientation[1] == 0 && p_abilityInfo.m_orientation[2] == 0 && p_abilityInfo.m_orientation[3] == 0)
+			{
+				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::NON_FATAL_ERROR, "Orientation for cone/cylinder shapes can't be 0,0,0,0");
+				return nullptr;
+			}
 
 		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_SPHERE)
 			body = CreateSphere(p_abilityInfo.m_radius, p_abilityInfo.m_mass, p_abilityInfo.m_position);
@@ -546,7 +553,7 @@ namespace Physics
 		m_dynamicObjects.push_back(body);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
-		userPointer->m_type = PhysicsType::TYPE_ABILITY;
+		userPointer->m_type = p_abilityInfo.m_type;
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;

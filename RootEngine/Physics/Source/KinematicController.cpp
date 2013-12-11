@@ -9,11 +9,15 @@ KinematicController::KinematicController( void )
 
 KinematicController::~KinematicController( void )
 {
-
+	delete m_kinController;
 }
 void KinematicController::RemovePlayer()
 {
-
+	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+	delete m_motionState;
+	delete m_ghostObject->getCollisionShape();
+	delete m_ghostObject;
+	delete this;
 }
 
 void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
@@ -77,7 +81,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_hasBeenKnockbacked = false;
 	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
-	//m_dynamicWorld->addAction(m_kinController);
+	
 
 }
 
