@@ -115,7 +115,7 @@ namespace Physics
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//Make a real update
+	
 	void RootPhysics::Update(float p_dt)
 	{
 		
@@ -491,6 +491,17 @@ namespace Physics
 		return true;
 	}
 
+	void RootPhysics::EnableDebugDraw( bool p_enabled )
+	{
+		if(p_enabled == true)
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw on ");
+		else
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw off");
+		}
+		m_debugDrawEnabled = p_enabled;
+	}
+
 	glm::vec3 RootPhysics::GetPos(int p_objectHandle)
 	{
 		if(!DoesObjectExist(p_objectHandle))
@@ -743,11 +754,6 @@ namespace Physics
 			return;
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
-	}
-
-	void RootPhysics::EnableDebugDraw( bool p_enabled )
-	{
-		m_debugDrawEnabled = p_enabled;
 	}
 
 }
