@@ -13,14 +13,12 @@ namespace RootForce
 {
 	namespace LuaAPI
 	{
+
 		static int CreateEntity(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
-			ECS::Entity **s = (ECS::Entity **)lua_newuserdata(p_luaState, sizeof(ECS::Entity *));
+			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
 			*s = g_world->GetEntityManager()->CreateEntity();
-
-			luaL_getmetatable(p_luaState, "Entity.Meta"); // Use global table 'EntityMeta' as metatable
-			lua_setmetatable(p_luaState, -2);  
 
 			//Userdata already on stack
 			return 1;
@@ -30,12 +28,22 @@ namespace RootForce
 		{
 			// Allocate memory for a pointer to to object
 			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
-			ECS::Entity* e = (ECS::Entity*)luaL_checkudata(p_luaState, 1, "EntityMeta");
-			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e);
-
-			lua_getglobal(p_luaState, "Render.CompMeta"); // Use global table 'RenderCompMeta' as metatable
-			lua_setmetatable(p_luaState, -2);  
+			//ECS::Entity** e = (ECS::Entity*)lua_topointer(p_luaState, 1);
 			
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
+
+			//luaL_getmetatable(p_luaState, "RenderableMeta"); // Use global table 'RenderCompMeta' as metatable
+			//luaL_setmetatable(p_luaState, "Renderable");  
+			
+			luaL_getmetatable(p_luaState, "Renderable");
+
+			// Set user data for Sprite to use this metatable
+			lua_setmetatable(p_luaState, -2);       
+    
+			// Set field '__self' of instance table to the sprite user data
+			//lua_setfield(p_luaState, -2, "__self");  
+
 			//Userdata already on stack
 			return 1;
 		}
@@ -54,15 +62,16 @@ namespace RootForce
 
 		static int SetRenderableModel(lua_State* p_luaState)
 		{
-			RootForce::Renderable* rtemp = (RootForce::Renderable*)luaL_checkudata(p_luaState, 1, "RenderCompMeta");
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "RenderCompMeta");
+
 			std::string handle = lua_tostring(p_luaState, 2);
 			std::string effecthandle = lua_tostring(p_luaState, 3);
 			
-			rtemp->m_model = g_engineContext.m_resourceManager->GetModel(handle);
-			rtemp->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(rtemp->m_model->m_textureHandles[0]);
-			rtemp->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(rtemp->m_model->m_textureHandles[1]);
-			rtemp->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture(rtemp->m_model->m_textureHandles[2]);
-			rtemp->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effecthandle);
+			(*rtemp)->m_model = g_engineContext.m_resourceManager->GetModel(handle);
+			(*rtemp)->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[0]);
+			(*rtemp)->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[1]);
+			(*rtemp)->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[2]);
+			(*rtemp)->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effecthandle);
 			return 0;
 		}
 
@@ -112,5 +121,25 @@ namespace RootForce
 			{"SetMaterial", SetRenderableMaterial},
 			{NULL, NULL}
 		};
+
+		static int LuaOpenEntity(lua_State* p_luaState)
+		{
+			luaL_newlib(p_luaState, RootForce::LuaAPI::entity_f);
+			lua_setglobal(p_luaState, "Entity");
+
+			return 1;
+		}
+
+		static int LuaOpenRenderable(lua_State* p_luaState)
+		{
+			luaL_newmetatable(p_luaState, "Renderable");			// metatable.--index = metatable			lua_pushvalue(p_luaState, -1);			lua_setfield(p_luaState, -2, "__index");
+
+			luaL_setfuncs(p_luaState, renderable_m, 0);
+
+			luaL_newlib(p_luaState, renderable_f);
+			lua_setglobal(p_luaState, "Renderable");
+
+			return 1;
+		}
 	}
 }

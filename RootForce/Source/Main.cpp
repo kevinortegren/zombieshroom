@@ -19,6 +19,7 @@
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
 
+#include <Lua/lua.hpp>
 #undef main
 
 int main(int argc, char* argv[]) 
@@ -95,9 +96,15 @@ namespace RootForce
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}
 
+
+
 	void Main::Start() 
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		RootForce::LuaAPI::LuaOpenRenderable(g_engineContext.m_script->GetLuaState());
+		RootForce::LuaAPI::LuaOpenEntity(g_engineContext.m_script->GetLuaState());
+
 
 
 		/*
@@ -110,7 +117,7 @@ namespace RootForce
 		lua_setfield(L, -3, name); // ex. system.gametime = newtable
 		lua_remove(L, -2);
 		*/
-		luaL_newmetatable(g_engineContext.m_script->GetLuaState(), "Entity.Meta");		// metatable.--index = metatable		lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);		lua_setfield(g_engineContext.m_script->GetLuaState(), -2, "__index");		//luaL_setfuncs(g_engineContext.m_script->GetLuaState(), );		//lua_pop(g_engineContext.m_script->GetLuaState(), 2);		//lua_pushglobaltable(g_engineContext.m_script->GetLuaState());		luaL_newlib(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f);
+		//lua_pop(g_engineContext.m_script->GetLuaState(), 2);
 		//lua_pop(g_engineContext.m_script->GetLuaState(), 3);
 		
 		//lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);
