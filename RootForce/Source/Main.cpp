@@ -171,7 +171,7 @@ namespace RootForce
 
         // Do not import a test world for now, instead create player on connect.
         // Import test world.
-        //m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+        m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();

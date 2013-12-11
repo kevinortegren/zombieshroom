@@ -71,7 +71,7 @@ namespace RootForce
 
 		int MessageGameStateSnapshot::GetSerializedSize() const
 		{
-
+			return 0;
 		}
 
 		void MessageGameStateSnapshot::Serialize(uint8_t* buffer) const

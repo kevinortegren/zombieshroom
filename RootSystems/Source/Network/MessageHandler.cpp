@@ -13,12 +13,12 @@ namespace RootForce
 
 		ECS::Entity* NetworkEntityMap::AddTemporaryEntity(int16_t& p_temporaryId)
 		{
-			m_worl
+			return nullptr;
 		}
 
 		ECS::Entity* NetworkEntityMap::AddSynchronizedEntity(int16_t& p_synchronizedId)
 		{
-
+			return nullptr;
 		}
 
 		void NetworkEntityMap::SetSynchronizedId(int16_t p_temporaryId, int16_t p_synchronizedId)
@@ -29,12 +29,12 @@ namespace RootForce
 
 		int16_t NetworkEntityMap::GetSynchronizedId(ECS::Entity* p_entity) const
 		{
-
+			return -1;
 		}
 
 		int16_t NetworkEntityMap::GetTemporaryId(ECS::Entity* p_entity) const
 		{
-
+			return -1;
 		}
 
 
