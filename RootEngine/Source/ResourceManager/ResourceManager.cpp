@@ -25,7 +25,9 @@ namespace RootEngine
 		m_workingDirectory	= p_workingDirectory;
 
 		m_effectImporter = std::shared_ptr<EffectImporter>(new EffectImporter(m_context->m_renderer));
+#ifndef COMPILE_LEVEL_EDITOR
 		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(p_context));
+#endif
 		m_textureImporter = std::shared_ptr<TextureImporter>(new TextureImporter(m_context->m_logger, m_context->m_renderer));
 		
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
@@ -34,6 +36,8 @@ namespace RootEngine
 	//////////////////////////////////////////////////////////////////////////
 	//Load functions
 	//////////////////////////////////////////////////////////////////////////
+
+#ifndef COMPILE_LEVEL_EDITOR
 	Model* ResourceManager::LoadCollada(std::string p_path)
 	{
 		if(m_models.find(p_path) == m_models.end())
@@ -52,6 +56,7 @@ namespace RootEngine
 		}
 		return m_models[p_path];
 	}
+#endif
 
 	Render::EffectInterface* ResourceManager::LoadEffect(std::string p_path)
 	{
@@ -72,11 +77,19 @@ namespace RootEngine
 		return m_effects[p_path].get();
 	}
 
-	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path )
+	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			std::shared_ptr<Render::TextureInterface> tex;
+			if(p_type == Render::TextureType::TEXTURE_2D)
+			{
+				tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			}
+			else if(p_type == Render::TextureType::TEXTURE_CUBEMAP)
+			{
+				tex = m_textureImporter->LoadCubeTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
+			}
 
 			if(tex)
 			{
@@ -157,7 +170,7 @@ namespace RootEngine
 		}
 		assert(false);
 	}
-
+#ifndef COMPILE_LEVEL_EDITOR
 	Physics::PhysicsMeshInterface* ResourceManager::GetPhysicsMesh( std::string p_handle )
 	{
 		if(m_physicMeshes.find(p_handle) != m_physicMeshes.end())
@@ -170,7 +183,7 @@ namespace RootEngine
 			return nullptr;
 		}
 	}
-
+#endif
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)
 	{
 		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)

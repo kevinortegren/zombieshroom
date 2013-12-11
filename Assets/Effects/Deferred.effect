@@ -22,18 +22,24 @@
               type: vertex
             - name: ambient
               type: fragment
+          depth:
+            write: 0
+            test: 0
         - name: directional
           shaders:
             - name: directional
               type: vertex
             - name: directional
               type: fragment
+          depth:
+            write: 0
+            test: 0
         - name: pointlight
           shaders:
             - name: pointlight
               type: vertex
             - name: pointlight
               type: fragment
-
-
-
+          depth:
+            write: 0
+            test: 0

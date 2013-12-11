@@ -1,6 +1,8 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 namespace RootEngine
 {
 	ModelImporter::ModelImporter(GameSharedContext* p_context)
@@ -54,15 +56,22 @@ namespace RootEngine
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
-		const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+		static const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 		std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
+
+		if(!p_aiMesh->HasPositions())
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %s, missing vertex position data.", handle.c_str());
+			return;
+		}
 
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
 		std::vector<glm::vec3> positions;
+
 		if(p_aiMesh->HasTangentsAndBitangents())
 		{
 			std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
@@ -143,7 +152,6 @@ namespace RootEngine
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
 		m_model->m_meshes.push_back(mesh.get());
-
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
@@ -162,7 +170,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_context->m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName, Render::TextureType::TEXTURE_2D))
 					{
 						m_model->m_textureHandles[0] = texName;
 					}
@@ -174,7 +182,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_context->m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName, Render::TextureType::TEXTURE_2D))
 					{
 						m_model->m_textureHandles[1] = texName;
 					}
@@ -186,7 +194,7 @@ namespace RootEngine
 				{
 					texName = GetNameFromPath(path.data);
 					//if load successfull -> add texture handle to model
-					if(m_context->m_resourceManager->LoadTexture(texName))
+					if(m_context->m_resourceManager->LoadTexture(texName, Render::TextureType::TEXTURE_2D))
 					{
 						m_model->m_textureHandles[2] = texName;
 					}
@@ -211,3 +219,5 @@ namespace RootEngine
 		return cutPath;
 	}
 }
+
+#endif

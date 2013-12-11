@@ -24,6 +24,8 @@ namespace RootForce
 		{
 			SetUsage<Renderable>();
 			SetUsage<Transform>();
+			m_renderer = nullptr;
+			m_logger = nullptr;
 		}
 		void Init();
 		void Begin();

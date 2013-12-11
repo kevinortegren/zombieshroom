@@ -181,8 +181,6 @@ namespace RootEngine
 					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
 					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &t);
 
-					memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
-
 					tempEvent.modifiers = 0;
 					if (p_event.key.keysym.mod & KMOD_LALT || p_event.key.keysym.mod & KMOD_RALT)
 						tempEvent.modifiers |= Awesomium::WebKeyboardEvent::kModAltKey;
@@ -232,6 +230,7 @@ namespace RootEngine
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
 			}
+			
 		}
 
 		int guiInstance::MapToAwesomium( SDL_Keycode p_key )

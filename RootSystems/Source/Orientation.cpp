@@ -77,9 +77,48 @@ namespace RootForce
 
 	mat3 Orientation::GetMatrix()
 	{
-		return mat3(GetRight(), GetUp(), GetFront());
+		return mat3(-GetRight(), GetUp(), GetFront());
 	}
 
+	void Orientation::SetOrientation(const glm::mat3& p_rotationMatrix)
+	{
+		// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+		// article "Quaternion Calculus and Fast Animation".
+
+		float trace = p_rotationMatrix[0][0]+p_rotationMatrix[1][1]+p_rotationMatrix[2][2];
+		float root;
+
+		if ( trace > 0.0 )
+		{
+			// |w| > 1/2, may as well choose w > 1/2
+			root = glm::sqrt(trace + 1.0f);  // 2w
+			m_orientation.w = 0.5f*root;
+			root = 0.5f/root;  // 1/(4w)
+			m_orientation.x = (p_rotationMatrix[2][1]-p_rotationMatrix[1][2])*root;
+			m_orientation.y = (p_rotationMatrix[0][2]-p_rotationMatrix[2][0])*root;
+			m_orientation.z = (p_rotationMatrix[1][0]-p_rotationMatrix[0][1])*root;
+		}
+		else
+		{
+			// |w| <= 1/2
+			static size_t next[3] = { 1, 2, 0 };
+			size_t i = 0;
+			if ( p_rotationMatrix[1][1] > p_rotationMatrix[0][0] )
+				i = 1;
+			if ( p_rotationMatrix[2][2] > p_rotationMatrix[i][i] )
+				i = 2;
+			size_t j = next[i];
+			size_t k = next[j];
+
+			root = glm::sqrt(p_rotationMatrix[i][i]-p_rotationMatrix[j][j]-p_rotationMatrix[k][k] + 1.0f);
+			float* apkQuat[3] = { &m_orientation.x, &m_orientation.y, &m_orientation.z };
+			*apkQuat[i] = 0.5f*root;
+			root = 0.5f/root;
+			m_orientation.w = (p_rotationMatrix[k][j]-p_rotationMatrix[j][k])*root;
+			*apkQuat[j] = (p_rotationMatrix[j][i]+p_rotationMatrix[i][j])*root;
+			*apkQuat[k] = (p_rotationMatrix[k][i]+p_rotationMatrix[i][k])*root;
+		}
+	}
 
 	void Orientation::SetOrientation(float p_rotationX, float p_rotationY, float p_rotationZ)
 	{
@@ -198,7 +237,7 @@ namespace RootForce
 		vec3 axis = glm::cross(direction, vec3(0.0f, 0.0f, 1.0f));
 		if(glm::length(axis) == 0)
 		{
-			axis = vec3(1.0f, 0.0f, 0.0f);
+		//	axis = vec3(1.0f, 0.0f, 0.0f);
 		}
 		float angle = glm::degrees(glm::acos(glm::dot(direction, vec3(0.0f, 0.0f, 1.0f))));
 		vec3 third = glm::cross(axis, vec3(0.0f, 0.0f, 1.0f));
@@ -208,11 +247,21 @@ namespace RootForce
 		}
 		Rotate(angle, axis);
 
-		//vec3 side1 = glm::cross(direction, GetUp());
-		//vec3 side2 = glm::cross(direction, up);
-		//vec3 newUp = glm::cross(side2, direction);
-		//float angle2 = glm::degrees(glm::acos(glm::dot(side2, side1)));
-		//RollGlobal(angle2);
+		vec3 targetRight = normalize(glm::cross(direction, up));
+		vec3 myRight = normalize(glm::cross(direction, GetUp()));
+		float angle2 = glm::degrees(glm::acos(glm::dot(targetRight, myRight)));
+		vec3 third2 = glm::cross(direction, myRight);
+		if (glm::dot(third2, targetRight) < 0)
+		{
+			angle2 = -angle2;
+		}
+		Roll(angle2);
+
+		//vec3 left = glm::cross(up, direction);
+		//up = glm::cross(direction, left);
+		//mat3 mat(left, up, direction);
+
+		//SetOrientation(mat);
 	}
 
 	glm::quat Orientation::GetQuaterion()

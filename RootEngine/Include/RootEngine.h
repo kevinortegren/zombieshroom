@@ -21,7 +21,8 @@ namespace RootEngine
 			INIT_RENDER = 4,
 			INIT_GUI = 8,
 			INIT_PHYSICS = 16,
-			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI | INIT_PHYSICS
+			INIT_SCRIPTING = 32,
+			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI | INIT_PHYSICS | INIT_SCRIPTING
 		};
 	}
 
@@ -35,31 +36,41 @@ namespace RootEngine
 		GameSharedContext GetGameSharedContext();
 		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
+		void LoadRender();
+#ifndef COMPILE_LEVEL_EDITOR
 		void LoadNetwork();
 		void LoadInput();
-		void LoadRender();
 		void LoadGUI();
-
 		//void LoadInputSystem();
 		void LoadPhysics();
 
+		void LoadScriptEngine();
+#endif
 
 		void* m_networkModule;
 		void* m_renderModule;
 		void* m_guiModule;
 		void* m_inputModule;
 		void* m_physicsModule;
+		void* m_scriptModule;
+
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
 
 		Logging m_logger;
-		MemoryTracker*	m_memTracker;
+		MemoryTracker* m_memTracker;
 		ResourceManager m_resourceManager;
+		Profiling m_profiler;
+		Render::RendererInterface* m_renderer;
+		ConfigManager m_configManager;
+#ifndef COMPILE_LEVEL_EDITOR
+		DebugOverlay m_debugOverlay;
 		Network::NetworkManager*		m_network;
-		Render::RendererInterface*		m_renderer;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
+		Script::ScriptInterface* m_scriptEngine;
+#endif
 
 	};
 }
