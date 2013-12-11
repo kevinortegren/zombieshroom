@@ -99,12 +99,32 @@ namespace RootForce
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
+
+		/*
+		// Create a new table for the functions to register.
+		lua_newtable(heart);
+
+		// Register the functions.
+		luaL_register(L, 0, functions);
+		lua_pushvalue(L, -1);
+		lua_setfield(L, -3, name); // ex. system.gametime = newtable
+		lua_remove(L, -2);
+		*/
+		luaL_newmetatable(g_engineContext.m_script->GetLuaState(), "Entity.Meta");		// metatable.--index = metatable		lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);		lua_setfield(g_engineContext.m_script->GetLuaState(), -2, "__index");		//luaL_setfuncs(g_engineContext.m_script->GetLuaState(), );		//lua_pop(g_engineContext.m_script->GetLuaState(), 2);		//lua_pushglobaltable(g_engineContext.m_script->GetLuaState());		luaL_newlib(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f);
+		//lua_pop(g_engineContext.m_script->GetLuaState(), 3);
+		
+		//lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);
+		
+	//	lua_setfield(g_engineContext.m_script->GetLuaState(), -1, "Ent");
+
+	/*	luaL_newmetatable(g_engineContext.m_script->GetLuaState(), "RenderCompMeta");		// metatable.--index = metatable		lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);		lua_setfield(g_engineContext.m_script->GetLuaState(), -2, "__index");		luaL_setfuncs(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_m, 0);		luaL_newlib(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f);*/
+
+		/*g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
 		g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
 		g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
 		g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
 		g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
-		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);
+		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);*/
 		
 		g_world = &m_world;
 
@@ -242,7 +262,7 @@ namespace RootForce
 			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
+				g_engineContext.m_script->SetFunction("AbilityTestOnActivate", "OnActivate");
 				g_engineContext.m_script->ExecuteScript();
 			}
 

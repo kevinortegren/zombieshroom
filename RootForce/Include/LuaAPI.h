@@ -15,13 +15,28 @@ namespace RootForce
 	{
 		static int CreateEntity(lua_State* p_luaState)
 		{
-			lua_pushlightuserdata(p_luaState, g_world->GetEntityManager()->CreateEntity());
+			// Allocate memory for a pointer to to object
+			ECS::Entity **s = (ECS::Entity **)lua_newuserdata(p_luaState, sizeof(ECS::Entity *));
+			*s = g_world->GetEntityManager()->CreateEntity();
+
+			luaL_getmetatable(p_luaState, "Entity.Meta"); // Use global table 'EntityMeta' as metatable
+			lua_setmetatable(p_luaState, -2);  
+
+			//Userdata already on stack
 			return 1;
 		}
 
 		static int CreateRenderable(lua_State* p_luaState)
 		{
-			lua_pushlightuserdata(p_luaState, g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>((ECS::Entity*)lua_topointer(p_luaState, 1)));
+			// Allocate memory for a pointer to to object
+			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
+			ECS::Entity* e = (ECS::Entity*)luaL_checkudata(p_luaState, 1, "EntityMeta");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e);
+
+			lua_getglobal(p_luaState, "Render.CompMeta"); // Use global table 'RenderCompMeta' as metatable
+			lua_setmetatable(p_luaState, -2);  
+			
+			//Userdata already on stack
 			return 1;
 		}
 
@@ -39,9 +54,10 @@ namespace RootForce
 
 		static int SetRenderableModel(lua_State* p_luaState)
 		{
-			std::string handle = lua_tostring(p_luaState, 1);
-			std::string effecthandle = lua_tostring(p_luaState, 2);
-			RootForce::Renderable* rtemp = (RootForce::Renderable*)lua_topointer(p_luaState, 3);
+			RootForce::Renderable* rtemp = (RootForce::Renderable*)luaL_checkudata(p_luaState, 1, "RenderCompMeta");
+			std::string handle = lua_tostring(p_luaState, 2);
+			std::string effecthandle = lua_tostring(p_luaState, 3);
+			
 			rtemp->m_model = g_engineContext.m_resourceManager->GetModel(handle);
 			rtemp->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(rtemp->m_model->m_textureHandles[0]);
 			rtemp->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(rtemp->m_model->m_textureHandles[1]);
@@ -80,5 +96,21 @@ namespace RootForce
 			ptemp->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
 			return 0;
 		}
+
+		static const struct luaL_Reg entity_f [] = {
+			{"New", CreateEntity},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg renderable_f [] = {
+			{"New", CreateRenderable},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg renderable_m [] = {
+			{"SetModel", SetRenderableModel},
+			{"SetMaterial", SetRenderableMaterial},
+			{NULL, NULL}
+		};
 	}
 }
