@@ -47,7 +47,7 @@ namespace RootForce
 				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
 				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), camera->m_near, camera->m_far);
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)g_engineContext.m_renderer->GetWidth(), (float)g_engineContext.m_renderer->GetHeight(), camera->m_near, camera->m_far);
 
 				g_engineContext.m_renderer->SetViewMatrix(viewMatrix);
 				g_engineContext.m_renderer->SetProjectionMatrix(projectionMatrix);
@@ -146,7 +146,6 @@ namespace RootForce
 		{
 			Transform* transform = m_transforms.Get(p_entity);
 			ThirdPersonBehavior* thirdPersonBehavior = m_thirdPersonBehaviors.Get(p_entity);
-			g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Mouse y: %i", m_deltaMouseMovement.y);
 
 			if(thirdPersonBehavior->m_targetTag != "")
 			{
