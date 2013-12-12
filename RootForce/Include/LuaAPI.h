@@ -52,7 +52,15 @@ namespace RootForce
 
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
 		{
-			lua_pushlightuserdata(p_luaState, g_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>((ECS::Entity*)lua_topointer(p_luaState, 1)));
+			// Allocate memory for a pointer to to object
+			RootForce::PhysicsAccessor **s = (RootForce::PhysicsAccessor **)lua_newuserdata(p_luaState, sizeof(RootForce::PhysicsAccessor *));
+
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(*e);
+
+			luaL_setmetatable(p_luaState, "PhysicsAccessor");
+
+			//Userdata already on stack
 			return 1;
 		}
 
@@ -76,9 +84,10 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetPhysicsAccessorInfo(lua_State* p_luaState)
+		static int SetInfo(lua_State* p_luaState)
 		{
-			RootForce::PhysicsAccessor* ptemp  = (RootForce::PhysicsAccessor*)lua_topointer(p_luaState, 1);
+			RootForce::PhysicsAccessor** ptemp = (RootForce::PhysicsAccessor**)luaL_checkudata(p_luaState, 1, "PhysicsAccessor");
+
 			RootEngine::Physics::AbilityPhysicsInfo info;
 			bool collide = lua_toboolean(p_luaState, 2) == 1 ? true : false; 
 			info.m_collidesWorld	= collide;
@@ -98,15 +107,15 @@ namespace RootForce
 			info.m_speed			= (float)lua_tonumber(p_luaState, 20);
 			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 21));
 	
-			ptemp->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
+			(*ptemp)->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
 			return 0;
 		}
-
+		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
 			{NULL, NULL}
 		};
-
+		//Renderable functions&methods
 		static const struct luaL_Reg renderable_f [] = {
 			{"New", CreateRenderable},
 			{NULL, NULL}
@@ -117,48 +126,45 @@ namespace RootForce
 			{"SetMaterial", SetRenderableMaterial},
 			{NULL, NULL}
 		};
-
+		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {
 			{"New", CreateTransformation},
 			{NULL, NULL}
 		};
-
+		
 		static const struct luaL_Reg transformation_m [] = {
 			{"SetModel", SetRenderableModel},
 			{"SetMaterial", SetRenderableMaterial},
 			{NULL, NULL}
 		};
+		//Physics function & methods
+		static const struct luaL_Reg physicsaccessor_f [] = {
+			{"New", CreatePhysicsAccessor},
+			{NULL, NULL}
+		};
 
-		static int LuaOpenEntity(lua_State* p_luaState)
+		static const struct luaL_Reg physicsaccessor_m [] = {
+			{"SetInfo", SetInfo},
+			{NULL, NULL}
+		};
+
+		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, std::string p_typeName)
 		{
-			luaL_newlib(p_luaState, RootForce::LuaAPI::entity_f);
-			lua_setglobal(p_luaState, "Entity");
+			luaL_newlib(p_luaState, p_funcReg);
+			lua_setglobal(p_luaState, p_typeName.c_str());
 
 			return 1;
 		}
 
-		static int LuaOpenRenderable(lua_State* p_luaState)
+		static int LuaSetupTypeWithMethods(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
-			luaL_newmetatable(p_luaState, "Renderable");			int meta_id = lua_gettop(p_luaState);						// metatable.--index = metatable			//lua_pushvalue(p_luaState, -1);			//lua_setfield(p_luaState, -2, "__index");
-			luaL_setfuncs(p_luaState, renderable_m, 0);
+			luaL_newmetatable(p_luaState, p_typeName.c_str());			int meta_id = lua_gettop(p_luaState);		
+			luaL_setfuncs(p_luaState, p_methodReg, 0);
 			lua_setfield(p_luaState, meta_id, "__index");  
 
-			luaL_newlib(p_luaState, renderable_f);
+			luaL_newlib(p_luaState, p_funcReg);
 
-			lua_setglobal(p_luaState, "Renderable");
-
-			return 1;
-		}
-
-		static int LuaOpenTransformation(lua_State* p_luaState)
-		{
-			luaL_newmetatable(p_luaState, "Transformation");			int meta_id = lua_gettop(p_luaState);		
-			luaL_setfuncs(p_luaState, transformation_m, 0);
-			lua_setfield(p_luaState, meta_id, "__index");  
-
-			luaL_newlib(p_luaState, transformation_f);
-
-			lua_setglobal(p_luaState, "Transformation");
+			lua_setglobal(p_luaState, p_typeName.c_str());
 
 			return 1;
 		}

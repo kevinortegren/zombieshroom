@@ -102,35 +102,11 @@ namespace RootForce
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		RootForce::LuaAPI::LuaOpenEntity(g_engineContext.m_script->GetLuaState());
-		RootForce::LuaAPI::LuaOpenRenderable(g_engineContext.m_script->GetLuaState());
-		RootForce::LuaAPI::LuaOpenTransformation(g_engineContext.m_script->GetLuaState());
-
-		/*
-		// Create a new table for the functions to register.
-		lua_newtable(heart);
-
-		// Register the functions.
-		luaL_register(L, 0, functions);
-		lua_pushvalue(L, -1);
-		lua_setfield(L, -3, name); // ex. system.gametime = newtable
-		lua_remove(L, -2);
-		*/
-		//lua_pop(g_engineContext.m_script->GetLuaState(), 2);
-		//lua_pop(g_engineContext.m_script->GetLuaState(), 3);
-		
-		//lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);
-		
-	//	lua_setfield(g_engineContext.m_script->GetLuaState(), -1, "Ent");
-
-	/*	luaL_newmetatable(g_engineContext.m_script->GetLuaState(), "RenderCompMeta");		// metatable.--index = metatable		lua_pushvalue(g_engineContext.m_script->GetLuaState(), -1);		lua_setfield(g_engineContext.m_script->GetLuaState(), -2, "__index");		luaL_setfuncs(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_m, 0);		luaL_newlib(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f);*/
-
-		/*g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
-		g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
-		g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
-		g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
-		g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
-		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);*/
+		//Bind c++ functions and members to Lua
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, "Entity");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
 		
 		g_world = &m_world;
 

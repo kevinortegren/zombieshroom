@@ -30,8 +30,27 @@ function AbilityTest.OnActivate (self)
 	local entity 		= Entity.New();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
-
-	print(self.cooldown);
-
+	local physics 		= PhysicsAccessor.New(entity);
 	renderComp:SetModel("Primitives/sphere", "Mesh");
+	physics:SetInfo(
+		true, --collideWorld
+		0, --dirx
+		0, --diry
+		1, --dirz
+		0, --gravx
+		-9, --gravy
+		0, --gravz
+		0, --orientX
+		0, --orientY
+		0, --orientZ
+		0, --orientW
+		0, --posX
+		0, --posY
+		0, --posZ
+		0.5, --height
+		1, --mass
+		1, --radius
+		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		50, --speed
+		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end
