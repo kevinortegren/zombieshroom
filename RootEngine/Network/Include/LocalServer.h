@@ -26,6 +26,7 @@ namespace RootEngine
 			bool Send(const Message& p_message);
 			void Host( USHORT p_port, bool p_isDedicated = true);
 			void Update();
+			void SetNetworkDiscoveryResponse( uint8_t* data, uint32_t size );
 
 			bool IsClientLocal(size_t p_index) const;
 		private:

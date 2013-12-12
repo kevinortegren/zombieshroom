@@ -17,6 +17,7 @@ namespace RootEngine
 			void Update();
 			bool Send( const Message& p_message );
 			bool ConnectTo( const char* p_ip , USHORT p_port);
+			void LanDiscovery(USHORT p_port);
 		};
 	}
 }
