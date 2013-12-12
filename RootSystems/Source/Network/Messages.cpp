@@ -10,6 +10,7 @@ namespace RootForce
 			int size = 0;
 			size += sizeof(TemporaryID);
 			size += sizeof(SynchronizedID);
+			size += sizeof(EntityType);
 
 			return size;
 		}
@@ -18,12 +19,14 @@ namespace RootForce
 		{
 			memcpy(buffer, &TemporaryID, sizeof(TemporaryID));
 			memcpy(buffer + sizeof(TemporaryID), &SynchronizedID, sizeof(SynchronizedID));
+			memcpy(buffer + sizeof(TemporaryID) + sizeof(SynchronizedID), &EntityType, sizeof(EntityType));
 		}
 
 		void EntityCreated::Deserialize(uint8_t* buffer)
 		{
 			memcpy(&TemporaryID, buffer, sizeof(TemporaryID));
 			memcpy(&SynchronizedID, buffer + sizeof(TemporaryID), sizeof(SynchronizedID));
+			memcpy(&EntityType, buffer + sizeof(TemporaryID) + sizeof(SynchronizedID), sizeof(EntityType));
 		}
 
 
@@ -47,25 +50,6 @@ namespace RootForce
 		}
 
 
-
-		int ComponentUpdated::GetSerializedSize() const
-		{
-			int size = 0;
-			size += sizeof(SynchronizedID);
-			size += sizeof(ComponentTypeID);
-
-			return size;
-		}
-
-		void ComponentUpdated::Serialize(uint8_t* buffer) const
-		{
-
-		}
-
-		void ComponentUpdated::Deserialize(uint8_t* buffer)
-		{
-
-		}
 
 
 
@@ -108,7 +92,7 @@ namespace RootForce
 		{
 			memcpy(&Type, buffer, sizeof(Type));
 			memcpy(&SenderID, buffer + sizeof(Type), sizeof(SenderID));
-			Message = (char*) buffer + sizeof(Type) + sizeof(SenderID);
+			Message = (const char*) buffer + sizeof(Type) + sizeof(SenderID);
 		}
 		
 
@@ -118,6 +102,7 @@ namespace RootForce
 		{
 			int size = 0;
 			size += strlen(PlayerName) + 1;
+			size += PlayerEntity.GetSerializedSize();
 
 			return size;
 		}
@@ -125,6 +110,13 @@ namespace RootForce
 		void MessageUserInfo::Serialize(uint8_t* buffer) const
 		{
 			memcpy(buffer, PlayerName, strlen(PlayerName) + 1);
+			PlayerEntity.Serialize(buffer + strlen(PlayerName) + 1);
+		}
+
+		void MessageUserInfo::Deserialize(uint8_t* buffer)
+		{
+			PlayerName = (const char*) buffer;
+			PlayerEntity.Deserialize(buffer + strlen(PlayerName) + 1);
 		}
 
 
@@ -144,6 +136,12 @@ namespace RootForce
 			UserInfo.Serialize(&buffer[sizeof(UserID)]);
 		}
 
+		void MessageUserConnected::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&UserID, buffer, sizeof(UserID));
+			UserInfo.Deserialize(buffer + sizeof(UserID));
+		}
+
 
 
 		int MessageUserDisconnected::GetSerializedSize() const
@@ -157,6 +155,11 @@ namespace RootForce
 		void MessageUserDisconnected::Serialize(uint8_t* buffer) const
 		{
 			memcpy(buffer, &UserID, sizeof(UserID));
+		}
+
+		void MessageUserDisconnected::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&UserID, buffer, sizeof(UserID));
 		}
 
 
@@ -174,6 +177,11 @@ namespace RootForce
 			memcpy(buffer, &Orientation[0], sizeof(Orientation));
 		}
 
+		void MessageUserCommandOrient::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&Orientation[0], buffer, sizeof(Orientation));
+		}
+
 
 
 		int MessageUserCommandSelectAbility::GetSerializedSize() const
@@ -187,6 +195,11 @@ namespace RootForce
 		void MessageUserCommandSelectAbility::Serialize(uint8_t* buffer) const
 		{
 			memcpy(buffer, &Slot, sizeof(Slot));
+		}
+
+		void MessageUserCommandSelectAbility::Deserialize(uint8_t* buffer)
+		{
+			memcpy(&Slot, buffer, sizeof(Slot));
 		}
 	}
 }

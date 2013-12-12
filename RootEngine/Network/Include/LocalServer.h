@@ -1,5 +1,8 @@
 #pragma once
+
 #include "Server.h"
+#include <vector>
+
 namespace RootEngine
 {
 	namespace Network
@@ -16,6 +19,7 @@ namespace RootEngine
 		{
 			virtual void Host( USHORT p_port, bool p_isDedicated = true) = 0;
 			virtual bool IsClientLocal(size_t p_index) const = 0;
+			virtual std::vector<uint8_t> GetConnectedClients() const = 0;
 		};
 
 		class LocalServer : public Server, public LocalServerInterface
@@ -28,6 +32,7 @@ namespace RootEngine
 			void Update();
 
 			bool IsClientLocal(size_t p_index) const;
+			std::vector<uint8_t> GetConnectedClients() const;
 		private:
 			Client* m_client[MAX_CLIENTS+1]; // 0 is not to be used, as ID 0 equals server
 			uint8_t m_numClients;

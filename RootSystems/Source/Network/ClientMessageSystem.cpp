@@ -1,5 +1,5 @@
-#include <Network/ClientMessageSystem.h>
-#include <Network/Messages.h>
+#include <RootSystems/Include/Network/ClientMessageSystem.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 namespace RootForce
 {
@@ -19,6 +19,7 @@ namespace RootForce
 			switch (p_message->MessageID)
 			{
 				case MessageType::GameStateSnapshot:
+					HandleGameStateSnapshotMessage(p_message);
 					break;
 				case MessageType::ChatToClient:
 					HandleChatToClientMessage(p_message);
@@ -30,29 +31,13 @@ namespace RootForce
 					HandleUserDisconnectedMessage(p_message);
 					break;
 				case RootEngine::Network::InnerMessageID::CONNECTION_ACCEPTED:
-				{
-					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection to server established");
-
-					// TODO: Create a user info message and send it
-					RootForce::Network::MessageUserInfo userInfoContents;
-					userInfoContents.PlayerName = "john doe";
-
-					RootEngine::Network::Message userInfoMessage;
-					userInfoMessage.MessageID = MessageType::UserInfo;
-					userInfoMessage.RecipientID = 0;
-					userInfoMessage.Reliability = RELIABLE;
-					userInfoMessage.DataSize = userInfoContents.GetSerializedSize();
-					userInfoMessage.Data = new uint8_t[userInfoMessage.DataSize];
-					userInfoContents.Serialize(userInfoMessage.Data);
-
-					m_server->Send(userInfoMessage);
-				} break;
+					HandleConnectionAcceptedMessage(p_message);
+					break;
 				case RootEngine::Network::InnerMessageID::CONNECTION_REFUSED:
-					m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Connection to server refused");
-					// TODO: Bail. Run for it. They're on to you.
+					HandleConnectionRefusedMessage(p_message);
 					break;
 				case RootEngine::Network::InnerMessageID::DISCONNECT:
-					// TODO: Remove entity associated with the given player
+					HandleConnectionLostMessage(p_message);
 					break;
 			}
 		}
@@ -64,25 +49,67 @@ namespace RootForce
 
 		void ClientMessageHandler::HandleChatToClientMessage(RootEngine::Network::Message* p_message)
 		{
-			//MessageChat* header = (MessageChat*) p_message->Data;
 			MessageChat header;
 			header.Deserialize(p_message->Data);
+
 			m_chatSystem->JSAddMessage( "#" + std::to_string(header.SenderID) + ": " + header.Message );
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client %d: %s", header.SenderID, header.Message);
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "CLIENT: Chat from client %d: %s", header.SenderID, header.Message);
 		}
 
 		void ClientMessageHandler::HandleUserConnectedMessage(RootEngine::Network::Message* p_message)
 		{
-			MessageUserConnected* header = (MessageUserConnected*) p_message->Data;
-			m_chatSystem->JSAddMessage(std::string("User Connected: ") + header->UserInfo.PlayerName + " #" + std::to_string(header->UserID));
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d (%s) connected", header->UserID, header->UserInfo.PlayerName);
+			//MessageUserConnected* header = (MessageUserConnected*) p_message->Data;
+			MessageUserConnected contents;
+			contents.Deserialize(p_message->Data);
+
+			m_chatSystem->JSAddMessage(std::string("User Connected: ") + contents.UserInfo.PlayerName + " #" + std::to_string(contents.UserID));
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "CLIENT: User %d (%s) connected", contents.UserID, contents.UserInfo.PlayerName);
 		}
 
 		void ClientMessageHandler::HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message)
 		{
-			MessageUserDisconnected* header = (MessageUserDisconnected*) p_message->Data;
-			m_chatSystem->JSAddMessage(std::string("User disconnected: #") + std::to_string(header->UserID) );
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "User %d disconnected", header->UserID);
+			MessageUserDisconnected contents;
+			contents.Deserialize(p_message->Data);
+
+			m_chatSystem->JSAddMessage(std::string("User disconnected: #") + std::to_string(contents.UserID) );
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "CLIENT: User %d disconnected", contents.UserID);
+		}
+
+		void ClientMessageHandler::HandleConnectionAcceptedMessage(RootEngine::Network::Message* p_message)
+		{
+			m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection to server established.");
+
+			// Create a player entity with a temporary ID until the server responds.
+			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+			TemporaryId_t tId = m_networkEntityMap.AddEntity(entity);
+
+
+			// Notify the server of our info
+			RootForce::Network::MessageUserInfo userInfoContents;
+			userInfoContents.PlayerName = "John Doe";
+			userInfoContents.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
+			userInfoContents.PlayerEntity.SynchronizedID = SYNCHRONIZED_ID_NONE;
+			userInfoContents.PlayerEntity.TemporaryID = tId;
+
+			RootEngine::Network::Message m;
+			m.MessageID = MessageType::UserInfo;
+			m.RecipientID = 0;
+			m.Reliability = RELIABLE_ORDERED;
+			m.DataSize = userInfoContents.GetSerializedSize();
+			m.Data = new uint8_t[m.DataSize];
+			userInfoContents.Serialize(m.Data);
+
+			m_server->Send(m);
+		}
+
+		void ClientMessageHandler::HandleConnectionRefusedMessage(RootEngine::Network::Message* p_message)
+		{
+			m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "CLIENT: Connection to server refused.");
+		}
+
+		void ClientMessageHandler::HandleConnectionLostMessage(RootEngine::Network::Message* p_message)
+		{
+			m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "CLIENT: Connection to server lost.");
 		}
 
 		void ClientMessageHandler::Update()
@@ -97,8 +124,8 @@ namespace RootForce
 				RootForce::Network::MessageChat netmsgchat;
 				netmsgchat.SenderID = -1; // TODO: Fix own sender ID to first player connected ID received
 				netmsgchat.Type = RootForce::Network::MessageChat::TYPE_DEBUG;
-				netmsgchat.Message = new char[chatmsg.size()+1];
-				std::strcpy(netmsgchat.Message, chatmsg.c_str());
+				netmsgchat.Message = chatmsg.c_str();//new char[chatmsg.size()+1];
+				//std::strcpy(netmsgchat.Message, chatmsg.c_str());
 
 				netmsg.MessageID = RootForce::Network::MessageType::ChatToServer;
 				netmsg.RecipientID = RootEngine::Network::RECIPIENT_BROADCAST;

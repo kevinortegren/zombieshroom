@@ -8,59 +8,7 @@ namespace RootForce
 {
 	namespace Network
 	{
-		NetworkEntityMap::NetworkEntityMap(ECS::World* p_world)
-			: m_world(p_world)
-			, m_nextSynchronizedId(0)
-		{}
-
-
-		ECS::Entity* NetworkEntityMap::AddEntity(TemporaryId_t& p_temporaryId)
-		{
-			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-
-			m_temporaryEntityMap[m_nextTemporaryId++] = entity;
-
-			p_temporaryId = m_nextTemporaryId;
-			return entity;
-		}
-
-		void NetworkEntityMap::SetSynchronizedId(TemporaryId_t p_temporaryId, SynchronizedId_t p_synchronizedId)
-		{
-			m_synchronizedEntityMap[p_synchronizedId] = m_temporaryEntityMap[p_temporaryId];
-			m_temporaryEntityMap.erase(m_temporaryEntityMap.find(p_temporaryId));
-		}
-
-		SynchronizedId_t NetworkEntityMap::GetSynchronizedId(ECS::Entity* p_entity) const
-		{
-			auto it = std::find(m_synchronizedEntityMap.begin(), m_synchronizedEntityMap.end(), p_entity->GetId());
-			if (it == m_synchronizedEntityMap.end())
-				return SYNCHRONIZED_ID_NONE;
-			else
-				return it->first;
-		}
-
-		TemporaryId_t NetworkEntityMap::GetTemporaryId(ECS::Entity* p_entity) const
-		{
-			auto it = std::find(m_temporaryEntityMap.begin(), m_temporaryEntityMap.end(), p_entity->GetId());
-			if (it == m_temporaryEntityMap.end())
-				return TEMPORARY_ID_NONE;
-			else
-				return it->first;
-		}
-
-		ECS::Entity* NetworkEntityMap::GetSynchronizedEntity(SynchronizedId_t p_synchronizedId) const
-		{
-			auto it = m_synchronizedEntityMap.find(p_synchronizedId);
-			if (it == m_synchronizedEntityMap.end())
-				return nullptr;
-			else
-				return it->second;
-		}
-
-		SynchronizedId_t NetworkEntityMap::NextSynchronizedId()
-		{
-			return m_nextSynchronizedId++;
-		}
+		
 
 
 
@@ -71,8 +19,6 @@ namespace RootForce
 			: m_world(p_world)
 			, m_logger(p_logger)
 		{
-			//m_world->GetEntityManager()->GetComponentList(
-
 			switch (p_type)
 			{
 				case MessageHandler::LOCAL:
@@ -86,15 +32,24 @@ namespace RootForce
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started local server on port: %u", port);
 					break;
 				case MessageHandler::REMOTE:
+				{
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
+					bool connectionSuccess = dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
 
-					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
-					m_serverMessageHandler = nullptr;
+					if (connectionSuccess)
+					{
+						m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
+						m_serverMessageHandler = nullptr;
 
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server connection to: %s:%u", address, port);
-					break;
+						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server connection to: %s:%u", address, port);
+					}
+					else
+					{
+						m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Failed to start remote server connection to: %s:%u", address, port);
+						throw std::runtime_error("");
+					}	
+				} break;
 				case MessageHandler::DEDICATED:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
@@ -108,9 +63,6 @@ namespace RootForce
 				default:
 					m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Invalid server type");
 			}
-
-			//if (m_clientMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ClientMessageSystem>(m_clientMessageSystem, "ClientMessageSystem");
-			//if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
 		}
 
 		void MessageHandler::Update()
@@ -155,17 +107,6 @@ namespace RootForce
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
 						break;
-						/*
-						uint8_t slot = message->SenderID;
-
-						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-						NetworkPlayerComponent* comp = m_world->GetEntityManager()->CreateComponent<NetworkPlayerComponent>(entity);
-						comp->PlayerSlot = slot;
-
-						m_playerEntities[slot] = entity;
-
-						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u connected", slot);
-						*/
 
 					case RootEngine::Network::InnerMessageID::DISCONNECT:
 						// This can either be a client or a server timing out or disconnecting
@@ -173,12 +114,6 @@ namespace RootForce
 							m_serverMessageHandler->HandleServerMessage(message.get());
 						if (m_clientMessageHandler != nullptr)
 							m_clientMessageHandler->HandleClientMessage(message.get());
-
-						/*
-						
-						m_world->GetEntityManager()->RemoveEntity(m_playerEntities[slot]);
-
-						*/
 						break;
 
 					default:

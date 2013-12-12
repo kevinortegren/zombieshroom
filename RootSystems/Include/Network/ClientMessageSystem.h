@@ -1,9 +1,12 @@
 #pragma once
 
 #include <Utility/ECS/Include/EntitySystem.h>
+#include <Utility/ECS/Include/World.h>
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootForce/Include/ChatSystem.h>
+
 namespace RootForce
 {
 	namespace Network
@@ -20,6 +23,8 @@ namespace RootForce
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
+
+			NetworkEntityMap m_networkEntityMap;
 			RootEngine::Network::Server* m_server;
 			ChatSystemInterface* m_chatSystem;
 
@@ -27,6 +32,9 @@ namespace RootForce
 			void HandleChatToClientMessage(RootEngine::Network::Message* p_message);
 			void HandleUserConnectedMessage(RootEngine::Network::Message* p_message);
 			void HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message);
+			void HandleConnectionAcceptedMessage(RootEngine::Network::Message* p_message);
+			void HandleConnectionRefusedMessage(RootEngine::Network::Message* p_message);
+			void HandleConnectionLostMessage(RootEngine::Network::Message* p_message);
 		};
 	}
 }

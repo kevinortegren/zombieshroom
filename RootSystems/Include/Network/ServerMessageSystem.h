@@ -5,7 +5,9 @@
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/Physics.h>
+
 
 namespace RootForce
 {
@@ -21,9 +23,10 @@ namespace RootForce
 		class ServerClientSystem : public ECS::EntitySystem
 		{
 		public:
-			ServerClientSystem(ECS::World* p_world, Logging* p_logger)
+			ServerClientSystem(ECS::World* p_world, Logging* p_logger, NetworkEntityMap* p_networkEntityMap)
 				: ECS::EntitySystem(p_world)
 				, m_logger(p_logger)
+				, m_networkEntityMap(p_networkEntityMap)
 			{
 				SetUsage<NetworkClientComponent>();
 			}
@@ -38,6 +41,7 @@ namespace RootForce
 			void HandleUserInfo(RootEngine::Network::Message* p_message);
 		private:
 			Logging* m_logger;
+			NetworkEntityMap* m_networkEntityMap;
 			std::vector<RootEngine::Network::Message> m_messages;
 
 			ECS::ComponentMapper<NetworkClientComponent> m_networkClientComponentMapper;
@@ -84,9 +88,18 @@ namespace RootForce
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
+			
+			NetworkEntityMap m_networkEntityMap;
 			RootEngine::Network::LocalServer* m_server;
-			ServerClientSystem* m_serverClientSystem;
+			//ServerClientSystem* m_serverClientSystem;
 
+			// Map the player slot to a player entity.
+			std::map<uint8_t, SynchronizedId_t> m_playerEntities;
+
+
+			void HandleUserConnectedMessage(RootEngine::Network::Message* p_message);
+			void HandleUserInfoMessage(RootEngine::Network::Message* p_message);
+			void HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message);
 			void HandleChatToServerMessage(RootEngine::Network::Message* p_message);
 			void HandleUserCommandMessage(RootEngine::Network::Message* p_message, RootForce::PlayerAction::PlayerAction p_action);
 		};

@@ -21,12 +21,16 @@ namespace RootEngine
 			if(p_message.RecipientID == -1)
 			{
 				if(!m_client[1]->IsRemote)
-					m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
+					Transmit(p_message, m_client[1]->GUID, false);
+					//m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
 				return Transmit(p_message, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 			else if (p_message.RecipientID == 0)
 			{
-				m_message.push_back(new Message(p_message));
+				// TODO: This is ugly. But need Sender ID for messages sent by local client.
+				Message* m = new Message(p_message);
+				m->SenderID = 1;
+				m_message.push_back(m);
 				return true;
 			}
 			else
@@ -162,7 +166,21 @@ namespace RootEngine
 
 		bool LocalServer::IsClientLocal(size_t p_index) const
 		{
+			if (m_client[p_index] == nullptr)
+				return false;
 			return !m_client[p_index]->IsRemote;
+		}
+
+		std::vector<uint8_t> LocalServer::GetConnectedClients() const
+		{
+			std::vector<uint8_t> connectedClients;
+			for (uint8_t i = 1; i < MAX_CLIENTS + 1; ++i)
+			{
+				if (m_client[i] != nullptr)
+					connectedClients.push_back(i);
+			}
+
+			return connectedClients;
 		}
 
 	}
