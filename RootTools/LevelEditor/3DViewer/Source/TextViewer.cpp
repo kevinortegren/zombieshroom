@@ -70,12 +70,12 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 }
 //CREATE CAMERA ENTITY
 
-ECS::Entity* CreateMeshEntity(ECS::World* p_world)
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-	renderable->m_model = g_engineContext.m_resourceManager->CreateModel("asda");
+	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
 			g_running = true;
 
-			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f)); 
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
 			Render::DirectionalLight dl;
 			dl.m_color = glm::vec4(0,0,1,1);
 
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
 				string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-				if(textureName != "")
+				if(textureName != "" && textureName != "NONE")
 				{
 					g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 					materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
@@ -237,7 +237,9 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberMeshes; i++)
 			{
-				Entities.push_back(CreateMeshEntity(&m_world));	
+				string name = RM.PmeshList[i]->transformation.name;
+				Entities.push_back(CreateMeshEntity(&m_world, name));	
+				cout << "LOADED: " << name  << " TO INDEX " << i << endl;
 
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_position = RM.PmeshList[i]->transformation.position;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_scale = RM.PmeshList[i]->transformation.scale;
@@ -300,6 +302,8 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.g = RM.PlightList[i]->color.g;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.b = RM.PlightList[i]->color.b;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.a = RM.PlightList[i]->color.a;
+				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.x = RM.PlightList[i]->Intensity;
+
 				//m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation(
 				
 				ReleaseMutex(RM.LightMutexHandle);
@@ -329,7 +333,16 @@ int main(int argc, char* argv[])
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
 					{
-						Entities.push_back(CreateMeshEntity(&m_world));
+						string name = RM.PmeshList[MeshIndex]->transformation.name;
+						if(name != "")
+						{
+							Entities.push_back(CreateMeshEntity(&m_world, name));
+							cout << "Adding " << name << " to index: " << MeshIndex << endl;
+						}
+					}
+					else
+					{
+						cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
 					}
 				
 					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
@@ -347,7 +360,7 @@ int main(int argc, char* argv[])
 						for(int i = 0; i < renderNrOfMaterials; i++)
 						{
 							string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-							if(textureName != "")
+							if(textureName != "" && textureName != "NONE")
 							{
 								g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 								materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
@@ -426,6 +439,9 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.g = RM.PlightList[LightIndex]->color.g;
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.b = RM.PlightList[LightIndex]->color.b;
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.a = RM.PlightList[LightIndex]->color.a;
+					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
+					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
+					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
 
 					//glm::quat rotation;
 					//rotation.x = RM.PlightList[LightIndex]->transformation.rotation.x;

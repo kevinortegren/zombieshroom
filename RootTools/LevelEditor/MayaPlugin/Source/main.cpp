@@ -630,7 +630,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
 					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					mesh.getVertexNormal(triangleVertices[j],false, normal, space_local);
+					mesh.getVertexNormal(triangleVertices[j], false, normal, space_local);
 					SM.meshList[meshIndex].normal[count].x = normal.x;
 					SM.meshList[meshIndex].normal[count].y = normal.y;
 					SM.meshList[meshIndex].normal[count].z = normal.z;
@@ -688,6 +688,8 @@ void MayaLightToList(MObject node, int lightIndex)
 		SM.lightList[lightIndex].color.g = light.color(&status).g;
 		SM.lightList[lightIndex].color.b = light.color(&status).b;
 		SM.lightList[lightIndex].color.a = light.color(&status).a;
+		SM.lightList[lightIndex].Intensity = light.intensity(&status);
+
 		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
 

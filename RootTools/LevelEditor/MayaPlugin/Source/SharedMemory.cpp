@@ -113,6 +113,7 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)
 		PlightList[index]->transformation.scale = lightList[index].transformation.scale;
 		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
 		PlightList[index]->color = lightList[index].color;
+		PlightList[index]->Intensity = lightList[index].Intensity;
 
 	ReleaseMutex(LightMutexHandle);
 }
@@ -163,10 +164,10 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 
 		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
 	}	
-
+	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30);
 	if(updateTransformation)
 	{
-		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+		//memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;

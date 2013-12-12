@@ -112,7 +112,9 @@ namespace RootEngine
 		{
 			Model* model = new Model();
 			model->m_meshes.resize(1);
-
+			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
+			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			
 			if(model)
 			{
 				m_models[p_path] = model;
