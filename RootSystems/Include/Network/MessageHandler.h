@@ -11,21 +11,34 @@ namespace RootForce
 {
 	namespace Network
 	{
+		typedef int16_t TemporaryId_t;
+		typedef int16_t SynchronizedId_t;
+
+		const TemporaryId_t TEMPORARY_ID_NONE = -1;
+		const SynchronizedId_t SYNCHRONIZED_ID_NONE = -1;
+
 		class NetworkEntityMap
 		{
 		public:
 			NetworkEntityMap(ECS::World* p_world);
 
-			ECS::Entity* AddTemporaryEntity(int16_t& p_temporaryId);
-			ECS::Entity* AddSynchronizedEntity(int16_t& p_synchronizedId);
-			void SetSynchronizedId(int16_t p_temporaryId, int16_t p_synchronizedId);
+			ECS::Entity* AddEntity(TemporaryId_t& p_temporaryId);
+			void SetSynchronizedId(TemporaryId_t p_temporaryId, SynchronizedId_t p_synchronizedId);
 
-			int16_t GetSynchronizedId(ECS::Entity* p_entity) const;
-			int16_t GetTemporaryId(ECS::Entity* p_entity) const;
+			SynchronizedId_t GetSynchronizedId(ECS::Entity* p_entity) const;
+			TemporaryId_t GetTemporaryId(ECS::Entity* p_entity) const;
+			ECS::Entity* GetSynchronizedEntity(SynchronizedId_t p_synchronizedId) const;
+
+			/** Only used by server */
+			SynchronizedId_t NextSynchronizedId();
 		private:
 			ECS::World* m_world;
 
-			std::map<int32_t, unsigned int> m_entityMap;
+			std::map<TemporaryId_t, ECS::Entity*> m_temporaryEntityMap;
+			std::map<SynchronizedId_t, ECS::Entity*> m_synchronizedEntityMap;
+
+			TemporaryId_t m_nextTemporaryId;
+			SynchronizedId_t m_nextSynchronizedId;
 		};
 
 

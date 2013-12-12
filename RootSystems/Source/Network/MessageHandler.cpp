@@ -2,6 +2,7 @@
 #include <Network/Messages.h>
 #include <RootEngine/Network/Include/LocalServer.h>
 #include <RootEngine/Network/Include/RemoteServer.h>
+#include <algorithm>
 
 namespace RootForce
 {
@@ -9,32 +10,56 @@ namespace RootForce
 	{
 		NetworkEntityMap::NetworkEntityMap(ECS::World* p_world)
 			: m_world(p_world)
+			, m_nextSynchronizedId(0)
 		{}
 
-		ECS::Entity* NetworkEntityMap::AddTemporaryEntity(int16_t& p_temporaryId)
+
+		ECS::Entity* NetworkEntityMap::AddEntity(TemporaryId_t& p_temporaryId)
 		{
-			return nullptr;
+			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+
+			m_temporaryEntityMap[m_nextTemporaryId++] = entity;
+
+			p_temporaryId = m_nextTemporaryId;
+			return entity;
 		}
 
-		ECS::Entity* NetworkEntityMap::AddSynchronizedEntity(int16_t& p_synchronizedId)
+		void NetworkEntityMap::SetSynchronizedId(TemporaryId_t p_temporaryId, SynchronizedId_t p_synchronizedId)
 		{
-			return nullptr;
+			m_synchronizedEntityMap[p_synchronizedId] = m_temporaryEntityMap[p_temporaryId];
+			m_temporaryEntityMap.erase(m_temporaryEntityMap.find(p_temporaryId));
 		}
 
-		void NetworkEntityMap::SetSynchronizedId(int16_t p_temporaryId, int16_t p_synchronizedId)
+		SynchronizedId_t NetworkEntityMap::GetSynchronizedId(ECS::Entity* p_entity) const
 		{
-
+			auto it = std::find(m_synchronizedEntityMap.begin(), m_synchronizedEntityMap.end(), p_entity->GetId());
+			if (it == m_synchronizedEntityMap.end())
+				return SYNCHRONIZED_ID_NONE;
+			else
+				return it->first;
 		}
 
-
-		int16_t NetworkEntityMap::GetSynchronizedId(ECS::Entity* p_entity) const
+		TemporaryId_t NetworkEntityMap::GetTemporaryId(ECS::Entity* p_entity) const
 		{
-			return -1;
+			auto it = std::find(m_temporaryEntityMap.begin(), m_temporaryEntityMap.end(), p_entity->GetId());
+			if (it == m_temporaryEntityMap.end())
+				return TEMPORARY_ID_NONE;
+			else
+				return it->first;
 		}
 
-		int16_t NetworkEntityMap::GetTemporaryId(ECS::Entity* p_entity) const
+		ECS::Entity* NetworkEntityMap::GetSynchronizedEntity(SynchronizedId_t p_synchronizedId) const
 		{
-			return -1;
+			auto it = m_synchronizedEntityMap.find(p_synchronizedId);
+			if (it == m_synchronizedEntityMap.end())
+				return nullptr;
+			else
+				return it->second;
+		}
+
+		SynchronizedId_t NetworkEntityMap::NextSynchronizedId()
+		{
+			return m_nextSynchronizedId++;
 		}
 
 
