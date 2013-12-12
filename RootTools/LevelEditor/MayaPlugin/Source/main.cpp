@@ -206,7 +206,6 @@ void loadScene()
 void viewCB(const MString &str, void *clientData)
 {
 	int tempInt = cameraExists(str);
-	Print("CAMER MOVE SHEIT ", tempInt );
 
 	if(tempInt!= -1)
 	{

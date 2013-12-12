@@ -249,9 +249,10 @@ int main(int argc, char* argv[])
 
 			//for(int i = 0; i < renderNrOfMaterials; i++)
 			//{
-			//	materials[i].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->texturePath);
+			//	materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->texturePath);
 			//	//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
-			//	materials[i].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+			//	materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+			//	cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
 			//}
 
 			for(int i = 0; i < numberMeshes; i++)

@@ -60,9 +60,10 @@ namespace RootEngine
 		Logging m_logger;
 		MemoryTracker* m_memTracker;
 		ResourceManager m_resourceManager;
-		Profiling m_profiler;
+
 		Render::RendererInterface* m_renderer;
 		ConfigManager m_configManager;
+		Profiling m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
 		DebugOverlay m_debugOverlay;
 		Network::NetworkManager*		m_network;
