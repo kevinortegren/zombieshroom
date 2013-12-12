@@ -130,7 +130,13 @@ void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
 
 void KinematicController::SetOrientation( glm::quat p_orientation )
 {
-	m_kinController->getGhostObject()->getWorldTransform().setRotation(btQuaternion(p_orientation[0], p_orientation[1], p_orientation[2], p_orientation[3]));
+	btQuaternion btquat;
+	btquat.setW(p_orientation.w);
+	btquat.setX(p_orientation.x);
+	btquat.setY(p_orientation.y);
+	btquat.setZ(p_orientation.z);
+
+	m_kinController->getGhostObject()->getWorldTransform().setRotation(btquat);
 }
 
 void KinematicController::SetUserPointer( void* p_userPointer )

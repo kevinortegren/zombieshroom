@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Camera.h>
 #include <RootSystems/Include/Transform.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
@@ -33,7 +34,10 @@ namespace RootForce
 				Camera* camera = m_cameras.Get(p_entity);
 
 				ECS::Entity* skybox = m_world->GetTagManager()->GetEntityByTag("Skybox");
-				m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
+				if(skybox)
+				{
+					m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
+				}
 
 				Orientation tempOrientation = transform->m_orientation;
 				tempOrientation.Yaw(180.0f);
@@ -43,11 +47,10 @@ namespace RootForce
 				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
 				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), camera->m_near, camera->m_far);
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)g_engineContext.m_renderer->GetWidth(), (float)g_engineContext.m_renderer->GetHeight(), camera->m_near, camera->m_far);
 
 				g_engineContext.m_renderer->SetViewMatrix(viewMatrix);
 				g_engineContext.m_renderer->SetProjectionMatrix(projectionMatrix);
-
 			}
 		}
 
@@ -58,8 +61,9 @@ namespace RootForce
 
 	struct LookAtBehavior : public ECS::Component<LookAtBehavior>
 	{
-		LookAtBehavior(){ m_targetTag = ""; }
+		LookAtBehavior(){ m_targetTag = ""; m_displacement = glm::vec3(0.0f); }
 		std::string m_targetTag;
+		glm::vec3 m_displacement;
 	};
 
 	class LookAtSystem : public ECS::EntitySystem
@@ -93,7 +97,11 @@ namespace RootForce
 					Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(target);
 					if(targetTransform)
 					{
-						transform->m_orientation.LookAt(targetTransform->m_position - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
+						glm::vec3 targetPosition;
+						Orientation* tOr = &targetTransform->m_orientation;
+						targetPosition = targetTransform->m_position;
+						targetPosition += tOr->GetRight() * -lookAtBehavior->m_displacement.x + tOr->GetUp() * lookAtBehavior->m_displacement.y + tOr->GetFront() * lookAtBehavior->m_displacement.z;
+						transform->m_orientation.LookAt(targetPosition - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
 					}
 					else
 					{
@@ -110,8 +118,10 @@ namespace RootForce
 	
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 6.0f;}
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
+		float m_distance;
 	};
 
 	class ThirdPersonBehaviorSystem : public ECS::EntitySystem
@@ -148,8 +158,10 @@ namespace RootForce
 						//Move the entity
 						glm::vec3 targetPosition = targetTransform->m_position;
 						Orientation tOrientation = targetTransform->m_orientation;
+						glm::vec3 localDisplacement(0.0f);
+						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
-						worldDisplacement = tOrientation.GetRight() * -thirdPersonBehavior->m_displacement.x + tOrientation.GetUp() * thirdPersonBehavior->m_displacement.y + tOrientation.GetFront() * thirdPersonBehavior->m_displacement.z;
+						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
 						transform->m_position = targetPosition + worldDisplacement;
 					}
 					else
@@ -163,5 +175,6 @@ namespace RootForce
 	private:
 		ECS::ComponentMapper<Transform> m_transforms;
 		ECS::ComponentMapper<ThirdPersonBehavior> m_thirdPersonBehaviors;
+		glm::ivec2 m_deltaMouseMovement;
 	};
 }

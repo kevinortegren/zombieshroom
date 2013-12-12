@@ -1,8 +1,11 @@
 #pragma once
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
+#endif
 #include <string>
 #include <vector>
 #include <map>
+#include <windows.h>
 
 namespace RootEngine
 {
@@ -11,7 +14,9 @@ namespace RootEngine
 	public:
 		virtual void Update(float dt) = 0;
 		virtual void StoreSample(std::string p_name, __int64 p_elapsedTime) = 0;
+#ifndef COMPILE_LEVEL_EDITOR
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
+#endif
 	private:
 	};
 
@@ -23,12 +28,16 @@ namespace RootEngine
 		
 		void Update(float dt);
 		void StoreSample(std::string p_name, __int64 p_elapsedTime);
+#ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
+#endif
 	private:
 		void Present();
 		std::map<std::string, std::vector<__int64>> m_sampleMap;
 		std::vector<std::string> m_ouputList;
+#ifndef COMPILE_LEVEL_EDITOR
 		DebugOverlayInterface* m_debugOverlay;
+#endif
 		float m_time;
 		int m_frames;
 	};

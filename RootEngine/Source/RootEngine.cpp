@@ -4,12 +4,13 @@
 #include <iostream>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Script/Include/RootScript.h>
-#include <RootEngine/Include/Profiling.h>
+
 
 #ifndef COMPILING_LEVEL_EDITOR
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
+#include <RootEngine/Include/Profiling.h>
 #endif
 
 #define WINDOW_WIDTH 1280
@@ -66,11 +67,14 @@ namespace RootEngine
 
 		m_configManager.LoadConfig("config.yaml");
 
+#ifndef COMPILING_LEVEL_EDITOR
 		m_network = nullptr;
-		m_renderer = nullptr;
 		m_gui = nullptr;
 		m_physics = nullptr;
 		m_scriptEngine = nullptr;
+
+#endif
+		m_renderer = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
 		
@@ -78,8 +82,8 @@ namespace RootEngine
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;
 		m_subsystemSharedContext.m_resourceManager = &m_resourceManager;
-		m_subsystemSharedContext.m_profiler = &m_profiler;
 		m_subsystemSharedContext.m_configManager = &m_configManager;
+		m_subsystemSharedContext.m_profiler = &m_profiler;
 
 		if((p_flags & SubsystemInit::INIT_RENDER) == SubsystemInit::INIT_RENDER)
 		{
@@ -118,12 +122,13 @@ namespace RootEngine
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
-		m_gameSharedContext.m_profiler = &m_profiler;
+
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;
 		m_gameSharedContext.m_configManager = &m_configManager;
 		m_gameSharedContext.m_resourceManager = &m_resourceManager;
 		m_gameSharedContext.m_renderer = m_renderer;
+		m_gameSharedContext.m_profiler = &m_profiler;
 #ifndef COMPILING_LEVEL_EDITOR
 		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
 		m_gameSharedContext.m_inputSys = m_inputSys;
@@ -132,9 +137,10 @@ namespace RootEngine
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_script = m_scriptEngine;
+		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
+
 #endif
 
-		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
 		m_resourceManager.Init(p_workingDirectory, &m_gameSharedContext);
 
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");

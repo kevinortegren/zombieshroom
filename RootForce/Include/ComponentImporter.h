@@ -123,7 +123,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				int type;
 				std::string modelHandle;
 				RootForce::Transform* temp = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-				glm::quat rotation =  temp->m_orientation.GetQuaterion();
+				glm::quat rotation =  temp->m_orientation.GetQuaternion();
 				p_node["Type"] >> type;
 				p_node["Mass"] >> mass;
 				p_node["ModelHandle"] >> modelHandle;

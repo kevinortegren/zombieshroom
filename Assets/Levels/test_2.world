@@ -3,7 +3,6 @@
     - 1
     - 2
     - 3
-    - 4
 - Components:
     - Type: 0
       Data:
@@ -19,12 +18,6 @@
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 3
-          Model: testchar
-          Effect: Mesh_NormalMap
-          Diffuse: DiffuseV1
-          Specular: SpecularV1
-          Normal: BumpV1
-        - Entity: 4
           Model: ground
           Effect: Mesh
           Diffuse: grass
@@ -32,8 +25,8 @@
       Data:
         - Entity: 0
           Position: [0, 0, 0]
-          Rotation: [0, 0, 0]
-          Scale: [100, 100, 100]
+          Rotation: [180, 0, 0]
+          Scale: [-100, -100, -100]
         - Entity: 1
           Position: [1, 0, 0]
           Rotation: [1, 0, 0]
@@ -43,10 +36,6 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
-          Position: [0, 100, 0]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 4
           Position: [0, -1, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
@@ -60,28 +49,15 @@
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
-    - Type: 3
-      Data:
-        - Entity: 3
-          Speed: 10
     - Type: 4
       Data:
         - Entity: 3
-          Type: 3
-          Mass: 5
-          ModelHandle: testchar0
-          StepHeight: 0.1
-          ModelHeight: 0.0
-          MaxSpeed: 10.0
-        - Entity: 4
           Type: 0
           Mass: 0
           ModelHandle: ground0
 - Tags:
     - Id: 0
       Tag: Skybox
-    - Id: 3
-      Tag: Player
 - Groups:
     - Id: 1
       Group: Lights

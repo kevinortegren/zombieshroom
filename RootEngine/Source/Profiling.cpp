@@ -63,20 +63,22 @@ namespace RootEngine
 			m_frames = 0;
 			m_time = 0;
 		}
-
+#ifndef COMPILE_LEVEL_EDITOR
 		for(std::string s : m_ouputList)
 		{
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
 		}
+#endif
 	}
 
 	void Profiling::StoreSample( std::string p_name, __int64 p_elapsedTime )
 	{
 		m_sampleMap[p_name].push_back(p_elapsedTime);
 	}
-
+#ifndef COMPILE_LEVEL_EDITOR
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
 	{
 		m_debugOverlay = p_debugOverlay;
 	}
+#endif
 }

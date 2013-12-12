@@ -26,13 +26,15 @@ int main(int argc, char* argv[])
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::FPSCONTROL);
+	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
 	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
+	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -69,7 +71,7 @@ namespace RootForce
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
-		if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
 		{
 			// TODO: Log error and throw exception (?)
 		}
@@ -99,17 +101,18 @@ namespace RootForce
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
-		g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
-		g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
-		g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
-		g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
-		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);
+		//Bind c++ functions and members to Lua
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, "Entity");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
 		
+		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
+
 		g_world = &m_world;
 
 		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(4);
+		std::vector<RootForce::Keybinding> keybindings(5);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
@@ -126,11 +129,20 @@ namespace RootForce
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
+		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
+		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[4].Edge = true;
+
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
+
+		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
 
 		// Initialize physics system
 		RootForce::PhysicsSystem* m_physicsSystem = new RootForce::PhysicsSystem(&m_world);
@@ -171,6 +183,12 @@ namespace RootForce
 
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		
+		m_playerSystem->CreatePlayer();
+
+		ECS::EntityManager* em = m_world.GetEntityManager();
+
+
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
@@ -178,13 +196,15 @@ namespace RootForce
 		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		camera->m_near = 0.1f;
 		camera->m_far = 1000.0f;
-		camera->m_fov = 75.0f;
+		camera->m_fov = 45.0f;
 		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		cameraLookAt->m_targetTag = "Player";
+		cameraLookAt->m_targetTag = "AimingDevice";
+		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		cameraThirdPerson->m_targetTag = "Player";
+		cameraThirdPerson->m_targetTag = "AimingDevice";
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
+
 
 		//Plane at bottom
 
@@ -211,23 +231,8 @@ namespace RootForce
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 
-		m_displayPhysicsDebug = false;
-		RootEngine::Physics::AbilityPhysicsInfo temp;
-		temp.m_collidesWorld = true;
-		temp.m_direction = glm::vec3(0,0,0);
-		temp.m_entityId = -1;
-		temp.m_gravity = glm::vec3(0,0,0);
-		temp.m_height = 2;
-		temp.m_mass = 0;
-		temp.m_orientation = glm::quat(1,0,0,1);
-		temp.m_position = glm::vec3(-3,0,0);
-		temp.m_radius = 3;
-		temp.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
-		temp.m_speed = 0;
-		temp.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
-		//g_engineContext.m_physics->AddAbilityToWorld(temp);
 
-	
+		m_displayPhysicsDebug = false;
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
@@ -240,6 +245,11 @@ namespace RootForce
 			m_world.SetDelta(dt);
 
 			g_engineContext.m_renderer->Clear();
+
+			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				m_running = false;
+			}
 
 			// Toggle rendering of normals.
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -271,14 +281,6 @@ namespace RootForce
 				}
 			}
 
-			// Code for testing scripts
-			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			{
-				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
-				g_engineContext.m_script->ExecuteScript();
-			}
-
 			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
 			{
@@ -287,12 +289,20 @@ namespace RootForce
 			}
 
 			{
-				PROFILE("Entity Systems", g_engineContext.m_profiler);
+				PROFILE("Player control system", g_engineContext.m_profiler);
 				m_playerControlSystem->Process();
-				abilitySystem->Process();
-
 			}
 
+			{
+				PROFILE("Script system", g_engineContext.m_profiler);
+				scriptSystem->Process();
+			}
+
+			{
+				PROFILE("Ability system", g_engineContext.m_profiler);
+				abilitySystem->Process();
+			}
+				
 			{
 				PROFILE("Network message handler", g_engineContext.m_profiler);
 				m_networkHandler->Update();
@@ -300,11 +310,11 @@ namespace RootForce
 
 			{
 				PROFILE("Physics", g_engineContext.m_profiler);
-				m_physicsSystem->Process();
 				g_engineContext.m_physics->Update(dt);
+				m_physicsSystem->Process();
 				
 			}
-
+			m_playerControlSystem->UpdateAimingDevice();
 			thirdPersonBehaviorSystem->Process();
 			lookAtSystem->Process();
 			cameraSystem->Process();
@@ -334,6 +344,8 @@ namespace RootForce
 
 	void Main::HandleEvents()
 	{
+		if (g_engineContext.m_inputSys != nullptr)
+			g_engineContext.m_inputSys->Reset();
 		SDL_Event event;
 		while(SDL_PollEvent(&event))
 		{
@@ -352,3 +364,4 @@ namespace RootForce
 		}
 	}
 }
+
