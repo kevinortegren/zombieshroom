@@ -42,12 +42,11 @@ namespace RootEngine
 			// Execute specific function
 			lua_getglobal(m_luaState, p_abilityName.c_str());
 			lua_getfield(m_luaState, -1, p_functionName.c_str());
-			lua_pushvalue(m_luaState, -2);
 		}
 
 		void ScriptManager::ExecuteScript()
 		{
-			lua_call(m_luaState, 1, 0);
+			lua_call(m_luaState, m_parameterCount, 0);
 			m_parameterCount = 0;
 		}
 

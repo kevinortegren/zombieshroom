@@ -30,7 +30,8 @@ namespace RootForce
 		player->m_selectedAbility = Abilitiy::ABILITY_TEST;
 
 		physics->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld("testchar0", entity->GetId(), transform->m_position, transform->m_orientation.GetQuaterion(), 5, 10.0f, 0.0f, 0.1f);
-	
+		
+
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
 	}
 
