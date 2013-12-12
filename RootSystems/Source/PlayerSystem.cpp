@@ -24,7 +24,7 @@ namespace RootForce
 		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("SpecularV1", Render::TextureType::TEXTURE_2D);
 		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
-		playerControl->m_mouseSensitivity = 0.0f;
+		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 10.0f;
 
 		player->m_abilities[0] = Abilitiy::ABILITY_TEST;
@@ -39,13 +39,6 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
-		RootForce::Renderable* aimingDeviceRenderable = entityManager->CreateComponent<RootForce::Renderable>(aimingDevice);
-
-		aimingDeviceRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
-		aimingDeviceRenderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("DiffuseV1", Render::TextureType::TEXTURE_2D);
-		aimingDeviceRenderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("BumpV1", Render::TextureType::TEXTURE_2D);
-		aimingDeviceRenderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
-		aimingDeviceRenderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("SpecularV1", Render::TextureType::TEXTURE_2D);
 
 	}
 

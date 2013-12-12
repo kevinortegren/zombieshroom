@@ -118,7 +118,7 @@ namespace RootForce
 	
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
-		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 6.0f;}
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 12.0f;}
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
 		float m_distance;

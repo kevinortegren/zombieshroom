@@ -250,7 +250,9 @@ namespace RootForce
 
 		vec3 targetRight = normalize(glm::cross(direction, up));
 		vec3 myRight = normalize(glm::cross(direction, GetUp()));
-		float angle2 = glm::degrees(glm::acos(glm::dot(targetRight, myRight)));
+		float ledot = glm::dot(targetRight, myRight);
+		float tacos = glm::acos(glm::min(ledot, 1.0f));
+		float angle2 = glm::degrees(tacos);
 		vec3 third2 = glm::cross(direction, myRight);
 		if (glm::dot(third2, targetRight) < 0)
 		{
