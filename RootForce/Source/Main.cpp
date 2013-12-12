@@ -107,6 +107,8 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
 		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
 		
+		g_engineContext.m_script->LoadScript("AbilityTest.lua");
+
 		g_world = &m_world;
 
 		// Initialize the system for controlling the player.
@@ -295,13 +297,20 @@ namespace RootForce
 			}
 
 			{
-				PROFILE("Entity Systems", g_engineContext.m_profiler);
+				PROFILE("Player control system", g_engineContext.m_profiler);
 				m_playerControlSystem->Process();
-				scriptSystem->Process();
-				abilitySystem->Process();
-
 			}
 
+			{
+				PROFILE("Script system", g_engineContext.m_profiler);
+				scriptSystem->Process();
+			}
+
+			{
+				PROFILE("Ability system", g_engineContext.m_profiler);
+				abilitySystem->Process();
+			}
+				
 			{
 				PROFILE("Network message handler", g_engineContext.m_profiler);
 				m_networkHandler->Update();
