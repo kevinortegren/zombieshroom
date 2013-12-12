@@ -1,4 +1,5 @@
 #include <PlayerControlSystem.h>
+#include <RootSystems\Include\ScriptSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
@@ -136,9 +137,10 @@ namespace RootForce
 		
 					if(player->m_selectedAbility == Abilitiy::ABILITY_TEST)
 					{
-						g_engineContext.m_script->LoadScript("AbilityTest.lua");
-						g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
-						g_engineContext.m_script->ExecuteScript();
+						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
+						script->m_name = "AbilityType";
+						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
 
 					break;

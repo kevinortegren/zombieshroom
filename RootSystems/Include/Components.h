@@ -9,6 +9,7 @@
 #include <RootSystems\Include\Network\ClientMessageSystem.h>
 #include <RootSystems\Include\Network\ServerMessageSystem.h>>
 #include <RootSystems\Include\CameraSystem.h>
+#include <RootSystems\Include\ScriptSystem.h>
 
 namespace RootForce
 {
@@ -26,7 +27,8 @@ namespace RootForce
 			NETWORKCLIENT,
 			CAMERA,
 			LOOKATBEHAVIOR,
-			THIRDPERSONBEHAVIOR
+			THIRDPERSONBEHAVIOR,
+			SCRIPT
 		};
 	}
 }

@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
-
+	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -176,6 +176,9 @@ namespace RootForce
 		RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
 		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
 
+		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
+
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
@@ -258,7 +261,7 @@ namespace RootForce
 				PROFILE("Entity Systems", g_engineContext.m_profiler);
 				m_playerSystem->Process();
 				m_playerControlSystem->Process();
-				abilitySystem->Process();
+				scriptSystem->Process();
 			}
 
 			{
