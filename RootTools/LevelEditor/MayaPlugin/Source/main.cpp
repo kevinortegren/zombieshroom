@@ -14,6 +14,7 @@ int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currN
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
+void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
 void NodeRemovedCB(MObject &node, void *clientData);
@@ -170,6 +171,11 @@ void loadScene()
 	for(int i = 0; i < currNrLights; i++)
 	{
 		MFnLight light = g_mayaLightList[i];
+		if(g_mayaLightList[i].hasFn(MFn::kLight))
+		{
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaLightList[i], dirtyLightNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+		}
 
 		if(light.parent(0,&status).hasFn(MFn::kTransform))
 		{
@@ -217,32 +223,6 @@ void viewCB(const MString &str, void *clientData)
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	MStatus status;
-	MFnMesh	mesh = node;
-	MPointArray points_;
-	MFloatArray U, V;
-	MString UVsetName;
-
-	UVsetName = mesh.currentUVSetName(&status, -1);
-
-	MSpace::Space world_space = MSpace::kObject;
-	float myPoints[g_maxVerticesPerMesh][4];
-
-	
-	//Print("Full pathname: ", mesh.fullPathName());
-
-	mesh.getPoints(points_, world_space);
-
-	points_.get(myPoints);
-
-	mesh.getUVs(U,V,&UVsetName);
-
-	//for(int i = 0; i < points_.length(); i++)
-	//{
-	//	Print("Vertex ", i, " X: ", myPoints[i][0]," Y: ", myPoints[i][1], " Z: ", myPoints[i][2]);
-	//	Print("U: ", U[i], " V: ", V[i]);
-	//}
-
 	int index = nodeExists(node);
 
 	if(index != -1)
@@ -251,24 +231,37 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
 	}
 }
+
+void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
+{
+	MStatus status;
+	MFnLight Light = node;
+
+	int index = nodeExists(node);
+	if(index != -1)
+	{
+		MayaLightToList(node, index);
+		SM.UpdateSharedLight(index, currNrLights);
+	}
+}
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	MStatus status = MS::kSuccess;
-	MSpace::Space _spaceWorld = MSpace::kWorld;
-	MSpace::Space _space = MSpace::kObject;
-	MSpace::Space _spaceTrans = MSpace::kTransform;
+	//MSpace::Space _spaceWorld = MSpace::kWorld;
+	//MSpace::Space _space = MSpace::kObject;
+	//MSpace::Space _spaceTrans = MSpace::kTransform;
 	MFnTransform trans = node;
 
-	double scale[3];
-	double rotX, rotY, rotZ, rotW;
-	
-	MFnMesh mesh = trans.child(0, &status);
+	//double scale[3];
+	//double rotX, rotY, rotZ, rotW;
+	//
+	//MFnMesh mesh = trans.child(0, &status);
 
-	trans.getScale(scale);
-	MVector translation = trans.getTranslation(_spaceTrans, &status);
+	//trans.getScale(scale);
+	//MVector translation = trans.getTranslation(_spaceTrans, &status);
 
-	trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, _space);
+	//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, _space);
 
 	int index = nodeExists(trans.child(0, &status));
 
@@ -280,11 +273,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 			MayaMeshToList(trans.child(0, &status), index);
 			SM.UpdateSharedMesh(index, true, false, currNrMeshes);
 		}
-		//if(trans.child(0, &status).hasFn(MFn::kCamera))
-		//{
-		//	MayaCameraToList(trans.child(0, &status), index);
-		//	SM.UpdateSharedCamera(index);
-		//}
+
 		if(trans.child(0, &status).hasFn(MFn::kLight))
 		{
 			MayaLightToList(trans.child(0, &status), index);
@@ -418,6 +407,8 @@ void checkForNewLights(MObject &node, void *clientData)
 		Print("New Light Added");
 		g_mayaLightList[currNrLights] = node;
 		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
 		currNrLights++;
 	}
 	
@@ -552,23 +543,32 @@ void MayaMeshToList(MObject node, int meshIndex)
 
 		//memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
 
-		//bool materialExists = false;
-		//for(int i = 0; i < currNrMaterials; i++)
-		//{
-		//	if(SM.materialList[i].materialName != materialName.asChar())
-		//	{
-		//		materialExists = true;
-		//	}
-		//}
+		bool materialExists = false;
+		int materialID = 0;
+		for(int i = 0; i < currNrMaterials; i++)
+		{
+			std::string tempMaterialName = SM.materialList[i].materialName;
+			std::string tempMaterialName2 = materialName.asChar();
+			if(tempMaterialName == tempMaterialName2)	//BLIR INTE SAMMA SHIET FAST ÄNDÅ SÅ BLIR DET DE.
+			{
+				materialExists = true;
+				materialID = i;
+			}
+		}
 
-		//if(!materialExists)
-		//{
-		//	memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
-		//	memcpy(SM.meshList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
-		//	memcpy(SM.meshList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
-		//	currNrMaterials++;
-		//	SM.UpdateSharedMaterials(currNrMaterials);
-		//}
+		if(!materialExists)
+		{
+			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
+			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
+			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+			currNrMaterials++;
+			materialID = currNrMaterials;
+			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+			
+		}else
+		{
+			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+		}
 		
 
 		//Get and set mesh name
@@ -639,7 +639,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 					mesh.getUV(uvID, U, V, 0);
 
 					SM.meshList[meshIndex].UV[count].x = U;
-					SM.meshList[meshIndex].UV[count].y = V;
+					SM.meshList[meshIndex].UV[count].y = 1-V;
 
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
@@ -684,6 +684,10 @@ void MayaLightToList(MObject node, int lightIndex)
 	if(node.hasFn(MFn::kLight))
 	{
 		MFnLight light = node;
+		SM.lightList[lightIndex].color.r = light.color(&status).r;
+		SM.lightList[lightIndex].color.g = light.color(&status).g;
+		SM.lightList[lightIndex].color.b = light.color(&status).b;
+		SM.lightList[lightIndex].color.a = light.color(&status).a;
 		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
 
