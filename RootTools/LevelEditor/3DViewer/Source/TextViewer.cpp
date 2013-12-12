@@ -24,8 +24,6 @@ bool g_running;
 void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
-std::vector<std::shared_ptr<Render::MeshInterface>> g_meshes;
-
 
 ReadMemory RM;
 void LoadScene()
@@ -77,11 +75,7 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world)
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-	renderable->m_model = new RootEngine::Model;
-	renderable->m_model->m_meshes.resize(1);
-	
-	g_meshes.push_back(g_engineContext.m_renderer->CreateMesh());
-	renderable->m_model->m_meshes[0] = g_meshes[g_meshes.size() - 1].get();
+	renderable->m_model = g_engineContext.m_resourceManager->CreateModel("asda");
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
