@@ -9,13 +9,14 @@ namespace RootForce
 {
 	void PlayerSystem::CreatePlayer()
 	{
-		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+		ECS::EntityManager* entityManager = m_world->GetEntityManager();
+		ECS::Entity* entity = entityManager->CreateEntity();
 		
-		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-		RootForce::Transform* transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
-		RootForce::PlayerControl* playerControl = m_world->GetEntityManager()->CreateComponent<RootForce::PlayerControl>(entity);
-		RootForce::Player* player = m_world->GetEntityManager()->CreateComponent<RootForce::Player>(entity);
-		RootForce::PhysicsAccessor* physics = m_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(entity);
+		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
+		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
+		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
+		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+		RootForce::PhysicsAccessor* physics = entityManager->CreateComponent<RootForce::PhysicsAccessor>(entity);
 
 		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
 		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("DiffuseV1", Render::TextureType::TEXTURE_2D);
@@ -32,6 +33,20 @@ namespace RootForce
 		physics->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld("testchar0", entity->GetId(), transform->m_position, transform->m_orientation.GetQuaternion(), 5, 10.0f, 0.0f, 0.1f);
 	
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
+
+		//Create player aiming device
+		ECS::Entity* aimingDevice = entityManager->CreateEntity();
+		m_world->GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
+
+		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
+		RootForce::Renderable* aimingDeviceRenderable = entityManager->CreateComponent<RootForce::Renderable>(aimingDevice);
+
+		aimingDeviceRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
+		aimingDeviceRenderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("DiffuseV1", Render::TextureType::TEXTURE_2D);
+		aimingDeviceRenderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("BumpV1", Render::TextureType::TEXTURE_2D);
+		aimingDeviceRenderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+		aimingDeviceRenderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("SpecularV1", Render::TextureType::TEXTURE_2D);
+
 	}
 
 	void PlayerSystem::Process()

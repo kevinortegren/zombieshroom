@@ -118,7 +118,7 @@ namespace RootForce
 	
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
-		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 4.0f;}
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 6.0f;}
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
 		float m_distance;
@@ -146,8 +146,7 @@ namespace RootForce
 		{
 			Transform* transform = m_transforms.Get(p_entity);
 			ThirdPersonBehavior* thirdPersonBehavior = m_thirdPersonBehaviors.Get(p_entity);
-			g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Mouse y: %i", m_deltaMouseMovement.y);
-
+			
 			if(thirdPersonBehavior->m_targetTag != "")
 			{
 				ECS::Entity* target = m_world->GetTagManager()->GetEntityByTag(thirdPersonBehavior->m_targetTag);

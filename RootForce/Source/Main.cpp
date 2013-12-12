@@ -188,12 +188,7 @@ namespace RootForce
 
 		ECS::EntityManager* em = m_world.GetEntityManager();
 
-		//Create player aiming device
 
-		ECS::Entity* aimingDevice = em->CreateEntity();
-		m_world.GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
-		RootForce::Transform* aimingDeviceTransform = em->CreateComponent<RootForce::Transform>(aimingDevice);
-		
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
