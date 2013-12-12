@@ -1,4 +1,5 @@
 #include <External/Include/RakNet/MessageIdentifiers.h>
+#include <External/Include/RakNet/BitStream.h>
 #include "RemoteServer.h"
 
 namespace RootEngine
@@ -27,11 +28,6 @@ namespace RootEngine
 			if(result == RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 				return true;
 			return false;
-		}
-
-		void RemoteServer::LanDiscovery(USHORT p_port)
-		{
-			m_peerInterface->Ping("255.255.255.255", p_port, false);
 		}
 
 		void RemoteServer::Update()
@@ -87,16 +83,8 @@ namespace RootEngine
 					}
 					case ID_UNCONNECTED_PONG:
 					// Network discovery has been answered! Praise to the LAN-god!
-					{
-						Message* message = new Message;
-						message->MessageID = InnerMessageID::NETWORK_DISCOVERY;
-						message->RecipientID = 0;
-						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->Data = new uint8_t[packet->length];
-						memcpy(message->Data, packet->data, packet->length);
-						message->DataSize = packet->length;
-						m_message.push_back(message);
-					} break;
+						ParseNetworkDiscoveryPacket(packet);
+						break;
 				}
 			}
 		}
