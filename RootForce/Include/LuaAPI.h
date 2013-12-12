@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #pragma once
 #include <Lua/lua.hpp>
 #include <Utility/ECS/Include/World.h>
@@ -91,11 +90,12 @@ namespace RootForce
 
 			RootEngine::Physics::AbilityPhysicsInfo info;
 			bool collide = lua_toboolean(p_luaState, 2) == 1 ? true : false; 
+			
+			glm::vec3 direction((float)lua_tonumber(p_luaState, 3), (float)lua_tonumber(p_luaState, 4), (float)lua_tonumber(p_luaState, 5));
+			glm::vec3 gravity((float)lua_tonumber(p_luaState, 6), (float)lua_tonumber(p_luaState, 7), (float)lua_tonumber(p_luaState, 8));
+			glm::quat orientation((float)lua_tonumber(p_luaState, 9), (float)lua_tonumber(p_luaState, 10), (float)lua_tonumber(p_luaState, 11), (float)lua_tonumber(p_luaState, 12));
+			glm::vec3 position((float)lua_tonumber(p_luaState, 13), (float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15));
 			info.m_collidesWorld	= collide;
-			float direction[]		= {(float)lua_tonumber(p_luaState, 3), (float)lua_tonumber(p_luaState, 4), (float)lua_tonumber(p_luaState, 5)};
-			float gravity[]			= {(float)lua_tonumber(p_luaState, 6), (float)lua_tonumber(p_luaState, 7), (float)lua_tonumber(p_luaState, 8)};
-			float orientation[]		= {(float)lua_tonumber(p_luaState, 9), (float)lua_tonumber(p_luaState, 10), (float)lua_tonumber(p_luaState, 11), (float)lua_tonumber(p_luaState, 12)};
-			float position[]		= {(float)lua_tonumber(p_luaState, 13), (float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15)};
 			info.m_direction		= direction;
 			info.m_entityId			= 0;
 			info.m_gravity			= gravity;
