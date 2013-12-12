@@ -1,11 +1,13 @@
 #pragma once
 
-#include <RootEngine/Include/Profiling.h>
+
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
-#include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
 #include <RootEngine/Include/ConfigManager.h>
-
+#include <RootEngine/Include/Profiling.h>
+#ifndef COMPILE_LEVEL_EDITOR
+#include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
+#endif
 namespace RootEngine
 {
 	class ResourceManagerInterface;
@@ -13,11 +15,15 @@ namespace RootEngine
 	struct SubsystemSharedContext
 	{
 		Logging* m_logger;
-		ProfilingInterface* m_profiler;
+
 		MemoryTracker* m_memTracker;
-		DebugOverlayInterface* m_debugOverlay;
+
 		ConfigManagerInterface* m_configManager;
 		ResourceManagerInterface* m_resourceManager;
+		ProfilingInterface* m_profiler;
+#ifndef COMPILE_LEVEL_EDITOR
+		DebugOverlayInterface* m_debugOverlay;
+#endif
 	};
 
 	/** This class needs to be implemented by all subsystem interfaces */
