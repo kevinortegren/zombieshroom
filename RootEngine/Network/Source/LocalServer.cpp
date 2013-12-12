@@ -46,12 +46,18 @@ namespace RootEngine
 			return false;
 		}
 
-		void LocalServer::Host( USHORT p_port, bool p_isDedicated )
+		bool LocalServer::Host( USHORT p_port, bool p_isDedicated )
 		{
 			m_numClients = 0;
 			RakNet::SocketDescriptor sd(p_port, 0);
 			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
-			m_peerInterface->Startup(MAX_CLIENTS, &sd, 1);
+			RakNet::StartupResult result = m_peerInterface->Startup(MAX_CLIENTS, &sd, 1);
+			if( result != RakNet::StartupResult::RAKNET_STARTED )
+			{
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Could not start a server on port: %u. Error #%u", p_port, result);
+				return false;
+			}
+
 			m_peerInterface->SetMaximumIncomingConnections(MAX_CLIENTS);
 
 			if(!p_isDedicated)
@@ -83,6 +89,7 @@ namespace RootEngine
 				m_message.push_back(message);
 			}
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server started on port %u.", p_port);
+			return true;
 		}
 
 		void LocalServer::Update()
@@ -105,12 +112,7 @@ namespace RootEngine
 					if( m_numClients >= MAX_CLIENTS )
 					{
 						// server full
-						g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Client refused: server full. Client IP: %u.%u.%u.%u:%u.",
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b1,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b2,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b3,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b4,
-							packet->systemAddress.address.addr4.sin_port);
+						g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Client refused: server full. Client IP: %s.", packet->systemAddress.ToString());
 					}
 					else
 					{
@@ -157,6 +159,14 @@ namespace RootEngine
 						message->DataSize = 1;
 						m_message.push_back(message);
 					}
+					break;
+				case ID_UNCONNECTED_PING:
+				// Network discovery. A network has been detected. Yay!
+					g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "A LAN-discovery request has been received from %s.", packet->systemAddress.ToString());
+					break;
+				case ID_UNCONNECTED_PONG:
+				// Network discovery has been answered! Praise to the LAN-god!
+					ParseNetworkDiscoveryPacket(packet);
 					break;
 				default:
 					break;

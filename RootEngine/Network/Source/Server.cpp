@@ -23,6 +23,16 @@ namespace RootEngine
 			return message;
 		}
 
+		void Server::SendNetworkDiscoveryMessage(USHORT p_port)
+		{
+			m_peerInterface->Ping("255.255.255.255", p_port, false);
+		}
+		
+		void Server::SetNetworkDiscoveryResponse( uint8_t* data, uint32_t size )
+		{
+			m_peerInterface->SetOfflinePingResponse((const char*)data, size);
+		}
+
 		bool Server::Transmit( const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast )
 		{
 			if(p_message.DataSize > UINT_MAX)
@@ -55,6 +65,22 @@ namespace RootEngine
 			bitstream.Read((char*)message->Data, (unsigned int)message->DataSize);
 
 			message->SenderID = p_clientID;
+
+			m_message.push_back(message);
+		}
+
+		void Server::ParseNetworkDiscoveryPacket(RakNet::Packet* p_packet)
+		{
+			Message* message = new Message;
+			message->MessageID = InnerMessageID::NETWORK_DISCOVERY;
+			message->RecipientID = 0;
+			message->Reliability = PacketReliability::RELIABLE_ORDERED;
+			message->Data = new uint8_t[p_packet->length + sizeof(char) * 16 + sizeof(USHORT)];
+			memcpy(message->Data, p_packet->data+5, p_packet->length-5);
+						
+			strcpy((char*)(message->Data + p_packet->length-5), p_packet->systemAddress.ToString(false)); // Append IP
+			*(USHORT*)(message->Data + p_packet->length-5 + sizeof(char) * 16) = p_packet->systemAddress.GetPort(); // and Port
+			message->DataSize = p_packet->length-5 + sizeof(char) * 16 + sizeof(USHORT);
 
 			m_message.push_back(message);
 		}

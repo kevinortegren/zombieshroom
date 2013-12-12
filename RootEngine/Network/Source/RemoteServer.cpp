@@ -1,4 +1,5 @@
 #include <External/Include/RakNet/MessageIdentifiers.h>
+#include <External/Include/RakNet/BitStream.h>
 #include "RemoteServer.h"
 
 namespace RootEngine
@@ -80,6 +81,10 @@ namespace RootEngine
 						m_message.push_back(message);
 						break;
 					}
+					case ID_UNCONNECTED_PONG:
+					// Network discovery has been answered! Praise to the LAN-god!
+						ParseNetworkDiscoveryPacket(packet);
+						break;
 				}
 			}
 		}

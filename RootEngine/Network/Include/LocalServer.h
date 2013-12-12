@@ -17,7 +17,7 @@ namespace RootEngine
 
 		class LocalServerInterface abstract
 		{
-			virtual void Host( USHORT p_port, bool p_isDedicated = true) = 0;
+			virtual bool Host( USHORT p_port, bool p_isDedicated = true) = 0;
 			virtual bool IsClientLocal(size_t p_index) const = 0;
 			virtual std::vector<uint8_t> GetConnectedClients() const = 0;
 		};
@@ -28,7 +28,7 @@ namespace RootEngine
 			LocalServer();
 			~LocalServer();
 			bool Send(const Message& p_message);
-			void Host( USHORT p_port, bool p_isDedicated = true);
+			bool Host( USHORT p_port, bool p_isDedicated = true);
 			void Update();
 
 			bool IsClientLocal(size_t p_index) const;

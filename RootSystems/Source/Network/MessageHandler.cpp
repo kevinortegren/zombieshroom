@@ -1,5 +1,6 @@
 #include <Network/MessageHandler.h>
 #include <Network/Messages.h>
+#include <Network/ServerInfo.h>
 #include <RootEngine/Network/Include/LocalServer.h>
 #include <RootEngine/Network/Include/RemoteServer.h>
 #include <algorithm>
@@ -24,7 +25,20 @@ namespace RootForce
 				case MessageHandler::LOCAL:
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, false);
+					if(!dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, false))
+					{
+						return;
+					}
+
+					m_server->SendNetworkDiscoveryMessage(port);
+					{
+						RootSystems::ServerInfo info;
+						strcpy(info.Name, "Local server");
+						info.MaxPlayers = 12;
+						info.NumPlayers = 2;
+						info.PasswordProtected = false;
+						m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
+					}
 					
 					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
 					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
@@ -35,7 +49,9 @@ namespace RootForce
 				{
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
+
 					bool connectionSuccess = dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
+					m_server->SendNetworkDiscoveryMessage(port);
 
 					if (connectionSuccess)
 					{
@@ -54,6 +70,15 @@ namespace RootForce
 					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
 					m_server = p_networkInterface->GetNetworkSystem();
 					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
+
+					{
+						RootSystems::ServerInfo info;
+						strcpy(info.Name, "Dedicated server");
+						info.MaxPlayers = 16;
+						info.NumPlayers = 0;
+						info.PasswordProtected = true;
+						m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
+					}
 
 					m_clientMessageHandler = nullptr;
 					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
@@ -114,6 +139,14 @@ namespace RootForce
 							m_serverMessageHandler->HandleServerMessage(message.get());
 						if (m_clientMessageHandler != nullptr)
 							m_clientMessageHandler->HandleClientMessage(message.get());
+						break;
+
+					case RootEngine::Network::InnerMessageID::NETWORK_DISCOVERY:
+						// TODO: Read the server info and attach it to the list of servers available
+						{
+							RootSystems::ServerInfoInternal* info = (RootSystems::ServerInfoInternal*)message->Data;
+							m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server found through LAN-discovery: %s (%s:%u) %u/%u", info->Name, info->IP, info->Port, info->NumPlayers, info->MaxPlayers);
+						}
 						break;
 
 					default:
