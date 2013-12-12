@@ -22,7 +22,8 @@ public:
 	void RemovePlayer();
 	void SetUserPointer(void* p_userPointer);
 	void SetDebugDrawer(DebugDrawer* p_drawer) const {m_kinController->debugDraw(p_drawer);}
-
+	void SetMass(float p_mass);
+	void SetGravity(float p_gravity);
 	float GetMass() const {return m_mass;}
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}

@@ -148,3 +148,13 @@ void KinematicController::SetUserPointer( void* p_userPointer )
 {
 	m_ghostObject->setUserPointer(p_userPointer);
 }
+
+void KinematicController::SetMass( float p_mass )
+{
+	m_mass = p_mass;
+}
+
+void KinematicController::SetGravity( float p_gravity )
+{
+	m_kinController->setGravity(p_gravity);
+}

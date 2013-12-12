@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::FPSCONTROL);
+	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
 	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
@@ -99,12 +99,11 @@ namespace RootForce
 	{
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		g_engineContext.m_script->RegisterFunction("CreateEntity",				RootForce::LuaAPI::CreateEntity);
-		g_engineContext.m_script->RegisterFunction("CreateTransformation",		RootForce::LuaAPI::CreateTransformation);
-		g_engineContext.m_script->RegisterFunction("CreateRenderable",			RootForce::LuaAPI::CreateRenderable);
-		g_engineContext.m_script->RegisterFunction("SetRenderableModel",		RootForce::LuaAPI::SetRenderableModel);
-		g_engineContext.m_script->RegisterFunction("CreatePhysicsAccessor",		RootForce::LuaAPI::CreatePhysicsAccessor);
-		g_engineContext.m_script->RegisterFunction("SetPhysicsAccessorInfo",	RootForce::LuaAPI::SetPhysicsAccessorInfo);
+		//Bind c++ functions and members to Lua
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, "Entity");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
+		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
 		
 		g_world = &m_world;
 
@@ -172,8 +171,10 @@ namespace RootForce
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
-		//Create player aiming device
 		ECS::EntityManager* em = m_world.GetEntityManager();
+
+		//Create player aiming device
+
 		ECS::Entity* aimingDevice = em->CreateEntity();
 		m_world.GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
 		RootForce::Transform* aimingDeviceTransform = em->CreateComponent<RootForce::Transform>(aimingDevice);
@@ -218,7 +219,7 @@ namespace RootForce
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 
-		
+	
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
@@ -252,11 +253,26 @@ namespace RootForce
 				}
 			}
 
+			// Toggle physics debug draw
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				if(m_displayPhysicsDebug)
+				{
+					m_displayPhysicsDebug = false;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+				}
+				else
+				{
+					m_displayPhysicsDebug = true;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+				}
+			}
+
 			// Code for testing scripts
 			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTestOnActivate");
+				g_engineContext.m_script->SetFunction("AbilityTest", "OnActivate");
 				g_engineContext.m_script->ExecuteScript();
 			}
 
@@ -335,3 +351,4 @@ namespace RootForce
 		}
 	}
 }
+

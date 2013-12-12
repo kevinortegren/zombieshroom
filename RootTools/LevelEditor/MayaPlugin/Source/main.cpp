@@ -17,6 +17,9 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
 void NodeRemovedCB(MObject &node, void *clientData);
+void viewCB(const MString &str, void *clientData);
+
+int cameraExists(MString name);
 
 void checkForNewMeshes(bool made, MObject source, MObject destination);
 void checkForNewCameras(MObject &node, void *clientData);
@@ -44,7 +47,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 {	
 	SM.InitalizeSharedMemory();
 	sortObjectList();
-	//printLists();
+	printLists();
 	loadScene();
 
 
@@ -185,15 +188,30 @@ void loadScene()
 
 		if(camera.parent(0,&status).hasFn(MFn::kTransform))
 		{
-			MObject transform = camera.parent(0, &status);
-			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
-			AddCallbackID(status, id);
-		}
+			//MObject transform = camera.parent(0, &status);
+			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 
-		SM.UpdateSharedCamera(currNrCameras);
+		}
+		const MString temp = "modelPanel4";
+
+		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);
+		//Print("Camera name: ", camera.name());
+		AddCallbackID(status, id);
+		SM.UpdateSharedCamera(i);
 		//MayaListToList(g_mayaCameraList[i]);
 	}
 
+}
+
+void viewCB(const MString &str, void *clientData)
+{
+	int tempInt = cameraExists(str);
+
+	if(tempInt!= -1)
+	{
+		MayaCameraToList(g_mayaCameraList[tempInt], tempInt);
+		SM.UpdateSharedCamera(tempInt);
+	}
 }
 
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
@@ -262,10 +280,11 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 			MayaMeshToList(trans.child(0, &status), index);
 			SM.UpdateSharedMesh(index, true, false, currNrMeshes);
 		}
-		if(trans.child(0, &status).hasFn(MFn::kCamera))
-		{
-			MayaCameraToList(trans.child(0, &status), index);
-		}
+		//if(trans.child(0, &status).hasFn(MFn::kCamera))
+		//{
+		//	MayaCameraToList(trans.child(0, &status), index);
+		//	SM.UpdateSharedCamera(index);
+		//}
 		if(trans.child(0, &status).hasFn(MFn::kLight))
 		{
 			MayaLightToList(trans.child(0, &status), index);
@@ -408,6 +427,30 @@ void checkForNewLights(MObject &node, void *clientData)
 		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 		AddCallbackID(status, id);
 	}
+}
+
+int cameraExists(MString name)
+{
+	int answer = -1;
+
+	if(name == "modelPanel1")
+	{
+		answer = 1;
+	}
+	if(name == "modelPanel4")
+	{
+		answer = 0;
+	}
+	if(name == "modelPanel3")
+	{
+		answer = 3;
+	}
+	if(name == "modelPanel2")
+	{
+		answer = 2;
+	}
+
+	return answer;
 }
 
 int nodeExists(MObject node)
@@ -663,6 +706,7 @@ void MayaLightToList(MObject node, int lightIndex)
 			SM.lightList[lightIndex].transformation.rotation.x = rotX;
 			SM.lightList[lightIndex].transformation.rotation.y = rotY;
 			SM.lightList[lightIndex].transformation.rotation.z = rotZ;
+			SM.lightList[lightIndex].transformation.rotation.w = rotW;
 		}
 	}
 }
@@ -725,6 +769,7 @@ void MayaCameraToList(MObject node, int cameraIndex)
 			SM.cameraList[cameraIndex].transformation.rotation.x = rotX;
 			SM.cameraList[cameraIndex].transformation.rotation.y = rotY;
 			SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
+			SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
 		}
 	}
 }
