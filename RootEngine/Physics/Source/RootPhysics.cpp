@@ -109,8 +109,75 @@ namespace Physics
 		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints |btIDebugDraw::DBG_DrawAabb);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
-		
+		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//Make a real update
+	void RootPhysics::Update(float p_dt)
+	{
+		
+		m_dt = p_dt;
+		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
+		{
+			m_playerObjects.at(i)->Update(m_dt);
+		}
+		m_dynamicWorld->stepSimulation(m_dt,1);
+		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
+		if(m_debugDrawEnabled)
+			m_dynamicWorld->debugDrawWorld();
+		
+	}
+	void RootPhysics::RemoveObject( int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		CustomUserPointer* userPointer = m_userPointer.at(p_objectHandle);
+		if(userPointer->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			unsigned int removedIndex = userPointer->m_vectorIndex;
+			m_playerObjects.at(removedIndex)->RemovePlayer();
+			delete m_playerObjects.at(removedIndex);
+			m_playerObjects.erase(m_playerObjects.begin() + removedIndex);
+
+			delete userPointer;
+			m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
+		
+			for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
+			{
+				m_userPointer.at(i)->m_id[0] --;
+				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER)
+				{
+					
+						m_userPointer.at(i)->m_vectorIndex--;
+				}
+			}
+
+		}
+		else
+		{
+			unsigned int removedIndex = userPointer->m_vectorIndex;
+			m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
+			delete m_dynamicObjects.at(removedIndex);
+			m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
+
+			delete userPointer;
+			m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
+
+			for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
+			{
+			
+				m_userPointer.at(i)->m_id[0] --;
+				if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER)
+				{
+
+					m_userPointer.at(i)->m_vectorIndex--;
+				}
+			}
+		}
 	}
 
 
@@ -133,21 +200,55 @@ namespace Physics
 		planeBody->setUserPointer((void*)userPointer);
 
 	}
-	//////////////////////////////////////////////////////////////////////////
-	//Make a real update
-	void RootPhysics::Update(float p_dt)
+	btRigidBody* RootPhysics::CreateSphere( float p_radius, float p_mass, glm::vec3 p_position)
 	{
-		
-		m_dt = p_dt;
-		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
-		{
-			m_playerObjects.at(i)->Update(m_dt);
-		}
-		m_dynamicWorld->stepSimulation(m_dt,1);
-		//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "DebugDrawingWorld");
-		m_dynamicWorld->debugDrawWorld();
-		
+		btCollisionShape* sphere = new btSphereShape(p_radius);
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), pos ));
+		btVector3 fallinertia(0,0,0);
+		sphere->calculateLocalInertia(p_mass,fallinertia);
+		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
+		btRigidBody* body = new btRigidBody(sphereCI);
+		body->setActivationState(DISABLE_DEACTIVATION);
+		return body;
 	}
+	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	{
+		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
+		
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		btVector3 fallinertia(0,0,0);
+		cylinder->calculateLocalInertia(p_mass,fallinertia);
+		btRigidBody::btRigidBodyConstructionInfo cylinderCI(p_mass,motionstate,cylinder,fallinertia);
+		btRigidBody* body = new btRigidBody(cylinderCI);
+		body->setActivationState(DISABLE_DEACTIVATION);
+		return body;
+	}
+	btRigidBody* RootPhysics::CreateCone(float p_radius, float p_height, glm::vec3 p_position,glm::quat p_rotation, float p_mass)
+	{
+		btCollisionShape* cone = new btConeShape(p_radius, p_height);
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		btVector3 fallinertia(0,0,0);
+		cone->calculateLocalInertia(p_mass,fallinertia);
+		btRigidBody::btRigidBodyConstructionInfo coneCI(p_mass,motionstate,cone,fallinertia);
+		btRigidBody* body = new btRigidBody(coneCI);
+		body->setActivationState(DISABLE_DEACTIVATION);
+		return body;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
@@ -239,25 +340,6 @@ namespace Physics
 		
 	}
 
-	//TODO :Remake to work for all objecttypes
-	void RootPhysics::SetDynamicObjectVelocity( int p_objectIndex, glm::vec3 p_velocity )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
-	}
-	//TODO : Remake to work for all objecttypes
-	void RootPhysics::SetObjectMass( int p_objectIndex, float p_mass )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		btVector3 fallInertia =  btVector3(0,0,0);
-		m_dynamicObjects.at(index)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
-		m_dynamicObjects.at(index)->setMassProps(p_mass, fallInertia);
-	}
-
 	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
@@ -279,226 +361,6 @@ namespace Physics
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
 	}
-	//TODO : remake so it wokrs for all types of controller, second TODO: implement differetn types of controllers
-	void RootPhysics::PlayerMoveXZ( int p_objectIndex, glm::vec3 p_direction )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Walk(p_direction, m_dt); //SADFJAKSJDGKLAS
-	}
-
-	void RootPhysics::PlayerJump( int p_objectIndex, float p_jumpForce )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		m_playerObjects.at(index)->Jump();
-	}
-	
-	glm::vec3 RootPhysics::GetPos(int p_objectIndex)
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return glm::vec3(0,0,0);
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		
-		btVector3 temp;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-			temp = m_playerObjects.at(index)->GetPosition();
-		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_DYNAMIC )
-			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-		glm::vec3 retVal;
-		retVal[0] = temp.getX();
-		retVal[1] = temp.getY();
-		retVal[2] = temp.getZ();
-		return retVal;
-
-	}
-
-	RootPhysics* RootPhysics::GetInstance()
-	{
-		if(!s_physicsInstance)
-		{
-			s_physicsInstance = new RootPhysics();
-		}
-		return s_physicsInstance;
-	}
-
- 	void RootPhysics::PlayerKnockback( int p_objectIndex, glm::vec3 p_pushDirection, float p_pushForce )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
- 		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
-		temp.normalize();
- 		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
-	}
-
-	void RootPhysics::RemoveObject( int p_objectIndex)
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		CustomUserPointer* userPointer = m_userPointer.at(p_objectIndex);
-		if(userPointer->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			unsigned int removedIndex = userPointer->m_vectorIndex;
-			m_playerObjects.at(removedIndex)->RemovePlayer();
-			delete m_playerObjects.at(removedIndex);
-			m_playerObjects.erase(m_playerObjects.begin() + removedIndex);
-
-			delete userPointer;
-			m_userPointer.erase(m_userPointer.begin() + p_objectIndex);
-		
-			for(unsigned int i = p_objectIndex; i < m_userPointer.size(); i++)
-			{
-				m_userPointer.at(i)->m_id[0] --;
-				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER)
-				{
-					
-						m_userPointer.at(i)->m_vectorIndex--;
-				}
-			}
-
-		}
-		else
-		{
-			unsigned int removedIndex = userPointer->m_vectorIndex;
-			m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
-			delete m_dynamicObjects.at(removedIndex);
-			m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
-
-			delete userPointer;
-			m_userPointer.erase(m_userPointer.begin() + p_objectIndex);
-
-			for(unsigned int i = p_objectIndex; i < m_userPointer.size(); i++)
-			{
-			
-				m_userPointer.at(i)->m_id[0] --;
-				if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER)
-				{
-
-					m_userPointer.at(i)->m_vectorIndex--;
-				}
-			}
-		}
-	}
-
-
-	btRigidBody* RootPhysics::CreateSphere( float p_radius, float p_mass, glm::vec3 p_position)
-	{
-		btCollisionShape* sphere = new btSphereShape(p_radius);
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), pos ));
-		btVector3 fallinertia(0,0,0);
-		sphere->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
-		btRigidBody* body = new btRigidBody(sphereCI);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		return body;
-	}
-	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
-	{
-		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
-		
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
-		btVector3 fallinertia(0,0,0);
-		cylinder->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo cylinderCI(p_mass,motionstate,cylinder,fallinertia);
-		btRigidBody* body = new btRigidBody(cylinderCI);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		return body;
-	}
-	btRigidBody* RootPhysics::CreateCone(float p_radius, float p_height, glm::vec3 p_position,glm::quat p_rotation, float p_mass)
-	{
-		btCollisionShape* cone = new btConeShape(p_radius, p_height);
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
-		btVector3 fallinertia(0,0,0);
-		cone->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo coneCI(p_mass,motionstate,cone,fallinertia);
-		btRigidBody* body = new btRigidBody(coneCI);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		return body;
-	}
-
-	glm::quat RootPhysics::GetObjectOrientation( int p_objectIndex)
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return glm::quat(0,0,0,0);
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		glm::quat retVal;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			btQuaternion temp = m_playerObjects.at(index)->GetOrientation();
-			retVal[0] = temp.x();
-			retVal[1] = temp.y();
-			retVal[2] = temp.z();
-			retVal[3] = temp.w();
-			
-		}
-		
-		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
-		{
-			btRigidBody* body = m_dynamicObjects.at(index);
-			btTransform transform;
-			transform = body->getWorldTransform();
-			
-			retVal[0] = transform.getRotation().x();
-			retVal[1] = transform.getRotation().y();
-			retVal[2] = transform.getRotation().z();
-			retVal[3] = transform.getRotation().w();
-		}
-		else
-		{
-			return glm::quat(0,0,0,0);
-		}
-		return retVal;
-	}
-
-	void RootPhysics::SetObjectOrientation( int p_objectIndex, glm::quat p_objectOrientation )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			m_playerObjects.at(index)->SetOrientation(p_objectOrientation);
-		}
-		else
-		{
-			float x,y,z, w;
-			btRigidBody* body = m_dynamicObjects.at(index);
-		
-			x = p_objectOrientation[0];
-			y = p_objectOrientation[1];
-			z = p_objectOrientation[2];
-			w = p_objectOrientation[3];
-			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-			//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-		}
-	}
-
-
 	int* RootPhysics::AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo)
 	{
 		btRigidBody* body = nullptr;
@@ -569,28 +431,58 @@ namespace Physics
 		return m_userPointer.back()->m_id;
 	}
 
-	bool RootPhysics::DoesObjectExist( int p_objectIndex )
+	//TODO : remake so it works for all types of controller, second TODO: implement different types of controllers
+	void RootPhysics::PlayerMoveXZ( int p_objectHandle, glm::vec3 p_direction )
 	{
-		if(m_userPointer.size() == 0 || (unsigned int)p_objectIndex >= m_userPointer.size() || p_objectIndex < 0)
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(index)->Walk(p_direction, m_dt); //SADFJAKSJDGKLAS
+	}
+
+	void RootPhysics::PlayerJump( int p_objectHandle, float p_jumpForce )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(index)->Jump();
+	}
+	
+ 	void RootPhysics::PlayerKnockback( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+ 		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
+		temp.normalize();
+ 		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+	}
+
+	bool RootPhysics::DoesObjectExist( int p_objectHandle )
+	{
+		if(m_userPointer.size() == 0 || (unsigned int)p_objectHandle >= m_userPointer.size() || p_objectHandle < 0)
 		{
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing user pointer at index %d", p_objectIndex);
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing user pointer at index %d", p_objectHandle);
 			return false;
 		}
 		else
 		{
-			if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 			{
-				if(m_playerObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
+				if(m_playerObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
-					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectIndex)->m_vectorIndex);
+					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
 				}
 			}
 			else
 			{
-				if(m_dynamicObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectIndex)->m_vectorIndex > m_dynamicObjects.size()-1 || m_userPointer.at(p_objectIndex)->m_vectorIndex < 0)
+				if(m_dynamicObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_dynamicObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
-					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing dynamic object at index %d", m_userPointer.at(p_objectIndex)->m_vectorIndex);
+					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing dynamic object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
 				}
 			}
@@ -598,16 +490,220 @@ namespace Physics
 		return true;
 	}
 
-	void RootPhysics::SetGravity( int p_objectIndex, glm::vec3 p_gravity )
+	glm::vec3 RootPhysics::GetPos(int p_objectHandle)
 	{
-		if(!DoesObjectExist(p_objectIndex))
-			return;
-		int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
+		if(!DoesObjectExist(p_objectHandle))
+			return glm::vec3(0,0,0);
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		
+		btVector3 temp;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+			temp = m_playerObjects.at(index)->GetPosition();
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC )
+			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
+		glm::vec3 retVal;
+		retVal[0] = temp.getX();
+		retVal[1] = temp.getY();
+		retVal[2] = temp.getZ();
+		return retVal;
+
+	}
+
+	float RootPhysics::GetMass( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return -1;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			//Implement later, not as cool as abilitys
-		//	m_playerObjects.at(index)->setGravity(p_gravity);
+			return m_playerObjects.at(index)->GetMass();
+		}
+
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		{
+			return 1/m_dynamicObjects.at(index)->getInvMass();
+		}
+	
+		return -1 ;
+		
+
+	}
+	int RootPhysics::GetType(int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return -1;
+		return m_userPointer.at(p_objectHandle)->m_type;
+
+	}
+
+	float RootPhysics::GetStepHeight( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return -1;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			return m_playerObjects.at(index)->GetStepHeight();
+		}
+		return -1;
+	}
+	glm::quat RootPhysics::GetOrientation( int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return glm::quat(0,0,0,0);
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		glm::quat retVal;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			btQuaternion temp = m_playerObjects.at(index)->GetOrientation();
+			retVal[0] = temp.x();
+			retVal[1] = temp.y();
+			retVal[2] = temp.z();
+			retVal[3] = temp.w();
 			
+		}
+		
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		{
+			btRigidBody* body = m_dynamicObjects.at(index);
+			btTransform transform;
+			transform = body->getWorldTransform();
+			
+			retVal[0] = transform.getRotation().x();
+			retVal[1] = transform.getRotation().y();
+			retVal[2] = transform.getRotation().z();
+			retVal[3] = transform.getRotation().w();
+		}
+		else
+		{
+			return glm::quat(0,0,0,0);
+		}
+		return retVal;
+	}
+
+	float RootPhysics::GetMaxSpeed( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return -1;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			return m_playerObjects.at(index)->GetMaxSpeed();
+		}
+		return -1;
+	}
+	float RootPhysics::GetModelHeight( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return -1;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			unsigned index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			return m_playerObjects.at(index)->GetModelHeight();
+		}
+		return -1;
+	}	
+
+	std::string RootPhysics::GetPhysicsModelHandle( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return "";
+		return m_userPointer.at(p_objectHandle)->m_modelHandle;
+		
+	}
+
+	std::vector<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
+	{
+		return &(m_userPointer.at(p_objectHandle)->m_collidedEntityId);
+	}
+
+
+	glm::vec3 RootPhysics::GetVelocity( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return glm::vec3(0,0,0);
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			//No
+			return glm::vec3(0,0,0);
+		}
+		else
+		{
+
+			btVector3 temp = m_dynamicObjects.at(index)->getLinearVelocity();
+
+			return glm::vec3(temp[0], temp[1], temp[2]);
+		}
+		
+	}
+	RootPhysics* RootPhysics::GetInstance()
+	{
+		if(!s_physicsInstance)
+		{
+			s_physicsInstance = new RootPhysics();
+		}
+		return s_physicsInstance;
+	}
+
+	void RootPhysics::SetVelocity( int p_objectHandle, glm::vec3 p_velocity )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		btVector3 temp (p_velocity[0], p_velocity[1], p_velocity[2]);
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->Walk(p_velocity, m_dt);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_ABILITY)
+		{
+			//Change if abilitys becomes controllerz
+			m_dynamicObjects.at(index)->setLinearVelocity(temp);
+		}
+		else
+		{
+			m_dynamicObjects.at(index)->setLinearVelocity(temp);
+		}
+	}
+
+	void RootPhysics::SetOrientation( int p_objectHandle, glm::quat p_objectOrientation )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->SetOrientation(p_objectOrientation);
+		}
+		else
+		{
+			float x,y,z, w;
+			btRigidBody* body = m_dynamicObjects.at(index);
+		
+			x = p_objectOrientation[0];
+			y = p_objectOrientation[1];
+			z = p_objectOrientation[2];
+			w = p_objectOrientation[3];
+			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+			//body->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
+		}
+	}
+
+
+	void RootPhysics::SetGravity( int p_objectHandle, glm::vec3 p_gravity )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->SetGravity(p_gravity[1]);		
 		}
 		else
 		{
@@ -621,79 +717,36 @@ namespace Physics
 		}
 	}
 
-	float RootPhysics::GetMass( int p_objectIndex )
+	//TODO : Remake to work for all objecttypes
+	void RootPhysics::SetMass( int p_objectHandle, float p_mass )
 	{
-		if(!DoesObjectExist(p_objectIndex))
-			return -1;
-		unsigned int index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+			m_playerObjects.at(index)->SetMass(p_mass);
+		else
 		{
-			return m_playerObjects.at(index)->GetMass();
+			btVector3 fallInertia =  btVector3(0,0,0);
+			m_dynamicObjects.at(index)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
+			m_dynamicObjects.at(index)->setMassProps(p_mass, fallInertia);
 		}
-
-		else if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_ABILITY)
-		{
-			return 1/m_dynamicObjects.at(index)->getInvMass();
-		}
-	
-		return -1 ;
 		
-
-	}
-	int RootPhysics::GetType(int p_objectIndex)
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return -1;
-		return m_userPointer.at(p_objectIndex)->m_type;
-
-	}
-
-	float RootPhysics::GetStepHeight( int p_objectIndex )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetStepHeight();
-		}
-		return -1;
-	}
-	float RootPhysics::GetMaxSpeed( int p_objectIndex )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetMaxSpeed();
-		}
-		return -1;
-	}
-	float RootPhysics::GetModelHeight( int p_objectIndex )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return -1;
-		if(m_userPointer.at(p_objectIndex)->m_type == PhysicsType::TYPE_PLAYER)
-		{
-			unsigned index = m_userPointer.at(p_objectIndex)->m_vectorIndex;
-			return m_playerObjects.at(index)->GetModelHeight();
-		}
-		return -1;
-	}	
-
-	std::string RootPhysics::GetPhysicsModelHandle( int p_objectIndex )
-	{
-		if(!DoesObjectExist(p_objectIndex))
-			return "";
-		return m_userPointer.at(p_objectIndex)->m_modelHandle;
 		
 	}
 
-	std::vector<unsigned int>* RootPhysics::GetCollisionVector( int p_objectIndex )
+	//TODO :Remake to work for all objecttypes
+	void RootPhysics::SetDynamicObjectVelocity( int p_objectHandle, glm::vec3 p_velocity )
 	{
-		return &(m_userPointer.at(p_objectIndex)->m_collidedEntityId);
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+	}
+
+	void RootPhysics::EnableDebugDraw( bool p_enabled )
+	{
+		m_debugDrawEnabled = p_enabled;
 	}
 
 }

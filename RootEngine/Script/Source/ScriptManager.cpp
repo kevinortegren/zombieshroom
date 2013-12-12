@@ -37,15 +37,17 @@ namespace RootEngine
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 		}
 
-		void ScriptManager::SetFunction(std::string p_functionName)
+		void ScriptManager::SetFunction(std::string p_abilityName ,std::string p_functionName)
 		{
 			// Execute specific function
-			lua_getglobal(m_luaState, p_functionName.c_str());
+			lua_getglobal(m_luaState, p_abilityName.c_str());
+			lua_getfield(m_luaState, -1, p_functionName.c_str());
+			lua_pushvalue(m_luaState, -2);
 		}
 
 		void ScriptManager::ExecuteScript()
 		{
-			lua_call(m_luaState, m_parameterCount, 0);
+			lua_call(m_luaState, 1, 0);
 			m_parameterCount = 0;
 		}
 
@@ -76,6 +78,11 @@ namespace RootEngine
 		{
 			// Execute the script
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+		}
+
+		lua_State* ScriptManager::GetLuaState()
+		{
+			return m_luaState;
 		}
 
 	}
