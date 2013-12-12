@@ -139,7 +139,7 @@ namespace RootForce
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
-						script->m_name = "AbilityTest";
+						script->m_name = g_engineContext.m_resourceManager->GetScript("AbilityTest");
 						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
 

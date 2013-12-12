@@ -107,7 +107,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
 		RootForce::LuaAPI::LuaSetupTypeWithMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
 		
-		g_engineContext.m_script->LoadScript("AbilityTest.lua");
+		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 
 		g_world = &m_world;
 
@@ -263,14 +263,6 @@ namespace RootForce
 					m_displayPhysicsDebug = true;
 					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 				}
-			}
-
-			// Code for testing scripts
-			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_1) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			{
-				g_engineContext.m_script->LoadScript("AbilityTest.lua");
-				g_engineContext.m_script->SetFunction("AbilityTest", "OnActivate");
-				g_engineContext.m_script->ExecuteScript();
 			}
 
 			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);

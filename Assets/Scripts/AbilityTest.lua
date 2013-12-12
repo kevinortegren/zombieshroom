@@ -28,8 +28,6 @@ AbilityTest.cooldown = 5.0;
 
 function AbilityTest.OnActivate (action)
 
-	print("Action:" .. action);
-
 	local entity 		= Entity.New();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
