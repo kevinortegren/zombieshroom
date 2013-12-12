@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
 	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
 	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
@@ -33,6 +34,7 @@ int main(int argc, char* argv[])
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
+	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -108,7 +110,7 @@ namespace RootForce
 		g_world = &m_world;
 
 		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(4);
+		std::vector<RootForce::Keybinding> keybindings(5);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
@@ -125,11 +127,20 @@ namespace RootForce
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
+		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
+		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[4].Edge = true;
+
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
+
+		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
 
 		// Initialize physics system
 		RootForce::PhysicsSystem* m_physicsSystem = new RootForce::PhysicsSystem(&m_world);
@@ -170,6 +181,8 @@ namespace RootForce
 
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		
+		m_playerSystem->CreatePlayer();
 
 		ECS::EntityManager* em = m_world.GetEntityManager();
 
@@ -218,8 +231,6 @@ namespace RootForce
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
-
-	
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
@@ -286,6 +297,7 @@ namespace RootForce
 			{
 				PROFILE("Entity Systems", g_engineContext.m_profiler);
 				m_playerControlSystem->Process();
+				scriptSystem->Process();
 				abilitySystem->Process();
 
 			}
@@ -297,11 +309,11 @@ namespace RootForce
 
 			{
 				PROFILE("Physics", g_engineContext.m_profiler);
-				m_physicsSystem->Process();
 				g_engineContext.m_physics->Update(dt);
+				m_physicsSystem->Process();
 				
 			}
-
+			m_playerControlSystem->UpdateAimingDevice();
 			thirdPersonBehaviorSystem->Process();
 			lookAtSystem->Process();
 			cameraSystem->Process();

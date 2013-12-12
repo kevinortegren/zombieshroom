@@ -104,21 +104,25 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					m_physics->SetVelocity(*(physAcc->m_handle), facing);
+					//m_physics->SetVelocity(*(physAcc->m_handle), facing);
+					movement += facing;
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						m_physics->SetVelocity(*(physAcc->m_handle), -facing);
+						//m_physics->SetVelocity(*(physAcc->m_handle), -facing);
+						movement += -facing;
 						//m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					m_physics->SetVelocity(*(physAcc->m_handle), right);
+					//m_physics->SetVelocity(*(physAcc->m_handle), right);
+					movement += right;
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
-						m_physics->SetVelocity(*(physAcc->m_handle), -right);
+						movement += -right;
+						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
 					break;
 				case PlayerAction::ORIENTATE:
@@ -128,7 +132,7 @@ namespace RootForce
 						// TODO: Update a camera controller with m_deltaMouseMovement.
 						//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-						m_angle.x = m_deltaMouseMovement.x;
+						m_angle.x = -m_deltaMouseMovement.x;
 						m_angle.y += m_deltaMouseMovement.y;
 					}
 					break;
@@ -142,7 +146,7 @@ namespace RootForce
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
-						script->m_name = "AbilityType";
+						script->m_name = "AbilityTest";
 						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
 
@@ -152,11 +156,21 @@ namespace RootForce
 			}
 		}
 		transform->m_orientation.YawGlobal(m_angle.x);
+
+		
+		if(movement != glm::vec3(0.0f))
+			m_physics->SetVelocity(*(physAcc->m_handle), movement);
+		m_physics->SetOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
+		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
+	}
+
+	void PlayerControlSystem::UpdateAimingDevice()
+	{
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
+		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
+
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.5f;
-
-		m_physics->SetOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
-		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 }

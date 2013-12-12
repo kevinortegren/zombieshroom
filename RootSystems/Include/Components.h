@@ -7,7 +7,7 @@
 #include <RootSystems\Include\PlayerSystem.h>
 #include <RootSystems\Include\PhysicsSystem.h>
 #include <RootSystems\Include\Network\ClientMessageSystem.h>
-#include <RootSystems\Include\Network\ServerMessageSystem.h>>
+#include <RootSystems\Include\Network\ServerMessageSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\ScriptSystem.h>
 

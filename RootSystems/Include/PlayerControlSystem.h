@@ -62,6 +62,7 @@ namespace RootForce
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		
 		void Process();
+		void UpdateAimingDevice();
 	private:
 		std::vector<Keybinding> m_keybindings;
 
