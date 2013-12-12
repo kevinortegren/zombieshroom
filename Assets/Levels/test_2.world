@@ -3,6 +3,7 @@
     - 1
     - 2
     - 3
+    - 4
 - Components:
     - Type: 0
       Data:
@@ -23,6 +24,10 @@
           Diffuse: DiffuseV1
           Specular: SpecularV1
           Normal: BumpV1
+        - Entity: 4
+          Model: ground
+          Effect: Mesh
+          Diffuse: grass
     - Type: 1
       Data:
         - Entity: 0
@@ -38,7 +43,11 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
-          Position: [0, 19, 0]
+          Position: [0, 100, 0]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [0, -1, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
@@ -64,6 +73,10 @@
           StepHeight: 0.1
           ModelHeight: 0.0
           MaxSpeed: 10.0
+        - Entity: 4
+          Type: 0
+          Mass: 0
+          ModelHandle: ground0
 - Tags:
     - Id: 0
       Tag: Skybox

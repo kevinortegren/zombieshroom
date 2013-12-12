@@ -155,10 +155,10 @@ namespace RootForce
 		RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
+		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
 
 		Render::DirectionalLight dl;
-		dl.m_color = glm::vec4(0.3f,0.3f,0.3f,1);
+		dl.m_color = glm::vec4(1.0f,1.f,1.f,1);
 		dl.m_direction = glm::vec3(0,0,-1);
 
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
@@ -191,8 +191,10 @@ namespace RootForce
 		glm::vec3 normal (0,1,0);
 		glm::vec3 position (0, -2, 0);
 	
-		g_engineContext.m_physics->CreatePlane(normal, position);
-
+		//g_engineContext.m_physics->CreatePlane(normal, position);
+		normal = glm::vec3 (0,0,-1);
+		position = glm::vec3 (0,0,9);
+	//	g_engineContext.m_physics->CreatePlane(normal, position);
 		// Setup the skybox.
 		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
 		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
@@ -208,6 +210,22 @@ namespace RootForce
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+
+		m_displayPhysicsDebug = false;
+		RootEngine::Physics::AbilityPhysicsInfo temp;
+		temp.m_collidesWorld = true;
+		temp.m_direction = glm::vec3(0,0,0);
+		temp.m_entityId = -1;
+		temp.m_gravity = glm::vec3(0,0,0);
+		temp.m_height = 2;
+		temp.m_mass = 0;
+		temp.m_orientation = glm::quat(1,0,0,1);
+		temp.m_position = glm::vec3(-3,0,0);
+		temp.m_radius = 3;
+		temp.m_shape = RootEngine::Physics::AbilityShape::SHAPE_CONE;
+		temp.m_speed = 0;
+		temp.m_type = RootEngine::Physics::PhysicsType::TYPE_ABILITY;
+		//g_engineContext.m_physics->AddAbilityToWorld(temp);
 
 	
 

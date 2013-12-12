@@ -79,24 +79,26 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					m_physics->SetVelocity(*(physAcc->m_handle), facing);
+					m_physics->SetPosition(*(physAcc->m_handle), transform->m_position + facing *dt * 10.f);
+					//m_physics->SetVelocity(*(physAcc->m_handle), facing);
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						m_physics->SetVelocity(*(physAcc->m_handle), -facing);
+						m_physics->SetPosition(*(physAcc->m_handle), transform->m_position - facing *dt * 10.f);
 						//m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					m_physics->SetVelocity(*(physAcc->m_handle), right);
-					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+					//m_physics->SetVelocity(*(physAcc->m_handle), right);
+					m_physics->SetPosition(*(physAcc->m_handle), transform->m_position + right *dt * 10.f);
+					//transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 
 					{
-						m_physics->SetVelocity(*(physAcc->m_handle), -right);
-						transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+						m_physics->SetPosition(*(physAcc->m_handle), transform->m_position - right *dt * 10.f);
+						//transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
 					}
 					break;
 				case PlayerAction::ORIENTATE:

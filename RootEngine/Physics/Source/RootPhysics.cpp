@@ -90,7 +90,7 @@ namespace Physics
 
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
-				int lol = 2;
+				int thisIsOnlyHereSoWeCanBreakHereIfWeWant = 2;
 
 		return false;
 	}
@@ -249,6 +249,40 @@ namespace Physics
 		return body;
 	}
 
+	btRigidBody* RootPhysics::CreateMesh( std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	{
+		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
+		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
+
+		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
+		//Cull unneccesary vertices to improve performance 
+		btShapeHull* objectHull = new btShapeHull(objectMeshShape);
+
+		btScalar margin = objectMeshShape->getMargin();
+		objectHull->buildHull(margin);
+		btConvexHullShape* simplifiedObject = new btConvexHullShape();
+		for(int i = 0; i < objectHull->numVertices(); i++)
+		{
+			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+		}	
+		simplifiedObject->recalcLocalAabb();
+		////Set Inertia
+		btVector3 fallInertia =  btVector3(0,0,0);
+		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
+
+		//Set startpos and start rotation and bind them to a motionstate
+		btTransform startTransform;
+		startTransform.setIdentity();
+		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
+		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
+		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
+
+		//create a body
+		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
+		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
+		return objectBody;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
@@ -268,6 +302,7 @@ namespace Physics
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 		//create the body
 		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
+		objectBody->setCollisionFlags(objectBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 		m_dynamicWorld->addRigidBody(objectBody);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
@@ -284,38 +319,9 @@ namespace Physics
 	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
 	{
 		
-		//creates the mesh shape
-		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		
-		btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
-		//Cull unneccesary vertices to improve performance 
-		btShapeHull* objectHull = new btShapeHull(objectMeshShape);
 		
-		btScalar margin = objectMeshShape->getMargin();
-		objectHull->buildHull(margin);
-		btConvexHullShape* simplifiedObject = new btConvexHullShape();
-		for(int i = 0; i < objectHull->numVertices(); i++)
-		{
-			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
-			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT,  "vertex : %d x: %f y: %f z: %f", i, objectHull->getVertexPointer()[i].x(),objectHull->getVertexPointer()[i].y(),objectHull->getVertexPointer()[i].z());
-		}	
-		simplifiedObject->recalcLocalAabb();
-
-		////Set Inertia
-		btVector3 fallInertia =  btVector3(0,0,0);
-		simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
-
-		//Set startpos and start rotation and bind them to a motionstate
-		btTransform startTransform;
-		startTransform.setIdentity();
-		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
-		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-
-		//create a body
-		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
-		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
+		btRigidBody* objectBody = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
 		objectBody->setCollisionFlags(objectBody->getCollisionFlags()| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK );
 		//add the body to the world,  TODO : We should also set a user defined gravity for the object
@@ -323,8 +329,6 @@ namespace Physics
 
 		//add to the dynamic object vector
 		m_dynamicObjects.push_back(objectBody);
-
-
 
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = m_dynamicObjects.size()-1;
@@ -376,18 +380,29 @@ namespace Physics
 
 		//Don't allow a orientation of {0,0,0,0} since that breaks bullet
 		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CYLINDER ||p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
+		{
 			if(p_abilityInfo.m_orientation[0] == 0 && p_abilityInfo.m_orientation[1] == 0 && p_abilityInfo.m_orientation[2] == 0 && p_abilityInfo.m_orientation[3] == 0)
 			{
 				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::NON_FATAL_ERROR, "Orientation for cone/cylinder shapes can't be 0,0,0,0");
 				return nullptr;
 			}
-
+		}
+		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CUSTOM_MESH)
+		{
+			if(p_abilityInfo.m_modelHandle.empty())
+			{
+				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::NON_FATAL_ERROR, "ModelHandle must be specified when using SHAPE_CUSTOM_MESH");
+				return nullptr;
+			}
+		}
 		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_SPHERE)
 			body = CreateSphere(p_abilityInfo.m_radius, p_abilityInfo.m_mass, p_abilityInfo.m_position);
 		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
 			body = CreateCone(p_abilityInfo.m_radius, p_abilityInfo.m_height, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
 		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CYLINDER)
 			body = CreateCylinder(p_abilityInfo.m_radius, p_abilityInfo.m_height, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
+		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CUSTOM_MESH)
+			body = CreateMesh(p_abilityInfo.m_modelHandle, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
 		else
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Unable to find AbilityShape; %d", p_abilityInfo.m_shape);
@@ -769,7 +784,7 @@ namespace Physics
 		btVector3 temp (p_position[0], p_position[1], p_position[2]);
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			m_playerObjects.at(index)->SetPosition(temp);
+			m_playerObjects.at(index)->Move(p_position, m_dt);
 		}
 		else
 		{

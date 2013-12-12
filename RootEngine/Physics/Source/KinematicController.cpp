@@ -59,14 +59,14 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(simplifiedObject);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(/*m_ghostObject->getCollisionFlags() | */btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/);
-	
+	m_ghostObject->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK /* |btCollisionObject::CF_KINEMATIC_OBJECT*/ /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 
 	m_kinController = new BulletCharacter(m_ghostObject, simplifiedObject, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f);
 	m_kinController->setJumpSpeed(5);
-
+	m_kinController->setMaxSlope(btRadians(54));
+	
 	m_hasBeenKnockbacked = false;
 	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
@@ -87,6 +87,21 @@ void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 	}
 	
 
+}
+
+void KinematicController::Move( glm::vec3 p_target, float p_dt )
+{
+	btVector3 from,to,traveldist;
+	from = m_ghostObject->getWorldTransform().getOrigin();
+	to = btVector3(p_target[0], p_target[1], p_target[2]);
+	traveldist = to- from;
+	if(traveldist.length() > 1 )
+	{
+		m_kinController->warp(to);
+		return;
+	}
+	m_kinController->setVelocityForTimeInterval(traveldist/p_dt, p_dt);
+	m_kinController->playerStep(m_dynamicWorld, p_dt);
 }
 
 void KinematicController::Update(float p_dt)
@@ -133,7 +148,7 @@ void KinematicController::SetGravity( float p_gravity )
 	m_kinController->setGravity(p_gravity);
 }
 
-void KinematicController::SetPosition(const btVector3& p_position )
+void KinematicController::SetPosition(const btVector3& p_position)
 {
-	m_ghostObject->getWorldTransform().setOrigin(p_position);
+	m_kinController->warp(p_position);
 }
