@@ -115,11 +115,10 @@ namespace RootForce
 	
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
-		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 4.0f; m_angle = 0;}
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 4.0f;}
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
 		float m_distance;
-		float m_angle;
 	};
 
 	class ThirdPersonBehaviorSystem : public ECS::EntitySystem
@@ -144,8 +143,7 @@ namespace RootForce
 		{
 			Transform* transform = m_transforms.Get(p_entity);
 			ThirdPersonBehavior* thirdPersonBehavior = m_thirdPersonBehaviors.Get(p_entity);
-			m_deltaMouseMovement = g_engineContext.m_inputSys->GetDeltaMousePos();
-			g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Mouse y: %i, Angle: %d", m_deltaMouseMovement.y, thirdPersonBehavior->m_angle);
+			g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Mouse y: %i", m_deltaMouseMovement.y);
 
 			if(thirdPersonBehavior->m_targetTag != "")
 			{
@@ -158,22 +156,11 @@ namespace RootForce
 						//Move the entity
 						glm::vec3 targetPosition = targetTransform->m_position;
 						Orientation tOrientation = targetTransform->m_orientation;
-						thirdPersonBehavior->m_angle += m_deltaMouseMovement.y;
-						if(thirdPersonBehavior->m_angle > 89.0f)
-						{
-							thirdPersonBehavior->m_angle = 89.0f;
-						}
-						if(thirdPersonBehavior->m_angle < -89.0f)
-						{
-							thirdPersonBehavior->m_angle = -89.0f;
-						}
-						tOrientation.Pitch(thirdPersonBehavior->m_angle);
 						glm::vec3 localDisplacement(0.0f);
 						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
 						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
 						transform->m_position = targetPosition + worldDisplacement;
-						
 					}
 					else
 					{

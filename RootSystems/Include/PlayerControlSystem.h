@@ -66,6 +66,7 @@ namespace RootForce
 		std::vector<Keybinding> m_keybindings;
 
 		glm::ivec2 m_deltaMouseMovement;
+		glm::vec2 m_angle;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsCurrentFrame;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsPreviousFrame;
 

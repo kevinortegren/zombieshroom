@@ -32,6 +32,8 @@ namespace RootEngine
 			virtual glm::ivec2 GetGlobalMousePos() = 0;
 			virtual glm::ivec2 GetDeltaMousePos() = 0;
 
+			virtual void LockMouseToCenter(bool p_enable) = 0;
+
 		};
 	}
 }

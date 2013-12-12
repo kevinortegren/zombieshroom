@@ -24,6 +24,8 @@ namespace RootEngine
 			glm::ivec2 GetGlobalMousePos();
 			glm::ivec2 GetDeltaMousePos();
 
+			void LockMouseToCenter(bool p_enable);
+
 			static InputManager* GetInstance();
 		private:
 
@@ -31,6 +33,7 @@ namespace RootEngine
 
 			glm::ivec2 m_globMousePos;
 			glm::ivec2 m_deltaMousePos;
+			bool m_lockMouseEnabled;
 
 			static InputManager* s_inputSys;
 		};

@@ -44,12 +44,15 @@ namespace RootEngine
 			case SDL_MOUSEMOTION:
 				//m_deltaMousePos.x = p_event.motion.x - m_globMousePos.x;
 				//m_deltaMousePos.y = p_event.motion.y - m_globMousePos.y;
-				m_globMousePos.x = p_event.motion.x;
-				m_globMousePos.y = p_event.motion.y;
+				m_globMousePos.x = -p_event.motion.x;
+				m_globMousePos.y = -p_event.motion.y;
 
-				m_deltaMousePos.x = p_event.motion.xrel;
-				m_deltaMousePos.y = p_event.motion.yrel;
-
+				m_deltaMousePos.x = -p_event.motion.xrel;
+				m_deltaMousePos.y = -p_event.motion.yrel;
+				if(m_lockMouseEnabled)
+				{
+					SDL_WarpMouseInWindow(NULL, 100, 100);
+				}
 				break;
 			default:
 				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
@@ -104,6 +107,12 @@ namespace RootEngine
 		}
 
 		
+
+		void InputManager::LockMouseToCenter(bool p_enable)
+		{
+			m_lockMouseEnabled = p_enable;
+		}
+
 	}
 
 }
