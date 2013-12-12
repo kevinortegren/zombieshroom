@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #pragma once
 #include <Lua/lua.hpp>
 #include <Utility/ECS/Include/World.h>
@@ -158,7 +159,9 @@ namespace RootForce
 
 		static int LuaSetupTypeWithMethods(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
-			luaL_newmetatable(p_luaState, p_typeName.c_str());			int meta_id = lua_gettop(p_luaState);		
+			luaL_newmetatable(p_luaState, p_typeName.c_str());
+			int meta_id = lua_gettop(p_luaState);
+		
 			luaL_setfuncs(p_luaState, p_methodReg, 0);
 			lua_setfield(p_luaState, meta_id, "__index");  
 

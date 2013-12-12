@@ -132,15 +132,15 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					p_node["StepHeight"] >> stepHeight;
 					p_node["ModelHeight"] >> modelHeight;
 					p_node["MaxSpeed"] >> maxSpeed;
-					physaccessor->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(modelHandle, p_entity->GetId(), &(temp->m_position.x), &(rotation.x), mass, maxSpeed, modelHeight, stepHeight);
+					physaccessor->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation, mass, maxSpeed, modelHeight, stepHeight);
 				}
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
 				{
-					physaccessor->m_handle = g_engineContext.m_physics->AddDynamicObjectToWorld(modelHandle, p_entity->GetId(), &(temp->m_position.x), &(rotation.x), mass);
+					physaccessor->m_handle = g_engineContext.m_physics->AddDynamicObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation, mass);
 				}
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
-					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), &(temp->m_position.x), &(rotation.x));
+					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation);
 					physaccessor->m_handle[0] = -1;
 				}
 

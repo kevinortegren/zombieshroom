@@ -19,7 +19,6 @@
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
 
-#include <Lua/lua.hpp>
 #undef main
 
 int main(int argc, char* argv[]) 
@@ -95,8 +94,6 @@ namespace RootForce
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}
-
-
 
 	void Main::Start() 
 	{
@@ -190,8 +187,8 @@ namespace RootForce
 
 		//Plane at bottom
 
-		float normal[3] = {0,1,0};
-		float position[3] = {0, -2, 0};
+		glm::vec3 normal (0,1,0);
+		glm::vec3 position (0, -2, 0);
 	
 		g_engineContext.m_physics->CreatePlane(normal, position);
 
@@ -211,7 +208,7 @@ namespace RootForce
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
 
-		
+	
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();
@@ -237,6 +234,21 @@ namespace RootForce
 				{
 					m_displayNormals = true;
 					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+				}
+			}
+
+			// Toggle physics debug draw
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				if(m_displayPhysicsDebug)
+				{
+					m_displayPhysicsDebug = false;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+				}
+				else
+				{
+					m_displayPhysicsDebug = true;
+					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 				}
 			}
 
@@ -321,3 +333,4 @@ namespace RootForce
 		}
 	}
 }
+

@@ -41,22 +41,22 @@ namespace RootEngine
 			int m_entityId; 
 			float m_radius;
 			float m_height; 
-			float* m_position; 
-			float* m_orientation; 
-			float* m_direction; 
+			glm::vec3 m_position; 
+			glm::quat m_orientation; 
+			glm::vec3 m_direction; 
 			float m_speed; 
 			PhysicsType::PhysicsType m_type; 
 			AbilityShape::AbilityShape m_shape;
 			bool m_collidesWorld ;
 			float m_mass; 
-			float* m_gravity;
+			glm::vec3 m_gravity;
 		};
 
 
 
 		struct CustomUserPointer
 		{
-			int m_type;
+			PhysicsType::PhysicsType m_type;
 			int m_vectorIndex;
 			unsigned int m_entityId; //My entity id
 			std::vector<unsigned int> m_collidedEntityId; //List of all entities collided with since last update
@@ -73,40 +73,45 @@ namespace RootEngine
 		{
 		public:
 			virtual void Init() = 0;
-			virtual void CreatePlane(float* p_normal, float* p_position) = 0;
+			virtual void CreatePlane(glm::vec3 p_normal, glm::vec3 p_position) = 0;
 			virtual void Update(float p_dt) = 0;
 
 			///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
-			virtual void PlayerKnockback(int p_objectIndex, float* p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
-			virtual void PlayerMoveXZ(int p_objectIndex, float* p_direction) = 0;
+			virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
+			virtual void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction) = 0;
 			///Call this when a character jumps
-			virtual void PlayerJump(int p_objectIndex, float p_jumpForce) = 0;
+			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
 			///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
-			virtual void SetDynamicObjectVelocity(int p_objectIndex, float* p_velocity) = 0;
-			virtual void SetObjectMass(int p_objectIndex, float p_mass) = 0;
+			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
+			
+			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			virtual void AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , float* p_position, float* p_rotation) = 0;
+			virtual void AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , glm::vec3 p_position, glm::quat p_rotation) = 0;
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  float* p_position, float* p_rotation, float p_mass) = 0;
+			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
 			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, float* p_position, float* p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
 			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;
 			/// p_Pos should be of type float[3]
-			virtual void GetPos(int p_objectIndex, float* p_pos)= 0;
-			virtual float GetMass(int p_objectIndex) = 0;
-			virtual int GetType(int p_objectIndex) = 0;
-			virtual float GetMaxSpeed(int p_objectIndex) = 0;
-			virtual float GetStepHeight(int p_objectIndex) = 0;
-			virtual float GetModelHeight(int p_objectIndex) = 0;
-			virtual std::vector<unsigned int>* GetCollisionVector(int p_objectIndex) = 0;
-			virtual std::string GetPhysicsModelHandle(int p_objectIndex) = 0;
-			virtual void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
-			virtual void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation) = 0;
-			virtual void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation) = 0;
+			virtual glm::vec3 GetPos(int p_objectHandle)= 0;
+			virtual glm::vec3 GetVelocity(int p_objectHandle) = 0;
+			virtual float GetMass(int p_objectHandle) = 0;
+			virtual int GetType(int p_objectHandle) = 0;
+			virtual float GetMaxSpeed(int p_objectHandle) = 0;
+			virtual float GetStepHeight(int p_objectHandle) = 0;
+			virtual float GetModelHeight(int p_objectHandle) = 0;
+			virtual std::vector<unsigned int>* GetCollisionVector(int p_objectHandle) = 0;
+			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
+			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
+			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
+			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
+			virtual void SetMass(int p_objectHandle, float p_mass) = 0;
+			virtual void SetGravity(int p_objectHandle, glm::vec3 p_gravity) = 0;
+			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
-			virtual void RemoveObject(int p_objectIndex) = 0;
+			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 		};
 
@@ -118,48 +123,51 @@ namespace RootEngine
 			void Startup();
 			void Shutdown();
 			static RootPhysics* GetInstance();
-			void CreatePlane(float* p_normal, float* p_position);
+			void CreatePlane(glm::vec3 p_normal, glm::vec3 p_position);
 			
 			void Update(float p_dt);
 			///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
-			void PlayerMoveXZ(int p_objectIndex, float* p_direction);
+			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
-			void PlayerJump(int p_objectIndex, float p_jumpForce); ///Call this when a character jumps
-			void PlayerKnockback(int p_objectIndex, float* p_pushDirection, float p_pushForce); ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
-			void SetDynamicObjectVelocity(int p_objectIndex, float* p_velocity); ///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
+			void PlayerJump(int p_objectHandle, float p_jumpForce); ///Call this when a character jumps
+			void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
+			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); ///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 
-			void SetObjectMass(int p_objectIndex, float p_mass);
+			void EnableDebugDraw(bool p_enabled);
 		
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			void AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  float* p_position, float* p_rotation);
+			void AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation);
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
-			int* AddDynamicObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  float* p_position, float* p_rotation, float p_mass);
+			int* AddDynamicObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			///Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			int* AddPlayerObjectToWorld(std::string p_modelHandle,unsigned int p_entityId, float* p_position, float* p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
+			int* AddPlayerObjectToWorld(std::string p_modelHandle,unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
 
 			int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo);
-			void GetPos(int p_objectIndex, float* p_pos);	/// p_pos should be of type float[3]
-			float GetMass(int p_objectIndex);
-			int GetType(int p_objectIndex);
-			float GetMaxSpeed(int p_objectIndex);
-			float GetStepHeight(int p_objectIndex);
-			float GetModelHeight(int p_objectIndex);
-			std::vector<unsigned int>* GetCollisionVector(int p_objectIndex);
-			std::string GetPhysicsModelHandle(int p_objectIndex);
-			void SetGravity(int p_objectIndex, float* p_gravity);
-			void GetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
-			void SetObjectOrientation(int p_objectIndex, float* p_objectOrientation);
-			void SetPlayerOrientation(int p_objectIndex, float* p_playerOrientation);
-			void RemoveObject(int p_objectIndex);
+			glm::vec3 GetPos(int p_objectHandle);	
+			glm::vec3 GetVelocity(int p_objectHandle);
+			float GetMass(int p_objectHandle);
+			int GetType(int p_objectHandle);
+			float GetMaxSpeed(int p_objectHandle);
+			float GetStepHeight(int p_objectHandle);
+			float GetModelHeight(int p_objectHandle);
+			std::vector<unsigned int>* GetCollisionVector(int p_objectHandle);
+			std::string GetPhysicsModelHandle(int p_objectHandle);
+			glm::quat GetOrientation(int p_objectHandle);
+			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);
+			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
+			void SetMass(int p_objectHandle, float p_mass);
+			void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation);
+			//void SetPlayerOrientation(int p_objectHandle, glm::quat p_playerOrientation);
+			void RemoveObject(int p_objectHandle);
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
 		private:
 			void Init();
-			bool DoesObjectExist(int p_objectIndex);
-			btRigidBody* CreateSphere(float p_radius, float p_mass, float* p_position);
-			btRigidBody* CreateCone(float p_radius, float p_height, float* p_position, float* p_rotation, float p_mass);
-			btRigidBody* CreateCylinder(float p_radius, float p_height,  float* p_position, float* p_rotation, float p_mass);
+			bool DoesObjectExist(int p_objectHandle);
+			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
+			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			RootPhysics();
 			~RootPhysics();
 			DebugDrawer* m_debugDrawer;
@@ -173,6 +181,7 @@ namespace RootEngine
 			std::vector<btRigidBody*> m_dynamicObjects;
 			std::vector<KinematicController*> m_playerObjects;
 			float m_dt;
+			bool m_debugDrawEnabled;
 			
 		};
 	}

@@ -11,7 +11,7 @@ public:
 	
 	void Init();
 	void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
-	void Knockback(float* p_direction, float p_power);
+	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
 
