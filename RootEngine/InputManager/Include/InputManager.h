@@ -16,12 +16,15 @@ namespace RootEngine
 			void Startup(void);
 			void Shutdown(void);
 			void HandleInput(SDL_Event& p_event);
+			void Reset();
 
 			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
 
 			glm::ivec2 GetGlobalMousePos();
 			glm::ivec2 GetDeltaMousePos();
+
+			void LockMouseToCenter(bool p_enable);
 
 			static InputManager* GetInstance();
 		private:
@@ -30,6 +33,7 @@ namespace RootEngine
 
 			glm::ivec2 m_globMousePos;
 			glm::ivec2 m_deltaMousePos;
+			bool m_lockMouseEnabled;
 
 			static InputManager* s_inputSys;
 		};

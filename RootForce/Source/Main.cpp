@@ -71,7 +71,7 @@ namespace RootForce
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
-		if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
 		{
 			// TODO: Log error and throw exception (?)
 		}
@@ -186,6 +186,15 @@ namespace RootForce
 		
 		m_playerSystem->CreatePlayer();
 
+		ECS::EntityManager* em = m_world.GetEntityManager();
+
+		//Create player aiming device
+
+		ECS::Entity* aimingDevice = em->CreateEntity();
+		m_world.GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
+		RootForce::Transform* aimingDeviceTransform = em->CreateComponent<RootForce::Transform>(aimingDevice);
+		
+
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
 		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
@@ -195,10 +204,12 @@ namespace RootForce
 		camera->m_fov = 75.0f;
 		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		cameraLookAt->m_targetTag = "Player";
+		cameraLookAt->m_targetTag = "AimingDevice";
+		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		cameraThirdPerson->m_targetTag = "Player";
+		cameraThirdPerson->m_targetTag = "AimingDevice";
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
+
 
 		//Plane at bottom
 
@@ -234,6 +245,11 @@ namespace RootForce
 			m_world.SetDelta(dt);
 
 			g_engineContext.m_renderer->Clear();
+
+			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			{
+				m_running = false;
+			}
 
 			// Toggle rendering of normals.
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -294,11 +310,11 @@ namespace RootForce
 
 			{
 				PROFILE("Physics", g_engineContext.m_profiler);
-				m_physicsSystem->Process();
 				g_engineContext.m_physics->Update(dt);
+				m_physicsSystem->Process();
 				
 			}
-
+			m_playerControlSystem->UpdateAimingDevice();
 			thirdPersonBehaviorSystem->Process();
 			lookAtSystem->Process();
 			cameraSystem->Process();
@@ -328,6 +344,8 @@ namespace RootForce
 
 	void Main::HandleEvents()
 	{
+		if (g_engineContext.m_inputSys != nullptr)
+			g_engineContext.m_inputSys->Reset();
 		SDL_Event event;
 		while(SDL_PollEvent(&event))
 		{

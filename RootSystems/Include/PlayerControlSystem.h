@@ -62,10 +62,12 @@ namespace RootForce
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		
 		void Process();
+		void UpdateAimingDevice();
 	private:
 		std::vector<Keybinding> m_keybindings;
 
 		glm::ivec2 m_deltaMouseMovement;
+		glm::vec2 m_angle;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsCurrentFrame;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsPreviousFrame;
 

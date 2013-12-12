@@ -20,8 +20,8 @@
       Data:
         - Entity: 0
           Position: [0, 0, 0]
-          Rotation: [0, 0, 0]
-          Scale: [100, 100, 100]
+          Rotation: [180, 0, 0]
+          Scale: [-100, -100, -100]
         - Entity: 1
           Position: [1, 0, 0]
           Rotation: [1, 0, 0]

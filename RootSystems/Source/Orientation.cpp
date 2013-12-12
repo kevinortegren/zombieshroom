@@ -75,6 +75,11 @@ namespace RootForce
 								1 -	2 * (m_orientation.x * m_orientation.x + m_orientation.y * m_orientation.y)));
 	}
 
+	glm::quat Orientation::GetQuaternion()
+	{
+		return m_orientation;
+	}
+
 	mat3 Orientation::GetMatrix()
 	{
 		return mat3(-GetRight(), GetUp(), GetFront());
@@ -235,10 +240,6 @@ namespace RootForce
 		vec3 direction = normalize(p_direction);
 		vec3 up = normalize(p_upVector);
 		vec3 axis = glm::cross(direction, vec3(0.0f, 0.0f, 1.0f));
-		if(glm::length(axis) == 0)
-		{
-		//	axis = vec3(1.0f, 0.0f, 0.0f);
-		}
 		float angle = glm::degrees(glm::acos(glm::dot(direction, vec3(0.0f, 0.0f, 1.0f))));
 		vec3 third = glm::cross(axis, vec3(0.0f, 0.0f, 1.0f));
 		if (glm::dot(third, direction) < 0)
@@ -256,17 +257,5 @@ namespace RootForce
 			angle2 = -angle2;
 		}
 		Roll(angle2);
-
-		//vec3 left = glm::cross(up, direction);
-		//up = glm::cross(direction, left);
-		//mat3 mat(left, up, direction);
-
-		//SetOrientation(mat);
 	}
-
-	glm::quat Orientation::GetQuaterion()
-	{
-		return m_orientation;
-	}
-
 }
