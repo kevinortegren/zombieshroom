@@ -17,6 +17,8 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
+#include <RootSystems\Include\Components.h>
+#include <ComponentExporter.h>
 
 #undef main
 
@@ -100,13 +102,14 @@ std::string GetNameFromPath( std::string p_path )
 int main(int argc, char* argv[]) 
 {
 	// Enable components to use.
-	RootForce::Renderable::SetTypeId(0);
-    RootForce::Transform::SetTypeId(1);
-    RootForce::PointLight::SetTypeId(2);
-    RootForce::Camera::SetTypeId(3);
-
+	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
+    RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+    RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+    RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	// Setup world.
 	ECS::World m_world;
+
+	m_world.GetEntityExporter()->SetExporter(Exporter);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Level3DViewer.exe";
