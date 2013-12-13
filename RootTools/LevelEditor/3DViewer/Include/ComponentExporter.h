@@ -63,7 +63,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
 			}
 			break;
-		case 3:
+		/*case 3:
 			{
 				RootForce::PlayerControl* input = static_cast<RootForce::PlayerControl*>(p_component);
 				p_emitter << YAML::Key << "Speed" << YAML::Value << input->m_speed;
@@ -90,7 +90,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				}
 
 			}
-			break;
+			break;*/
 		default:
 			break;
 	}
