@@ -43,7 +43,7 @@
       Data:
         - Entity: 1
           Attenuation: [0, 0, 1]
-          Color: [0.4, 0, 0, 1]
+          Color: [1, 0, 0, 1]
           Range: 2
         - Entity: 2
           Attenuation: [0, 0.2, 0]

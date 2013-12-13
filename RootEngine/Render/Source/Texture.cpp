@@ -85,8 +85,8 @@ namespace Render
 		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(cube.levels() - 1)); 
 
-		glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		//glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		//glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
 		GLenum faces[] = { 
 			GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 
