@@ -27,10 +27,10 @@ namespace RootForce
 				return;
 			}
 		
-			glm::quat temp;
-			m_physics->GetPos(*(accessor->m_handle), &transform->m_position.x);
-			m_physics->GetObjectOrientation(*(accessor->m_handle),&temp.x);
-			transform->m_orientation.SetOrientation(temp);
+
+			transform->m_position = m_physics->GetPos(*(accessor->m_handle));
+			transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(accessor->m_handle)));
+			
 		}
 	}
 

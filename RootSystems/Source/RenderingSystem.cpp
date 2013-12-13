@@ -10,7 +10,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-
+		int a = 0;
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)

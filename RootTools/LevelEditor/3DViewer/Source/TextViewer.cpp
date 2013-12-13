@@ -179,13 +179,25 @@ int main(int argc, char* argv[])
 			std::vector<ECS::Entity*> LightEntities;
 			std::vector<ECS::Entity*> Entities;
 
-			//cameras.push_back(m_world.GetEntityManager()->CreateEntity());
-			//RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
-			//RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
+			cameras.push_back(m_world.GetEntityManager()->CreateEntity());
+			RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
+			RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
 			//camera->m_near = 0.1f;
 			//camera->m_far = 1000.0f;
 			//camera->m_fov = 75.0f;
-			//m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
+			m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
+
+			//cameraTransform->m_orientation.SetOrientation(glm::quat(0,1,0,0));
+
+			cout << "Default Camera Created" << endl;
+			cout << "Position: "		<< cameraTransform->m_position.x << " "
+				<< cameraTransform->m_position.y << " "
+				<< cameraTransform->m_position.z << endl;
+			cout << "Rotation: "		<< cameraTransform->m_orientation.GetQuaterion().x << " "
+				<< cameraTransform->m_orientation.GetQuaterion().y << " "
+				<< cameraTransform->m_orientation.GetQuaterion().z << " "
+				<< cameraTransform->m_orientation.GetQuaterion().w << endl;
+			cout << "FieldOfView "		<< camera->m_fov << endl;
 
 			/*Entities.push_back(CreateEntity(&m_world));*/
 
@@ -237,9 +249,10 @@ int main(int argc, char* argv[])
 
 			//for(int i = 0; i < renderNrOfMaterials; i++)
 			//{
-			//	materials[i].m_diffuseMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->texturePath);
+			//	materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->texturePath);
 			//	//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
-			//	materials[i].m_effect = m_engineContext.m_resourceManager->GetEffect("Mesh");
+			//	materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+			//	cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
 			//}
 
 			for(int i = 0; i < numberMeshes; i++)
@@ -255,7 +268,7 @@ int main(int argc, char* argv[])
 				//tempTexName = GetNameFromPath(RM.PmeshList[i]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
 				//if(tempTexName == "NONE.dds")
 				//{
-				//	RM.PmeshList[i]->MaterialID = 0;
+					RM.PmeshList[i]->MaterialID = 0;
 				//}
 				//else
 				//{
@@ -368,7 +381,7 @@ int main(int argc, char* argv[])
 					//tempTexName = GetNameFromPath(RM.PmeshList[MeshIndex]->texturePath)+".dds";	//Verkar ta in en jävla lampa och kamera ibland, dafaq.
 					//if(tempTexName == "NONE.dds")
 					//{
-					//	RM.PmeshList[MeshIndex]->MaterialID = 0;
+						RM.PmeshList[MeshIndex]->MaterialID = 0;
 					//}
 					//else
 					//{
@@ -448,12 +461,64 @@ int main(int argc, char* argv[])
 
 				}
 
+				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				int cameraIDchange = RM.CameraIdChange->x;
+				RM.CameraIdChange->x = -1;
+				ReleaseMutex(RM.IdMutexHandle);
+
+
+				/////////////////////// UPDATE CAMERAS ////////////////////////////////
+				if( cameraIDchange != -1)
+				{
+					RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+					WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+
+					glm::quat rotation;
+					rotation.x = RM.PcameraList[cameraIDchange]->transformation.rotation.x;
+					rotation.y = RM.PcameraList[cameraIDchange]->transformation.rotation.y;
+					rotation.z = RM.PcameraList[cameraIDchange]->transformation.rotation.z;
+					rotation.w = RM.PcameraList[cameraIDchange]->transformation.rotation.w;
+
+					//CAMERA IS LOOKING BACKWARDS!!
+					cameraTransform->m_position.x = RM.PcameraList[cameraIDchange]->transformation.position.x; // ALT negative
+					cameraTransform->m_position.y = RM.PcameraList[cameraIDchange]->transformation.position.y;
+					cameraTransform->m_position.z = RM.PcameraList[cameraIDchange]->transformation.position.z;// ALT negative
+					//cameraTransform->m_orientation.SetOrientation(glm::quat(0,1,0,0));
+					cameraTransform->m_orientation.SetOrientation(rotation);
+					cameraTransform->m_orientation.Yaw(180);
+					
+					camera->m_far = RM.PcameraList[cameraIDchange]->farClippingPlane;					
+					camera->m_near = RM.PcameraList[cameraIDchange]->nearClippingPlane;
+					//camera->m_fov = glm::degrees(RM.PcameraList[cameraIDchange]->horizontalFieldOfView);
+					camera->m_fov = glm::degrees(RM.PcameraList[cameraIDchange]->verticalFieldOfView);
+
+					cout << "CameraIdChange: "	<< cameraIDchange << endl;
+					cout << "Position: "		<< cameraTransform->m_position.x << " "
+												<< cameraTransform->m_position.y << " "
+												<< cameraTransform->m_position.z << endl;
+					cout << "Rotation: "		<< cameraTransform->m_orientation.GetQuaterion().x << " "
+												<< cameraTransform->m_orientation.GetQuaterion().y << " "
+												<< cameraTransform->m_orientation.GetQuaterion().z << " "
+												<< cameraTransform->m_orientation.GetQuaterion().w << endl;
+					cout << "FieldOfView "		<< camera->m_fov << endl;
+					cout << "Far "				<< camera->m_far << endl;
+					cout << "Near "				<< camera->m_near << endl;
+
+					ReleaseMutex(RM.CameraMutexHandle);
+
+				}
+
+				
+
 				HandleEvents();
 
 				g_engineContext.m_renderer->Clear();
 
+				cameraSystem->Process();
 				pointLightSystem->Process();
 				renderingSystem->Process();
+				
 
 				g_engineContext.m_renderer->Render();
 

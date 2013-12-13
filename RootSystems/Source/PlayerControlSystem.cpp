@@ -1,9 +1,13 @@
 #include <PlayerControlSystem.h>
+#include <RootSystems\Include\ScriptSystem.h>
+
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
 	Keybinding::Keybinding()
-		: Action(PlayerAction::NONE)
+		: Action(PlayerAction::NONE), Edge(false)
 	{}
 
 	Keybinding::Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action)
@@ -44,10 +48,21 @@ namespace RootForce
 		{
 			for (SDL_Scancode sc : kb.Bindings)
 			{
-				if (m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN)
+				if(kb.Edge)
 				{
-					m_inputtedActionsCurrentFrame.push_back(kb.Action);
-					break;
+					if (m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.Action);
+						break;
+					}
+				}
+				else
+				{
+					if(m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.Action);
+						break;
+					}	
 				}
 			}
 		}
@@ -64,13 +79,23 @@ namespace RootForce
 
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(m_world->GetTagManager()->GetEntityByTag("Player"));
+
+
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
+		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
+
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
+		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(entity);
+		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
+
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
 		
+		glm::vec3 movement(0.0f);
+		m_angle.x = 0;
+
 		// Get the speed of the player
 		float speed = controller->m_speed;
 
@@ -79,48 +104,73 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					m_physics->PlayerMoveXZ(*(physAcc->m_handle), &facing.x);
+					//m_physics->SetVelocity(*(physAcc->m_handle), facing);
+					movement += facing;
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						glm::vec3 backwards = /*glm::vec3(0,20,-20);//*/-facing;
-						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &backwards.x);
+						//m_physics->SetVelocity(*(physAcc->m_handle), -facing);
+						movement += -facing;
 						//m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					m_physics->PlayerMoveXZ(*(physAcc->m_handle), &right.x);
-					transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+					//m_physics->SetVelocity(*(physAcc->m_handle), right);
+					movement += right;
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
-
 					{
-						glm::vec3 left = -right;
-						m_physics->PlayerMoveXZ(*(physAcc->m_handle), &left.x);
-						transform->m_orientation.LookAt(-transform->m_position/*glm::vec3(0.3f, 0.1f, 0.5f)*/, glm::vec3(0.0f, 1.0f, 0.0f));
+						movement += -right;
+						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
 					break;
 				case PlayerAction::ORIENTATE:
-				{
-					//m_physics->SetPlayerOrientation(playerID, orientation);
-					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
-					// TODO: Update a camera controller with m_deltaMouseMovement.
-					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
-					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-					
-				} break;
+					{
+						//m_physics->SetPlayerOrientation(playerID, orientation);
+						//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
+						// TODO: Update a camera controller with m_deltaMouseMovement.
+						//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
+						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+						m_angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
+						m_angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
+					}
+					break;
 				case PlayerAction::SELECT_ABILITY:
 					// TODO: Implement selection of abilities.
+
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
-					// TODO: Implement activation of abilities.
+		
+					if(player->m_selectedAbility == Abilitiy::ABILITY_TEST)
+					{
+						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
+						script->m_name = g_engineContext.m_resourceManager->GetScript("AbilityTest");
+						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
+					}
+
 					break;
 				default:
 					break;
 			}
 		}
+		transform->m_orientation.YawGlobal(m_angle.x);
 
+		
+		if(movement != glm::vec3(0.0f))
+			m_physics->SetVelocity(*(physAcc->m_handle), movement);
+		m_physics->SetOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
+	}
+
+	void PlayerControlSystem::UpdateAimingDevice()
+	{
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
+		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
+
+		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
+		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
 	}
 }

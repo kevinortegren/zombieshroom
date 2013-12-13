@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 #include <string>
 #include <Awesomium/WebCore.h>
@@ -24,3 +25,4 @@ namespace RootEngine
 		std::string m_rightOverlay;
 	};
 }
+#endif

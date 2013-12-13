@@ -82,6 +82,7 @@ message("${EXTERNAL_LIBRARIES}")
 add_definitions(-D_VARIADIC_MAX=10)
 add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
+add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(/wd4005)    # Disable macro redefinition warning
 
 # Add sub projects and dependencies.

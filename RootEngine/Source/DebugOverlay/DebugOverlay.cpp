@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "DebugOverlay/DebugOverlay.h"
 
 #include <Awesomium/WebCore.h>
@@ -70,3 +71,5 @@ namespace RootEngine
 		m_rightOverlay = "";
 	}
 }
+
+#endif

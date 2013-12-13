@@ -4,10 +4,10 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Physics.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/PlayerSystem.h>
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
-
 
 namespace RootForce
 {
@@ -17,7 +17,6 @@ namespace RootForce
 		float m_speed;
 		float m_mouseSensitivity;
 	};
-
 
 	/** 
 		Enumerate all the actions a player can do via input.
@@ -44,6 +43,7 @@ namespace RootForce
 	{
 		PlayerAction::PlayerAction Action;
 		std::vector<SDL_Scancode> Bindings;
+		bool Edge;
 
 		Keybinding();
 		Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action);
@@ -62,10 +62,12 @@ namespace RootForce
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		
 		void Process();
+		void UpdateAimingDevice();
 	private:
 		std::vector<Keybinding> m_keybindings;
 
 		glm::ivec2 m_deltaMouseMovement;
+		glm::vec2 m_angle;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsCurrentFrame;
 		std::vector<PlayerAction::PlayerAction> m_inputtedActionsPreviousFrame;
 

@@ -24,7 +24,7 @@ namespace RootEngine
 
 
 			/* This sets a specific script that is to be used when doing a specific function call with added parameters. */
-			virtual void SetFunction(std::string p_functionName) = 0;
+			virtual void SetFunction(std::string p_abilityName, std::string p_functionName) = 0;
 			
 			virtual void LoadScript(std::string p_scriptPath) = 0;
 
@@ -36,6 +36,8 @@ namespace RootEngine
 			virtual void AddParameterNumber(double p_double) = 0;
 			virtual void AddParameterBoolean(bool p_bool) = 0;
 			virtual void RegisterFunction(std::string p_funcName, lua_CFunction p_func) = 0;
+
+			virtual lua_State* GetLuaState() = 0;
 		};
 	}
 }
