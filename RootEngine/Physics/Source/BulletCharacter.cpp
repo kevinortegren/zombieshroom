@@ -45,7 +45,7 @@ protected:
 
 BulletCharacter::BulletCharacter( btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btScalar p_stepHeight ) : btKinematicCharacterController(p_ghostObject,p_convexShape,p_stepHeight)
 {
-	
+	m_addedMargin = 0.02f;
 }
 
 BulletCharacter::~BulletCharacter( void )
@@ -184,6 +184,53 @@ bool BulletCharacter::IsKnockbacked()
 
 
 
+void BulletCharacter::stepUp ( btCollisionWorld* world)
+{
+	// phase 1: up
+	btTransform start, end;
+	m_targetPosition = m_currentPosition + getUpAxisDirections()[m_upAxis] * (m_stepHeight + (m_verticalOffset > 0.f?m_verticalOffset:0.f));
+
+	start.setIdentity ();
+	end.setIdentity ();
+
+	/* FIXME: Handle penetration properly */
+	start.setOrigin (m_currentPosition + getUpAxisDirections()[m_upAxis] * (m_convexShape->getMargin() + m_addedMargin));
+	end.setOrigin (m_targetPosition);
+
+	btKinematicClosestNotMeConvexResultCallback callback (m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
+	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
+	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
+	
+	if (m_useGhostObjectSweepTest)
+	{
+		m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
+	}
+	else
+	{
+		world->convexSweepTest (m_convexShape, start, end, callback);
+	}
+
+	if (callback.hasHit())
+	{
+		// Only modify the position if the hit was a slope and not a wall or ceiling.
+		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
+		{
+			// we moved up only a fraction of the step height
+			m_currentStepOffset = m_stepHeight * callback.m_closestHitFraction;
+			if (m_interpolateUp == true)
+				m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
+			else
+				m_currentPosition = m_targetPosition;
+		}
+		m_verticalVelocity = 0.0;
+		m_verticalOffset = 0.0;
+	} 
+	else 
+	{
+		m_currentStepOffset = m_stepHeight;
+		m_currentPosition = m_targetPosition;
+	}
+}
 void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, const btVector3& walkMove)
 {
 	// printf("m_normalizedDirection=%f,%f,%f\n",
@@ -406,53 +453,6 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 		}
 		//printf("full drop - %g, %g\n", m_currentPosition.getY(), m_targetPosition.getY());
 
-		m_currentPosition = m_targetPosition;
-	}
-}
-void BulletCharacter::stepUp ( btCollisionWorld* world)
-{
-	// phase 1: up
-	btTransform start, end;
-	m_targetPosition = m_currentPosition + getUpAxisDirections()[m_upAxis] * (m_stepHeight + (m_verticalOffset > 0.f?m_verticalOffset:0.f));
-
-	start.setIdentity ();
-	end.setIdentity ();
-
-	/* FIXME: Handle penetration properly */
-	start.setOrigin (m_currentPosition + getUpAxisDirections()[m_upAxis] * (m_convexShape->getMargin() + m_addedMargin));
-	end.setOrigin (m_targetPosition);
-
-	btKinematicClosestNotMeConvexResultCallback callback (m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
-	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
-	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
-
-	if (m_useGhostObjectSweepTest)
-	{
-		m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
-	}
-	else
-	{
-		world->convexSweepTest (m_convexShape, start, end, callback);
-	}
-
-	if (callback.hasHit())
-	{
-		// Only modify the position if the hit was a slope and not a wall or ceiling.
-		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
-		{
-			// we moved up only a fraction of the step height
-			m_currentStepOffset = m_stepHeight * callback.m_closestHitFraction;
-			if (m_interpolateUp == true)
-				m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
-			else
-				m_currentPosition = m_targetPosition;
-		}
-		m_verticalVelocity = 0.0;
-		m_verticalOffset = 0.0;
-	} 
-	else 
-	{
-		m_currentStepOffset = m_stepHeight;
 		m_currentPosition = m_targetPosition;
 	}
 }

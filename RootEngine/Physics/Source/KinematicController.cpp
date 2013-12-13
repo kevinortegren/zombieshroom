@@ -24,9 +24,9 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 							float* p_vertexBuffer, int p_vertexStride, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 {
 	m_dynamicWorld = p_world;
-	m_heightOffset = p_modelHeight / 2.0f;
+	m_heightOffset = p_modelHeight / 2.0f; //cleanup
 	m_stepHeight = p_stepHeight;
-	m_maxSpeed = p_maxSpeed;
+	m_maxSpeed = p_maxSpeed; //cleanup
 	m_mass = p_mass;
 
 	//Shape
@@ -94,7 +94,7 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 	btVector3 from,to,traveldist;
 	from = m_ghostObject->getWorldTransform().getOrigin();
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
-	traveldist = to- from;
+	traveldist = to - from;
 	if(traveldist.length() > 1 )
 	{
 		m_kinController->warp(to);
