@@ -39,7 +39,7 @@ function AbilityTest.OnActivate (action)
 	local transform 	= Transformation.New(entity);
 	transform:SetPos(x, y, z);
 	local physics 		= PhysicsAccessor.New(entity);
-	renderComp:SetModel("testchar");
+	renderComp:SetModel("Primitives/sphereTangents");
 	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
 	physics:SetInfo(
 		true, --collideWorld
@@ -47,7 +47,7 @@ function AbilityTest.OnActivate (action)
 		aimy, --diry
 		aimz, --dirz
 		0, --gravx
-		0, --gravy
+		-9.82, --gravy
 		0, --gravz
 		0, --orientX
 		0, --orientY
