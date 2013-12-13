@@ -48,7 +48,7 @@
         - Entity: 2
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
-          Range: 10
+          Range: 20
     - Type: 4
       Data:
         - Entity: 3
