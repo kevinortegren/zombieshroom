@@ -314,7 +314,10 @@ namespace RootForce
 			lookAtSystem->Process();
 			cameraSystem->Process();
 			pointLightSystem->Process();
-			renderingSystem->Process();
+			{
+				PROFILE("RenderingSystem", g_engineContext.m_profiler);
+				renderingSystem->Process();
+			}
 			g_engineContext.m_renderer->Render();
 	
 			{
