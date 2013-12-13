@@ -33,7 +33,7 @@ void GetMaterial(MObject node);
 void MayaMeshToList(MObject node, int id);
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 
 // Lägger till ett callback-id i callback-arrayen.
@@ -224,9 +224,11 @@ void viewCB(const MString &str, void *clientData)
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	int index = nodeExists(node);
+	Print("DirtyMeshNodeCB called! ");
 
 	if(index != -1)
 	{
+		Print("DirtyMeshNodeCB called! ");
 		MayaMeshToList(node, index);
 		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
 	}
@@ -527,21 +529,10 @@ void MayaMeshToList(MObject node, int meshIndex)
 		MString materialName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
+		MObject material_objectNode;
 																								////NEW STUFFS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode);
 		materialName = material_node.name();
-
-		//if(material_node.typeName() == "lambert")
-		//{
-		//	Print("LAMBERT FOUND");
-		//	Print(material_node.name());
-		//	Print(material_node.pluginName());
-		//}
-
-		//memcpy(SM.meshList[meshIndex].texturePath, texturepath.asChar(), texturepath.numChars());
-		//memcpy(SM.meshList[meshIndex].normalPath, normalpath.asChar(),normalpath.numChars());
-
-		//memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
 
 		bool materialExists = false;
 		int materialID = 0;
@@ -561,6 +552,10 @@ void MayaMeshToList(MObject node, int meshIndex)
 			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+
 			currNrMaterials++;
 			materialID = currNrMaterials;
 			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
@@ -780,7 +775,7 @@ void MayaCameraToList(MObject node, int cameraIndex)
 	}
 }
 
-void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
+void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node, MObject &out_materialObject)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -802,6 +797,7 @@ void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_no
 		else
 		{
 			MObject material_object(materials[0].node(&status));
+			out_materialObject = materials[0].node(&status);
 			out_material_node.setObject(material_object);
 		}
 	}
@@ -893,7 +889,7 @@ void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float
 	}
 }
 
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -908,7 +904,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		
 		for(int j = 0; j < shaders.length(); j++)
 		{
-			GetMaterialNode(shaders[j], material_node);
+			GetMaterialNode(shaders[j], material_node, out_materialNode);
 			ExtractColor(material_node, out_color_path);
 			ExtractBump(material_node, out_bump_path, out_bump_depth);			
 		}
