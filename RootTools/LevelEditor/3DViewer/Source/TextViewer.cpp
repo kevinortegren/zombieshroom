@@ -322,6 +322,10 @@ int main(int argc, char* argv[])
 			}
 
 			//////////////////////// LOAD CAMERA  /////////////////////////////////////////
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+			*RM.CameraIdChange = glm::vec2(-1,-1);
+			ReleaseMutex(RM.IdMutexHandle);
 
 			RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
 			WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
@@ -365,6 +369,7 @@ int main(int argc, char* argv[])
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				int MeshIndex = RM.MeshIdChange->x;
 				int RemoveMeshIndex = RM.MeshIdChange->y;
+				int RemoveLightIndex = RM.LightIdChange->y;
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
@@ -446,16 +451,7 @@ int main(int argc, char* argv[])
 
 					ReleaseMutex(RM.MeshMutexHandle);
 				}
-
-				//Remove mesh component at index
-				if(RemoveMeshIndex != -1)	
-				{					
-					m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
-					m_world.GetEntityManager()->RemoveEntity(Entities[RemoveMeshIndex]);
-					Entities.erase(Entities.begin() + RemoveMeshIndex);
-				}
 				
-
 				///////////////////////UPDATE LIGHTS////////////////////////////////
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
@@ -484,12 +480,6 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
 					m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
-
-					//glm::quat rotation;
-					//rotation.x = RM.PlightList[LightIndex]->transformation.rotation.x;
-					//rotation.y = RM.PlightList[LightIndex]->transformation.rotation.y;
-					//rotation.z = RM.PlightList[LightIndex]->transformation.rotation.z;
-					//rotation.w = RM.PlightList[LightIndex]->transformation.rotation.w;
 
 					ReleaseMutex(RM.LightMutexHandle);
 				}
@@ -526,6 +516,20 @@ int main(int argc, char* argv[])
 					ReleaseMutex(RM.CameraMutexHandle);
 
 				}			
+
+				//Remove mesh component at index
+				if(RemoveMeshIndex != -1)	
+				{					
+					m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
+					m_world.GetEntityManager()->RemoveEntity(Entities[RemoveMeshIndex]);
+					Entities.erase(Entities.begin() + RemoveMeshIndex);
+				}
+				if(RemoveLightIndex != -1)	
+				{					
+					m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);
+					m_world.GetEntityManager()->RemoveEntity(LightEntities[RemoveLightIndex]);
+					LightEntities.erase(LightEntities.begin() + RemoveLightIndex);
+				}
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();

@@ -302,6 +302,7 @@ void NodeAddedCB(MObject &node, void *clientData)
 void NodeRemovedCB(MObject &node, void *clientData)
 {
 	int removeID = 0;
+
 	if(node.hasFn(MFn::kMesh))
 	{
 		Print("Removed a mesh!");
@@ -326,8 +327,27 @@ void NodeRemovedCB(MObject &node, void *clientData)
 				SM.RemoveMesh(removeID, currNrMeshes);
 			}
 		}	
+	}
+	if(node.hasFn(MFn::kLight))
+	{
+		MFnLight light = node;
 
-		printLists();
+		for(int i = 0; i < currNrLights; i ++)
+		{
+			MFnLight listLight = g_mayaLightList[i];
+			if(listLight.name() == light.name())
+			{
+				removeID = i;
+				for(int j = i; j < currNrLights; j++)
+				{
+					g_mayaLightList[j] = g_mayaLightList[j+1];
+					MayaLightToList(g_mayaLightList[j], j);
+					SM.UpdateSharedLight(j,currNrLights-1);
+				}
+				currNrLights--;
+				SM.RemoveLight(removeID, currNrMeshes);
+			}
+		}
 	}
 }
 
