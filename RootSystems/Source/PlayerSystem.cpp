@@ -19,9 +19,9 @@ namespace RootForce
 		RootForce::PhysicsAccessor* physics = entityManager->CreateComponent<RootForce::PhysicsAccessor>(entity);
 
 		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
-		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("DiffuseV1", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("BumpV1", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("SpecularV1", Render::TextureType::TEXTURE_2D);
+		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+		renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 		playerControl->m_mouseSensitivity = 0.3f;
