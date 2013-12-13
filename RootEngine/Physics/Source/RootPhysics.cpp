@@ -292,7 +292,7 @@ namespace Physics
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		btScalar mass = 0; //mass is always 0 for static objects
 		btCollisionShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
-
+		
 		//Set startpos and start rotation
 		btTransform startTransform;
 		startTransform.setIdentity();

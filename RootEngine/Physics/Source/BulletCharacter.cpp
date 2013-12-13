@@ -423,6 +423,8 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 	end.setOrigin (m_targetPosition);
 
 	btKinematicClosestNotMeConvexResultCallback callback (m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
+	
+	
 	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
 
@@ -434,10 +436,11 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 	{
 		world->convexSweepTest (m_convexShape, start, end, callback);
 	}
-
+	
 	if (callback.hasHit())
 	{
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
+		//callback.m_hitNormalWorld.setY(callback.m_hitNormalWorld.y() * -1); 
 		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
 		{
 			// we moved up only a fraction of the step height
