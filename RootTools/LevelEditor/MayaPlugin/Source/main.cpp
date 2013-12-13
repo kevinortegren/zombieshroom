@@ -164,6 +164,7 @@ void loadScene()
 			AddCallbackID(status, id);
 		}
 
+		MayaMeshToList(g_mayaMeshList[i], i);
 		SM.UpdateSharedMesh(i, true, true, currNrMeshes);
 		//MayaListToList(g_mayaMeshList[i]);
 	}
@@ -184,8 +185,8 @@ void loadScene()
 			AddCallbackID(status, id);
 		}
 
-		SM.UpdateSharedLight(currNrLights, currNrLights); 
-		//MayaListToList(g_mayaLightList[i]);
+		MayaLightToList(g_mayaLightList[i], i);
+		SM.UpdateSharedLight(i, currNrLights);
 	}
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
@@ -201,10 +202,11 @@ void loadScene()
 		const MString temp = "modelPanel4";
 
 		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);
-		//Print("Camera name: ", camera.name());
+		
 		AddCallbackID(status, id);
+
+		MayaCameraToList(g_mayaCameraList[i], i);
 		SM.UpdateSharedCamera(i);
-		//MayaListToList(g_mayaCameraList[i]);
 	}
 
 }
@@ -552,7 +554,8 @@ void MayaMeshToList(MObject node, int meshIndex)
 			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
-
+			MFnBlinnShader Blinn = material_objectNode;
+			Print("New Material name: ", Blinn.name());
 			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 

@@ -26,6 +26,7 @@ bool g_running;
 void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
+bool export;
 
 ReadMemory RM;
 void LoadScene()
@@ -44,6 +45,12 @@ void HandleEvents()
 			g_running = false;
 			break;
 
+		case SDL_KEYDOWN:
+			{
+				if(event.key.keysym.scancode == SDL_SCANCODE_P)
+					export = true;
+			}
+			break;
 		//default:
 			//if (m_engineContext.m_inputSys != nullptr)
 			//	m_engineContext.m_inputSys->HandleInput(event);
@@ -101,6 +108,8 @@ std::string GetNameFromPath( std::string p_path )
  } 
 int main(int argc, char* argv[]) 
 {
+	export = false;
+
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
     RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
@@ -235,7 +244,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			//SET TO UPDATE ALL BELOW FIRST TIME
+			//SET TO UPDATE ALL MATERIALS BELOW FIRST TIME
 			renderNrOfMaterials = -1;
 
 			for(int i = 0; i < numberMeshes; i++)
@@ -305,12 +314,36 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.g = RM.PlightList[i]->color.g;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.b = RM.PlightList[i]->color.b;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_color.a = RM.PlightList[i]->color.a;
-				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.x = RM.PlightList[i]->Intensity;
-
-				//m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation(
+				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.x = 0.0f;
+				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.y = 1-0.1 * RM.PlightList[i]->Intensity;
+				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.z = 0.0f;
 				
 				ReleaseMutex(RM.LightMutexHandle);
 			}
+
+			//////////////////////// LOAD CAMERA  /////////////////////////////////////////
+
+			RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+			WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+
+			glm::quat rotation;
+			rotation.x = RM.PcameraList[0]->transformation.rotation.x;
+			rotation.y = RM.PcameraList[0]->transformation.rotation.y;
+			rotation.z = RM.PcameraList[0]->transformation.rotation.z;
+			rotation.w = RM.PcameraList[0]->transformation.rotation.w;
+
+			cameraTransform->m_position.x = RM.PcameraList[0]->transformation.position.x;
+			cameraTransform->m_position.y = RM.PcameraList[0]->transformation.position.y;
+			cameraTransform->m_position.z = RM.PcameraList[0]->transformation.position.z;
+			cameraTransform->m_orientation.SetOrientation(rotation);
+			//Rotate 180 to fix camera
+			cameraTransform->m_orientation.Yaw(180);
+
+			camera->m_far = RM.PcameraList[0]->farClippingPlane;					
+			camera->m_near = RM.PcameraList[0]->nearClippingPlane;
+			camera->m_fov = glm::degrees(RM.PcameraList[0]->verticalFieldOfView);
+
+			ReleaseMutex(RM.CameraMutexHandle);
 
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE //////////////////////////////////////////////////////////////
@@ -320,6 +353,12 @@ int main(int argc, char* argv[])
 				uint64_t now = SDL_GetPerformanceCounter();
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
+
+				if(export)
+				{
+					m_world.GetEntityExporter()->Export("level");
+					export = false;
+				}
 
 				// GET MESH CHANGE AND REMOVE INDEX
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -455,13 +494,13 @@ int main(int argc, char* argv[])
 					ReleaseMutex(RM.LightMutexHandle);
 				}
 
+				/////////////////////// UPDATE CAMERAS ////////////////////////////////
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				int cameraIDchange = RM.CameraIdChange->x;
 				RM.CameraIdChange->x = -1;
 				ReleaseMutex(RM.IdMutexHandle);
-
-				/////////////////////// UPDATE CAMERAS ////////////////////////////////
+				
 				if( cameraIDchange != -1)
 				{
 					RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");

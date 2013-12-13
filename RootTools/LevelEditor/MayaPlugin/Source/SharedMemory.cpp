@@ -88,10 +88,10 @@ int SharedMemory::InitalizeSharedMemory()
 	NumberOfMaterials = (int*)(mem);
 	
 
-	//if(first_process)
-	//{
+	if(first_process)
+	{
 		memset(raw_data,0,total_memory_size);
-	//}
+	}
 	return 0;
 }
 
