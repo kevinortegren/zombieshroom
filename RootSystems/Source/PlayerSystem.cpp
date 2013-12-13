@@ -25,7 +25,7 @@ namespace RootForce
 		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 		playerControl->m_mouseSensitivity = 0.3f;
-		playerControl->m_speed = 10.0f;
+		playerControl->m_speed = 0.5f;
 
 		player->m_abilities[0] = Abilitiy::ABILITY_TEST;
 		player->m_selectedAbility = Abilitiy::ABILITY_TEST;
