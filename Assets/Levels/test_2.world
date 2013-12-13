@@ -28,11 +28,11 @@
           Rotation: [180, 0, 0]
           Scale: [-100, -100, -100]
         - Entity: 1
-          Position: [1, 0, 0]
+          Position: [1, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [-1, 0, 0]
+          Position: [-1, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
