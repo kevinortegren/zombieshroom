@@ -88,7 +88,7 @@ namespace RootForce
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(entity);
 		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
-
+		
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
@@ -104,24 +104,20 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					//m_physics->SetVelocity(*(physAcc->m_handle), facing);
-					movement += facing;
+					movement += facing * speed;
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						//m_physics->SetVelocity(*(physAcc->m_handle), -facing);
-						movement += -facing;
-						//m_physics->PlayerKnockback(*(physAcc->m_handle), &backwards.x, 5.f);
+						movement += -facing * speed;
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					//m_physics->SetVelocity(*(physAcc->m_handle), right);
-					movement += right;
+					movement += right * speed;
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
-						movement += -right;
+						movement += -right * speed;
 						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
 					break;
@@ -159,7 +155,8 @@ namespace RootForce
 
 		
 		if(movement != glm::vec3(0.0f))
-			m_physics->SetVelocity(*(physAcc->m_handle), movement);
+			m_physics->SetPosition(*(physAcc->m_handle), movement  + transform->m_position);
+			//m_physics->SetVelocity(*(physAcc->m_handle), movement);
 		m_physics->SetOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}

@@ -24,10 +24,12 @@ public:
 	void SetDebugDrawer(DebugDrawer* p_drawer) const {m_kinController->debugDraw(p_drawer);}
 	void SetMass(float p_mass);
 	void SetGravity(float p_gravity);
+	void SetPosition(const btVector3& p_position);
 	float GetMass() const {return m_mass;}
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}
 	float GetModelHeight() const {return m_heightOffset;}
+	void Move(glm::vec3 p_target, float p_dt);
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
 	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
 

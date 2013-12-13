@@ -141,7 +141,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
 					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation);
-					physaccessor->m_handle[0] = -1;
+					physaccessor->m_handle = new int(-1);
 				}
 
 			}
