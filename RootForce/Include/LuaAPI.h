@@ -20,6 +20,31 @@ namespace RootForce
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
 			*s = g_world->GetEntityManager()->CreateEntity();
 
+			luaL_setmetatable(p_luaState, "Entity");
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int GetEntityByTag(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*s = g_world->GetTagManager()->GetEntityByTag(lua_tostring(p_luaState, 1));
+			
+			luaL_setmetatable(p_luaState, "Entity");
+			//Userdata already on stack
+			return 1;
+		}
+		
+		static int GetTransformation(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
+
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Transform>(*e);
+
+			luaL_setmetatable(p_luaState, "Transformation");
 			//Userdata already on stack
 			return 1;
 		}
@@ -48,6 +73,28 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Transformation");
 			//Userdata already on stack
 			return 1;
+		}
+
+		static int GetPos(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_position.x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_position.y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_position.z );
+
+			return 3;
+		}
+
+		static int SetPos(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			(*ptemp)->m_position.x = (float)lua_tonumber(p_luaState, 1);
+			(*ptemp)->m_position.y = (float)lua_tonumber(p_luaState, 2);
+			(*ptemp)->m_position.z = (float)lua_tonumber(p_luaState, 3);
+
+			return 0;
 		}
 
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
@@ -114,8 +161,15 @@ namespace RootForce
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
+			{"GetEntityByTag", GetEntityByTag},
 			{NULL, NULL}
 		};
+
+		static const struct luaL_Reg entity_m [] = {
+			{"GetTransformation", GetTransformation},
+			{NULL, NULL}
+		};
+
 		//Renderable functions&methods
 		static const struct luaL_Reg renderable_f [] = {
 			{"New", CreateRenderable},
@@ -136,6 +190,8 @@ namespace RootForce
 		static const struct luaL_Reg transformation_m [] = {
 			{"SetModel", SetRenderableModel},
 			{"SetMaterial", SetRenderableMaterial},
+			{"GetPos", GetPos},
+			{"SetPos", SetPos},
 			{NULL, NULL}
 		};
 		//Physics function & methods
@@ -149,15 +205,7 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
-		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, std::string p_typeName)
-		{
-			luaL_newlib(p_luaState, p_funcReg);
-			lua_setglobal(p_luaState, p_typeName.c_str());
-
-			return 1;
-		}
-
-		static int LuaSetupTypeWithMethods(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
+		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
 			int meta_id = lua_gettop(p_luaState);

@@ -128,8 +128,8 @@ namespace RootForce
 						// TODO: Update a camera controller with m_deltaMouseMovement.
 						//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-						m_angle.x = -m_deltaMouseMovement.x;
-						m_angle.y += m_deltaMouseMovement.y;
+						m_angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
+						m_angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
 					}
 					break;
 				case PlayerAction::SELECT_ABILITY:
@@ -168,6 +168,6 @@ namespace RootForce
 
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
-		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.5f + transform->m_orientation.GetRight() * 1.0f + transform->m_orientation.GetFront() * 2.0f;
+		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
 	}
 }
