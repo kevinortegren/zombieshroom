@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include <Lua/lua.hpp>
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
@@ -97,6 +97,39 @@ namespace RootForce
 			return 0;
 		}
 
+		static int GetFront(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().z );
+
+			return 3;
+		}
+
+		static int GetUp(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().z );
+
+			return 3;
+		}
+
+		static int GetRight(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().z );
+
+			return 3;
+		}
+
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
@@ -192,6 +225,9 @@ namespace RootForce
 			{"SetMaterial", SetRenderableMaterial},
 			{"GetPos", GetPos},
 			{"SetPos", SetPos},
+			{"GetFront", GetFront},
+			{"GetUp", GetUp},
+			{"GetRight", GetRight},
 			{NULL, NULL}
 		};
 		//Physics function & methods
