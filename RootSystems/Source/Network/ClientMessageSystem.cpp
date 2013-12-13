@@ -124,8 +124,7 @@ namespace RootForce
 				RootForce::Network::MessageChat netmsgchat;
 				netmsgchat.SenderID = -1; // TODO: Fix own sender ID to first player connected ID received
 				netmsgchat.Type = RootForce::Network::MessageChat::TYPE_DEBUG;
-				netmsgchat.Message = chatmsg.c_str();//new char[chatmsg.size()+1];
-				//std::strcpy(netmsgchat.Message, chatmsg.c_str());
+				netmsgchat.Message = chatmsg.c_str();
 
 				netmsg.MessageID = RootForce::Network::MessageType::ChatToServer;
 				netmsg.RecipientID = RootEngine::Network::RECIPIENT_BROADCAST;

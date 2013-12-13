@@ -234,7 +234,7 @@ namespace RootForce
 						SynchronizedId_t otherSynchronizedId = m_playerEntities[connectedClients[i]];
 						NetworkClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(m_networkEntityMap.GetSynchronizedEntity(otherSynchronizedId));
 
-						userConnectedMessage.UserID = i;
+						userConnectedMessage.UserID = connectedClients[i];
 						userConnectedMessage.UserInfo.PlayerName = otherClientComponent->Name.c_str();
 						userConnectedMessage.UserInfo.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
 						userConnectedMessage.UserInfo.PlayerEntity.SynchronizedID = otherSynchronizedId;
