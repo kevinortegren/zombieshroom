@@ -149,18 +149,24 @@ namespace RootForce
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
 
 			std::string handle = lua_tostring(p_luaState, 2);
-			std::string effecthandle = lua_tostring(p_luaState, 3);
 			
-			(*rtemp)->m_model = g_engineContext.m_resourceManager->GetModel(handle);
-			(*rtemp)->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[0]);
-			(*rtemp)->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[1]);
-			(*rtemp)->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[2]);
-			(*rtemp)->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effecthandle);
+			(*rtemp)->m_model = g_engineContext.m_resourceManager->LoadCollada(handle);
 			return 0;
 		}
 
 		static int SetRenderableMaterial(lua_State* p_luaState)
 		{
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+
+			std::string diffuseHandle = lua_tostring(p_luaState, 2);
+			std::string specularHandle = lua_tostring(p_luaState, 3);
+			std::string normalHandle = lua_tostring(p_luaState, 4);
+			std::string effectHandle = lua_tostring(p_luaState, 5);
+
+			(*rtemp)->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuseHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specularHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normalHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect(effectHandle);
 			return 0;
 		}
 

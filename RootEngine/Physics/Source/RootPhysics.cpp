@@ -286,7 +286,7 @@ namespace Physics
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
 	{
-		//TODO if time and need to improve performance: Use compundshapes
+		//TODO if time and need to improve performance: Use compoundshapes
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		btScalar mass = 0; //mass is always 0 for static objects
@@ -464,15 +464,15 @@ namespace Physics
 		m_playerObjects.at(index)->Jump();
 	}
 	
- 	void RootPhysics::PlayerKnockback( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
+	void RootPhysics::PlayerKnockback( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
- 		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
+		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
- 		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
 	}
 
 	bool RootPhysics::DoesObjectExist( int p_objectHandle )

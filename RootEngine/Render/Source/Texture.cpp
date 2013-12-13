@@ -11,7 +11,11 @@ namespace Render
 	bool Texture::Load(const std::string filepath)
 	{
 		gli::texture2D texture(gli::loadStorageDDS(filepath));
-		assert(!texture.empty());
+
+		if(texture.empty())
+		{
+			return false;
+		}
 
 		m_target = GL_TEXTURE_2D;
 
