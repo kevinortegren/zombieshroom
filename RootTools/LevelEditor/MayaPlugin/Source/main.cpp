@@ -248,24 +248,12 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 		SM.UpdateSharedLight(index, currNrLights);
 	}
 }
+
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	MStatus status = MS::kSuccess;
-	//MSpace::Space _spaceWorld = MSpace::kWorld;
-	//MSpace::Space _space = MSpace::kObject;
-	//MSpace::Space _spaceTrans = MSpace::kTransform;
 	MFnTransform trans = node;
-
-	//double scale[3];
-	//double rotX, rotY, rotZ, rotW;
-	//
-	//MFnMesh mesh = trans.child(0, &status);
-
-	//trans.getScale(scale);
-	//MVector translation = trans.getTranslation(_spaceTrans, &status);
-
-	//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, _space);
 
 	int index = nodeExists(trans.child(0, &status));
 
@@ -285,10 +273,6 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 		}
 
 	}
-	//Print("Trans name: ", trans.fullPathName());
-	//Print("Scale: X: ", scale[0], " Y: ", scale[1], " Z: ", scale[2]);
-	//Print("Translation: X: ", translation.x, " Y: ", translation.y, " Z: ", translation.z);
-	//Print("Rotation X: ", rotX, " Y: ", rotY, " Z: ", rotZ, " W: ", rotW);
 }
 
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
@@ -364,6 +348,15 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 	if (Status(__LINE__, status1) && Status(__LINE__, status2))
 	{
 		checkForNewMeshes(made, source, destination);
+		Print("Updating all materials");
+		for(int i = 0; i < currNrMeshes; i++)
+		{
+			for(int j = 0; j < currNrMaterials; j++)
+			{
+				SM.UpdateSharedMaterials(currNrMaterials, j, i);
+			}
+		}
+		
 	}
 }
 
@@ -798,7 +791,7 @@ void MayaCameraToList(MObject node, int cameraIndex)
 	}
 }
 
-void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node, MObject &out_materialObject)
+void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -820,13 +813,12 @@ void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_no
 		else
 		{
 			MObject material_object(materials[0].node(&status));
-			out_materialObject = materials[0].node(&status);
 			out_material_node.setObject(material_object);
 		}
 	}
 }
 
-void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path)
+void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MObject &out_materialObject)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -847,6 +839,7 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path)
 			//ftn == fileTextureName
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
+			out_materialObject = connections[n].node(&status);
 
 			break;
 		}
@@ -927,8 +920,8 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		
 		for(int j = 0; j < shaders.length(); j++)
 		{
-			GetMaterialNode(shaders[j], material_node, out_materialNode);
-			ExtractColor(material_node, out_color_path);
+			GetMaterialNode(shaders[j], material_node);
+			ExtractColor(material_node, out_color_path, out_materialNode);
 			ExtractBump(material_node, out_bump_path, out_bump_depth);			
 		}
 	}
