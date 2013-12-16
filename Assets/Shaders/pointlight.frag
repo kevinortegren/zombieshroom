@@ -37,12 +37,12 @@ vec3 GetVSPositionFromDepth()
 	z = z * 2 - 1;
 
 	float x = ex_TexCoord.x * 2 - 1;
-    float y = ex_TexCoord.y * 2 - 1;
+	float y = ex_TexCoord.y * 2 - 1;
 
 	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
-    vec4 sPos = invProj * vProjectedPos;
+	vec4 sPos = invProj * vProjectedPos;
 
-    return (sPos.xyz / sPos.w);
+	return (sPos.xyz / sPos.w);
 }
 
 void main() {
@@ -74,5 +74,5 @@ void main() {
 		light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));
 	}
 
-    out_Color = vec4(light, 1.0f);
+	out_Color = vec4(light, 1.0f);
 }

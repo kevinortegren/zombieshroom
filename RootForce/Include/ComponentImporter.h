@@ -41,21 +41,21 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				 {
 					 std::string diffuse;
 					 p_node["Diffuse"] >> diffuse;
-					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(diffuse);
+					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
 				 }
 				 const YAML::Node* specularNode = p_node.FindValue("Specular");
 				 if(specularNode != nullptr)
 				 {
 					 std::string specular;
 					 p_node["Specular"] >> specular;
-					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(specular);
+					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
 				 }
 				 const YAML::Node* normalNode = p_node.FindValue("Normal");
 				 if(normalNode != nullptr)
 				 {
 					 std::string normal;
 					 p_node["Normal"] >> normal;
-					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture(normal);
+					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
 				 }
 			}
 			break;
@@ -123,7 +123,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				int type;
 				std::string modelHandle;
 				RootForce::Transform* temp = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-				glm::quat rotation =  temp->m_orientation.GetQuaterion();
+				glm::quat rotation =  temp->m_orientation.GetQuaternion();
 				p_node["Type"] >> type;
 				p_node["Mass"] >> mass;
 				p_node["ModelHandle"] >> modelHandle;
@@ -141,7 +141,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
 					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation);
-					physaccessor->m_handle[0] = -1;
+					physaccessor->m_handle = new int(-1);
 				}
 
 			}

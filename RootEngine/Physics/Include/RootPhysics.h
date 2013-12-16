@@ -33,7 +33,8 @@ namespace RootEngine
 			{
 				SHAPE_SPHERE,
 				SHAPE_CONE,
-				SHAPE_CYLINDER
+				SHAPE_CYLINDER,
+				SHAPE_CUSTOM_MESH
 			};
 		}
 		struct AbilityPhysicsInfo
@@ -50,6 +51,7 @@ namespace RootEngine
 			bool m_collidesWorld ;
 			float m_mass; 
 			glm::vec3 m_gravity;
+			std::string m_modelHandle; //No need to specify this unless a SHAPE_CUSTOM_MESH is used
 		};
 
 
@@ -61,7 +63,6 @@ namespace RootEngine
 			unsigned int m_entityId; //My entity id
 			std::vector<unsigned int> m_collidedEntityId; //List of all entities collided with since last update
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
-			bool m_collided;
 			std::string m_modelHandle;
 			~CustomUserPointer()
 			{
@@ -77,10 +78,10 @@ namespace RootEngine
 			virtual void Update(float p_dt) = 0;
 
 			///Set the direction a controllable object is facing, should be sent in every update and is assumed to be a vec3, the y value is ignored however
-			virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
-			virtual void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction) = 0;
+		//	virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0; ///p_pushDirection is the direction the pushing has, for the love of god normalize it first
+		//	virtual void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction) = 0;
 			///Call this when a character jumps
-			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
+		//	virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
 			///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
 			
@@ -108,6 +109,7 @@ namespace RootEngine
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
 			virtual void SetMass(int p_objectHandle, float p_mass) = 0;
 			virtual void SetGravity(int p_objectHandle, glm::vec3 p_gravity) = 0;
+			virtual void SetPosition(int p_objectHandle , glm::vec3 p_position) = 0;
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
@@ -158,7 +160,7 @@ namespace RootEngine
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
 			void SetMass(int p_objectHandle, float p_mass);
 			void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation);
-			//void SetPlayerOrientation(int p_objectHandle, glm::quat p_playerOrientation);
+			void SetPosition(int p_objectHandle , glm::vec3 p_position);
 			void RemoveObject(int p_objectHandle);
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
@@ -168,6 +170,7 @@ namespace RootEngine
 			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
 			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			btRigidBody* CreateMesh(std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			RootPhysics();
 			~RootPhysics();
 			DebugDrawer* m_debugDrawer;
