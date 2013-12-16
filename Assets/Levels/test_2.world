@@ -28,11 +28,11 @@
           Rotation: [180, 0, 0]
           Scale: [-100, -100, -100]
         - Entity: 1
-          Position: [1, 0, 0]
+          Position: [1, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [-1, 0, 0]
+          Position: [-1, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
@@ -43,7 +43,7 @@
       Data:
         - Entity: 1
           Attenuation: [0, 0, 1]
-          Color: [0.4, 0, 0, 1]
+          Color: [1, 0, 0, 1]
           Range: 2
         - Entity: 2
           Attenuation: [0, 0.2, 0]

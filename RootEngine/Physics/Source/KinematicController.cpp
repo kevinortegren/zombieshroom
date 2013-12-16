@@ -25,7 +25,6 @@ void KinematicController::RemovePlayer()
 	delete m_motionState;
 	delete m_ghostObject->getCollisionShape();
 	delete m_ghostObject;
-	
 }
 
 void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 

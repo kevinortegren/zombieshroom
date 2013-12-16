@@ -32,30 +32,34 @@ function AbilityTest.OnActivate (action)
 	local playerEntity  = Entity.GetEntityByTag("Player");
 	local playerTrans   = playerEntity:GetTransformation();
 	x, y, z = playerTrans:GetPos();
+	local aimingDevice  = Entity.GetEntityByTag("AimingDevice");
+	local aimingTrans   = aimingDevice:GetTransformation();
+	aimx, aimy, aimz = aimingTrans:GetFront();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
 	transform:SetPos(x, y, z);
 	local physics 		= PhysicsAccessor.New(entity);
-	renderComp:SetModel("Primitives/sphere", "Mesh");
+	renderComp:SetModel("Primitives/sphereTangents");
+	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
 	physics:SetInfo(
 		true, --collideWorld
-		0, --dirx
-		1, --diry
-		1, --dirz
+		aimx, --dirx
+		aimy, --diry
+		aimz, --dirz
 		0, --gravx
-		-9, --gravy
+		-9.82, --gravy
 		0, --gravz
 		0, --orientX
 		0, --orientY
 		0, --orientZ
 		0, --orientW
-		x, --posX
-		y+1, --posY
-		z+2, --posZ
+		x + aimx * 3, --posX
+		4 + y + aimy * 3, --posY
+		z + aimz * 3, --posZ
 		0.5, --height
 		3, --mass
 		1, --radius
 		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
-		15, --speed
+		40, --speed
 		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end

@@ -118,10 +118,10 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		//glFrontFace(GL_CCW);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -308,25 +308,37 @@ namespace Render
 
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
+				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 0);
 					glBindTexture((*itr).m_material->m_diffuseMap->GetTarget(), (*itr).m_material->m_diffuseMap->GetHandle());
 				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 				
+				glActiveTexture(GL_TEXTURE0 + 1);
 				if((*itr).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 1);
 					glBindTexture((*itr).m_material->m_specularMap->GetTarget(), (*itr).m_material->m_specularMap->GetHandle());
 				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 
+				glActiveTexture(GL_TEXTURE0 + 2);
 				if((*itr).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 2);
 					glBindTexture((*itr).m_material->m_normalMap->GetTarget(), (*itr).m_material->m_normalMap->GetHandle());
+				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)

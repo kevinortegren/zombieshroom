@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include <Lua/lua.hpp>
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
@@ -97,6 +97,39 @@ namespace RootForce
 			return 0;
 		}
 
+		static int GetFront(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().z );
+
+			return 3;
+		}
+
+		static int GetUp(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().z );
+
+			return 3;
+		}
+
+		static int GetRight(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().x );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().y );
+			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().z );
+
+			return 3;
+		}
+
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
@@ -116,18 +149,24 @@ namespace RootForce
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
 
 			std::string handle = lua_tostring(p_luaState, 2);
-			std::string effecthandle = lua_tostring(p_luaState, 3);
 			
-			(*rtemp)->m_model = g_engineContext.m_resourceManager->GetModel(handle);
-			(*rtemp)->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[0]);
-			(*rtemp)->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[1]);
-			(*rtemp)->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture((*rtemp)->m_model->m_textureHandles[2]);
-			(*rtemp)->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effecthandle);
+			(*rtemp)->m_model = g_engineContext.m_resourceManager->LoadCollada(handle);
 			return 0;
 		}
 
 		static int SetRenderableMaterial(lua_State* p_luaState)
 		{
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+
+			std::string diffuseHandle = lua_tostring(p_luaState, 2);
+			std::string specularHandle = lua_tostring(p_luaState, 3);
+			std::string normalHandle = lua_tostring(p_luaState, 4);
+			std::string effectHandle = lua_tostring(p_luaState, 5);
+
+			(*rtemp)->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuseHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specularHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normalHandle, Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect(effectHandle);
 			return 0;
 		}
 
@@ -192,6 +231,9 @@ namespace RootForce
 			{"SetMaterial", SetRenderableMaterial},
 			{"GetPos", GetPos},
 			{"SetPos", SetPos},
+			{"GetFront", GetFront},
+			{"GetUp", GetUp},
+			{"GetRight", GetRight},
 			{NULL, NULL}
 		};
 		//Physics function & methods
