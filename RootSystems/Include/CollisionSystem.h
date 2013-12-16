@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/ScriptSystem.h>
 #include <set>
 
 namespace RootForce
@@ -24,9 +25,10 @@ namespace RootForce
 		{
 			SetUsage<Collision>();
 			SetUsage<CollisionResponder>();
+			SetUsage<Script>();
 		}
 
-		ECS::ComponentMapper<Collision> m_colliders;
+		ECS::ComponentMapper<Script> m_scripts;
 		ECS::ComponentMapper<CollisionResponder> m_responders;
 
 		void Init();

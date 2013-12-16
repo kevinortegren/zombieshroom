@@ -7,7 +7,7 @@ namespace RootForce
 {
 	void CollisionSystem::Init()
 	{
-		m_colliders.Init(m_world->GetEntityManager());
+		m_scripts.Init(m_world->GetEntityManager());
 		m_responders.Init(m_world->GetEntityManager());
 	}
 
@@ -22,9 +22,9 @@ namespace RootForce
 
 		for(auto itr = cr->m_collidedEntityId.begin(); itr != cr->m_collidedEntityId.end(); ++itr)
 		{
-			if((*itr) != 3)
-			g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d collided with %d", p_entity->GetId(), (*itr));
+			Script* script = m_scripts.Get(p_entity);
 
+			script->m_actions.push_back(Action(ActionType::ACTION_COLLIDE));
 		}
 
 		cr->m_collidedEntityId.clear();
