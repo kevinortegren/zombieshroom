@@ -218,7 +218,8 @@ namespace RootForce
 		// Setup the skybox.
 		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
 		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
-		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
+		r->m_material = g_engineContext.m_resourceManager->GetMaterial("Skybox"); 
+		r->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),

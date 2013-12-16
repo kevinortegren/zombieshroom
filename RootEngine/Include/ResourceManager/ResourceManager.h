@@ -57,6 +57,7 @@ namespace RootEngine
 		virtual Model*								GetModel(std::string p_handle) = 0;
 		virtual Render::EffectInterface*			GetEffect(std::string p_handle) = 0;
 		virtual Render::TextureInterface*			GetTexture(std::string p_handle) = 0;
+		virtual Render::Material*					GetMaterial(std::string p_handle) = 0;
 	};
 
 	class ResourceManager : public ResourceManagerInterface
@@ -86,6 +87,7 @@ namespace RootEngine
 		Model*							GetModel(std::string p_handle);
 		Render::EffectInterface*		GetEffect(std::string p_handle);
 		Render::TextureInterface*		GetTexture(std::string p_handle);
+		Render::Material*				GetMaterial(std::string p_handle);
 
 		const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture);
 		const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect);
@@ -99,6 +101,7 @@ namespace RootEngine
 		std::map<std::string, std::shared_ptr<Render::MeshInterface>>			m_meshes;
 		std::map<std::string, std::shared_ptr<Render::EffectInterface>>			m_effects;
 		std::map<std::string, std::shared_ptr<Render::TextureInterface>>		m_textures;
+		std::map<std::string, std::shared_ptr<Render::Material>>				m_materials;
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>>	m_physicMeshes;
 		std::map<std::string, std::string>										m_scripts;
 

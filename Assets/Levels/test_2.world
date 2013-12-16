@@ -8,19 +8,15 @@
       Data:
         - Entity: 0
           Model: Primitives/box
-          Effect: Skybox
-        - Entity: 1
-          Model: Primitives/sphere
-          Effect: Mesh
-          Diffuse: sphere_diffuse
-        - Entity: 2
-          Model: Primitives/sphere
-          Effect: Mesh
-          Diffuse: sphere_diffuse
+          Material:
+            Name: Skybox
+            Effect: Skybox
         - Entity: 3
           Model: ground
-          Effect: Mesh
-          Diffuse: grass
+          Material:
+            Name: Grass
+            Effect: Mesh
+            Diffuse: grass
     - Type: 1
       Data:
         - Entity: 0

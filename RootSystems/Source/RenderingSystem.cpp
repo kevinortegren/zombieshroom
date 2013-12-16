@@ -20,7 +20,12 @@ namespace RootForce
 			Transform* transform = m_transforms.Get(p_entity);
 			Renderable* renderable = m_renderables.Get(p_entity);
 
-			if(renderable->m_material.m_effect == nullptr)
+			if(!renderable->m_material)
+			{
+				m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
+				return;
+			}
+			if(renderable->m_material->m_effect == nullptr)
 			{
 				m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
 				return;
@@ -45,7 +50,7 @@ namespace RootForce
 				Render::RenderJob job;
 				job.m_mesh = (*itr);
 				job.m_uniforms = uniforms;
-				job.m_material = &renderable->m_material;
+				job.m_material = renderable->m_material;
 
 				m_renderer->AddRenderJob(job);
 			}

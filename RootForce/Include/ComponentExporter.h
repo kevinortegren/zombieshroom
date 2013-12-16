@@ -17,24 +17,24 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);
 					p_emitter << YAML::Key << "Model" << YAML::Value << s;
 				}
-				if(renderable->m_material.m_effect != nullptr)
+				if(renderable->m_material->m_effect != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material.m_effect);
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect);
 					p_emitter << YAML::Key << "Effect" << YAML::Value << s;
 				}			
-				if(renderable->m_material.m_diffuseMap != nullptr)
+				if(renderable->m_material->m_diffuseMap != nullptr)
 				{				
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_diffuseMap);
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_diffuseMap);
 					p_emitter << YAML::Key << "Diffuse" << YAML::Value << s;
 				}	
-				if(renderable->m_material.m_specularMap != nullptr)
+				if(renderable->m_material->m_specularMap != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_specularMap);
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_specularMap);
 					p_emitter << YAML::Key << "Specular" << YAML::Value << s;
 				}
-				if(renderable->m_material.m_normalMap != nullptr)
+				if(renderable->m_material->m_normalMap != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_normalMap);
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_normalMap);
 					p_emitter << YAML::Key << "Normal" << YAML::Value << s;
 				}	
 			}

@@ -40,7 +40,8 @@ function AbilityTest.OnActivate (action)
 	transform:SetPos(x, y, z);
 	local physics 		= PhysicsAccessor.New(entity);
 	renderComp:SetModel("Primitives/sphereTangents");
-	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
+	renderComp:SetMaterial("Fireball");
+	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
 	physics:SetInfo(
 		true, --collideWorld
 		aimx, --dirx
