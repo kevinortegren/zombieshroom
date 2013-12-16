@@ -9,6 +9,7 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <RootEngine/Render/Include/Animation.h>
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
@@ -50,6 +51,7 @@ namespace Render
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
 		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
 		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
+		virtual std::shared_ptr<AnimationInterface> CreateAnimation() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -85,6 +87,7 @@ namespace Render
 		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
+		std::shared_ptr<AnimationInterface> CreateAnimation() { return std::shared_ptr<AnimationInterface>(new Animation);}
 
 	private:
 
