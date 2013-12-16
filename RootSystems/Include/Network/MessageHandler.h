@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/Network/ClientMessageSystem.h>
 #include <RootSystems/Include/Network/ServerMessageSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 namespace RootForce
 {
@@ -21,11 +21,16 @@ namespace RootForce
 			};
 
 			MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface);
+			void PingNetwork(USHORT p_port);
 
 			void Host(int16_t p_port, ServerType p_type);
 			void Connect( int16_t p_port, const char* p_address = "");
 
 			void Update();
+			void SetChatSystem(ChatSystemInterface* p_chatSystem);
+
+			ClientMessageHandler* GetClientMessageHandler() { return m_clientMessageHandler; }
+			ServerMessageHandler* GetServerMessageHandler() { return m_serverMessageHandler; }
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
@@ -33,9 +38,6 @@ namespace RootForce
 			RootEngine::Network::Server* m_server;
 			ClientMessageHandler* m_clientMessageHandler;
 			ServerMessageHandler* m_serverMessageHandler;
-
-			// Might change to all dynamic objects
-			std::map<uint8_t, ECS::Entity*> m_playerEntities;
 			RootEngine::Network::NetworkInterface* m_networkInterface;
 		};
 	}

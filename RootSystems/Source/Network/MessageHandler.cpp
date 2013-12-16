@@ -2,8 +2,10 @@
 
 #include <Network/MessageHandler.h>
 #include <Network/Messages.h>
+#include <Network/ServerInfo.h>
 #include <RootEngine/Network/Include/LocalServer.h>
 #include <RootEngine/Network/Include/RemoteServer.h>
+#include <algorithm>
 
 namespace RootForce
 {
@@ -13,7 +15,8 @@ namespace RootForce
 			: m_world(p_world)
 			, m_logger(p_logger)
 		{
-			m_clientMessageHandler = new ClientMessageHandler(m_world, m_logger, m_server);
+			m_clientMessageHandler = nullptr;
+			m_serverMessageHandler = nullptr;
 			m_networkInterface = p_networkInterface;
 
 			p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
@@ -24,6 +27,10 @@ namespace RootForce
 			//if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
 		}
 
+		void MessageHandler::PingNetwork(USHORT p_port)
+		{
+			m_server->SendNetworkDiscoveryMessage(p_port);
+		}
 
 		void MessageHandler::Host(int16_t p_port, ServerType p_type)
 		{
@@ -33,12 +40,24 @@ namespace RootForce
 			{
 			case RootForce::Network::MessageHandler::LOCAL:
 				dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(p_port, false);
+				m_clientMessageHandler = new ClientMessageHandler(m_world, m_logger, m_server);
+				m_serverMessageHandler = new ServerMessageHandler(m_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
 				break;
 			case RootForce::Network::MessageHandler::DEDICATED:
 				dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(p_port);
+				m_serverMessageHandler = new ServerMessageHandler(m_world, m_logger, dynamic_cast<RootEngine::Network::LocalServer*>(m_server));
 				break;
 			default:
 				break;
+			}
+
+			{
+				RootSystems::ServerInfo info;
+				strcpy(info.Name, "Local server");
+				info.MaxPlayers = 12;
+				info.NumPlayers = 2;
+				info.PasswordProtected = false;
+				m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
 			}
 			
 		}
@@ -49,12 +68,17 @@ namespace RootForce
 			m_server = m_networkInterface->GetNetworkSystem();
 			dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->Initialize();
 			dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(p_address, p_port);
+
+			m_clientMessageHandler = new ClientMessageHandler(m_world, m_logger, m_server);
+
 		}
 
 		void MessageHandler::Update()
 		{
+			if(m_clientMessageHandler != nullptr)
+				m_clientMessageHandler->Update();
+			 
 			m_server->Update();
-
 			std::shared_ptr<RootEngine::Network::Message> message = nullptr;
 			while ((message = std::shared_ptr<RootEngine::Network::Message>(m_server->PollMessage())) != nullptr)
 			{
@@ -91,17 +115,6 @@ namespace RootForce
 						else
 							m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Received server message without local or remote server existing");
 						break;
-						/*
-						uint8_t slot = message->SenderID;
-
-						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-						NetworkPlayerComponent* comp = m_world->GetEntityManager()->CreateComponent<NetworkPlayerComponent>(entity);
-						comp->PlayerSlot = slot;
-
-						m_playerEntities[slot] = entity;
-
-						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Player at slot %u connected", slot);
-						*/
 
 					case RootEngine::Network::InnerMessageID::DISCONNECT:
 						// This can either be a client or a server timing out or disconnecting
@@ -109,12 +122,14 @@ namespace RootForce
 							m_serverMessageHandler->HandleServerMessage(message.get());
 						if (m_clientMessageHandler != nullptr)
 							m_clientMessageHandler->HandleClientMessage(message.get());
+						break;
 
-						/*
-						
-						m_world->GetEntityManager()->RemoveEntity(m_playerEntities[slot]);
-
-						*/
+					case RootEngine::Network::InnerMessageID::NETWORK_DISCOVERY:
+						// TODO: Read the server info and attach it to the list of servers available
+						{
+							RootSystems::ServerInfoInternal* info = (RootSystems::ServerInfoInternal*)message->Data;
+							m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server found through LAN-discovery: %s (%s:%u) %u/%u", info->Name, info->IP, info->Port, info->NumPlayers, info->MaxPlayers);
+						}
 						break;
 
 					default:
@@ -123,7 +138,11 @@ namespace RootForce
 			}
 		}
 
-
+		void MessageHandler::SetChatSystem( ChatSystemInterface* p_chatSystem )
+		{
+			if(m_clientMessageHandler != nullptr)
+				m_clientMessageHandler->SetChatSystem(p_chatSystem);
+		}
 	}
 }
 

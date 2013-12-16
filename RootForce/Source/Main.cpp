@@ -144,7 +144,7 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world, &g_engineContext));
 
 		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
@@ -186,13 +186,13 @@ namespace RootForce
 		RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
 		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
 
+
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		
 		m_playerSystem->CreatePlayer();
 
 		ECS::EntityManager* em = m_world.GetEntityManager();
-
 
 
 		//Create camera
@@ -215,8 +215,7 @@ namespace RootForce
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
 
-		g_engineContext.m_gui->LoadURL("debug.html");
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 		//Plane at bottom
 
@@ -233,11 +232,15 @@ namespace RootForce
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-		
+        g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+                g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+        
+        g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+        m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 
-		// Initialize the network system
-		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
-		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
+        // Initialize the network system
+        m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
+       
 
 
 		m_displayPhysicsDebug = false;
@@ -264,6 +267,8 @@ namespace RootForce
 				break;
 			case RootForce::GameState::Ingame:
 				// Start the main loop
+				m_networkHandler->SetChatSystem(&m_chat);
+				m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
 				g_engineContext.m_inputSys->LockMouseToCenter(true);
 				old = SDL_GetPerformanceCounter();
 				while (m_currentState == RootForce::GameState::Ingame && m_running)

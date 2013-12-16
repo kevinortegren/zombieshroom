@@ -17,7 +17,8 @@ namespace RootEngine
 		{
 			enum InnerMessageID
 			{
-				CONNECTION_REFUSED = 252,
+				NETWORK_DISCOVERY = 251,
+				CONNECTION_REFUSED,
 				CONNECTION_ACCEPTED,
 				CONNECT,
 				DISCONNECT
@@ -73,6 +74,8 @@ namespace RootEngine
 			virtual void Update() = 0;
 			virtual bool Send(const Message& p_message) = 0;
 			virtual Message* PollMessage() = 0;
+			virtual void SendNetworkDiscoveryMessage(USHORT p_port) = 0;
+			virtual void SetNetworkDiscoveryResponse( uint8_t* data, uint32_t size ) = 0;
 		};
 
 		const int8_t RECIPIENT_BROADCAST = -1;
@@ -85,12 +88,15 @@ namespace RootEngine
 			virtual void Update() = 0;
 			virtual bool Send(const Message& p_message) = 0;
 			Message* PollMessage();
+			void SendNetworkDiscoveryMessage(USHORT p_port);
+			void SetNetworkDiscoveryResponse( uint8_t* data, uint32_t size );
 		protected:
 			std::vector<Message*> m_message;
 			bool Transmit(const Message& p_message, RakNet::RakNetGUID p_guid, bool p_broadcast); // ToDo: Find a more fitting name.
 			RakNet::RakPeerInterface* m_peerInterface;
 
 			void ParseNonRaknetPacket(RakNet::Packet* p_packet, uint8_t p_clientID);
+			void ParseNetworkDiscoveryPacket(RakNet::Packet* p_packet);
 		};
 	}
 }

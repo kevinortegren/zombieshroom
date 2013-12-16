@@ -12,6 +12,7 @@
 #include <RootSystems/Include/Network/MessageHandler.h>
 #include <memory>
 #include <string>
+#include "ChatSystem.h"
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -35,13 +36,13 @@ namespace RootForce
 
 		void Start();
 	private:
+        void HandleEvents();
+        void testfuncofawesome(std::vector<glm::vec3> p_debugVectors);
+        bool m_running;
+        void* m_engineModule;
+        std::shared_ptr<SDL_Window> m_window;
+        RootForce::ChatSystem m_chat;
 
-		void HandleEvents();
-		void testfuncofawesome(std::vector<glm::vec3> p_debugVectors);
-		bool m_running;
-		void* m_engineModule;
-		std::shared_ptr<SDL_Window> m_window;
-	
 		ECS::World m_world;
 		
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
