@@ -5,14 +5,16 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootEngine\Render\Include\Renderer.h>
 #include <RootEngine\Include\Logging\Logging.h>
+#include <RootSystems\Include\Action.h>
+#include <vector>
 
 namespace RootForce
 {
 	/** Component owned by a player entity that will be controlled via input. */
-	struct AbilityComponent : public ECS::Component<AbilityComponent>
+	struct Ability : public ECS::Component<Ability>
 	{
-		float m_speed;
-		float m_mouseSensitivity;
+		std::string m_name;
+		std::vector<Action> m_actions;
 	};
 
 	/** This system will update the player entity depending on input received. */

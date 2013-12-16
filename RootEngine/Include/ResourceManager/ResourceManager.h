@@ -27,6 +27,10 @@ namespace RootEngine
 		#ifndef COMPILE_LEVEL_EDITOR
 			virtual Model*	LoadCollada(std::string p_path) = 0;
 			virtual Physics::PhysicsMeshInterface* GetPhysicsMesh(std::string p_handle) = 0;
+
+			virtual std::string ForceLoadScript(std::string p_scriptName) = 0;
+			virtual std::string LoadScript(std::string p_scriptName) = 0;
+			virtual std::string GetScript(std::string p_scriptName) = 0;
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
@@ -59,6 +63,10 @@ namespace RootEngine
 		#ifndef COMPILE_LEVEL_EDITOR
 			Model*	LoadCollada(std::string p_path);
 			Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
+
+			std::string ForceLoadScript(std::string p_scriptName);
+			std::string LoadScript(std::string p_scriptName);
+			std::string GetScript(std::string p_scriptName);
 		#endif
 
 		Model* CreateModel(const std::string& p_path);
@@ -84,6 +92,7 @@ namespace RootEngine
 		std::map<std::string, std::shared_ptr<Render::EffectInterface>>			m_effects;
 		std::map<std::string, std::shared_ptr<Render::TextureInterface>>		m_textures;
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>>	m_physicMeshes;
+		std::map<std::string, std::string>										m_scripts;
 
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR

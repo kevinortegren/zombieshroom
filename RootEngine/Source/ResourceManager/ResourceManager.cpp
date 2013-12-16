@@ -54,7 +54,37 @@ namespace RootEngine
 				return nullptr;
 			}
 		}
-		return m_models[p_path];
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
+			return m_models[p_path];
+		}
+		
+	}
+
+	std::string ResourceManager::LoadScript( std::string p_scriptName )
+	{
+		if(m_scripts.find(p_scriptName) == m_scripts.end())
+		{
+			m_context->m_script->LoadScript(p_scriptName + ".lua");
+			m_scripts[p_scriptName] = p_scriptName;
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: %s.lua", p_scriptName.c_str());
+			return p_scriptName;
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			return "";
+		}
+		
+	}
+
+	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
+	{
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: %s.lua, it may already exist in Resource Manager!", p_scriptName.c_str());
+		m_context->m_script->LoadScript(p_scriptName + ".lua");
+		m_scripts[p_scriptName] = p_scriptName;
+		return p_scriptName;
 	}
 #endif
 
@@ -73,8 +103,13 @@ namespace RootEngine
 			else
 				return nullptr;
 		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
+			return m_effects[p_path].get();
+		}
 
-		return m_effects[p_path].get();
+		
 	}
 
 	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
@@ -103,7 +138,12 @@ namespace RootEngine
 				return nullptr;
 			}
 		}
-		return m_textures[p_path].get();
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
+			return m_textures[p_path].get();
+		}
+		
 	}
 
 	Model* ResourceManager::CreateModel(const std::string& p_path)
@@ -139,7 +179,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get model: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
@@ -152,7 +192,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get effect: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
@@ -165,7 +205,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get texture: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
@@ -178,10 +218,12 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Mesh has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get mesh: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
+
+	
 
 	const std::string& ResourceManager::ResolveStringFromTexture(Render::TextureInterface* p_texture)
 	{
@@ -201,8 +243,21 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Physics mesh has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get physics mesh: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
+		}
+	}
+	
+	std::string ResourceManager::GetScript( std::string p_scriptName )
+	{
+		if(m_scripts.find(p_scriptName) != m_scripts.end())
+		{
+			return p_scriptName;
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get script: %s.lua, but it has never been loaded!", p_scriptName.c_str());
+			return "";
 		}
 	}
 #endif
@@ -230,4 +285,11 @@ namespace RootEngine
 	{
 		return m_workingDirectory;
 	}
+
+	
+
+	
+
+	
+
 }

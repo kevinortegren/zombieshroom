@@ -75,6 +75,11 @@ namespace RootForce
 								1 -	2 * (m_orientation.x * m_orientation.x + m_orientation.y * m_orientation.y)));
 	}
 
+	glm::quat Orientation::GetQuaternion()
+	{
+		return m_orientation;
+	}
+
 	mat3 Orientation::GetMatrix()
 	{
 		return mat3(-GetRight(), GetUp(), GetFront());
@@ -235,10 +240,6 @@ namespace RootForce
 		vec3 direction = normalize(p_direction);
 		vec3 up = normalize(p_upVector);
 		vec3 axis = glm::cross(direction, vec3(0.0f, 0.0f, 1.0f));
-		if(glm::length(axis) == 0)
-		{
-		//	axis = vec3(1.0f, 0.0f, 0.0f);
-		}
 		float angle = glm::degrees(glm::acos(glm::dot(direction, vec3(0.0f, 0.0f, 1.0f))));
 		vec3 third = glm::cross(axis, vec3(0.0f, 0.0f, 1.0f));
 		if (glm::dot(third, direction) < 0)
@@ -249,24 +250,14 @@ namespace RootForce
 
 		vec3 targetRight = normalize(glm::cross(direction, up));
 		vec3 myRight = normalize(glm::cross(direction, GetUp()));
-		float angle2 = glm::degrees(glm::acos(glm::dot(targetRight, myRight)));
+		float ledot = glm::dot(targetRight, myRight);
+		float tacos = glm::acos(glm::min(ledot, 1.0f));
+		float angle2 = glm::degrees(tacos);
 		vec3 third2 = glm::cross(direction, myRight);
 		if (glm::dot(third2, targetRight) < 0)
 		{
 			angle2 = -angle2;
 		}
 		Roll(angle2);
-
-		//vec3 left = glm::cross(up, direction);
-		//up = glm::cross(direction, left);
-		//mat3 mat(left, up, direction);
-
-		//SetOrientation(mat);
 	}
-
-	glm::quat Orientation::GetQuaterion()
-	{
-		return m_orientation;
-	}
-
 }
