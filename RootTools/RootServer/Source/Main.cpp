@@ -79,7 +79,8 @@ Main::~Main()
 void Main::Start() 
 {
 	// Initialize the network system
-	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network, RootForce::Network::MessageHandler::DEDICATED, 5567));
+	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network));
+	m_networkHandler->Host(5567, RootForce::Network::MessageHandler::DEDICATED);
 	
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );

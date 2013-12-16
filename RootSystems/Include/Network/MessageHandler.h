@@ -20,7 +20,10 @@ namespace RootForce
 				DEDICATED
 			};
 
-			MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface, ServerType p_type, int16_t port, const char* address = "");
+			MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface);
+
+			void Host(int16_t p_port, ServerType p_type);
+			void Connect( int16_t p_port, const char* p_address = "");
 
 			void Update();
 		private:
@@ -33,6 +36,7 @@ namespace RootForce
 
 			// Might change to all dynamic objects
 			std::map<uint8_t, ECS::Entity*> m_playerEntities;
+			RootEngine::Network::NetworkInterface* m_networkInterface;
 		};
 	}
 }

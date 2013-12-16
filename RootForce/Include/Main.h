@@ -18,6 +18,16 @@ ECS::World* g_world;
 
 namespace RootForce
 {
+
+	namespace GameState
+	{
+		enum GameState
+		{
+			Menu,
+			Ingame
+		};
+	}
+
 	class Main {
 	public:
 		Main(std::string p_workingDirectory);
@@ -40,6 +50,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug;
+		GameState::GameState m_currentState;
 	};
 }
 

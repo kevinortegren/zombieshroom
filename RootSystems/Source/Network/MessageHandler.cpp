@@ -9,46 +9,46 @@ namespace RootForce
 {
 	namespace Network
 	{
-		MessageHandler::MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface, ServerType p_type, int16_t port, const char* address)
+		MessageHandler::MessageHandler(ECS::World* p_world, Logging* p_logger, RootEngine::Network::NetworkInterface* p_networkInterface)
 			: m_world(p_world)
 			, m_logger(p_logger)
 		{
-			switch (p_type)
-			{
-				case MessageHandler::LOCAL:
-					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
-					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, false);
-					
-					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
-					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, m_server);
+			m_clientMessageHandler = new ClientMessageHandler(m_world, m_logger, m_server);
+			m_networkInterface = p_networkInterface;
 
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started local server on port: %u", port);
-					break;
-				case MessageHandler::REMOTE:
-					p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
-					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(address, port);
-
-					m_clientMessageHandler = new ClientMessageHandler(p_world, m_logger, m_server);
-
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server connection to: %s:%u", address, port);
-					break;
-				case MessageHandler::DEDICATED:
-					p_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
-					m_server = p_networkInterface->GetNetworkSystem();
-					dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(port, true);
-
-					m_serverMessageHandler = new ServerMessageHandler(p_world, m_logger, m_server);
-
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started dedicated local server on port: %u", port);
-					break;
-				default:
-					m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Invalid server type");
-			}
-
+			p_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
+			m_server = p_networkInterface->GetNetworkSystem();
+			dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->Initialize();
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Started remote server");
 			//if (m_clientMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ClientMessageSystem>(m_clientMessageSystem, "ClientMessageSystem");
 			//if (m_serverMessageSystem != nullptr) p_world->GetSystemManager()->AddSystem<ServerMessageSystem>(m_serverMessageSystem, "ServerMessageSystem");
+		}
+
+
+		void MessageHandler::Host(int16_t p_port, ServerType p_type)
+		{
+			m_networkInterface->Initialize(RootEngine::Network::PeerType::LOCALSERVER);
+			m_server = m_networkInterface->GetNetworkSystem();
+			switch (p_type)
+			{
+			case RootForce::Network::MessageHandler::LOCAL:
+				dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(p_port, false);
+				break;
+			case RootForce::Network::MessageHandler::DEDICATED:
+				dynamic_cast<RootEngine::Network::LocalServer*>(m_server)->Host(p_port);
+				break;
+			default:
+				break;
+			}
+			
+		}
+
+		void MessageHandler::Connect( int16_t p_port, const char* p_address /*= ""*/ )
+		{
+			m_networkInterface->Initialize(RootEngine::Network::PeerType::REMOTESERVER);
+			m_server = m_networkInterface->GetNetworkSystem();
+			dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->Initialize();
+			dynamic_cast<RootEngine::Network::RemoteServer*>(m_server)->ConnectTo(p_address, p_port);
 		}
 
 		void MessageHandler::Update()
@@ -122,6 +122,8 @@ namespace RootForce
 				}
 			}
 		}
+
+
 	}
 }
 

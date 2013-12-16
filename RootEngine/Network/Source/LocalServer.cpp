@@ -14,6 +14,7 @@ namespace RootEngine
 		LocalServer::~LocalServer()
 		{
 			delete[] &m_client;
+			m_peerInterface->Shutdown(0);
 		}
 
 		bool LocalServer::Send( const Message& p_message )

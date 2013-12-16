@@ -10,7 +10,17 @@ namespace RootEngine
 		}
 		RemoteServer::~RemoteServer()
 		{
+			m_peerInterface->Shutdown(0);
 		}
+
+
+		void RemoteServer::Initialize()
+		{
+			RakNet::SocketDescriptor sd;
+			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
+			m_peerInterface->Startup(1, &sd, 1);
+		}
+
 
 		bool RemoteServer::Send(const Message& p_message)
 		{
@@ -19,10 +29,6 @@ namespace RootEngine
 
 		bool RemoteServer::ConnectTo( const char* p_ip , USHORT p_port)
 		{
-			RakNet::SocketDescriptor sd;
-			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
-			m_peerInterface->Startup(1, &sd, 1);
-
 			RakNet::ConnectionAttemptResult result = m_peerInterface->Connect( p_ip, p_port, 0, 0 );
 			if(result == RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 				return true;

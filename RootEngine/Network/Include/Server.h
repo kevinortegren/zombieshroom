@@ -81,7 +81,7 @@ namespace RootEngine
 		{
 		public:
 			Server(void);
-			~Server(void);
+			virtual ~Server(void) = 0;
 			virtual void Update() = 0;
 			virtual bool Send(const Message& p_message) = 0;
 			Message* PollMessage();

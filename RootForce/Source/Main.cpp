@@ -19,6 +19,8 @@
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
 
+#include "Menu.h"
+
 #undef main
 
 int main(int argc, char* argv[]) 
@@ -88,6 +90,8 @@ namespace RootForce
 		{
 			// TODO: Log error and throw exception (?)
 		}
+
+		m_currentState = GameState::Menu;
 	}
 
 	Main::~Main() 
@@ -99,6 +103,7 @@ namespace RootForce
 
 	void Main::Start() 
 	{
+		
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 		//Bind c++ functions and members to Lua
@@ -206,6 +211,13 @@ namespace RootForce
 		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
 
 
+		//Initiate GUI
+		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+
+		g_engineContext.m_gui->LoadURL("debug.html");
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+
 		//Plane at bottom
 
 		glm::vec3 normal (0,1,0);
@@ -221,128 +233,153 @@ namespace RootForce
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
-
-		g_engineContext.m_gui->LoadURL("debug.html");
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->GetView());
+		
 
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
-		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
+		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
 
 
 		m_displayPhysicsDebug = false;
 
-		// Start the main loop
-		uint64_t old = SDL_GetPerformanceCounter();
-		while (m_running)
-		{	
-			uint64_t now = SDL_GetPerformanceCounter();
-			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
-			old = now;
-	
-			m_world.SetDelta(dt);
-
-			g_engineContext.m_renderer->Clear();
-
-			if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		uint64_t old;
+		while(m_running)
+			switch (m_currentState)
 			{
-				m_running = false;
-			}
-
-			// Toggle rendering of normals.
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			{
-				if(m_displayNormals)
+			case RootForce::GameState::Menu:
+				g_engineContext.m_inputSys->LockMouseToCenter(false);
+				 old = SDL_GetPerformanceCounter();
+				while (m_currentState == RootForce::GameState::Menu && m_running)
 				{
-					m_displayNormals = false;
-					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+					HandleEvents();
+					m_networkHandler->Update();
+
+					g_engineContext.m_renderer->Clear();
+
+					g_engineContext.m_gui->Update();
+					g_engineContext.m_gui->Render();
+
+					g_engineContext.m_renderer->Swap();
 				}
-				else
-				{
-					m_displayNormals = true;
-					g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+				break;
+			case RootForce::GameState::Ingame:
+				// Start the main loop
+				g_engineContext.m_inputSys->LockMouseToCenter(true);
+				old = SDL_GetPerformanceCounter();
+				while (m_currentState == RootForce::GameState::Ingame && m_running)
+				{	
+					uint64_t now = SDL_GetPerformanceCounter();
+					float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+					old = now;
+
+					m_world.SetDelta(dt);
+
+					g_engineContext.m_renderer->Clear();
+
+					if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					{
+						m_running = false;
+					}
+
+					// Toggle rendering of normals.
+					if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					{
+						if(m_displayNormals)
+						{
+							m_displayNormals = false;
+							g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+						}
+						else
+						{
+							m_displayNormals = true;
+							g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+						}
+					}
+
+					// Toggle physics debug draw
+					if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					{
+						if(m_displayPhysicsDebug)
+						{
+							m_displayPhysicsDebug = false;
+							g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+						}
+						else
+						{
+							m_displayPhysicsDebug = true;
+							g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+						}
+					}
+
+					g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
+
+					{
+						PROFILE("Handle Events", g_engineContext.m_profiler);
+						HandleEvents();
+					}
+
+					{
+						PROFILE("Player control system", g_engineContext.m_profiler);
+						m_playerControlSystem->Process();
+					}
+
+					{
+						PROFILE("Script system", g_engineContext.m_profiler);
+						scriptSystem->Process();
+					}
+
+					{
+						PROFILE("Ability system", g_engineContext.m_profiler);
+						abilitySystem->Process();
+					}
+
+					{
+						PROFILE("Network message handler", g_engineContext.m_profiler);
+						m_networkHandler->Update();
+					}
+
+					{
+						PROFILE("Physics", g_engineContext.m_profiler);
+						g_engineContext.m_physics->Update(dt);
+						m_physicsSystem->Process();
+
+					}
+					m_playerControlSystem->UpdateAimingDevice();
+					thirdPersonBehaviorSystem->Process();
+					lookAtSystem->Process();
+					cameraSystem->Process();
+					pointLightSystem->Process();
+					{
+						PROFILE("RenderingSystem", g_engineContext.m_profiler);
+						renderingSystem->Process();
+					}
+					g_engineContext.m_renderer->Render();
+
+					{
+						PROFILE("Render Lines", g_engineContext.m_profiler);
+						g_engineContext.m_renderer->RenderLines();
+					}
+
+
+					g_engineContext.m_profiler->Update(dt);
+
+
+					{
+						PROFILE("GUI", g_engineContext.m_profiler);
+
+						g_engineContext.m_gui->Update();
+						g_engineContext.m_gui->Render();
+					}
+					g_engineContext.m_debugOverlay->RenderOverlay();
+					g_engineContext.m_renderer->Swap();
 				}
+				break;
+			default:
+				break;
 			}
 
-			// Toggle physics debug draw
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			{
-				if(m_displayPhysicsDebug)
-				{
-					m_displayPhysicsDebug = false;
-					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-				}
-				else
-				{
-					m_displayPhysicsDebug = true;
-					g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-				}
-			}
 
-			g_engineContext.m_debugOverlay->AddHTMLToBuffer(std::to_string(dt).c_str(), RootEngine::TextColor::GRAY, false);
 		
-			{
-				PROFILE("Handle Events", g_engineContext.m_profiler);
-				HandleEvents();
-			}
-
-			{
-				PROFILE("Player control system", g_engineContext.m_profiler);
-				m_playerControlSystem->Process();
-			}
-
-			{
-				PROFILE("Script system", g_engineContext.m_profiler);
-				scriptSystem->Process();
-			}
-
-			{
-				PROFILE("Ability system", g_engineContext.m_profiler);
-				abilitySystem->Process();
-			}
-				
-			{
-				PROFILE("Network message handler", g_engineContext.m_profiler);
-				m_networkHandler->Update();
-			}
-
-			{
-				PROFILE("Physics", g_engineContext.m_profiler);
-				g_engineContext.m_physics->Update(dt);
-				m_physicsSystem->Process();
-				
-			}
-			m_playerControlSystem->UpdateAimingDevice();
-			thirdPersonBehaviorSystem->Process();
-			lookAtSystem->Process();
-			cameraSystem->Process();
-			pointLightSystem->Process();
-			{
-				PROFILE("RenderingSystem", g_engineContext.m_profiler);
-				renderingSystem->Process();
-			}
-			g_engineContext.m_renderer->Render();
-	
-			{
-				PROFILE("Render Lines", g_engineContext.m_profiler);
-				g_engineContext.m_renderer->RenderLines();
-			}
-		
-	
-			g_engineContext.m_profiler->Update(dt);
-		
-		
-			{
-				PROFILE("GUI", g_engineContext.m_profiler);
-
-				g_engineContext.m_gui->Update();
-				g_engineContext.m_gui->Render();
-			}
-			g_engineContext.m_debugOverlay->RenderOverlay();
-			g_engineContext.m_renderer->Swap();
-		}
 	}
 
 	void Main::HandleEvents()
