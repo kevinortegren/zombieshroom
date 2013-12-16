@@ -54,16 +54,20 @@ namespace RootEngine
 			std::string m_modelHandle; //No need to specify this unless a SHAPE_CUSTOM_MESH is used
 		};
 
-
-
 		struct CustomUserPointer
 		{
 			PhysicsType::PhysicsType m_type;
 			int m_vectorIndex;
 			unsigned int m_entityId; //My entity id
-			std::vector<unsigned int> m_collidedEntityId; //List of all entities collided with since last update
+			std::vector<unsigned int>* m_collidedEntityId; //List of all entities collided with since last update
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			std::string m_modelHandle;
+
+			CustomUserPointer()
+			{
+				m_collidedEntityId = nullptr;
+			}
+
 			~CustomUserPointer()
 			{
 				delete m_id;
@@ -87,12 +91,12 @@ namespace RootEngine
 			
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			virtual void AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , glm::vec3 p_position, glm::quat p_rotation) = 0;
+			virtual int* AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , glm::vec3 p_position, glm::quat p_rotation) = 0;
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
 			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
 			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::vector<unsigned int>* p_enityCollidedId) = 0;
 			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;
 			/// p_Pos should be of type float[3]
 			virtual glm::vec3 GetPos(int p_objectHandle)= 0;
@@ -138,12 +142,12 @@ namespace RootEngine
 			void EnableDebugDraw(bool p_enabled);
 		
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			void AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation);
+			int* AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation);
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
 			int* AddDynamicObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			///Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
-			int* AddPlayerObjectToWorld(std::string p_modelHandle,unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight);
+			int* AddPlayerObjectToWorld(std::string p_modelHandle,unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::vector<unsigned int>* p_enityCollidedId);
 
 			int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo);
 			glm::vec3 GetPos(int p_objectHandle);	

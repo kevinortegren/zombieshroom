@@ -49,12 +49,10 @@
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
-    - Type: 4
+    - Type: 12
       Data:
         - Entity: 3
-          Type: 0
-          Mass: 0
-          ModelHandle: ground0
+          MeshHandle: ground0
 - Tags:
     - Id: 0
       Tag: Skybox
@@ -63,3 +61,5 @@
       Group: Lights
     - Id: 2
       Group: Lights
+    - Id: 3
+      Group: Static

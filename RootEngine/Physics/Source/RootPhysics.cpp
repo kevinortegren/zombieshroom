@@ -74,7 +74,6 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
-		
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
@@ -82,10 +81,16 @@ namespace Physics
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
 
+		if(pointer1->m_collidedEntityId == nullptr)
+			return false;
+
+		if(pointer2->m_collidedEntityId == nullptr)
+			return false;
+
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
+			pointer1->m_collidedEntityId->push_back(pointer2->m_entityId);
 		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-			pointer2->m_collidedEntityId.push_back(pointer1->m_entityId);
+			pointer2->m_collidedEntityId->push_back(pointer1->m_entityId);
 
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
@@ -284,7 +289,7 @@ namespace Physics
 
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
+	int* RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
 	{
 		//TODO if time and need to improve performance: Use compoundshapes
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
@@ -313,8 +318,9 @@ namespace Physics
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		objectBody->setUserPointer((void*)userPointer);
 
-
+		return userPointer->m_id;
 	}
+
 	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
 	{
 		
@@ -343,7 +349,7 @@ namespace Physics
 		
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::vector<unsigned int>* p_enityCollidedId )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
@@ -360,6 +366,7 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
+		userPointer->m_collidedEntityId = p_enityCollidedId;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
@@ -641,7 +648,7 @@ namespace Physics
 
 	std::vector<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
 	{
-		return &(m_userPointer.at(p_objectHandle)->m_collidedEntityId);
+		return (m_userPointer.at(p_objectHandle)->m_collidedEntityId);
 	}
 
 

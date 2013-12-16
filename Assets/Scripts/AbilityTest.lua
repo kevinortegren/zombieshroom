@@ -37,11 +37,17 @@ function AbilityTest.OnActivate (action)
 	aimx, aimy, aimz = aimingTrans:GetFront();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
+	
 	transform:SetPos(x, y, z);
-	local physics 		= PhysicsAccessor.New(entity);
+	
 	renderComp:SetModel("Primitives/sphereTangents");
 	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
+	
+	local collision = Collision.New(entity);
+
+	local physics = Physics.New(entity);
 	physics:SetInfo(
+		collision,
 		true, --collideWorld
 		aimx, --dirx
 		aimy, --diry

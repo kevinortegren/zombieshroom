@@ -5,17 +5,33 @@
 
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
-#include <RootSystems/Include/Physics.h>
 
 namespace RootForce
 {
+	struct Collision : public ECS::Component<Collision>
+	{
+		int* m_handle;
+		std::string m_meshHandle;
+	};
+
+	struct CollisionResponder : public ECS::Component<CollisionResponder>
+	{
+		std::vector<unsigned int> m_collidedEntityId;
+	};
+
+	struct Physics : public ECS::Component<Physics>
+	{
+		// TODO: Add data.
+		float m_mass;
+	};
 
 	struct PhysicsSystem : public ECS::EntitySystem
 	{
 		PhysicsSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
 		{
-			SetUsage<PhysicsAccessor>();
+			SetUsage<Physics>();
+			SetUsage<Collision>();
 			SetUsage<Transform>();
 		}
 		void Init();
@@ -25,9 +41,11 @@ namespace RootForce
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		void SetLoggingInterface(Logging::LoggingInterface* p_logger);
 
-		ECS::ComponentMapper<PhysicsAccessor> m_physicsAccessor;
+		void AddStaticEntities();
+
+		ECS::ComponentMapper<Physics> m_physicsAccessor;
+		ECS::ComponentMapper<Collision> m_collisions;
 		ECS::ComponentMapper<Transform> m_transforms;
-	
 		
 	private:
 		RootEngine::Physics::PhysicsInterface* m_physics;

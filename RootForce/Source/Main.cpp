@@ -28,13 +28,15 @@ int main(int argc, char* argv[])
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
 	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
 	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
-	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
+	RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -105,8 +107,10 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
 		
+
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 
 		g_world = &m_world;
@@ -184,11 +188,13 @@ namespace RootForce
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		
+		m_physicsSystem->AddStaticEntities();
+
 		m_playerSystem->CreatePlayer();
 
+
+		
 		ECS::EntityManager* em = m_world.GetEntityManager();
-
-
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
