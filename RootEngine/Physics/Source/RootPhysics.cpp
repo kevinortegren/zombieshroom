@@ -51,7 +51,6 @@ namespace Physics
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			KinematicController* temp = m_playerObjects[i];
-			temp->RemovePlayer();
 			delete temp;
 		}
 		for(unsigned int i = 0; i < m_userPointer.size(); i++)
@@ -287,6 +286,7 @@ namespace Physics
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
 	{
+		
 		//TODO if time and need to improve performance: Use compundshapes
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
@@ -313,7 +313,7 @@ namespace Physics
 		userPointer->m_entityId = p_entityId;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		objectBody->setUserPointer((void*)userPointer);
-
+		
 
 	}
 	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
@@ -524,7 +524,9 @@ namespace Physics
 		
 		btVector3 temp;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
 			temp = m_playerObjects.at(index)->GetPosition();
+		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC )
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
 		glm::vec3 retVal;
