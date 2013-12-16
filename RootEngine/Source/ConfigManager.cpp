@@ -61,10 +61,8 @@ namespace RootEngine
 			{
 				return true;
 			}
-			else
-			{
-				return false;
-			}
+
+		return false;
 	}
 
 	int ConfigManager::GetConfigValueAsInteger(const std::string& p_key)
@@ -93,6 +91,7 @@ namespace RootEngine
 	{
 		if(m_values.find(p_key) == m_values.end())
 			return m_values[p_key];
+		return std::string("");
 	}
 
 	void ConfigManager::Parse(const YAML::Node& p_node, const std::string& p_key)

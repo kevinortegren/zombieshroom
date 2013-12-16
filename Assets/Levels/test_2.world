@@ -2,6 +2,7 @@
     - 0
     - 1
     - 2
+    - 3
 - Components:
     - Type: 0
       Data:
@@ -16,6 +17,10 @@
           Model: Primitives/sphere
           Effect: Mesh
           Diffuse: sphere_diffuse
+        - Entity: 3
+          Model: ground
+          Effect: Mesh
+          Diffuse: grass
     - Type: 1
       Data:
         - Entity: 0
@@ -23,23 +28,33 @@
           Rotation: [180, 0, 0]
           Scale: [-100, -100, -100]
         - Entity: 1
-          Position: [1, 0, 0]
+          Position: [1, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [-1, 0, 0]
+          Position: [-1, -18, 0]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 3
+          Position: [0, -1, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
         - Entity: 1
           Attenuation: [0, 0, 1]
-          Color: [0.4, 0, 0, 1]
+          Color: [1, 0, 0, 1]
           Range: 2
         - Entity: 2
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
+    - Type: 4
+      Data:
+        - Entity: 3
+          Type: 0
+          Mass: 0
+          ModelHandle: ground0
 - Tags:
     - Id: 0
       Tag: Skybox
