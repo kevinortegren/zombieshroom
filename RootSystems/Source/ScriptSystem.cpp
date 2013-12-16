@@ -21,8 +21,12 @@ void RootForce::ScriptSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		g_engineContext.m_script->SetFunction(script->m_name, "OnActivate");
 		g_engineContext.m_script->AddParameterNumber((*itr).m_action);
-		//TODO: Add data params.
-		
+
+		if((*itr).m_action == RootForce::ActionType::ACTION_COLLIDE)
+		{
+			g_engineContext.m_script->AddParameterNumber((*itr).m_data.m_collision.m_entityId);
+		}
+
 		g_engineContext.m_script->ExecuteScript();
 	}
 

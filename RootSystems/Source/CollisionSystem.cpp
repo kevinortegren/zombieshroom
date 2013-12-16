@@ -23,8 +23,10 @@ namespace RootForce
 		for(auto itr = cr->m_collidedEntityId.begin(); itr != cr->m_collidedEntityId.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
+			Action action(ActionType::ACTION_COLLIDE);
+			action.m_data.m_collision.m_entityId = (*itr);
 
-			script->m_actions.push_back(Action(ActionType::ACTION_COLLIDE));
+			script->m_actions.push_back(action);
 		}
 
 		cr->m_collidedEntityId.clear();
