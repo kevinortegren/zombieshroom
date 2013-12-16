@@ -139,7 +139,7 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world, &g_engineContext));
 
 		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
@@ -227,9 +227,10 @@ namespace RootForce
         m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 
         // Initialize the network system
-        RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
+        RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::REMOTE;
         m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
         m_networkHandler->SetChatSystem(&m_chat);
+		m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
 
 		// Start the main loop
 		uint64_t old = SDL_GetPerformanceCounter();

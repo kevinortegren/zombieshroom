@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootForce/Include/ChatSystem.h>
+#include <RootSystems/Include/PlayerSystem.h>
 
 namespace RootForce
 {
@@ -20,6 +21,7 @@ namespace RootForce
 			void Update();
 			void HandleClientMessage(RootEngine::Network::Message* p_message);
 			void SetChatSystem(ChatSystemInterface* p_chatSystem) { m_chatSystem = p_chatSystem; }
+			void SetPlayerSystem(PlayerSystem* p_playerSystem) { m_playerSystem = p_playerSystem; }
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
@@ -27,6 +29,7 @@ namespace RootForce
 			NetworkEntityMap m_networkEntityMap;
 			RootEngine::Network::Server* m_server;
 			ChatSystemInterface* m_chatSystem;
+			PlayerSystem* m_playerSystem;
 
 			void HandleGameStateSnapshotMessage(RootEngine::Network::Message* p_message);
 			void HandleChatToClientMessage(RootEngine::Network::Message* p_message);

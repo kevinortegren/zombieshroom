@@ -80,9 +80,9 @@ namespace RootForce
 			m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection to server established.");
 
 			// Create a player entity with a temporary ID until the server responds.
-			ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+			//m_playerSystem->CreatePlayer();
+			ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 			TemporaryId_t tId = m_networkEntityMap.AddEntity(entity);
-
 
 			// Notify the server of our info
 			RootForce::Network::MessageUserInfo userInfoContents;

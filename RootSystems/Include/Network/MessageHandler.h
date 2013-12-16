@@ -25,6 +25,8 @@ namespace RootForce
 			void Update();
 			void SetChatSystem(ChatSystemInterface* p_chatSystem);
 
+			ClientMessageHandler* GetClientMessageHandler() { return m_clientMessageHandler; }
+			ServerMessageHandler* GetServerMessageHandler() { return m_serverMessageHandler; }
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
