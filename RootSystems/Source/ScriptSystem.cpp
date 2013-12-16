@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems\Include\ScriptSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
@@ -33,3 +34,4 @@ void RootForce::ScriptSystem::End()
 {
 
 }
+#endif

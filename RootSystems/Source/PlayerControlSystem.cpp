@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <PlayerControlSystem.h>
 #include <RootSystems\Include\ScriptSystem.h>
 
@@ -171,3 +173,5 @@ namespace RootForce
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
 	}
 }
+
+#endif
