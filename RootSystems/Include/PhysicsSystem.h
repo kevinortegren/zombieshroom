@@ -5,20 +5,10 @@
 
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/CollisionSystem.h>
 
 namespace RootForce
 {
-	struct Collision : public ECS::Component<Collision>
-	{
-		int* m_handle;
-		std::string m_meshHandle;
-	};
-
-	struct CollisionResponder : public ECS::Component<CollisionResponder>
-	{
-		std::vector<unsigned int> m_collidedEntityId;
-	};
-
 	struct Physics : public ECS::Component<Physics>
 	{
 		// TODO: Add data.

@@ -18,7 +18,7 @@ namespace RootForce
 		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
 		RootForce::Physics* physics = entityManager->CreateComponent<RootForce::Physics>(entity);
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);
-		RootForce::CollisionResponder* collisionRespond = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);
+		RootForce::CollisionResponder* collisionResponder = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);
 
 		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
 		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
@@ -35,7 +35,7 @@ namespace RootForce
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";
 		collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity->GetId(),
-			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionRespond->m_collidedEntityId);
+			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionResponder->m_collidedEntityId);
 
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
 

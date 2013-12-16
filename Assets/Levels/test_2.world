@@ -28,11 +28,11 @@
           Rotation: [180, 0, 0]
           Scale: [-100, -100, -100]
         - Entity: 1
-          Position: [1, -18, 0]
+          Position: [3, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [-1, -18, 0]
+          Position: [-3, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
@@ -51,6 +51,10 @@
           Range: 20
     - Type: 12
       Data:
+        - Entity: 1
+          MeshHandle: sphere0
+        - Entity: 2
+          MeshHandle: sphere0
         - Entity: 3
           MeshHandle: ground0
 - Tags:
@@ -62,4 +66,8 @@
     - Id: 2
       Group: Lights
     - Id: 3
+      Group: Static
+    - Id: 2
+      Group: Static
+    - Id: 1
       Group: Static

@@ -1,26 +1,38 @@
 #pragma once
 
-#include <Utility\ECS\Include\Component.h>
-#include <vector>
+#include <Utility/ECS/Include/World.h>
+#include <set>
 
 namespace RootForce
 {
 	struct Collision : public ECS::Component<Collision>
 	{
 		int* m_handle;
+		std::string m_meshHandle;
 	};
 
-	struct CollisionRespond : public ECS::Component<CollisionRespond>
+	struct CollisionResponder : public ECS::Component<CollisionResponder>
 	{
-		std::vector<unsigned int> m_collidedEntityId;
+		std::set<unsigned int> m_collidedEntityId;
 	};
 
-	struct Physics : public ECS::Component<Physics>
+	class CollisionSystem : public ECS::EntitySystem
 	{
-		// TODO: Add data.
-		float m_mass;
-	};
+	public:
+		CollisionSystem(ECS::World* p_world)
+			: ECS::EntitySystem(p_world)
+		{
+			SetUsage<Collision>();
+			SetUsage<CollisionResponder>();
+		}
 
-	
+		ECS::ComponentMapper<Collision> m_colliders;
+		ECS::ComponentMapper<CollisionResponder> m_responders;
+
+		void Init();
+		void Begin();
+		void ProcessEntity(ECS::Entity* p_entity);
+		void End();
+	};
 
 }

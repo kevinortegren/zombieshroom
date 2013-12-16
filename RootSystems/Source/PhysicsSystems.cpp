@@ -1,6 +1,5 @@
 #include <PhysicsSystem.h>
 
-
 namespace RootForce
 {
 	void PhysicsSystem::Init()

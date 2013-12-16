@@ -76,21 +76,23 @@ namespace Physics
 	{
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
+		
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
 
-		if(pointer1->m_collidedEntityId == nullptr)
-			return false;
-
-		if(pointer2->m_collidedEntityId == nullptr)
-			return false;
-
-		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-			pointer1->m_collidedEntityId->push_back(pointer2->m_entityId);
-		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-			pointer2->m_collidedEntityId->push_back(pointer1->m_entityId);
+		if(pointer1->m_collidedEntityId != nullptr)
+		{
+			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
+				pointer1->m_collidedEntityId->insert(pointer2->m_entityId);
+		}
+			
+		if(pointer2->m_collidedEntityId != nullptr)
+		{
+			if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
+				pointer2->m_collidedEntityId->insert(pointer1->m_entityId);
+		}
 
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
@@ -349,7 +351,7 @@ namespace Physics
 		
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::vector<unsigned int>* p_enityCollidedId )
+	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
@@ -646,7 +648,7 @@ namespace Physics
 		
 	}
 
-	std::vector<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
+	std::set<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
 	{
 		return (m_userPointer.at(p_objectHandle)->m_collidedEntityId);
 	}

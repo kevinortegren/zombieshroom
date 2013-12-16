@@ -4,11 +4,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-//#include <RenderingSystem.h>
-//#include <LightSystem.h>
-#include <RootSystems/Include/CameraSystem.h>
-#include <RootSystems/Include/PhysicsSystem.h>
-
 #include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
@@ -110,10 +105,12 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
 		
-
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 
 		g_world = &m_world;
+
+		m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(5);
@@ -137,14 +134,17 @@ namespace RootForce
 		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
 		keybindings[4].Edge = true;
 
+		// System responsible for controlling the player.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
+		// System responsible for updating the player.
 		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
 
+		// System responsible for executing script based on actions.
 		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
 
@@ -154,8 +154,8 @@ namespace RootForce
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-		m_world.GetEntityImporter()->SetImporter(Importer);
-		m_world.GetEntityExporter()->SetExporter(Exporter);
+		RootForce::CollisionSystem* m_collisionSystem = new RootForce::CollisionSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
 		// Initialize render and point light system.
 		RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -318,8 +318,9 @@ namespace RootForce
 				PROFILE("Physics", g_engineContext.m_profiler);
 				g_engineContext.m_physics->Update(dt);
 				m_physicsSystem->Process();
-				
+				m_collisionSystem->Process();
 			}
+
 			m_playerControlSystem->UpdateAimingDevice();
 			thirdPersonBehaviorSystem->Process();
 			lookAtSystem->Process();
