@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="theme.green.css" /></rel>
+    <link rel="stylesheet" href="menu.css" /></rel>
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="menu.js"></script>
+  </head>
+  <body>
+    <div id="main-menu" class="verticaltablehax"><div class="verticalcenterhax">
+      <div id="main-wrapper">
+        <a target="_blank" href="http://twitter.com/zombieshroomdev"><h1 class="textcenter blink">Root Force</h1></a>
+        <input id="main-play" type="submit" class="main-button" value="Play" />
+        <input id="main-options" type="submit" class="main-button" value="Options" />
+        <input id="main-exit" type="submit" class="main-button" value="Exit" />
+      </div>
+    </div></div>
+    
+    <div id="lan-menu" class="verticaltablehax"><div class="verticalcenterhax">
+      <div id="lan-wrapper">
+        <table id="lan-list" class="tablesorter-green">
+          <thead><tr><td>Address</td><td style="min-width:300px;">Name</td><td>Players</td><td>Max Players</td><td>Ping</td><td>Password</td></tr></thead>
+        </table>
+        <input id="lan-back" type="submit" class="button" value="Back" />
+        <input id="lan-refresh" type="submit" class="button floatright" value="Refresh" />
+        <input id="lan-connect" type="submit" class="button floatright" value="Connect" />
+        <input id="lan-direct" type="submit" class="button floatright" value="Direct Connect"  />
+        <input id="lan-host" type="submit" class="button floatright" value="Host" />
+        <br class="clear"/>
+      </div>
+    </div></div>
+    
+    <div id="options-menu" class="verticaltablehax"><div class="verticalcenterhax">
+      <div id="options-wrapper">
+        <h1 class="textcenter blink">Options</h1>
+        <input id="options-player" type="submit" class="main-button" value="Player" />
+        <input id="options-graphics" type="submit" class="main-button" value="Graphics" />
+        <input id="options-sound" type="submit" class="main-button" value="Sound" />
+        <input id="options-keybind" type="submit" class="main-button" value="Key Bindings" />
+        <input id="options-back" type="submit" class="main-button" value="Back" />
+      </div>
+    </div></div>
+    
+    <div id="overlay" class="verticaltablehax"><div class="verticalcenterhax">
+      <div id="lan-direct-popup" class="popup">
+        <div id="lan-direct-close" class="close">[Close]</div>
+        <h3>Direct connect</h3>
+        IP: <input type="text" id="lan-direct-input" /> <input type="submit" id="lan-direct-submit" value="Connect" />
+      </div>
+      
+      <img src="http://jimpunk.net/Loading/wp-content/uploads/loading83.gif" id="connecting" class="popup" />
+      
+      <div id="lan-host-overlay" class="popup">
+        <div id="lan-host-close" class="close">[Close]</div>
+        <h3>Host</h3>
+        <div><div class="inline-100px">Name</div><input type="text" id="lan-host-name" /></div>
+        <div><div class="inline-100px">Password</div><input type="text" id="lan-host-password" /></div>
+        <div><div class="inline-100px">Mapfile</div>
+          <select id="host-map">
+            <option value="test">Test map</option>
+          </select>
+        </div>
+        <div><div class="inline-100px">Max Players</div><input type="number" id="lan-host-maxplayers" /></div>
+        <div><div class="inline-100px">Match Length</div><input type="number" id="lan-host-matchlength" /></div>
+        <div><div class="inline-100px">Kill Victory</div><input type="number" id="lan-host-killvictory" /></div>
+        <div><div class="inline-100px"></div><input type="submit" id="lan-host-submit" value="Host" /></div>
+      </div>
+    <div></div>
+  </body>
+</html>

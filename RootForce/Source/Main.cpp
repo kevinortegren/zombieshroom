@@ -232,11 +232,15 @@ namespace RootForce
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
+		//Initiate Gui
         g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
                 g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
         
         g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
         m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+
+		//Initiate Menu
+		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"));
 
         // Initialize the network system
         m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
@@ -263,12 +267,37 @@ namespace RootForce
 					g_engineContext.m_gui->Render();
 
 					g_engineContext.m_renderer->Swap();
+
+					MenuEvent::MenuEvent event = m_menu->PollEvent();
+
+					switch (event.type)
+					{
+					case MenuEvent::EventType::Exit:
+						m_running = false;
+						break;
+					case MenuEvent::EventType::Host:
+						m_networkHandler->SetChatSystem(&m_chat);
+						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						m_networkHandler->Host(event.data[0].ToInteger(), Network::MessageHandler::ServerType::LOCAL); //TODO: make sure Host returns boolean and only change gamestate if true
+						m_currentState = RootForce::GameState::Ingame;
+						break;
+					case MenuEvent::EventType::Connect:
+						m_networkHandler->SetChatSystem(&m_chat);
+						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						m_networkHandler->Connect(event.data[0].ToInteger(), Awesomium::ToString(event.data[1].ToString()).c_str()); //TODO: make sure Connect returns boolean and only change gamestate if true
+						m_currentState = RootForce::GameState::Ingame;
+						break;
+					case MenuEvent::EventType::Refresh:
+						m_networkHandler->PingNetwork(5567);
+						break;
+					default:
+						break;
+					}
 				}
 				break;
 			case RootForce::GameState::Ingame:
 				// Start the main loop
-				m_networkHandler->SetChatSystem(&m_chat);
-				m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+				
 				g_engineContext.m_inputSys->LockMouseToCenter(true);
 				old = SDL_GetPerformanceCounter();
 				while (m_currentState == RootForce::GameState::Ingame && m_running)

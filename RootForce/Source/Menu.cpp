@@ -6,6 +6,7 @@ namespace RootForce
 	RootForce::Menu::Menu( Awesomium::WebView* p_view )
 	{
 		m_view = p_view;
+
 	}
 
 	MenuEvent::MenuEvent RootForce::Menu::PollEvent()
@@ -20,6 +21,16 @@ namespace RootForce
 		m_event.erase(m_event.begin());
 		return event;
 	}
+
+
+	void Menu::ExitEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	{
+		MenuEvent::MenuEvent event;
+		event.type = MenuEvent::EventType::Exit;
+
+		m_event.push_back(event);
+	}
+
 
 	void RootForce::Menu::HostEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
 	{
@@ -37,6 +48,21 @@ namespace RootForce
 		event.data = p_array;
 
 		m_event.push_back(event);
+	}
+
+
+	void Menu::RefreshEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	{
+		MenuEvent::MenuEvent event;
+		event.type = MenuEvent::EventType::Refresh;
+		event.data = p_array;
+
+		m_event.push_back(event);
+	}
+
+	const Awesomium::JSValue& Menu::GetMapList(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	{
+		return Awesomium::JSValue();
 	}
 
 }
