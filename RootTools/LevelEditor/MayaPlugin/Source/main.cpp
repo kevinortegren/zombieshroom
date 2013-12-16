@@ -50,7 +50,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 	sortObjectList();
 	printLists();
 	loadScene();
-
+	*SM.export = false;
 
 	myInitMemoryCheck(); // Har koll på minnet och minnesläckor
 	MStatus status = MS::kSuccess;
@@ -71,6 +71,52 @@ EXPORT MStatus initializePlugin(MObject obj)
 	}
 
 	return status;
+}
+
+void Export()
+{
+	//Varje mesh föregående i listan ska jämföras med nuvarandes vertexpunkter
+	
+	for(int i = 0; i < currNrMeshes; i++)
+	{
+		bool exists = true;
+		for(int j = 0; j < i; j++)
+		{
+			if(SM.meshList[i].nrOfVertices != SM.meshList[j].nrOfVertices)
+			{
+				exists = false;
+			}
+			else
+			{
+				for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
+				{
+					if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])
+					{
+						exists = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if(!exists)
+		{
+			MString temp, ExportFunction;		//CANNOT SAVE FULLPATHNAME FILES with char |
+			//temp = SM.meshList[i].transformation.name;
+			MGlobal::executeCommand("select -r " + temp);
+			ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"C:/Users/BTH/Desktop/" + temp + ".dae\"";
+			Print(temp);
+			MGlobal::executeCommand(ExportFunction);
+			Print(ExportFunction);
+		}
+	}
+
+	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
+
+	*SM.export = false;
+
+	ReleaseMutex(SM.IdMutexHandle);
 }
 
 void sortObjectList()
@@ -219,6 +265,10 @@ void viewCB(const MString &str, void *clientData)
 	{
 		MayaCameraToList(g_mayaCameraList[tempInt], tempInt);
 		SM.UpdateSharedCamera(tempInt);
+	}
+	if(*SM.export == true)
+	{
+	Export();
 	}
 }
 
@@ -584,7 +634,6 @@ void MayaMeshToList(MObject node, int meshIndex)
 
 		//Get and set mesh name
 		memcpy(SM.meshList[meshIndex].transformation.name, mesh.fullPathName().asChar(), mesh.fullPathName().numChars());
-
 		//Get points from mesh
 		mesh.getPoints(points_, space_local);
 

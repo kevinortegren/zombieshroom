@@ -26,7 +26,7 @@ bool g_running;
 void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
-bool export;
+bool entityExport;
 
 ReadMemory RM;
 void LoadScene()
@@ -48,7 +48,15 @@ void HandleEvents()
 		case SDL_KEYDOWN:
 			{
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
-					export = true;
+					entityExport = true;
+
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+					*RM.export = true;
+
+					ReleaseMutex(RM.IdMutexHandle);
+
 			}
 			break;
 		//default:
@@ -108,7 +116,8 @@ std::string GetNameFromPath( std::string p_path )
  } 
 int main(int argc, char* argv[]) 
 {
-	export = false;
+	entityExport = false;
+
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -358,10 +367,10 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
-				if(export)
+				if(entityExport)
 				{
 					m_world.GetEntityExporter()->Export("level");
-					export = false;
+					entityExport = false;
 				}
 
 				// GET MESH CHANGE AND REMOVE INDEX

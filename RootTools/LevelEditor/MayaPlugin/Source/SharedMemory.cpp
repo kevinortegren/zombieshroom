@@ -8,6 +8,7 @@ SharedMemory::SharedMemory()
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
 	InitalizeSharedMemory();
+	//export = nullptr;
 }
 
 SharedMemory::~SharedMemory()
@@ -23,8 +24,9 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Material) * g_maxMeshes;
-	total_memory_size += sizeof(int);
+	total_memory_size += sizeof(int) * 4;
 	total_memory_size += sizeof(glm::vec2) * 3;
+	total_memory_size += sizeof(bool);
 	
 
 
@@ -86,6 +88,10 @@ int SharedMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(Material) * g_maxMeshes);
 
 	NumberOfMaterials = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	export = (bool*)(mem);
 	
 
 	//if(first_process)
