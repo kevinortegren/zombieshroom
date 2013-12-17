@@ -12,6 +12,15 @@ void ECS::EntityExporter::SetExporter(COMPEXPORT p_exporter)
 
 void ECS::EntityExporter::Export(const std::string& p_filepath)
 {
+	std::vector<bool> nonExportIds;
+	nonExportIds.resize(m_world->GetEntityManager()->GetNumEntities());
+
+	auto range = m_world->GetGroupManager()->GetEntitiesInGroup("NonExport");
+	for(auto itr = range.first; itr != range.second; ++itr)
+	{
+		nonExportIds[itr->second->GetId()] = true;
+	}
+
 	YAML::Emitter out;
 	out << YAML::BeginSeq;
 
@@ -19,11 +28,15 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::BeginMap;
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
+
 	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
 	{
-		std::cout << "Entity " << m_world->GetEntityManager()->m_entities[i]->GetId() << std::endl;
+		if(nonExportIds[m_world->GetEntityManager()->m_entities[i]->GetId()])
+			continue;
+
 		out << m_world->GetEntityManager()->m_entities[i]->GetId();
 	}
+
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
@@ -42,6 +55,10 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 		{
 			if(m_world->GetEntityManager()->m_components[i][j] == nullptr)
 				continue;
+
+			if(nonExportIds[j])
+				continue;
+
 			out << YAML::BeginMap;
 			out << YAML::Key << "Entity" << YAML::Value << j;
 			m_exporter(out, m_world->GetEntityManager()->m_components[i][j].get(), i);
@@ -57,13 +74,14 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::BeginMap;
 	out << YAML::Key << "Tags";
 	out << YAML::Value << YAML::BeginSeq;
-	out << YAML::BeginMap;
+	
 	for(auto itr = m_world->GetTagManager()->m_tags.begin(); itr != m_world->GetTagManager()->m_tags.end(); ++itr)
 	{
+		out << YAML::BeginMap;
 		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
 		out << YAML::Key << "Tag" << YAML::Value << (*itr).first;
+		out << YAML::EndMap;
 	}
-	out << YAML::EndMap;
 
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
@@ -72,13 +90,17 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::BeginMap;
 	out << YAML::Key << "Groups";
 	out << YAML::Value << YAML::BeginSeq;
-	out << YAML::BeginMap;
+	
 	for(auto itr = m_world->GetGroupManager()->m_groups.begin(); itr != m_world->GetGroupManager()->m_groups.end(); ++itr)
 	{
-		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
-		out << YAML::Key << "Group" << YAML::Value << (*itr).first;
+		if((*itr).first != "NonExport")
+		{
+			out << YAML::BeginMap;
+			out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
+			out << YAML::Key << "Group" << YAML::Value << (*itr).first;
+			out << YAML::EndMap;
+		}
 	}
-	out << YAML::EndMap;
 
 	out << YAML::EndSeq;
 

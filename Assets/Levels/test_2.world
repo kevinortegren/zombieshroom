@@ -3,12 +3,15 @@
     - 1
     - 2
     - 3
+    - 4
+    - 7
 - Components:
     - Type: 0
       Data:
         - Entity: 0
           Model: Primitives/box
           Effect: Skybox
+          Diffuse: SkyBox
         - Entity: 1
           Model: Primitives/sphere
           Effect: Mesh
@@ -25,18 +28,26 @@
       Data:
         - Entity: 0
           Position: [0, 0, 0]
-          Rotation: [180, 0, 0]
+          Rotation: [1, 0, 0]
           Scale: [-100, -100, -100]
         - Entity: 1
-          Position: [1, -18, 0]
+          Position: [3, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [-1, -18, 0]
+          Position: [-3, -18, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 3
           Position: [0, -1, 0]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 7
+          Position: [0, 0, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
@@ -49,13 +60,51 @@
           Attenuation: [0, 0.2, 0]
           Color: [1, 1, 1, 1]
           Range: 20
+    - Type: 3
+      Data:
+        - Entity: 7
     - Type: 4
       Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        - Entity: 7
+    - Type: 10
+      Data:
+        - Entity: 7
+    - Type: 11
+      Data:
+        []
+    - Type: 12
+      Data:
+        - Entity: 1
+          MeshHandle: sphere0
+        - Entity: 2
+          MeshHandle: sphere0
         - Entity: 3
-          Type: 0
-          Mass: 0
-          ModelHandle: ground0
+          MeshHandle: ground0
+    - Type: 13
+      Data:
+        []
 - Tags:
+    - Id: 6
+      Tag: AimingDevice
+    - Id: 7
+      Tag: Camera
+    - Id: 5
+      Tag: Player
     - Id: 0
       Tag: Skybox
 - Groups:
@@ -63,3 +112,9 @@
       Group: Lights
     - Id: 2
       Group: Lights
+    - Id: 3
+      Group: Static
+    - Id: 2
+      Group: Static
+    - Id: 1
+      Group: Static

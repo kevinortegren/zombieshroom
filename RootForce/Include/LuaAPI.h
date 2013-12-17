@@ -13,7 +13,6 @@ namespace RootForce
 {
 	namespace LuaAPI
 	{
-
 		static int CreateEntity(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
@@ -36,6 +35,15 @@ namespace RootForce
 			return 1;
 		}
 		
+		static int GetId(lua_State* p_luaState)
+		{
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+
+			lua_pushnumber(p_luaState, (*e)->GetId());
+
+			return 1;
+		}
+
 		static int GetTransformation(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
@@ -130,15 +138,38 @@ namespace RootForce
 			return 3;
 		}
 
+		static int CreateCollision(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			RootForce::Collision **s = (RootForce::Collision **)lua_newuserdata(p_luaState, 4);
+
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Collision>(*e);
+
+			luaL_setmetatable(p_luaState, "Collision");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int SetMeshHandle(lua_State* p_luaState)
+		{
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			std::string handle = lua_tostring(p_luaState, 2);
+
+			(*rtemp)->m_meshHandle = handle;
+			return 0;
+		}
+
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
-			RootForce::PhysicsAccessor **s = (RootForce::PhysicsAccessor **)lua_newuserdata(p_luaState, sizeof(RootForce::PhysicsAccessor *));
+			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
 
 			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
-			*s = g_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(*e);
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Physics>(*e);
 
-			luaL_setmetatable(p_luaState, "PhysicsAccessor");
+			luaL_setmetatable(p_luaState, "Physics");
 
 			//Userdata already on stack
 			return 1;
@@ -172,29 +203,31 @@ namespace RootForce
 
 		static int SetInfo(lua_State* p_luaState)
 		{
-			RootForce::PhysicsAccessor** ptemp = (RootForce::PhysicsAccessor**)luaL_checkudata(p_luaState, 1, "PhysicsAccessor");
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 
 			RootEngine::Physics::AbilityPhysicsInfo info;
-			bool collide = lua_toboolean(p_luaState, 2) == 1 ? true : false; 
+			bool collide = lua_toboolean(p_luaState, 3) == 1 ? true : false; 
 			
-			glm::vec3 direction((float)lua_tonumber(p_luaState, 3), (float)lua_tonumber(p_luaState, 4), (float)lua_tonumber(p_luaState, 5));
-			glm::vec3 gravity((float)lua_tonumber(p_luaState, 6), (float)lua_tonumber(p_luaState, 7), (float)lua_tonumber(p_luaState, 8));
-			glm::quat orientation((float)lua_tonumber(p_luaState, 9), (float)lua_tonumber(p_luaState, 10), (float)lua_tonumber(p_luaState, 11), (float)lua_tonumber(p_luaState, 12));
-			glm::vec3 position((float)lua_tonumber(p_luaState, 13), (float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15));
+			glm::vec3 direction((float)lua_tonumber(p_luaState, 4), (float)lua_tonumber(p_luaState, 5), (float)lua_tonumber(p_luaState,6));
+			glm::vec3 gravity((float)lua_tonumber(p_luaState, 7), (float)lua_tonumber(p_luaState, 8), (float)lua_tonumber(p_luaState, 9));
+			glm::quat orientation((float)lua_tonumber(p_luaState, 10), (float)lua_tonumber(p_luaState, 11), (float)lua_tonumber(p_luaState, 12), (float)lua_tonumber(p_luaState, 13));
+			glm::vec3 position((float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15), (float)lua_tonumber(p_luaState, 16));
 			info.m_collidesWorld	= collide;
 			info.m_direction		= direction;
-			info.m_entityId			= 0;
+			info.m_entityId			= (unsigned int)lua_tonumber(p_luaState, 17);
 			info.m_gravity			= gravity;
-			info.m_height			= (float)lua_tonumber(p_luaState, 16);
-			info.m_mass				= (float)lua_tonumber(p_luaState, 17);
+			info.m_height			= (float)lua_tonumber(p_luaState, 18);
+			info.m_mass				= (float)lua_tonumber(p_luaState, 19);
 			info.m_orientation		= orientation;
 			info.m_position			= position;
-			info.m_radius			= (float)lua_tonumber(p_luaState, 18);
-			info.m_shape			= (RootEngine::Physics::AbilityShape::AbilityShape)((int)lua_tonumber(p_luaState, 19));
-			info.m_speed			= (float)lua_tonumber(p_luaState, 20);
-			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 21));
+			info.m_radius			= (float)lua_tonumber(p_luaState, 20);
+			info.m_shape			= (RootEngine::Physics::PhysicsShape::PhysicsShape)((int)lua_tonumber(p_luaState, 21));
+			info.m_speed			= (float)lua_tonumber(p_luaState, 22);
+			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 23));
 	
-			(*ptemp)->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
+			(*rtemp)->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
+
 			return 0;
 		}
 		//Entity functions
@@ -205,6 +238,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg entity_m [] = {
+			{"GetId", GetId},
 			{"GetTransformation", GetTransformation},
 			{NULL, NULL}
 		};
@@ -236,6 +270,17 @@ namespace RootForce
 			{"GetRight", GetRight},
 			{NULL, NULL}
 		};
+
+		static const struct luaL_Reg collision_f [] = {
+			{"New", CreateCollision},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg collision_m [] = {
+			{"SetMeshHandle", SetMeshHandle},
+			{NULL, NULL}
+		};
+
 		//Physics function & methods
 		static const struct luaL_Reg physicsaccessor_f [] = {
 			{"New", CreatePhysicsAccessor},
