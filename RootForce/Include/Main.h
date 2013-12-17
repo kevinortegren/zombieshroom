@@ -9,7 +9,12 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/AbilitySystem.h>
-#include <RootSystems/Include/Network/MessageHandler.h>
+
+//#include <RootSystems/Include/Network/MessageHandler.h>
+#include <RootSystems/Include/Network/LanList.h>
+#include <RootSystems/Include/Network/Server.h>
+#include <RootSystems/Include/Network/Client.h>
+
 #include <memory>
 #include <string>
 #include "ChatSystem.h"
@@ -41,14 +46,17 @@ namespace RootForce
         bool m_running;
         void* m_engineModule;
         std::shared_ptr<SDL_Window> m_window;
-        RootForce::ChatSystem m_chat;
 
 		ECS::World m_world;
 		
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
 
-		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
+		RootForce::ChatSystem m_chat;
+		RootSystems::LanList m_lanList;
+		std::shared_ptr<RootForce::Network::Server> m_server;
+		std::shared_ptr<RootForce::Network::Client> m_client;
+
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug;
 		GameState::GameState m_currentState;

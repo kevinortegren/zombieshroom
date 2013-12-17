@@ -242,8 +242,7 @@ namespace RootForce
 		//Initiate Menu
 		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher());
 
-        // Initialize the network system
-        m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
+        
        
 		m_displayPhysicsDebug = false;
 
@@ -254,11 +253,17 @@ namespace RootForce
 			case RootForce::GameState::Menu:
 				m_menu->Unhide();
 				g_engineContext.m_inputSys->LockMouseToCenter(false);
-				 old = SDL_GetPerformanceCounter();
+				old = SDL_GetPerformanceCounter();
+
+				// Initialize a client (defer the initialization of the server until we know we need one)
+				m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
+				// TODO: Add LAN discovery message handler to the client
+
 				while (m_currentState == RootForce::GameState::Menu && m_running)
 				{
 					HandleEvents();
-					m_networkHandler->Update();
+
+					m_client->Update();
 
 					g_engineContext.m_renderer->Clear();
 
@@ -267,7 +272,7 @@ namespace RootForce
 
 					g_engineContext.m_renderer->Swap();
 
-					std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal*>> lanList = m_networkHandler->GetLanList()->GetList();
+					std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal*>> lanList = m_lanList.GetList();
 					for(int i = 0; i < lanList.size(); i++)
 						m_menu->AddServer(lanList.at(i));
 
@@ -279,21 +284,27 @@ namespace RootForce
 						m_running = false;
 						break;
 					case MenuEvent::EventType::Host:
-						m_networkHandler->SetChatSystem(&m_chat);
-						m_networkHandler->Host(event.data[0].ToInteger(), Network::MessageHandler::ServerType::LOCAL); //TODO: make sure Host returns boolean and only change gamestate if true
-						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
-						m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
+						m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, "Local Server", event.data[0].ToInteger(), 12));
+						m_client->Connect("127.0.0.1", event.data[0].ToInteger());
 						m_currentState = RootForce::GameState::Ingame;
+
+						//m_networkHandler->SetChatSystem(&m_chat);
+						//m_networkHandler->Host(event.data[0].ToInteger(), Network::MessageHandler::ServerType::LOCAL); //TODO: make sure Host returns boolean and only change gamestate if true
+						//m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						//m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
 						break;
 					case MenuEvent::EventType::Connect:
-						m_networkHandler->SetChatSystem(&m_chat);
-						m_networkHandler->Connect(event.data[0].ToInteger(), Awesomium::ToString(event.data[1].ToString()).c_str()); //TODO: make sure Connect returns boolean and only change gamestate if true
-						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
-						m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
+						m_client->Connect(Awesomium::ToString(event.data[1].ToString()).c_str(), event.data[0].ToInteger()); 
 						m_currentState = RootForce::GameState::Ingame;
+
+						//m_networkHandler->SetChatSystem(&m_chat);
+						//m_networkHandler->Connect(event.data[0].ToInteger(), Awesomium::ToString(event.data[1].ToString()).c_str()); //TODO: make sure Connect returns boolean and only change gamestate if true
+						//m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						//m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
+						
 						break;
 					case MenuEvent::EventType::Refresh:
-						m_networkHandler->PingNetwork(5567);
+						m_client->PingNetwork(&m_lanList, 5567);
 						break;
 					default:
 						break;
@@ -373,9 +384,15 @@ namespace RootForce
 						abilitySystem->Process();
 					}
 
+					if (m_server != nullptr)
 					{
-						PROFILE("Network message handler", g_engineContext.m_profiler);
-						m_networkHandler->Update();
+						PROFILE("Server", g_engineContext.m_profiler);
+						m_server->Update();
+					}
+
+					{
+						PROFILE("Client", g_engineContext.m_profiler);
+						m_client->Update();
 					}
 
 					{

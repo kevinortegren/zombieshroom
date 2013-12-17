@@ -34,7 +34,7 @@ namespace RootForce
 	{
 		std::string command = "AddServer('";
 		command = command + p_serverInfo.second->IP + ":" + std::to_string(p_serverInfo.second->Port) + "','";
-		command = command + p_serverInfo.second->Name + "',";
+		command = command + p_serverInfo.second->Name.C_String() + "',";
 		command = command + std::to_string(p_serverInfo.second->NumPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.second->MaxPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.first/1000) + ",'";

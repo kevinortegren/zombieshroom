@@ -316,12 +316,12 @@ namespace RootForce
 		}
 		void ServerMessageHandler::UpdateServerInfo()
 		{
-			RootSystems::ServerInfo info;
-			strcpy(info.Name, "Local server");
-			info.MaxPlayers = 12;
-			info.NumPlayers = m_server->GetConnectedClients().size();
-			info.PasswordProtected = false;
-			m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
+			//RootSystems::ServerInfo info;
+			//strcpy(info.Name, "Local server");
+			//info.MaxPlayers = 12;
+			//info.NumPlayers = m_server->GetConnectedClients().size();
+			//info.PasswordProtected = false;
+			//m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
 		}
 
 	}
