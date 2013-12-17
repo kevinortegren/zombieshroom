@@ -88,7 +88,7 @@ namespace RootForce
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
-		PhysicsAccessor* physAcc = m_world->GetEntityManager()->GetComponent<PhysicsAccessor>(entity);
+		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
 		
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
@@ -157,9 +157,9 @@ namespace RootForce
 
 		
 		if(movement != glm::vec3(0.0f))
-			m_physics->SetPosition(*(physAcc->m_handle), movement  + transform->m_position);
+			m_physics->SetPosition(*(collision->m_handle), movement  + transform->m_position);
 			//m_physics->SetVelocity(*(physAcc->m_handle), movement);
-		m_physics->SetOrientation(*(physAcc->m_handle), transform->m_orientation.GetQuaternion());
+		m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 

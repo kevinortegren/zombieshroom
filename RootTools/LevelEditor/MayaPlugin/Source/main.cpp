@@ -2,12 +2,13 @@
 #include "maya_includes.h"
 
 #include "SharedMemory.h"
-
+#include <algorithm>
 SharedMemory SM;
 
 // Globala variabler.
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
+MString g_outputDirectory = "C:/Users/BTH/Documents/zombieshroom/Assets/Models/";
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights];
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0;
@@ -35,6 +36,7 @@ void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
+void Export();
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -50,7 +52,6 @@ EXPORT MStatus initializePlugin(MObject obj)
 	sortObjectList();
 	printLists();
 	loadScene();
-
 
 	myInitMemoryCheck(); // Har koll på minnet och minnesläckor
 	MStatus status = MS::kSuccess;
@@ -71,6 +72,90 @@ EXPORT MStatus initializePlugin(MObject obj)
 	}
 
 	return status;
+}
+
+void Export()
+{	
+	for(int i = 0; i < currNrMeshes; i++)
+	{
+		Print("Index ", i, " ", SM.meshList[i].transformation.name);
+		int count = 0;
+		int countVertex = 0;
+		bool exists = true;
+		int saveJ = 0;
+		if(i == 0)
+		{
+			exists = false;
+		}
+		else
+		{
+			for(int j = 0; j < i; j++)
+			{
+				if(SM.meshList[i].nrOfVertices == SM.meshList[j].nrOfVertices)
+				{
+					for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
+					{
+						if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
+						{
+							exists = false;
+						}
+						else
+						{
+							countVertex++;
+							if(countVertex == SM.meshList[i].nrOfVertices)
+							{
+								exists = true;
+								saveJ = j;
+								break;   /// i++ och j = 0 !?!
+							}
+						}
+						
+					}
+					if(exists)
+						break;
+				}
+				else
+				{
+					count++;
+					if(count == i)
+						exists = false;
+				}
+				
+			}
+		
+		}
+
+		if(exists)
+		{
+			//Change name in materiallist to existing one!!!!!!!!!!!!!!!
+
+			MFnMesh mesh = g_mayaMeshList[saveJ];
+			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
+			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
+			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
+		}
+		else
+		{
+			MString name, realName, ExportFunction;		//CANNOT SAVE FULLPATHNAME FILES with char | //Fixed in cleanfullpathname() function but not needed anymore
+			name = SM.meshList[i].modelName;
+
+			MFnMesh mesh = g_mayaMeshList[i];
+			realName = mesh.fullPathName();
+
+			MGlobal::executeCommand("select -r " + realName);
+			ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + g_outputDirectory + name + ".dae\"";
+			Print(name);
+			MGlobal::executeCommand(ExportFunction);
+			Print(ExportFunction);
+		}
+	}
+
+	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
+
+	*SM.export = 2;
+
+	ReleaseMutex(SM.IdMutexHandle);
 }
 
 void sortObjectList()
@@ -220,6 +305,16 @@ void viewCB(const MString &str, void *clientData)
 		MayaCameraToList(g_mayaCameraList[tempInt], tempInt);
 		SM.UpdateSharedCamera(tempInt);
 	}
+
+	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
+
+	if(*SM.export == 1)
+	{
+	Export();
+	}
+
+	ReleaseMutex(SM.IdMutexHandle);
 }
 
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
@@ -512,6 +607,18 @@ int nodeExists(MObject node)
 	return answer;
 }
 
+MString cleanFullPathName(const char * str)
+{
+	string tmpString = str;
+	char chars[] = "| _";
+	for (unsigned int i = 0; i < strlen(chars); ++i)
+	{
+		tmpString.erase(std::remove(tmpString.begin(), tmpString.end(), chars[i]), tmpString.end());
+	}
+
+	MString TEMP = tmpString.c_str();
+	return TEMP;
+}
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
 
 void MayaMeshToList(MObject node, int meshIndex)
@@ -580,11 +687,14 @@ void MayaMeshToList(MObject node, int meshIndex)
 		{
 			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
 		}
-		
 
+		//MString TEMP = cleanFullPathName(mesh.fullPathName().asChar());
+		MString TEMP = cleanFullPathName(mesh.fullPathName().asChar());
 		//Get and set mesh name
-		memcpy(SM.meshList[meshIndex].transformation.name, mesh.fullPathName().asChar(), mesh.fullPathName().numChars());
+		memcpy(SM.meshList[meshIndex].transformation.name, TEMP.asChar(), TEMP.numChars());
 
+		TEMP = cleanFullPathName(mesh.name().asChar());
+		memcpy(SM.meshList[meshIndex].modelName, TEMP.asChar(), TEMP.numChars());
 		//Get points from mesh
 		mesh.getPoints(points_, space_local);
 

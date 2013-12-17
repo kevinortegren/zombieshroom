@@ -4,11 +4,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-//#include <RenderingSystem.h>
-//#include <LightSystem.h>
-#include <RootSystems/Include/CameraSystem.h>
-#include <RootSystems/Include/PhysicsSystem.h>
-
 #include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
@@ -28,13 +23,15 @@ int main(int argc, char* argv[])
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
 	RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
 	RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
-	RootForce::PhysicsAccessor::SetTypeId(RootForce::ComponentType::PHYSICS);
+	RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
 	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
@@ -105,11 +102,17 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "PhysicsAccessor");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
 		
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 
+		g_engineContext.m_resourceManager->LoadCollada("AnimationTest");
+
 		g_world = &m_world;
+
+		m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(5);
@@ -133,14 +136,20 @@ namespace RootForce
 		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
 		keybindings[4].Edge = true;
 
+		// System responsible for controlling the player.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(&m_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
+		// System responsible for updating the world.
+		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(&m_world));
+
+		// System responsible for updating the player.
 		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
 
+		// System responsible for executing script based on actions.
 		RootForce::ScriptSystem* scriptSystem = new RootForce::ScriptSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(scriptSystem, "ScriptSystem");
 
@@ -150,8 +159,8 @@ namespace RootForce
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_world.GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-		m_world.GetEntityImporter()->SetImporter(Importer);
-		m_world.GetEntityExporter()->SetExporter(Exporter);
+		RootForce::CollisionSystem* m_collisionSystem = new RootForce::CollisionSystem(&m_world);
+		m_world.GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
 		// Initialize render and point light system.
 		RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -160,6 +169,10 @@ namespace RootForce
 		renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+		m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+		// Initialize camera systems.
 		RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
 		RootForce::LookAtSystem* lookAtSystem = new RootForce::LookAtSystem(&m_world);
@@ -167,59 +180,16 @@ namespace RootForce
 		RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+		m_worldSystem->CreateWorld("level");
 
-		Render::DirectionalLight dl;
-		dl.m_color = glm::vec4(1.0f,1.f,1.f,1);
-		dl.m_direction = glm::vec3(0,0,-1);
-
-		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
-
-		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
-		m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
-
-		RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
-		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
-
-		// Import test world.
-		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
-		
 		m_playerSystem->CreatePlayer();
 
-		ECS::EntityManager* em = m_world.GetEntityManager();
-
-
-
-		//Create camera
-		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
-		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
-		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
-		camera->m_near = 0.1f;
-		camera->m_far = 1000.0f;
-		camera->m_fov = 45.0f;
-		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		cameraLookAt->m_targetTag = "AimingDevice";
-		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
-
-
 		//Plane at bottom
-
 		glm::vec3 normal (0,1,0);
 		glm::vec3 position (0, -2, 0);
 	
-		//g_engineContext.m_physics->CreatePlane(normal, position);
 		normal = glm::vec3 (0,0,-1);
 		position = glm::vec3 (0,0,9);
-	//	g_engineContext.m_physics->CreatePlane(normal, position);
-		// Setup the skybox.
-		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
-		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
-		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
-			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
@@ -230,7 +200,6 @@ namespace RootForce
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
-
 
 		m_displayPhysicsDebug = false;
 
@@ -294,35 +263,40 @@ namespace RootForce
 			}
 
 			{
+				PROFILE("Physics", g_engineContext.m_profiler);
+				g_engineContext.m_physics->Update(dt);
+				m_physicsSystem->Process();
+			}
+
+			{
+				PROFILE("Collision system", g_engineContext.m_profiler);
+				m_collisionSystem->Process();
+			}
+
+			{
 				PROFILE("Script system", g_engineContext.m_profiler);
 				scriptSystem->Process();
 			}
 
-			{
-				PROFILE("Ability system", g_engineContext.m_profiler);
-				abilitySystem->Process();
-			}
-				
 			{
 				PROFILE("Network message handler", g_engineContext.m_profiler);
 				m_networkHandler->Update();
 			}
 
 			{
-				PROFILE("Physics", g_engineContext.m_profiler);
-				g_engineContext.m_physics->Update(dt);
-				m_physicsSystem->Process();
-				
+				PROFILE("Camera systems", g_engineContext.m_profiler);
+				m_playerControlSystem->UpdateAimingDevice();
+				thirdPersonBehaviorSystem->Process();
+				lookAtSystem->Process();
+				cameraSystem->Process();
 			}
-			m_playerControlSystem->UpdateAimingDevice();
-			thirdPersonBehaviorSystem->Process();
-			lookAtSystem->Process();
-			cameraSystem->Process();
-			pointLightSystem->Process();
+
 			{
 				PROFILE("RenderingSystem", g_engineContext.m_profiler);
+				pointLightSystem->Process();
 				renderingSystem->Process();
 			}
+
 			g_engineContext.m_renderer->Render();
 	
 			{
@@ -333,13 +307,13 @@ namespace RootForce
 	
 			g_engineContext.m_profiler->Update(dt);
 		
-		
 			{
 				PROFILE("GUI", g_engineContext.m_profiler);
 
 				g_engineContext.m_gui->Update();
 				g_engineContext.m_gui->Render();
 			}
+
 			g_engineContext.m_debugOverlay->RenderOverlay();
 			g_engineContext.m_renderer->Swap();
 		}

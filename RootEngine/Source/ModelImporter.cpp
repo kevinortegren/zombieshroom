@@ -19,8 +19,10 @@ namespace RootEngine
 	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
 		m_model = new Model(); //Owned by ResourceManager
-		
-		const aiScene* aiscene = m_importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals);
+
+		Assimp::Importer importer;
+		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+
 
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
@@ -33,7 +35,7 @@ namespace RootEngine
 		}
 		else 
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, m_importer.GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
 		}
 
 		return m_model;
@@ -208,24 +210,24 @@ namespace RootEngine
 
 	void ModelImporter::LoadBones( unsigned int p_index, const aiMesh* p_aiMesh )
 	{
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data...");
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
 
-		std::shared_ptr<Render::AnimationInterface> m_animation = m_context->m_renderer->CreateAnimation();
+		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(p_aiMesh->mNumVertices);
 
 		//Loop through all the bones in the mesh
-		for(unsigned int i = 0; p_aiMesh->mNumBones; i++)
+		for(unsigned int i = 0; i < p_aiMesh->mNumBones; i++)
 		{
 			unsigned int boneIndex = 0;
 			//Store bone name
 			std::string boneName = p_aiMesh->mBones[i]->mName.data;
 
 			//If bone doesn't exist, add a new bone to the end of the list
-			if(!m_animation->BoneExists(boneName))
+			if(!animation->BoneExists(boneName))
 			{
-				boneIndex = m_animation->GetNumBones();
-				m_animation->SetNumBones(boneIndex + 1);
+				boneIndex = animation->GetNumBones();
+				animation->SetNumBones(boneIndex + 1);
 
-				Render::BoneInfo bi;
+				RootEngine::RootAnimation::BoneInfo bi;
 				//Great code for converting atMatrix4x4 to glm::mat4x4!
 				aiMatrix4x4 am = p_aiMesh->mBones[i]->mOffsetMatrix;
 				glm::mat4x4 gm = glm::mat4x4();
@@ -235,23 +237,26 @@ namespace RootEngine
 				gm[3][0] = am.d1; gm[3][1] = am.d2; gm[3][2] = am.d3; gm[3][3] = am.d4;
 				bi.m_boneOffset = gm;
 
-				m_animation->MapBone(boneName, boneIndex);
+				animation->MapBone(boneName, boneIndex);
+				
 			}
 			else
 			{
 				//Get bone index if it exists
-				boneIndex = m_animation->GetIndexFromBoneName(boneName);
+				boneIndex = animation->GetIndexFromBoneName(boneName);
 			}
 			//Loop through all weights in the bone and add weights and bone data to vertex slot
 			for(unsigned int j = 0; j < p_aiMesh->mBones[i]->mNumWeights; j++)
 			{
 				unsigned int vertexID =  p_aiMesh->mBones[i]->mWeights[j].mVertexId;
 				float vweight  = p_aiMesh->mBones[i]->mWeights[j].mWeight;                   
-				m_animation->AddBoneData(vertexID, boneIndex, vweight);
+				animation->AddBoneData(vertexID, boneIndex, vweight);
+				//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "AddBoneData -> VertexID:  %d, BoneIndex: %d, Weight: %f", vertexID, boneIndex, vweight);
 			}
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Added bone: %s", boneName.c_str());
 		}
 
-		m_model->m_animations.push_back(m_animation.get());
+		m_model->m_animations.push_back(animation);
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded animation data!");
 	}
 

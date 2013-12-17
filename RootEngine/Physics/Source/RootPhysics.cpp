@@ -77,10 +77,10 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
-		
-		
+
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
+		
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
@@ -89,10 +89,19 @@ namespace Physics
 			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
 		else if(!pointer2->m_modelHandle.compare("ground0"))
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
-		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
-		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-			pointer2->m_collidedEntityId.push_back(pointer1->m_entityId);
+
+		if(pointer1->m_collidedEntityId != nullptr)
+		{
+			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
+				pointer1->m_collidedEntityId->insert(pointer2->m_entityId);
+		}
+			
+		if(pointer2->m_collidedEntityId != nullptr)
+		{
+			if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
+				pointer2->m_collidedEntityId->insert(pointer1->m_entityId);
+		}
+
 
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
@@ -332,15 +341,14 @@ namespace Physics
 		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 	}
 
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
 		btScalar mass = 0; //mass is always 0 for static objects
-		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
-		
-		//Set startpos and start rotation
 
+		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
+		objectMeshShape->setLocalScaling(btVector3(p_scale.x, p_scale.y, p_scale.z));
 
 		btTransform startTransform;
 		startTransform.setIdentity();
@@ -395,10 +403,10 @@ namespace Physics
 		
 		userPointer->m_entityId = p_entityId;
 		*(userPointer->m_id) = m_userPointer.size()-1;
-		
-		
+
 		return userPointer->m_id;
 	}
+
 	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
 	{	
 		btRigidBody* objectBody = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
@@ -423,7 +431,7 @@ namespace Physics
 		return userPointer->m_id;
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
@@ -440,6 +448,7 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
+		userPointer->m_collidedEntityId = p_enityCollidedId;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
@@ -721,9 +730,9 @@ namespace Physics
 		
 	}
 
-	std::vector<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
+	std::set<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
 	{
-		return &(m_userPointer.at(p_objectHandle)->m_collidedEntityId);
+		return (m_userPointer.at(p_objectHandle)->m_collidedEntityId);
 	}
 
 

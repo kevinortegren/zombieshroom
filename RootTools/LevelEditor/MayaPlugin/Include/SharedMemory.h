@@ -31,9 +31,12 @@ public:
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
-
+	int* export;
 	Material materialList[g_maxMeshes];
 	int* NumberOfMaterials;
+	DWORD milliseconds;
+
+		HANDLE IdMutexHandle;
 
 private:
 	//Functions
@@ -41,10 +44,8 @@ private:
 	int shutdown();
 	//Variables
 	HANDLE MeshMutexHandle;
-	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
-	DWORD milliseconds;
 	HANDLE shared_memory_handle;
 	unsigned char* raw_data;
 	Mesh* PmeshList[g_maxMeshes];
