@@ -188,8 +188,7 @@ namespace RootForce
 		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
 
 		// Import test world.
-		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
-
+		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\level.world");
 		m_physicsSystem->AddStaticEntities();
 
 		m_playerSystem->CreatePlayer();
