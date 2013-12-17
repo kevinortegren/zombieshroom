@@ -6,6 +6,7 @@
 
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 extern ContactAddedCallback		gContactAddedCallback;
+
 //#include "vld.h"
 namespace RootEngine
 {
@@ -86,7 +87,10 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
-
+		if(pointer1->m_modelHandle.compare("ground0"))
+			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
+		else if(pointer2->m_modelHandle.compare("ground0"))
+			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
 		if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
@@ -112,13 +116,16 @@ namespace Physics
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
 		gContactAddedCallback = callbackFunc;
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
-
+		
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints |btIDebugDraw::DBG_DrawAabb);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb );
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+
+		//btSetDebugDrawer(m_debugDrawer);
+
 	}
 
 
@@ -290,53 +297,100 @@ namespace Physics
 		return objectBody;
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-	void RootPhysics::AddStaticObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation )
+	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass )
 	{
+		btRigidBody* body = CreateSphere(p_radius, p_mass, p_position);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+	}
 
-		//TODO if time and need to improve performance: Use compoundshapes
+	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass )
+	{
+		btRigidBody* body = CreateCylinder(p_radius, p_height , p_position, p_rotation, p_mass);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+	}
 
+	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass )
+	{
+		btRigidBody* body = CreateCone(p_radius, p_height , p_position, p_rotation, p_mass);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+	}
+
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		btScalar mass = 0; //mass is always 0 for static objects
+
 		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
 		
 		
 		//Set startpos and start rotation
+
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
-		//Create a motionstate
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-		//create the body
-		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
-		
-		objectBody->setCollisionFlags(objectBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_STATIC_OBJECT);
+
 
 		btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
 		btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
 
+		btRigidBody* body = new btRigidBody(mass,motionstate,objectMeshShape);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
+	}
 
-		m_dynamicWorld->addRigidBody(objectBody);
+	void RootPhysics::BindHullShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	{
+		btRigidBody* body = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
+	}
+	//////////////////////////////////////////////////////////////////////////
+	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
+	int* RootPhysics::AddStaticObjectToWorld(unsigned int p_entityId)
+	{
+
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
 		m_userPointer.push_back(userPointer);
 		userPointer->m_type = PhysicsType::TYPE_STATIC;
 		userPointer->m_id = new int();
-		userPointer->m_modelHandle = p_modelHandle;
+		
 		userPointer->m_entityId = p_entityId;
 		*(userPointer->m_id) = m_userPointer.size()-1;
-		objectBody->setUserPointer((void*)userPointer);
 		
-
+		
+		return userPointer->m_id;
 	}
 	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
-	{
-		
-		
-		
+	{	
 		btRigidBody* objectBody = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
 		objectBody->setCollisionFlags(objectBody->getCollisionFlags()| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK );
@@ -357,7 +411,6 @@ namespace Physics
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		objectBody->setUserPointer((void*)userPointer);
 		return userPointer->m_id;
-		
 	}
 
 	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
@@ -394,7 +447,7 @@ namespace Physics
 		gravity.setZ(p_abilityInfo.m_gravity[2]);
 
 		//Don't allow a orientation of {0,0,0,0} since that breaks bullet
-		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CYLINDER ||p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
+		if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_CYLINDER ||p_abilityInfo.m_shape == PhysicsShape::SHAPE_CONE)
 		{
 			if(p_abilityInfo.m_orientation[0] == 0 && p_abilityInfo.m_orientation[1] == 0 && p_abilityInfo.m_orientation[2] == 0 && p_abilityInfo.m_orientation[3] == 0)
 			{
@@ -402,7 +455,7 @@ namespace Physics
 				return nullptr;
 			}
 		}
-		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CUSTOM_MESH)
+		else if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_CUSTOM_MESH)
 		{
 			if(p_abilityInfo.m_modelHandle.empty())
 			{
@@ -410,17 +463,17 @@ namespace Physics
 				return nullptr;
 			}
 		}
-		if(p_abilityInfo.m_shape == AbilityShape::SHAPE_SPHERE)
+		if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_SPHERE)
 			body = CreateSphere(p_abilityInfo.m_radius, p_abilityInfo.m_mass, p_abilityInfo.m_position);
-		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CONE)
+		else if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_CONE)
 			body = CreateCone(p_abilityInfo.m_radius, p_abilityInfo.m_height, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
-		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CYLINDER)
+		else if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_CYLINDER)
 			body = CreateCylinder(p_abilityInfo.m_radius, p_abilityInfo.m_height, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
-		else if(p_abilityInfo.m_shape == AbilityShape::SHAPE_CUSTOM_MESH)
+		else if(p_abilityInfo.m_shape == PhysicsShape::SHAPE_CUSTOM_MESH)
 			body = CreateMesh(p_abilityInfo.m_modelHandle, p_abilityInfo.m_position, p_abilityInfo.m_orientation, p_abilityInfo.m_mass);
 		else
 		{
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Unable to find AbilityShape; %d", p_abilityInfo.m_shape);
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Unable to find PhysicsShape; %d", p_abilityInfo.m_shape);
 			return nullptr;
 		}
 		if(body == nullptr)
@@ -808,6 +861,8 @@ namespace Physics
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
 		}
 	}
+
+	
 
 }
 }

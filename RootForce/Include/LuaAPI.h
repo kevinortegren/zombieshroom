@@ -190,7 +190,7 @@ namespace RootForce
 			info.m_orientation		= orientation;
 			info.m_position			= position;
 			info.m_radius			= (float)lua_tonumber(p_luaState, 18);
-			info.m_shape			= (RootEngine::Physics::AbilityShape::AbilityShape)((int)lua_tonumber(p_luaState, 19));
+			info.m_shape			= (RootEngine::Physics::PhysicsShape::PhysicsShape)((int)lua_tonumber(p_luaState, 19));
 			info.m_speed			= (float)lua_tonumber(p_luaState, 20);
 			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 21));
 	

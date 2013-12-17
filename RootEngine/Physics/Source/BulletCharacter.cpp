@@ -306,7 +306,7 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 			btScalar hitDistance;
 			hitDistance = (callback.m_hitPointWorld - m_currentPosition).length();
 
-			//			m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
+				//		m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 
 			updateTargetPositionBasedOnCollision (callback.m_hitNormalWorld);
 			btVector3 currentDir = m_targetPosition - m_currentPosition;
