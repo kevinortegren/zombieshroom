@@ -26,10 +26,11 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 												   const btConvexShape* convexA,const btConvexShape* convexB,
 												   const btTransform& transA,const btTransform& transB,
 												   btVector3& v, btVector3& pa, btVector3& pb,
-												   class btIDebugDraw* debugDraw
+												   class btIDebugDraw* debugDraw,btStackAlloc* stackAlloc
 												   )
 {
 
+	(void)stackAlloc;
 	(void)v;
 	
 	bool check2d= convexA->isConvex2d() && convexB->isConvex2d();

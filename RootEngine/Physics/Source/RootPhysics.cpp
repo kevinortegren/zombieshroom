@@ -243,7 +243,7 @@ namespace Physics
 		cylinder->calculateLocalInertia(p_mass,fallinertia);
 		btRigidBody::btRigidBodyConstructionInfo cylinderCI(p_mass,motionstate,cylinder,fallinertia);
 		btRigidBody* body = new btRigidBody(cylinderCI);
-		body->setContactProcessingThreshold(0);
+		//body->setContactProcessingThreshold(0);
 		body->setActivationState(DISABLE_DEACTIVATION);
 		return body;
 	}
@@ -279,7 +279,7 @@ namespace Physics
 		btConvexHullShape* simplifiedObject = new btConvexHullShape();
 		for(int i = 0; i < objectHull->numVertices(); i++)
 		{
-			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+			simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
 		}	
 		simplifiedObject->recalcLocalAabb();
 		////Set Inertia
@@ -345,7 +345,7 @@ namespace Physics
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-	//	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
+		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{

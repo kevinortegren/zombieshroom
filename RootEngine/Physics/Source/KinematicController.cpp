@@ -46,7 +46,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	btConvexHullShape* simplifiedObject = new btConvexHullShape();
 	for(int i = 0; i < objectHull->numVertices(); i++)
 	{
-		simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+		simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
 	}
 	simplifiedObject->recalcLocalAabb();
 	//End shape
@@ -61,23 +61,22 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 	m_motionState = new btDefaultMotionState(startTransform);
-	btCapsuleShape* capsuleShape = new btCapsuleShape(1,2.0f);
-	btSphereShape* sphereShape = new btSphereShape(2.0f);
+	//btCapsuleShape* capsuleShape = new btCapsuleShape(1,2.0f);
+//	btSphereShape* sphereShape = new btSphereShape(2.0f);
 	
-	capsuleShape->calculateLocalInertia(p_mass, fallInertia);
+	//capsuleShape->calculateLocalInertia(p_mass, fallInertia);
 	
 	
 	m_ghostObject = new btPairCachingGhostObject();
-	capsuleShape->setMargin(0.04f);
-	m_ghostObject->setCollisionShape(capsuleShape);
+	//capsuleShape->setMargin(0.04f);
+	m_ghostObject->setCollisionShape(simplifiedObject);
 	
 	m_ghostObject->setContactProcessingThreshold(0.f);
 	
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
 	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
-	m_ghostObject->setCcdSweptSphereRadius(2);
-	m_ghostObject->setCcdMotionThreshold(2);
-	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
+
+	m_kinController = new BulletCharacter(m_ghostObject, simplifiedObject, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 6.0f);
 	

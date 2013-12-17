@@ -4,7 +4,7 @@
 
 #include "Bullet/LinearMath/btHashMap.h"
 #include "Bullet/LinearMath/btVector3.h"
-		  
+
 #include "Bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h"
 
 ///The btInternalEdgeUtility helps to avoid or reduce artifacts due to wrong collision normals caused by internal edges.
