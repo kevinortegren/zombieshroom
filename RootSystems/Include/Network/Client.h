@@ -3,6 +3,7 @@
 #include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
 
 namespace RootForce
 {
@@ -17,10 +18,12 @@ namespace RootForce
 			bool Connect(const char* p_address, unsigned short p_port);
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
+			void SetMessageHandler(MessageHandler* p_messageHandler);
 			void Update();
 		private:
 			Logging* m_logger;
 			RakNet::RakPeerInterface* m_peer;
+			MessageHandler* m_messageHandler;
 		};
 	}
 }

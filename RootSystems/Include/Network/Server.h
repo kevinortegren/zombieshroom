@@ -2,6 +2,7 @@
 
 #include <RakNet/RakPeerInterface.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 
@@ -18,12 +19,14 @@ namespace RootForce
 			RootSystems::ServerInfo GetServerInfo() const;
 			void SetServerInfo(const RootSystems::ServerInfo& p_info);
 
+			void SetMessageHandler(MessageHandler* p_messageHandler);
 			void Update();
 		private:
 			Logging* m_logger;
 
 			RootSystems::ServerInfo m_info;
 			RakNet::RakPeerInterface* m_peer;
+			MessageHandler* m_messageHandler;
 
 			void UpdatePingResponse();
 		};

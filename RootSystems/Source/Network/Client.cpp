@@ -9,6 +9,8 @@ namespace RootForce
 	{
 		Client::Client(Logging* p_logger)
 			: m_logger(p_logger)
+			, m_peer(nullptr)
+			, m_messageHandler(nullptr)
 		{
 			m_peer = RakNet::RakPeerInterface::GetInstance();
 
@@ -39,6 +41,11 @@ namespace RootForce
 			return true;
 		}
 
+		void Client::SetMessageHandler(MessageHandler* p_messageHandler)
+		{
+			m_messageHandler = p_messageHandler;
+		}
+
 		void Client::Update()
 		{
 			for (RakNet::Packet* packet = m_peer->Receive(); packet; m_peer->DeallocatePacket(packet), packet = m_peer->Receive())
@@ -46,6 +53,9 @@ namespace RootForce
 				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
 				bs.Read(id);
+
+				if (m_messageHandler != nullptr)
+					m_messageHandler->ParsePacket(id, &bs, packet);
 			}
 		}
 	}
