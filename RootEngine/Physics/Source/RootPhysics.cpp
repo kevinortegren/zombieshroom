@@ -124,6 +124,7 @@ namespace Physics
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 
+		
 		//btSetDebugDrawer(m_debugDrawer);
 
 	}
@@ -337,7 +338,7 @@ namespace Physics
 		btScalar mass = 0; //mass is always 0 for static objects
 
 		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
-		
+		objectMeshShape->setMargin(objectMeshShape->getMargin() + 0.04f);
 		
 		//Set startpos and start rotation
 

@@ -18,7 +18,7 @@
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 3
-          Model: ground
+          Model: groundDanger
           Effect: Mesh
           Diffuse: grass
     - Type: 1
@@ -37,7 +37,7 @@
           Scale: [1, 1, 1]
         - Entity: 3
           Position: [0, -1, 0]
-          Rotation: [1, 1, -1, -1]
+          Rotation: [-1, -1, -1, 0]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
@@ -54,7 +54,7 @@
         - Entity: 3
           Type: 0
           Mass: 0
-          ModelHandle: ground0
+          ModelHandle: groundDanger0
 - Tags:
     - Id: 0
       Tag: Skybox
