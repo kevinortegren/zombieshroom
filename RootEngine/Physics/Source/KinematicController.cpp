@@ -71,7 +71,8 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_kinController->setGravity(9.82f * 6);
 	m_kinController->setJumpSpeed(5);
-	m_kinController->setMaxSlope(btRadians(45));
+
+	m_kinController->setMaxSlope(btRadians(45.0f));
 	
 	m_hasBeenKnockbacked = false;
 	
@@ -102,7 +103,7 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
 	
 	traveldist = to - from;
-	if(traveldist.length() > 1 )
+	if(traveldist.length() > 3 )
 	{
 		m_kinController->warp(to);
 		return;
