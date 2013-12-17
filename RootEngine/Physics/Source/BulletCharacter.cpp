@@ -221,7 +221,13 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 	if (callback.hasHit())
 	{
 		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
+
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
+
 		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
 		{
 			// we moved up only a fraction of the step height
@@ -280,7 +286,6 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 
 		btScalar margin = m_convexShape->getMargin();
 		m_convexShape->setMargin(margin + m_addedMargin);
-
 
 		if (m_useGhostObjectSweepTest)
 		{
@@ -421,6 +426,11 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	if (callback.hasHit() || runonce == true)
 	{
 		// we dropped a fraction of the height -> hit floor
+
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
 
 		btScalar fraction = (m_currentPosition.getY() - callback.m_hitPointWorld.getY()) / 2;
 

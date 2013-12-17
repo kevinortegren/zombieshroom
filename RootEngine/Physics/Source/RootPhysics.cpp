@@ -3,6 +3,9 @@
 #include <iostream>
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
+
+#include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
+extern ContactAddedCallback		gContactAddedCallback;
 //#include "vld.h"
 namespace RootEngine
 {
@@ -75,6 +78,8 @@ namespace Physics
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
 		
+		btAdjustInternalEdgeContacts(p_cp, p_obj1, p_obj2, p_id1, p_index1);
+
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
@@ -93,6 +98,9 @@ namespace Physics
 
 		return false;
 	}
+
+	
+
 	void RootPhysics::Init()
 	{
 		m_collisionConfig= new btDefaultCollisionConfiguration();
@@ -292,7 +300,8 @@ namespace Physics
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 		btScalar mass = 0; //mass is always 0 for static objects
-		btCollisionShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
+		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true); // the bool is a flag that improves memory usage
+		
 		
 		//Set startpos and start rotation
 		btTransform startTransform;
@@ -303,7 +312,13 @@ namespace Physics
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 		//create the body
 		btRigidBody* objectBody = new btRigidBody(mass,motionstate,objectMeshShape);
-		objectBody->setCollisionFlags(objectBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		
+		objectBody->setCollisionFlags(objectBody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_STATIC_OBJECT);
+
+		btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
+		btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+
+
 		m_dynamicWorld->addRigidBody(objectBody);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
