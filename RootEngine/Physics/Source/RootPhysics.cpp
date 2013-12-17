@@ -82,9 +82,9 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
-		if(pointer1->m_modelHandle.compare("ground0"))
+		if(pointer1->m_modelHandle.compare("ground0") && pointer2->m_type == PhysicsType::TYPE_ABILITY)
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
-		else if(pointer2->m_modelHandle.compare("ground0"))
+		else if(pointer2->m_modelHandle.compare("ground0") && pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
 			pointer1->m_collidedEntityId.push_back(pointer2->m_entityId);
@@ -110,7 +110,7 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb );
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
@@ -326,6 +326,7 @@ namespace Physics
 		btScalar mass = 0; //mass is always 0 for static objects
 		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
 		btTriangleInfoMap* test = new btTriangleInfoMap();
+	//	test->m_edgeDistanceThreshold = 0.01f;
 		btGenerateInternalEdgeInfo(objectMeshShape, test);
 		btTransform startTransform;
 		startTransform.setIdentity();
@@ -333,6 +334,7 @@ namespace Physics
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
 		btRigidBody* body = new btRigidBody(mass,motionstate,objectMeshShape);
+	//	body->setActivationState(DISABLE_DEACTIVATION);
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 		m_dynamicWorld->addRigidBody(body);
@@ -471,7 +473,7 @@ namespace Physics
 		body->setFlags(BT_DISABLE_WORLD_GRAVITY);
 		body->setGravity(gravity);
 		body->applyGravity();
-		body->setActivationState(DISABLE_DEACTIVATION);
+	//	body->setActivationState(DISABLE_DEACTIVATION);
 		if(p_abilityInfo.m_collidesWorld)
 		{
 			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);

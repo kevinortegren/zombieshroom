@@ -66,7 +66,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject->setCollisionShape(capsuleShape);
 	m_ghostObject->setContactProcessingThreshold(0.f);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 6);
@@ -75,7 +75,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_hasBeenKnockbacked = false;
 	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 	//m_dynamicWorld->addAction(m_kinController);
 
 }
