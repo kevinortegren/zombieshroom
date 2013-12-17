@@ -26,7 +26,7 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Material) * g_maxMeshes;
 	total_memory_size += sizeof(int) * 4;
 	total_memory_size += sizeof(glm::vec2) * 3;
-	total_memory_size += sizeof(bool);
+	total_memory_size += sizeof(int);
 	
 
 

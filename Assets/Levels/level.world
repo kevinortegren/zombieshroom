@@ -1,0 +1,126 @@
+- Entities:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+- Components:
+    - Type: 0
+      Data:
+        - Entity: 1
+          Model: pCubeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 2
+          Model: pCylinderShape1
+          Effect: Mesh
+          Diffuse: blockMana
+        - Entity: 3
+          Model: pConeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 4
+          Model: pCubeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 5
+          Model: pCubeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 6
+          Model: pCylinderShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 7
+          Model: pCylinderShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 8
+          Model: pConeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 9
+          Model: pConeShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+        - Entity: 10
+          Model: pPlaneShape1
+          Effect: Mesh
+          Diffuse: grayLambert
+    - Type: 1
+      Data:
+        - Entity: 1
+          Position: [-5.92708, 0, 3.53193]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 2
+          Position: [-0.932131, 0, -4.05705]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 3
+          Position: [2.13894, 0, 3.84695]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [-5.92708, 0, 0.937898]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 5
+          Position: [-5.92708, 0, 6.53037]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 6
+          Position: [-0.932131, 0, -8.04512]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 7
+          Position: [-0.932131, 0, -1.02105]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 8
+          Position: [5.02904, 0, 3.84695]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 9
+          Position: [7.78107, 0, 3.84695]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 10
+          Position: [-4.99158, -0.726885, 1.12738]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+    - Type: 2
+      Data:
+        []
+    - Type: 3
+      Data:
+        []
+- Tags:
+    - Id: 0
+      Tag: Camera
+- Groups:
+    - Id: 1
+      Group: Static
+    - Id: 2
+      Group: Static
+    - Id: 3
+      Group: Static
+    - Id: 4
+      Group: Static
+    - Id: 5
+      Group: Static
+    - Id: 6
+      Group: Static
+    - Id: 7
+      Group: Static
+    - Id: 8
+      Group: Static
+    - Id: 9
+      Group: Static
+    - Id: 10
+      Group: Static

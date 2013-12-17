@@ -27,6 +27,7 @@ void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
 int entityExport;
+string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/Levels/";
 
 ReadMemory RM;
 void LoadScene()
@@ -96,6 +97,8 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
+	p_world->GetGroupManager()->RegisterEntity("Static", entity);
+
 	return entity;
 }
 
@@ -116,7 +119,8 @@ std::string GetNameFromPath( std::string p_path )
  } 
 int main(int argc, char* argv[]) 
 {
-	entityExport = false;
+	entityExport = 0;
+
 
 
 	// Enable components to use.
@@ -199,6 +203,8 @@ int main(int argc, char* argv[])
 			RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
 			RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
 			m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
+			m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
+
 
 			std::shared_ptr<Render::Mesh> Mesh[g_maxMeshes];
 
@@ -225,6 +231,7 @@ int main(int argc, char* argv[])
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
+			*RM.export = 0;
 			numberMeshes = *RM.NumberOfMeshes;
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
@@ -379,14 +386,23 @@ int main(int argc, char* argv[])
 				ReleaseMutex(RM.IdMutexHandle);
 
 				if(entityExport == 2)
-				{
-					m_world.GetEntityExporter()->Export("level.txt");
-					entityExport = false;
+				{			
 
 					for(int i = 0; i < Entities.size(); i++)
 					{
 						//UPDATE modelName for all Entities from shared memory
+						RootForce::Renderable *mesh = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
+
+						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+						string name = RM.PmeshList[i]->modelName;
+						ReleaseMutex(RM.MeshMutexHandle);
+
+						g_engineContext.m_resourceManager->RenameModel(mesh->m_model, name);
 					}
+
+					m_world.GetEntityExporter()->Export(g_savepath + "level.world");
+					entityExport = false;
 					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 					*RM.export = 0;
