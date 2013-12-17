@@ -34,6 +34,7 @@ namespace RootEngine
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
+		virtual bool RenameModel(Model* p_model, const std::string& p_name) = 0;
 
 		virtual Render::MeshInterface*	GetMesh(std::string p_handle) = 0;
 		virtual Render::EffectInterface*	LoadEffect(std::string p_path) = 0;
@@ -70,6 +71,8 @@ namespace RootEngine
 		#endif
 
 		Model* CreateModel(const std::string& p_path);
+		bool RenameModel(Model* p_model, const std::string& p_name);
+
 
 		Render::MeshInterface*		GetMesh(std::string p_handle);
 		Render::EffectInterface*	LoadEffect(std::string p_path);

@@ -168,6 +168,24 @@ namespace RootEngine
 		return m_models[p_path];
 	}
 
+	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
+	{
+		// Look if new name dosent exist.
+		if(m_models.find(p_name) == m_models.end())
+		{
+			std::string oldName = ResolveStringFromModel(p_model);
+
+			// Set the model.
+			m_models[p_name] = p_model;
+
+			// Remove the model from the old name.
+			m_models[oldName] = nullptr;	
+		}
+
+		return false;
+	}
+
+
 	//////////////////////////////////////////////////////////////////////////
 	//Get functions
 	//////////////////////////////////////////////////////////////////////////

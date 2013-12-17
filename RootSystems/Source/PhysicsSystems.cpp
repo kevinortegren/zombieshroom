@@ -1,11 +1,11 @@
 #include <PhysicsSystem.h>
 
-
 namespace RootForce
 {
 	void PhysicsSystem::Init()
 	{
 		m_physicsAccessor.Init(m_world->GetEntityManager());
+		m_collisions.Init(m_world->GetEntityManager());
 		m_transforms.Init(m_world->GetEntityManager());
 	}
 
@@ -18,21 +18,13 @@ namespace RootForce
 	{
 		if(m_physics && m_logger)
 		{
-			
 			Transform* transform = m_transforms.Get(p_entity);
-			PhysicsAccessor* accessor = m_physicsAccessor.Get(p_entity);
-			if((accessor->m_handle) == nullptr || *(accessor->m_handle) == -1)
-			{
-				//m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Entity %i has no physicsaccessor", p_entity->GetId());
-				return;
-			}
-			if(m_physics->GetType(*(accessor->m_handle)) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
-				return;
-		
+			Collision* collision = m_collisions.Get(p_entity);
 
-			transform->m_position = m_physics->GetPos(*(accessor->m_handle));
-			transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(accessor->m_handle)));
-			
+			Physics* accessor = m_physicsAccessor.Get(p_entity);
+
+			transform->m_position = m_physics->GetPos(*(collision->m_handle));
+			transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(collision->m_handle)));
 		}
 	}
 
@@ -49,5 +41,29 @@ namespace RootForce
 	void PhysicsSystem::SetLoggingInterface(Logging::LoggingInterface* p_logger)
 	{
 		m_logger = p_logger;
+	}
+
+	void PhysicsSystem::AddStaticEntities()
+	{
+		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		for(auto itr = range.first; itr != range.second; ++itr)
+		{
+			ECS::Entity* entity = itr->second;
+			Collision* c = m_world->GetEntityManager()->GetComponent<Collision>(entity);
+			Transform* t = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+
+			c->m_handle = m_physics->AddStaticObjectToWorld(entity->GetId());
+			
+			if(entity->GetId() == 3)
+			{
+				m_physics->BindMeshShape(*(c->m_handle), c->m_meshHandle, t->m_position, t->m_orientation.GetQuaternion(), 0.0f);
+			}
+			else
+			{
+				//m_physics->BindSphereShape(*(c->m_handle), t->m_position, t->m_orientation.GetQuaternion(), 1.0f, 0.0f);
+				m_physics->BindHullShape(*(c->m_handle), c->m_meshHandle, t->m_position, t->m_orientation.GetQuaternion(), 0.0f);
+			}
+
+		}
 	}
 }
