@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/ServerMessageSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <RootSystems/Include/Network/LanList.h>
 
 namespace RootForce
 {
@@ -31,6 +32,7 @@ namespace RootForce
 
 			ClientMessageHandler* GetClientMessageHandler() { return m_clientMessageHandler; }
 			ServerMessageHandler* GetServerMessageHandler() { return m_serverMessageHandler; }
+			RootSystems::LanList* GetLanList() { return &m_lanList; }
 		private:
 			ECS::World* m_world;
 			Logging* m_logger;
@@ -39,6 +41,7 @@ namespace RootForce
 			ClientMessageHandler* m_clientMessageHandler;
 			ServerMessageHandler* m_serverMessageHandler;
 			RootEngine::Network::NetworkInterface* m_networkInterface;
+			RootSystems::LanList m_lanList;
 		};
 	}
 }

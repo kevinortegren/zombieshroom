@@ -10,7 +10,7 @@ $(document).ready(function() {
     $("#options-menu").css("display", "table");
   } );
   $("#main-exit").click(function() {
-    alert("Not yet implemented! D:");
+    Menu.Exit();
   } );
   // Options menu
   $("#options-player").click(function() {
@@ -31,10 +31,10 @@ $(document).ready(function() {
   } );
   // Lan menu
   $("#lan-list").tablesorter();
-  $("#lan-list tr").click(function() {
-    $("#selected").attr("id", "");
-    $(this).attr("id", "selected");
-  } );
+  // $("#lan-list tr").click(function() {
+    // $("#selected").attr("id", "");
+    // $(this).attr("id", "selected");
+  // } );
   $("#lan-back").click(function() {
     $("#main-menu").css("display", "table");
     $("#lan-menu").css("display", "none");
@@ -42,7 +42,8 @@ $(document).ready(function() {
   } );
   $("#lan-refresh").click(function() {
     $("#lan-list tr").not($("#lan-list thead tr")).remove();
-    alert("ToDo: Call C++ to ping the LAN for available servers");
+    Menu.Refresh();
+    alert("ToDo: Callback from C++ to menu to update server list");
   } );
   $("#lan-connect").click(function() {
     if($("#selected").length < 1)
@@ -50,10 +51,11 @@ $(document).ready(function() {
     //alert($($("#selected").children()[0]).html());
     $("#overlay").css("display", "table");
     $("#connecting").css("display", "block");
+    var address = $($("#selected").children()[0]).html().split(":");
+    Menu.Connect(address[1], address[0]);
     setTimeout( function() {
         $("#overlay").css("display", "none");
         $("#connecting").css("display", "none");
-        alert("Not yet implemented! D:");
       },
       3000
     );
@@ -74,7 +76,10 @@ $(document).ready(function() {
   } );
   $("#lan-direct-submit").click(function() {
     $("#lan-direct-close").click();
-    alert("Not yet implemented! D:");
+    $("#overlay").css("display", "table");
+    $("#connecting").css("display", "block");
+    var input = $("#lan-direct-input").val().split(':');
+    Menu.Connect(input[1], input[0]);
   } );
   // Lan menu - Host popup
   $("#lan-host-close").click(function() {
@@ -83,6 +88,23 @@ $(document).ready(function() {
   } );
   $("#lan-host-submit").click(function() {
     $("#lan-host-close").click();
-    alert("Not yet implemented! D:\n"+$("#host-map").val());
+    Menu.Host($("#lan-host-port").val());
   } );
 } );
+function Hide()
+{
+  $("body").css("display", "none");
+}
+function Unide()
+{
+  $("body").css("display", "block");
+}
+function AddServer(addr,name,players,maxplayers,ping,password)
+{
+  $("#lan-list").append("<tr><td>"+addr+"</td><td>"+name+"</td><td>"+players+"</td><td>"+maxplayers+"</td><td>"+ping+"</td><td>"+password+"</td></tr>");
+  $("#lan-list").tablesorter();
+  $("#lan-list tr").click(function() {
+    $("#selected").attr("id", "");
+    $(this).attr("id", "selected");
+  } );
+}

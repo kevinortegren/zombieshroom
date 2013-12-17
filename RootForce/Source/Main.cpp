@@ -240,13 +240,11 @@ namespace RootForce
         m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 
 		//Initiate Menu
-		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"));
+		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher());
 
         // Initialize the network system
         m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));
        
-
-
 		m_displayPhysicsDebug = false;
 
 		uint64_t old;
@@ -254,6 +252,7 @@ namespace RootForce
 			switch (m_currentState)
 			{
 			case RootForce::GameState::Menu:
+				m_menu->Unhide();
 				g_engineContext.m_inputSys->LockMouseToCenter(false);
 				 old = SDL_GetPerformanceCounter();
 				while (m_currentState == RootForce::GameState::Menu && m_running)
@@ -268,6 +267,10 @@ namespace RootForce
 
 					g_engineContext.m_renderer->Swap();
 
+					std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal*>> lanList = m_networkHandler->GetLanList()->GetList();
+					for(int i = 0; i < lanList.size(); i++)
+						m_menu->AddServer(lanList.at(i));
+
 					MenuEvent::MenuEvent event = m_menu->PollEvent();
 
 					switch (event.type)
@@ -277,14 +280,16 @@ namespace RootForce
 						break;
 					case MenuEvent::EventType::Host:
 						m_networkHandler->SetChatSystem(&m_chat);
-						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
 						m_networkHandler->Host(event.data[0].ToInteger(), Network::MessageHandler::ServerType::LOCAL); //TODO: make sure Host returns boolean and only change gamestate if true
+						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
 						m_currentState = RootForce::GameState::Ingame;
 						break;
 					case MenuEvent::EventType::Connect:
 						m_networkHandler->SetChatSystem(&m_chat);
-						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
 						m_networkHandler->Connect(event.data[0].ToInteger(), Awesomium::ToString(event.data[1].ToString()).c_str()); //TODO: make sure Connect returns boolean and only change gamestate if true
+						m_networkHandler->GetClientMessageHandler()->SetPlayerSystem(m_playerSystem.get());
+						m_networkHandler->GetClientMessageHandler()->SetChatSystem(&m_chat);
 						m_currentState = RootForce::GameState::Ingame;
 						break;
 					case MenuEvent::EventType::Refresh:
@@ -294,6 +299,7 @@ namespace RootForce
 						break;
 					}
 				}
+				m_menu->Hide();
 				break;
 			case RootForce::GameState::Ingame:
 				// Start the main loop

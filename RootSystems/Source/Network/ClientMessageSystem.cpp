@@ -13,6 +13,7 @@ namespace RootForce
 			: m_world(p_world)
 			, m_logger(p_logger)
 			, m_server(p_server)
+			, m_chatSystem(nullptr)
 		{
 
 		}

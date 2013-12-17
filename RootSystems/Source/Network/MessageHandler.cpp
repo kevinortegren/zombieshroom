@@ -2,7 +2,6 @@
 
 #include <Network/MessageHandler.h>
 #include <Network/Messages.h>
-#include <Network/ServerInfo.h>
 #include <RootEngine/Network/Include/LocalServer.h>
 #include <RootEngine/Network/Include/RemoteServer.h>
 #include <algorithm>
@@ -30,6 +29,7 @@ namespace RootForce
 		void MessageHandler::PingNetwork(USHORT p_port)
 		{
 			m_server->SendNetworkDiscoveryMessage(p_port);
+			m_lanList.Start();
 		}
 
 		void MessageHandler::Host(int16_t p_port, ServerType p_type)
@@ -49,17 +49,7 @@ namespace RootForce
 				break;
 			default:
 				break;
-			}
-
-			{
-				RootSystems::ServerInfo info;
-				strcpy(info.Name, "Local server");
-				info.MaxPlayers = 12;
-				info.NumPlayers = 2;
-				info.PasswordProtected = false;
-				m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
-			}
-			
+			}			
 		}
 
 		void MessageHandler::Connect( int16_t p_port, const char* p_address /*= ""*/ )
@@ -129,6 +119,7 @@ namespace RootForce
 						{
 							RootSystems::ServerInfoInternal* info = (RootSystems::ServerInfoInternal*)message->Data;
 							m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server found through LAN-discovery: %s (%s:%u) %u/%u", info->Name, info->IP, info->Port, info->NumPlayers, info->MaxPlayers);
+							m_lanList.AddServer(info);
 						}
 						break;
 

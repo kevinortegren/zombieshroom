@@ -2,6 +2,7 @@
 
 #include <Network/ServerMessageSystem.h>
 #include <Network/Messages.h>
+#include <Network/ServerInfo.h>
 
 namespace RootForce
 {
@@ -99,6 +100,8 @@ namespace RootForce
 		{
 			//m_serverClientSystem = new ServerClientSystem(m_world, m_logger, m_networkEntityMap);
 			//m_world->GetSystemManager()->AddSystem<ServerClientSystem>(m_serverClientSystem, "ServerClientSystem");
+			
+			UpdateServerInfo();
 		}
 
 
@@ -181,6 +184,7 @@ namespace RootForce
 			m_networkEntityMap.SetSynchronizedId(tId, sId);
 
 			m_playerEntities[(uint8_t)p_message->Data[0]] = sId;
+			UpdateServerInfo();
 		}
 
 		void ServerMessageHandler::HandleUserInfoMessage(RootEngine::Network::Message* p_message)
@@ -280,6 +284,7 @@ namespace RootForce
 
 			m_world->GetEntityManager()->RemoveAllComponents(entity);
 			m_world->GetEntityManager()->RemoveEntity(entity);
+			UpdateServerInfo();
 		}
 
 
@@ -309,7 +314,15 @@ namespace RootForce
 		{
 			
 		}
-
+		void ServerMessageHandler::UpdateServerInfo()
+		{
+			RootSystems::ServerInfo info;
+			strcpy(info.Name, "Local server");
+			info.MaxPlayers = 12;
+			info.NumPlayers = m_server->GetConnectedClients().size();
+			info.PasswordProtected = false;
+			m_server->SetNetworkDiscoveryResponse((uint8_t*)&info, sizeof(info));
+		}
 
 	}
 }

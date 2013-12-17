@@ -102,6 +102,8 @@ namespace RootForce
 			void HandleUserDisconnectedMessage(RootEngine::Network::Message* p_message);
 			void HandleChatToServerMessage(RootEngine::Network::Message* p_message);
 			void HandleUserCommandMessage(RootEngine::Network::Message* p_message, RootForce::PlayerAction::PlayerAction p_action);
+
+			void UpdateServerInfo();
 		};
 	}
 }

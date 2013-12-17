@@ -6,9 +6,9 @@ body, input
 }
 body
 {
-  background-image: url('http://forestry.ky.gov/Kentuckysstateforests/PublishingImages/TygartsStateForest.jpg');
+  background-image: url('TygartsStateForest.jpg');
 }
-*
+:not[input,select,option]
 {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -66,6 +66,10 @@ a
   border: 1px solid #666666;
   margin: 2px;
 }
+.button:active
+{
+  background-color: #CCCCCC;
+}
 #selected
 {
   background-color: #FFCC66;
@@ -111,6 +115,10 @@ a
   border: 1px solid #666666;
   font-size: 24px;
 }
+.main-button:active
+{
+  background-color: #CCCCCC;
+}
 #options-menu,
 #lan-menu
 {
@@ -129,6 +137,11 @@ a
   padding: 2px;
   width: 100%;
 }
+#lan-list-wrapper
+{
+  height: 600px;
+  overflow: auto;
+}
 #lan-direct-popup
 {
   width: 300px;
@@ -136,6 +149,12 @@ a
 }
 #lan-host-overlay
 {
-  width: 300px;
+  width: 500px;
   height: 300px;
+}
+#host-map
+{
+  -webkit-appearance: listbox;
+  align-items: flex-start;
+  width: 200px;
 }

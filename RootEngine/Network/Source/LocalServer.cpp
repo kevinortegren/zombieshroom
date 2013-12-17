@@ -13,7 +13,8 @@ namespace RootEngine
 		}
 		LocalServer::~LocalServer()
 		{
-			delete[] &m_client;
+			for(int i = 0; i < MAX_CLIENTS + 1; i++)
+				delete m_client[i];
 			m_peerInterface->Shutdown(0);
 		}
 
