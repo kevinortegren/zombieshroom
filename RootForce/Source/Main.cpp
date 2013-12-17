@@ -221,7 +221,7 @@ namespace RootForce
 			}
 
 			// Toggle rendering of normals.
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				if(m_displayNormals)
 				{

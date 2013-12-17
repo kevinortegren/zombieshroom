@@ -24,8 +24,8 @@ namespace RootForce
 		
 		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
 		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+		renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 		transform->m_position = glm::vec3(0, 100, 0);
@@ -51,9 +51,7 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", aimingDevice);
 
-
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
-
 	}
 
 	void PlayerSystem::Process()

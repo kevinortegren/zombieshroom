@@ -11,11 +11,11 @@ namespace RootForce
 	void WorldSystem::CreateWorld(const std::string& p_worldName)
 	{
 		// Setup static lights.
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 		Render::DirectionalLight directionalLight;
-		directionalLight.m_color = glm::vec4(0.4f);
-		directionalLight.m_direction = glm::vec3(0,1,-1);
+		directionalLight.m_color = glm::vec4(0.8f);
+		directionalLight.m_direction = glm::vec3(0, -1,-1);
 
 		g_engineContext.m_renderer->AddDirectionalLight(directionalLight, 0);
 
