@@ -35,23 +35,23 @@
         - Entity: 4
           Model: pCubeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 5
           Model: pCubeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 6
           Model: pCylinderShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 7
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 8
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 9
           Model: pPlaneShape1
           Effect: Mesh
@@ -59,15 +59,15 @@
         - Entity: 10
           Model: pCylinderShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 11
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 12
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grass
+          Diffuse: grayLambert
         - Entity: 13
         - Entity: 14
         - Entity: 15
@@ -177,6 +177,44 @@
     - Type: 3
       Data:
         []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        []
+    - Type: 12
+      Data:
+        - Entity: 1
+        - Entity: 2
+        - Entity: 3
+        - Entity: 4
+        - Entity: 5
+        - Entity: 6
+        - Entity: 7
+        - Entity: 8
+        - Entity: 9
+        - Entity: 10
+        - Entity: 11
+        - Entity: 12
 - Tags:
     - Id: 0
       Tag: Camera
