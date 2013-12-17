@@ -20,7 +20,7 @@ namespace RootEngine
 	{
 		m_model = new Model(); //Owned by ResourceManager
 		
-		const aiScene* aiscene = m_importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+		const aiScene* aiscene = m_importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals);
 
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);

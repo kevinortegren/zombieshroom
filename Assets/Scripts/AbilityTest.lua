@@ -49,10 +49,10 @@ function AbilityTest.OnActivate (action)
 		0, --gravx
 		-9.82, --gravy
 		0, --gravz
-		1, --orientX
+		0, --orientX
 		0, --orientY
 		0, --orientZ
-		0, --orientW
+		1, --orientW
 		x + aimx * 3, --posX
 		4 + y + aimy * 3, --posY
 		z + aimz * 3, --posZ

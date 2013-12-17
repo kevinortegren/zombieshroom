@@ -38,6 +38,7 @@ private:
 	btPairCachingGhostObject* m_ghostObject;
 	btMotionState* m_motionState;
 	BulletCharacter* m_kinController;
+
 	bool m_hasStepped;
 	float m_maxSpeed;
 	float m_stepHeight;
