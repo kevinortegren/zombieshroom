@@ -17,8 +17,9 @@ public:
 	void UpdateSharedCamera(int index);
 	void UpdateSharedLight(int index, int nrOfLights);
 	void RemoveMesh(int id, int nrOfMeshes);
+	void RemoveLight(int id, int nrOfLights);
 	int InitalizeSharedMemory();
-	void UpdateSharedMaterials(int nrOfMaterials);
+	void UpdateSharedMaterials(int nrOfMaterials, int materialID, int meshID);
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];

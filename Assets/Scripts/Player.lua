@@ -7,8 +7,9 @@ function Player.OnActivate (action, ...)
 
 	if action == 1 then
 
-		 -- print("Player collided with " .. arg[1])
-
+		if arg[1] ~= 3 then
+			-- print("Player collided with " .. arg[1])
+		end
 	end
 
 end

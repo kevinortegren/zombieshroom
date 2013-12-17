@@ -25,17 +25,17 @@ subject to the following restrictions:
 #ifndef GIMPACT_SHAPE_H
 #define GIMPACT_SHAPE_H
 
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "BulletCollision/CollisionShapes/btTriangleShape.h"
-#include "BulletCollision/CollisionShapes/btStridingMeshInterface.h"
-#include "BulletCollision/CollisionShapes/btCollisionMargin.h"
-#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
-#include "BulletCollision/CollisionShapes/btConcaveShape.h"
-#include "BulletCollision/CollisionShapes/btTetrahedronShape.h"
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btTransform.h"
-#include "LinearMath/btMatrix3x3.h"
-#include "LinearMath/btAlignedObjectArray.h"
+#include "Bullet/BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "Bullet/BulletCollision/CollisionShapes/btTriangleShape.h"
+#include "Bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h"
+#include "Bullet/BulletCollision/CollisionShapes/btCollisionMargin.h"
+#include "Bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h"
+#include "Bullet/BulletCollision/CollisionShapes/btConcaveShape.h"
+#include "Bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h"
+#include "Bullet/LinearMath/btVector3.h"
+#include "Bullet/LinearMath/btTransform.h"
+#include "Bullet/LinearMath/btMatrix3x3.h"
+#include "Bullet/LinearMath/btAlignedObjectArray.h"
 
 #include "btGImpactQuantizedBvh.h" // box tree class
 

@@ -43,6 +43,7 @@
 #include <maya/MFnPointLight.h>
 #include <maya/MFloatVectorArray.h>
 #include <maya/MFnLambertShader.h>
+#include <maya/MFnBlinnShader.h>
 #include <maya/MPlugArray.h>
 
 #ifdef _DEBUG

@@ -28,14 +28,15 @@ namespace RootEngine
 				TYPE_PLAYER
 			};
 		}
-		namespace AbilityShape
+		namespace PhysicsShape	
 		{
-			enum AbilityShape
+			enum PhysicsShape
 			{
 				SHAPE_SPHERE,
 				SHAPE_CONE,
 				SHAPE_CYLINDER,
-				SHAPE_CUSTOM_MESH
+				SHAPE_CUSTOM_MESH,
+				SHAPE_HULL
 			};
 		}
 		struct AbilityPhysicsInfo
@@ -48,7 +49,7 @@ namespace RootEngine
 			glm::vec3 m_direction; 
 			float m_speed; 
 			PhysicsType::PhysicsType m_type; 
-			AbilityShape::AbilityShape m_shape;
+			PhysicsShape::PhysicsShape m_shape;
 			bool m_collidesWorld ;
 			float m_mass; 
 			glm::vec3 m_gravity;
@@ -92,13 +93,19 @@ namespace RootEngine
 			
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			virtual int* AddStaticObjectToWorld(std::string p_modelHandle, unsigned int p_entityId , glm::vec3 p_position, glm::quat p_rotation) = 0;
+			virtual int* AddStaticObjectToWorld( unsigned int p_entityId) = 0;
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			virtual The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
 			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
 			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
 			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId) = 0;
 			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;
+
+			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass) = 0;
+			virtual void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass) = 0;
+			virtual void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass) = 0;
+			virtual void BindMeshShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
+			virtual void BindHullShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
 			/// p_Pos should be of type float[3]
 			virtual glm::vec3 GetPos(int p_objectHandle)= 0;
 			virtual glm::vec3 GetVelocity(int p_objectHandle) = 0;
@@ -141,9 +148,14 @@ namespace RootEngine
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); ///Object index is the value returned by the add function, velocity is a vec3 of the objects velocity (speed*target) Used for abilities mainly
 
 			void EnableDebugDraw(bool p_enabled);
-		
+
+			void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass);
+			void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass);
+			void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass);
+			void BindMeshShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			void BindHullShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			///Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-			int* AddStaticObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation);
+			int* AddStaticObjectToWorld( unsigned int p_entityId);
 			/*	Use this to add a dynamic object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3, mass affect how the object behaves in the world. Note: Mass must be >0 
 			The return value is the index to the objects rigidbody and should be used where a index parameter is requested*/
 			int* AddDynamicObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);

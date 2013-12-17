@@ -1,7 +1,15 @@
 #include "KinematicController.h"
 #include "Bullet/BulletCollision/CollisionShapes/btShapeHull.h"
 
+namespace RootEngine
+{
 
+	namespace Physics
+	{
+		extern RootEngine::SubsystemSharedContext g_context;
+
+	}
+}
 KinematicController::KinematicController( void )
 {
 
@@ -46,30 +54,29 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
 	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
-
 	//Set startpos and start rotation and bind them to a motionstate
 	btTransform startTransform;
 	startTransform.setIdentity();
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 	m_motionState = new btDefaultMotionState(startTransform);
-
-	
+	btCapsuleShape* capsuleShape = new btCapsuleShape(0.8f, 2.5f);
+	capsuleShape->calculateLocalInertia(p_mass, fallInertia);
 	m_ghostObject = new btPairCachingGhostObject();
-	m_ghostObject->setCollisionShape(simplifiedObject);
+	m_ghostObject->setCollisionShape(capsuleShape);
+	m_ghostObject->setContactProcessingThreshold(0.f);
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK /* |btCollisionObject::CF_KINEMATIC_OBJECT*/ /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
-
-	m_kinController = new BulletCharacter(m_ghostObject, simplifiedObject, p_stepHeight);
+	m_ghostObject->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
-	m_kinController->setGravity(9.82f);
+	m_kinController->setGravity(9.82f * 6);
 	m_kinController->setJumpSpeed(5);
-	m_kinController->setMaxSlope(btRadians(54));
+	m_kinController->setMaxSlope(btRadians(45));
 	
 	m_hasBeenKnockbacked = false;
 	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
-	
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+	//m_dynamicWorld->addAction(m_kinController);
 
 }
 
@@ -93,12 +100,15 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 	btVector3 from,to,traveldist;
 	from = m_ghostObject->getWorldTransform().getOrigin();
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
+	
 	traveldist = to - from;
 	if(traveldist.length() > 1 )
 	{
 		m_kinController->warp(to);
 		return;
 	}
+	//float temp = m_kinController->test(from, to, m_dynamicWorld);
+	//m_kinController->warp(to + traveldist * temp);
 	m_kinController->setVelocityForTimeInterval(traveldist/p_dt, p_dt);
 	m_kinController->playerStep(m_dynamicWorld, p_dt);
 }

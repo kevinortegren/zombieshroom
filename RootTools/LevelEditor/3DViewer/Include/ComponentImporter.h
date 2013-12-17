@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Utility\ECS\Include\World.h>
-#include <RootSystems\Include\Components.h>
 
 #include <yaml-cpp\yaml.h>
 
@@ -12,7 +11,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 {
 	switch(p_type)
 	{
-		case RootForce::ComponentType::RENDERABLE:
+		case 0:
 			{
 				RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
 				
@@ -42,25 +41,25 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				 {
 					 std::string diffuse;
 					 p_node["Diffuse"] >> diffuse;
-					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
+					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(diffuse);
 				 }
 				 const YAML::Node* specularNode = p_node.FindValue("Specular");
 				 if(specularNode != nullptr)
 				 {
 					 std::string specular;
 					 p_node["Specular"] >> specular;
-					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
+					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->GetTexture(specular);
 				 }
 				 const YAML::Node* normalNode = p_node.FindValue("Normal");
 				 if(normalNode != nullptr)
 				 {
 					 std::string normal;
 					 p_node["Normal"] >> normal;
-					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
+					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->GetTexture(normal);
 				 }
 			}
 			break;
-		case RootForce::ComponentType::TRANSFORM:
+		case 1:
 			{
 				RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p_entity);
 
@@ -86,7 +85,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				transform->m_scale = scale;
 			}
 			break;
-		case RootForce::ComponentType::POINTLIGHT:
+		case 2:
 			{
 				RootForce::PointLight* pointLight = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(p_entity);
 
@@ -111,20 +110,20 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				pointLight->m_range = range;
 			}
 			break;
-		case RootForce::ComponentType::PLAYERCONTROL:
+		case 3:
 			{
 				RootForce::PlayerControl* input = p_world->GetEntityManager()->CreateComponent<RootForce::PlayerControl>(p_entity);
 				p_node["Speed"] >> input->m_speed;
 			}
 			break;
-		case RootForce::ComponentType::PHYSICS:
+		case 4:
 			{
-				/*RootForce::PhysicsAccessor* physaccessor = p_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(p_entity);
+				RootForce::PhysicsAccessor* physaccessor = p_world->GetEntityManager()->CreateComponent<RootForce::PhysicsAccessor>(p_entity);
 				float mass, maxSpeed, stepHeight, modelHeight;
 				int type;
 				std::string modelHandle;
 				RootForce::Transform* temp = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-				glm::quat rotation =  temp->m_orientation.GetQuaternion();
+				glm::quat rotation =  temp->m_orientation.GetQuaterion();
 				p_node["Type"] >> type;
 				p_node["Mass"] >> mass;
 				p_node["ModelHandle"] >> modelHandle;
@@ -133,7 +132,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					p_node["StepHeight"] >> stepHeight;
 					p_node["ModelHeight"] >> modelHeight;
 					p_node["MaxSpeed"] >> maxSpeed;
-					physaccessor->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation, mass, maxSpeed, modelHeight, stepHeight, nullptr);
+					physaccessor->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation, mass, maxSpeed, modelHeight, stepHeight);
 				}
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
 				{
@@ -141,19 +140,10 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				}
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
-					physaccessor->m_handle = g_engineContext.m_physics->AddStaticObjectToWorld(p_entity->GetId());
-					g_engineContext.m_physics->BindMeshShape(*(physaccessor->m_handle), modelHandle, temp->m_position, temp->m_orientation.GetQuaternion(), 0);
-				}*/
+					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation);
+					physaccessor->m_handle[0] = -1;
+				}
 
-			}
-			break;
-		case RootForce::ComponentType::COLLISION:
-			{
-				RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
-				std::string meshHandle;
-				
-				p_node["MeshHandle"] >> meshHandle;
-				collision->m_meshHandle = meshHandle;
 			}
 			break;
 		default:

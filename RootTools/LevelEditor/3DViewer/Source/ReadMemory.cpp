@@ -20,7 +20,8 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
-	//total_memory_size += sizeof(Material) * g_maxMeshes;
+	total_memory_size += sizeof(Material) * g_maxMeshes;
+	total_memory_size += sizeof(int);
 	total_memory_size += sizeof(glm::vec2) * 3;
 	
 

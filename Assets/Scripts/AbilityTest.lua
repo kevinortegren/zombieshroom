@@ -55,17 +55,18 @@ function AbilityTest.OnActivate (action)
 		0, --gravx
 		-9.82, --gravy
 		0, --gravz
-		0, --orientX
+		1, --orientX
 		0, --orientY
-		0, --orientZ
+		-1, --orientZ
 		0, --orientW
 		x + aimx * 3, --posX
 		4 + y + aimy * 3, --posY
 		z + aimz * 3, --posZ
+		entity:GetId(),
 		0.5, --height
 		3, --mass
 		1, --radius
-		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		2, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 		40, --speed
 		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end

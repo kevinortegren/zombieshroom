@@ -25,7 +25,7 @@ subject to the following restrictions:
 */
 
 
-#include "LinearMath/btAlignedObjectArray.h"
+#include "Bullet/LinearMath/btAlignedObjectArray.h"
 
 #include "btBoxCollision.h"
 #include "btTriangleShapeEx.h"

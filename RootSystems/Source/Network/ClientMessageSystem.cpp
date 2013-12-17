@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <Network/ClientMessageSystem.h>
 #include <Network/Messages.h>
 
@@ -84,3 +86,5 @@ namespace RootForce
 
 	}
 }
+
+#endif

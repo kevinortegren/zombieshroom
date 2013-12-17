@@ -35,6 +35,15 @@ namespace RootForce
 			return 1;
 		}
 		
+		static int GetId(lua_State* p_luaState)
+		{
+			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+
+			lua_pushnumber(p_luaState, (*e)->GetId());
+
+			return 1;
+		}
+
 		static int GetTransformation(lua_State* p_luaState)
 		{
 			// Allocate memory for a pointer to to object
@@ -206,16 +215,16 @@ namespace RootForce
 			glm::vec3 position((float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15), (float)lua_tonumber(p_luaState, 16));
 			info.m_collidesWorld	= collide;
 			info.m_direction		= direction;
-			info.m_entityId			= 0;
+			info.m_entityId			= (unsigned int)lua_tonumber(p_luaState, 17);
 			info.m_gravity			= gravity;
-			info.m_height			= (float)lua_tonumber(p_luaState, 17);
-			info.m_mass				= (float)lua_tonumber(p_luaState, 18);
+			info.m_height			= (float)lua_tonumber(p_luaState, 18);
+			info.m_mass				= (float)lua_tonumber(p_luaState, 19);
 			info.m_orientation		= orientation;
 			info.m_position			= position;
-			info.m_radius			= (float)lua_tonumber(p_luaState, 19);
-			info.m_shape			= (RootEngine::Physics::AbilityShape::AbilityShape)((int)lua_tonumber(p_luaState, 20));
-			info.m_speed			= (float)lua_tonumber(p_luaState, 21);
-			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 22));
+			info.m_radius			= (float)lua_tonumber(p_luaState, 20);
+			info.m_shape			= (RootEngine::Physics::PhysicsShape::PhysicsShape)((int)lua_tonumber(p_luaState, 21));
+			info.m_speed			= (float)lua_tonumber(p_luaState, 22);
+			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 23));
 	
 			(*rtemp)->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
 
@@ -229,6 +238,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg entity_m [] = {
+			{"GetId", GetId},
 			{"GetTransformation", GetTransformation},
 			{NULL, NULL}
 		};

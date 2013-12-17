@@ -52,7 +52,18 @@ namespace RootForce
 			Collision* c = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 			Transform* t = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 
-			c->m_handle = m_physics->AddStaticObjectToWorld(c->m_meshHandle, entity->GetId(), t->m_position, t->m_orientation.GetQuaternion());
+			c->m_handle = m_physics->AddStaticObjectToWorld(entity->GetId());
+			
+			if(entity->GetId() == 3)
+			{
+				m_physics->BindMeshShape(*(c->m_handle), c->m_meshHandle, t->m_position, t->m_orientation.GetQuaternion(), 0.0f);
+			}
+			else
+			{
+				//m_physics->BindSphereShape(*(c->m_handle), t->m_position, t->m_orientation.GetQuaternion(), 1.0f, 0.0f);
+				m_physics->BindHullShape(*(c->m_handle), c->m_meshHandle, t->m_position, t->m_orientation.GetQuaternion(), 0.0f);
+			}
+
 		}
 	}
 }

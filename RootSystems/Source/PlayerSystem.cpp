@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
@@ -55,3 +56,4 @@ namespace RootForce
 
 	}
 }
+#endif

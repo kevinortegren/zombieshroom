@@ -62,5 +62,7 @@ struct Camera
 struct Light
 {
 	Transform transformation;
+	glm::vec4 color;
+	float Intensity;
 };
 
