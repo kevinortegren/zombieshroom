@@ -61,6 +61,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 	m_motionState = new btDefaultMotionState(startTransform);
 	btCapsuleShape* capsuleShape = new btCapsuleShape(0.8f, 2.5f);
+	//btSphereShape* capsuleShape = new btSphereShape(2);
 	capsuleShape->calculateLocalInertia(p_mass, fallInertia);
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(capsuleShape);

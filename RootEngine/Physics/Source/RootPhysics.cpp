@@ -326,7 +326,7 @@ namespace Physics
 		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 	}
 
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
@@ -334,6 +334,7 @@ namespace Physics
 		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
 		btTriangleInfoMap* test = new btTriangleInfoMap();
 		btGenerateInternalEdgeInfo(objectMeshShape, test);
+		objectMeshShape->setLocalScaling(btVector3(p_scale.x, p_scale.y, p_scale.z));
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));

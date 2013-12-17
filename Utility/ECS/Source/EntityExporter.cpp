@@ -77,6 +77,9 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	
 	for(auto itr = m_world->GetTagManager()->m_tags.begin(); itr != m_world->GetTagManager()->m_tags.end(); ++itr)
 	{
+		if(nonExportIds[(*itr).second->GetId()])
+			continue;
+
 		out << YAML::BeginMap;
 		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
 		out << YAML::Key << "Tag" << YAML::Value << (*itr).first;

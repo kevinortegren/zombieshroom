@@ -51,16 +51,16 @@ void HandleEvents()
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
 					entityExport = true;
 
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
-				*RM.export = 1;
+					*RM.export = 1;
 
-				ReleaseMutex(RM.IdMutexHandle);
+					ReleaseMutex(RM.IdMutexHandle);
 
 			}
 			break;
-			//default:
+		//default:
 			//if (m_engineContext.m_inputSys != nullptr)
 			//	m_engineContext.m_inputSys->HandleInput(event);
 			//if (m_engineContext.m_gui != nullptr)
@@ -73,7 +73,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
-
+	
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
 
 	RootForce::PointLight* pl = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(lightEntity);
@@ -105,20 +105,20 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 }
 
 std::string GetNameFromPath( std::string p_path )
-{
-	std::string cutPath;
-	std::string::size_type slashIndex, dotIndex;
+ {
+  std::string cutPath;
+  std::string::size_type slashIndex, dotIndex;
 
-	// Extract the file name
-	cutPath  = p_path;
-	slashIndex = cutPath.find_last_of("/")+1;
-	if(slashIndex == 0)
-		slashIndex = cutPath.find_last_of("\\")+1;
-	cutPath  = cutPath.substr(slashIndex, cutPath.size());
-	dotIndex = cutPath.find_last_of(".");
-	cutPath  = cutPath.substr(0, dotIndex);
-	return cutPath;
-} 
+  // Extract the file name
+  cutPath  = p_path;
+  slashIndex = cutPath.find_last_of("/")+1;
+  if(slashIndex == 0)
+   slashIndex = cutPath.find_last_of("\\")+1;
+  cutPath  = cutPath.substr(slashIndex, cutPath.size());
+  dotIndex = cutPath.find_last_of(".");
+  cutPath  = cutPath.substr(0, dotIndex);
+  return cutPath;
+ } 
 int main(int argc, char* argv[]) 
 {
 	entityExport = 0;
@@ -127,11 +127,11 @@ int main(int argc, char* argv[])
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+    RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+    RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+    RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-
+	
 	// Setup world.
 	ECS::World m_world;
 
@@ -167,12 +167,12 @@ int main(int argc, char* argv[])
 
 			// TODO: Make these parameters more configurable.
 			g_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
-				"Root Force",
-				SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				1280,
-				720,
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
+					"Root Force",
+					SDL_WINDOWPOS_UNDEFINED,
+					SDL_WINDOWPOS_UNDEFINED,
+					1280,
+					720,
+					SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 				SDL_DestroyWindow);
 			if (g_window == nullptr) 
 			{
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 			g_engineContext.m_resourceManager->LoadTexture("grayLambert", Render::TextureType::TEXTURE_2D);
 			defaultMaterial->m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("grayLambert");
 			defaultMaterial->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-
+			
 			int numberMeshes;
 			int numberLights;
 
@@ -240,7 +240,7 @@ int main(int argc, char* argv[])
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
 			std::string tempTexName;
-
+			
 
 			ReleaseMutex(RM.IdMutexHandle);
 
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 			int renderNrOfMaterials = *RM.NumberOfMaterials;
-
+			
 
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices);
-
+				
 				cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) << endl;
 				if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) == "NONE")
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = *defaultMaterial;
@@ -321,11 +321,11 @@ int main(int argc, char* argv[])
 			*RM.LightIdChange = glm::vec2(-1,-1);
 
 			ReleaseMutex(RM.IdMutexHandle);
-
+			
 			for(int i = 0; i < numberLights; i++)
 			{
 				LightEntities.push_back(CreateLightEntity(&m_world));
-
+				
 				RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 				WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
 
@@ -337,7 +337,7 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.x = 0.0f;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.y = 1-0.1 * RM.PlightList[i]->Intensity;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.z = 0.0f;
-
+				
 				ReleaseMutex(RM.LightMutexHandle);
 			}
 
@@ -385,7 +385,7 @@ int main(int argc, char* argv[])
 				int RemoveMeshIndex = RM.MeshIdChange->y;
 				int RemoveLightIndex = RM.LightIdChange->y;
 				entityExport = *RM.export;
-
+				
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
@@ -433,7 +433,7 @@ int main(int argc, char* argv[])
 					{
 						cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
 					}
-
+				
 					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -482,7 +482,7 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-
+					
 					cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) << endl;
 					if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) == "NONE")
 						m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = *defaultMaterial;
@@ -493,7 +493,7 @@ int main(int argc, char* argv[])
 
 					ReleaseMutex(RM.MeshMutexHandle);
 				}
-
+				
 				///////////////////////UPDATE LIGHTS////////////////////////////////
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
@@ -509,7 +509,7 @@ int main(int argc, char* argv[])
 					{
 						LightEntities.push_back(CreateLightEntity(&m_world));
 					}
-
+				
 					RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -532,7 +532,7 @@ int main(int argc, char* argv[])
 				int cameraIDchange = RM.CameraIdChange->x;
 				RM.CameraIdChange->x = -1;
 				ReleaseMutex(RM.IdMutexHandle);
-
+				
 				if( cameraIDchange != -1)
 				{
 					RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
@@ -550,7 +550,7 @@ int main(int argc, char* argv[])
 					cameraTransform->m_orientation.SetOrientation(rotation);
 					//Rotate 180 to fix camera
 					cameraTransform->m_orientation.Yaw(180);
-
+					
 					camera->m_far = RM.PcameraList[cameraIDchange]->farClippingPlane;					
 					camera->m_near = RM.PcameraList[cameraIDchange]->nearClippingPlane;
 					camera->m_fov = glm::degrees(RM.PcameraList[cameraIDchange]->verticalFieldOfView);
@@ -598,7 +598,7 @@ int main(int argc, char* argv[])
 		std::cin.get();
 		return 1;
 	}
-
+	
 	SDL_Quit();
 	DynamicLoader::FreeSharedLibrary(g_engineModule);
 

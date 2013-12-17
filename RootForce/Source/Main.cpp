@@ -143,6 +143,9 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
+		// System responsible for updating the world.
+		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(&m_world));
+
 		// System responsible for updating the player.
 		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(&m_world));
 
@@ -166,6 +169,10 @@ namespace RootForce
 		renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
+		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+		m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+		// Initialize camera systems.
 		RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
 		RootForce::LookAtSystem* lookAtSystem = new RootForce::LookAtSystem(&m_world);
@@ -173,59 +180,16 @@ namespace RootForce
 		RootForce::ThirdPersonBehaviorSystem* thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(&m_world);
 		m_world.GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
-
-		Render::DirectionalLight dl;
-		dl.m_color = glm::vec4(1.0f,1.f,1.f,1);
-		dl.m_direction = glm::vec3(0,0,-1);
-
-		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
-
-		RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
-		m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
-
-		RootForce::AbilitySystem* abilitySystem = new RootForce::AbilitySystem(&m_world, g_engineContext.m_renderer);
-		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
-
-		// Import test world.
-		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\level.world");
-		m_physicsSystem->AddStaticEntities();
+		m_worldSystem->CreateWorld("level");
 
 		m_playerSystem->CreatePlayer();
 
-		ECS::EntityManager* em = m_world.GetEntityManager();
-
-		//Create camera
-		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
-		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
-		m_world.GetGroupManager()->RegisterEntity("NonExport", cameraEntity);
-		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
-		camera->m_near = 0.1f;
-		camera->m_far = 1000.0f;
-		camera->m_fov = 45.0f;
-		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-		RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		cameraLookAt->m_targetTag = "AimingDevice";
-		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
-
-
 		//Plane at bottom
-
 		glm::vec3 normal (0,1,0);
 		glm::vec3 position (0, -2, 0);
 	
-		//g_engineContext.m_physics->CreatePlane(normal, position);
 		normal = glm::vec3 (0,0,-1);
 		position = glm::vec3 (0,0,9);
-	//	g_engineContext.m_physics->CreatePlane(normal, position);
-		// Setup the skybox.
-		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
-		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
-		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
-			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
@@ -299,36 +263,40 @@ namespace RootForce
 			}
 
 			{
+				PROFILE("Physics", g_engineContext.m_profiler);
+				g_engineContext.m_physics->Update(dt);
+				m_physicsSystem->Process();
+			}
+
+			{
+				PROFILE("Collision system", g_engineContext.m_profiler);
+				m_collisionSystem->Process();
+			}
+
+			{
 				PROFILE("Script system", g_engineContext.m_profiler);
 				scriptSystem->Process();
 			}
 
-			{
-				PROFILE("Ability system", g_engineContext.m_profiler);
-				abilitySystem->Process();
-			}
-				
 			{
 				PROFILE("Network message handler", g_engineContext.m_profiler);
 				m_networkHandler->Update();
 			}
 
 			{
-				PROFILE("Physics", g_engineContext.m_profiler);
-				g_engineContext.m_physics->Update(dt);
-				m_physicsSystem->Process();
-				m_collisionSystem->Process();
+				PROFILE("Camera systems", g_engineContext.m_profiler);
+				m_playerControlSystem->UpdateAimingDevice();
+				thirdPersonBehaviorSystem->Process();
+				lookAtSystem->Process();
+				cameraSystem->Process();
 			}
 
-			m_playerControlSystem->UpdateAimingDevice();
-			thirdPersonBehaviorSystem->Process();
-			lookAtSystem->Process();
-			cameraSystem->Process();
-			pointLightSystem->Process();
 			{
 				PROFILE("RenderingSystem", g_engineContext.m_profiler);
+				pointLightSystem->Process();
 				renderingSystem->Process();
 			}
+
 			g_engineContext.m_renderer->Render();
 	
 			{
@@ -339,13 +307,13 @@ namespace RootForce
 	
 			g_engineContext.m_profiler->Update(dt);
 		
-		
 			{
 				PROFILE("GUI", g_engineContext.m_profiler);
 
 				g_engineContext.m_gui->Update();
 				g_engineContext.m_gui->Render();
 			}
+
 			g_engineContext.m_debugOverlay->RenderOverlay();
 			g_engineContext.m_renderer->Swap();
 		}

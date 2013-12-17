@@ -28,6 +28,8 @@ namespace RootForce
 		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
+		transform->m_position = glm::vec3(0, 100, 0);
+
 		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 0.1f;
 
