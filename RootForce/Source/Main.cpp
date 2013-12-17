@@ -188,7 +188,7 @@ namespace RootForce
 		m_world.GetSystemManager()->AddSystem<RootForce::AbilitySystem>(abilitySystem, "AbilitySystem");
 
 		// Import test world.
-		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\level.world");
 
 		m_physicsSystem->AddStaticEntities();
 
@@ -223,10 +223,19 @@ namespace RootForce
 		position = glm::vec3 (0,0,9);
 	//	g_engineContext.m_physics->CreatePlane(normal, position);
 		// Setup the skybox.
-		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
-		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
+
+		ECS::Entity* skybox = m_world.GetEntityManager()->CreateEntity();
+
+		RootForce::Renderable* r = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
+		RootForce::Transform* t = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
+		t->m_scale = glm::vec3(-100);
+
+		r->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
+		m_world.GetTagManager()->RegisterEntity("Skybox", skybox);
+		m_world.GetGroupManager()->RegisterEntity("NonExport", skybox);
 
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
