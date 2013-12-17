@@ -14,6 +14,9 @@
     - 13
     - 14
     - 15
+    - 16
+    - 17
+    - 18
 - Components:
     - Type: 0
       Data:
@@ -32,23 +35,23 @@
         - Entity: 4
           Model: pCubeShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 5
           Model: pCubeShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 6
           Model: pCylinderShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 7
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 8
           Model: pConeShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 9
           Model: pPlaneShape1
           Effect: Mesh
@@ -56,12 +59,21 @@
         - Entity: 10
           Model: pCylinderShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
         - Entity: 11
+          Model: pConeShape1
+          Effect: Mesh
+          Diffuse: grass
         - Entity: 12
+          Model: pConeShape1
+          Effect: Mesh
+          Diffuse: grass
         - Entity: 13
         - Entity: 14
         - Entity: 15
+        - Entity: 16
+        - Entity: 17
+        - Entity: 18
     - Type: 1
       Data:
         - Entity: 1
@@ -93,9 +105,9 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 8
-          Position: [7.78107, 0, 3.84695]
+          Position: [41.5053, 17.0975, 5.30095]
           Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Scale: [1, 4.05652, 1]
         - Entity: 9
           Position: [-4.99158, -1.50213, 1.12738]
           Rotation: [1, 0, 0]
@@ -105,46 +117,62 @@
           Rotation: [1, 0, 0]
           Scale: [1, 3.96101, 1]
         - Entity: 11
+          Position: [47.6826, 24.4714, -2.55917]
+          Rotation: [1, 0, 0]
+          Scale: [1, 4.05652, 1]
+        - Entity: 12
+          Position: [45.5245, 21.2698, 2.75935]
+          Rotation: [1, 0, 0]
+          Scale: [1, 4.05652, 1]
+        - Entity: 13
           Position: [0, 8.31752, 0]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 12
+        - Entity: 14
           Position: [-28.4874, 5.03396, -24.9807]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 13
+        - Entity: 15
           Position: [18.3776, 6.24688, 31.6612]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 14
+        - Entity: 16
           Position: [21.3407, 6.83117, -31.6234]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
-        - Entity: 15
+        - Entity: 17
           Position: [-31.0512, 7.00646, 31.7077]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 18
+          Position: [55.8696, 31.8015, -0.0325007]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 11
+        - Entity: 13
           Attenuation: [0, 0.0827067, 0]
           Color: [0, 1, 1, 1]
           Range: 1000
-        - Entity: 12
+        - Entity: 14
           Attenuation: [0, 0.0676692, 0]
           Color: [1, 0, 0.808983, 1]
           Range: 1000
-        - Entity: 13
+        - Entity: 15
           Attenuation: [0, 0.01, 0]
           Color: [0, 0, 1, 1]
           Range: 1000
-        - Entity: 14
+        - Entity: 16
           Attenuation: [0, 0.135338, 0]
           Color: [1, 0.977533, 0, 1]
           Range: 1000
-        - Entity: 15
+        - Entity: 17
           Attenuation: [0, 0.0902256, 0]
           Color: [0.2809, 1, 0, 1]
+          Range: 1000
+        - Entity: 18
+          Attenuation: [0, 0.135338, 0]
+          Color: [1, 0.977533, 0, 1]
           Range: 1000
     - Type: 3
       Data:
@@ -172,4 +200,8 @@
     - Id: 9
       Group: Static
     - Id: 10
+      Group: Static
+    - Id: 11
+      Group: Static
+    - Id: 12
       Group: Static
