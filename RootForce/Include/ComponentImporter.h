@@ -140,8 +140,8 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				}
 				else if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
-					g_engineContext.m_physics->AddStaticObjectToWorld(modelHandle, p_entity->GetId(), temp->m_position, rotation);
-					physaccessor->m_handle = new int(-1);
+					physaccessor->m_handle = g_engineContext.m_physics->AddStaticObjectToWorld(p_entity->GetId());
+					g_engineContext.m_physics->BindMeshShape(*(physaccessor->m_handle), modelHandle, temp->m_position, temp->m_orientation.GetQuaternion(), 0);
 				}
 
 			}

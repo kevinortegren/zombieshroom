@@ -26,6 +26,8 @@ namespace RootForce
 				//m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Entity %i has no physicsaccessor", p_entity->GetId());
 				return;
 			}
+			if(m_physics->GetType(*(accessor->m_handle)) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
+				return;
 		
 
 			transform->m_position = m_physics->GetPos(*(accessor->m_handle));

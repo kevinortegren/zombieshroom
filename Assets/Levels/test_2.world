@@ -37,7 +37,7 @@
           Scale: [1, 1, 1]
         - Entity: 3
           Position: [0, -1, 0]
-          Rotation: [1, 0, 0]
+          Rotation: [1, 1, -1, -1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:

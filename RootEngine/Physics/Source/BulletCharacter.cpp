@@ -221,6 +221,8 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 	if (callback.hasHit())
 	{
 		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
+		/*if(callback.m_hitNormalWorld.y() < 0.0f)
+		m_currentPosition.setY(m_currentPosition.y() +0.2f);*/
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
 		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
 		{
@@ -301,7 +303,7 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 			btScalar hitDistance;
 			hitDistance = (callback.m_hitPointWorld - m_currentPosition).length();
 
-			//			m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
+				//		m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 
 			updateTargetPositionBasedOnCollision (callback.m_hitNormalWorld);
 			btVector3 currentDir = m_targetPosition - m_currentPosition;
