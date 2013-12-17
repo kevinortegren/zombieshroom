@@ -109,6 +109,8 @@ namespace RootForce
 		
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 
+		g_engineContext.m_resourceManager->LoadCollada("AnimationTest");
+
 		g_world = &m_world;
 
 		// Initialize the system for controlling the player.

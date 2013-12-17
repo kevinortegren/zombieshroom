@@ -19,8 +19,8 @@ namespace RootEngine
 	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
 		m_model = new Model(); //Owned by ResourceManager
-		
-		const aiScene* aiscene = m_importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+		Assimp::Importer importer;
+		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
@@ -33,7 +33,7 @@ namespace RootEngine
 		}
 		else 
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, m_importer.GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
 		}
 
 		return m_model;
@@ -208,12 +208,12 @@ namespace RootEngine
 
 	void ModelImporter::LoadBones( unsigned int p_index, const aiMesh* p_aiMesh )
 	{
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data...");
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
 
-		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation();
+		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(p_aiMesh->mNumVertices);
 
 		//Loop through all the bones in the mesh
-		for(unsigned int i = 0; p_aiMesh->mNumBones; i++)
+		for(unsigned int i = 0; i < p_aiMesh->mNumBones; i++)
 		{
 			unsigned int boneIndex = 0;
 			//Store bone name
@@ -236,6 +236,7 @@ namespace RootEngine
 				bi.m_boneOffset = gm;
 
 				animation->MapBone(boneName, boneIndex);
+				
 			}
 			else
 			{
@@ -248,7 +249,9 @@ namespace RootEngine
 				unsigned int vertexID =  p_aiMesh->mBones[i]->mWeights[j].mVertexId;
 				float vweight  = p_aiMesh->mBones[i]->mWeights[j].mWeight;                   
 				animation->AddBoneData(vertexID, boneIndex, vweight);
+				//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "AddBoneData -> VertexID:  %d, BoneIndex: %d, Weight: %f", vertexID, boneIndex, vweight);
 			}
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Added bone: %s", boneName.c_str());
 		}
 
 		m_model->m_animations.push_back(animation);
