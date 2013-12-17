@@ -94,6 +94,7 @@ namespace RootEngine
 			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;
 			//Use this to add a Controllable object to the world, i.e Players. Return value is the index position of the object. position and rotation is of type float[3]
 			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight) = 0;
+			///Only use this if you want bullet to handle the abilitys movement, otherwise use AddcontrollableObject
 			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;
 
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass) = 0;
