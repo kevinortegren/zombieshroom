@@ -29,12 +29,14 @@ AbilityTest.cooldown = 5.0;
 function AbilityTest.OnActivate (action)
 
 	local entity 		= Entity.New();
+
 	local playerEntity  = Entity.GetEntityByTag("Player");
+
 	local playerTrans   = playerEntity:GetTransformation();
 	x, y, z = playerTrans:GetPos();
 	local aimingDevice  = Entity.GetEntityByTag("AimingDevice");
 	local aimingTrans   = aimingDevice:GetTransformation();
-	aimx, aimy, aimz = aimingTrans:GetFront();
+	aimx, aimy, aimz 	= aimingTrans:GetFront();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
 	

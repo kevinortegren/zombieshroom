@@ -1,5 +1,6 @@
  #pragma once
 #include <Lua/lua.hpp>
+#include <glm/glm.hpp>
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -230,6 +231,133 @@ namespace RootForce
 
 			return 0;
 		}
+
+		static int CreateVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((int)lua_tonumber(p_luaState, 1), (int)lua_tonumber(p_luaState, 2), (int)lua_tonumber(p_luaState, 3));
+
+			luaL_setmetatable(p_luaState, "Vec3");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int SetVec3Value(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			std::string memberName = lua_tostring(p_luaState, 2);
+			float setValue = (float)lua_tonumber(p_luaState, 3);
+
+			if(memberName == "x")
+				ptemp->x = setValue;
+			if(memberName == "y")
+				ptemp->y = setValue;
+			if(memberName == "z")
+				ptemp->z = setValue;
+			
+			return 0;
+		}
+
+		static int GetVec3Value(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			std::string memberName = lua_tostring(p_luaState, 2);
+
+			if(memberName == "x")
+				lua_pushnumber(p_luaState, ptemp->x);
+			if(memberName == "y")
+				lua_pushnumber(p_luaState, ptemp->y);
+			if(memberName == "z")
+				lua_pushnumber(p_luaState, ptemp->z);
+
+			return 1;
+		}
+
+		static int AddVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			
+			glm::vec3 v3 = (*v1)+(*v2);
+			// Allocate memory for a pointer to to object
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+
+			luaL_setmetatable(p_luaState, "Vec3");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int SubVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+
+			glm::vec3 v3 = (*v1)-(*v2);
+			// Allocate memory for a pointer to to object
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+
+			luaL_setmetatable(p_luaState, "Vec3");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int MulVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+
+			glm::vec3 v3 = (*v1)*(*v2);
+			// Allocate memory for a pointer to to object
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+
+			luaL_setmetatable(p_luaState, "Vec3");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int DivVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+
+			glm::vec3 v3 = (*v1)/(*v2);
+			// Allocate memory for a pointer to to object
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+
+			luaL_setmetatable(p_luaState, "Vec3");
+
+			//Userdata already on stack
+			return 1;
+		}
+
+		static int DotVec3(lua_State* p_luaState)
+		{
+			// Allocate memory for a pointer to to object
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+
+			float vecdot = glm::dot((*v1), (*v2));
+			
+			lua_pushnumber(p_luaState, vecdot);
+
+			return 1;
+		}
+		
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
@@ -292,13 +420,43 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		//Physics function & methods
+		static const struct luaL_Reg vec3_f [] = {
+			{"New", CreateVec3},
+			{"Dot", DotVec3},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg vec3_m [] = {
+			{"__newindex", SetVec3Value},
+			{"__add", AddVec3},
+			{"__sub", SubVec3},
+			{"__mul", MulVec3},
+			{"__div", DivVec3},
+			{"__index", GetVec3Value},
+			{NULL, NULL}
+		};
+		
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
 			int meta_id = lua_gettop(p_luaState);
-		
 			luaL_setfuncs(p_luaState, p_methodReg, 0);
+
 			lua_setfield(p_luaState, meta_id, "__index");  
+
+			luaL_newlib(p_luaState, p_funcReg);
+
+			lua_setglobal(p_luaState, p_typeName.c_str());
+
+			return 1;
+		}
+
+		static int LuaSetupTypeNoMethods(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
+		{
+			luaL_newmetatable(p_luaState, p_typeName.c_str());
+			int meta_id = lua_gettop(p_luaState);
+			luaL_setfuncs(p_luaState, p_methodReg, 0);
 
 			luaL_newlib(p_luaState, p_funcReg);
 
