@@ -7,8 +7,8 @@ SharedMemory::SharedMemory()
 	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
-	InitalizeSharedMemory();
 	export = nullptr;
+	InitalizeSharedMemory();
 }
 
 SharedMemory::~SharedMemory()
@@ -27,8 +27,6 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(int) * 4;
 	total_memory_size += sizeof(glm::vec2) * 3;
 	total_memory_size += sizeof(int);
-	
-
 
 	shared_memory_handle = CreateFileMapping(
 		INVALID_HANDLE_VALUE,

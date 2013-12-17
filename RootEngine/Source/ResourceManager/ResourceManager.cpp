@@ -158,7 +158,7 @@ namespace RootEngine
 			if(model)
 			{
 				m_models[p_path] = model;
-				return m_models[p_path];
+				return m_models.find(p_path)->second;
 			}
 			else
 			{

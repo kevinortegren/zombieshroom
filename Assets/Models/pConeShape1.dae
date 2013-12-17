@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Desktop/Golf.mb</source_data>
     </contributor>
-    <created>2013-12-17T13:29:04</created>
-    <modified>2013-12-17T13:29:04</modified>
+    <created>2013-12-17T16:11:11</created>
+    <modified>2013-12-17T16:11:11</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -104,7 +104,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="Golf">
       <node id="pCone1" name="pCone1" type="NODE">
-        <translate sid="translate">2.138939 0 3.846954</translate>
+        <translate sid="translate">2.138939 -1.718802 9.626791</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>

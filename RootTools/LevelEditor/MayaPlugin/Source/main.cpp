@@ -37,6 +37,7 @@ void MayaCameraToList(MObject node, int id);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
+int exportMaya;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -48,10 +49,18 @@ void AddCallbackID(MStatus status, MCallbackId id)
 // Initiera pluginet.
 EXPORT MStatus initializePlugin(MObject obj)
 {	
-	SM.InitalizeSharedMemory();
+	//SM.InitalizeSharedMemory();
 	sortObjectList();
 	printLists();
 	loadScene();
+
+	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
+
+	*SM.export = 0;
+	exportMaya = 0;
+
+	ReleaseMutex(SM.IdMutexHandle);
 
 	myInitMemoryCheck(); // Har koll på minnet och minnesläckor
 	MStatus status = MS::kSuccess;
@@ -106,7 +115,7 @@ void Export()
 							{
 								exists = true;
 								saveJ = j;
-								break;   /// i++ och j = 0 !?!
+								break;
 							}
 						}
 						
@@ -127,8 +136,6 @@ void Export()
 
 		if(exists)
 		{
-			//Change name in materiallist to existing one!!!!!!!!!!!!!!!
-
 			MFnMesh mesh = g_mayaMeshList[saveJ];
 			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
@@ -154,6 +161,7 @@ void Export()
 	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
 
 	*SM.export = 2;
+	exportMaya = 0;
 
 	ReleaseMutex(SM.IdMutexHandle);
 }
@@ -251,7 +259,6 @@ void loadScene()
 
 		MayaMeshToList(g_mayaMeshList[i], i);
 		SM.UpdateSharedMesh(i, true, true, currNrMeshes);
-		//MayaListToList(g_mayaMeshList[i]);
 	}
 	//Light transformation CB
 	for(int i = 0; i < currNrLights; i++)
@@ -308,24 +315,23 @@ void viewCB(const MString &str, void *clientData)
 
 	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
-
-	if(*SM.export == 1)
-	{
-	Export();
-	}
-
+	exportMaya = *SM.export;
 	ReleaseMutex(SM.IdMutexHandle);
+
+	if(exportMaya == 1)
+	{
+		Export();
+		exportMaya = 0;
+	}	
 }
 
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	int index = nodeExists(node);
-	Print("DirtyMeshNodeCB called! ");
 
 	if(index != -1)
 	{
-		Print("DirtyMeshNodeCB called! ");
 		MayaMeshToList(node, index);
 		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
 	}
@@ -465,7 +471,6 @@ void checkForNewMeshes(bool made, MObject source, MObject destination)
 		MFnMesh mesh = destination;
 		g_mayaMeshList[currNrMeshes] = destination;
 
-		//Print("Added ", mesh.fullPathName());
 		id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaMeshList[currNrMeshes], dirtyMeshNodeCB, nullptr, &status);
 		AddCallbackID(status, id);
 

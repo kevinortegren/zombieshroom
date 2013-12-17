@@ -30,10 +30,10 @@ int entityExport;
 string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/Levels/";
 
 ReadMemory RM;
-void LoadScene()
-{
-
-}
+//void LoadScene()
+//{
+//
+//}
 
 void HandleEvents()
 {
@@ -49,15 +49,15 @@ void HandleEvents()
 		case SDL_KEYDOWN:
 			{
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
+				{
 					entityExport = true;
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					*RM.export = 1;
 
-				*RM.export = 1;
-
-				ReleaseMutex(RM.IdMutexHandle);
-
+					ReleaseMutex(RM.IdMutexHandle);
+				}
 			}
 			break;
 			//default:
@@ -101,8 +101,7 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 
 	p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
-	return entity;
-}
+	return entity;}
 
 std::string GetNameFromPath( std::string p_path )
 {
@@ -121,9 +120,13 @@ std::string GetNameFromPath( std::string p_path )
 } 
 int main(int argc, char* argv[]) 
 {
+	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+	*RM.export = 0;
 	entityExport = 0;
 
-
+	ReleaseMutex(RM.IdMutexHandle);
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -235,13 +238,10 @@ int main(int argc, char* argv[])
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
-			*RM.export = 0;
 			numberMeshes = *RM.NumberOfMeshes;
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
 			std::string tempTexName;
-
-
 			ReleaseMutex(RM.IdMutexHandle);
 
 			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
@@ -391,11 +391,25 @@ int main(int argc, char* argv[])
 
 				if(entityExport == 2)
 				{			
+					m_world.GetEntityManager()->RemoveAllComponentsOfType<RootForce::Renderable>();
 
-					for(int i = 0; i < Entities.size(); i++)
+					for(int i = 0; i < Entities.size()-1; i++)
 					{
 						//UPDATE modelName for all Entities from shared memory
-						RootForce::Renderable *mesh = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
+
+						RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
+
+						string shortPath = GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath);
+
+						if(shortPath == "NONE")
+						{
+							mesh->m_material = *defaultMaterial;
+						}
+						else
+						{
+							mesh->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(shortPath);
+							mesh->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh"); 
+						}
 
 						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -405,7 +419,9 @@ int main(int argc, char* argv[])
 						RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
 						collision->m_meshHandle = name + "0";
 
-						g_engineContext.m_resourceManager->RenameModel(mesh->m_model, name);
+						mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
+
+
 					}
 
 					m_world.GetEntityExporter()->Export(g_savepath + "level.world");
@@ -422,7 +438,7 @@ int main(int argc, char* argv[])
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
 					{
-						string name = RM.PmeshList[MeshIndex]->modelName;
+						string name = RM.PmeshList[MeshIndex]->transformation.name;
 						if(name != "")
 						{
 							Entities.push_back(CreateMeshEntity(&m_world, name));
