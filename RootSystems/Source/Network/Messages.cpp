@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/Messages.h>
 #include <cstring>
 
@@ -128,3 +130,5 @@ TEST(Messages, Serialize)
 	EXPECT_TRUE(m.Message == m2.Message);
 }
 */
+
+#endif

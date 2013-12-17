@@ -146,6 +146,28 @@ namespace RootEngine
 		
 	}
 
+	Model* ResourceManager::CreateModel(const std::string& p_path)
+	{
+		if(m_models.find(p_path) == m_models.end())
+		{
+			Model* model = new Model();
+			model->m_meshes.resize(1);
+			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
+			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			
+			if(model)
+			{
+				m_models[p_path] = model;
+				return m_models[p_path];
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		return m_models[p_path];
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//Get functions
 	//////////////////////////////////////////////////////////////////////////

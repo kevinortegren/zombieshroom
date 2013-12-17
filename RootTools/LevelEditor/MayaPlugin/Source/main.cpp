@@ -14,6 +14,7 @@ int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currN
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
+void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
 void NodeRemovedCB(MObject &node, void *clientData);
@@ -32,7 +33,7 @@ void GetMaterial(MObject node);
 void MayaMeshToList(MObject node, int id);
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 
 // Lägger till ett callback-id i callback-arrayen.
@@ -163,6 +164,7 @@ void loadScene()
 			AddCallbackID(status, id);
 		}
 
+		MayaMeshToList(g_mayaMeshList[i], i);
 		SM.UpdateSharedMesh(i, true, true, currNrMeshes);
 		//MayaListToList(g_mayaMeshList[i]);
 	}
@@ -170,6 +172,11 @@ void loadScene()
 	for(int i = 0; i < currNrLights; i++)
 	{
 		MFnLight light = g_mayaLightList[i];
+		if(g_mayaLightList[i].hasFn(MFn::kLight))
+		{
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaLightList[i], dirtyLightNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+		}
 
 		if(light.parent(0,&status).hasFn(MFn::kTransform))
 		{
@@ -178,8 +185,8 @@ void loadScene()
 			AddCallbackID(status, id);
 		}
 
-		SM.UpdateSharedLight(currNrLights, currNrLights); 
-		//MayaListToList(g_mayaLightList[i]);
+		MayaLightToList(g_mayaLightList[i], i);
+		SM.UpdateSharedLight(i, currNrLights);
 	}
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
@@ -195,10 +202,11 @@ void loadScene()
 		const MString temp = "modelPanel4";
 
 		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);
-		//Print("Camera name: ", camera.name());
+		
 		AddCallbackID(status, id);
+
+		MayaCameraToList(g_mayaCameraList[i], i);
 		SM.UpdateSharedCamera(i);
-		//MayaListToList(g_mayaCameraList[i]);
 	}
 
 }
@@ -217,58 +225,35 @@ void viewCB(const MString &str, void *clientData)
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	MStatus status;
-	MFnMesh	mesh = node;
-	MPointArray points_;
-	MFloatArray U, V;
-	MString UVsetName;
-
-	UVsetName = mesh.currentUVSetName(&status, -1);
-
-	MSpace::Space world_space = MSpace::kObject;
-	float myPoints[g_maxVerticesPerMesh][4];
-
-	
-	//Print("Full pathname: ", mesh.fullPathName());
-
-	mesh.getPoints(points_, world_space);
-
-	points_.get(myPoints);
-
-	mesh.getUVs(U,V,&UVsetName);
-
-	//for(int i = 0; i < points_.length(); i++)
-	//{
-	//	Print("Vertex ", i, " X: ", myPoints[i][0]," Y: ", myPoints[i][1], " Z: ", myPoints[i][2]);
-	//	Print("U: ", U[i], " V: ", V[i]);
-	//}
-
 	int index = nodeExists(node);
+	Print("DirtyMeshNodeCB called! ");
 
 	if(index != -1)
 	{
+		Print("DirtyMeshNodeCB called! ");
 		MayaMeshToList(node, index);
 		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
 	}
 }
+
+void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
+{
+	MStatus status;
+	MFnLight Light = node;
+
+	int index = nodeExists(node);
+	if(index != -1)
+	{
+		MayaLightToList(node, index);
+		SM.UpdateSharedLight(index, currNrLights);
+	}
+}
+
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	MStatus status = MS::kSuccess;
-	MSpace::Space _spaceWorld = MSpace::kWorld;
-	MSpace::Space _space = MSpace::kObject;
-	MSpace::Space _spaceTrans = MSpace::kTransform;
 	MFnTransform trans = node;
-
-	double scale[3];
-	double rotX, rotY, rotZ, rotW;
-	
-	MFnMesh mesh = trans.child(0, &status);
-
-	trans.getScale(scale);
-	MVector translation = trans.getTranslation(_spaceTrans, &status);
-
-	trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, _space);
 
 	int index = nodeExists(trans.child(0, &status));
 
@@ -280,11 +265,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 			MayaMeshToList(trans.child(0, &status), index);
 			SM.UpdateSharedMesh(index, true, false, currNrMeshes);
 		}
-		//if(trans.child(0, &status).hasFn(MFn::kCamera))
-		//{
-		//	MayaCameraToList(trans.child(0, &status), index);
-		//	SM.UpdateSharedCamera(index);
-		//}
+
 		if(trans.child(0, &status).hasFn(MFn::kLight))
 		{
 			MayaLightToList(trans.child(0, &status), index);
@@ -292,10 +273,6 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 		}
 
 	}
-	//Print("Trans name: ", trans.fullPathName());
-	//Print("Scale: X: ", scale[0], " Y: ", scale[1], " Z: ", scale[2]);
-	//Print("Translation: X: ", translation.x, " Y: ", translation.y, " Z: ", translation.z);
-	//Print("Rotation X: ", rotX, " Y: ", rotY, " Z: ", rotZ, " W: ", rotW);
 }
 
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
@@ -309,6 +286,7 @@ void NodeAddedCB(MObject &node, void *clientData)
 void NodeRemovedCB(MObject &node, void *clientData)
 {
 	int removeID = 0;
+
 	if(node.hasFn(MFn::kMesh))
 	{
 		Print("Removed a mesh!");
@@ -333,8 +311,27 @@ void NodeRemovedCB(MObject &node, void *clientData)
 				SM.RemoveMesh(removeID, currNrMeshes);
 			}
 		}	
+	}
+	if(node.hasFn(MFn::kLight))
+	{
+		MFnLight light = node;
 
-		printLists();
+		for(int i = 0; i < currNrLights; i ++)
+		{
+			MFnLight listLight = g_mayaLightList[i];
+			if(listLight.name() == light.name())
+			{
+				removeID = i;
+				for(int j = i; j < currNrLights; j++)
+				{
+					g_mayaLightList[j] = g_mayaLightList[j+1];
+					MayaLightToList(g_mayaLightList[j], j);
+					SM.UpdateSharedLight(j,currNrLights-1);
+				}
+				currNrLights--;
+				SM.RemoveLight(removeID, currNrMeshes);
+			}
+		}
 	}
 }
 
@@ -351,6 +348,15 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 	if (Status(__LINE__, status1) && Status(__LINE__, status2))
 	{
 		checkForNewMeshes(made, source, destination);
+		Print("Updating all materials");
+		for(int i = 0; i < currNrMeshes; i++)
+		{
+			for(int j = 0; j < currNrMaterials; j++)
+			{
+				SM.UpdateSharedMaterials(currNrMaterials, j, i);
+			}
+		}
+		
 	}
 }
 
@@ -418,6 +424,8 @@ void checkForNewLights(MObject &node, void *clientData)
 		Print("New Light Added");
 		g_mayaLightList[currNrLights] = node;
 		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
 		currNrLights++;
 	}
 	
@@ -536,39 +544,42 @@ void MayaMeshToList(MObject node, int meshIndex)
 		MString materialName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
+		MObject material_objectNode;
 																								////NEW STUFFS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode);
 		materialName = material_node.name();
 
-		//if(material_node.typeName() == "lambert")
-		//{
-		//	Print("LAMBERT FOUND");
-		//	Print(material_node.name());
-		//	Print(material_node.pluginName());
-		//}
+		bool materialExists = false;
+		int materialID = 0;
+		for(int i = 0; i < currNrMaterials; i++)
+		{
+			std::string tempMaterialName = SM.materialList[i].materialName;
+			std::string tempMaterialName2 = materialName.asChar();
+			if(tempMaterialName == tempMaterialName2)	//BLIR INTE SAMMA SHIET FAST ÄNDÅ SÅ BLIR DET DE.
+			{
+				materialExists = true;
+				materialID = i;
+			}
+		}
 
-		//memcpy(SM.meshList[meshIndex].texturePath, texturepath.asChar(), texturepath.numChars());
-		//memcpy(SM.meshList[meshIndex].normalPath, normalpath.asChar(),normalpath.numChars());
+		if(!materialExists)
+		{
+			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
+			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
+			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+			MFnBlinnShader Blinn = material_objectNode;
+			Print("New Material name: ", Blinn.name());
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
 
-		//memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
-
-		//bool materialExists = false;
-		//for(int i = 0; i < currNrMaterials; i++)
-		//{
-		//	if(SM.materialList[i].materialName != materialName.asChar())
-		//	{
-		//		materialExists = true;
-		//	}
-		//}
-
-		//if(!materialExists)
-		//{
-		//	memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
-		//	memcpy(SM.meshList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
-		//	memcpy(SM.meshList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
-		//	currNrMaterials++;
-		//	SM.UpdateSharedMaterials(currNrMaterials);
-		//}
+			currNrMaterials++;
+			materialID = currNrMaterials;
+			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+			
+		}else
+		{
+			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+		}
 		
 
 		//Get and set mesh name
@@ -630,7 +641,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
 					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					mesh.getVertexNormal(triangleVertices[j],false, normal, space_local);
+					mesh.getVertexNormal(triangleVertices[j], false, normal, space_local);
 					SM.meshList[meshIndex].normal[count].x = normal.x;
 					SM.meshList[meshIndex].normal[count].y = normal.y;
 					SM.meshList[meshIndex].normal[count].z = normal.z;
@@ -639,7 +650,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 					mesh.getUV(uvID, U, V, 0);
 
 					SM.meshList[meshIndex].UV[count].x = U;
-					SM.meshList[meshIndex].UV[count].y = V;
+					SM.meshList[meshIndex].UV[count].y = 1-V;
 
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
@@ -684,6 +695,12 @@ void MayaLightToList(MObject node, int lightIndex)
 	if(node.hasFn(MFn::kLight))
 	{
 		MFnLight light = node;
+		SM.lightList[lightIndex].color.r = light.color(&status).r;
+		SM.lightList[lightIndex].color.g = light.color(&status).g;
+		SM.lightList[lightIndex].color.b = light.color(&status).b;
+		SM.lightList[lightIndex].color.a = light.color(&status).a;
+		SM.lightList[lightIndex].Intensity = light.intensity(&status);
+
 		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
 
@@ -801,7 +818,7 @@ void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_no
 	}
 }
 
-void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path)
+void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MObject &out_materialObject)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -822,6 +839,7 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path)
 			//ftn == fileTextureName
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
+			out_materialObject = connections[n].node(&status);
 
 			break;
 		}
@@ -887,7 +905,7 @@ void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float
 	}
 }
 
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode)
 {
 	MStatus status = MS::kSuccess;;
 
@@ -903,7 +921,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		for(int j = 0; j < shaders.length(); j++)
 		{
 			GetMaterialNode(shaders[j], material_node);
-			ExtractColor(material_node, out_color_path);
+			ExtractColor(material_node, out_color_path, out_materialNode);
 			ExtractBump(material_node, out_bump_path, out_bump_depth);			
 		}
 	}
