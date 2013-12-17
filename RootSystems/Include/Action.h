@@ -12,11 +12,21 @@ namespace RootForce
 		};
 	}
 
+	struct CollisionData
+	{
+		int m_entityId;
+	};
+
 	struct Action
 	{
 		Action(ActionType::ActionType p_action)
 			: m_action(p_action) {}
 
 		ActionType::ActionType m_action;
+
+		union 
+		{
+			CollisionData m_collision;
+		} m_data;
 	};
 }
