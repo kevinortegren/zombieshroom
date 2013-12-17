@@ -5,6 +5,7 @@ ReadMemory::ReadMemory()
 	NumberOfMeshes = nullptr;
 	NumberOfLights = nullptr;
 	NumberOfCameras = nullptr;
+	export = nullptr;
 	InitalizeSharedMemory();
 }
 
@@ -88,7 +89,7 @@ int ReadMemory::InitalizeSharedMemory()
 
 	mem = (unsigned char*)(mem + sizeof(int));
 
-	export = (bool*)(mem);
+	export = (int*)(mem);
 	
 
 	if(first_process)

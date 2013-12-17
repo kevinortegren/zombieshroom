@@ -26,7 +26,7 @@ bool g_running;
 void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
-bool entityExport;
+int entityExport;
 
 ReadMemory RM;
 void LoadScene()
@@ -53,7 +53,7 @@ void HandleEvents()
 					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
-					*RM.export = true;
+					*RM.export = 1;
 
 					ReleaseMutex(RM.IdMutexHandle);
 
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberMeshes; i++)
 			{
-				string name = RM.PmeshList[i]->transformation.name;
+				string name = RM.PmeshList[i]->modelName;
 				Entities.push_back(CreateMeshEntity(&m_world, name));	
 				cout << "LOADED: " << name  << " TO INDEX " << i << endl;
 
@@ -367,21 +367,31 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
-				if(entityExport)
-				{
-					m_world.GetEntityExporter()->Export("level");
-					entityExport = false;
-				}
-
 				// GET MESH CHANGE AND REMOVE INDEX
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				int MeshIndex = RM.MeshIdChange->x;
 				int RemoveMeshIndex = RM.MeshIdChange->y;
 				int RemoveLightIndex = RM.LightIdChange->y;
+				entityExport = *RM.export;
+				
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
+				if(entityExport == 2)
+				{
+					m_world.GetEntityExporter()->Export("level.txt");
+					entityExport = false;
+
+					for(int i = 0; i < Entities.size(); i++)
+					{
+						//UPDATE modelName for all Entities from shared memory
+					}
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					*RM.export = 0;
+					ReleaseMutex(RM.IdMutexHandle);
+				}
 				/////////////////////// UPDATE MESHES ////////////////////////////////
 				if(MeshIndex != -1)					
 				{
@@ -389,7 +399,7 @@ int main(int argc, char* argv[])
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
 					{
-						string name = RM.PmeshList[MeshIndex]->transformation.name;
+						string name = RM.PmeshList[MeshIndex]->modelName;
 						if(name != "")
 						{
 							Entities.push_back(CreateMeshEntity(&m_world, name));

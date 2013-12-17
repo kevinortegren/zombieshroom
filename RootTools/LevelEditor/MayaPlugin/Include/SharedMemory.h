@@ -31,7 +31,7 @@ public:
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
-	bool* export;
+	int* export;
 	Material materialList[g_maxMeshes];
 	int* NumberOfMaterials;
 	DWORD milliseconds;
