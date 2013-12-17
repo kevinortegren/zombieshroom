@@ -187,18 +187,17 @@ namespace RootForce
 
 		// Import test world.
 		m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
-		
+
 		m_physicsSystem->AddStaticEntities();
 
 		m_playerSystem->CreatePlayer();
 
-
-		
 		ECS::EntityManager* em = m_world.GetEntityManager();
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
 		m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+		m_world.GetGroupManager()->RegisterEntity("NonExport", cameraEntity);
 		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		camera->m_near = 0.1f;
 		camera->m_far = 1000.0f;
@@ -236,7 +235,6 @@ namespace RootForce
 		// Initialize the network system
 		RootForce::Network::MessageHandler::ServerType serverType = RootForce::Network::MessageHandler::LOCAL;
 		m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network, serverType, 5567, "127.0.0.1"));
-
 
 		m_displayPhysicsDebug = false;
 

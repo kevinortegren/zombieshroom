@@ -75,6 +75,11 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
 				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
 			}
+		case RootForce::ComponentType::COLLISION:
+			{
+				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
+				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+			}
 			break;
 		default:
 			break;

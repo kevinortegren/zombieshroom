@@ -42,10 +42,13 @@ namespace RootForce
 		script->m_name = g_engineContext.m_resourceManager->LoadScript("Player");
 
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", entity);
 
 		//Create player aiming device
 		ECS::Entity* aimingDevice = entityManager->CreateEntity();
 		m_world->GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", aimingDevice);
+
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
