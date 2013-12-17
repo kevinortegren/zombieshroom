@@ -4,9 +4,9 @@ namespace RootEngine
 {
 	namespace RootAnimation
 	{
-		Animation::Animation() : m_numBones(0)
+		Animation::Animation(unsigned int p_vertSize) : m_numBones(0)
 		{
-
+			m_boneData.resize(p_vertSize);
 		}
 
 		Animation::~Animation()

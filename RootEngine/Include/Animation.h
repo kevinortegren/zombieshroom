@@ -70,7 +70,7 @@ namespace RootEngine
 			class Animation : public AnimationInterface
 			{
 			public:
-				Animation();
+				Animation(unsigned int p_vertSize);
 				~Animation();
 
 				bool BoneExists(std::string p_boneName);

@@ -52,7 +52,7 @@ namespace RootEngine
 
 		GameSharedContext*			m_context;
 		Model*						m_model; 
-		Assimp::Importer			m_importer;
+		
 	};
 #endif
 }
