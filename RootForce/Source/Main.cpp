@@ -67,6 +67,7 @@ namespace RootForce
 	Main::Main(std::string p_workingDirectory) 
 		: m_running(true)
 	{
+		m_workingDirectory = p_workingDirectory;
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
@@ -240,7 +241,8 @@ namespace RootForce
         m_chat.Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 
 		//Initiate Menu
-		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher());
+		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext);
+		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDirectory);
 
         // Initialize the network system
         m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, g_engineContext.m_logger, g_engineContext.m_network));

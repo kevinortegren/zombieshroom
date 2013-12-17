@@ -39,6 +39,7 @@ namespace RootForce
         void HandleEvents();
         void testfuncofawesome(std::vector<glm::vec3> p_debugVectors);
         bool m_running;
+		std::string m_workingDirectory;
         void* m_engineModule;
         std::shared_ptr<SDL_Window> m_window;
         RootForce::ChatSystem m_chat;

@@ -31,10 +31,6 @@ $(document).ready(function() {
   } );
   // Lan menu
   $("#lan-list").tablesorter();
-  // $("#lan-list tr").click(function() {
-    // $("#selected").attr("id", "");
-    // $(this).attr("id", "selected");
-  // } );
   $("#lan-back").click(function() {
     $("#main-menu").css("display", "table");
     $("#lan-menu").css("display", "none");
@@ -43,12 +39,10 @@ $(document).ready(function() {
   $("#lan-refresh").click(function() {
     $("#lan-list tr").not($("#lan-list thead tr")).remove();
     Menu.Refresh();
-    alert("ToDo: Callback from C++ to menu to update server list");
   } );
   $("#lan-connect").click(function() {
     if($("#selected").length < 1)
       return;
-    //alert($($("#selected").children()[0]).html());
     $("#overlay").css("display", "table");
     $("#connecting").css("display", "block");
     var address = $($("#selected").children()[0]).html().split(":");
@@ -67,7 +61,6 @@ $(document).ready(function() {
   $("#lan-host").click(function() {
     $("#overlay").css("display", "table");
     $("#lan-host-overlay").css("display", "block");
-    alert("ToDo: Call C++ to update the list of available maps");
   } );
   // Lan menu - Direct connect popup
   $("#lan-direct-close").click(function() {
@@ -99,12 +92,25 @@ function Unide()
 {
   $("body").css("display", "block");
 }
-function AddServer(addr,name,players,maxplayers,ping,password)
+function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
 {
-  $("#lan-list").append("<tr><td>"+addr+"</td><td>"+name+"</td><td>"+players+"</td><td>"+maxplayers+"</td><td>"+ping+"</td><td>"+password+"</td></tr>");
+  $("#lan-list").append("<tr><td>"+addr+"</td><td>"+name+"</td><td>"+mapfile+"</td><td>"+players+"</td><td>"+maxplayers+"</td><td>"+ping+"</td><td>"+password+"</td></tr>");
   $("#lan-list").tablesorter();
   $("#lan-list tr").click(function() {
     $("#selected").attr("id", "");
     $(this).attr("id", "selected");
   } );
+}
+function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist)
+{
+  maplist.forEach(function(map) {
+    $("#lan-host-map").append("<option value='"+map+"'>"+map+"</option>");
+  });
+  $("#lan-host-name").val(name);
+  $("#lan-host-map").val(mapfile);
+  $("#lan-host-port").val(port);
+  $("#lan-host-password").val(password);
+  $("#lan-host-maxplayers").val(maxplayers);
+  $("#lan-host-matchlength").val(matchlength);
+  $("#lan-host-killvictory").val(killvictory);
 }

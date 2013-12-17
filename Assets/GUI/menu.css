@@ -8,11 +8,13 @@ body
 {
   background-image: url('TygartsStateForest.jpg');
 }
-:not[input,select,option]
+*
 {
   -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+}
+input
+{
+  -webkit-user-select: text;
 }
 a
 {
@@ -20,7 +22,8 @@ a
   cursor: pointer;
   color: #000000;
 }
-@-webkit-keyframes blinker {  
+@-webkit-keyframes blinker
+{  
   0% { color: #ff0000;}
   16% { color: #aaaa00;}
   33% { color: #00ff00;}
@@ -29,9 +32,9 @@ a
   83% { color: #aa00aa;}
   100% { color: #ff0000;}
 }
-.blink{
+.blink
+{
   -webkit-animation: blinker 5s linear infinite alternate;
-  animation: blinker 5s linear infinite alternate;
 }
 .textcenter
 {
@@ -152,7 +155,7 @@ a
   width: 500px;
   height: 300px;
 }
-#host-map
+#lan-host-map
 {
   -webkit-appearance: listbox;
   align-items: flex-start;
