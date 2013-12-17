@@ -51,7 +51,7 @@
         - Entity: 10
           Model: pPlaneShape1
           Effect: Mesh
-          Diffuse: grayLambert
+          Diffuse: grass
     - Type: 1
       Data:
         - Entity: 1
@@ -91,15 +91,61 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 10
-          Position: [-4.99158, -0.726885, 1.12738]
+          Position: [-4.99158, -1.50213, 1.12738]
           Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Scale: [6.05529, 6.05529, 6.05529]
     - Type: 2
       Data:
         []
     - Type: 3
       Data:
         []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        []
+    - Type: 12
+      Data:
+        - Entity: 1
+          MeshHandle: pCubeShape10
+        - Entity: 2
+          MeshHandle: pCylinderShape10
+        - Entity: 3
+          MeshHandle: pConeShape10
+        - Entity: 4
+          MeshHandle: pCubeShape10
+        - Entity: 5
+          MeshHandle: pCubeShape10
+        - Entity: 6
+          MeshHandle: pCylinderShape10
+        - Entity: 7
+          MeshHandle: pCylinderShape10
+        - Entity: 8
+          MeshHandle: pConeShape10
+        - Entity: 9
+          MeshHandle: pConeShape10
+        - Entity: 10
+          MeshHandle: pPlaneShape10
 - Tags:
     - Id: 0
       Tag: Camera

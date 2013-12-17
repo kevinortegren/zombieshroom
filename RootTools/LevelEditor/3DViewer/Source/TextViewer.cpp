@@ -96,6 +96,8 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
+	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
+	collision->m_meshHandle = p_name;
 
 	p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
@@ -128,6 +130,8 @@ int main(int argc, char* argv[])
     RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
     RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
     RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	
 	// Setup world.
 	ECS::World m_world;
 
@@ -397,6 +401,9 @@ int main(int argc, char* argv[])
 						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 						string name = RM.PmeshList[i]->modelName;
 						ReleaseMutex(RM.MeshMutexHandle);
+
+						RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
+						collision->m_meshHandle = name + "0";
 
 						g_engineContext.m_resourceManager->RenameModel(mesh->m_model, name);
 					}
