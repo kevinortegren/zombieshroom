@@ -8,6 +8,7 @@
 #include <RootSystems/Include/Network/MessageHandler.h>
 #include <string>
 
+
 class Main {
 public:
 	Main(std::string p_workingDirectory);
@@ -26,4 +27,5 @@ private:
 	std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 
 	std::string m_workingDir;
+
 };

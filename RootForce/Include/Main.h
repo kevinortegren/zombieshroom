@@ -10,24 +10,15 @@
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/AbilitySystem.h>
 #include <RootSystems/Include/Network/MessageHandler.h>
-#include <memory>
-#include <string>
 #include "ChatSystem.h"
+#include <RootForce/Include/Menustate.h>
+#include <RootForce/Include/Ingamestate.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
 
 namespace RootForce
 {
-
-	namespace GameState
-	{
-		enum GameState
-		{
-			Menu,
-			Ingame
-		};
-	}
 
 	class Main {
 	public:
@@ -41,17 +32,14 @@ namespace RootForce
         bool m_running;
         void* m_engineModule;
         std::shared_ptr<SDL_Window> m_window;
-        RootForce::ChatSystem m_chat;
 
 		ECS::World m_world;
 		
-		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
-
 		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
-		bool m_displayNormals;
-		bool m_displayPhysicsDebug;
-		GameState::GameState m_currentState;
+
+		GameStates::GameStates m_currentState;
+		std::shared_ptr<RootForce::Menustate> m_menustate;
+		std::shared_ptr<RootForce::Ingamestate> m_gamestate;
 	};
 }
 
