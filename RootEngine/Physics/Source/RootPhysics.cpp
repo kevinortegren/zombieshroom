@@ -4,6 +4,8 @@
 #include <Bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
+extern ContactAddedCallback		gContactAddedCallback;
+
 //#include "vld.h"
 namespace RootEngine
 {
@@ -75,6 +77,7 @@ namespace Physics
 	///Must be global, used to check custom collision events, NOTE : Don't ever ever use this yourself!
 	bool callbackFunc(btManifoldPoint& p_cp,const btCollisionObjectWrapper * p_obj1 , int p_id1, int p_index1, const btCollisionObjectWrapper * p_obj2 , int p_id2, int p_index2 )
 	{
+
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
 		
@@ -82,10 +85,11 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
-		if(pointer1->m_modelHandle.compare("ground0"))
-			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
-		else if(pointer2->m_modelHandle.compare("ground0"))
+		if(!pointer1->m_modelHandle.compare("ground0"))
 			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
+		else if(!pointer2->m_modelHandle.compare("ground0"))
+			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
+
 		if(pointer1->m_collidedEntityId != nullptr)
 		{
 			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
@@ -98,17 +102,22 @@ namespace Physics
 				pointer2->m_collidedEntityId->insert(pointer1->m_entityId);
 		}
 
+
 		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
 			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
 				int thisIsOnlyHereSoWeCanBreakHereIfWeWant = 2;
 
-		return false;
+		return true;
 	}
+
+	
+
 	void RootPhysics::Init()
 	{
 		m_collisionConfig= new btDefaultCollisionConfiguration();
 		m_dispatcher = new btCollisionDispatcher(m_collisionConfig);
 		m_broadphase = new btDbvtBroadphase();
+		//m_broadphase = new btAxisSweep3(btVector3(-1000,-1000,-1000), btVector3(1000,1000,1000));
 		m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 		m_solver = new btSequentialImpulseConstraintSolver();
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
@@ -117,11 +126,14 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb );
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+
+		//btSetDebugDrawer(m_debugDrawer);
+
 	}
 
 
@@ -131,11 +143,12 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
+		m_dynamicWorld->stepSimulation(m_dt,1);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			m_playerObjects.at(i)->Update(m_dt);
 		}
-		m_dynamicWorld->stepSimulation(m_dt,1);
+		
 		if(m_debugDrawEnabled)
 			m_dynamicWorld->debugDrawWorld();
 		
@@ -239,6 +252,7 @@ namespace Physics
 		cylinder->calculateLocalInertia(p_mass,fallinertia);
 		btRigidBody::btRigidBodyConstructionInfo cylinderCI(p_mass,motionstate,cylinder,fallinertia);
 		btRigidBody* body = new btRigidBody(cylinderCI);
+		//body->setContactProcessingThreshold(0);
 		body->setActivationState(DISABLE_DEACTIVATION);
 		return body;
 	}
@@ -256,6 +270,7 @@ namespace Physics
 		btRigidBody::btRigidBodyConstructionInfo coneCI(p_mass,motionstate,cone,fallinertia);
 		btRigidBody* body = new btRigidBody(coneCI);
 		body->setActivationState(DISABLE_DEACTIVATION);
+		body->setContactProcessingThreshold(0);
 		return body;
 	}
 
@@ -273,7 +288,7 @@ namespace Physics
 		btConvexHullShape* simplifiedObject = new btConvexHullShape();
 		for(int i = 0; i < objectHull->numVertices(); i++)
 		{
-			simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+			simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
 		}	
 		simplifiedObject->recalcLocalAabb();
 		////Set Inertia
@@ -326,22 +341,37 @@ namespace Physics
 		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 	}
 
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass )
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
+		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
 		btScalar mass = 0; //mass is always 0 for static objects
+
 		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
-		btTriangleInfoMap* test = new btTriangleInfoMap();
-		btGenerateInternalEdgeInfo(objectMeshShape, test);
+		objectMeshShape->setLocalScaling(btVector3(p_scale.x, p_scale.y, p_scale.z));
+
 		btTransform startTransform;
 		startTransform.setIdentity();
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
+		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		{
+			btVector3 fallIntertia = btVector3(0,0,0);
+			objectMeshShape->calculateLocalInertia(p_mass,fallIntertia );
+		}
+		
+		
+		btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
+		trinfoMap->m_edgeDistanceThreshold = 0.01f;
+		trinfoMap->m_equalVertexThreshold = 0.01f;
+		btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+
 		btRigidBody* body = new btRigidBody(mass,motionstate,objectMeshShape);
+		
+	//	body->setActivationState(DISABLE_DEACTIVATION);
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+			body->setCollisionFlags(/*body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK |*/ btCollisionObject::CF_STATIC_OBJECT);
 		m_dynamicWorld->addRigidBody(body);
 		m_dynamicObjects.push_back(body);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
@@ -479,7 +509,7 @@ namespace Physics
 		body->setFlags(BT_DISABLE_WORLD_GRAVITY);
 		body->setGravity(gravity);
 		body->applyGravity();
-		body->setActivationState(DISABLE_DEACTIVATION);
+	//	body->setActivationState(DISABLE_DEACTIVATION);
 		if(p_abilityInfo.m_collidesWorld)
 		{
 			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);

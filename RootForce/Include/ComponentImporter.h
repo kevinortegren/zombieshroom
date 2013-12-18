@@ -16,48 +16,78 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 			{
 				RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
 				
-				 const YAML::Node* effectNode = p_node.FindValue("Effect");
-				 if(effectNode != nullptr)
-				 {
-					 // Load effect.
-					 std::string effect;
-					 p_node["Effect"] >> effect;
-					 g_engineContext.m_resourceManager->LoadEffect(effect);
-					 renderable->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect(effect);
-
-					 // Allocate memory for this renderables uniforms.
-					renderable->m_material.m_params = g_engineContext.m_renderer->CreateEffectParams();
-					renderable->m_material.m_params->AllocateParams(renderable->m_material.m_effect);
-				 }
-				 const YAML::Node* modelNode = p_node.FindValue("Model");
-				 if(modelNode != nullptr)
-				 {
+				const YAML::Node* modelNode = p_node.FindValue("Model");
+				if(modelNode != nullptr)
+				{
 					std::string model;
-					 p_node["Model"] >> model;
-					 g_engineContext.m_resourceManager->LoadCollada(model);
-					 renderable->m_model = g_engineContext.m_resourceManager->GetModel(model);
-				 }
-				 const YAML::Node* diffuseNode = p_node.FindValue("Diffuse");
-				 if(diffuseNode != nullptr)
-				 {
-					 std::string diffuse;
-					 p_node["Diffuse"] >> diffuse;
-					 renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
-				 }
-				 const YAML::Node* specularNode = p_node.FindValue("Specular");
-				 if(specularNode != nullptr)
-				 {
-					 std::string specular;
-					 p_node["Specular"] >> specular;
-					 renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
-				 }
-				 const YAML::Node* normalNode = p_node.FindValue("Normal");
-				 if(normalNode != nullptr)
-				 {
-					 std::string normal;
-					 p_node["Normal"] >> normal;
-					 renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
-				 }
+					p_node["Model"] >> model;
+					g_engineContext.m_resourceManager->LoadCollada(model);
+					renderable->m_model = g_engineContext.m_resourceManager->GetModel(model);
+				}
+
+				const YAML::Node* materialNode = p_node.FindValue("Material");
+				if(materialNode != nullptr)
+				{
+					const YAML::Node* materialNameNode = materialNode->FindValue("Name");
+					if(materialNameNode != nullptr)
+					{
+						std::string materialName;
+						p_node["Material"]["Name"] >> materialName;
+						renderable->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
+					}
+
+					const YAML::Node* effectNode = materialNode->FindValue("Effect");
+					if(effectNode != nullptr)
+					{
+						// Load effect.
+						std::string effect;
+						p_node["Material"]["Effect"] >> effect;
+						g_engineContext.m_resourceManager->LoadEffect(effect);
+						if(renderable->m_material)
+						{
+							renderable->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect(effect);
+
+							// Allocate memory for this renderable's uniforms.
+							//renderable->m_material->m_params = g_engineContext.m_renderer->CreateEffectParams();
+							//renderable->m_material->m_params->AllocateParams(renderable->m_material->m_effect);
+						}
+						else
+						{
+							g_engineContext.m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Trying to set effect on a renderable that doesn't have a material!");
+						}
+					}
+
+					const YAML::Node* diffuseNode = materialNode->FindValue("Diffuse");
+					if(diffuseNode != nullptr)
+					{
+						std::string diffuse;
+						p_node["Material"]["Diffuse"] >> diffuse;
+						if(renderable->m_material)
+						{
+							renderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
+						}
+						else
+						{
+							g_engineContext.m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Trying to set diffuse texture on a renderable that doesn't have a material!");
+						}
+					}
+					const YAML::Node* specularNode = materialNode->FindValue("Specular");
+					if(specularNode != nullptr)
+					{
+						std::string specular;
+						p_node["Material"]["Specular"] >> specular;
+						renderable->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
+					}
+					const YAML::Node* normalNode = materialNode->FindValue("Normal");
+					if(normalNode != nullptr)
+					{
+						std::string normal;
+						p_node["Material"]["Normal"] >> normal;
+						renderable->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
+					}
+				}
+
+				
 			}
 			break;
 		case RootForce::ComponentType::TRANSFORM:

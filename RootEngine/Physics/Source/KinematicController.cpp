@@ -46,11 +46,12 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	btConvexHullShape* simplifiedObject = new btConvexHullShape();
 	for(int i = 0; i < objectHull->numVertices(); i++)
 	{
-		simplifiedObject->addPoint(objectHull->getVertexPointer()[i], false);
+		simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
 	}
 	simplifiedObject->recalcLocalAabb();
 	//End shape
-
+	
+	
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
 	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
@@ -60,22 +61,33 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 	m_motionState = new btDefaultMotionState(startTransform);
+
 	btCapsuleShape* capsuleShape = new btCapsuleShape(0.8f, 2.5f);
+	//btSphereShape* capsuleShape = new btSphereShape(2);
+
 	capsuleShape->calculateLocalInertia(p_mass, fallInertia);
+	
+	
 	m_ghostObject = new btPairCachingGhostObject();
+	//capsuleShape->setMargin(0.04f);
 	m_ghostObject->setCollisionShape(capsuleShape);
+	
 	m_ghostObject->setContactProcessingThreshold(0.f);
+	
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
-	m_kinController->setGravity(9.82f * 6);
+	m_kinController->setGravity(9.82f * 6.0f);
+	
 	m_kinController->setJumpSpeed(5);
-	m_kinController->setMaxSlope(btRadians(45));
+
+	m_kinController->setMaxSlope(btRadians(45.0f));
 	
 	m_hasBeenKnockbacked = false;
 	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::KinematicFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 	//m_dynamicWorld->addAction(m_kinController);
 
 }
@@ -102,7 +114,7 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
 	
 	traveldist = to - from;
-	if(traveldist.length() > 1 )
+	if(traveldist.length() > 3 )
 	{
 		m_kinController->warp(to);
 		return;

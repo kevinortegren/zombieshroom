@@ -221,14 +221,17 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 	if (callback.hasHit())
 	{
 		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
-		/*if(callback.m_hitNormalWorld.y() < 0.0f)
-		m_currentPosition.setY(m_currentPosition.y() +0.2f);*/
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
+
 		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
 		{
 			// we moved up only a fraction of the step height
 			m_currentStepOffset = m_stepHeight * callback.m_closestHitFraction;
-			if (m_interpolateUp == true)
+			if (/*m_interpolateUp == */true)
 				m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 			else
 				m_currentPosition = m_targetPosition;
@@ -282,7 +285,6 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 
 		btScalar margin = m_convexShape->getMargin();
 		m_convexShape->setMargin(margin + m_addedMargin);
-
 
 		if (m_useGhostObjectSweepTest)
 		{
@@ -398,7 +400,7 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	
 		btScalar downVelocity2 = (m_verticalVelocity<0.f?-m_verticalVelocity:0.f) * dt;
 		bool has_hit = false;
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 			has_hit = callback.hasHit() || callback2.hasHit();
 		else
 			has_hit = callback2.hasHit();
@@ -424,13 +426,18 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	{
 		// we dropped a fraction of the height -> hit floor
 
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
+
 		btScalar fraction = (m_currentPosition.getY() - callback.m_hitPointWorld.getY()) / 2;
 
 		//printf("hitpoint: %g - pos %g\n", callback.m_hitPointWorld.getY(), m_currentPosition.getY());
 
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 		{
-			if (full_drop == true)
+			if (/*full_drop == */true)
                                 m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
                         else
                                 //due to errors in the closestHitFraction variable when used with large polygons, calculate the hit fraction manually
@@ -439,7 +446,7 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 		else
 			m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 
-		full_drop = false;
+		//full_drop = false;
 
 		m_verticalVelocity = 0.0;
 		m_verticalOffset = 0.0;
@@ -449,9 +456,9 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	{
 		// we dropped the full height
 		
-		full_drop = true;
+		//full_drop = true;
 
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 		{
 			downVelocity = (m_verticalVelocity<0.f?-m_verticalVelocity:0.f) * dt;
 			if (downVelocity > m_fallSpeed && (m_wasOnGround || !m_wasJumping))

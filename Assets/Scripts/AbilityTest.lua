@@ -29,11 +29,12 @@ function AbilityTest.OnActivate (action)
 	transformComp:SetPos(posVec);
 	
 	renderComp:SetModel("Primitives/sphereTangents");
+	renderComp:SetMaterial("Fireball");
 	renderComp:SetMaterialDiffuse("fireballDiffuse");
 	renderComp:SetMaterialSpecular("fireballSpecular");
 	renderComp:SetMaterialNormal("fireballNormal");
 	renderComp:SetMaterialEffect("Mesh_NormalMap");
-
+	
 	physicsComp:SetInfo(
 		collisionComp,
 		true, --collideWorld
@@ -54,7 +55,7 @@ function AbilityTest.OnActivate (action)
 		0.5, --height
 		3, --mass
 		1, --radius
-		2, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 		40, --speed
 		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end

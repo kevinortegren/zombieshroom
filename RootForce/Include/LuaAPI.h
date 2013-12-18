@@ -163,7 +163,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Physics");
 			return 1;
 		}
-
+		static int SetRenderableMaterial(lua_State* p_luaState)
+        {
+            RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+            std::string handle = luaL_checkstring(p_luaState, 2);
+            (*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
+            return 0;
+        }
 		static int SetRenderableModel(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -394,12 +400,15 @@ namespace RootForce
 
 		static const struct luaL_Reg renderable_m [] = {
 			{"SetModel", SetRenderableModel},
+			{"SetMaterial", SetRenderableMaterial},
 			{"SetMaterialDiffuse", SetRenderableDiffuse},
 			{"SetMaterialSpecular", SetRenderableSpecular},
 			{"SetMaterialNormal", SetRenderableNormal},
 			{"SetMaterialEffect", SetRenderableEffect},
 			{NULL, NULL}
 		};
+
+
 		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {
 			{"New", CreateTransformation},

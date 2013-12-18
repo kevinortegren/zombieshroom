@@ -23,10 +23,13 @@ namespace RootForce
 		RootForce::Script* script = entityManager->CreateComponent<RootForce::Script>(entity);
 		
 		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
-		renderable->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_normalMap = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
-		renderable->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+		renderable->m_material = g_engineContext.m_resourceManager->GetMaterial("testchar");
+		renderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+
+		transform->m_position = glm::vec3(0, 100, 0);
 
 		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 0.1f;
@@ -40,7 +43,7 @@ namespace RootForce
 			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionResponder->m_collidedEntityId);
 
 		script->m_name = g_engineContext.m_resourceManager->LoadScript("Player");
-
+	
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", entity);
 
@@ -48,7 +51,6 @@ namespace RootForce
 		ECS::Entity* aimingDevice = entityManager->CreateEntity();
 		m_world->GetTagManager()->RegisterEntity("AimingDevice", aimingDevice);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", aimingDevice);
-
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 

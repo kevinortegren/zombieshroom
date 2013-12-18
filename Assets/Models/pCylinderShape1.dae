@@ -13,10 +13,10 @@
 			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=1;exportMaterialsOnly=0;
 			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/PlayerChar/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Desktop/Golf.mb</source_data>
     </contributor>
-    <created>2013-12-17T11:07:01</created>
-    <modified>2013-12-17T11:07:01</modified>
+    <created>2013-12-17T13:29:04</created>
+    <modified>2013-12-17T13:29:04</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -172,7 +172,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="untitled">
+    <visual_scene id="VisualSceneNode" name="Golf">
       <node id="pCylinder1" name="pCylinder1" type="NODE">
         <translate sid="translate">-0.9321309 0 -4.057048</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
