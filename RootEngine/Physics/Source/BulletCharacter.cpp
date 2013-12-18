@@ -220,10 +220,10 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 
 	if (callback.hasHit())
 	{
-		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
 		//////////////////////////////////////////////////////////////////////////
-		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
-		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
 		//////////////////////////////////////////////////////////////////////////
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
 
