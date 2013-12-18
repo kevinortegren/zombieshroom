@@ -19,14 +19,17 @@ namespace RootEngine
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
 			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
 			m_core->set_surface_factory(m_glTexSurfaceFactory);
-
+			m_view = nullptr;
 		}
 
 
 		void guiInstance::Shutdown(void)
 		{
-			m_view->Stop();
-			m_view->Destroy();
+			if(m_view)
+			{
+				m_view->Stop();
+				m_view->Destroy();
+			}
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
 
 			glDeleteTextures(1, &m_texture);
@@ -166,7 +169,7 @@ namespace RootEngine
 							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
 
 						m_view->InjectKeyboardEvent(tempEvent);
-						delete temp;
+						delete[] temp;
 		
 						break;
 					}
