@@ -12,6 +12,7 @@
 
 #include <string>
 
+
 class Main {
 public:
 	Main(std::string p_workingDirectory);
@@ -31,4 +32,5 @@ private:
 	std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 
 	std::string m_workingDir;
+
 };

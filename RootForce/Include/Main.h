@@ -15,25 +15,19 @@
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <ChatSystem.h>
 
 #include <memory>
 #include <string>
-#include "ChatSystem.h"
+
+#include <RootForce/Include/Menustate.h>
+#include <RootForce/Include/Ingamestate.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
 
 namespace RootForce
 {
-
-	namespace GameState
-	{
-		enum GameState
-		{
-			Menu,
-			Ingame
-		};
-	}
 
 	class Main {
 	public:
@@ -45,11 +39,13 @@ namespace RootForce
         void HandleEvents();
         void testfuncofawesome(std::vector<glm::vec3> p_debugVectors);
         bool m_running;
+		std::string m_workingDirectory;
         void* m_engineModule;
         std::shared_ptr<SDL_Window> m_window;
 
 		ECS::World m_world;
 		
+        
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
 
@@ -60,9 +56,12 @@ namespace RootForce
 		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
 
+        GameStates::GameStates m_currentState;
+		std::shared_ptr<RootForce::Menustate> m_menustate;
+		std::shared_ptr<RootForce::Ingamestate> m_gamestate;
+        
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug;
-		GameState::GameState m_currentState;
 	};
 }
 

@@ -23,9 +23,7 @@ namespace RootForce
 			// Setup the ping response (for network discovery)
 			RootSystems::ServerInfo info;
 			m_info.Name = p_name.c_str();
-			m_info.MapFile = "None";
-			//strcpy(m_info.Name, p_name.c_str());
-			//strcpy(m_info.MapFile, "None");
+			m_info.MapFile = "test2.world";
 			m_info.MaxPlayers = p_maxConnections;
 			m_info.NumPlayers = 0;
 			m_info.PasswordProtected = false;
