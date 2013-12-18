@@ -257,7 +257,9 @@ namespace RootForce
 				m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
 				m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger));
 				m_clientMessageHandler->SetLanList(&m_lanList);
+				m_clientMessageHandler->SetChatSystem(&m_chat);
 				m_client->SetMessageHandler(m_clientMessageHandler.get());
+				m_client->SetChatSystem(&m_chat);
 
 				while (m_currentState == RootForce::GameState::Menu && m_running)
 				{

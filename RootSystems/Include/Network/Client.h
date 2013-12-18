@@ -4,6 +4,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootForce/Include/ChatSystem.h>
 
 namespace RootForce
 {
@@ -19,6 +20,7 @@ namespace RootForce
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
+			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void Update();
 
 			RakNet::RakPeerInterface* GetPeerInterface();
@@ -26,6 +28,7 @@ namespace RootForce
 			Logging* m_logger;
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
+			RootForce::ChatSystem* m_chatSystem;
 		};
 	}
 }

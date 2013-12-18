@@ -1,4 +1,5 @@
 #include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/Messages.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <stdexcept>
@@ -46,6 +47,11 @@ namespace RootForce
 			m_messageHandler = p_messageHandler;
 		}
 
+		void Client::SetChatSystem(RootForce::ChatSystem* p_chatSystem)
+		{
+			m_chatSystem = p_chatSystem;
+		}
+
 		void Client::Update()
 		{
 			for (RakNet::Packet* packet = m_peer->Receive(); packet; m_peer->DeallocatePacket(packet), packet = m_peer->Receive())
@@ -56,6 +62,22 @@ namespace RootForce
 
 				if (m_messageHandler != nullptr)
 					m_messageHandler->ParsePacket(id, &bs, packet);
+			}
+
+			// Send a chat message
+			std::string chatMessage = m_chatSystem->PollMessage();
+			if (chatMessage != "")
+			{
+				MessageChat c;
+				c.Message = chatMessage.c_str();
+				c.SenderID = -1;
+				c.Type = MessageChat::TYPE_CHAT;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) MessageType::ChatToServer);
+				c.Serialize(true, &bs);
+
+				m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 			}
 		}
 

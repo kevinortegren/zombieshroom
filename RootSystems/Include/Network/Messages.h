@@ -1,5 +1,7 @@
 #pragma once
 
+#include <RakNet/MessageIdentifiers.h>
+#include <RakNet/BitStream.h>
 #include <glm/gtc/quaternion.hpp>
 #include <stdint.h>
 #include <vector>
@@ -14,7 +16,7 @@ namespace RootForce
 		{
 			enum MessageType
 			{
-				GameStateSnapshot,
+				GameStateSnapshot = ID_USER_PACKET_ENUM + 1,
 				ChatToServer,
 				ChatToClient,
 				UserConnected,
@@ -51,18 +53,14 @@ namespace RootForce
 			SynchronizedId_t SynchronizedID;
 			uint8_t EntityType;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		struct EntityRemoved
 		{
 			uint16_t SynchronizedID;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 
@@ -72,9 +70,7 @@ namespace RootForce
 			std::vector<EntityCreated> CreatedEntities;
 			std::vector<EntityRemoved> RemovedEntities;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		/** Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. */
@@ -86,22 +82,18 @@ namespace RootForce
 
 			uint8_t Type;
 			int8_t SenderID;
-			const char* Message;
+			RakNet::RakString Message;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 		
 		/** Sent to the server when connecting (in order to identify yourself). Also sent from the server as part of the MessageUserConnected message. */
 		struct MessageUserInfo
 		{
-			const char* PlayerName;
+			RakNet::RakString PlayerName;
 			EntityCreated PlayerEntity;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		/** Sent to all connected clients when a client connects. Also sent to the connecting client for each connected client. */
@@ -110,9 +102,7 @@ namespace RootForce
 			int8_t UserID;
 			MessageUserInfo UserInfo;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 
@@ -121,9 +111,7 @@ namespace RootForce
 		{
 			int8_t UserID;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		/** Sent to the server when the player reorients the character. */
@@ -131,9 +119,7 @@ namespace RootForce
 		{
 			glm::quat Orientation;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		/** Sent to the server when the player selects a new ability. */
@@ -141,9 +127,7 @@ namespace RootForce
 		{
 			uint8_t Slot;
 
-			int GetSerializedSize() const;
-			void Serialize(uint8_t* buffer) const;
-			void Deserialize(uint8_t* buffer);
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
 		// TODO: Add parameters for activate ability. Later.

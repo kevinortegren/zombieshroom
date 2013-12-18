@@ -85,8 +85,6 @@ namespace RootForce
 			const unsigned char* data = bs.GetData();
 			unsigned int size = bs.GetNumberOfBytesUsed();
 
-			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Ping response length (bytes): %d", size);
-
 			m_peer->SetOfflinePingResponse((const char*)bs.GetData(), bs.GetNumberOfBytesUsed());
 		}
 	}
