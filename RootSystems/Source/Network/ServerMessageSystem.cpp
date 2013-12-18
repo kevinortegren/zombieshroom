@@ -318,6 +318,7 @@ namespace RootForce
 		{
 			RootSystems::ServerInfo info;
 			strcpy(info.Name, "Local server");
+			strcpy(info.Mapfile, "test2.world");
 			info.MaxPlayers = 12;
 			info.NumPlayers = m_server->GetConnectedClients().size();
 			info.PasswordProtected = false;

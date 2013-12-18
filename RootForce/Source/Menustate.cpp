@@ -17,7 +17,7 @@ namespace RootForce
 			m_engineContext->m_configManager->GetConfigValueAsInteger("ScreenHeight"));
 
 		//Initiate Menu
-		m_menu = std::shared_ptr<Menu>(new Menu(p_engineContext->m_gui->LoadURL("menu.html"), p_engineContext->m_gui->GetDispatcher()));
+		m_menu = std::shared_ptr<Menu>(new Menu(p_engineContext->m_gui->LoadURL("menu.html"), p_engineContext->m_gui->GetDispatcher(), *m_engineContext));
 	}
 
 	GameStates::GameStates Menustate::Update()

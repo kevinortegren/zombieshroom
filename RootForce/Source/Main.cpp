@@ -48,6 +48,9 @@ namespace RootForce
 	{
 		m_menustate = std::shared_ptr<Menustate>(new Menustate());
 		m_gamestate = std::shared_ptr<Ingamestate>(new Ingamestate());
+
+		m_workingDirectory = p_workingDirectory;
+
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
 		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");

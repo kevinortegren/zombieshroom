@@ -10,6 +10,7 @@ namespace RootSystems
 	struct ServerInfo
 	{
 		char Name[255];
+		char Mapfile[64];
 		uint8_t NumPlayers;
 		uint8_t MaxPlayers;
 		bool PasswordProtected;
@@ -20,6 +21,7 @@ namespace RootSystems
 	struct ServerInfoInternal
 	{
 		char Name[255];
+		char Mapfile[64];
 		uint8_t NumPlayers;
 		uint8_t MaxPlayers;
 		bool PasswordProtected;
