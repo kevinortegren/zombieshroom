@@ -18,7 +18,7 @@
 
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
 #include <RootSystems\Include\Components.h>
-#include <ComponentExporter.h>
+//#include <ComponentExporter.h>
 
 #undef main
 
@@ -57,7 +57,7 @@ void HandleEvents()
 				}
 			}
 			break;
-			//default:
+		//default:
 			//if (m_engineContext.m_inputSys != nullptr)
 			//	m_engineContext.m_inputSys->HandleInput(event);
 			//if (m_engineContext.m_gui != nullptr)
@@ -71,7 +71,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
-
+	
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
 
 	RootForce::PointLight* pl = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(lightEntity);
@@ -85,14 +85,30 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
+void CreateMaterial(string textureName, string materialName)
+{
+	if(textureName == "" || textureName == "NONE")
+	{
+		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
+		mat->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+	}
+	else
+	{
+		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+		mat->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+	}
+
+}
+
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
-	//renderable->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs"); //Skapar material bajs
-	//renderable->m_material->m_diffuse = g_engineContext.m_resourceManager->GetTexture(dqweqweqw);	//Tilldelar textur till material
+
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
@@ -130,15 +146,15 @@ int main(int argc, char* argv[])
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+    RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+    RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+    RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-
+	
 	// Setup world.
 	ECS::World m_world;
 
-	m_world.GetEntityExporter()->SetExporter(Exporter);
+	//m_world.GetEntityExporter()->SetExporter(Exporter);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Level3DViewer.exe";
@@ -170,12 +186,12 @@ int main(int argc, char* argv[])
 
 			// TODO: Make these parameters more configurable.
 			g_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
-				"Root Force",
-				SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				1280,
-				720,
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
+					"Root Force",
+					SDL_WINDOWPOS_UNDEFINED,
+					SDL_WINDOWPOS_UNDEFINED,
+					1280,
+					720,
+					SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 				SDL_DestroyWindow);
 			if (g_window == nullptr) 
 			{
@@ -216,16 +232,16 @@ int main(int argc, char* argv[])
 			std::shared_ptr<Render::Mesh> Mesh[g_maxMeshes];
 
 			Render::Material* materials;
-			materials = new Render::Material[g_maxMeshes];
+			//materials = new Render::Material[g_maxMeshes];
 
 			//CREATE DEFAULT MATERIAL
 			Render::Material* defaultMaterial;
-			defaultMaterial = new Render::Material;
+			//defaultMaterial = new Render::Material;
 			g_engineContext.m_resourceManager->LoadEffect("Mesh");
 			g_engineContext.m_resourceManager->LoadTexture("grayLambert", Render::TextureType::TEXTURE_2D);
-			defaultMaterial->m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("grayLambert");
-			defaultMaterial->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-
+			//defaultMaterial->m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("grayLambert");
+			//defaultMaterial->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+			
 			int numberMeshes;
 			int numberLights;
 
@@ -243,6 +259,7 @@ int main(int argc, char* argv[])
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
 			std::string tempTexName;
+
 			ReleaseMutex(RM.IdMutexHandle);
 
 			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
@@ -253,17 +270,18 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
-				string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-				if(textureName != "" && textureName != "NONE")
-				{
-					g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-					materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
-					materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-					//renderable->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs"); //Skapar material bajs
-					//renderable->m_material->m_diffuse = g_engineContext.m_resourceManager->GetTexture(dqweqweqw);	//Tilldelar textur till material
-					cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
-					cout << "NumberOF materials: " << renderNrOfMaterials << endl;
-				}
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName));
+				//CreateMaterialEntity(m_world, )	
+				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs");
+				//string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
+				//if(textureName != "" && textureName != "NONE")
+				//{
+				//	g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+				//	materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
+				//	materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+				//	cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
+				//	cout << "NumberOF materials: " << renderNrOfMaterials << endl;
+				//}
 			}
 			// Set to update all materials
 			renderNrOfMaterials = -1;
@@ -304,13 +322,16 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices);
 
 				// Get material connected to mesh and set it from materiallist
-				cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) << endl;
-				if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) == "NONE")
-					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = *defaultMaterial;
-				else
-				{
-					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = materials[RM.PmeshList[i]->MaterialID];
-				}
+
+				//cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) << endl;
+				//if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) == "NONE")
+					
+					//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material 
+				//else
+				//{
+				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
+				rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[i]->materialName));
+				//}
 
 				ReleaseMutex(RM.MeshMutexHandle);
 
@@ -324,11 +345,11 @@ int main(int argc, char* argv[])
 			*RM.LightIdChange = glm::vec2(-1,-1);
 
 			ReleaseMutex(RM.IdMutexHandle);
-
+			
 			for(int i = 0; i < numberLights; i++)
 			{
 				LightEntities.push_back(CreateLightEntity(&m_world));
-
+				
 				RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 				WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
 
@@ -340,7 +361,7 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.x = 0.0f;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.y = 1-0.1 * RM.PlightList[i]->Intensity;
 				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[i])->m_attenuation.z = 0.0f;
-
+				
 				ReleaseMutex(RM.LightMutexHandle);
 			}
 
@@ -388,7 +409,7 @@ int main(int argc, char* argv[])
 				int RemoveMeshIndex = RM.MeshIdChange->y;
 				int RemoveLightIndex = RM.LightIdChange->y;
 				entityExport = *RM.export;
-
+				
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
@@ -405,15 +426,15 @@ int main(int argc, char* argv[])
 
 						string shortPath = GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath);
 
-						if(shortPath == "NONE")
-						{
-							mesh->m_material = *defaultMaterial;
-						}
-						else
-						{
-							mesh->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(shortPath);
-							mesh->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh"); 
-						}
+						//if(shortPath == "NONE")
+						//{
+						//	mesh->m_material = *defaultMaterial;
+						//}
+						//else
+						//{
+						//	mesh->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(shortPath);
+						//	mesh->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh"); 
+						//}
 
 						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -453,7 +474,7 @@ int main(int argc, char* argv[])
 					{
 						cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
 					}
-
+				
 					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -461,25 +482,32 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
-					//Update material list
-					if(renderNrOfMaterials != *RM.NumberOfMaterials)
-					{
-						renderNrOfMaterials = *RM.NumberOfMaterials;
+					////Update material list
+					//if(renderNrOfMaterials != *RM.NumberOfMaterials)
+					//{
+					//	renderNrOfMaterials = *RM.NumberOfMaterials;
 
-						for(int i = 0; i < renderNrOfMaterials; i++)
-						{
-							string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-							if(textureName != "" && textureName != "NONE")
-							{
-								g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-								materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
-								//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
-								materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-								cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
-								cout << "NumberOF materials: " << renderNrOfMaterials << endl;
-							}
-						}
-					}
+					//	for(int i = 0; i < renderNrOfMaterials; i++)
+					//	{
+					//Render::Material* old = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName))->;
+
+					//string Old = RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->;
+
+					//if(g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName))->m_diffuseMap
+					//CreateMaterial(GetNameFromPath(RM.PmaterialList[MeshIndex]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
+					CreateMaterial(GetNameFromPath(RM.PmaterialList[MeshIndex]->texturePath), GetNameFromPath(RM.PmaterialList[MeshIndex]->materialName));
+					//		string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
+					//		if(textureName != "" && textureName != "NONE")
+					//		{
+					//			g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+					//			materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
+					//			//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
+					//			materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+					//			cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
+					//			cout << "NumberOF materials: " << renderNrOfMaterials << endl;
+					//	}
+					//}
+					//}
 
 					/// ROTATION
 					glm::quat rotation;
@@ -502,19 +530,23 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
+					
+					//cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) << endl;
+					//if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) == "NONE")
+					//	m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = *defaultMaterial;
+					//else
+					//{
+					//	m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = materials[RM.PmeshList[MeshIndex]->MaterialID];
+					//}
 
-					cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) << endl;
-					if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) == "NONE")
-						m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = *defaultMaterial;
-					else
-					{
-						m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = materials[RM.PmeshList[MeshIndex]->MaterialID];
-					}
+					RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+					rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
 
 					ReleaseMutex(RM.MeshMutexHandle);
 				}
 
 				/////////////////////// UPDATE LIGHTS ////////////////////////////////
+
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
@@ -529,7 +561,7 @@ int main(int argc, char* argv[])
 					{
 						LightEntities.push_back(CreateLightEntity(&m_world));
 					}
-
+				
 					RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -552,7 +584,7 @@ int main(int argc, char* argv[])
 				int cameraIDchange = RM.CameraIdChange->x;
 				RM.CameraIdChange->x = -1;
 				ReleaseMutex(RM.IdMutexHandle);
-
+				
 				if( cameraIDchange != -1)
 				{
 					RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
@@ -570,7 +602,7 @@ int main(int argc, char* argv[])
 					cameraTransform->m_orientation.SetOrientation(rotation);
 					//Rotate 180 to fix camera
 					cameraTransform->m_orientation.Yaw(180);
-
+					
 					camera->m_far = RM.PcameraList[cameraIDchange]->farClippingPlane;					
 					camera->m_near = RM.PcameraList[cameraIDchange]->nearClippingPlane;
 					camera->m_fov = glm::degrees(RM.PcameraList[cameraIDchange]->verticalFieldOfView);
@@ -620,7 +652,7 @@ int main(int argc, char* argv[])
 		std::cin.get();
 		return 1;
 	}
-
+	
 	SDL_Quit();
 	DynamicLoader::FreeSharedLibrary(g_engineModule);
 

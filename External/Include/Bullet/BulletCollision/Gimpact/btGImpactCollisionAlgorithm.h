@@ -210,10 +210,6 @@ public:
 			manifoldArray.push_back(m_manifoldPtr);
 	}
 
-	btManifoldResult*	internalGetResultOut()
-	{
-		return m_resultOut;
-	}
 
 	struct CreateFunc :public 	btCollisionAlgorithmCreateFunc
 	{

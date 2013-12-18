@@ -53,7 +53,6 @@ btConeTwistConstraint::btConeTwistConstraint(btRigidBody& rbA,const btTransform&
 											 m_useSolveConstraintObsolete(CONETWIST_USE_OBSOLETE_SOLVER)
 {
 	m_rbBFrame = m_rbAFrame;
-	m_rbBFrame.setOrigin(btVector3(0., 0., 0.));
 	init();	
 }
 
@@ -137,9 +136,6 @@ void btConeTwistConstraint::getInfo2NonVirtual (btConstraintInfo2* info,const bt
 		btVector3 a1neg = -a1;
 		a1neg.getSkewSymmetricMatrix(angular0,angular1,angular2);
 	}
-    info->m_J2linearAxis[0] = -1;
-    info->m_J2linearAxis[info->rowskip+1] = -1;
-    info->m_J2linearAxis[2*info->rowskip+2] = -1;
 	btVector3 a2 = transB.getBasis() * m_rbBFrame.getOrigin();
 	{
 		btVector3* angular0 = (btVector3*)(info->m_J2angularAxis);
@@ -729,8 +725,7 @@ void btConeTwistConstraint::calcAngleInfo2(const btTransform& transA, const btTr
 			{
 				if(m_swingSpan1 < m_fixThresh)
 				{ // hinge around Y axis
-//					if(!(btFuzzyZero(y)))
-					if((!(btFuzzyZero(x))) || (!(btFuzzyZero(z))))
+					if(!(btFuzzyZero(y)))
 					{
 						m_solveSwingLimit = true;
 						if(m_swingSpan2 >= m_fixThresh)
@@ -752,8 +747,7 @@ void btConeTwistConstraint::calcAngleInfo2(const btTransform& transA, const btTr
 				}
 				else
 				{ // hinge around Z axis
-//					if(!btFuzzyZero(z))
-					if((!(btFuzzyZero(x))) || (!(btFuzzyZero(y))))
+					if(!btFuzzyZero(z))
 					{
 						m_solveSwingLimit = true;
 						if(m_swingSpan1 >= m_fixThresh)

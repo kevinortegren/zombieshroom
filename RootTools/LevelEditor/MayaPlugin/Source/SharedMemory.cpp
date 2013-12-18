@@ -172,6 +172,7 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 
 	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
 	memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
+	memcpy(PmeshList[index]->materialName, materialList[PmeshList[index]->MaterialID].materialName, 30);
 
 	if(updateTransformation)
 	{

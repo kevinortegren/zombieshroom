@@ -226,6 +226,20 @@ namespace RootEngine
 		}
 	}
 
+	Render::Material* ResourceManager::GetMaterial( std::string p_handle )
+	{
+		if(m_materials.find(p_handle) != m_materials.end())
+		{
+			return m_materials[p_handle].get();
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating new material: %s", p_handle.c_str());
+			m_materials[p_handle] = m_context->m_renderer->CreateMaterial();
+			return m_materials[p_handle].get();
+		}
+	}
+
 	Render::MeshInterface* ResourceManager::GetMesh( std::string p_handle )
 	{
 		if(m_meshes.find(p_handle) != m_meshes.end())
@@ -297,15 +311,18 @@ namespace RootEngine
 		assert(false);
 	}
 
+	const std::string& ResourceManager::ResolveStringFromMaterial(Render::Material* p_material)
+	{
+		for(auto itr = m_materials.begin(); itr != m_materials.end(); ++itr)
+		{
+			if((*itr).second.get() == p_material)
+				return (*itr).first;
+		}
+		assert(false);
+	}
+
 	const std::string& ResourceManager::GetWorkingDirectory()
 	{
 		return m_workingDirectory;
 	}
-
-	
-
-	
-
-	
-
 }

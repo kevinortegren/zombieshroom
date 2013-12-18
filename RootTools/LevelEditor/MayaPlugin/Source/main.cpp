@@ -14,6 +14,7 @@ MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCame
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
+void dirtyTextureNode(MObject &node, MPlug&, void *clientData);
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData);
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
@@ -64,6 +65,18 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 	myInitMemoryCheck(); // Har koll på minnet och minnesläckor
 	MStatus status = MS::kSuccess;
+
+	//MItDependencyNodes it(MFn::kFileTexture);			/////////////////////////////////////////FUUUUUGLY///////////////////////////////////////////////////
+
+	//while(!it.isDone())
+	//{
+	//	Print("Herroooooow");
+	//	MObject obj = it.item();
+
+	//	it.next();
+	//	MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(obj, dirtyTextureNode, nullptr, &status);
+	//	AddCallbackID(status, id);
+	//}
 
 	// Registrera ett nytt plug-in till Maya.
 	MFnPlugin plugin(obj, "UD1414-Labb02", "1.0", "Any", &status);
@@ -334,6 +347,11 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
 	}
 }
+
+ void dirtyTextureNode(MObject &node, MPlug&, void *clientData)					/////////////////////////////////////DONT DO SHIT//////////////////////////////////
+ {
+	Print("DEEPSHIEEEEET IT WOOOORKS");
+ }
 
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
@@ -697,10 +715,28 @@ void MayaMeshToList(MObject node, int meshIndex)
 			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+
+			Print(texturepath.asChar());
 			//MFnBlinnShader Blinn = material_objectNode;
+			//Print(Blinn.name().asChar());
 			//Print("New Material name: ", Blinn.name());
 			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
 			//AddCallbackID(status, id);
+			//for(int i = 0; i < 7; i++)
+			//{
+			//	
+			//	Child = mesh.child;
+			//	if(Child.hasFn(MFn::kFileTexture))
+			//	{
+			//	Print ("Herrow");
+			//	break;
+			//	}
+
+			//}
+
+			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyTextureNode, nullptr, &status);
+			//AddCallbackID(status, id);
+
 
 			currNrMaterials++;
 			materialID = currNrMaterials;
@@ -967,10 +1003,13 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MOb
 			found_color = true;
 			MFnDependencyNode texture_node(connections[n].node(&status));
 
-			//ftn == fileTextureName
+			//MObject FileNode;
+			//texture_node.setObject(FileNode);
+			
+
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
-			out_materialObject = connections[n].node(&status);
+			//out_materialObject = FileNode;
 
 			break;
 		}

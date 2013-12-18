@@ -41,10 +41,9 @@ function AbilityTest.OnActivate (action)
 	transform:SetPos(x, y, z);
 	
 	renderComp:SetModel("Primitives/sphereTangents");
-	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
-	
+	renderComp:SetMaterial("Fireball");
+	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
 	local collision = Collision.New(entity);
-
 	local physics = Physics.New(entity);
 	physics:SetInfo(
 		collision,
@@ -66,7 +65,7 @@ function AbilityTest.OnActivate (action)
 		0.5, --height
 		3, --mass
 		1, --radius
-		2, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 		40, --speed
 		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end

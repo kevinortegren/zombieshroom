@@ -11,10 +11,10 @@ namespace RootForce
 	struct Renderable : public ECS::Component<Renderable>
 	{
 		Renderable()
-			: m_model(nullptr) {}
+			: m_model(nullptr), m_material(nullptr) {}
 
 		RootEngine::Model* m_model;
-		Render::Material m_material;
+		Render::Material* m_material;
 	};
 
 	struct RenderingSystem : public ECS::EntitySystem
