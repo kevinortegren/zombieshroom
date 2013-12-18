@@ -70,6 +70,6 @@ namespace RootEngine
 		m_leftOverlay = "";
 		m_rightOverlay = "";
 	}
-
 }
+
 #endif

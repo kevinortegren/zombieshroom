@@ -23,6 +23,8 @@ namespace RootEngine
 
 		void NetworkManager::Initialize(PeerType::PeerType p_peerType)
 		{
+			if(m_networkSys)
+				delete m_networkSys;
 			switch( p_peerType )
 			{
 			case PeerType::LOCALSERVER:
