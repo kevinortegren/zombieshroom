@@ -10,6 +10,8 @@ const int g_maxCameras = 15;
 const int g_maxLights = 10;
 
 const int g_maxVerticesPerMesh = 10000;
+const int g_maxNameLength = 30;
+const int g_maxPathLength = 100;
 
 struct Transform
 {
@@ -27,18 +29,19 @@ struct Mesh
 	glm::vec3 vertex[g_maxVerticesPerMesh];
 	glm::vec2 UV[g_maxVerticesPerMesh];
 	glm::vec3 normal[g_maxVerticesPerMesh];
-	char texturePath[100];
-	char normalPath[100];
+	/*char texturePath[100];
+	char normalPath[100];*/
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
 	//int indices[g_maxVerticesPerMesh*3];
-	char materialName[30];
+	char materialName[g_maxNameLength];
+	char modelName[g_maxNameLength];
 };
 
 struct Material
 {
-	char materialName[30];
-	char texturePath[100];
-	char normalPath[100];	
+	char materialName[g_maxNameLength];
+	char texturePath[g_maxPathLength];
+	char normalPath[g_maxPathLength];	
 };
 
 struct Camera
@@ -62,5 +65,7 @@ struct Camera
 struct Light
 {
 	Transform transformation;
+	glm::vec4 color;
+	float Intensity;
 };
 

@@ -29,12 +29,12 @@ vec3 GetVSPositionFromDepth()
 {
 	float z = texture(g_Depth, ex_TexCoord).x;
 	float x = (ex_TexCoord.x) * 2 - 1;
-    float y = (ex_TexCoord.y) * 2 - 1;
+	float y = (ex_TexCoord.y) * 2 - 1;
 
 	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
-    vec4 sPos = invProj * vProjectedPos;
+	vec4 sPos = invProj * vProjectedPos;
 
-    return (sPos.xyz / sPos.w);
+	return (sPos.xyz / sPos.w);
 }
 
 void main() {
@@ -53,5 +53,5 @@ void main() {
 	vec3 spec_color = vec3(0) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-    out_Color = vec4(diffuse_color + spec_color, 1.0f);
+	out_Color = vec4(diffuse_color + spec_color, 1.0f);
 }

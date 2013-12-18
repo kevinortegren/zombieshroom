@@ -8,6 +8,7 @@ SharedMemory::SharedMemory()
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
 	InitalizeSharedMemory();
+	export = nullptr;
 }
 
 SharedMemory::~SharedMemory()
@@ -22,8 +23,10 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
-	//total_memory_size += sizeof(Material) * g_maxMeshes;
+	total_memory_size += sizeof(Material) * g_maxMeshes;
+	total_memory_size += sizeof(int) * 4;
 	total_memory_size += sizeof(glm::vec2) * 3;
+	total_memory_size += sizeof(int);
 	
 
 
@@ -46,36 +49,49 @@ int SharedMemory::InitalizeSharedMemory()
 	{
 		PmeshList[i] = ((Mesh*)raw_data) + i ;
 	}
+
+	unsigned char* mem = (unsigned char*)(raw_data + sizeof(Mesh) * g_maxMeshes);
+	NumberOfMeshes = (int*)(mem);
+	mem = (unsigned char*)(NumberOfMeshes + sizeof(int));
+
+	MeshIdChange = (glm::vec2*)(mem);
+	mem = (unsigned char*)(MeshIdChange + sizeof(glm::vec2));
+
 	for(int i = 0; i < g_maxLights; i++)
 	{
-		PlightList[i] = ((Light*)raw_data) + i ;
+		PlightList[i] = ((Light*)mem) + i ;
 	}
+	mem = (unsigned char*)(mem + sizeof(Light) * g_maxLights);
+
+	NumberOfLights = (int*)(mem);
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	LightIdChange = (glm::vec2*)(mem);
+	mem = (unsigned char*)(mem + sizeof(glm::vec2));
+
 	for(int i = 0; i < g_maxCameras; i++)
 	{
-		PcameraList[i] = ((Camera*)raw_data) + i ;
+		PcameraList[i] = ((Camera*)mem) + i ;
 	}
-	//for(int i = 0; i < g_maxMeshes; i++)
-	//{
-	//	PmaterialList[i] = ((Material*)raw_data) + i ;
-	//}
+	mem = (unsigned char*)(mem + sizeof(Camera) * g_maxCameras);
 
-	unsigned char* mem = (unsigned char*)raw_data;
-	NumberOfMeshes = (int*)(mem + sizeof(Mesh) * g_maxMeshes);
-	mem = (unsigned char*)NumberOfMeshes;
-	MeshIdChange = (glm::vec2*)(mem + sizeof(int));
-	mem = (unsigned char*)MeshIdChange;
-	CameraIdChange = (glm::vec2*)(mem + sizeof(glm::vec2));
-	mem = (unsigned char*)CameraIdChange;
-	LightIdChange = (glm::vec2*)(mem + sizeof(glm::vec2));
-	mem = (unsigned char*)LightIdChange;
+	CameraIdChange = (glm::vec2*)(mem);
+	mem = (unsigned char*)(mem + sizeof(glm::vec2));
 
-	NumberOfLights = (int*)(mem + sizeof(Light) * g_maxLights);
-	mem = (unsigned char*)NumberOfLights;
-	NumberOfCameras = (int*)(mem + sizeof(Camera) * g_maxCameras);
-	mem = (unsigned char*)NumberOfCameras;
+	NumberOfCameras = (int*)(mem);
+	mem = (unsigned char*)(mem + sizeof(int));
 
-	//NumberOfMaterials = (int*)(mem + sizeof(Material) * g_maxMeshes);
-	//mem = (unsigned char*)NumberOfMaterials;
+	for(int i = 0; i < g_maxMeshes; i++)
+	{
+		PmaterialList[i] = ((Material*)mem) + i ;
+	}
+	mem = (unsigned char*)(mem + sizeof(Material) * g_maxMeshes);
+
+	NumberOfMaterials = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	export = (int*)(mem);
 	
 
 	//if(first_process)
@@ -102,6 +118,8 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)
 		PlightList[index]->transformation.position = lightList[index].transformation.position;
 		PlightList[index]->transformation.scale = lightList[index].transformation.scale;
 		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
+		PlightList[index]->color = lightList[index].color;
+		PlightList[index]->Intensity = lightList[index].Intensity;
 
 	ReleaseMutex(LightMutexHandle);
 }
@@ -121,6 +139,10 @@ void SharedMemory::UpdateSharedCamera(int index)
 		memcpy(PcameraList[index]->transformation.name, cameraList[index].transformation.name, 50); 
 		PcameraList[index]->transformation.position = cameraList[index].transformation.position;
 		PcameraList[index]->transformation.rotation = cameraList[index].transformation.rotation;
+		PcameraList[index]->horizontalFieldOfView = cameraList[index].horizontalFieldOfView;
+		PcameraList[index]->verticalFieldOfView = cameraList[index].verticalFieldOfView;
+		PcameraList[index]->nearClippingPlane = cameraList[index].nearClippingPlane;
+		PcameraList[index]->farClippingPlane = cameraList[index].farClippingPlane;
 
 	ReleaseMutex(CameraMutexHandle);
 }
@@ -147,33 +169,28 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		}
 
 		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
+		
 	}	
 
 	if(updateTransformation)
 	{
 		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+		memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
-	}
-
-
-	//memcpy(PmeshList[index]->texturePath, meshList[index].texturePath, 100);		//Ligger pointlight här av någon annledning. DERRRP.
-	//memcpy(PmeshList[index]->normalPath, meshList[index].normalPath, 100);
-	
-	//PmeshList[index]->texturePath = meshList[index].texturePath;
-	//PmeshList[index]->normalPath = meshList[index].normalPath;
-	
+	}	
 
 	ReleaseMutex(MeshMutexHandle);
 }
 
-void SharedMemory::UpdateSharedMaterials(int nrOfMaterials)
+void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int materialID, int meshID)
 {
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
 	*NumberOfMaterials = nrOfMaterials;
+	PmeshList[meshID]->MaterialID = materialID;
 
 	for(int i = 0; i < nrOfMaterials; i++)
 	{
@@ -192,6 +209,17 @@ void SharedMemory::RemoveMesh(int id, int nrOfMeshes)
 
 	MeshIdChange->y = id;
 	*NumberOfMeshes = nrOfMeshes;
+
+	ReleaseMutex(IdMutexHandle);
+}
+
+void SharedMemory::RemoveLight(int id, int nrOfLights)
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+
+	LightIdChange->y = id;
+	*NumberOfLights = nrOfLights;
 
 	ReleaseMutex(IdMutexHandle);
 }

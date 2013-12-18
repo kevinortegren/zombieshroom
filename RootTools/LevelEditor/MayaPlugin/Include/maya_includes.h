@@ -24,10 +24,12 @@
 #include <maya/MPolyMessage.h>
 #include <maya/MNodeMessage.h>
 #include <maya/MSceneMessage.h>
+#include <maya/MUiMessage.h>
 
 // Libs
 #pragma comment(lib, "Foundation.lib") // Länka mot Foundation.lib
 #pragma comment(lib, "OpenMaya.lib") // Länka mot OpenMaya.lib
+#pragma comment(lib, "OpenMayaUI.lib")
 
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MPointArray.h>
@@ -41,6 +43,7 @@
 #include <maya/MFnPointLight.h>
 #include <maya/MFloatVectorArray.h>
 #include <maya/MFnLambertShader.h>
+#include <maya/MFnBlinnShader.h>
 #include <maya/MPlugArray.h>
 
 #ifdef _DEBUG

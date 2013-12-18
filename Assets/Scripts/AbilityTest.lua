@@ -14,20 +14,58 @@
 ---------- shape -> 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 ---------- type  -> 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 
+--[[
+	print( type(renderComp) )
 
-function AbilityTestOnActivate ()
-	local entity 		= CreateEntity();
-	local transcomp 	= CreateTransformation(entity);
-	local rendercomp 	= CreateRenderable(entity);
-	SetRenderableModel("Primitives/sphere", "Mesh", rendercomp);
-	local physiccomp	= CreatePhysicsAccessor(entity);
-	SetPhysicsAccessorInfo(physiccomp, true, --[[dirX]]0, --[[dirY]]0, --[[dirZ]]1, --[[gravX]]0, --[[gravY]]-9, --[[gravZ]]0, --[[orientX]]0, --[[orientY]]0, --[[orientZ]]0, --[[orientW]]0, --[[posX]]0, --[[posY]]0, --[[posZ]]0, --[[height]]0.5, --[[mass]]1, --[[radius]]1, --[[shape]]0, --[[speed]]50, --[[type]]1);
-end
+	local meta = getmetatable(renderComp)
+	for k,v in pairs(meta) do
+	  print("    ", k, v)
+	end
+--]]
 
-function AbilityTestOnCollision (ent1, ent2)
+AbilityTest = {}
+AbilityTest.cooldown = 5.0;
 
-end
+function AbilityTest.OnActivate (action)
 
-function AbilityTestOnDestroy (ent1)
-
+	local entity 		= Entity.New();
+	local playerEntity  = Entity.GetEntityByTag("Player");
+	local playerTrans   = playerEntity:GetTransformation();
+	x, y, z = playerTrans:GetPos();
+	local aimingDevice  = Entity.GetEntityByTag("AimingDevice");
+	local aimingTrans   = aimingDevice:GetTransformation();
+	aimx, aimy, aimz = aimingTrans:GetFront();
+	local renderComp 	= Renderable.New(entity);
+	local transform 	= Transformation.New(entity);
+	
+	transform:SetPos(x, y, z);
+	
+	renderComp:SetModel("Primitives/sphereTangents");
+	renderComp:SetMaterial("Fireball");
+	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
+	local collision = Collision.New(entity);
+	local physics = Physics.New(entity);
+	physics:SetInfo(
+		collision,
+		true, --collideWorld
+		aimx, --dirx
+		aimy, --diry
+		aimz, --dirz
+		0, --gravx
+		-9.82, --gravy
+		0, --gravz
+		1, --orientX
+		0, --orientY
+		-1, --orientZ
+		0, --orientW
+		x + aimx * 3, --posX
+		4 + y + aimy * 3, --posY
+		z + aimz * 3, --posZ
+		entity:GetId(),
+		0.5, --height
+		3, --mass
+		1, --radius
+		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		40, --speed
+		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end

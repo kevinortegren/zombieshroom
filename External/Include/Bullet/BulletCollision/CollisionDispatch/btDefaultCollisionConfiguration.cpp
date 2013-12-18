@@ -19,8 +19,6 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h"
-#include "BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.h"
-
 #include "BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h"
@@ -34,6 +32,7 @@ subject to the following restrictions:
 
 
 
+#include "LinearMath/btStackAlloc.h"
 #include "LinearMath/btPoolAllocator.h"
 
 
@@ -66,10 +65,6 @@ btDefaultCollisionConfiguration::btDefaultCollisionConfiguration(const btDefault
 	m_swappedConvexConcaveCreateFunc = new (mem)btConvexConcaveCollisionAlgorithm::SwappedCreateFunc;
 	mem = btAlignedAlloc(sizeof(btCompoundCollisionAlgorithm::CreateFunc),16);
 	m_compoundCreateFunc = new (mem)btCompoundCollisionAlgorithm::CreateFunc;
-
-	mem = btAlignedAlloc(sizeof(btCompoundCompoundCollisionAlgorithm::CreateFunc),16);
-	m_compoundCompoundCreateFunc = new (mem)btCompoundCompoundCollisionAlgorithm::CreateFunc;
-
 	mem = btAlignedAlloc(sizeof(btCompoundCollisionAlgorithm::SwappedCreateFunc),16);
 	m_swappedCompoundCreateFunc = new (mem)btCompoundCollisionAlgorithm::SwappedCreateFunc;
 	mem = btAlignedAlloc(sizeof(btEmptyAlgorithm::CreateFunc),16);
@@ -111,6 +106,16 @@ btDefaultCollisionConfiguration::btDefaultCollisionConfiguration(const btDefault
 	collisionAlgorithmMaxElementSize = btMax(collisionAlgorithmMaxElementSize,maxSize2);
 	collisionAlgorithmMaxElementSize = btMax(collisionAlgorithmMaxElementSize,maxSize3);
 
+	if (constructionInfo.m_stackAlloc)
+	{
+		m_ownsStackAllocator = false;
+		this->m_stackAlloc = constructionInfo.m_stackAlloc;
+	} else
+	{
+		m_ownsStackAllocator = true;
+		void* mem = btAlignedAlloc(sizeof(btStackAlloc),16);
+		m_stackAlloc = new(mem)btStackAlloc(constructionInfo.m_defaultStackAllocatorSize);
+	}
 		
 	if (constructionInfo.m_persistentManifoldPool)
 	{
@@ -139,6 +144,12 @@ btDefaultCollisionConfiguration::btDefaultCollisionConfiguration(const btDefault
 
 btDefaultCollisionConfiguration::~btDefaultCollisionConfiguration()
 {
+	if (m_ownsStackAllocator)
+	{
+		m_stackAlloc->destroy();
+		m_stackAlloc->~btStackAlloc();
+		btAlignedFree(m_stackAlloc);
+	}
 	if (m_ownsCollisionAlgorithmPool)
 	{
 		m_collisionAlgorithmPool->~btPoolAllocator();
@@ -160,9 +171,6 @@ btDefaultCollisionConfiguration::~btDefaultCollisionConfiguration()
 
 	m_compoundCreateFunc->~btCollisionAlgorithmCreateFunc();
 	btAlignedFree( m_compoundCreateFunc);
-
-	m_compoundCompoundCreateFunc->~btCollisionAlgorithmCreateFunc();
-	btAlignedFree(m_compoundCompoundCreateFunc);
 
 	m_swappedCompoundCreateFunc->~btCollisionAlgorithmCreateFunc();
 	btAlignedFree( m_swappedCompoundCreateFunc);
@@ -265,12 +273,6 @@ btCollisionAlgorithmCreateFunc* btDefaultCollisionConfiguration::getCollisionAlg
 	if (btBroadphaseProxy::isConvex(proxyType1) && btBroadphaseProxy::isConcave(proxyType0))
 	{
 		return m_swappedConvexConcaveCreateFunc;
-	}
-
-
-	if (btBroadphaseProxy::isCompound(proxyType0) && btBroadphaseProxy::isCompound(proxyType1))
-	{
-		return m_compoundCompoundCreateFunc;
 	}
 
 	if (btBroadphaseProxy::isCompound(proxyType0))

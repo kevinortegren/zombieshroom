@@ -54,7 +54,37 @@ namespace RootEngine
 				return nullptr;
 			}
 		}
-		return m_models[p_path];
+		else
+		{
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
+			return m_models[p_path];
+		}
+		
+	}
+
+	std::string ResourceManager::LoadScript( std::string p_scriptName )
+	{
+		if(m_scripts.find(p_scriptName) == m_scripts.end())
+		{
+			m_context->m_script->LoadScript(p_scriptName + ".lua");
+			m_scripts[p_scriptName] = p_scriptName;
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: %s.lua", p_scriptName.c_str());
+			return p_scriptName;
+		}
+		else
+		{
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			return "";
+		}
+		
+	}
+
+	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
+	{
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: %s.lua, it may already exist in Resource Manager!", p_scriptName.c_str());
+		m_context->m_script->LoadScript(p_scriptName + ".lua");
+		m_scripts[p_scriptName] = p_scriptName;
+		return p_scriptName;
 	}
 #endif
 
@@ -73,8 +103,13 @@ namespace RootEngine
 			else
 				return nullptr;
 		}
+		else
+		{
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
+			return m_effects[p_path].get();
+		}
 
-		return m_effects[p_path].get();
+		
 	}
 
 	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
@@ -103,8 +138,51 @@ namespace RootEngine
 				return nullptr;
 			}
 		}
-		return m_textures[p_path].get();
+		else
+		{
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
+			return m_textures[p_path].get();
+		}
+		
 	}
+
+	Model* ResourceManager::CreateModel(const std::string& p_path)
+	{
+		if(m_models.find(p_path) == m_models.end())
+		{
+			Model* model = new Model();
+			model->m_meshes.resize(1);
+			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
+			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			
+			if(model)
+			{
+				m_models[p_path] = model;
+				return m_models[p_path];
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		return m_models[p_path];
+	}
+
+	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
+	{
+		// Look if new name dosent exist.
+		
+		std::string oldName = ResolveStringFromModel(p_model);
+
+		// Remove the model from the old name.
+		m_models[oldName] = nullptr;	
+
+		// Set the model.
+		m_models[p_name] = p_model;
+
+		return false;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	//Get functions
@@ -117,7 +195,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get model: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
@@ -130,7 +208,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get effect: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
@@ -143,8 +221,22 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get texture: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
+		}
+	}
+
+	Render::Material* ResourceManager::GetMaterial( std::string p_handle )
+	{
+		if(m_materials.find(p_handle) != m_materials.end())
+		{
+			return m_materials[p_handle].get();
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating new material: %s", p_handle.c_str());
+			m_materials[p_handle] = m_context->m_renderer->CreateMaterial();
+			return m_materials[p_handle].get();
 		}
 	}
 
@@ -156,10 +248,12 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Mesh has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get mesh: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
 		}
 	}
+
+	
 
 	const std::string& ResourceManager::ResolveStringFromTexture(Render::TextureInterface* p_texture)
 	{
@@ -179,8 +273,21 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Physics mesh has not been loaded: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get physics mesh: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
+		}
+	}
+	
+	std::string ResourceManager::GetScript( std::string p_scriptName )
+	{
+		if(m_scripts.find(p_scriptName) != m_scripts.end())
+		{
+			return p_scriptName;
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get script: %s.lua, but it has never been loaded!", p_scriptName.c_str());
+			return "";
 		}
 	}
 #endif
@@ -199,6 +306,16 @@ namespace RootEngine
 		for(auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
 			if((*itr).second == p_model)
+				return (*itr).first;
+		}
+		assert(false);
+	}
+
+	const std::string& ResourceManager::ResolveStringFromMaterial(Render::Material* p_material)
+	{
+		for(auto itr = m_materials.begin(); itr != m_materials.end(); ++itr)
+		{
+			if((*itr).second.get() == p_material)
 				return (*itr).first;
 		}
 		assert(false);

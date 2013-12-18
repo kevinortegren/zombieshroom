@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>BTH</author>
+      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
+      <comments>
+			ColladaMaya export options: 
+			bakeTransforms=0;relativePaths=1;copyTextures=0;exportTriangles=0;exportCgfxFileReferences=1;
+			isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=1;
+			exportCameras=1;exportJointsAndSkin=1;exportAnimations=1;exportInvisibleNodes=0;exportDefaultCameras=0;
+			exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=1;exportVertexColorsPerVertex=1;
+			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=1;exportMaterialsOnly=0;
+			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
+		</comments>
+      <source_data>file:///C:/Users/BTH/Documents/maya/projects/default/untitled</source_data>
+    </contributor>
+    <created>2013-12-12T15:20:53</created>
+    <modified>2013-12-12T15:20:53</modified>
+    <unit name="centimeter" meter="0.01"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_materials>
+    <material id="lambert1" name="lambert1">
+      <instance_effect url="#lambert1-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="lambert1-fx">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.4 0.4 0.4 1</color>
+            </diffuse>
+            <transparent opaque="RGB_ZERO">
+              <color>0 0 0 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="pSphereShape1" name="pSphereShape1">
+      <mesh>
+        <source id="pSphereShape1-positions" name="pSphereShape1-positions">
+          <float_array id="pSphereShape1-positions-array" count="210">-67.63097 -4.185371 -63.61597 -67.63097 3.421664 -96.37322 -67.63097 13.80775 -126.6046 -67.63097 26.71737 -153.566 -67.63097 41.8326 -176.5931 -67.63097 58.78142 -195.118 -67.63097 77.14619 -208.6874 -67.63097 96.47482 -216.9637 -67.63097 116.2915 -219.746 -67.63097 136.1079 -216.9637 72.88104 -4.185371 -63.61597 72.88104 3.421664 -96.37322 72.88104 13.80775 -126.6046 72.88104 26.71737 -153.566 72.88104 41.8326 -176.5931 72.88104 58.78142 -195.118 72.88104 77.14619 -208.6874 72.88104 96.47482 -216.9637 72.88104 116.2915 -219.746 72.88104 136.1079 -216.9637 -67.63097 -4.185371 107.6703 72.88104 -4.185371 107.6703 -67.63097 -4.185371 -15.18839 72.88104 -4.185371 -15.18839 -67.63097 -4.185371 34.12533 72.88104 -4.185371 34.12533 -67.63097 -4.185371 69.2151 72.88104 -4.185371 69.2151 43.66248 136.1079 -216.9637 43.66248 116.2915 -219.746 43.66248 96.47482 -216.9637 43.66248 77.14619 -208.6874 43.66248 58.78142 -195.118 43.66248 41.8326 -176.5931 43.66248 26.71737 -153.566 43.66248 13.80775 -126.6046 43.66248 3.421664 -96.37322 43.66248 -4.185371 -63.61597 43.66248 -4.185371 -15.18839 43.66248 -4.185371 34.12533 43.66248 -4.185371 69.2151 43.66248 -4.185371 107.6703 9.474225 136.1079 -216.9637 9.474225 116.2915 -219.746 9.474225 96.47482 -216.9637 9.474225 77.14619 -208.6874 9.474225 58.78142 -195.118 9.474225 41.8326 -176.5931 9.474225 26.71737 -153.566 9.474225 13.80775 -126.6046 9.474225 3.421664 -96.37322 9.474225 -4.185371 -63.61597 9.474225 -4.185371 -15.18839 9.474225 -4.185371 34.12533 9.474225 -4.185371 69.2151 9.474225 -4.185371 107.6703 -31.08161 136.1079 -216.9637 -31.08161 116.2915 -219.746 -31.08161 96.47482 -216.9637 -31.08161 77.14619 -208.6874 -31.08161 58.78142 -195.118 -31.08161 41.8326 -176.5931 -31.08161 26.71737 -153.566 -31.08161 13.80775 -126.6046 -31.08161 3.421664 -96.37322 -31.08161 -4.185371 -63.61597 -31.08161 -4.185371 -15.18839 -31.08161 -4.185371 34.12533 -31.08161 -4.185371 69.2151 -31.08161 -4.185371 107.6703</float_array>
+          <technique_common>
+            <accessor source="#pSphereShape1-positions-array" count="70" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pSphereShape1-normals" name="pSphereShape1-normals">
+          <float_array id="pSphereShape1-normals-array" count="345">0 -0.9740797 -0.2262052 0 -0.9740797 -0.2262052 0 -0.9740797 -0.2262052 0 -0.9740797 -0.2262052 0 -0.9457439 -0.3249131 0 -0.9457439 -0.3249131 0 -0.9457439 -0.3249131 0 -0.9457439 -0.3249131 0 -0.9019383 -0.4318646 0 -0.9019383 -0.4318646 0 -0.9019384 -0.4318646 0 -0.9019384 -0.4318646 0 -0.8359865 -0.5487502 0 -0.8359865 -0.5487502 0 -0.8359865 -0.54875 0 -0.8359865 -0.54875 0 -0.7377951 -0.6750247 0 -0.7377951 -0.6750247 0 -0.7377951 -0.6750247 0 -0.7377951 -0.6750247 0 -0.5942605 -0.8042725 0 -0.5942605 -0.8042725 0 -0.5942605 -0.8042726 0 -0.5942605 -0.8042726 0 -0.3936221 -0.9192723 0 -0.3936221 -0.9192723 0 -0.3936221 -0.9192723 0 -0.3936221 -0.9192723 0 -0.1390404 -0.9902867 0 -0.1390404 -0.9902867 0 -0.1390404 -0.9902868 0 -0.1390404 -0.9902868 0 0.1390428 -0.9902863 0 0.1390428 -0.9902863 0 0.1390428 -0.9902864 0 0.1390428 -0.9902864 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0.1390427 -0.9902864 0 0.1390427 -0.9902864 0 0.1390427 -0.9902864 0 0.1390427 -0.9902864 0 -0.1390404 -0.9902868 0 -0.1390404 -0.9902868 0 -0.1390404 -0.9902866 0 -0.1390404 -0.9902866 0 -0.3936222 -0.9192723 0 -0.3936222 -0.9192723 0 -0.3936221 -0.9192724 0 -0.3936221 -0.9192724 0 -0.5942606 -0.8042726 0 -0.5942606 -0.8042726 0 -0.5942606 -0.8042725 0 -0.5942606 -0.8042725 0 -0.7377951 -0.6750248 0 -0.7377951 -0.6750248 0 -0.7377951 -0.6750247 0 -0.7377951 -0.6750247 0 -0.8359865 -0.5487501 0 -0.8359865 -0.5487501 0 -0.8359864 -0.54875 0 -0.8359864 -0.54875 0 -0.9019384 -0.4318646 0 -0.9019384 -0.4318646 0 -0.9019384 -0.4318646 0 -0.9019384 -0.4318646 0 -0.9457439 -0.3249131 0 -0.9457439 -0.3249131 0 -0.9457439 -0.324913 0 -0.9457439 -0.324913 0 -0.9740797 -0.2262052 0 -0.9740797 -0.2262052 0 -0.9740796 -0.2262051 0 -0.9740796 -0.2262051 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -0.9999999 0 0 -1 0 0 -1 0 0 0.1390428 -0.9902864 0 0.1390428 -0.9902864 0 -0.1390404 -0.9902867 0 -0.1390404 -0.9902867 0 -0.3936222 -0.9192724 0 -0.3936222 -0.9192724 0 -0.5942605 -0.8042727 0 -0.5942605 -0.8042727 0 -0.7377951 -0.6750247 0 -0.7377951 -0.6750247 0 -0.8359866 -0.54875 0 -0.8359866 -0.54875 0 -0.9019384 -0.4318647 0 -0.9019384 -0.4318647 0 -0.9457439 -0.3249131 0 -0.9457439 -0.3249131 0 -0.9740797 -0.2262051 0 -0.9740797 -0.2262051 0 -1 0 0 -0.9999999 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#pSphereShape1-normals-array" count="115" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pSphereShape1-map1" name="pSphereShape1-map1">
+          <float_array id="pSphereShape1-map1-array" count="230">0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1 0 1 0 0.2827297 1 0.2827297 0 0.5706331 1 0.5706331 0 0.7754927 1 0.7754927 1 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 1 0.7920578 0 0.7920578 0.7920578 0 0 0.7920578 0.7920578 0.2827297 0.7920578 0.5706331 0.7920578 0.7754927 0.7920578 1 1 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 1 0.5487446 0 0.5487446 0.5487446 0 0 0.5487446 0.5487446 0.2827297 0.5487446 0.5706331 0.5487446 0.7754927 0.5487446 1 1 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 1 0.2601143 0 0.2601143 0.2601143 0 0 0.2601143 0.2601143 0.2827296 0.2601143 0.5706331 0.2601143 0.7754927 0.2601143 1</float_array>
+          <technique_common>
+            <accessor source="#pSphereShape1-map1-array" count="115" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="pSphereShape1-vertices" name="pSphereShape1-vertices">
+          <input semantic="POSITION" source="#pSphereShape1-positions"/>
+        </vertices>
+        <polylist material="initialShadingGroup" count="52">
+          <input semantic="VERTEX" source="#pSphereShape1-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#pSphereShape1-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#pSphereShape1-map1" offset="2" set="0"/>
+          <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4</vcount>
+          <p>0 0 0 1 1 1 64 2 107 65 3 110 1 4 4 2 5 5 63 6 105 64 7 108 2 8 8 3 9 9 62 10 103 63 11 106 3 12 12 4 13 13 61 14 101 62 15 104 4 16 16 5 17 17 60 18 99 61 19 102 5 20 20 6 21 21 59 22 97 60 23 100 6 24 24 7 25 25 58 26 95 59 27 98 7 28 28 8 29 29 57 30 93 58 31 96 8 32 32 9 33 33 56 34 92 57 35 94 26 36 44 68 37 113 69 38 114 20 39 39 0 40 36 65 41 109 66 42 111 22 43 40 22 43 40 66 42 111 67 44 112 24 45 42 24 45 42 67 44 112 68 37 113 26 36 44 29 46 48 28 47 46 19 48 34 18 49 35 30 50 50 29 51 47 18 52 30 17 53 31 31 54 52 30 55 49 17 56 26 16 57 27 32 58 54 31 59 51 16 60 22 15 61 23 33 62 56 32 63 53 15 64 18 14 65 19 34 66 58 33 67 55 14 68 14 13 69 15 35 70 60 34 71 57 13 72 10 12 73 11 36 74 62 35 75 59 12 76 6 11 77 7 37 78 64 36 79 61 11 80 2 10 81 3 38 82 65 37 83 63 10 84 37 23 85 41 39 86 66 38 82 65 23 85 41 25 87 43 40 88 67 39 86 66 25 87 43 27 89 45 41 90 68 40 88 67 27 89 45 21 91 38 43 92 71 42 93 69 28 47 46 29 46 48 44 94 73 43 95 70 29 51 47 30 50 50 45 96 75 44 97 72 30 55 49 31 54 52 46 98 77 45 99 74 31 59 51 32 58 54 47 100 79 46 101 76 32 63 53 33 62 56 48 102 81 47 103 78 33 67 55 34 66 58 49 104 83 48 105 80 34 71 57 35 70 60 50 106 85 49 107 82 35 75 59 36 74 62 51 108 87 50 109 84 36 79 61 37 78 64 52 110 88 51 111 86 37 83 63 38 82 65 53 112 89 52 110 88 38 82 65 39 86 66 54 113 90 53 112 89 39 86 66 40 88 67 55 114 91 54 113 90 40 88 67 41 90 68 57 35 94 56 34 92 42 93 69 43 92 71 58 31 96 57 30 93 43 95 70 44 94 73 59 27 98 58 26 95 44 97 72 45 96 75 60 23 100 59 22 97 45 99 74 46 98 77 61 19 102 60 18 99 46 101 76 47 100 79 62 15 104 61 14 101 47 103 78 48 102 81 63 11 106 62 10 103 48 105 80 49 104 83 64 7 108 63 6 105 49 107 82 50 106 85 65 3 110 64 2 107 50 109 84 51 108 87 66 42 111 65 41 109 51 111 86 52 110 88 67 44 112 66 42 111 52 110 88 53 112 89 68 37 113 67 44 112 53 112 89 54 113 90 69 38 114 68 37 113 54 113 90 55 114 91</p>
+        </polylist>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <originalMayaNodeId>pSphereShape1</originalMayaNodeId>
+          <double_sided>1</double_sided>
+        </technique>
+      </extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="VisualSceneNode" name="untitled">
+      <node id="pSphere1" name="pSphere1" type="NODE">
+        <translate sid="translate">-3.221302 4.57187 0</translate>
+        <translate sid="rotatePivot">2.625038 -1.880533 0.1020753</translate>
+        <rotate sid="rotateZ">0 0 1 0</rotate>
+        <rotate sid="rotateY">0 1 0 0</rotate>
+        <rotate sid="rotateX">1 0 0 0</rotate>
+        <translate sid="rotatePivotInverse">-2.625038 1.880533 -0.1020753</translate>
+        <translate sid="scalePivot">2.625038 -1.880533 0.1020753</translate>
+        <scale sid="scale">1 1 1</scale>
+        <translate sid="scalePivotInverse">-2.625038 1.880533 -0.1020753</translate>
+        <instance_geometry url="#pSphereShape1">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="initialShadingGroup" target="#lambert1"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADAMaya">
+            <originalMayaNodeId>pSphere1</originalMayaNodeId>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#VisualSceneNode"/>
+  </scene>
+</COLLADA>

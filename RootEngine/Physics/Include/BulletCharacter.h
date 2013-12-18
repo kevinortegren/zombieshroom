@@ -3,6 +3,7 @@
 #include <Bullet/btBulletCollisionCommon.h>
 #include <Bullet/BulletDynamics/Character/btKinematicCharacterController.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
+#include <RootEngine/Include/SubsystemSharedContext.h>
 class BulletCharacter : public btKinematicCharacterController 
 {
 public:
@@ -11,10 +12,13 @@ public:
 	
 	void Init();
 	void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
-	void Knockback(float* p_direction, float p_power);
+	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
-
+	void stepForwardAndStrafe ( btCollisionWorld* collisionWorld, const btVector3& walkMove);
+	void stepDown ( btCollisionWorld* collisionWorld, btScalar dt);
+	void stepUp ( btCollisionWorld* world);
+	float test(const btVector3& start,const btVector3& end, btCollisionWorld* world );
 private:
 	bool m_hasBeenKnockbacked;
 	btVector3 m_knockbackVelocity;

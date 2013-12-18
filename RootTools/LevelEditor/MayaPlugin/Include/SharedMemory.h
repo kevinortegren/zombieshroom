@@ -17,8 +17,9 @@ public:
 	void UpdateSharedCamera(int index);
 	void UpdateSharedLight(int index, int nrOfLights);
 	void RemoveMesh(int id, int nrOfMeshes);
+	void RemoveLight(int id, int nrOfLights);
 	int InitalizeSharedMemory();
-	void UpdateSharedMaterials(int nrOfMaterials);
+	void UpdateSharedMaterials(int nrOfMaterials, int materialID, int meshID);
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];
@@ -30,9 +31,12 @@ public:
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
-
+	int* export;
 	Material materialList[g_maxMeshes];
 	int* NumberOfMaterials;
+	DWORD milliseconds;
+
+		HANDLE IdMutexHandle;
 
 private:
 	//Functions
@@ -40,10 +44,8 @@ private:
 	int shutdown();
 	//Variables
 	HANDLE MeshMutexHandle;
-	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
-	DWORD milliseconds;
 	HANDLE shared_memory_handle;
 	unsigned char* raw_data;
 	Mesh* PmeshList[g_maxMeshes];

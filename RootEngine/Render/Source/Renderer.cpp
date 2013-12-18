@@ -118,10 +118,10 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
-		//glFrontFace(GL_CCW);
+		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 #if defined(_DEBUG) && defined(WIN32)
@@ -196,7 +196,7 @@ namespace Render
 		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
-		m_cameraVars.m_projection = glm::perspectiveFov<float>(75.0f, (float)width, (float)height, 0.1f, 1000.0f);
+		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 1000.0f);
 
 		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
@@ -233,6 +233,7 @@ namespace Render
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
+		
 	}
 
 	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
@@ -301,6 +302,7 @@ namespace Render
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 
 			(*itr).m_mesh->Bind();
+			Material* mat = (*itr).m_material;
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
@@ -308,25 +310,37 @@ namespace Render
 
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
+				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 0);
 					glBindTexture((*itr).m_material->m_diffuseMap->GetTarget(), (*itr).m_material->m_diffuseMap->GetHandle());
 				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 				
+				glActiveTexture(GL_TEXTURE0 + 1);
 				if((*itr).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 1);
 					glBindTexture((*itr).m_material->m_specularMap->GetTarget(), (*itr).m_material->m_specularMap->GetHandle());
 				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 
+				glActiveTexture(GL_TEXTURE0 + 2);
 				if((*itr).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glActiveTexture(GL_TEXTURE0 + 2);
 					glBindTexture((*itr).m_material->m_normalMap->GetTarget(), (*itr).m_material->m_normalMap->GetHandle());
+				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
@@ -384,6 +398,7 @@ namespace Render
 
 	void GLRenderer::RenderLines()
 	{
+		glEnable(GL_DEPTH_TEST);
 		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
 		for(unsigned int i = 0; i < m_lines.size(); i++)
 		{
@@ -455,6 +470,13 @@ namespace Render
 	{
 		m_cameraVars.m_projection = p_projectionMatrix;
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	std::shared_ptr<Material> GLRenderer::CreateMaterial()
+	{
+		Material* mat = new Material;
+		m_materialMeshMap[mat] = std::vector<MeshInterface*>(); //unknown if needed
+		return std::shared_ptr<Material>(mat); 
 	}
 
 

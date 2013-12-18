@@ -1,1 +1,0 @@
-print("[LUA] This is a printout from LUA.")

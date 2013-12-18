@@ -12,6 +12,9 @@ find_library(MAYA_OPEN_MAYA_LIB
     NAMES OpenMaya
     HINTS "${CMAKE_SOURCE_DIR}/RootTools/LevelEditor/External/Lib")
 
+find_library(MAYA_OPEN_MAYA_UI_LIB
+    NAMES OpenMayaUI
+    HINTS "${CMAKE_SOURCE_DIR}/RootTools/LevelEditor/External/Lib")
 
 
-set(MAYA_LIBRARIES ${MAYA_FOUNDATION_LIB} ${MAYA_OPEN_MAYA_LIB})
+set(MAYA_LIBRARIES ${MAYA_FOUNDATION_LIB} ${MAYA_OPEN_MAYA_LIB} ${MAYA_OPEN_MAYA_UI_LIB} )
