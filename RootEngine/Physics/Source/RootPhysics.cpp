@@ -205,6 +205,248 @@ namespace Physics
 	}
 
 
+	int* RootPhysics::CreateHandle( unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled )
+	{
+		CustomUserPointer* userPointer = new CustomUserPointer();
+		userPointer->m_vectorIndex = -1;
+		m_userPointer.push_back(userPointer);
+		userPointer->m_type = p_physicsType;
+		userPointer->m_id = new int();
+		userPointer->m_externalControlled = p_externalControlled;
+		userPointer->m_entityId = p_entityId;
+		*(userPointer->m_id) = m_userPointer.size()-1;
+
+		return userPointer->m_id;
+	}
+
+	
+
+
+	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld )
+	{
+		
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		ShapeStruct temp;
+		temp.m_radius = p_radius;
+		temp.m_type = PhysicsShape::SHAPE_SPHERE;
+		btCollisionShape* shape = CreateShape(temp);
+		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		{
+			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+		}
+		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
+		{
+			
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+			m_dynamicWorld->addRigidBody(body);
+			m_dynamicObjects.push_back(body);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+		else //Create a controller
+		{
+			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+			ghostObject->setCollisionShape(shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			else
+			{
+				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+			}
+			if(!p_collideWithWorld)
+				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			ObjectController* controller = new ObjectController();
+			controller->Init(ghostObject, (btConvexShape*)shape);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+			m_externallyControlled.push_back(controller);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
+			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+	}
+
+	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld )
+	{
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		ShapeStruct temp;
+		temp.m_radius = p_radius;
+		temp.m_height = p_height;
+		temp.m_type = PhysicsShape::SHAPE_CYLINDER;
+		btCollisionShape* shape = CreateShape(temp);
+		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		{
+			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+		}
+		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
+		{
+
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+			m_dynamicWorld->addRigidBody(body);
+			m_dynamicObjects.push_back(body);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+		else //Create a controller
+		{
+			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+			ghostObject->setCollisionShape(shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			else
+			{
+				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+			}
+			if(!p_collideWithWorld)
+				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			ObjectController* controller = new ObjectController();
+			controller->Init(ghostObject, (btConvexShape*)shape);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+			m_externallyControlled.push_back(controller);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
+			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+	}
+
+	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld )
+	{
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		ShapeStruct temp;
+		temp.m_radius = p_radius;
+		temp.m_height = p_height;
+		temp.m_type = PhysicsShape::SHAPE_CONE;
+		btCollisionShape* shape = CreateShape(temp);
+		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		{
+			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+		}
+		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
+		{
+
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+			m_dynamicWorld->addRigidBody(body);
+			m_dynamicObjects.push_back(body);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+		else //Create a controller
+		{
+			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+			ghostObject->setCollisionShape(shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			else
+			{
+				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+			}
+			if(!p_collideWithWorld)
+				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			ObjectController* controller = new ObjectController();
+			controller->Init(ghostObject, (btConvexShape*)shape);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+			m_externallyControlled.push_back(controller);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
+			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+	}
+
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld )
+	{
+		btVector3 pos;
+		pos.setX( p_position[0]);
+		pos.setY( p_position[1]);
+		pos.setZ( p_position[2]);
+		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
+		btTransform trans = btTransform(quat, pos );
+		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+		ShapeStruct temp;
+		temp.m_modelHandle = p_modelHandle;
+		temp.m_scale = p_scale;
+		temp.m_type = PhysicsShape::SHAPE_CUSTOM_MESH;
+		btCollisionShape* shape = CreateShape(temp);
+		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		{
+			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+		}
+		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
+		{
+
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+			m_dynamicWorld->addRigidBody(body);
+			m_dynamicObjects.push_back(body);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+		else //Create a controller
+		{
+			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
+			ghostObject->setCollisionShape(shape);
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			else
+			{
+				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+			}
+			if(!p_collideWithWorld)
+				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			ObjectController* controller = new ObjectController();
+			controller->Init(ghostObject, (btConvexShape*)shape);
+			ghostObject->setWorldTransform(trans);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter);
+			m_externallyControlled.push_back(controller);
+			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
+			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+			return;
+		}
+	}
+
+	void RootPhysics::BindHullShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld )
+	{
+		btRigidBody* body = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+		m_dynamicWorld->addRigidBody(body);
+		m_dynamicObjects.push_back(body);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
+		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
+	}
 	//Creates an impassable plane
 	void RootPhysics::CreatePlane(glm::vec3 p_normal, glm::vec3 p_position)
 	{
@@ -309,89 +551,69 @@ namespace Physics
 		return objectBody;
 	}
 
-	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass )
+	btCollisionShape* RootPhysics::CreateShape( ShapeStruct p_shapeStruct )
 	{
-		btRigidBody* body = CreateSphere(p_radius, p_mass, p_position);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-		m_dynamicWorld->addRigidBody(body);
-		m_dynamicObjects.push_back(body);
-		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
-	}
-
-	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass )
-	{
-		btRigidBody* body = CreateCylinder(p_radius, p_height , p_position, p_rotation, p_mass);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-		m_dynamicWorld->addRigidBody(body);
-		m_dynamicObjects.push_back(body);
-		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
-	}
-
-	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass )
-	{
-		btRigidBody* body = CreateCone(p_radius, p_height , p_position, p_rotation, p_mass);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-		m_dynamicWorld->addRigidBody(body);
-		m_dynamicObjects.push_back(body);
-		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
-	}
-
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass )
-	{
-		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
-		btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
-		btScalar mass = 0; //mass is always 0 for static objects
-
-		btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
-		objectMeshShape->setLocalScaling(btVector3(p_scale.x, p_scale.y, p_scale.z));
-
-
-		btTransform startTransform;
-		startTransform.setIdentity();
-		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
-		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
-		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
+		if(p_shapeStruct.m_type == PhysicsShape::SHAPE_SPHERE)
 		{
-			btVector3 fallIntertia = btVector3(0,0,0);
-			objectMeshShape->calculateLocalInertia(p_mass,fallIntertia );
+			btCollisionShape* sphere = new btSphereShape(p_shapeStruct.m_radius);
+			return sphere;
 		}
-		
-		
-		btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
-		//trinfoMap->m_edgeDistanceThreshold = 0.01f;
-		//trinfoMap->m_equalVertexThreshold = 0.01f;
-		btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+		else if(p_shapeStruct.m_type == PhysicsShape::SHAPE_CONE)
+		{
+			btCollisionShape* cone = new btConeShape(p_shapeStruct.m_radius, p_shapeStruct.m_height);
+			return cone;
+		}
+		else if(p_shapeStruct.m_type == PhysicsShape::SHAPE_CYLINDER)
+		{
+			btCollisionShape* cylinder = new btCylinderShape(btVector3(p_shapeStruct.m_radius, p_shapeStruct.m_height, p_shapeStruct.m_radius));
+			return cylinder;
+		}
+		else if(p_shapeStruct.m_type == PhysicsShape::SHAPE_HULL)
+		{
+			PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_shapeStruct.m_modelHandle);
+			btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float));
 
-		btRigidBody* body = new btRigidBody(mass,motionstate,objectMeshShape);
-		
-	//	body->setActivationState(DISABLE_DEACTIVATION);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(/*body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK |*/ btCollisionObject::CF_STATIC_OBJECT);
-		m_dynamicWorld->addRigidBody(body);
-		m_dynamicObjects.push_back(body);
-		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
-		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
+			btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
+			//Cull unneccesary vertices to improve performance 
+			btShapeHull* objectHull = new btShapeHull(objectMeshShape);
+			btScalar margin = objectMeshShape->getMargin();
+			objectHull->buildHull(margin);
+			btConvexHullShape* simplifiedObject = new btConvexHullShape();
+			for(int i = 0; i < objectHull->numVertices(); i++)
+			{
+				simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
+			}	
+			simplifiedObject->recalcLocalAabb();
+			simplifiedObject->setLocalScaling(btVector3(p_shapeStruct.m_scale.x, p_shapeStruct.m_scale.y, p_shapeStruct.m_scale.z));
+			
+			return (btCollisionShape*)simplifiedObject;
+		}
+		else if(p_shapeStruct.m_type == PhysicsShape::SHAPE_CUSTOM_MESH)
+		{
+			PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_shapeStruct.m_modelHandle);
+			if(tempMesh == NULL)
+			{
+				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Mesh for %s not found", p_shapeStruct.m_modelHandle);
+				return nullptr;
+			}
+			btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
+			btScalar mass = 0; //mass is always 0 for static objects
+
+			btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
+			objectMeshShape->setLocalScaling(btVector3(p_shapeStruct.m_scale.x, p_shapeStruct.m_scale.y, p_shapeStruct.m_scale.z));
+			btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
+			trinfoMap->m_edgeDistanceThreshold = 0.01f;
+			trinfoMap->m_equalVertexThreshold = 0.01f;
+			btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+			return (btCollisionShape*)objectMeshShape;
+		}
+		else
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Shape %d not specified", p_shapeStruct.m_type);
+			return nullptr;
+		}
 	}
 
-	void RootPhysics::BindHullShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
-	{
-		btRigidBody* body = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-		m_dynamicWorld->addRigidBody(body);
-		m_dynamicObjects.push_back(body);
-		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
-		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
-	}
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
 	int* RootPhysics::AddStaticObjectToWorld(unsigned int p_entityId)
@@ -451,6 +673,7 @@ namespace Physics
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
 		userPointer->m_collidedEntityId = p_enityCollidedId;
+		userPointer->m_externalControlled = true;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
@@ -529,6 +752,7 @@ namespace Physics
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		userPointer->m_entityId = p_abilityInfo.m_entityId;
+		userPointer->m_externalControlled = false;
 		body->setUserPointer((void*)userPointer);
 
 
@@ -611,18 +835,28 @@ namespace Physics
 			return glm::vec3(0,0,0);
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		
+		glm::vec3 retVal;
 		btVector3 temp;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			temp = m_playerObjects.at(index)->GetPosition();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC )
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled )
+		{
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-		glm::vec3 retVal;
-		retVal[0] = temp.getX();
-		retVal[1] = temp.getY();
-		retVal[2] = temp.getZ();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();		
+		}
+		else
+		{
+			retVal = m_externallyControlled.at(index)->GetPos();
+		}
+		
+		
 		return retVal;
 
 	}
@@ -638,9 +872,13 @@ namespace Physics
 			return m_playerObjects.at(index)->GetMass();
 		}
 
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			return 1/m_dynamicObjects.at(index)->getInvMass();
+		}
+		else
+		{
+			return 0;
 		}
 	
 		return -1 ;
@@ -683,7 +921,7 @@ namespace Physics
 			
 		}
 		
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			btRigidBody* body = m_dynamicObjects.at(index);
 			btTransform transform;
@@ -694,9 +932,9 @@ namespace Physics
 			retVal[2] = transform.getRotation().z();
 			retVal[3] = transform.getRotation().w();
 		}
-		else
+		else //Todo: return externallycontrolled orientation if needed.
 		{
-			return glm::quat(0,0,0,0);
+			return glm::quat(0,0,0,1);
 		}
 		return retVal;
 	}
@@ -748,12 +986,16 @@ namespace Physics
 			//No, player doesn't have a constant velocity, and im gonna go ahead and guess that ability controllers won't either
 			return glm::vec3(0,0,0);
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 
 			btVector3 temp = m_dynamicObjects.at(index)->getLinearVelocity();
 
 			return glm::vec3(temp[0], temp[1], temp[2]);
+		}
+		else
+		{
+			return glm::vec3(0,0,0);
 		}
 		
 	}
@@ -776,14 +1018,14 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->Walk(p_velocity, m_dt);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			//Change if abilities becomes controllerz
+			
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
 		else
 		{
-			m_dynamicObjects.at(index)->setLinearVelocity(temp);
+			m_externallyControlled.at(index)->Move(p_velocity, m_dynamicWorld);
 		}
 	}
 
@@ -883,7 +1125,10 @@ namespace Physics
 		}
 	}
 
-	
+	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId )
+	{
+		m_userPointer.at(p_objectHandle)->m_collidedEntityId = p_enityCollidedId;
+	}
 
 }
 }
