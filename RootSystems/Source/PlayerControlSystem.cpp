@@ -106,20 +106,20 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					movement += facing * speed;
+					movement += facing;// * speed;
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
-						movement += -facing * speed;
+						movement += -facing;// * speed;
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					movement += right * speed;
+					movement += right;// * speed;
 					//transform->m_orientation.YawGlobal(-90.0f * dt);
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
-						movement += -right * speed;
+						movement += -right;// * speed;
 						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
 					break;
@@ -147,18 +147,22 @@ namespace RootForce
 						script->m_name = g_engineContext.m_resourceManager->GetScript("AbilityTest");
 						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
-
+					
 					break;
 				default:
 					break;
 			}
 		}
 		transform->m_orientation.YawGlobal(m_angle.x);
-
 		
+
 		if(movement != glm::vec3(0.0f))
+		{
+			movement = glm::normalize(movement) * speed;// * dt;
 			m_physics->SetPosition(*(collision->m_handle), movement  + transform->m_position);
-			//m_physics->SetVelocity(*(physAcc->m_handle), movement);
+			//g_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "dt: %f", dt);
+		}
+		
 		m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}

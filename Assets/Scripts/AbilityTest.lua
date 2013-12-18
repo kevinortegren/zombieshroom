@@ -53,7 +53,7 @@ function AbilityTest.OnActivate (action)
 		posVec.z + 		frontVec.z * 3, --posZ
 		entity:GetId(),
 		0.5, --height
-		3, --mass
+		30, --mass
 		1, --radius
 		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 		40, --speed
