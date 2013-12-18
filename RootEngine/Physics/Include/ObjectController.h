@@ -2,6 +2,7 @@
 #include <Bullet/btBulletCollisionCommon.h>
 #include <Bullet/btBulletDynamicsCommon.h>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 class ObjectController
 {
@@ -11,6 +12,7 @@ public:
 	void Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape);
 	void Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_world );
 	glm::vec3 GetPos() const{return m_currentPos;}
+	void SetOrientation(glm::quat p_orientation);
 	//float GetMass() const {return }
 private:
 	glm::vec3 m_currentPos;

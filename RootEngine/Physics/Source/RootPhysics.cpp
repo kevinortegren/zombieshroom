@@ -131,7 +131,7 @@ namespace Physics
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
-
+		
 		
 		//btSetDebugDrawer(m_debugDrawer);
 
@@ -144,7 +144,7 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
-		m_dynamicWorld->stepSimulation(m_dt,1);
+		m_dynamicWorld->stepSimulation(m_dt,4);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			m_playerObjects.at(i)->Update(m_dt);
@@ -822,9 +822,15 @@ namespace Physics
 	void RootPhysics::EnableDebugDraw( bool p_enabled )
 	{
 		if(p_enabled == true)
+		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw on ");
+			
+		}
 		else
+		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Turned physics debugdraw off");
+			
+		}
 		
 		m_debugDrawEnabled = p_enabled;
 	}
@@ -983,7 +989,8 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			//No, player doesn't have a constant velocity, and im gonna go ahead and guess that ability controllers won't either
+			//No, player doesn't have a constant velocity, and i'm gonna go ahead and guess that ability controllers won't either
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
@@ -995,6 +1002,7 @@ namespace Physics
 		}
 		else
 		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
 		}
 		
@@ -1040,7 +1048,7 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetOrientation(p_objectOrientation);
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			float x,y,z, w;
 			btRigidBody* body = m_dynamicObjects.at(index);
@@ -1051,6 +1059,10 @@ namespace Physics
 			w = p_objectOrientation[3];
 			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 			
+		}
+		else
+		{
+			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation);
 		}
 	}
 
@@ -1064,7 +1076,7 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetGravity(p_gravity[1]);		
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			
 			btVector3 gravity;
@@ -1073,6 +1085,11 @@ namespace Physics
 			gravity.setZ(p_gravity[2]);
 			m_dynamicObjects.at(index)->setGravity(gravity);
 			m_dynamicObjects.at(index)->applyGravity();
+		}
+		else
+		{
+			//Gravity doesn't exist in objectcontroller now, add if needed
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Changing gravity is not supported for externally controlled objects");
 		}
 	}
 
@@ -1084,11 +1101,16 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 			m_playerObjects.at(index)->SetMass(p_mass);
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			btVector3 fallInertia =  btVector3(0,0,0);
 			m_dynamicObjects.at(index)->getCollisionShape()->calculateLocalInertia(p_mass, fallInertia);
 			m_dynamicObjects.at(index)->setMassProps(p_mass, fallInertia);
+		}
+		else
+		{
+			//Mass doesn't exist in objectcontroller now, add if needed
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Changing mass is not supported for externally controlled objects");
 		}
 		
 		
@@ -1104,8 +1126,12 @@ namespace Physics
 		{
 			return;
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 			m_dynamicObjects.at(index)->setLinearVelocity(btVector3(p_velocity[0], p_velocity[1], p_velocity[2]));
+		else
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Changing velocity is not supported for externally controlled objects");
+		}
 	}
 
 	void RootPhysics::SetPosition( int p_objectHandle , glm::vec3 p_position )
@@ -1119,9 +1145,13 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->Move(p_position, m_dt);
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
+		else
+		{
+			m_externallyControlled.at(index)->Move(p_position, m_dynamicWorld);
 		}
 	}
 

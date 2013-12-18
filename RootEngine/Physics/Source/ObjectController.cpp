@@ -73,3 +73,13 @@ void ObjectController::Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_w
 
 }
 
+void ObjectController::SetOrientation( glm::quat p_orientation )
+{
+	btQuaternion btquat;
+	btquat.setW(p_orientation.w);
+	btquat.setX(p_orientation.x);
+	btquat.setY(p_orientation.y);
+	btquat.setZ(p_orientation.z);
+	m_ghostObject->getWorldTransform().setRotation(btquat);
+}
+

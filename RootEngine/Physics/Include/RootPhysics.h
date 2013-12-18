@@ -216,6 +216,7 @@ namespace RootEngine
 			std::vector<KinematicController*> m_playerObjects;
 			float m_dt;
 			bool m_debugDrawEnabled;
+			float m_removeMeLater;
 			
 		};
 	}

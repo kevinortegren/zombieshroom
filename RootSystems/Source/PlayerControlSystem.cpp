@@ -147,7 +147,7 @@ namespace RootForce
 						script->m_name = g_engineContext.m_resourceManager->GetScript("AbilityTest");
 						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
-
+					
 					break;
 				default:
 					break;

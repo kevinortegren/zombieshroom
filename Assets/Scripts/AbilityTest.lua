@@ -64,9 +64,9 @@ function AbilityTest.OnActivate (action)
 		z + aimz * 3, --posZ
 		entity:GetId(),
 		0.5, --height
-		3, --mass
+		30, --mass
 		1, --radius
-		2, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
+		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
 		40, --speed
 		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
 end
