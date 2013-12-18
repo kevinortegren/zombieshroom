@@ -173,13 +173,14 @@ void sortObjectList()
 
 	currNrSceneObjects = 0;
 
+	//add all objects to a array.
 	while(!it.isDone())
 	{
 		g_objectList[currNrSceneObjects] = it.item();
 		currNrSceneObjects++;
 		it.next();
 	}
-
+	//Sort the list mesh to meshlist and so on.
 	for(int i= 0; i < currNrSceneObjects; i ++)
 	{
 		if(g_objectList[i].hasFn(MFn::kMesh))
@@ -209,6 +210,7 @@ void sortObjectList()
 
 void printLists()
 {
+	//Print the lists, cuz it´s how cool kidz does it.
 	Print("Meshes");
 	for(int i = 0; i < currNrMeshes; i++)
 	{
@@ -239,6 +241,7 @@ void printLists()
 void loadScene()
 {
 	MStatus status;
+	//Goes through all the objects in sorted list and adds callbacks to them.
 
 	//mesh transformation CB
 	for(int i = 0; i < currNrMeshes; i++)
@@ -285,12 +288,6 @@ void loadScene()
 	{
 		MFnCamera camera = g_mayaCameraList[i];
 
-		if(camera.parent(0,&status).hasFn(MFn::kTransform))
-		{
-			//MObject transform = camera.parent(0, &status);
-			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
-
-		}
 		const MString temp = "modelPanel4";
 
 		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);
@@ -305,6 +302,7 @@ void loadScene()
 
 void viewCB(const MString &str, void *clientData)
 {
+	//Callback when moving camera
 	int tempInt = cameraExists(str);
 
 	if(tempInt!= -1)
@@ -379,6 +377,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
 void NodeAddedCB(MObject &node, void *clientData)
 {
+	//Callback when node is added.
 	checkForNewCameras(node, clientData);
 	checkForNewLights(node, clientData);
 	//printLists();
@@ -386,6 +385,7 @@ void NodeAddedCB(MObject &node, void *clientData)
 
 void NodeRemovedCB(MObject &node, void *clientData)
 {
+	//Callback when node is removed
 	int removeID = 0;
 
 	if(node.hasFn(MFn::kMesh))
@@ -539,6 +539,7 @@ void checkForNewLights(MObject &node, void *clientData)
 
 int cameraExists(MString name)
 {
+	//Return a index so we know what camera to update.
 	int answer = -1;
 
 	if(name == "modelPanel1")
@@ -563,6 +564,7 @@ int cameraExists(MString name)
 
 int nodeExists(MObject node)
 {
+	//Takes out the index of the node in our arrays. Else return -1.
 	int answer = -1;
 	if (node.hasFn(MFn::kMesh))
 	{
@@ -614,6 +616,7 @@ int nodeExists(MObject node)
 
 MString cleanFullPathName(const char * str)
 {
+	//Are being used to remove retarded symbols from fullpathname.
 	string tmpString = str;
 	char chars[] = "| _";
 	for (unsigned int i = 0; i < strlen(chars); ++i)
@@ -628,7 +631,7 @@ MString cleanFullPathName(const char * str)
 
 void MayaMeshToList(MObject node, int meshIndex)
 {
-
+	//Get mesh and transformation information from the nodes. Used when editing a node / adding a new one.
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
@@ -640,6 +643,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 	///////////////////////	MESH
 	if (node.hasFn(MFn::kMesh))
 	{
+
 		MFnMesh mesh = node;
 		bool updateTrans = false;
 		bool updateMesh = false;
@@ -650,6 +654,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 		float floatPoints[g_maxVerticesPerMesh][4];
 		float U, V;
 
+		//Get the material information.
 		//Get, set texturepaths
 		MString texturepath = "";
 		MString normalpath = "";
@@ -657,32 +662,45 @@ void MayaMeshToList(MObject node, int meshIndex)
 		float bumpdepth;
 		MFnDependencyNode material_node;
 		MObject material_objectNode;
-																								////NEW STUFFS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-
+
+		//Get the name of the transformation and the model name for the exporter.
+		MString transName = cleanFullPathName(mesh.fullPathName().asChar());
+		//Get and set mesh name
+		memcpy(SM.meshList[meshIndex].transformation.name, transName.asChar(), transName.numChars());
+
+		MString name = cleanFullPathName(mesh.name().asChar());
+		memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
+
+
+		/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
+
 		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode);
 		materialName = material_node.name();
 
+		//see if the material is already existing.
 		bool materialExists = false;
 		int materialID = 0;
 		for(int i = 0; i < currNrMaterials; i++)
 		{
 			std::string tempMaterialName = SM.materialList[i].materialName;
 			std::string tempMaterialName2 = materialName.asChar();
-			if(tempMaterialName == tempMaterialName2)	//BLIR INTE SAMMA SHIET FAST ÄNDÅ SÅ BLIR DET DE.
+			if(tempMaterialName == tempMaterialName2)
 			{
 				materialExists = true;
 				materialID = i;
 			}
 		}
 
+		//If it´s not existing then add it to the material array.
 		if(!materialExists)
 		{
 			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
-			MFnBlinnShader Blinn = material_objectNode;
-			Print("New Material name: ", Blinn.name());
-			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
-			AddCallbackID(status, id);
+			//MFnBlinnShader Blinn = material_objectNode;
+			//Print("New Material name: ", Blinn.name());
+			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
+			//AddCallbackID(status, id);
 
 			currNrMaterials++;
 			materialID = currNrMaterials;
@@ -693,13 +711,8 @@ void MayaMeshToList(MObject node, int meshIndex)
 			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
 		}
 
-		//MString TEMP = cleanFullPathName(mesh.fullPathName().asChar());
-		MString TEMP = cleanFullPathName(mesh.fullPathName().asChar());
-		//Get and set mesh name
-		memcpy(SM.meshList[meshIndex].transformation.name, TEMP.asChar(), TEMP.numChars());
+		///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
 
-		TEMP = cleanFullPathName(mesh.name().asChar());
-		memcpy(SM.meshList[meshIndex].modelName, TEMP.asChar(), TEMP.numChars());
 		//Get points from mesh
 		mesh.getPoints(points_, space_local);
 
@@ -718,7 +731,8 @@ void MayaMeshToList(MObject node, int meshIndex)
 
 		int uvID;
 
-
+		//goes through the polygons extracting information. 
+		//Quads -> triangles
 		for(int i = 0; i < numPolygons; i++)
 		{
 			MIntArray polygonVertices, localIndex;
@@ -726,6 +740,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 
 			int nrOfTriangles;
 
+			//decides if the face have 1 or 2 triangles.
 			if(polygonVertexCount >= 4)
 				nrOfTriangles = 2;
 			else
@@ -773,7 +788,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 			}
 		}
 
-		///////////////////////	MESH TRANSFORM
+		///////////////////////	MESH TRANSFORM ////////////////////////////////////////
 		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
 		{
 			MFnTransform transform = mesh.parent(0, &status);
@@ -908,7 +923,7 @@ void MayaCameraToList(MObject node, int cameraIndex)
 
 void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
 {
-	MStatus status = MS::kSuccess;;
+	MStatus status = MS::kSuccess;
 
 	MFnDependencyNode shading_engine_node(shading_engine);
 	MPlug surface_shader_plug = shading_engine_node.findPlug("surfaceShader", &status);
@@ -936,6 +951,7 @@ void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_no
 void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MObject &out_materialObject)
 {
 	MStatus status = MS::kSuccess;;
+	//Get the texture paths.
 
 	MPlug color_plug;
 	MPlugArray connections;
@@ -1022,6 +1038,7 @@ void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float
 
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode)
 {
+	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
 
 	MObjectArray shaders;
@@ -1044,6 +1061,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle )
 {
+	//Get the local indexes for the triangle
   MIntArray   localIndex;
   unsigned    gv, gt;
   assert ( getTriangle.length() == 3 );    // Should always deal with a triangle

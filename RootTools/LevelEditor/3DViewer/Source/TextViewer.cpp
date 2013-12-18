@@ -30,10 +30,6 @@ int entityExport;
 string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/Levels/";
 
 ReadMemory RM;
-//void LoadScene()
-//{
-//
-//}
 
 void HandleEvents()
 {
@@ -48,6 +44,7 @@ void HandleEvents()
 
 		case SDL_KEYDOWN:
 			{
+				// If pressing "P" set to export scene
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
 				{
 					entityExport = true;
@@ -68,6 +65,7 @@ void HandleEvents()
 		}
 	}
 }
+
 ECS::Entity* CreateLightEntity(ECS::World* p_world)	
 {
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
@@ -86,7 +84,6 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 
 	return lightEntity;
 }
-//CREATE CAMERA ENTITY
 
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 {
@@ -94,14 +91,16 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
-
+	//renderable->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs"); //Skapar material bajs
+	//renderable->m_material->m_diffuse = g_engineContext.m_resourceManager->GetTexture(dqweqweqw);	//Tilldelar textur till material
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
 	p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
-	return entity;}
+	return entity;
+}
 
 std::string GetNameFromPath( std::string p_path )
 {
@@ -118,6 +117,7 @@ std::string GetNameFromPath( std::string p_path )
 	cutPath  = cutPath.substr(0, dotIndex);
 	return cutPath;
 } 
+
 int main(int argc, char* argv[]) 
 {
 	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -217,9 +217,10 @@ int main(int argc, char* argv[])
 
 			Render::Material* materials;
 			materials = new Render::Material[g_maxMeshes];
+
+			//CREATE DEFAULT MATERIAL
 			Render::Material* defaultMaterial;
 			defaultMaterial = new Render::Material;
-
 			g_engineContext.m_resourceManager->LoadEffect("Mesh");
 			g_engineContext.m_resourceManager->LoadTexture("grayLambert", Render::TextureType::TEXTURE_2D);
 			defaultMaterial->m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("grayLambert");
@@ -234,7 +235,7 @@ int main(int argc, char* argv[])
 
 			//Load existing objects
 
-			///////////////////////LOAD MESHES////////////////////////////////
+			/////////////////////// LOAD SCENE ////////////////////////////////
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
@@ -247,8 +248,8 @@ int main(int argc, char* argv[])
 			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
+			/////////////////////// LOAD MATERIALS ////////////////////////////////
 			int renderNrOfMaterials = *RM.NumberOfMaterials;
-
 
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
@@ -257,16 +258,17 @@ int main(int argc, char* argv[])
 				{
 					g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 					materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
-					//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
 					materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+					//renderable->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs"); //Skapar material bajs
+					//renderable->m_material->m_diffuse = g_engineContext.m_resourceManager->GetTexture(dqweqweqw);	//Tilldelar textur till material
 					cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
 					cout << "NumberOF materials: " << renderNrOfMaterials << endl;
 				}
 			}
-
-			//SET TO UPDATE ALL MATERIALS BELOW FIRST TIME
+			// Set to update all materials
 			renderNrOfMaterials = -1;
 
+			/////////////////////// LOAD MESHES ////////////////////////////////
 			for(int i = 0; i < numberMeshes; i++)
 			{
 				string name = RM.PmeshList[i]->modelName;
@@ -301,6 +303,7 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices);
 
+				// Get material connected to mesh and set it from materiallist
 				cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) << endl;
 				if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) == "NONE")
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = *defaultMaterial;
@@ -313,7 +316,7 @@ int main(int argc, char* argv[])
 
 			}
 
-			///////////////////////Load Lights////////////////////////////////
+			/////////////////////// Load Lights ////////////////////////////////
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
@@ -389,6 +392,7 @@ int main(int argc, char* argv[])
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
+				/////////////  EXPORT   ///////////////////////
 				if(entityExport == 2)
 				{			
 					m_world.GetEntityManager()->RemoveAllComponentsOfType<RootForce::Renderable>();
@@ -421,7 +425,6 @@ int main(int argc, char* argv[])
 
 						mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 
-
 					}
 
 					m_world.GetEntityExporter()->Export(g_savepath + "level.world");
@@ -431,6 +434,7 @@ int main(int argc, char* argv[])
 					*RM.export = 0;
 					ReleaseMutex(RM.IdMutexHandle);
 				}
+
 				/////////////////////// UPDATE MESHES ////////////////////////////////
 				if(MeshIndex != -1)					
 				{
@@ -510,7 +514,7 @@ int main(int argc, char* argv[])
 					ReleaseMutex(RM.MeshMutexHandle);
 				}
 
-				///////////////////////UPDATE LIGHTS////////////////////////////////
+				/////////////////////// UPDATE LIGHTS ////////////////////////////////
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
@@ -575,13 +579,15 @@ int main(int argc, char* argv[])
 
 				}			
 
-				//Remove mesh component at index
-				if(RemoveMeshIndex != -1)	
+				//Remove component at index
+				if(RemoveMeshIndex != -1 && RemoveMeshIndex < Entities.size())	
 				{					
+					cout << "Removing " << RemoveMeshIndex << " EntitySize " << Entities.size() << endl;
 					m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
 					m_world.GetEntityManager()->RemoveEntity(Entities[RemoveMeshIndex]);
 					Entities.erase(Entities.begin() + RemoveMeshIndex);
 				}
+
 				if(RemoveLightIndex != -1)	
 				{					
 					m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);

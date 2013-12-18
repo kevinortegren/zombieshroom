@@ -170,10 +170,12 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		
 	}	
 
+	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+	memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
+
 	if(updateTransformation)
 	{
-		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
-		memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
+		
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
