@@ -1,5 +1,6 @@
  #pragma once
 #include <Lua/lua.hpp>
+#include <glm/glm.hpp>
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -13,201 +14,200 @@ namespace RootForce
 {
 	namespace LuaAPI
 	{
+		#define NumberOfArgs(n) CheckNrOfArgs(p_luaState, n, __FUNCTION__, __LINE__)
+
+		void CheckNrOfArgs(lua_State* p_luaState, int p_expectedNrOfArgs, std::string p_func, int p_line)
+		{
+			int nargs = lua_gettop(p_luaState);
+			if(nargs > p_expectedNrOfArgs)
+			{
+				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, "Lua Error: Too many arguments when calling C function %s at line %s!", p_func.c_str(), std::to_string(p_line).c_str());
+			}
+			else if(nargs < p_expectedNrOfArgs)
+			{
+				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Lua Error: Too few arguments when calling C function %s at line %s!", p_func.c_str(), std::to_string(p_line).c_str());
+				luaL_argerror(p_luaState, nargs, "Too few arguments!");
+			}
+		}
+
 		static int CreateEntity(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(0);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
 			*s = g_world->GetEntityManager()->CreateEntity();
-
 			luaL_setmetatable(p_luaState, "Entity");
-			//Userdata already on stack
 			return 1;
 		}
 
 		static int GetEntityByTag(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
-			*s = g_world->GetTagManager()->GetEntityByTag(lua_tostring(p_luaState, 1));
-			
+			*s = g_world->GetTagManager()->GetEntityByTag(luaL_checkstring(p_luaState, 1));
 			luaL_setmetatable(p_luaState, "Entity");
-			//Userdata already on stack
 			return 1;
 		}
 		
 		static int GetId(lua_State* p_luaState)
 		{
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
-
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			lua_pushnumber(p_luaState, (*e)->GetId());
-
 			return 1;
 		}
 
 		static int GetTransformation(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
-
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Transform>(*e);
-
 			luaL_setmetatable(p_luaState, "Transformation");
-			//Userdata already on stack
 			return 1;
 		}
 
 		static int CreateRenderable(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
-			
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
-
 			luaL_setmetatable(p_luaState, "Renderable");
-			//Userdata already on stack
 			return 1;
 		}
 
 		static int CreateTransformation(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
-			
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
-
 			luaL_setmetatable(p_luaState, "Transformation");
-			//Userdata already on stack
 			return 1;
 		}
 
 		static int GetPos(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			lua_pushnumber(p_luaState, (*ptemp)->m_position.x );
-			lua_pushnumber(p_luaState, (*ptemp)->m_position.y );
-			lua_pushnumber(p_luaState, (*ptemp)->m_position.z );
-
-			return 3;
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_position);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
 		}
 
 		static int SetPos(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(2);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			(*ptemp)->m_position.x = (float)lua_tonumber(p_luaState, 1);
-			(*ptemp)->m_position.y = (float)lua_tonumber(p_luaState, 2);
-			(*ptemp)->m_position.z = (float)lua_tonumber(p_luaState, 3);
-
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			(*ptemp)->m_position = (*v1);
 			return 0;
 		}
 
 		static int GetFront(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().x );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().y );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetFront().z );
-
-			return 3;
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_orientation.GetFront());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
 		}
 
 		static int GetUp(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().x );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().y );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetUp().z );
-
-			return 3;
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_orientation.GetUp());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
 		}
 
 		static int GetRight(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().x );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().y );
-			lua_pushnumber(p_luaState, (*ptemp)->m_orientation.GetRight().z );
-
-			return 3;
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_orientation.GetRight());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
 		}
 
 		static int CreateCollision(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Collision **s = (RootForce::Collision **)lua_newuserdata(p_luaState, 4);
-
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Collision>(*e);
-
 			luaL_setmetatable(p_luaState, "Collision");
-
-			//Userdata already on stack
 			return 1;
 		}
 
 		static int SetMeshHandle(lua_State* p_luaState)
 		{
+			NumberOfArgs(2);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			std::string handle = lua_tostring(p_luaState, 2);
-
+			std::string handle = luaL_checkstring(p_luaState, 2);
 			(*rtemp)->m_meshHandle = handle;
 			return 0;
 		}
 
 		static int CreatePhysicsAccessor(lua_State* p_luaState)
 		{
-			// Allocate memory for a pointer to to object
+			NumberOfArgs(1);
 			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
-
-			ECS::Entity** e = (ECS::Entity**)lua_touserdata(p_luaState, 1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Physics>(*e);
-
 			luaL_setmetatable(p_luaState, "Physics");
-
-			//Userdata already on stack
 			return 1;
 		}
-
+		static int SetRenderableMaterial(lua_State* p_luaState)
+        {
+            RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+            std::string handle = luaL_checkstring(p_luaState, 2);
+            (*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
+            return 0;
+        }
 		static int SetRenderableModel(lua_State* p_luaState)
 		{
+			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-
-			std::string handle = lua_tostring(p_luaState, 2);
-			
+			std::string handle = luaL_checkstring(p_luaState, 2);
 			(*rtemp)->m_model = g_engineContext.m_resourceManager->LoadCollada(handle);
 			return 0;
 		}
 
-		static int SetRenderableMaterial(lua_State* p_luaState)
+		static int SetRenderableDiffuse(lua_State* p_luaState)
 		{
+			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-
-			std::string handle = lua_tostring(p_luaState, 2);
-
-			(*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
+			(*rtemp)->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
 			return 0;
 		}
 
-		static int SetRenderableMaterialProperties(lua_State* p_luaState)
+		static int SetRenderableSpecular(lua_State* p_luaState)
 		{
+			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			return 0;
+		}
 
-			std::string diffuseHandle = lua_tostring(p_luaState, 2);
-			std::string specularHandle = lua_tostring(p_luaState, 3);
-			std::string normalHandle = lua_tostring(p_luaState, 4);
-			std::string effectHandle = lua_tostring(p_luaState, 5);
+		static int SetRenderableNormal(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			return 0;
+		}
 
-			(*rtemp)->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuseHandle, Render::TextureType::TEXTURE_2D);
-			(*rtemp)->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specularHandle, Render::TextureType::TEXTURE_2D);
-			(*rtemp)->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normalHandle, Render::TextureType::TEXTURE_2D);
-			(*rtemp)->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect(effectHandle);
+		static int SetRenderableEffect(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect(luaL_checkstring(p_luaState, 2));
 			return 0;
 		}
 
@@ -240,6 +240,162 @@ namespace RootForce
 
 			return 0;
 		}
+
+		static int CreateVec3(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((int)lua_tonumber(p_luaState, 1), (int)lua_tonumber(p_luaState, 2), (int)lua_tonumber(p_luaState, 3));
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int SetVec3Value(lua_State* p_luaState)
+		{
+			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			float setValue = (float)luaL_checknumber(p_luaState, 3);
+			if(memberName == "x")
+				ptemp->x = setValue;
+			if(memberName == "y")
+				ptemp->y = setValue;
+			if(memberName == "z")
+				ptemp->z = setValue;
+			return 0;
+		}
+
+		static int GetVec3Value(lua_State* p_luaState)
+		{
+			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			if(memberName == "x")
+				lua_pushnumber(p_luaState, ptemp->x);
+			if(memberName == "y")
+				lua_pushnumber(p_luaState, ptemp->y);
+			if(memberName == "z")
+				lua_pushnumber(p_luaState, ptemp->z);
+			return 1;
+		}
+
+		static int AddVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3 v3 = (*v1)+(*v2);
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int SubVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3 v3 = (*v1)-(*v2);
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int MulVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3 v3 = (*v1)*(*v2);
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int DivVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3 v3 = (*v1)/(*v2);
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int DotVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			float vecdot = glm::dot((*v1), (*v2));
+			lua_pushnumber(p_luaState, vecdot);
+			return 1;
+		}
+
+		static int CrossVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3  v3 = glm::cross((*v1), (*v2));
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int DistanceVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			float vecdist = glm::distance((*v1), (*v2));
+			lua_pushnumber(p_luaState, vecdist);
+			return 1;
+		}
+
+		static int LengthVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			float vecdot = glm::length((*v1));
+			lua_pushnumber(p_luaState, vecdot);
+			return 1;
+		}
+		
+		static int NormalizeVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3  v3 = glm::normalize((*v1));
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int ReflectVec3(lua_State* p_luaState)
+		{
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3  v3 = glm::reflect((*v1), (*v2));
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3(v3);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int CreateArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int SetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArrayLength(lua_State* p_luaState)
+		{
+			return 0;
+		}
+	
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
@@ -262,7 +418,10 @@ namespace RootForce
 		static const struct luaL_Reg renderable_m [] = {
 			{"SetModel", SetRenderableModel},
 			{"SetMaterial", SetRenderableMaterial},
-			{"SetMaterialProperties", SetRenderableMaterialProperties},
+			{"SetMaterialDiffuse", SetRenderableDiffuse},
+			{"SetMaterialSpecular", SetRenderableSpecular},
+			{"SetMaterialNormal", SetRenderableNormal},
+			{"SetMaterialEffect", SetRenderableEffect},
 			{NULL, NULL}
 		};
 
@@ -274,13 +433,11 @@ namespace RootForce
 		};
 		
 		static const struct luaL_Reg transformation_m [] = {
-			{"SetModel", SetRenderableModel},
-			{"SetMaterial", SetRenderableMaterial},
-			{"GetPos", GetPos},
-			{"SetPos", SetPos},
-			{"GetFront", GetFront},
-			{"GetUp", GetUp},
-			{"GetRight", GetRight},
+			{"GetPos",		GetPos},
+			{"SetPos",		SetPos},
+			{"GetFront",	GetFront},
+			{"GetUp",		GetUp},
+			{"GetRight",	GetRight},
 			{NULL, NULL}
 		};
 
@@ -305,13 +462,60 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg vec3_f [] = {
+			{"New", CreateVec3},
+			{"Dot", DotVec3},
+			{"Cross", CrossVec3},
+			{"Distance", DistanceVec3},
+			{"Length", LengthVec3},
+			{"Normalize", NormalizeVec3},
+			{"Reflect", ReflectVec3},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg vec3_m [] = {
+			{"__newindex", SetVec3Value},
+			{"__add", AddVec3},
+			{"__sub", SubVec3},
+			{"__mul", MulVec3},
+			{"__div", DivVec3},
+			{"__index", GetVec3Value},
+			{"__len", LengthVec3},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg array_f [] = {
+			{"New", CreateArray},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg array_m [] = {
+			{"__newindex", SetArray},
+			{"__index", GetArray},
+			{"__len", GetArrayLength},
+			{NULL, NULL}
+		};
+		
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
 			int meta_id = lua_gettop(p_luaState);
-		
 			luaL_setfuncs(p_luaState, p_methodReg, 0);
+
 			lua_setfield(p_luaState, meta_id, "__index");  
+
+			luaL_newlib(p_luaState, p_funcReg);
+
+			lua_setglobal(p_luaState, p_typeName.c_str());
+
+			return 1;
+		}
+
+		static int LuaSetupTypeNoMethods(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
+		{
+			luaL_newmetatable(p_luaState, p_typeName.c_str());
+			int meta_id = lua_gettop(p_luaState);
+			luaL_setfuncs(p_luaState, p_methodReg, 0);
 
 			luaL_newlib(p_luaState, p_funcReg);
 

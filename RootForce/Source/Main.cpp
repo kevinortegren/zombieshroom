@@ -4,7 +4,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-#include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
 

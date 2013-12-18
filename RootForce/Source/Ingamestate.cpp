@@ -1,6 +1,6 @@
 #include "Ingamestate.h"
-
 #include <RootForce/Include/LuaAPI.h>
+
 namespace RootForce
 {
 	Ingamestate::Ingamestate()
@@ -36,6 +36,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
+        RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
         g_engineContext.m_resourceManager->LoadCollada("AnimationTest");

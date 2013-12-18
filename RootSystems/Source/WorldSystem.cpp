@@ -47,10 +47,10 @@ namespace RootForce
 			Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 			Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 
-			collision->m_handle = g_engineContext.m_physics->AddStaticObjectToWorld(entity->GetId());
-			
+			//collision->m_handle = g_engineContext.m_physics->AddStaticObjectToWorld(entity->GetId());
+			collision->m_handle = g_engineContext.m_physics->CreateHandle(entity->GetId(), RootEngine::Physics::PhysicsType::TYPE_STATIC, false);
 			g_engineContext.m_physics->BindMeshShape(*(collision->m_handle), collision->m_meshHandle,
-				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f);
+				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
 
 
