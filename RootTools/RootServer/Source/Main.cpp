@@ -78,10 +78,11 @@ Main::~Main()
 
 void Main::Start() 
 {
-	// Initialize the network system
-	m_networkHandler = std::shared_ptr<RootForce::Network::MessageHandler>(new RootForce::Network::MessageHandler(&m_world, m_engineContext.m_logger, m_engineContext.m_network));
-	m_networkHandler->Host(5567, RootForce::Network::MessageHandler::DEDICATED);
-	
+	// Initialize the server
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(m_engineContext.m_logger, "Dedicated Server", 5567));
+	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), m_engineContext.m_logger));
+	m_server->SetMessageHandler(m_serverMessageHandler.get());
+
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );
 		
@@ -99,7 +100,7 @@ void Main::Start()
 		m_world.SetDelta(dt);
 		
 		//m_playerControlSystem->Process();
-		m_networkHandler->Update();
+		m_server->Update();
 		m_engineContext.m_physics->Update(dt);
 
 		// ToDo: Move event handling to shared server-logic class
