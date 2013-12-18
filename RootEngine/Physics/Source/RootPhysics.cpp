@@ -591,6 +591,11 @@ namespace Physics
 		else if(p_shapeStruct.m_type == PhysicsShape::SHAPE_CUSTOM_MESH)
 		{
 			PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_shapeStruct.m_modelHandle);
+			if(tempMesh == NULL)
+			{
+				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Mesh for %s not found", p_shapeStruct.m_modelHandle);
+				return nullptr;
+			}
 			btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
 			btScalar mass = 0; //mass is always 0 for static objects
 
@@ -669,6 +674,7 @@ namespace Physics
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entityId = p_entityId;
 		userPointer->m_collidedEntityId = p_enityCollidedId;
+		userPointer->m_externalControlled = true;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
 		return userPointer->m_id;
@@ -747,6 +753,7 @@ namespace Physics
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		userPointer->m_entityId = p_abilityInfo.m_entityId;
+		userPointer->m_externalControlled = false;
 		body->setUserPointer((void*)userPointer);
 
 
@@ -829,18 +836,28 @@ namespace Physics
 			return glm::vec3(0,0,0);
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		
+		glm::vec3 retVal;
 		btVector3 temp;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			temp = m_playerObjects.at(index)->GetPosition();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC )
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled )
+		{
 			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-		glm::vec3 retVal;
-		retVal[0] = temp.getX();
-		retVal[1] = temp.getY();
-		retVal[2] = temp.getZ();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();		
+		}
+		else
+		{
+			retVal = m_externallyControlled.at(index)->GetPos();
+		}
+		
+		
 		return retVal;
 
 	}
@@ -856,9 +873,13 @@ namespace Physics
 			return m_playerObjects.at(index)->GetMass();
 		}
 
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			return 1/m_dynamicObjects.at(index)->getInvMass();
+		}
+		else
+		{
+			return 0;
 		}
 	
 		return -1 ;
@@ -901,7 +922,7 @@ namespace Physics
 			
 		}
 		
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			btRigidBody* body = m_dynamicObjects.at(index);
 			btTransform transform;
@@ -912,9 +933,9 @@ namespace Physics
 			retVal[2] = transform.getRotation().z();
 			retVal[3] = transform.getRotation().w();
 		}
-		else
+		else //Todo: return externallycontrolled orientation if needed.
 		{
-			return glm::quat(0,0,0,0);
+			return glm::quat(0,0,0,1);
 		}
 		return retVal;
 	}
@@ -966,12 +987,16 @@ namespace Physics
 			//No, player doesn't have a constant velocity, and im gonna go ahead and guess that ability controllers won't either
 			return glm::vec3(0,0,0);
 		}
-		else
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 
 			btVector3 temp = m_dynamicObjects.at(index)->getLinearVelocity();
 
 			return glm::vec3(temp[0], temp[1], temp[2]);
+		}
+		else
+		{
+			return glm::vec3(0,0,0);
 		}
 		
 	}
@@ -994,14 +1019,14 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->Walk(p_velocity, m_dt);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_ABILITY)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			//Change if abilities becomes controllerz
+			
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
 		else
 		{
-			m_dynamicObjects.at(index)->setLinearVelocity(temp);
+			m_externallyControlled.at(index)->Move(p_velocity, m_dynamicWorld);
 		}
 	}
 
@@ -1099,6 +1124,11 @@ namespace Physics
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
 		}
+	}
+
+	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId )
+	{
+		m_userPointer.at(p_objectHandle)->m_collidedEntityId = p_enityCollidedId;
 	}
 
 }

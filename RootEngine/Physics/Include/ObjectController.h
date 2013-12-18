@@ -10,6 +10,8 @@ public:
 	~ObjectController();
 	void Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape);
 	void Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_world );
+	glm::vec3 GetPos() const{return m_currentPos;}
+	//float GetMass() const {return }
 private:
 	glm::vec3 m_currentPos;
 	btPairCachingGhostObject* m_ghostObject;
