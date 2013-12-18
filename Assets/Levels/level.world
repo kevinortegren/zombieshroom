@@ -5,180 +5,71 @@
     - 4
     - 5
     - 6
-    - 7
-    - 8
-    - 9
-    - 10
-    - 11
-    - 12
-    - 13
-    - 14
-    - 15
-    - 16
-    - 17
-    - 18
 - Components:
     - Type: 0
       Data:
         - Entity: 1
           Model: pCubeShape1
           Material:
-            Name: grayLambert
+            Name: Tree
             Effect: Mesh
-            Diffuse: grayLambert
+            Diffuse: Tree1v1Texture
         - Entity: 2
-          Model: pCylinderShape1
+          Model: pCubeShape1
           Material:
-            Name: blockMana
+            Name: Tree
             Effect: Mesh
-            Diffuse: blockMana
+            Diffuse: Tree1v1Texture
         - Entity: 3
-          Model: pConeShape1
+          Model: pCubeShape1
           Material:
-            Name: grayLambert
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 4
           Model: pCubeShape1
           Material:
-            Name: grayLambert
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 5
-          Model: pCubeShape1
-          Material:
-            Name: grayLambert
-        - Entity: 6
-          Model: pCylinderShape1
-          Material:
-            Name: grayLambert
-        - Entity: 7
-          Model: pConeShape1
-          Material:
-            Name: grayLambert
-        - Entity: 8
-          Model: pConeShape1
-          Material:
-            Name: grayLambert
-        - Entity: 9
-          Model: pCylinderShape1
-          Material:
-            Name: grayLambert
-        - Entity: 10
-          Model: pConeShape1
-          Material:
-            Name: grayLambert
-        - Entity: 11
-          Model: pConeShape1
-          Material:
-            Name: grayLambert
-        - Entity: 12
           Model: pPlaneShape1
           Material:
-            Name: grass
+            Name: Ground
             Effect: Mesh
-            Diffuse: grass
-        - Entity: 13
-        - Entity: 14
-        - Entity: 15
-        - Entity: 16
-        - Entity: 17
-        - Entity: 18
+            Diffuse: GroundV1v1
+        - Entity: 6
     - Type: 1
       Data:
         - Entity: 1
-          Position: [-5.92708, 0, 3.53193]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Position: [11.576, -9.5, 0.0288114]
+          Rotation: [0, 0, -1]
+          Scale: [1.93036, 1.93036, 1.93036]
         - Entity: 2
-          Position: [-0.932131, 0, -4.05705]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Position: [-11.0916, -9.1, 0.0288114]
+          Rotation: [0.00925402, -0.999941, 0.00562249]
+          Scale: [1.93036, 1.93036, 1.93036]
         - Entity: 3
-          Position: [2.13894, 0, 3.84695]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Position: [0.808924, -9.1, -11.679]
+          Rotation: [0, -1, 0]
+          Scale: [1.93036, 1.93036, 1.93036]
         - Entity: 4
-          Position: [-5.92708, 0, 0.937898]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
+          Position: [0.808924, -9.1, 10.4087]
+          Rotation: [0, -1, 0]
+          Scale: [1.93036, 1.93036, 1.93036]
         - Entity: 5
-          Position: [-5.92708, 0, 6.53037]
+          Position: [0.00169052, -10, -0.140248]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 6
-          Position: [-9.50116, 4.54682, -34.6556]
-          Rotation: [1, 0, 0]
-          Scale: [1, 3.96101, 1]
-        - Entity: 7
-          Position: [5.02904, 0, 3.84695]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 8
-          Position: [41.5053, 17.0975, 5.30095]
-          Rotation: [1, 0, 0]
-          Scale: [1, 4.05652, 1]
-        - Entity: 9
-          Position: [-15.166, 4.54682, -34.6556]
-          Rotation: [1, 0, 0]
-          Scale: [1, 3.96101, 1]
-        - Entity: 10
-          Position: [47.6826, 24.4714, -2.55917]
-          Rotation: [1, 0, 0]
-          Scale: [1, 4.05652, 1]
-        - Entity: 11
-          Position: [45.5245, 21.2698, 2.75935]
-          Rotation: [1, 0, 0]
-          Scale: [1, 4.05652, 1]
-        - Entity: 12
-          Position: [-4.99158, -1.50213, 1.12738]
-          Rotation: [1, 0, 0]
-          Scale: [9.47807, 9.47807, 9.47807]
-        - Entity: 13
-          Position: [0, 8.31752, 0]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 14
-          Position: [-28.4874, 5.03396, -24.9807]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 15
-          Position: [18.3776, 6.24688, 31.6612]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 16
-          Position: [21.3407, 6.83117, -31.6234]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 17
-          Position: [-31.0512, 7.00646, 31.7077]
-          Rotation: [1, 0, 0]
-          Scale: [1, 1, 1]
-        - Entity: 18
-          Position: [55.8696, 31.8015, -0.0325007]
+          Position: [0, -6, 0.0553659]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 13
-          Attenuation: [0, 0.0827067, 0]
-          Color: [0, 1, 1, 1]
-          Range: 1000
-        - Entity: 14
-          Attenuation: [0, 0.0676692, 0]
-          Color: [1, 0, 0.808983, 1]
-          Range: 1000
-        - Entity: 15
-          Attenuation: [0, 0.01, 0]
-          Color: [0, 0, 1, 1]
-          Range: 1000
-        - Entity: 16
-          Attenuation: [0, 0.135338, 0]
-          Color: [1, 0.977533, 0, 1]
-          Range: 1000
-        - Entity: 17
-          Attenuation: [0, 0.0902256, 0]
-          Color: [0.2809, 1, 0, 1]
-          Range: 1000
-        - Entity: 18
-          Attenuation: [0, 0.135338, 0]
-          Color: [1, 0.977533, 0, 1]
+        - Entity: 6
+          Attenuation: [0, 0.1, 0]
+          Color: [1, 1, 1, 1]
           Range: 1000
     - Type: 3
       Data:
@@ -212,26 +103,12 @@
         - Entity: 1
           MeshHandle: pCubeShape10
         - Entity: 2
-          MeshHandle: pCylinderShape10
+          MeshHandle: pCubeShape10
         - Entity: 3
-          MeshHandle: pConeShape10
+          MeshHandle: pCubeShape10
         - Entity: 4
           MeshHandle: pCubeShape10
         - Entity: 5
-          MeshHandle: pCubeShape10
-        - Entity: 6
-          MeshHandle: pCylinderShape10
-        - Entity: 7
-          MeshHandle: pConeShape10
-        - Entity: 8
-          MeshHandle: pConeShape10
-        - Entity: 9
-          MeshHandle: pCylinderShape10
-        - Entity: 10
-          MeshHandle: pConeShape10
-        - Entity: 11
-          MeshHandle: pConeShape10
-        - Entity: 12
           MeshHandle: pPlaneShape10
 - Tags:
     - Id: 0
@@ -246,18 +123,4 @@
     - Id: 4
       Group: Static
     - Id: 5
-      Group: Static
-    - Id: 6
-      Group: Static
-    - Id: 7
-      Group: Static
-    - Id: 8
-      Group: Static
-    - Id: 9
-      Group: Static
-    - Id: 10
-      Group: Static
-    - Id: 11
-      Group: Static
-    - Id: 12
       Group: Static
