@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
 			g_running = true;
 
-			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)); 
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)); 
 			Render::DirectionalLight dl;
 			dl.m_color = glm::vec4(0,0,1,1);
 
