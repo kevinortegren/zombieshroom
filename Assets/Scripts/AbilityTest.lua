@@ -12,12 +12,12 @@ AbilityTest = {};
 
 function AbilityTest.OnActivate (action)
 
-	--Create entity
-	local entity 		= Entity.New();
-
 	--Get data from Player & AimingDevice entities
 	local posVec  		= Entity.GetEntityByTag("Player"):GetTransformation():GetPos();
 	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetFront();
+
+	--Create entity
+	local entity 		= Entity.New();
 
 	--Create components and put them in our new entity
 	local renderComp 	= Renderable.New(entity);

@@ -115,7 +115,7 @@ class Logging : public LoggingInterface
 		LogTag::LogTag m_defaultTag;
 
 };
-
+//(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)
 #define LogText(...) LT(__FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define LogTextToFile(...) LTF(__FUNCTION__,  __LINE__, ##__VA_ARGS__)
 #define LogTextToConsole(...) LTC(__FUNCTION__,  __LINE__, ##__VA_ARGS__)
