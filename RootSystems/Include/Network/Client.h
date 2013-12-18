@@ -10,6 +10,12 @@ namespace RootForce
 {
 	namespace Network
 	{
+		struct RemoteClient
+		{
+			int8_t Slot;
+			RakNet::SystemAddress Address;
+		};
+
 		class Client
 		{
 		public:

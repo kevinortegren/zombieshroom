@@ -14,6 +14,7 @@
 #include <RootSystems/Include/Components.h>
 
 #include <RootForce/Include/GameStates.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
@@ -39,6 +40,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::ChatSystem> m_chat;
 		std::shared_ptr<RootForce::Network::Server> m_server;
 		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
+		std::shared_ptr<RootForce::Network::NetworkEntityMap> m_networkEntityMap;
 		RootForce::Network::Client* m_client;
 		RootForce::Network::ClientMessageHandler* m_clientMessageHandler;
 

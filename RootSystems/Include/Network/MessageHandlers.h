@@ -1,10 +1,12 @@
 #pragma once
 
+#include <Utility/ECS/Include/World.h>
 #include <RakNet/RakPeerInterface.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
@@ -41,9 +43,14 @@ namespace RootForce
 		class ServerMessageHandler : public MessageHandler
 		{
 		public:
-			ServerMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger);
+			ServerMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world);
+
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 
 			void ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
+		private:
+			ECS::World* m_world;
+			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }

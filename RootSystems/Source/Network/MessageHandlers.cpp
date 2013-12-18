@@ -83,8 +83,15 @@ namespace RootForce
 
 
 
-		ServerMessageHandler::ServerMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger)
-			: MessageHandler(p_peer, p_logger) {}
+		ServerMessageHandler::ServerMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
+			: MessageHandler(p_peer, p_logger)
+			, m_world(p_world)
+			, m_networkEntityMap(nullptr) {}
+
+		void ServerMessageHandler::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
+		{
+			m_networkEntityMap = p_networkEntityMap;
+		}
 
 		void ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
@@ -112,18 +119,77 @@ namespace RootForce
 
 				case MessageType::ChatToServer:
 				{
-					MessageChat c;
-					c.Serialize(false, p_bs);
+					MessageChat m;
+					m.Serialize(false, p_bs);
 
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client (%s): %s", p_packet->systemAddress.ToString(), c.Message.C_String());
+					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client (%s): %s", p_packet->systemAddress.ToString(), m.Message.C_String());
 
 					// Forward the message to broadcast
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) MessageType::ChatToClient);
 
-					c.SenderID = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-					c.Serialize(true, &bs);
+					m.SenderID = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					m.Serialize(true, &bs);
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				} break;
+
+				case MessageType::UserInfo:
+				{
+					MessageUserInfo m;
+					m.Serialize(false, p_bs);
+
+					// Create a synchronized entity for the connected player.
+					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+					SynchronizedId_t sId = m_networkEntityMap->NextSynchronizedId();
+					m_networkEntityMap->SetSynchronizedId(tId, sId);
+
+					// Notify the connected player of the synchronized entity.
+					{
+						MessageUserConnected n;
+						n.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+						n.UserInfo.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
+						n.UserInfo.PlayerEntity.SynchronizedID = sId;
+						n.UserInfo.PlayerEntity.TemporaryID = m.PlayerEntity.TemporaryID;
+						n.UserInfo.PlayerName = m.PlayerName;
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) MessageType::UserConnected);
+						n.Serialize(true, &bs);
+
+						m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+					}
+
+					// Notify the rest of the connected players of the synchronized entity.
+					{
+						DataStructures::List<RakNet::SystemAddress> connectedAddresses;
+						DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
+						m_peer->GetSystemList(connectedAddresses, connectedGUIDs);
+
+						MessageUserConnected n;
+						n.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+						n.UserInfo.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
+						n.UserInfo.PlayerEntity.SynchronizedID = sId;
+						n.UserInfo.PlayerEntity.TemporaryID = -1;
+						n.UserInfo.PlayerName = m.PlayerName;
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) MessageType::UserConnected);
+						n.Serialize(true, &bs);
+
+						for (unsigned int i = 0; i < connectedAddresses.Size(); ++i)
+						{
+							if (connectedAddresses[i] != p_packet->systemAddress)
+							{
+								m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, connectedAddresses[i], false);
+							}
+						}
+					}
+
+					// Notify the connected player of the rest of the connected players and their synchronized entities.
+					{
+						// TODO: Need to add functionality to the NetworkEntityMap to be able to yield Entity from SystemAddress.
+					}
 				} break;
 			}
 		}
