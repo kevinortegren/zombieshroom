@@ -10,24 +10,34 @@
       Data:
         - Entity: 1
           Model: pCubeShape1
-          Effect: Mesh
-          Diffuse: Tree1v1Texture
+          Material:
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 2
           Model: pCubeShape1
-          Effect: Mesh
-          Diffuse: Tree1v1Texture
+          Material:
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 3
           Model: pCubeShape1
-          Effect: Mesh
-          Diffuse: Tree1v1Texture
+          Material:
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 4
           Model: pCubeShape1
-          Effect: Mesh
-          Diffuse: Tree1v1Texture
+          Material:
+            Name: Tree
+            Effect: Mesh
+            Diffuse: Tree1v1Texture
         - Entity: 5
           Model: pPlaneShape1
-          Effect: Mesh
-          Diffuse: GroundV1v1
+          Material:
+            Name: Ground
+            Effect: Mesh
+            Diffuse: GroundV1v1
         - Entity: 6
     - Type: 1
       Data:
@@ -52,7 +62,7 @@
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
         - Entity: 6
-          Position: [0, 4.7383, 0.0553659]
+          Position: [0, -6, 0.0553659]
           Rotation: [1, 0, 0]
           Scale: [1, 1, 1]
     - Type: 2

@@ -41,10 +41,9 @@ function AbilityTest.OnActivate (action)
 	transform:SetPos(x, y, z);
 	
 	renderComp:SetModel("Primitives/sphereTangents");
-	renderComp:SetMaterial("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
-	
+	renderComp:SetMaterial("Fireball");
+	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
 	local collision = Collision.New(entity);
-
 	local physics = Physics.New(entity);
 	physics:SetInfo(
 		collision,

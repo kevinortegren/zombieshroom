@@ -11,11 +11,11 @@ namespace RootForce
 	void WorldSystem::CreateWorld(const std::string& p_worldName)
 	{
 		// Setup static lights.
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 		Render::DirectionalLight directionalLight;
-		directionalLight.m_color = glm::vec4(0.4f);
-		directionalLight.m_direction = glm::vec3(0,1,-1);
+		directionalLight.m_color = glm::vec4(0.8f);
+		directionalLight.m_direction = glm::vec3(0, -1,-1);
 
 		g_engineContext.m_renderer->AddDirectionalLight(directionalLight, 0);
 
@@ -28,8 +28,9 @@ namespace RootForce
 		t->m_scale = glm::vec3(-100);
 
 		r->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
-		r->m_material.m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
-		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+		r->m_material = g_engineContext.m_resourceManager->GetMaterial("Skybox");
+		r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
+		r->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);

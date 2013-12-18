@@ -190,6 +190,13 @@ namespace RootForce
 	
 		normal = glm::vec3 (0,0,-1);
 		position = glm::vec3 (0,0,9);
+	//	g_engineContext.m_physics->CreatePlane(normal, position);
+		// Setup the skybox.
+		auto e = m_world.GetTagManager()->GetEntityByTag("Skybox");
+		auto r = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(e);
+		r->m_material = g_engineContext.m_resourceManager->GetMaterial("Skybox"); 
+		r->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
+			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
@@ -221,7 +228,7 @@ namespace RootForce
 			}
 
 			// Toggle rendering of normals.
-			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			{
 				if(m_displayNormals)
 				{
