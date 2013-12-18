@@ -32,6 +32,7 @@ public:
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
+	int* export;
 	HANDLE MeshMutexHandle;
 	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;

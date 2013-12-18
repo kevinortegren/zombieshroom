@@ -233,6 +233,7 @@ namespace Render
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
+		
 	}
 
 	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
@@ -301,6 +302,7 @@ namespace Render
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 
 			(*itr).m_mesh->Bind();
+			Material* mat = (*itr).m_material;
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
@@ -468,6 +470,13 @@ namespace Render
 	{
 		m_cameraVars.m_projection = p_projectionMatrix;
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	std::shared_ptr<Material> GLRenderer::CreateMaterial()
+	{
+		Material* mat = new Material;
+		m_materialMeshMap[mat] = std::vector<MeshInterface*>(); //unknown if needed
+		return std::shared_ptr<Material>(mat); 
 	}
 
 

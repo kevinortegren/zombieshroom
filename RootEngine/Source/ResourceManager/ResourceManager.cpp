@@ -56,7 +56,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
 			return m_models[p_path];
 		}
 		
@@ -73,7 +73,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
 			return "";
 		}
 		
@@ -105,7 +105,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
 			return m_effects[p_path].get();
 		}
 
@@ -140,7 +140,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
 			return m_textures[p_path].get();
 		}
 		
@@ -167,6 +167,22 @@ namespace RootEngine
 		}
 		return m_models[p_path];
 	}
+
+	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
+	{
+		// Look if new name dosent exist.
+		
+		std::string oldName = ResolveStringFromModel(p_model);
+
+		// Remove the model from the old name.
+		m_models[oldName] = nullptr;	
+
+		// Set the model.
+		m_models[p_name] = p_model;
+
+		return false;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	//Get functions
@@ -207,6 +223,20 @@ namespace RootEngine
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get texture: %s, but it has never been loaded!", p_handle.c_str());
 			return nullptr;
+		}
+	}
+
+	Render::Material* ResourceManager::GetMaterial( std::string p_handle )
+	{
+		if(m_materials.find(p_handle) != m_materials.end())
+		{
+			return m_materials[p_handle].get();
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating new material: %s", p_handle.c_str());
+			m_materials[p_handle] = m_context->m_renderer->CreateMaterial();
+			return m_materials[p_handle].get();
 		}
 	}
 
@@ -281,15 +311,18 @@ namespace RootEngine
 		assert(false);
 	}
 
+	const std::string& ResourceManager::ResolveStringFromMaterial(Render::Material* p_material)
+	{
+		for(auto itr = m_materials.begin(); itr != m_materials.end(); ++itr)
+		{
+			if((*itr).second.get() == p_material)
+				return (*itr).first;
+		}
+		assert(false);
+	}
+
 	const std::string& ResourceManager::GetWorkingDirectory()
 	{
 		return m_workingDirectory;
 	}
-
-	
-
-	
-
-	
-
 }

@@ -91,6 +91,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 
 			}
 			break;*/
+		case 12:
+			{
+				RootForce::Collision* col = static_cast<RootForce::Collision*>(p_component);
+				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << col->m_meshHandle;
+			}
+			break;
 		default:
 			break;
 	}

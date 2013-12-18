@@ -4,9 +4,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
 
-//#include <RenderingSystem.h>
-//#include <LightSystem.h>
-
 #include <RootForce/Include/LuaAPI.h>
 #include <RootForce/Include/RawMeshPrimitives.h>
 #include <glm/glm.hpp>
@@ -22,8 +19,8 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
-			RootForce::Main m(path);
-			m.Start();
+        RootForce::Main m(path);
+        m.Start();
 	} 
 	catch (std::exception& e) 
 	{
@@ -61,6 +58,7 @@ namespace RootForce
 		{
 			// TODO: Log error and throw exception (?)
 		}
+
 		// TODO: Make these parameters more configurable.
 		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 				"Root Force",
@@ -87,13 +85,11 @@ namespace RootForce
 
 	void Main::Start() 
 	{
-		
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
-		
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-
 		g_world = &m_world;
+        m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
 
@@ -124,7 +120,6 @@ namespace RootForce
 					{
 						HandleEvents();
 						m_currentState = m_menustate->Update();
-						m_menustate->Render();
 					}
 				} break;
 
@@ -140,8 +135,8 @@ namespace RootForce
 						uint64_t now = SDL_GetPerformanceCounter();
 						float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 						old = now;
-                
-						HandleEvents();
+
+                        HandleEvents();
 
 						if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 						{
@@ -149,7 +144,6 @@ namespace RootForce
 						}
                     
 						m_gamestate->Update(dt);
-						m_gamestate->Render();
 					}
 				} break;
 
@@ -157,7 +151,6 @@ namespace RootForce
 				{
 					m_running = false;
 				} break;
-
 			}
         }
 	}

@@ -50,6 +50,7 @@ namespace Render
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
 		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
 		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
+		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -85,6 +86,7 @@ namespace Render
 		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
+		std::shared_ptr<Material> CreateMaterial();
 
 	private:
 
@@ -105,6 +107,7 @@ namespace Render
 		Mesh m_fullscreenQuad;
 		Mesh m_lineMesh;
 
+		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
 		std::vector<RenderJob> m_jobs;
 		std::vector<Line> m_lines;
 

@@ -4,17 +4,15 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/LanList.h>
 #include <GameStates.h>
+
 namespace RootForce
 {
-	
-
 	class Menustate
 	{
 	public:
 		Menustate();
 		void Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
 		GameStates::GameStates Update();
-		void Render();
 		GameStates::PlayData GetPlayData() { return m_playData; }
 		
 	private:
@@ -25,6 +23,5 @@ namespace RootForce
 
 		std::shared_ptr<Menu> m_menu;
 		GameStates::PlayData m_playData;
-		
 	};
 }

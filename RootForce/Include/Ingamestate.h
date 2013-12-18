@@ -1,6 +1,7 @@
 #pragma once
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/LightSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
@@ -30,7 +31,6 @@ namespace RootForce
 			RootForce::Network::Client* p_client, 
 			RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
 		void Update(float p_deltaTime);
-		void Render();
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 
@@ -47,14 +47,15 @@ namespace RootForce
 
 		//Game systems
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
+		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
-		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::ScriptSystem* m_scriptSystem;
+		RootForce::PhysicsSystem* m_physicsSystem;
+		RootForce::CollisionSystem* m_collisionSystem;
+		RootForce::RenderingSystem* m_renderingSystem;
+		RootForce::PointLightSystem* m_pointLightSystem;
 		RootForce::CameraSystem* m_cameraSystem;
 		RootForce::LookAtSystem* m_lookAtSystem;
 		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
-		RootForce::RenderingSystem* m_renderingSystem;
-		RootForce::PointLightSystem* m_pointLightSystem;
-		RootForce::AbilitySystem* m_abilitySystem;
 	};
 }

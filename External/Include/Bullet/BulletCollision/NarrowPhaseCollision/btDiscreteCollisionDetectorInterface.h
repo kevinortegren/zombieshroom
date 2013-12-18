@@ -19,6 +19,7 @@ subject to the following restrictions:
 
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
+class btStackAlloc;
 
 /// This interface is made to be used by an iterative approach to do TimeOfImpact calculations
 /// This interface allows to query for closest points and penetration depth between two (convex) objects
@@ -42,13 +43,15 @@ struct btDiscreteCollisionDetectorInterface
 	struct ClosestPointInput
 	{
 		ClosestPointInput()
-			:m_maximumDistanceSquared(btScalar(BT_LARGE_FLOAT))
+			:m_maximumDistanceSquared(btScalar(BT_LARGE_FLOAT)),
+			m_stackAlloc(0)
 		{
 		}
 
 		btTransform m_transformA;
 		btTransform m_transformB;
 		btScalar	m_maximumDistanceSquared;
+		btStackAlloc* m_stackAlloc;
 	};
 
 	virtual ~btDiscreteCollisionDetectorInterface() {};

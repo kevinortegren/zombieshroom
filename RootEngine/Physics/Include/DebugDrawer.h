@@ -30,6 +30,6 @@ public:
 private:
 	std::vector<glm::vec3> m_debugVectors;
 	int m_counter;
-	Render::Material m_mat;
+	Render::Material* m_mat;
 };
 

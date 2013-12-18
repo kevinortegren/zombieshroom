@@ -4,13 +4,14 @@
 #include <RootSystems\Include\RenderingSystem.h>
 #include <RootSystems\Include\LightSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
+#include <RootSystems\Include\PhysicsSystem.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
-#include <RootSystems\Include\PhysicsSystem.h>
 #include <RootSystems\Include\ScriptSystem.h>
 #include <RootSystems\Include\PlayerControlSystem.h>
 #include <RootSystems\Include\PlayerSystem.h>
 #include <RootSystems\Include\Network\NetworkComponents.h>
+#include <RootSystems\Include\CollisionSystem.h>
 #endif
 
 namespace RootForce
@@ -30,7 +31,9 @@ namespace RootForce
 			NETWORKCLIENT,
 			LOOKATBEHAVIOR,
 			THIRDPERSONBEHAVIOR,
-			SCRIPT
+			SCRIPT,
+			COLLISION,
+			COLLISIONRESPONDER
 		};
 	}
 }

@@ -1,6 +1,14 @@
 #include "BulletCharacter.h"
 
+namespace RootEngine
+{
 
+	namespace Physics
+	{
+		extern RootEngine::SubsystemSharedContext g_context;
+
+	}
+}
 class btKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
@@ -19,7 +27,7 @@ public:
 
 		if (!convexResult.m_hitCollisionObject->hasContactResponse())
 			return btScalar(1.0);
-
+		
 		btVector3 hitNormalWorld;
 		if (normalInWorldSpace)
 		{
@@ -192,11 +200,11 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 
 	start.setIdentity ();
 	end.setIdentity ();
-
+	//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Current pos: %f %f %f", m_currentPosition.x(), m_currentPosition.y(), m_currentPosition.z());
+	//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "target pos: %f %f %f", m_targetPosition.x(), m_targetPosition.y(), m_targetPosition.z());
 	/* FIXME: Handle penetration properly */
 	start.setOrigin (m_currentPosition + getUpAxisDirections()[m_upAxis] * (m_convexShape->getMargin() + m_addedMargin));
 	end.setOrigin (m_targetPosition);
-
 	btKinematicClosestNotMeConvexResultCallback callback (m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
 	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
@@ -212,12 +220,18 @@ void BulletCharacter::stepUp ( btCollisionWorld* world)
 
 	if (callback.hasHit())
 	{
+		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Bad triangle...");
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
 		// Only modify the position if the hit was a slope and not a wall or ceiling.
+
 		if(callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]) > 0.0)
 		{
 			// we moved up only a fraction of the step height
 			m_currentStepOffset = m_stepHeight * callback.m_closestHitFraction;
-			if (m_interpolateUp == true)
+			if (/*m_interpolateUp == */true)
 				m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 			else
 				m_currentPosition = m_targetPosition;
@@ -272,7 +286,6 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 		btScalar margin = m_convexShape->getMargin();
 		m_convexShape->setMargin(margin + m_addedMargin);
 
-
 		if (m_useGhostObjectSweepTest)
 		{
 			m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
@@ -292,7 +305,7 @@ void BulletCharacter::stepForwardAndStrafe ( btCollisionWorld* collisionWorld, c
 			btScalar hitDistance;
 			hitDistance = (callback.m_hitPointWorld - m_currentPosition).length();
 
-			//			m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
+				//		m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 
 			updateTargetPositionBasedOnCollision (callback.m_hitNormalWorld);
 			btVector3 currentDir = m_targetPosition - m_currentPosition;
@@ -387,7 +400,7 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	
 		btScalar downVelocity2 = (m_verticalVelocity<0.f?-m_verticalVelocity:0.f) * dt;
 		bool has_hit = false;
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 			has_hit = callback.hasHit() || callback2.hasHit();
 		else
 			has_hit = callback2.hasHit();
@@ -413,13 +426,18 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	{
 		// we dropped a fraction of the height -> hit floor
 
+		//////////////////////////////////////////////////////////////////////////
+		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
+		//////////////////////////////////////////////////////////////////////////
+
 		btScalar fraction = (m_currentPosition.getY() - callback.m_hitPointWorld.getY()) / 2;
 
 		//printf("hitpoint: %g - pos %g\n", callback.m_hitPointWorld.getY(), m_currentPosition.getY());
 
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 		{
-			if (full_drop == true)
+			if (/*full_drop == */true)
                                 m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
                         else
                                 //due to errors in the closestHitFraction variable when used with large polygons, calculate the hit fraction manually
@@ -428,7 +446,7 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 		else
 			m_currentPosition.setInterpolate3 (m_currentPosition, m_targetPosition, callback.m_closestHitFraction);
 
-		full_drop = false;
+		//full_drop = false;
 
 		m_verticalVelocity = 0.0;
 		m_verticalOffset = 0.0;
@@ -438,9 +456,9 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	{
 		// we dropped the full height
 		
-		full_drop = true;
+		//full_drop = true;
 
-		if (bounce_fix == true)
+		if (false/*bounce_fix == true*/)
 		{
 			downVelocity = (m_verticalVelocity<0.f?-m_verticalVelocity:0.f) * dt;
 			if (downVelocity > m_fallSpeed && (m_wasOnGround || !m_wasJumping))
@@ -455,4 +473,19 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 
 		m_currentPosition = m_targetPosition;
 	}
+
+}
+
+float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, btCollisionWorld* world )
+{
+	btTransform start, end;
+	start.setIdentity ();
+	end.setIdentity ();
+	start.setOrigin (p_start);
+	end.setOrigin (p_end);
+	btKinematicClosestNotMeConvexResultCallback callback(m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
+	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
+	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
+	m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
+	return callback.m_closestHitFraction;
 }

@@ -37,42 +37,41 @@ namespace RootForce
 		for(int i = 0; i < lanList.size(); i++)
 			m_menu->AddServer(lanList.at(i));
 
+		GameStates::GameStates result = GameStates::Exit;
 		switch (event.type)
 		{
-		case MenuEvent::EventType::Exit:
-			return GameStates::Exit;
-			break;
-		case MenuEvent::EventType::Refresh:
-			m_client->PingNetwork(m_lanList.get(), 5567);
-			return GameStates::Menu;
-			break;
-		case MenuEvent::EventType::Host:
-			m_playData.Host = true;
-			m_playData.p_port = event.data[0].ToInteger();
-			m_menu->Hide();
-			return GameStates::Ingame;
-			break;
-		case MenuEvent::EventType::Connect:
-			m_playData.Host = false;
-			m_playData.p_port = event.data[0].ToInteger();
-			m_playData.p_address = Awesomium::ToString(event.data[1].ToString());
-			m_menu->Hide();
-			return GameStates::Ingame;
-			break;
-		default:
-			m_menu->Unhide();
-			return GameStates::Menu;
-			break;
+			case MenuEvent::EventType::Exit:
+				result = GameStates::Exit;
+				break;
+			case MenuEvent::EventType::Refresh:
+				m_client->PingNetwork(m_lanList.get(), 5567);
+				result = GameStates::Menu;
+				break;
+			case MenuEvent::EventType::Host:
+				m_playData.Host = true;
+				m_playData.p_port = event.data[0].ToInteger();
+				m_menu->Hide();
+				result = GameStates::Ingame;
+				break;
+			case MenuEvent::EventType::Connect:
+				m_playData.Host = false;
+				m_playData.p_port = event.data[0].ToInteger();
+				m_playData.p_address = Awesomium::ToString(event.data[1].ToString());
+				m_menu->Hide();
+				result = GameStates::Ingame;
+				break;
+			default:
+				m_menu->Unhide();
+				result = GameStates::Menu;
+				break;
 		}
-	}
 
-	void Menustate::Render()
-	{
 		m_engineContext->m_renderer->Clear();
 
 		m_engineContext->m_gui->Render();
 
 		m_engineContext->m_renderer->Swap();
-	}
 
+		return result;
+	}
 }
