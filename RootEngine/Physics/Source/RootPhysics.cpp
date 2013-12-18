@@ -1098,6 +1098,11 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
+		if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Can't change mass for static objects");
+			return;
+		}
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 			m_playerObjects.at(index)->SetMass(p_mass);
