@@ -6,14 +6,17 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/AbilitySystem.h>
-#include <RootSystems/Include/Network/MessageHandler.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
-#include "GameStates.h"
-#include "ChatSystem.h"
+
+#include <RootForce/Include/GameStates.h>
+#include <RootSystems/Include/Network/Server.h>
+#include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
 {
@@ -21,16 +24,23 @@ namespace RootForce
 	{
 	public:
 		Ingamestate();
-		void Initialize(RootEngine::GameSharedContext* p_engineContext, std::shared_ptr<RootForce::Network::MessageHandler> p_networkHandler, std::shared_ptr<ECS::World> p_world, GameStates::PlayData p_playData);
+		void Initialize(RootEngine::GameSharedContext* p_engineContext, 
+			ECS::World* p_world, 
+			GameStates::PlayData p_playData, 
+			RootForce::Network::Client* p_client, 
+			RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
 		void Update(float p_deltaTime);
 		void Render();
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
-		RootForce::ChatSystemInterface* m_chat;
 
-		std::shared_ptr<ECS::World> m_world;
+		ECS::World* m_world;
 
-		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
+		std::shared_ptr<RootForce::ChatSystem> m_chat;
+		std::shared_ptr<RootForce::Network::Server> m_server;
+		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
+		RootForce::Network::Client* m_client;
+		RootForce::Network::ClientMessageHandler* m_clientMessageHandler;
 
 		bool m_displayNormals; // TODO: May not be needed?
 		bool m_displayPhysicsDebug; // TODO: May not be needed?
@@ -43,8 +53,8 @@ namespace RootForce
 		RootForce::CameraSystem* m_cameraSystem;
 		RootForce::LookAtSystem* m_lookAtSystem;
 		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
-		std::shared_ptr<RootForce::RenderingSystem> m_renderingSystem;
-		std::shared_ptr<RootForce::PointLightSystem> m_pointLightSystem;
-		std::shared_ptr<RootForce::AbilitySystem> m_abilitySystem;
+		RootForce::RenderingSystem* m_renderingSystem;
+		RootForce::PointLightSystem* m_pointLightSystem;
+		RootForce::AbilitySystem* m_abilitySystem;
 	};
 }

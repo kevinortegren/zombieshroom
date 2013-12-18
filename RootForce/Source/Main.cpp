@@ -103,51 +103,61 @@ namespace RootForce
 
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
+
+		// Setup a client
+		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
+		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger));
+		m_client->SetMessageHandler(m_clientMessageHandler.get());
+
 		while(m_running)
         {
 			switch (m_currentState)
 			{
-			case RootForce::GameStates::Menu:
-                // Initialize the network system
-                m_menustate->Initialize(&g_engineContext, m_networkHandler);
-            
-				g_engineContext.m_inputSys->LockMouseToCenter(false);
-
-				while (m_currentState == RootForce::GameStates::Menu && m_running)
+				case RootForce::GameStates::Menu:
 				{
-					HandleEvents();
-					m_currentState = m_menustate->Update();
-					m_menustate->Render();
-				}
-				break;
-			case RootForce::GameStates::Ingame:
-				// Start the main loop
-				m_gamestate->Initialize(&g_engineContext, m_networkHandler, std::shared_ptr<ECS::World>(&m_world), m_menustate->GetPlayData());
-				g_engineContext.m_inputSys->LockMouseToCenter(true);
-                
-				uint64_t old = SDL_GetPerformanceCounter();
-				while (m_currentState == RootForce::GameStates::Ingame && m_running)
-				{	
-                    uint64_t now = SDL_GetPerformanceCounter();
-					float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
-					old = now;
-                
-					HandleEvents();
+					// Initialize the network system
+					m_menustate->Initialize(&g_engineContext, m_client.get(), m_clientMessageHandler.get());
+            
+					g_engineContext.m_inputSys->LockMouseToCenter(false);
 
-					if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					while (m_currentState == RootForce::GameStates::Menu && m_running)
 					{
-						m_running = false;
+						HandleEvents();
+						m_currentState = m_menustate->Update();
+						m_menustate->Render();
 					}
+				} break;
+
+				case RootForce::GameStates::Ingame:
+				{
+					// Start the main loop
+					m_gamestate->Initialize(&g_engineContext, &m_world, m_menustate->GetPlayData(), m_client.get(), m_clientMessageHandler.get());
+					g_engineContext.m_inputSys->LockMouseToCenter(true);
+                
+					uint64_t old = SDL_GetPerformanceCounter();
+					while (m_currentState == RootForce::GameStates::Ingame && m_running)
+					{	
+						uint64_t now = SDL_GetPerformanceCounter();
+						float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+						old = now;
+                
+						HandleEvents();
+
+						if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+						{
+							m_running = false;
+						}
                     
-					m_gamestate->Update(dt);
-					m_gamestate->Render();
-				}
-				break;
-			case RootForce::GameStates::Exit:
-				m_running = false;
-				break;
-			default:
-				break;
+						m_gamestate->Update(dt);
+						m_gamestate->Render();
+					}
+				} break;
+
+				case RootForce::GameStates::Exit:
+				{
+					m_running = false;
+				} break;
+
 			}
         }
 	}

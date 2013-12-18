@@ -4,7 +4,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
-#include <RootForce/Include/ChatSystem.h>
+#include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
 {

@@ -17,14 +17,15 @@ namespace RootForce
 		RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 		RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 		RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
-
-		m_chat = new ChatSystem();
 	}
 
-	void Ingamestate::Initialize(RootEngine::GameSharedContext* p_engineContext, std::shared_ptr<RootForce::Network::MessageHandler> p_networkHandler, std::shared_ptr<ECS::World> p_world, GameStates::PlayData p_playData)
+	void Ingamestate::Initialize(RootEngine::GameSharedContext* p_engineContext, 
+			ECS::World* p_world, 
+			GameStates::PlayData p_playData, 
+			RootForce::Network::Client* p_client, 
+			RootForce::Network::ClientMessageHandler* p_clientMessageHandler)
 	{
 		m_engineContext = p_engineContext;
-		m_networkHandler = p_networkHandler;
 		m_world = p_world;
 
 		//Bind c++ functions and members to Lua
@@ -57,18 +58,18 @@ namespace RootForce
 		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
 		keybindings[4].Edge = true;
 
-		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(m_world.get()));
+		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(m_world));
 		m_playerControlSystem->SetInputInterface(m_engineContext->m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(m_engineContext->m_logger);
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(m_engineContext->m_physics);
 
 		//Initiate scriptsystem
-		m_scriptSystem = new RootForce::ScriptSystem(m_world.get());
+		m_scriptSystem = new RootForce::ScriptSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
 
 		// Initialize physics system
-		m_physicsSystem = new RootForce::PhysicsSystem(m_world.get());
+		m_physicsSystem = new RootForce::PhysicsSystem(m_world);
 		m_physicsSystem->SetPhysicsInterface(m_engineContext->m_physics);
 		m_physicsSystem->SetLoggingInterface(m_engineContext->m_logger);
 		m_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
@@ -77,26 +78,26 @@ namespace RootForce
 		m_world->GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize render and point light system.
-		m_renderingSystem = std::shared_ptr<RootForce::RenderingSystem>(new RootForce::RenderingSystem(m_world.get()));
-		m_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem.get(), "RenderingSystem");
+		m_renderingSystem = new RootForce::RenderingSystem(m_world);
+		m_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
 
 		m_renderingSystem->SetLoggingInterface(m_engineContext->m_logger);
 		m_renderingSystem->SetRendererInterface(m_engineContext->m_renderer);
 
-		m_cameraSystem = new RootForce::CameraSystem(m_world.get());
+		m_cameraSystem = new RootForce::CameraSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
-		m_lookAtSystem = new RootForce::LookAtSystem(m_world.get());
+		m_lookAtSystem = new RootForce::LookAtSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
-		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(m_world.get());
+		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-		m_pointLightSystem = std::shared_ptr<RootForce::PointLightSystem>(new RootForce::PointLightSystem(m_world.get(), m_engineContext->m_renderer));
-		m_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem.get(), "PointLightSystem");
+		m_pointLightSystem = new RootForce::PointLightSystem(m_world, m_engineContext->m_renderer);
+		m_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
 
 
 		//Initialize Abilitysystem
-		m_abilitySystem = std::shared_ptr<RootForce::AbilitySystem>(new RootForce::AbilitySystem(m_world.get(), m_engineContext->m_renderer));
-		m_world->GetSystemManager()->AddSystem<RootForce::AbilitySystem>(m_abilitySystem.get(), "AbilitySystem");
+		m_abilitySystem = new RootForce::AbilitySystem(m_world, m_engineContext->m_renderer);
+		m_world->GetSystemManager()->AddSystem<RootForce::AbilitySystem>(m_abilitySystem, "AbilitySystem");
 
 		//Create camera
 		ECS::Entity* cameraEntity = m_world->GetEntityManager()->CreateEntity();
@@ -116,7 +117,7 @@ namespace RootForce
 		// Import test world.
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 
-		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(m_world.get(), p_engineContext));
+		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(m_world, p_engineContext));
 		m_playerSystem->CreatePlayer();
 
 		m_displayPhysicsDebug = false;
@@ -139,13 +140,28 @@ namespace RootForce
 		r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 			"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-		m_chat->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
 
-		if(p_playData.Host)
-			m_networkHandler->Host(p_playData.p_port, Network::MessageHandler::LOCAL);
-		else if(!p_playData.Host)
-			m_networkHandler->Connect(p_playData.p_port, p_playData.p_address.c_str());
-		m_networkHandler->SetChatSystem(m_chat);
+		m_chat = std::shared_ptr<RootForce::ChatSystem>(new RootForce::ChatSystem);
+		m_chat->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
+		
+		// Setup the network
+		m_client = p_client;
+		m_clientMessageHandler = p_clientMessageHandler;
+
+		if (p_playData.Host)
+		{
+			m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(p_engineContext->m_logger, "Local Server", p_playData.p_port));
+			m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger));
+			m_server->SetMessageHandler(m_serverMessageHandler.get());
+			m_client->Connect("127.0.0.1", p_playData.p_port);
+		}
+		else
+		{
+			m_client->Connect(p_playData.p_address.c_str(), p_playData.p_port); 
+		}
+
+		m_client->SetChatSystem(m_chat.get());
+		m_clientMessageHandler->SetChatSystem(m_chat.get());
 	}
 
 	void Ingamestate::Update(float p_deltaTime)
@@ -174,9 +190,15 @@ namespace RootForce
 			m_abilitySystem->Process();
 		}
 
+		if (m_server != nullptr)
 		{
-			PROFILE("Network message handler", m_engineContext->m_profiler);
-			m_networkHandler->Update();
+			PROFILE("Server", m_engineContext->m_profiler);
+			m_server->Update();
+		}
+
+		{
+			PROFILE("Client", m_engineContext->m_profiler);
+			m_client->Update();
 		}
 
 		{

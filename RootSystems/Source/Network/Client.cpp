@@ -12,6 +12,7 @@ namespace RootForce
 			: m_logger(p_logger)
 			, m_peer(nullptr)
 			, m_messageHandler(nullptr)
+			, m_chatSystem(nullptr)
 		{
 			m_peer = RakNet::RakPeerInterface::GetInstance();
 
@@ -65,19 +66,22 @@ namespace RootForce
 			}
 
 			// Send a chat message
-			std::string chatMessage = m_chatSystem->PollMessage();
-			if (chatMessage != "")
+			if (m_chatSystem != nullptr)
 			{
-				MessageChat c;
-				c.Message = chatMessage.c_str();
-				c.SenderID = -1;
-				c.Type = MessageChat::TYPE_CHAT;
+				std::string chatMessage = m_chatSystem->PollMessage();
+				if (chatMessage != "")
+				{
+					MessageChat c;
+					c.Message = chatMessage.c_str();
+					c.SenderID = -1;
+					c.Type = MessageChat::TYPE_CHAT;
 
-				RakNet::BitStream bs;
-				bs.Write((RakNet::MessageID) MessageType::ChatToServer);
-				c.Serialize(true, &bs);
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::ChatToServer);
+					c.Serialize(true, &bs);
 
-				m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+				}
 			}
 		}
 
