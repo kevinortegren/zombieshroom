@@ -21,7 +21,7 @@
           Effect: Mesh
           Diffuse: sphere_diffuse
         - Entity: 3
-          Model: groundDanger
+          Model: ground
           Effect: Mesh
           Diffuse: grass
     - Type: 1
