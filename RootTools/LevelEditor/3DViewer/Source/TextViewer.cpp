@@ -26,7 +26,8 @@ bool g_running;
 void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
-bool export;
+int entityExport;
+string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/Levels/";
 
 ReadMemory RM;
 void LoadScene()
@@ -48,7 +49,15 @@ void HandleEvents()
 		case SDL_KEYDOWN:
 			{
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
-					export = true;
+					entityExport = true;
+
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+					*RM.export = 1;
+
+					ReleaseMutex(RM.IdMutexHandle);
+
 			}
 			break;
 		//default:
@@ -87,6 +96,10 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
+	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
+	collision->m_meshHandle = p_name;
+
+	p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
 	return entity;
 }
@@ -108,13 +121,17 @@ std::string GetNameFromPath( std::string p_path )
  } 
 int main(int argc, char* argv[]) 
 {
-	export = false;
+	entityExport = 0;
+
+
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
     RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
     RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
     RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	
 	// Setup world.
 	ECS::World m_world;
 
@@ -190,6 +207,8 @@ int main(int argc, char* argv[])
 			RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
 			RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
 			m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
+			m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
+
 
 			std::shared_ptr<Render::Mesh> Mesh[g_maxMeshes];
 
@@ -216,6 +235,7 @@ int main(int argc, char* argv[])
 			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
+			*RM.export = 0;
 			numberMeshes = *RM.NumberOfMeshes;
 			*RM.MeshIdChange = glm::vec2(-1, -1);
 			std::string OldtempTexName;
@@ -249,7 +269,7 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberMeshes; i++)
 			{
-				string name = RM.PmeshList[i]->transformation.name;
+				string name = RM.PmeshList[i]->modelName;
 				Entities.push_back(CreateMeshEntity(&m_world, name));	
 				cout << "LOADED: " << name  << " TO INDEX " << i << endl;
 
@@ -358,21 +378,43 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
-				if(export)
-				{
-					m_world.GetEntityExporter()->Export("level");
-					export = false;
-				}
-
 				// GET MESH CHANGE AND REMOVE INDEX
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				int MeshIndex = RM.MeshIdChange->x;
 				int RemoveMeshIndex = RM.MeshIdChange->y;
 				int RemoveLightIndex = RM.LightIdChange->y;
+				entityExport = *RM.export;
+				
 				*RM.MeshIdChange = glm::vec2(-1, -1);
 				ReleaseMutex(RM.IdMutexHandle);
 
+				if(entityExport == 2)
+				{			
+
+					for(int i = 0; i < Entities.size(); i++)
+					{
+						//UPDATE modelName for all Entities from shared memory
+						RootForce::Renderable *mesh = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
+
+						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+						string name = RM.PmeshList[i]->modelName;
+						ReleaseMutex(RM.MeshMutexHandle);
+
+						RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
+						collision->m_meshHandle = name + "0";
+
+						g_engineContext.m_resourceManager->RenameModel(mesh->m_model, name);
+					}
+
+					m_world.GetEntityExporter()->Export(g_savepath + "level.world");
+					entityExport = false;
+					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					*RM.export = 0;
+					ReleaseMutex(RM.IdMutexHandle);
+				}
 				/////////////////////// UPDATE MESHES ////////////////////////////////
 				if(MeshIndex != -1)					
 				{
@@ -380,7 +422,7 @@ int main(int argc, char* argv[])
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
 					{
-						string name = RM.PmeshList[MeshIndex]->transformation.name;
+						string name = RM.PmeshList[MeshIndex]->modelName;
 						if(name != "")
 						{
 							Entities.push_back(CreateMeshEntity(&m_world, name));

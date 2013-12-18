@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/LightSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
@@ -36,6 +37,7 @@ namespace RootForce
 		
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
+		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 
 		std::shared_ptr<RootForce::Network::MessageHandler> m_networkHandler;
 		bool m_displayNormals;

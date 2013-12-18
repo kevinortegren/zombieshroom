@@ -8,6 +8,7 @@ SharedMemory::SharedMemory()
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
 	InitalizeSharedMemory();
+	export = nullptr;
 }
 
 SharedMemory::~SharedMemory()
@@ -23,8 +24,9 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Material) * g_maxMeshes;
-	total_memory_size += sizeof(int);
+	total_memory_size += sizeof(int) * 4;
 	total_memory_size += sizeof(glm::vec2) * 3;
+	total_memory_size += sizeof(int);
 	
 
 
@@ -86,6 +88,10 @@ int SharedMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(Material) * g_maxMeshes);
 
 	NumberOfMaterials = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	export = (int*)(mem);
 	
 
 	//if(first_process)
@@ -163,23 +169,17 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		}
 
 		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
+		
 	}	
-	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30);
+
 	if(updateTransformation)
 	{
-		//memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
+		memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
-	}
-
-
-	//memcpy(PmeshList[index]->texturePath, meshList[index].texturePath, 100);		//Ligger pointlight här av någon annledning. DERRRP.
-	//memcpy(PmeshList[index]->normalPath, meshList[index].normalPath, 100);
-	
-	//PmeshList[index]->texturePath = meshList[index].texturePath;
-	//PmeshList[index]->normalPath = meshList[index].normalPath;
-	
+	}	
 
 	ReleaseMutex(MeshMutexHandle);
 }

@@ -12,7 +12,7 @@
 #include <RootEngine/Render/Include/Texture.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Mesh.h>
-#include <RootEngine/Render/Include/Animation.h>
+#include <RootEngine/Include/Animation.h>
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
@@ -26,7 +26,7 @@ namespace RootEngine
 	{
 		std::vector<Render::MeshInterface*> m_meshes;
 		std::vector<Physics::PhysicsMeshInterface*> m_physicsMeshes;
-		std::vector<Render::AnimationInterface*> m_animations;
+		std::vector<RootEngine::RootAnimation::AnimationInterface*> m_animations;
 
 		std::string m_textureHandles[3];
 		
@@ -52,7 +52,7 @@ namespace RootEngine
 
 		GameSharedContext*			m_context;
 		Model*						m_model; 
-		Assimp::Importer			m_importer;
+		
 	};
 #endif
 }
