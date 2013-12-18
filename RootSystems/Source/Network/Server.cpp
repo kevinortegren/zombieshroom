@@ -9,6 +9,7 @@ namespace RootForce
 	{
 		Server::Server(Logging* p_logger, const std::string& p_name, unsigned short p_port, unsigned int p_maxConnections)
 			: m_logger(p_logger)
+			, m_messageHandler(nullptr)
 		{
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
@@ -22,7 +23,9 @@ namespace RootForce
 			// Setup the ping response (for network discovery)
 			RootSystems::ServerInfo info;
 			m_info.Name = p_name.c_str();
-			m_info.MapFile = "";
+			m_info.MapFile = "None";
+			//strcpy(m_info.Name, p_name.c_str());
+			//strcpy(m_info.MapFile, "None");
 			m_info.MaxPlayers = p_maxConnections;
 			m_info.NumPlayers = 0;
 			m_info.PasswordProtected = false;
@@ -69,10 +72,20 @@ namespace RootForce
 			}
 		}
 
+		RakNet::RakPeerInterface* Server::GetPeerInterface()
+		{
+			return m_peer;
+		}
+
 		void Server::UpdatePingResponse()
 		{
 			RakNet::BitStream bs;
 			m_info.Serialize(true, &bs);
+
+			const unsigned char* data = bs.GetData();
+			unsigned int size = bs.GetNumberOfBytesUsed();
+
+			m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Ping response length (bytes): %d", size);
 
 			m_peer->SetOfflinePingResponse((const char*)bs.GetData(), bs.GetNumberOfBytesUsed());
 		}

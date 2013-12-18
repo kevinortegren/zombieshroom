@@ -20,6 +20,8 @@ namespace RootForce
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
 			void Update();
+
+			RakNet::RakPeerInterface* GetPeerInterface();
 		private:
 			Logging* m_logger;
 			RakNet::RakPeerInterface* m_peer;

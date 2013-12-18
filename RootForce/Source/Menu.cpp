@@ -30,15 +30,15 @@ namespace RootForce
 		m_view->ExecuteJavascript(Awesomium::WSLit("Unhide();"), Awesomium::WebString());
 		//m_view->ResumeRendering();
 	}
-	void RootForce::Menu::AddServer(std::pair<uint64_t,RootSystems::ServerInfoInternal*> p_serverInfo)
+	void RootForce::Menu::AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo)
 	{
 		std::string command = "AddServer('";
-		command = command + p_serverInfo.second->IP + ":" + std::to_string(p_serverInfo.second->Port) + "','";
-		command = command + p_serverInfo.second->Name.C_String() + "',";
-		command = command + std::to_string(p_serverInfo.second->NumPlayers) + ",";
-		command = command + std::to_string(p_serverInfo.second->MaxPlayers) + ",";
+		command = command + p_serverInfo.second.IP + ":" + std::to_string(p_serverInfo.second.Port) + "','";
+		command = command + p_serverInfo.second.Name.C_String() + "',";
+		command = command + std::to_string(p_serverInfo.second.NumPlayers) + ",";
+		command = command + std::to_string(p_serverInfo.second.MaxPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.first/1000) + ",'";
-		command = command + (p_serverInfo.second->PasswordProtected?"Yes":"No") + "');";
+		command = command + (p_serverInfo.second.PasswordProtected?"Yes":"No") + "');";
 
 		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
 	}

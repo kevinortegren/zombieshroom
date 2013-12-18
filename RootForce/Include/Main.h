@@ -14,6 +14,7 @@
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
 
 #include <memory>
 #include <string>
@@ -56,6 +57,8 @@ namespace RootForce
 		RootSystems::LanList m_lanList;
 		std::shared_ptr<RootForce::Network::Server> m_server;
 		std::shared_ptr<RootForce::Network::Client> m_client;
+		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
+		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
 
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug;

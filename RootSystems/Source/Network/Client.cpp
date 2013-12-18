@@ -58,5 +58,10 @@ namespace RootForce
 					m_messageHandler->ParsePacket(id, &bs, packet);
 			}
 		}
+
+		RakNet::RakPeerInterface* Client::GetPeerInterface()
+		{
+			return m_peer;
+		}
 	}
 }

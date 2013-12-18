@@ -242,8 +242,6 @@ namespace RootForce
 		//Initiate Menu
 		Menu* m_menu = new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher());
 
-        
-       
 		m_displayPhysicsDebug = false;
 
 		uint64_t old;
@@ -257,7 +255,9 @@ namespace RootForce
 
 				// Initialize a client (defer the initialization of the server until we know we need one)
 				m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
-				// TODO: Add LAN discovery message handler to the client
+				m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger));
+				m_clientMessageHandler->SetLanList(&m_lanList);
+				m_client->SetMessageHandler(m_clientMessageHandler.get());
 
 				while (m_currentState == RootForce::GameState::Menu && m_running)
 				{
@@ -272,7 +272,7 @@ namespace RootForce
 
 					g_engineContext.m_renderer->Swap();
 
-					std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal*>> lanList = m_lanList.GetList();
+					std::vector<std::pair<uint64_t, RootSystems::ServerInfoInternal>> lanList = m_lanList.GetList();
 					for(int i = 0; i < lanList.size(); i++)
 						m_menu->AddServer(lanList.at(i));
 
@@ -285,6 +285,8 @@ namespace RootForce
 						break;
 					case MenuEvent::EventType::Host:
 						m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, "Local Server", event.data[0].ToInteger(), 12));
+						m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger));
+						m_server->SetMessageHandler(m_serverMessageHandler.get());
 						m_client->Connect("127.0.0.1", event.data[0].ToInteger());
 						m_currentState = RootForce::GameState::Ingame;
 

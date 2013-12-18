@@ -32,7 +32,7 @@ namespace RootForce
 		MenuEvent::MenuEvent PollEvent();
 		void Hide();
 		void Unhide();
-		void AddServer(std::pair<uint64_t,RootSystems::ServerInfoInternal*> p_serverInfo);
+		void AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo);
 	private:
 		void ExitEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void HostEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
