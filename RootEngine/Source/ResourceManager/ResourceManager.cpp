@@ -56,7 +56,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
 			return m_models[p_path];
 		}
 		
@@ -73,7 +73,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
 			return "";
 		}
 		
@@ -105,7 +105,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
 			return m_effects[p_path].get();
 		}
 
@@ -140,11 +140,49 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
 			return m_textures[p_path].get();
 		}
 		
 	}
+
+	Model* ResourceManager::CreateModel(const std::string& p_path)
+	{
+		if(m_models.find(p_path) == m_models.end())
+		{
+			Model* model = new Model();
+			model->m_meshes.resize(1);
+			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
+			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			
+			if(model)
+			{
+				m_models[p_path] = model;
+				return m_models[p_path];
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		return m_models[p_path];
+	}
+
+	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
+	{
+		// Look if new name dosent exist.
+		
+		std::string oldName = ResolveStringFromModel(p_model);
+
+		// Remove the model from the old name.
+		m_models[oldName] = nullptr;	
+
+		// Set the model.
+		m_models[p_name] = p_model;
+
+		return false;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	//Get functions
@@ -268,6 +306,16 @@ namespace RootEngine
 		for(auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
 			if((*itr).second == p_model)
+				return (*itr).first;
+		}
+		assert(false);
+	}
+
+	const std::string& ResourceManager::ResolveStringFromMaterial(Render::Material* p_material)
+	{
+		for(auto itr = m_materials.begin(); itr != m_materials.end(); ++itr)
+		{
+			if((*itr).second.get() == p_material)
 				return (*itr).first;
 		}
 		assert(false);

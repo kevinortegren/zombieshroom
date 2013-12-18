@@ -37,12 +37,16 @@ function AbilityTest.OnActivate (action)
 	aimx, aimy, aimz = aimingTrans:GetFront();
 	local renderComp 	= Renderable.New(entity);
 	local transform 	= Transformation.New(entity);
+	
 	transform:SetPos(x, y, z);
-	local physics 		= PhysicsAccessor.New(entity);
+	
 	renderComp:SetModel("Primitives/sphereTangents");
 	renderComp:SetMaterial("Fireball");
 	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
+	local collision = Collision.New(entity);
+	local physics = Physics.New(entity);
 	physics:SetInfo(
+		collision,
 		true, --collideWorld
 		aimx, --dirx
 		aimy, --diry
@@ -50,13 +54,14 @@ function AbilityTest.OnActivate (action)
 		0, --gravx
 		-9.82, --gravy
 		0, --gravz
-		0, --orientX
+		1, --orientX
 		0, --orientY
-		0, --orientZ
+		-1, --orientZ
 		0, --orientW
 		x + aimx * 3, --posX
 		4 + y + aimy * 3, --posY
 		z + aimz * 3, --posZ
+		entity:GetId(),
 		0.5, --height
 		3, --mass
 		1, --radius

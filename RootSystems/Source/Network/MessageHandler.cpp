@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <Network/MessageHandler.h>
 #include <Network/Messages.h>
 #include <RootEngine/Network/Include/LocalServer.h>
@@ -164,3 +166,5 @@ TEST(NetworkMessage, SerializeCopy)
 	EXPECT_TRUE(strcmp(m.Message, m2.Message) == 0);
 }
 */
+
+#endif

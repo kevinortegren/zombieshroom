@@ -5,7 +5,6 @@
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
-#include <RootSystems/Include/Physics.h>
 
 namespace RootForce
 {

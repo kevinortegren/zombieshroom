@@ -53,7 +53,6 @@ protected:
 
 	//for variable timesteps
 	btScalar	m_localTime;
-	btScalar	m_fixedTimeStep;
 	//for variable timesteps
 
 	bool	m_ownsIslandManager;
@@ -65,8 +64,6 @@ protected:
 	
 	int	m_profileTimings;
 
-	bool	m_latencyMotionStateInterpolation;
-
 	btAlignedObjectArray<btPersistentManifold*>	m_predictiveManifolds;
 
 	virtual void	predictUnconstraintMotion(btScalar timeStep);
@@ -77,7 +74,7 @@ protected:
 
 	virtual void	solveConstraints(btContactSolverInfo& solverInfo);
 	
-	virtual void	updateActivationState(btScalar timeStep);
+	void	updateActivationState(btScalar timeStep);
 
 	void	updateActions(btScalar timeStep);
 
@@ -219,16 +216,6 @@ public:
 	///Preliminary serialization test for Bullet 2.76. Loading those files requires a separate parser (see Bullet/Demos/SerializeDemo)
 	virtual	void	serialize(btSerializer* serializer);
 
-	///Interpolate motion state between previous and current transform, instead of current and next transform.
-	///This can relieve discontinuities in the rendering, due to penetrations
-	void setLatencyMotionStateInterpolation(bool latencyInterpolation )
-	{
-		m_latencyMotionStateInterpolation = latencyInterpolation;
-	}
-	bool getLatencyMotionStateInterpolation() const
-	{
-		return m_latencyMotionStateInterpolation;
-	}
 };
 
 #endif //BT_DISCRETE_DYNAMICS_WORLD_H

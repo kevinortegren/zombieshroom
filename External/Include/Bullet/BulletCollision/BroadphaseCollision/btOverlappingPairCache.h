@@ -96,12 +96,6 @@ class btHashedOverlappingPairCache : public btOverlappingPairCache
 	btOverlapFilterCallback* m_overlapFilterCallback;
 	bool		m_blockedForChanges;
 
-protected:
-	
-	btAlignedObjectArray<int>	m_hashTable;
-	btAlignedObjectArray<int>	m_next;
-	btOverlappingPairCallback*	m_ghostPairCallback;
-
 
 public:
 	btHashedOverlappingPairCache();
@@ -271,6 +265,11 @@ private:
 	virtual void	sortOverlappingPairs(btDispatcher* dispatcher);
 	
 
+protected:
+	
+	btAlignedObjectArray<int>	m_hashTable;
+	btAlignedObjectArray<int>	m_next;
+	btOverlappingPairCallback*	m_ghostPairCallback;
 	
 };
 
