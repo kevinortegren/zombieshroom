@@ -379,6 +379,23 @@ namespace RootForce
 			return 1;
 		}
 
+		static int CreateArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int SetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArrayLength(lua_State* p_luaState)
+		{
+			return 0;
+		}
+	
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
@@ -445,7 +462,6 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
-		//Physics function & methods
 		static const struct luaL_Reg vec3_f [] = {
 			{"New", CreateVec3},
 			{"Dot", DotVec3},
@@ -465,6 +481,18 @@ namespace RootForce
 			{"__div", DivVec3},
 			{"__index", GetVec3Value},
 			{"__len", LengthVec3},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg array_f [] = {
+			{"New", CreateArray},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg array_m [] = {
+			{"__newindex", SetArray},
+			{"__index", GetArray},
+			{"__len", GetArrayLength},
 			{NULL, NULL}
 		};
 		
