@@ -98,7 +98,6 @@ namespace RootForce
 
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
-
 		// Setup a client
 		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
 		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger));
