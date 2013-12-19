@@ -19,6 +19,8 @@ namespace RootForce
         RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+        RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 	}
 
 	void Ingamestate::Initialize(RootEngine::GameSharedContext* p_engineContext, 
@@ -103,6 +105,14 @@ namespace RootForce
 
 		m_pointLightSystem = new RootForce::PointLightSystem(m_world, g_engineContext.m_renderer);
 		m_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+
+		m_particleSystem = new RootForce::ParticleSystem(m_world);
+		m_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
+
+		ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+		RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(m_world);
@@ -215,6 +225,7 @@ namespace RootForce
 			PROFILE("RenderingSystem", m_engineContext->m_profiler);
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
+			//m_particleSystem->Process();
 		}
         
 		m_engineContext->m_renderer->Render();

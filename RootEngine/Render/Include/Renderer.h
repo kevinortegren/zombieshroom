@@ -9,9 +9,12 @@
 #include <RootEngine/Render/Include/Line.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
+#include <RootEngine/Render/Include/ParticleSystem.h>
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
+#include <array>
+#include <stack>
 
 #if defined(_WINDLL)
 #define RENDERSYS_DLL_EXPORT __declspec(dllexport)
@@ -51,6 +54,8 @@ namespace Render
 		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
 		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
+
+		virtual ParticleSystem* CreateParticleSystem() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -87,6 +92,7 @@ namespace Render
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 		std::shared_ptr<Material> CreateMaterial();
+		ParticleSystem* CreateParticleSystem();
 
 	private:
 
@@ -136,18 +142,16 @@ namespace Render
 		size_t m_numDirectionalLights;
 		size_t m_numPointLights;
 
-
 		std::shared_ptr<TechniqueInterface> m_lightingTech;
 		std::shared_ptr<TechniqueInterface> m_debugTech;
 		std::shared_ptr<TechniqueInterface> m_normalTech;
 
-		//debug
-
-		GLuint m_debugFbo;
-		GLuint m_testHandle;
-		//GLuint m_testHandle;
-
 		bool m_displayNormals;
+
+		// Particle systems.
+		unsigned m_particleSystemsCount;
+		std::stack<unsigned> m_emptyParticleSlots;
+		std::array<ParticleSystem, 100> m_particleSystems;
 	};
 }
 

@@ -11,6 +11,8 @@
 
 namespace Render
 {
+	class GLRenderer;
+
 	struct ParticleVertex
 	{
 		glm::vec3 m_initialPos;
@@ -20,10 +22,19 @@ namespace Render
 		float m_type; // 0 = emitter;
 	};
 
-	class ParticleSystem
+	class ParticleSystemInterface
 	{
 	public:
-		void Init(Render::EffectInterface* p_effect);
+		virtual void Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect) = 0;
+		virtual void Update(float p_dt) = 0;
+	};
+
+	class ParticleSystem : public ParticleSystemInterface
+	{
+	public:
+		ParticleSystem();
+		~ParticleSystem();
+		void Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect);
 		void Update(float p_dt);
 
 	private:
@@ -31,8 +42,10 @@ namespace Render
 		int m_currentVB;
 		int m_currentTFB;
 		GLuint m_transformFeedback[2];
-		Render::Buffer m_vertexBuffer[2];
-		Render::VertexAttributes* m_attributes[2];
+		
+		std::shared_ptr<Render::BufferInterface> m_vertexBuffer[2];
+		std::shared_ptr<Render::VertexAttributesInterface> m_attributes[2];
+
 		Render::EffectInterface* m_effect;
 	};
 }

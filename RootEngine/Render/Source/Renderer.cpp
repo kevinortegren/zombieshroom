@@ -58,7 +58,8 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_numDirectionalLights(0),
-		m_numPointLights(0) 
+		m_numPointLights(0),
+		m_particleSystemsCount(0)
 	{
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::INIT_PRINT, "Renderer subsystem initialized!");
 	}
@@ -479,7 +480,20 @@ namespace Render
 		return std::shared_ptr<Material>(mat); 
 	}
 
+	ParticleSystem* GLRenderer::CreateParticleSystem()
+	{
+		unsigned slot = m_particleSystemsCount;
+		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
+		{
+			unsigned slot = m_emptyParticleSlots.top();
+			m_emptyParticleSlots.pop();	
+		}
 
+		m_particleSystems[slot].Init( this, g_context.m_resourceManager->LoadEffect("ParticleUpdate") );
+
+
+		return &m_particleSystems[slot++];
+	}
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

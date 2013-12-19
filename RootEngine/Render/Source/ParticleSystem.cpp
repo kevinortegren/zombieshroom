@@ -1,8 +1,20 @@
 #include <RootEngine\Render\Include\ParticleSystem.h>
+#include <RootEngine\Render\Include\Renderer.h>
 
 namespace Render
 {
-	void ParticleSystem::Init(Render::EffectInterface* p_effect)
+	
+	ParticleSystem::ParticleSystem()
+	{
+
+	}
+
+	ParticleSystem::~ParticleSystem()
+	{
+		glDeleteTransformFeedbacks(2, m_transformFeedback);
+	}
+
+	void ParticleSystem::Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect)
 	{
 		m_effect = p_effect;
 
@@ -18,21 +30,26 @@ namespace Render
 
 		glGenTransformFeedbacks(2, m_transformFeedback);
 
-		m_vertexBuffer[0].Init(GL_ARRAY_BUFFER);
-		m_vertexBuffer[1].Init(GL_ARRAY_BUFFER);
+		m_vertexBuffer[0] = p_renderer->CreateBuffer();
+		m_vertexBuffer[1] = p_renderer->CreateBuffer();
+
+
+		m_vertexBuffer[0]->Init(GL_ARRAY_BUFFER);
+		m_vertexBuffer[1]->Init(GL_ARRAY_BUFFER);
 
 		for (unsigned i = 0; i < 2 ; i++) {
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[i]);
 			
-			m_vertexBuffer[i].BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vertexBuffer[i].GetBufferId());
+			m_vertexBuffer[i]->BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vertexBuffer[i]->GetBufferId());
 
+			m_attributes[i] = p_renderer->CreateVertexAttributes();
 			m_attributes[i]->Init(5);
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
 
 		} 
 
@@ -49,7 +66,7 @@ namespace Render
 
 		glEnable(GL_RASTERIZER_DISCARD); 
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[m_currentVB].GetBufferId());
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[m_currentVB]->GetBufferId());
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[m_currentTFB]); 
 
 		 m_attributes[m_currentVB]->Bind();

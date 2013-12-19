@@ -1,12 +1,45 @@
-- name: ParticleUpdate
+- name: DeferredLighting
   techniques:
-    - name: ParticleUpdate
+    - name: Lighting
       uniforms:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+        - name: Lights
+          slot: 2
       textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Normals
+          slot: 1
+        - name: g_Depth
+          slot: 2
       programs:
-        - name: 2D_GUI
+        - name: ambient
           shaders:
-            - name: 2D_GUI
+            - name: ambient
               type: vertex
-            - name: 2D_GUI
+            - name: ambient
               type: fragment
+          depth:
+            write: 0
+            test: 0
+        - name: directional
+          shaders:
+            - name: directional
+              type: vertex
+            - name: directional
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+        - name: pointlight
+          shaders:
+            - name: pointlight
+              type: vertex
+            - name: pointlight
+              type: fragment
+          depth:
+            write: 0
+            test: 0
