@@ -151,6 +151,7 @@ namespace RootForce
 					break;
 				case PlayerAction::JUMP:
 					m_physics->PlayerJump(*(collision->m_handle), 20.0f);
+					
 					break;
 				default:
 					break;

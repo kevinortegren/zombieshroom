@@ -251,8 +251,8 @@ namespace Physics
 			m_dynamicWorld->addRigidBody(body);
 			m_dynamicObjects.push_back(body);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				body->setActivationState(DISABLE_DEACTIVATION);
+			/*if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setActivationState(DISABLE_DEACTIVATION);*/
 			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 			return;
 		}
