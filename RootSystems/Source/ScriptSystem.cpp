@@ -23,7 +23,10 @@ void RootForce::ScriptSystem::ProcessEntity(ECS::Entity* p_entity)
 		g_engineContext.m_script->SetFunction(script->m_name, "Process");
 		g_engineContext.m_script->AddParameterNumber((*itr).m_action);
 
-		if((*itr).m_action == RootForce::ActionType::ACTION_COLLIDE)
+		if((*itr).m_action == RootForce::ActionType::ACTION_CREATE)
+		{
+		}
+		else if((*itr).m_action == RootForce::ActionType::ACTION_COLLIDE)
 		{
 			g_engineContext.m_script->AddParameterNumber((*itr).m_data.m_collision.m_entityId);
 		}

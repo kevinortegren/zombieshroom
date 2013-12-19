@@ -89,6 +89,9 @@ namespace RootEngine
 			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
+			//Not final?
+			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release

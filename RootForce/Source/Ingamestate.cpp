@@ -39,6 +39,8 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
@@ -46,7 +48,7 @@ namespace RootForce
         g_engineContext.m_resourceManager->LoadCollada("AnimationTest");
         
 		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(5);
+		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
@@ -64,9 +66,13 @@ namespace RootForce
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[4].Action = RootForce::PlayerAction::JUMP;
 		keybindings[4].Edge = true;
-
+		
+		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[5].Edge = true;
+		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(m_world));
 		m_playerControlSystem->SetInputInterface(m_engineContext->m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(m_engineContext->m_logger);
