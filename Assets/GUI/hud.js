@@ -39,7 +39,29 @@ function OnLoad()
 	});
 }
 
-function SetHealth(p_health)
+function Set(p_id, p_value)
 {
-	
+	$("#"+p_id).html(p_value);
+	if(p_id == "timeleft")
+		if(parseInt(p_value.split(':')[0]) < 2)
+			$("#"+p_id).class("blink");
+		else
+			$("#"+p_id).class("");
+}
+
+function SetAbility(p_slot, p_ability)
+{
+	$("#slot"+p_slot).css("background-image", "url('"+p_ability+"'.png')");
+}
+
+function SetAbilityFocus(p_slot)
+{
+	$(".slotselected").class("slot");
+	$("#slot"+p_slot).class("slot slotselected");
+}
+
+function StartCooldown(p_slot, p_duration)
+{
+	$("#slot"+p_slot+"-cooldown").css("background-position", "50% 0px");
+	$("#slot"+p_slot+"-cooldown").animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
 }
