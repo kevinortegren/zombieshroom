@@ -37,7 +37,7 @@ namespace RootForce
 		m_client->Update();
 
 		std::vector<std::pair<uint64_t, RootSystems::ServerInfoInternal>> lanList = m_lanList->GetList();
-		for(int i = 0; i < lanList.size(); i++)
+		for(unsigned int i = 0; i < lanList.size(); i++)
 			m_menu->AddServer(lanList.at(i));
 
 		GameStates::GameStates result = GameStates::Exit;
