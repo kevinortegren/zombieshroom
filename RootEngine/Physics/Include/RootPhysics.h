@@ -92,6 +92,7 @@ namespace RootEngine
 			//Not final?
 			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
 			virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
+
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
 			virtual int* AddStaticObjectToWorld( unsigned int p_entityId) = 0; ///Legacy func, will be removed before release
