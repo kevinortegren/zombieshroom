@@ -1,5 +1,11 @@
 #pragma once
-#include "GameStates.h"
+
+#include <Utility/ECS/Include/World.h>
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Network/Server.h>
+#include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
+
 namespace RootForce
 {
 	namespace GameStates
@@ -7,6 +13,7 @@ namespace RootForce
 		enum GameStates
 		{
 			Menu,
+			Connecting,
 			Ingame,
 			Exit
 		};

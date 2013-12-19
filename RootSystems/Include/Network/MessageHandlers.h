@@ -5,9 +5,10 @@
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootSystems/Include/ChatSystem.h>
+#include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
-#include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
 {
@@ -29,15 +30,20 @@ namespace RootForce
 		class ClientMessageHandler : public MessageHandler
 		{
 		public:
-			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger);
+			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world);
 
 			void SetLanList(RootSystems::LanList* p_list);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
+			void SetPlayerSystem(PlayerSystem* p_playerSystem);
 
 			void ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
+			ECS::World* m_world;
 			RootSystems::LanList* m_list;
 			RootForce::ChatSystem* m_chatSystem;
+			NetworkEntityMap* m_networkEntityMap;
+			PlayerSystem* m_playerSystem;
 		};
 
 		class ServerMessageHandler : public MessageHandler

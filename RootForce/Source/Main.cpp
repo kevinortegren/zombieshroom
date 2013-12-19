@@ -42,23 +42,33 @@ namespace RootForce
 	Main::Main(std::string p_workingDirectory) 
 		: m_running(true)
 	{
-		m_menustate = std::shared_ptr<Menustate>(new Menustate());
-		m_gamestate = std::shared_ptr<Ingamestate>(new Ingamestate());
-
 		m_workingDirectory = p_workingDirectory;
 
+
+		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
+		if (m_engineModule == nullptr)
+		{
+			throw std::runtime_error("Failed to load RootEngine - please check your installation");
+		}
+
 		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
+		
+		if (libInitializeEngine == nullptr)
+		{
+			throw std::runtime_error("Failed to load RootEngine - please check your installation");
+		}
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
 		{
-			// TODO: Log error and throw exception (?)
+			throw std::runtime_error("Failed to initialize SDL");
 		}
 
-		// TODO: Make these parameters more configurable.
+
+		// TODO: Make these parameters (even?) more configurable.
 		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 				"Root Force",
 				SDL_WINDOWPOS_UNDEFINED,
@@ -69,8 +79,13 @@ namespace RootForce
 			SDL_DestroyWindow);
 		if (m_window == nullptr) 
 		{
-			// TODO: Log error and throw exception (?)
+			throw std::runtime_error("Failed to create window");
 		}
+
+
+		// Setup the screen states
+		m_menustate = std::shared_ptr<Menustate>(new Menustate());
+		m_gamestate = std::shared_ptr<Ingamestate>(new Ingamestate());
 
 		m_currentState = GameStates::Menu;
 	}
@@ -99,9 +114,9 @@ namespace RootForce
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
 
-		// Setup a client
+		// Setup a client (but don't connect until we have connection details)
 		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
-		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger));
+		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger, &m_world));
 		m_client->SetMessageHandler(m_clientMessageHandler.get());
 
 		while(m_running)

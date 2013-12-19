@@ -106,9 +106,9 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-        // Create a world and player
+        // Create a world (defer creation of player to the network)
+		// WARNING: This means a player is not guaranteed to exist until an accept message is received.
         m_worldSystem->CreateWorld("level");
-		m_playerSystem->CreatePlayer();
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -127,11 +127,13 @@ namespace RootForce
 		// Setup the network
 		m_client = p_client;
 		m_clientMessageHandler = p_clientMessageHandler;
+		m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
 
 		if (p_playData.Host)
 		{
 			m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(p_engineContext->m_logger, "Local Server", p_playData.p_port));
-			m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger));
+			m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger, m_world));
+			m_serverMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
 			m_server->SetMessageHandler(m_serverMessageHandler.get());
 			m_client->Connect("127.0.0.1", p_playData.p_port);
 		}
@@ -142,6 +144,7 @@ namespace RootForce
 
 		m_client->SetChatSystem(m_chat.get());
 		m_clientMessageHandler->SetChatSystem(m_chat.get());
+		m_clientMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
 	}
 
 	void Ingamestate::Update(float p_deltaTime)

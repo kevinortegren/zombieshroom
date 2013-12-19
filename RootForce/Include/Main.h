@@ -11,6 +11,7 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 
+#include <RootForce/Include/GameStates.h>
 #include <RootForce/Include/Menustate.h>
 #include <RootForce/Include/Ingamestate.h>
 
