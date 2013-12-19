@@ -13,32 +13,53 @@ namespace RootEngine
 		}
 		LocalServer::~LocalServer()
 		{
-			delete[] &m_client;
+			for(int i = 0; i < MAX_CLIENTS + 1; i++)
+				delete m_client[i];
+			m_peerInterface->Shutdown(0);
 		}
 
 		bool LocalServer::Send( const Message& p_message )
 		{
 			if(p_message.RecipientID == -1)
 			{
+				if(!m_client[1]->IsRemote)
+					Transmit(p_message, m_client[1]->GUID, false);
+					//m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
 				return Transmit(p_message, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 			else if (p_message.RecipientID == 0)
 			{
-				m_message.push_back(new Message(p_message));
+				// TODO: This is ugly. But need Sender ID for messages sent by local client.
+				Message* m = new Message(p_message);
+				m->SenderID = 1;
+				m_message.push_back(m);
+				return true;
 			}
 			else
 			{
-				return Transmit(p_message, m_client[p_message.RecipientID]->GUID, false);
+				if(!m_client[p_message.RecipientID]->IsRemote)
+				{
+					m_message.push_back(new Message(p_message)); //TODO make sure this is necessary
+					return true;
+				}
+				else
+					return Transmit(p_message, m_client[p_message.RecipientID]->GUID, false);
 			}
 			return false;
 		}
 
-		void LocalServer::Host( USHORT p_port, bool p_isDedicated )
+		bool LocalServer::Host( USHORT p_port, bool p_isDedicated )
 		{
 			m_numClients = 0;
 			RakNet::SocketDescriptor sd(p_port, 0);
 			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
-			m_peerInterface->Startup(MAX_CLIENTS, &sd, 1);
+			RakNet::StartupResult result = m_peerInterface->Startup(MAX_CLIENTS, &sd, 1);
+			if( result != RakNet::StartupResult::RAKNET_STARTED )
+			{
+				g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::FATAL_ERROR, "Could not start a server on port: %u. Error #%u", p_port, result);
+				return false;
+			}
+
 			m_peerInterface->SetMaximumIncomingConnections(MAX_CLIENTS);
 
 			if(!p_isDedicated)
@@ -52,6 +73,7 @@ namespace RootEngine
 				
 				Message* message = new Message;
 				message->MessageID = InnerMessageID::CONNECT;
+				message->SenderID = 1;
 				message->RecipientID = 0;
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
 				message->Data = new uint8_t[1];
@@ -61,6 +83,7 @@ namespace RootEngine
 
 				message = new Message;
 				message->MessageID = InnerMessageID::CONNECTION_ACCEPTED;
+				message->SenderID = 0;
 				message->RecipientID = 0;
 				message->Reliability = PacketReliability::RELIABLE_ORDERED;
 				message->Data = nullptr;
@@ -68,6 +91,7 @@ namespace RootEngine
 				m_message.push_back(message);
 			}
 			g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Server started on port %u.", p_port);
+			return true;
 		}
 
 		void LocalServer::Update()
@@ -90,12 +114,7 @@ namespace RootEngine
 					if( m_numClients >= MAX_CLIENTS )
 					{
 						// server full
-						g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Client refused: server full. Client IP: %u.%u.%u.%u:%u.",
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b1,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b2,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b3,
-							packet->systemAddress.address.addr4.sin_addr.S_un.S_un_b.s_b4,
-							packet->systemAddress.address.addr4.sin_port);
+						g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Client refused: server full. Client IP: %s.", packet->systemAddress.ToString());
 					}
 					else
 					{
@@ -110,9 +129,9 @@ namespace RootEngine
 
 						Message* message = new Message;
 						message->MessageID = InnerMessageID::CONNECT;
+						message->SenderID = 0;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
-						message->SenderID = clientID;
 						message->Data = new uint8_t[1];
 						message->Data[0] = clientID;
 						message->DataSize = 1;
@@ -136,17 +155,44 @@ namespace RootEngine
 						message->MessageID = InnerMessageID::DISCONNECT;
 						message->RecipientID = 0;
 						message->Reliability = PacketReliability::RELIABLE_ORDERED;
+						message->SenderID = 0;
 						message->Data = new uint8_t[1];
-						message->SenderID = clientID;
 						message->Data[0] = clientID;
 						message->DataSize = 1;
 						m_message.push_back(message);
 					}
 					break;
+				case ID_UNCONNECTED_PING:
+				// Network discovery. A network has been detected. Yay!
+					g_context.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "A LAN-discovery request has been received from %s.", packet->systemAddress.ToString());
+					break;
+				case ID_UNCONNECTED_PONG:
+				// Network discovery has been answered! Praise to the LAN-god!
+					ParseNetworkDiscoveryPacket(packet);
+					break;
 				default:
 					break;
 				}
 			}
+		}
+
+		bool LocalServer::IsClientLocal(size_t p_index) const
+		{
+			if (m_client[p_index] == nullptr)
+				return false;
+			return !m_client[p_index]->IsRemote;
+		}
+
+		std::vector<uint8_t> LocalServer::GetConnectedClients() const
+		{
+			std::vector<uint8_t> connectedClients;
+			for (uint8_t i = 1; i < MAX_CLIENTS + 1; ++i)
+			{
+				if (m_client[i] != nullptr)
+					connectedClients.push_back(i);
+			}
+
+			return connectedClients;
 		}
 
 	}

@@ -12,23 +12,22 @@ namespace RootEngine
 	{
 		guiInstance* guiInstance::s_gui = nullptr;
 		RootEngine::SubsystemSharedContext g_context;
-
 		void guiInstance::Startup(void)
 		{
 			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
 			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
 			m_core->set_surface_factory(m_glTexSurfaceFactory);
-			m_view = nullptr;
+			m_dispatcher = new Dispatcher();
 		}
 
 
 		void guiInstance::Shutdown(void)
 		{
-			if(m_view)
+			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 			{
-				m_view->Stop();
-				m_view->Destroy();
+				m_viewBuffer.at(i)->Stop();
+				m_viewBuffer.at(i)->Destroy();
 			}
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
 
@@ -41,9 +40,6 @@ namespace RootEngine
 		{
 			m_width = p_width;
 			m_height = p_height;
-			m_view = m_core->CreateWebView(m_width, m_height);
-			
-			m_view->SetTransparent(true);
   
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
@@ -91,16 +87,16 @@ namespace RootEngine
 			glBindVertexArray(m_vertexArrayBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
-			SurfaceToTexture((GLTextureSurface*)m_view->surface());
 
-			/*glEnable( GL_BLEND );
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			glDisable(GL_DEPTH_TEST);*/
+			glDisable(GL_DEPTH_TEST);
 
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+			{
+				SurfaceToTexture((GLTextureSurface*)m_viewBuffer.at(i)->surface());
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			}
 
-			/*glEnable(GL_DEPTH_TEST);
-			glDisable( GL_BLEND );*/
+			glEnable(GL_DEPTH_TEST);
 
 			glBindVertexArray(0);
 		}
@@ -113,11 +109,31 @@ namespace RootEngine
 			return s_gui;
 		}
 
-		void guiInstance::LoadURL( std::string p_path )
+		Awesomium::WebView* guiInstance::LoadURL( std::string p_path )
 		{
 			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
+			//Awesomium::WebURL url(Awesomium::WSLit("http://www.google.com"));
 
-			m_view->LoadURL(url);
+			Awesomium::WebView* temp = m_core->CreateWebView(m_width, m_height);
+
+			temp->SetTransparent(true);
+
+			temp->LoadURL(url);
+
+			m_viewBuffer.push_back(temp);
+
+			return temp;
+
+		}
+
+		void guiInstance::DestroyView( Awesomium::WebView* p_view )
+		{
+
+			p_view->Stop();
+			p_view->Destroy();
+			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+				if(m_viewBuffer.at(i) == p_view)
+					m_viewBuffer.erase(m_viewBuffer.begin() + i);
 		}
 
 		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
@@ -154,33 +170,59 @@ namespace RootEngine
 			{
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
+                case SDL_TEXTINPUT:
+				{
+					char temp[20];
+					char* t = temp;
+
+					tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
+					Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &t);
+
+					tempEvent.modifiers = 0;
+					if (p_event.key.keysym.mod & KMOD_LALT || p_event.key.keysym.mod & KMOD_RALT)
+						tempEvent.modifiers |= Awesomium::WebKeyboardEvent::kModAltKey;
+					if (p_event.key.keysym.mod & KMOD_LCTRL || p_event.key.keysym.mod & KMOD_RCTRL)
+						tempEvent.modifiers |= Awesomium::WebKeyboardEvent::kModControlKey;
+					if (p_event.key.keysym.mod & KMOD_LSHIFT || p_event.key.keysym.mod & KMOD_RSHIFT)
+						tempEvent.modifiers |= Awesomium::WebKeyboardEvent::kModShiftKey;
+					if (p_event.key.keysym.mod & KMOD_NUM)
+						tempEvent.modifiers |= Awesomium::WebKeyboardEvent::kModIsKeypad;
+
+					tempEvent.native_key_code = p_event.key.keysym.scancode;
+
+					if(p_event.type == SDL_KEYDOWN)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
+					if(p_event.type == SDL_TEXTINPUT)
 					{
-
-						tempEvent.virtual_key_code = MapToAwesomium(p_event.key.keysym.scancode);
-					
-						char* temp = new char[20];
-						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &(temp));
-
-						memcpy(tempEvent.key_identifier, temp, sizeof(char)*20 );
-
-						if(p_event.type == SDL_KEYDOWN)
-							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyDown;
-						if(p_event.type == SDL_KEYUP)
-							tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
-
-						m_view->InjectKeyboardEvent(tempEvent);
-						delete[] temp;
-		
-						break;
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeChar;
+						for (int i = 0; i < 4; i++) {
+							tempEvent.text[i] = (wchar16)p_event.text.text[i];
+							tempEvent.unmodified_text[i] = (wchar16)p_event.text.text[i];
+						}
+						// Use the first character of the text as the 'key code'
+						tempEvent.virtual_key_code = (wchar16)p_event.text.text[0];
+						tempEvent.native_key_code = (wchar16)p_event.text.text[0];
+						Awesomium::GetKeyIdentifierFromVirtualKeyCode(tempEvent.virtual_key_code, &t);
 					}
+					if(p_event.type == SDL_KEYUP)
+						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
+                        
+                    for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
+
+				} break;
+
 				case SDL_MOUSEBUTTONDOWN:
-					m_view->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						m_viewBuffer.at(i)->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEBUTTONUP:
-					m_view->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						m_viewBuffer.at(i)->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEMOTION:
-					m_view->InjectMouseMove(p_event.motion.x, p_event.motion.y);
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
 					break;
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
@@ -204,6 +246,8 @@ namespace RootEngine
 				return Awesomium::KeyCodes::AK_BACK;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_TAB)
 				return Awesomium::KeyCodes::AK_TAB;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_ESCAPE)
+				return Awesomium::KeyCodes::AK_ESCAPE;
 			else if(p_key == InputManager::MouseButton::LEFT)
 				return Awesomium::kMouseButton_Left;
 			else if(p_key == InputManager::MouseButton::RIGHT)

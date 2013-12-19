@@ -1,4 +1,5 @@
 #include <External/Include/RakNet/MessageIdentifiers.h>
+#include <External/Include/RakNet/BitStream.h>
 #include "RemoteServer.h"
 
 namespace RootEngine
@@ -10,7 +11,17 @@ namespace RootEngine
 		}
 		RemoteServer::~RemoteServer()
 		{
+			m_peerInterface->Shutdown(0);
 		}
+
+
+		void RemoteServer::Initialize()
+		{
+			RakNet::SocketDescriptor sd;
+			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
+			m_peerInterface->Startup(1, &sd, 1);
+		}
+
 
 		bool RemoteServer::Send(const Message& p_message)
 		{
@@ -19,10 +30,6 @@ namespace RootEngine
 
 		bool RemoteServer::ConnectTo( const char* p_ip , USHORT p_port)
 		{
-			RakNet::SocketDescriptor sd;
-			m_peerInterface = RakNet::RakPeerInterface::GetInstance();
-			m_peerInterface->Startup(1, &sd, 1);
-
 			RakNet::ConnectionAttemptResult result = m_peerInterface->Connect( p_ip, p_port, 0, 0 );
 			if(result == RakNet::ConnectionAttemptResult::CONNECTION_ATTEMPT_STARTED)
 				return true;
@@ -80,6 +87,10 @@ namespace RootEngine
 						m_message.push_back(message);
 						break;
 					}
+					case ID_UNCONNECTED_PONG:
+					// Network discovery has been answered! Praise to the LAN-god!
+						ParseNetworkDiscoveryPacket(packet);
+						break;
 				}
 			}
 		}

@@ -66,9 +66,17 @@ namespace RootEngine
 	{
 		if(m_scripts.find(p_scriptName) == m_scripts.end())
 		{
-			m_context->m_script->LoadScript(p_scriptName + ".lua");
+			if(m_context->m_script->LoadScript(p_scriptName + ".lua") == 1)
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when loading script: '%s.lua'", p_scriptName.c_str());
+				return "";
+			}
+			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: '%s.lua'", p_scriptName.c_str());
+			}
 			m_scripts[p_scriptName] = p_scriptName;
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: '%s.lua'", p_scriptName.c_str());
+			
 			return p_scriptName;
 		}
 		else

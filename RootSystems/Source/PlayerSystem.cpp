@@ -3,9 +3,6 @@
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
 
-#include <RootEngine/Include/GameSharedContext.h>
-extern RootEngine::GameSharedContext g_engineContext;
-
 namespace RootForce
 {
 	void PlayerSystem::CreatePlayer()
@@ -17,6 +14,7 @@ namespace RootForce
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
 		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+
 		RootForce::Physics* physics = entityManager->CreateComponent<RootForce::Physics>(entity);
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);
 		RootForce::CollisionResponder* collisionResponder = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);

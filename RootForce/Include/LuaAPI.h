@@ -154,7 +154,25 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CreatePhysicsAccessor(lua_State* p_luaState)
+		static int CreateHandle(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((unsigned int)luaL_checknumber(p_luaState, 2), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) == 1 ? true : false );
+			return 0;
+		}
+
+		static int CreateCollisionResponder(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::CollisionResponder **s = (RootForce::CollisionResponder **)lua_newuserdata(p_luaState, 4);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(*e);
+			luaL_setmetatable(p_luaState, "CollisionResponder");
+			return 1;
+		}
+		
+		static int CreatePhysics(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
@@ -163,6 +181,46 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Physics");
 			return 1;
 		}
+
+		static int SetMass(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+
+		static int BindShape(lua_State* p_luaState)
+		{
+			NumberOfArgs(7);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
+			float radius = (float)luaL_checknumber(p_luaState, 5);
+			float mass = (float)luaL_checknumber(p_luaState, 6);
+			bool collideWorld = lua_toboolean(p_luaState, 7) == 1 ? true : false;
+			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, mass, collideWorld);
+			return 0;
+		}
+
+		static int SetPhysPos(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int SetPhysVelocity(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+
+			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*v1));
+			return 0;
+		}
+		
 		static int SetRenderableMaterial(lua_State* p_luaState)
         {
             RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -211,41 +269,11 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetInfo(lua_State* p_luaState)
-		{
-			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-
-			RootEngine::Physics::AbilityPhysicsInfo info;
-			bool collide = lua_toboolean(p_luaState, 3) == 1 ? true : false; 
-			
-			glm::vec3 direction((float)lua_tonumber(p_luaState, 4), (float)lua_tonumber(p_luaState, 5), (float)lua_tonumber(p_luaState,6));
-			glm::vec3 gravity((float)lua_tonumber(p_luaState, 7), (float)lua_tonumber(p_luaState, 8), (float)lua_tonumber(p_luaState, 9));
-			glm::quat orientation((float)lua_tonumber(p_luaState, 10), (float)lua_tonumber(p_luaState, 11), (float)lua_tonumber(p_luaState, 12), (float)lua_tonumber(p_luaState, 13));
-			glm::vec3 position((float)lua_tonumber(p_luaState, 14), (float)lua_tonumber(p_luaState, 15), (float)lua_tonumber(p_luaState, 16));
-			info.m_collidesWorld	= collide;
-			info.m_direction		= direction;
-			info.m_entityId			= (unsigned int)lua_tonumber(p_luaState, 17);
-			info.m_gravity			= gravity;
-			info.m_height			= (float)lua_tonumber(p_luaState, 18);
-			info.m_mass				= (float)lua_tonumber(p_luaState, 19);
-			info.m_orientation		= orientation;
-			info.m_position			= position;
-			info.m_radius			= (float)lua_tonumber(p_luaState, 20);
-			info.m_shape			= (RootEngine::Physics::PhysicsShape::PhysicsShape)((int)lua_tonumber(p_luaState, 21));
-			info.m_speed			= (float)lua_tonumber(p_luaState, 22);
-			info.m_type				= (RootEngine::Physics::PhysicsType::PhysicsType)((int)lua_tonumber(p_luaState, 23));
-	
-			(*rtemp)->m_handle = g_engineContext.m_physics->AddAbilityToWorld(info);
-
-			return 0;
-		}
-
 		static int CreateVec3(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
 			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
-			*s = glm::vec3((int)lua_tonumber(p_luaState, 1), (int)lua_tonumber(p_luaState, 2), (int)lua_tonumber(p_luaState, 3));
+			*s = glm::vec3((float)lua_tonumber(p_luaState, 1), (float)lua_tonumber(p_luaState, 2), (float)lua_tonumber(p_luaState, 3));
 			luaL_setmetatable(p_luaState, "Vec3");
 			return 1;
 		}
@@ -379,6 +407,68 @@ namespace RootForce
 			return 1;
 		}
 
+		static int CreateArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int SetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArray(lua_State* p_luaState)
+		{
+			return 0;
+		}
+		static int GetArrayLength(lua_State* p_luaState)
+		{
+			return 0;
+		}
+	
+		static int GetQuatValue(lua_State* p_luaState)
+		{
+			glm::quat* ptemp = (glm::quat*)luaL_checkudata(p_luaState, 1, "Quat");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			if(memberName == "x")
+				lua_pushnumber(p_luaState, ptemp->x);
+			if(memberName == "y")
+				lua_pushnumber(p_luaState, ptemp->y);
+			if(memberName == "z")
+				lua_pushnumber(p_luaState, ptemp->z);
+			if(memberName == "w")
+				lua_pushnumber(p_luaState, ptemp->w);
+			return 1;
+		}
+
+		static int SetQuatValue(lua_State* p_luaState)
+		{
+			glm::quat* ptemp = (glm::quat*)luaL_checkudata(p_luaState, 1, "Quat");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			float setValue = (float)luaL_checknumber(p_luaState, 3);
+			if(memberName == "x")
+				ptemp->x = setValue;
+			if(memberName == "y")
+				ptemp->y = setValue;
+			if(memberName == "z")
+				ptemp->z = setValue;
+			if(memberName == "w")
+				ptemp->w = setValue;
+			return 0;
+		}
+
+		static int CreateQuat(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			glm::quat *s = (glm::quat *)lua_newuserdata(p_luaState, sizeof(glm::quat));
+			float a1 = (float)lua_tonumber(p_luaState, 1);
+			float a2 = (float)lua_tonumber(p_luaState, 2);
+			float a3 = (float)lua_tonumber(p_luaState, 3);
+			float a4 = (float)lua_tonumber(p_luaState, 4);
+
+			*s = glm::quat(a1,a2,a3,a4);
+			luaL_setmetatable(p_luaState, "Quat");
+			return 1;
+		}
+
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", CreateEntity},
@@ -431,21 +521,24 @@ namespace RootForce
 
 		static const struct luaL_Reg collision_m [] = {
 			{"SetMeshHandle", SetMeshHandle},
+			{"CreateHandle", CreateHandle},
 			{NULL, NULL}
 		};
 
 		//Physics function & methods
 		static const struct luaL_Reg physicsaccessor_f [] = {
-			{"New", CreatePhysicsAccessor},
+			{"New", CreatePhysics},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg physicsaccessor_m [] = {
-			{"SetInfo", SetInfo},
+			{"SetMass", SetMass},
+			{"BindShape", BindShape},
+			{"SetPos", SetPhysPos},
+			{"SetVelocity", SetPhysVelocity},
 			{NULL, NULL}
 		};
 
-		//Physics function & methods
 		static const struct luaL_Reg vec3_f [] = {
 			{"New", CreateVec3},
 			{"Dot", DotVec3},
@@ -467,7 +560,38 @@ namespace RootForce
 			{"__len", LengthVec3},
 			{NULL, NULL}
 		};
+
+		static const struct luaL_Reg array_f [] = {
+			{"New", CreateArray},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg array_m [] = {
+			{"__newindex", SetArray},
+			{"__index", GetArray},
+			{"__len", GetArrayLength},
+			{NULL, NULL}
+		};
+		static const struct luaL_Reg collisionresponder_f [] = {
+			{"New", CreateCollisionResponder},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg collisionresponder_m [] = {
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg quat_f [] = {
+			{"New", CreateQuat},
+			{NULL, NULL}
+		};
 		
+		static const struct luaL_Reg quat_m [] = {
+			{"__newindex", SetQuatValue},
+			{"__index", GetQuatValue},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());

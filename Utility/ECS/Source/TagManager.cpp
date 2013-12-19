@@ -12,7 +12,7 @@ void ECS::TagManager::Unregister(const std::string& p_tag)
 
 ECS::Entity* ECS::TagManager::GetEntityByTag(const std::string& p_tag)
 {
-	if(m_tags.find(p_tag) == m_tags.end())
+	if (m_tags.find(p_tag) == m_tags.end())
 		return nullptr;
 
 	return m_tags[p_tag];
