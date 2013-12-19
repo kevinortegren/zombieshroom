@@ -91,15 +91,16 @@ void CreateMaterial(string textureName, string materialName)
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
-		mat->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
 	else
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-		mat->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
+		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
 
+	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
 }
 
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
@@ -228,19 +229,7 @@ int main(int argc, char* argv[])
 			m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
 			m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
 
-
 			std::shared_ptr<Render::Mesh> Mesh[g_maxMeshes];
-
-			Render::Material* materials;
-			//materials = new Render::Material[g_maxMeshes];
-
-			//CREATE DEFAULT MATERIAL
-			Render::Material* defaultMaterial;
-			//defaultMaterial = new Render::Material;
-			g_engineContext.m_resourceManager->LoadEffect("Mesh");
-			g_engineContext.m_resourceManager->LoadTexture("grayLambert", Render::TextureType::TEXTURE_2D);
-			//defaultMaterial->m_diffuseMap = g_engineContext.m_resourceManager->GetTexture("grayLambert");
-			//defaultMaterial->m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
 			
 			int numberMeshes;
 			int numberLights;
@@ -271,17 +260,6 @@ int main(int argc, char* argv[])
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
 				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName));
-				//CreateMaterialEntity(m_world, )	
-				//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material = g_engineContext.m_resourceManager->GetMaterial("bajs");
-				//string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-				//if(textureName != "" && textureName != "NONE")
-				//{
-				//	g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-				//	materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
-				//	materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-				//	cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
-				//	cout << "NumberOF materials: " << renderNrOfMaterials << endl;
-				//}
 			}
 			// Set to update all materials
 			renderNrOfMaterials = -1;
@@ -322,16 +300,8 @@ int main(int argc, char* argv[])
 				m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[i]->nrOfVertices);
 
 				// Get material connected to mesh and set it from materiallist
-
-				//cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) << endl;
-				//if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath) == "NONE")
-					
-					//m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_material 
-				//else
-				//{
 				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
 				rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[i]->materialName));
-				//}
 
 				ReleaseMutex(RM.MeshMutexHandle);
 
@@ -483,31 +453,7 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 					////Update material list
-					//if(renderNrOfMaterials != *RM.NumberOfMaterials)
-					//{
-					//	renderNrOfMaterials = *RM.NumberOfMaterials;
-
-					//	for(int i = 0; i < renderNrOfMaterials; i++)
-					//	{
-					//Render::Material* old = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName))->;
-
-					//string Old = RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->;
-
-					//if(g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName))->m_diffuseMap
-					//CreateMaterial(GetNameFromPath(RM.PmaterialList[MeshIndex]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-					CreateMaterial(GetNameFromPath(RM.PmaterialList[MeshIndex]->texturePath), GetNameFromPath(RM.PmaterialList[MeshIndex]->materialName));
-					//		string textureName = GetNameFromPath(RM.PmaterialList[i]->texturePath);
-					//		if(textureName != "" && textureName != "NONE")
-					//		{
-					//			g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-					//			materials[i].m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(textureName);
-					//			//materials[i].m_normalMap = m_engineContext.m_resourceManager->GetTexture(RM.PmaterialList[i]->normalPath);
-					//			materials[i].m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh");
-					//			cout << "Material: " << RM.PmaterialList[i]->texturePath << " added to index: " << i << endl;
-					//			cout << "NumberOF materials: " << renderNrOfMaterials << endl;
-					//	}
-					//}
-					//}
+					CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
 
 					/// ROTATION
 					glm::quat rotation;
@@ -530,14 +476,6 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-					
-					//cout << GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) << endl;
-					//if(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath) == "NONE")
-					//	m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = *defaultMaterial;
-					//else
-					//{
-					//	m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_material = materials[RM.PmeshList[MeshIndex]->MaterialID];
-					//}
 
 					RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 					rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
