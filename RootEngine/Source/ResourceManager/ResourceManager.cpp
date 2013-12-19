@@ -336,4 +336,12 @@ namespace RootEngine
 	{
 		return m_workingDirectory;
 	}
+
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
+		}
+	}
 }
