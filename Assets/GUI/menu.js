@@ -30,14 +30,19 @@ $(document).ready(function() {
     $("#main-menu").css("display", "table");
   } );
   // Lan menu
-  $("#lan-list").tablesorter();
+  function ClearTable()
+  {
+    $("#lan-list tr").not($("#lan-list thead tr")).remove();
+	$("#lan-list").append("<tr style='display:none;'><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+	$("#lan-list").tablesorter();
+  };
   $("#lan-back").click(function() {
     $("#main-menu").css("display", "table");
     $("#lan-menu").css("display", "none");
     $("#selected").attr("id", "");
   } );
   $("#lan-refresh").click(function() {
-    $("#lan-list tr").not($("#lan-list thead tr")).remove();
+    ClearTable();
     Menu.Refresh();
   } );
   $("#lan-connect").click(function() {
@@ -46,6 +51,8 @@ $(document).ready(function() {
     $("#overlay").css("display", "table");
     $("#connecting").css("display", "block");
     var address = $($("#selected").children()[0]).html().split(":");
+	if(!address[1] || !address[0])
+		return;
     Menu.Connect(address[1], address[0]);
     setTimeout( function() {
         $("#overlay").css("display", "none");

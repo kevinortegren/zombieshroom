@@ -18,6 +18,7 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
+#include <RootForce/Include/HUD.h>
 
 namespace RootForce
 {
@@ -36,7 +37,6 @@ namespace RootForce
 
 		ECS::World* m_world;
 
-		std::shared_ptr<RootForce::ChatSystem> m_chat;
 		std::shared_ptr<RootForce::Network::Server> m_server;
 		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 		RootForce::Network::Client* m_client;
@@ -44,6 +44,8 @@ namespace RootForce
 
 		bool m_displayNormals; // TODO: May not be needed?
 		bool m_displayPhysicsDebug; // TODO: May not be needed?
+
+		std::shared_ptr<RootForce::HUD> m_hud;
 
 		//Game systems
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;

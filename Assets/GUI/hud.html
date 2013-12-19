@@ -5,26 +5,48 @@
 		<script type="text/javascript" src="hud.js"></script>
 	</head>
 	<body onload="OnLoad();">
-		<div id="statusbar">
-			<div id="teamscore">
-			</div>
-			<div id="score">
-			</div>
-			<div id="timeleft">
-			</div>
-			
+		<div id="score">
+			<img src="Team.png" style="height: 45%;"/> <a id="TeamScore" style="color: green">573</a> : <a id="EnemyScore" style="color: red;">195</a><br />
+			<img src="Swordaxe.png" style="height: 45%;"/> <a id="PlayerScore" style="color: green">21</a> <img src="RIP.png" style="height: 45%;"/> <a id="PlayerDeaths" style="color: red;">16</a>
+		</div>
+		<div id="TimeLeft">
+			30:00
 		</div>
 		<div id="chatbody">
 			<div id="chatlog">
 			</div>
-			<form><input id="chatinput" type="text" /></form>
+			<input id="chatinput" type="text" />
 		</div>
-		<div id="health">
-			<img src="http://upload.wikimedia.org/wikipedia/commons/e/ee/Red_Cross_icon.svg" width="40px" />
-			<a id="healthtext"> 100 </a>
+		<div id="healthcontainer">
+			<img src="health.png" />
+			<a id="Health" style="display: inline-block; vertical-align: middle;"> 100 </a>
 		</div>
 		<div id="abilitybar">
+			<div id="slot0" class="slot">
+				<div id="slot0-cooldown" class="cooldown">
+					RMB
+				</div>
+			</div>
+			<div id="slot1" class="slot slotselected">
+				<div id="slot1-cooldown" class="cooldown">
+					1
+				</div>
+			</div>
+			<div id="slot2" class="slot">
+				<div id="slot2-cooldown" class="cooldown">
+					2
+				</div>
+			</div>
+			<div id="slot3" class="slot">
+				<div id="slot3-cooldown" class="cooldown">
+					3
+				</div>
+			</div>
 		</div>
-		
+		<div class="verticaltablehax" style="z-index:-500;">
+			<div class="verticalcenterhax" style="text-align: center">
+				<img id="crosshair" src="crosshair.png" />
+			</div>
+		</div>
 	</body>
 </html>
