@@ -110,7 +110,7 @@ namespace RootForce
 				case RootForce::GameStates::Menu:
 				{
 					// Initialize the network system
-					m_menustate->Initialize(&g_engineContext, m_client.get(), m_clientMessageHandler.get());
+					m_menustate->Initialize(&g_engineContext, m_client.get(), m_clientMessageHandler.get(), m_workingDirectory);
             
 					g_engineContext.m_inputSys->LockMouseToCenter(false);
 

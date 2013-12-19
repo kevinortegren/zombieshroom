@@ -11,7 +11,7 @@ namespace RootForce
 	{
 	public:
 		Menustate();
-		void Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
+		void Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler, std::string p_workingDir);
 		GameStates::GameStates Update();
 		GameStates::PlayData GetPlayData() { return m_playData; }
 		
@@ -23,5 +23,7 @@ namespace RootForce
 
 		std::shared_ptr<Menu> m_menu;
 		GameStates::PlayData m_playData;
+
+		std::string m_workingDir;
 	};
 }
