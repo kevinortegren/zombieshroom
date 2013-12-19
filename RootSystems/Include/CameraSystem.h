@@ -101,7 +101,7 @@ namespace RootForce
 						Orientation* tOr = &targetTransform->m_orientation;
 						targetPosition = targetTransform->m_position;
 						targetPosition += tOr->GetRight() * -lookAtBehavior->m_displacement.x + tOr->GetUp() * lookAtBehavior->m_displacement.y + tOr->GetFront() * lookAtBehavior->m_displacement.z;
-						transform->m_orientation.LookAt(targetPosition - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
+						transform->m_orientation.LookAt(targetPosition - transform->m_position, tOr->GetUp());
 					}
 					else
 					{
