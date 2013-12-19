@@ -25,6 +25,7 @@ public:
 	void SetMass(float p_mass);
 	void SetGravity(float p_gravity);
 	void SetPosition(const btVector3& p_position);
+	void SetJumpForce(float p_jumpForce);
 	float GetMass() const {return m_mass;}
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}

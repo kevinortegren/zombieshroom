@@ -44,7 +44,7 @@ namespace RootForce
         g_engineContext.m_resourceManager->LoadCollada("AnimationTest");
         
 		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(5);
+		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
@@ -62,9 +62,13 @@ namespace RootForce
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[4].Action = RootForce::PlayerAction::JUMP;
 		keybindings[4].Edge = true;
-
+		
+		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[5].Edge = true;
+		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(m_world));
 		m_playerControlSystem->SetInputInterface(m_engineContext->m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(m_engineContext->m_logger);

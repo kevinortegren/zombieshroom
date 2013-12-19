@@ -34,7 +34,8 @@ namespace RootForce
 			STRAFE_LEFT,
 			ORIENTATE,
 			SELECT_ABILITY,
-			ACTIVATE_ABILITY
+			ACTIVATE_ABILITY,
+			JUMP
 		};
 	}
 

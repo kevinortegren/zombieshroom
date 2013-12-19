@@ -776,6 +776,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(index)->SetJumpForce(p_jumpForce);
 		m_playerObjects.at(index)->Jump();
 	}
 	
