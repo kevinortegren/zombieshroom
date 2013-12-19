@@ -19,6 +19,8 @@ namespace RootForce
         RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+
+		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void Ingamestate::Initialize(RootEngine::GameSharedContext* p_engineContext, 
@@ -37,6 +39,8 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
@@ -127,8 +131,9 @@ namespace RootForce
 		//r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-		m_chat = std::shared_ptr<RootForce::ChatSystem>(new RootForce::ChatSystem);
-		m_chat->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
+		m_hud->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
+		//m_chat = std::shared_ptr<RootForce::ChatSystem>(new RootForce::ChatSystem);
+		//m_chat->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
 		
 		// Setup the network
 		m_client = p_client;
@@ -146,14 +151,14 @@ namespace RootForce
 			m_client->Connect(p_playData.p_address.c_str(), p_playData.p_port); 
 		}
 
-		m_client->SetChatSystem(m_chat.get());
-		m_clientMessageHandler->SetChatSystem(m_chat.get());
+		m_client->SetChatSystem(m_hud->GetChatSystem().get());
+		m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 	}
 
 	void Ingamestate::Update(float p_deltaTime)
 	{
 		m_world->SetDelta(p_deltaTime);
-
+		m_hud->Update();
 		m_engineContext->m_renderer->Clear();
 
 		//Debug drawing TODO: Remove for release

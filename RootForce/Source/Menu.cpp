@@ -27,6 +27,7 @@ namespace RootForce
 	{
 		m_view->ExecuteJavascript(Awesomium::WSLit("Hide();"), Awesomium::WebString());
 		//m_view->PauseRendering(); // Calling this should save some processing power, but it doesn't wait until the view is updated as transparent
+		m_view->ReduceMemoryUsage();
 	}
 	void RootForce::Menu::Unhide()
 	{
