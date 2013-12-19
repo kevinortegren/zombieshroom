@@ -162,7 +162,8 @@ namespace RootForce
 						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
 						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-						transform->m_position = targetPosition + worldDisplacement;
+						float distFrac = g_engineContext.m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
+						transform->m_position = targetPosition + worldDisplacement*distFrac;
 					}
 					else
 					{

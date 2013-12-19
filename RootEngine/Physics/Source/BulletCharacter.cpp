@@ -42,7 +42,7 @@ public:
 		if (dotUp < m_minSlopeDot) {
 			return btScalar(1.0);
 		}
-
+		
 		return ClosestConvexResultCallback::addSingleResult (convexResult, normalInWorldSpace);
 	}
 protected:
