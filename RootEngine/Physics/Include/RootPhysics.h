@@ -93,6 +93,8 @@ namespace RootEngine
 			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
 			virtual void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
+			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
+
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
 			virtual int* AddStaticObjectToWorld( unsigned int p_entityId) = 0; ///Legacy func, will be removed before release
@@ -151,6 +153,8 @@ namespace RootEngine
 			void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
+
+			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 
 			int* CreateHandle(unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 

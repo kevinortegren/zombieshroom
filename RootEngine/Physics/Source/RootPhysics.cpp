@@ -13,6 +13,27 @@ namespace RootEngine
 
 namespace Physics
 {
+
+	struct RayAgainstStaticCast : public btCollisionWorld::ClosestRayResultCallback
+	{
+		RayAgainstStaticCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
+		{
+
+		}
+		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
+		{
+			CustomUserPointer* ptr = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
+			if (ptr->m_type == PhysicsType::TYPE_STATIC)
+			{
+				return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+			}
+			else
+			{
+				return 1.0f;
+			}
+		}
+	};
+
 	RootEngine::SubsystemSharedContext g_context;
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
@@ -1170,6 +1191,14 @@ namespace Physics
 	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId )
 	{
 		m_userPointer.at(p_objectHandle)->m_collidedEntityId = p_enityCollidedId;
+	}
+
+	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
+	{
+		RayAgainstStaticCast rayResult;
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_endPos[0], p_endPos[1], p_endPos[2]), rayResult);
+
+		return rayResult.m_closestHitFraction;
 	}
 
 }
