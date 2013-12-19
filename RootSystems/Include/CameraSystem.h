@@ -101,7 +101,7 @@ namespace RootForce
 						Orientation* tOr = &targetTransform->m_orientation;
 						targetPosition = targetTransform->m_position;
 						targetPosition += tOr->GetRight() * -lookAtBehavior->m_displacement.x + tOr->GetUp() * lookAtBehavior->m_displacement.y + tOr->GetFront() * lookAtBehavior->m_displacement.z;
-						transform->m_orientation.LookAt(targetPosition - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
+						transform->m_orientation.LookAt(targetPosition - transform->m_position, tOr->GetUp());
 					}
 					else
 					{
@@ -162,7 +162,8 @@ namespace RootForce
 						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
 						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-						transform->m_position = targetPosition + worldDisplacement;
+						float distFrac = g_engineContext.m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
+						transform->m_position = targetPosition + worldDisplacement*distFrac;
 					}
 					else
 					{
