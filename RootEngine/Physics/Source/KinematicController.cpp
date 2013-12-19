@@ -81,7 +81,9 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_kinController->setGravity(9.82f * 3.0f);
 	
-	m_kinController->setJumpSpeed(5);
+	m_kinController->setJumpSpeed(20.0f);
+	m_kinController->setFallSpeed(200.0f);
+	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
 
 	m_kinController->setMaxSlope(btRadians(45.0f));
 	
