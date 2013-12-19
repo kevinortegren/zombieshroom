@@ -372,6 +372,14 @@ namespace RootForce
 			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((unsigned int)luaL_checknumber(p_luaState, 2), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) == 1 ? true : false );
 			return 0;
 		}
+
+		static int CollisionGetHandle(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			lua_pushnumber(p_luaState, *(*rtemp)->m_handle); 
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//COLLISIONRESPONDER
 		//////////////////////////////////////////////////////////////////////////
@@ -385,6 +393,14 @@ namespace RootForce
 			return 1;
 		}
 		
+		static int CollisionResponderSetCollisionContainer(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::CollisionResponder** rtemp = (RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 1, "CollisionResponder");
+			RootForce::Collision** ctemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			g_engineContext.m_physics->SetCollisionContainer(*(*ctemp)->m_handle, &(*rtemp)->m_collidedEntityId);
+			return 0;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//PHYSICS
 		//////////////////////////////////////////////////////////////////////////
@@ -433,6 +449,13 @@ namespace RootForce
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
 
 			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*v1));
+			return 0;
+		}
+		static int PhysicsKnockBack(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			g_engineContext.m_physics->PlayerKnockback((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
 		
@@ -754,6 +777,21 @@ namespace RootForce
 			return 0;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//SCRIPT
+		//////////////////////////////////////////////////////////////////////////
+		static int ScriptCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script **)lua_newuserdata(p_luaState, sizeof(RootForce::Script*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Script>(*e);
+			(*s)->m_name = g_engineContext.m_resourceManager->GetScript(luaL_checkstring(p_luaState, 2));
+			luaL_setmetatable(p_luaState, "Script");
+			
+			return 1;
+		}
+
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
 			{"New", EntityCreate},
@@ -819,6 +857,7 @@ namespace RootForce
 		static const struct luaL_Reg collision_m [] = {
 			{"SetMeshHandle", CollisionSetMeshHandle},
 			{"CreateHandle", CollisionCreateHandle},
+			{"GetHandle", CollisionGetHandle},
 			{NULL, NULL}
 		};
 
@@ -833,6 +872,7 @@ namespace RootForce
 			{"BindShape", PhysicsBindShape},
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
+			{"KnockBack", PhysicsKnockBack},
 			{NULL, NULL}
 		};
 
@@ -875,6 +915,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg collisionresponder_m [] = {
+			{"SetContainer", CollisionResponderSetCollisionContainer},
 			{NULL, NULL}
 		};
 
@@ -912,6 +953,15 @@ namespace RootForce
 			{"RollGlobal",		OrientRollGlobal},
 			{"RotateGlobal",	OrientRotateGlobal},
 			{"LookAt",			OrientLookAt},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg script_f [] = {
+			{"New", ScriptCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg script_m [] = {
 			{NULL, NULL}
 		};
 

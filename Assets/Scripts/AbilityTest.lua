@@ -31,6 +31,7 @@ function AbilityTest.OnCreate ()
 	local colRespComp	= CollisionResponder.New(entity);
 	local physicsComp 	= Physics.New(entity);
 	local transformComp	= Transformation.New(entity);
+	local scriptComp	= Script.New(entity, "AbilityTest");
 
 	--Set data in our new components
 	transformComp:SetPos(posVec);
@@ -45,12 +46,13 @@ function AbilityTest.OnCreate ()
 	collisionComp:CreateHandle(entity:GetId(), 1, false);
 	physicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 30, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 40, frontVec.y * 40, frontVec.z * 40));
+	colRespComp:SetContainer(collisionComp);
 end
 
 function AbilityTest.OnCollide (args)
-	print("COLLISION");
-	print(args[1]);
+	
 end
 
 function AbilityTest.OnDestroy ()
+
 end
