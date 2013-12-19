@@ -19,6 +19,8 @@ namespace RootEngine
 		m_ouputList.clear();
 		m_ouputList.shrink_to_fit();
 
+		m_ouputList.push_back("<div style='text-align: left; display: inline-block;'>");
+
 		float averageFrameTime = (m_time/(float)m_frames)*1000.0f;
 		double collectedPercentages = 0;
 		std::string output	= "FPS: " + std::to_string(m_frames);
@@ -56,6 +58,8 @@ namespace RootEngine
 		std::string otherOutput	= "Other: " + std::to_string(100 - collectedPercentages) + "%";
 		m_ouputList.push_back(otherOutput);
 
+		m_ouputList.push_back("</div>");
+
 	}
 
 	void Profiling::Update( float p_dt )
@@ -72,7 +76,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 		for(std::string s : m_ouputList)
 		{
-			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
+			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
 #endif
 	}
