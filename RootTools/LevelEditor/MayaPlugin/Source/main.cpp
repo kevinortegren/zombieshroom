@@ -758,14 +758,15 @@ void MayaMeshToList(MObject node, int meshIndex)
 		MIntArray polygonVertices;
 		MPoint UVpoint;
 		float2 UV;
-
 		int triangleVertices[3];
 		MVector normal;
 		int count = 0;
+		MFloatVectorArray normals;
 
 		SM.meshList[meshIndex].nrOfVertices = 0;
 
 		int uvID;
+		mesh.getNormals(normals);
 
 		//goes through the polygons extracting information. 
 		//Quads -> triangles
@@ -773,7 +774,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 		{
 			MIntArray polygonVertices, localIndex;
 			int polygonVertexCount = mesh.polygonVertexCount(i);
-
+			MIntArray normalIDs;
 			int nrOfTriangles;
 
 			//decides if the face have 1 or 2 triangles.
@@ -783,6 +784,8 @@ void MayaMeshToList(MObject node, int meshIndex)
 				nrOfTriangles = 1;
 			
 			mesh.getPolygonVertices(i, polygonVertices);
+
+			mesh.getFaceNormalIds(i, normalIDs);
 
 			//Two triangles (t) in polygon
 			for(int t = 0; t < nrOfTriangles; t++)
@@ -802,12 +805,17 @@ void MayaMeshToList(MObject node, int meshIndex)
 				for(int j = 0; j < 3; j++)
 				{
 					int temp = i;
-
+					
+					
 					SM.meshList[meshIndex].vertex[count].x = floatPoints[triangleVertices[j]][0];
 					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
 					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					mesh.getVertexNormal(triangleVertices[j], false, normal, space_local);
+					//mesh.getVertexNormal(localIndex[j], normal, space_local);
+					//OLD
+
+					normal = normals[normalIDs[localIndex[j]]];					
+
 					SM.meshList[meshIndex].normal[count].x = normal.x;
 					SM.meshList[meshIndex].normal[count].y = normal.y;
 					SM.meshList[meshIndex].normal[count].z = normal.z;

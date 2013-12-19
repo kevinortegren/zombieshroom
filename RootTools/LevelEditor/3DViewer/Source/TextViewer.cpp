@@ -18,7 +18,7 @@
 
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
 #include <RootSystems\Include\Components.h>
-//#include <ComponentExporter.h>
+#include <ComponentExporter.h>
 
 #undef main
 
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 	// Setup world.
 	ECS::World m_world;
 
-	//m_world.GetEntityExporter()->SetExporter(Exporter);
+	m_world.GetEntityExporter()->SetExporter(Exporter);
 
 	std::string path(argv[0]);
 	std::string rootforcename = "Level3DViewer.exe";
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
 				/////////////  EXPORT   ///////////////////////
 				if(entityExport == 2)
 				{			
-					m_world.GetEntityManager()->RemoveAllComponentsOfType<RootForce::Renderable>();
+					//m_world.GetEntityManager()->RemoveAllComponentsOfType<RootForce::Renderable>();
 
 					for(int i = 0; i < Entities.size()-1; i++)
 					{
@@ -394,7 +394,10 @@ int main(int argc, char* argv[])
 
 						RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
 
-						string shortPath = GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath);
+						//string shortPath = GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath);
+						string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
+						//CreateMaterial(shortPath, materialName);
+						mesh->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
 						//if(shortPath == "NONE")
 						//{
