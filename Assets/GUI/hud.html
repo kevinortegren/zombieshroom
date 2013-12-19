@@ -1,98 +1,30 @@
 <html>
 	<head>
-		<style type="text/css">
-			body
-			{
-				font-family: Comic Sans MS;
-				font-size: 12px;
-				color: white;
-			}
-			#chatbody
-			{
-				min-width: 300px;
-				height: 200px;
-				width: 30%;
-				background-color:rgba(60,60,60,0.4);
-				position: relative;
-				margin-top: -280px;
-			}
-			#chatlog
-			{
-				height: 180px;
-				overflow: hidden;
-			}
-			#chatinput
-			{
-				width: 100%;
-				height: 20px;
-				background-color:rgba(60,60,60,0.4);
-				border: 1px solid rgba(40,40,40,0.4);
-				font-family: Comic Sans MS;
-				color: white;
-			}
-			#placeholder
-			{
-				height: 100%;
-				width: 100%;
-			}
-			
-			:not(input)
-			{
-				-webkit-user-select: none;
-				-moz-user-select: none;
-				user-select: none;
-			}
-		</style>
-		<script type="text/javascript">
-			function AddMessage(p_message)
-			{
-				document.getElementById("chatlog").innerHTML += p_message + "<br>";
-				document.getElementById("chatlog").scrollTop = document.getElementById("chatlog").scrollHeight;
-			}
-			function Send(event)
-			{
-				document.getElementById('chatinput').blur();
-				ChatSystem.Send(document.getElementById("chatinput").value);
-				document.getElementById("chatinput").value = "";
-				event.preventDefault();
-				event.stopPropagation();
-			}
-			
-			document.onkeydown = function(event)
-			{
-				if(document.activeElement != document.getElementById('chatinput') && event.keyCode == 13) // Enter
-				{
-					document.getElementById('chatinput').focus();
-				}
-				else if(event.keyCode == 27) // Esc
-				{
-					document.getElementById('chatinput').blur();
-				}
-				else
-					return true;
-			}
-			
-			function OnLoad()
-			{
-				document.getElementById('chatinput').onblur = function(){ ChatSystem.SetFocus(false); };
-				document.getElementById('chatinput').onfocus = function(){ ChatSystem.SetFocus(true); };
-				document.getElementById('chatinput').onkeydown = function()
-				{
-					if(document.activeElement == document.getElementById('chatinput') && event.keyCode == 13)
-						Send(event);
-					else
-						return true;
-				};
-			}
-		</script>
+		<link rel="stylesheet" href="hud.css" />
+		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+		<script type="text/javascript" src="hud.js"></script>
 	</head>
 	<body onload="OnLoad();">
-		<div id="placeholder">
+		<div id="statusbar">
+			<div id="teamscore">
+			</div>
+			<div id="score">
+			</div>
+			<div id="timeleft">
+			</div>
+			
 		</div>
 		<div id="chatbody">
 			<div id="chatlog">
 			</div>
 			<form><input id="chatinput" type="text" /></form>
 		</div>
+		<div id="health">
+			<img src="http://upload.wikimedia.org/wikipedia/commons/e/ee/Red_Cross_icon.svg" width="40px" />
+			<a id="healthtext"> 100 </a>
+		</div>
+		<div id="abilitybar">
+		</div>
+		
 	</body>
 </html>
