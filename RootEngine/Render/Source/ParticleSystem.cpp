@@ -14,10 +14,8 @@ namespace Render
 		glDeleteTransformFeedbacks(2, m_transformFeedback);
 	}
 
-	void ParticleSystem::Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect)
+	void ParticleSystem::Init(GLRenderer* p_renderer)
 	{
-		m_effect = p_effect;
-
 		ParticleVertex particles[RENDER_MAXPARTCILES];
 		memset(particles, 0, RENDER_MAXPARTCILES*sizeof(ParticleVertex));
 
@@ -30,27 +28,34 @@ namespace Render
 
 		glGenTransformFeedbacks(2, m_transformFeedback);
 
-		m_vertexBuffer[0] = p_renderer->CreateBuffer();
-		m_vertexBuffer[1] = p_renderer->CreateBuffer();
+		m_meshes[0] = p_renderer->CreateMesh();
+		m_meshes[1] = p_renderer->CreateMesh();
 
+		std::shared_ptr<BufferInterface> vertexBuffer[2];
+		std::shared_ptr<VertexAttributesInterface> attributes[2];
 
-		m_vertexBuffer[0]->Init(GL_ARRAY_BUFFER);
-		m_vertexBuffer[1]->Init(GL_ARRAY_BUFFER);
+		vertexBuffer[0] = p_renderer->CreateBuffer();
+		vertexBuffer[0]->Init(GL_ARRAY_BUFFER);
+
+		vertexBuffer[1] = p_renderer->CreateBuffer();
+		vertexBuffer[1]->Init(GL_ARRAY_BUFFER);
 
 		for (unsigned i = 0; i < 2 ; i++) {
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[i]);
 			
-			m_vertexBuffer[i]->BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vertexBuffer[i]->GetBufferId());
+			vertexBuffer[i]->BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
 
-			m_attributes[i] = p_renderer->CreateVertexAttributes();
-			m_attributes[i]->Init(5);
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
-			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
+			attributes[i] = p_renderer->CreateVertexAttributes();
+			attributes[i]->Init(5);
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
 
+			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
+			m_meshes[i]->SetVertexAttribute(attributes[i]);
 		} 
 
 		m_currentVB = 0;
@@ -60,16 +65,12 @@ namespace Render
 
 	void ParticleSystem::Update(float p_dt)
 	{
-		auto updateTechnique = m_effect->GetTechniques()[0];
-
-		//TODO: Per effect uniform binding of dt.
-
 		glEnable(GL_RASTERIZER_DISCARD); 
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[m_currentVB]->GetBufferId());
+		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[m_currentTFB]); 
 
-		 m_attributes[m_currentVB]->Bind();
+		 m_meshes[m_currentVB]->Bind();
 
 		 glBeginTransformFeedback(GL_POINTS);
 
@@ -83,8 +84,15 @@ namespace Render
 
 		 glEndTransformFeedback();
 
-		 m_attributes[m_currentVB]->Unbind();
+		 m_meshes[m_currentVB]->Unbind();
 
 		 std::swap(m_currentVB, m_currentTFB);
+
+		 glDisable(GL_RASTERIZER_DISCARD);
+	}
+
+	Render::MeshInterface* ParticleSystem::GetMesh()
+	{
+		return m_meshes[m_currentTFB].get();
 	}
 }

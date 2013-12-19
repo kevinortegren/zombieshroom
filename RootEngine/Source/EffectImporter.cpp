@@ -24,7 +24,7 @@ namespace RootEngine
 		const YAML::Node& techniques = p_node["techniques"];
 		for(size_t i = 0; i < techniques.size(); ++i)
 		{
-			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique();
+			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique(m_renderer);
 
 			std::string techniqueName;
 			techniques[i]["name"] >> techniqueName;
@@ -67,9 +67,20 @@ namespace RootEngine
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());
 
+					// TODO: Fix this.
+					if(shaderName == "particle_update" && extension == ".geometry")
+					{
+						const GLchar* Varyings[5];
+						Varyings[0] = "vert_initialPos1";
+						Varyings[1] = "vert_initialVel1";
+						Varyings[2] = "vert_scale1";
+						Varyings[3] = "vert_age1";
+						Varyings[4] = "vert_type1";
+
+						glTransformFeedbackVaryings(program->GetHandle(), 5, Varyings, GL_INTERLEAVED_ATTRIBS);
+					}
+
 				}
-
-
 
 				if(programs[i].FindValue("blend"))
 				{
@@ -93,7 +104,6 @@ namespace RootEngine
 				program->Compile();
 				program->Apply();
 
-				// Create uniform buffer for this technique.
 				const YAML::Node& uniforms = techniques[i]["uniforms"];
 				for(size_t j = 0; j < uniforms.size(); ++j)
 				{
@@ -105,19 +115,21 @@ namespace RootEngine
 
 					// Bind shader name to slot.
 					program->BindUniformBuffer(name, slot);
-
-					// Create the buffer.
-					std::pair<int, std::shared_ptr<Render::BufferInterface>> bufferPair;
-
-					std::shared_ptr<Render::BufferInterface> buffer = m_renderer->CreateBuffer();
-					buffer->Init(GL_UNIFORM_BUFFER);
-
-					bufferPair.first = slot;
-					bufferPair.second = buffer;
-
-					technique->m_uniforms.push_back(bufferPair);
 				}
 		
+				const YAML::Node& texture = techniques[i]["textures"];
+				for(size_t j = 0; j < texture.size(); ++j)
+				{
+					std::string name;
+					texture[j]["name"] >> name;
+					
+					int slot;
+					texture[j]["slot"] >> slot;
+
+					program->BindTexture(name, slot);
+				}
+
+
 				if(techniques[i].FindValue("PerObject") != nullptr)
 				{
 					const YAML::Node& perObjects = techniques[i]["PerObject"];
@@ -139,17 +151,7 @@ namespace RootEngine
 					}
 				}
 
-				const YAML::Node& texture = techniques[i]["textures"];
-				for(size_t j = 0; j < texture.size(); ++j)
-				{
-					std::string name;
-					texture[j]["name"] >> name;
-					
-					int slot;
-					texture[j]["slot"] >> slot;
 
-					program->BindTexture(name, slot);
-				}
 			}
 		}
 

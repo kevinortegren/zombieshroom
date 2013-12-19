@@ -489,8 +489,7 @@ namespace Render
 			m_emptyParticleSlots.pop();	
 		}
 
-		m_particleSystems[slot].Init( this, g_context.m_resourceManager->LoadEffect("ParticleUpdate") );
-
+		m_particleSystems[slot].Init( this );
 
 		return &m_particleSystems[slot++];
 	}

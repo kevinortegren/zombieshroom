@@ -2,6 +2,8 @@
   techniques:
     - name: ParticleUpdate
       uniforms:
+        - name: PerTech
+          slot: 3
       textures:
       programs:
         - name: particle_update

@@ -3,8 +3,7 @@
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 
-#include <RootEngine\Render\Include\Buffer.h>
-#include <RootEngine\Render\Include\VertexAttributes.h>
+#include <RootEngine\Render\Include\Mesh.h>
 #include <RootEngine\Render\Include\Effect.h>
 
 #define RENDER_MAXPARTCILES 1000
@@ -25,8 +24,9 @@ namespace Render
 	class ParticleSystemInterface
 	{
 	public:
-		virtual void Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect) = 0;
+		virtual void Init(GLRenderer* p_renderer) = 0;
 		virtual void Update(float p_dt) = 0;
+		virtual Render::MeshInterface* GetMesh() = 0;
 	};
 
 	class ParticleSystem : public ParticleSystemInterface
@@ -34,18 +34,15 @@ namespace Render
 	public:
 		ParticleSystem();
 		~ParticleSystem();
-		void Init(GLRenderer* p_renderer, Render::EffectInterface* p_effect);
+		void Init(GLRenderer* p_renderer);
 		void Update(float p_dt);
+		Render::MeshInterface* GetMesh();
 
 	private:
 		bool m_first;
 		int m_currentVB;
 		int m_currentTFB;
 		GLuint m_transformFeedback[2];
-		
-		std::shared_ptr<Render::BufferInterface> m_vertexBuffer[2];
-		std::shared_ptr<Render::VertexAttributesInterface> m_attributes[2];
-
-		Render::EffectInterface* m_effect;
+		std::shared_ptr<Render::MeshInterface> m_meshes[2];
 	};
 }

@@ -1,6 +1,7 @@
 
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
+#include <RootEngine/Render/Include/Renderer.h>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -109,6 +110,7 @@ namespace Render
 	GLint Program::Compile( )
 	{
 		glUseProgram( 0 );
+
 		// link program
 		glLinkProgram( m_glHandle );
 
@@ -133,6 +135,11 @@ namespace Render
 			return status;
 		}
 		return GL_TRUE;
+	}
+
+	GLuint Program::GetHandle()
+	{
+		return m_glHandle;
 	}
 
 	void Program::Apply( )
@@ -185,27 +192,25 @@ namespace Render
 		return m_program;
 	}
 
-	void Technique::BindUniforms()
+	void Technique::BufferUniforms(unsigned p_offset, unsigned p_size, void* p_data)
 	{
-		for(auto itr = m_uniforms.begin(); itr != m_uniforms.end(); ++itr)
-		{
-			//glBindBufferBase(GL_UNIFORM_BUFFER, (*itr).first, (*itr).second->GetBufferId());
-		}
+		m_perTechniqueBuffer->BufferData(p_offset, p_size, p_data);
 	}
 
-	void Technique::BindTextures()
+	std::shared_ptr<Render::BufferInterface> Technique::GetUniformBuffer()
 	{
-		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
-		{
-			//glActiveTexture(GL_TEXTURE0 + (*itr).first);
-			//glBindTexture(GL_TEXTURE_2D, (*itr).second);
-		}
+		return m_perTechniqueBuffer;
 	}
 
-	std::shared_ptr<Technique> Effect::CreateTechnique()
+	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);
+
+		technique->m_perTechniqueBuffer = p_renderer->CreateBuffer();
+		technique->m_perTechniqueBuffer->Init(GL_UNIFORM_BUFFER);
+
 		m_techniques.push_back(technique);
+
 		return technique;
 	}
 

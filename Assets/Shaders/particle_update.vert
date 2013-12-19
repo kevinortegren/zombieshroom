@@ -6,7 +6,6 @@ layout(location = 2) in vec2 in_scale;
 layout(location = 3) in float in_age;
 layout(location = 4) in float in_type;
 
-
 out vec3 vert_initialVel;
 out vec2 vert_scale;
 out float vert_age;
