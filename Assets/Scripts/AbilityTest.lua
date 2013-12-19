@@ -1,11 +1,3 @@
---[[
-	print( type(renderComp) )
-
-	local meta = getmetatable(renderComp)
-	for k,v in pairs(meta) do
-	  print("    ", k, v)
-	end
---]]
 ACTION_CREATE = 0;
 ACTION_COLLIDE = 1;
 
@@ -28,7 +20,7 @@ function AbilityTest.OnCreate ()
 
 	--Get data from Player & AimingDevice entities
 	local posVec  		= Entity.GetEntityByTag("Player"):GetTransformation():GetPos();
-	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetFront();
+	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetOrient():GetFront();
 
 	--Create entity
 	local entity 		= Entity.New();
@@ -56,6 +48,8 @@ function AbilityTest.OnCreate ()
 end
 
 function AbilityTest.OnCollide (args)
+	print("COLLISION");
+	print(args[1]);
 end
 
 function AbilityTest.OnDestroy ()

@@ -30,7 +30,10 @@ namespace RootForce
 			}
 		}
 
-		static int CreateEntity(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//ENTITY
+		//////////////////////////////////////////////////////////////////////////
+		static int EntityCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(0);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
@@ -39,7 +42,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int GetEntityByTag(lua_State* p_luaState)
+		static int EntityGetByTag(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
@@ -47,8 +50,17 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
 		}
+
+		static int EntityGetByID(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			//*s = g_world->GetGroupManager()->
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
 		
-		static int GetId(lua_State* p_luaState)
+		static int EntityGetId(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
@@ -56,7 +68,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int GetTransformation(lua_State* p_luaState)
+		static int EntityGetTransformation(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
@@ -66,17 +78,50 @@ namespace RootForce
 			return 1;
 		}
 
-		static int CreateRenderable(lua_State* p_luaState)
+		static int EntityGetRenderable(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(*e);
 			luaL_setmetatable(p_luaState, "Renderable");
 			return 1;
 		}
 
-		static int CreateTransformation(lua_State* p_luaState)
+		static int EntityGetPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Physics>(*e);
+			luaL_setmetatable(p_luaState, "Physics");
+			return 1;
+		}
+
+		static int EntityGetCollision(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Collision **s = (RootForce::Collision **)lua_newuserdata(p_luaState, sizeof(RootForce::Collision *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Collision>(*e);
+			luaL_setmetatable(p_luaState, "Collision");
+			return 1;
+		}
+
+		static int EntityGetCollisionResponder(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::CollisionResponder **s = (RootForce::CollisionResponder **)lua_newuserdata(p_luaState, sizeof(RootForce::CollisionResponder *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>(*e);
+			luaL_setmetatable(p_luaState, "CollisionResponder");
+			return 1;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//TRANSFORMATION
+		//////////////////////////////////////////////////////////////////////////
+		static int TransformationCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
@@ -86,7 +131,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int GetPos(lua_State* p_luaState)
+		static int TransformationGetPos(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
@@ -96,7 +141,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SetPos(lua_State* p_luaState)
+		static int TransformationSetPos(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
@@ -105,37 +150,203 @@ namespace RootForce
 			return 0;
 		}
 
-		static int GetFront(lua_State* p_luaState)
+		static int TransformationGetScale(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
 			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
-			*s = glm::vec3((*ptemp)->m_orientation.GetFront());
+			*s = glm::vec3((*ptemp)->m_scale);
 			luaL_setmetatable(p_luaState, "Vec3");
 			return 1;
 		}
 
-		static int GetUp(lua_State* p_luaState)
+		static int TransformationSetScale(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			(*ptemp)->m_scale = (*v1);
+			return 0;
+		}
+
+		static int TransformationGetOrient(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
-			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
-			*s = glm::vec3((*ptemp)->m_orientation.GetUp());
-			luaL_setmetatable(p_luaState, "Vec3");
+			RootForce::Orientation **s = (RootForce::Orientation **)lua_newuserdata(p_luaState, sizeof(RootForce::Orientation*));
+			*s = &(*ptemp)->m_orientation;
+			luaL_setmetatable(p_luaState, "Orientation");
 			return 1;
 		}
 
-		static int GetRight(lua_State* p_luaState)
+		static int TransformationSetOrient(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			RootForce::Orientation** v1 = (RootForce::Orientation**)luaL_checkudata(p_luaState, 2, "Orientation");
+			(*ptemp)->m_orientation = (*(*v1));
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//ORIENT
+		//////////////////////////////////////////////////////////////////////////
+		static int OrientCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+			RootForce::Orientation *s = (RootForce::Orientation *)lua_newuserdata(p_luaState, sizeof(RootForce::Orientation));
+			*s = RootForce::Orientation();
+			luaL_setmetatable(p_luaState, "Orientation");
+			return 1;
+		}
+
+		static int OrientGetFront(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::Transform** ptemp = (RootForce::Transform**)luaL_checkudata(p_luaState, 1, "Transformation");
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
 			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
-			*s = glm::vec3((*ptemp)->m_orientation.GetRight());
+			*s = glm::vec3((*ptemp)->GetFront());
 			luaL_setmetatable(p_luaState, "Vec3");
 			return 1;
 		}
 
-		static int CreateCollision(lua_State* p_luaState)
+		static int OrientGetUp(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->GetUp());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int OrientGetRight(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->GetRight());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int OrientGetAxis(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->GetAxis());
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
+		static int OrientGetAngle(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			lua_pushnumber(p_luaState, (*ptemp)->GetAngle());
+			return 1;
+		}
+
+		static int OrientGetQuaternion(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::quat *s = (glm::quat *)lua_newuserdata(p_luaState, sizeof(glm::quat));
+			*s = glm::quat((*ptemp)->GetQuaternion());
+			luaL_setmetatable(p_luaState, "Quat");
+			return 1;
+		}
+
+		static int OrientSetOrientation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::quat* rtemp = (glm::quat*)luaL_checkudata(p_luaState, 2, "Quat");
+			(*ptemp)->SetOrientation(*rtemp);
+			return 0;
+		}
+
+		static int OrientPitch(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->Pitch((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientYaw(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->Yaw((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientRoll(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->Roll((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientRotate(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::quat* rtemp = (glm::quat*)luaL_checkudata(p_luaState, 2, "Quat");
+			(*ptemp)->Rotate(*rtemp);
+			return 0;
+		}
+
+		static int OrientPitchGlobal(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->PitchGlobal((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientYawGlobal(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->YawGlobal((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientRollGlobal(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			(*ptemp)->RollGlobal((float)luaL_checknumber(p_luaState, 2));
+			return 0;
+		}
+
+		static int OrientRotateGlobal(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::quat* rtemp = (glm::quat*)luaL_checkudata(p_luaState, 2, "Quat");
+			(*ptemp)->RotateGlobal(*rtemp);
+			return 0;
+		}
+
+		static int OrientLookAt(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Orientation** ptemp = (RootForce::Orientation**)luaL_checkudata(p_luaState, 1, "Orientation");
+			glm::vec3* dir = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			glm::vec3* up = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			(*ptemp)->LookAt(*dir, *up);
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//COLLISION
+		//////////////////////////////////////////////////////////////////////////
+		static int CollisionCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Collision **s = (RootForce::Collision **)lua_newuserdata(p_luaState, 4);
@@ -145,7 +356,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SetMeshHandle(lua_State* p_luaState)
+		static int CollisionSetMeshHandle(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
@@ -154,15 +365,17 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CreateHandle(lua_State* p_luaState)
+		static int CollisionCreateHandle(lua_State* p_luaState)
 		{
 			NumberOfArgs(4);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
 			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((unsigned int)luaL_checknumber(p_luaState, 2), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) == 1 ? true : false );
 			return 0;
 		}
-
-		static int CreateCollisionResponder(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//COLLISIONRESPONDER
+		//////////////////////////////////////////////////////////////////////////
+		static int CollisionResponderCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::CollisionResponder **s = (RootForce::CollisionResponder **)lua_newuserdata(p_luaState, 4);
@@ -172,7 +385,10 @@ namespace RootForce
 			return 1;
 		}
 		
-		static int CreatePhysics(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//PHYSICS
+		//////////////////////////////////////////////////////////////////////////
+		static int PhysicsCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
@@ -182,7 +398,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SetMass(lua_State* p_luaState)
+		static int PhysicsSetMass(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
@@ -190,7 +406,14 @@ namespace RootForce
 			return 0;
 		}
 
-		static int BindShape(lua_State* p_luaState)
+		static int PhysicsSetPos(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int PhysicsBindShape(lua_State* p_luaState)
 		{
 			NumberOfArgs(7);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
@@ -202,15 +425,7 @@ namespace RootForce
 			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, mass, collideWorld);
 			return 0;
 		}
-
-		static int SetPhysPos(lua_State* p_luaState)
-		{
-			NumberOfArgs(2);
-			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 2);
-			return 0;
-		}
-		static int SetPhysVelocity(lua_State* p_luaState)
+		static int PhysicsSetVelocity(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
@@ -221,14 +436,28 @@ namespace RootForce
 			return 0;
 		}
 		
-		static int SetRenderableMaterial(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//RENDERABLE
+		//////////////////////////////////////////////////////////////////////////
+		static int RenderableCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable **s = (RootForce::Renderable **)lua_newuserdata(p_luaState, sizeof(RootForce::Renderable *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
+			luaL_setmetatable(p_luaState, "Renderable");
+			return 1;
+		}
+
+		static int RenderableSetMaterial(lua_State* p_luaState)
         {
+			NumberOfArgs(2);
             RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
             std::string handle = luaL_checkstring(p_luaState, 2);
             (*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
             return 0;
         }
-		static int SetRenderableModel(lua_State* p_luaState)
+		static int RenderableSetModel(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -237,7 +466,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetRenderableDiffuse(lua_State* p_luaState)
+		static int RenderableSetDiffuse(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -245,7 +474,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetRenderableSpecular(lua_State* p_luaState)
+		static int RenderableSetSpecular(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -253,7 +482,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetRenderableNormal(lua_State* p_luaState)
+		static int RenderableSetNormal(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -261,7 +490,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int SetRenderableEffect(lua_State* p_luaState)
+		static int RenderableSetEffect(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
@@ -269,7 +498,57 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CreateVec3(lua_State* p_luaState)
+		static int RenderableGetMaterial(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromMaterial((*rtemp)->m_material).c_str());
+			return 1;
+		}
+		static int RenderableGetModel(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromModel((*rtemp)->m_model).c_str());
+			return 1;
+		}
+
+		static int RenderableGetDiffuse(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_diffuseMap).c_str());
+			return 1;
+		}
+
+		static int RenderableGetSpecular(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_specularMap).c_str());
+			return 1;
+		}
+
+		static int RenderableGetNormal(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_normalMap).c_str());
+			return 1;
+		}
+
+		static int RenderableGetEffect(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromEffect((*rtemp)->m_material->m_effect).c_str());
+			return 1;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//VEC3
+		//////////////////////////////////////////////////////////////////////////
+		static int Vec3Create(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
 			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
@@ -278,7 +557,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SetVec3Value(lua_State* p_luaState)
+		static int Vec3SetValue(lua_State* p_luaState)
 		{
 			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			std::string memberName = luaL_checkstring(p_luaState, 2);
@@ -292,7 +571,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int GetVec3Value(lua_State* p_luaState)
+		static int Vec3GetValue(lua_State* p_luaState)
 		{
 			glm::vec3* ptemp = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			std::string memberName = luaL_checkstring(p_luaState, 2);
@@ -305,7 +584,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int AddVec3(lua_State* p_luaState)
+		static int Vec3Add(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -316,7 +595,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SubVec3(lua_State* p_luaState)
+		static int Vec3Sub(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -327,7 +606,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int MulVec3(lua_State* p_luaState)
+		static int Vec3Mul(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -338,7 +617,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int DivVec3(lua_State* p_luaState)
+		static int Vec3Div(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -349,7 +628,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int DotVec3(lua_State* p_luaState)
+		static int Vec3Dot(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -358,7 +637,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int CrossVec3(lua_State* p_luaState)
+		static int Vec3Cross(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -369,7 +648,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int DistanceVec3(lua_State* p_luaState)
+		static int Vec3Distance(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -378,7 +657,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int LengthVec3(lua_State* p_luaState)
+		static int Vec3Length(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			float vecdot = glm::length((*v1));
@@ -386,7 +665,7 @@ namespace RootForce
 			return 1;
 		}
 		
-		static int NormalizeVec3(lua_State* p_luaState)
+		static int Vec3Normalize(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3  v3 = glm::normalize((*v1));
@@ -396,7 +675,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int ReflectVec3(lua_State* p_luaState)
+		static int Vec3Reflect(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
 			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
@@ -407,24 +686,44 @@ namespace RootForce
 			return 1;
 		}
 
-		static int CreateArray(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//ARRAY
+		//////////////////////////////////////////////////////////////////////////
+		static int ArrayCreate(lua_State* p_luaState)
 		{
 			return 0;
 		}
-		static int SetArray(lua_State* p_luaState)
+		static int ArraySet(lua_State* p_luaState)
 		{
 			return 0;
 		}
-		static int GetArray(lua_State* p_luaState)
+		static int ArrayGet(lua_State* p_luaState)
 		{
 			return 0;
 		}
-		static int GetArrayLength(lua_State* p_luaState)
+		static int ArrayGetLength(lua_State* p_luaState)
 		{
 			return 0;
 		}
 	
-		static int GetQuatValue(lua_State* p_luaState)
+		//////////////////////////////////////////////////////////////////////////
+		//QUAT
+		//////////////////////////////////////////////////////////////////////////
+		static int QuatCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			glm::quat *s = (glm::quat *)lua_newuserdata(p_luaState, sizeof(glm::quat));
+			float a1 = (float)lua_tonumber(p_luaState, 1);
+			float a2 = (float)lua_tonumber(p_luaState, 2);
+			float a3 = (float)lua_tonumber(p_luaState, 3);
+			float a4 = (float)lua_tonumber(p_luaState, 4);
+
+			*s = glm::quat(a4,a1,a2,a3);
+			luaL_setmetatable(p_luaState, "Quat");
+			return 1;
+		}
+
+		static int QuatGetValue(lua_State* p_luaState)
 		{
 			glm::quat* ptemp = (glm::quat*)luaL_checkudata(p_luaState, 1, "Quat");
 			std::string memberName = luaL_checkstring(p_luaState, 2);
@@ -439,7 +738,7 @@ namespace RootForce
 			return 1;
 		}
 
-		static int SetQuatValue(lua_State* p_luaState)
+		static int QuatSetValue(lua_State* p_luaState)
 		{
 			glm::quat* ptemp = (glm::quat*)luaL_checkudata(p_luaState, 1, "Quat");
 			std::string memberName = luaL_checkstring(p_luaState, 2);
@@ -455,125 +754,123 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CreateQuat(lua_State* p_luaState)
-		{
-			NumberOfArgs(4);
-			glm::quat *s = (glm::quat *)lua_newuserdata(p_luaState, sizeof(glm::quat));
-			float a1 = (float)lua_tonumber(p_luaState, 1);
-			float a2 = (float)lua_tonumber(p_luaState, 2);
-			float a3 = (float)lua_tonumber(p_luaState, 3);
-			float a4 = (float)lua_tonumber(p_luaState, 4);
-
-			*s = glm::quat(a1,a2,a3,a4);
-			luaL_setmetatable(p_luaState, "Quat");
-			return 1;
-		}
-
 		//Entity functions
 		static const struct luaL_Reg entity_f [] = {
-			{"New", CreateEntity},
-			{"GetEntityByTag", GetEntityByTag},
+			{"New", EntityCreate},
+			{"GetEntityByTag", EntityGetByTag},
+			{"GetEntityByID", EntityGetByID},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg entity_m [] = {
-			{"GetId", GetId},
-			{"GetTransformation", GetTransformation},
+			{"GetId", EntityGetId},
+			{"GetTransformation", EntityGetTransformation},
+			{"GetRenderable", EntityGetRenderable},
+			{"GetPhysics", EntityGetPhysics},
+			{"GetCollision", EntityGetCollision},
+			{"GetCollisionResponder", EntityGetCollisionResponder},
 			{NULL, NULL}
 		};
 
 		//Renderable functions&methods
 		static const struct luaL_Reg renderable_f [] = {
-			{"New", CreateRenderable},
+			{"New", RenderableCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg renderable_m [] = {
-			{"SetModel", SetRenderableModel},
-			{"SetMaterial", SetRenderableMaterial},
-			{"SetMaterialDiffuse", SetRenderableDiffuse},
-			{"SetMaterialSpecular", SetRenderableSpecular},
-			{"SetMaterialNormal", SetRenderableNormal},
-			{"SetMaterialEffect", SetRenderableEffect},
+			{"SetModel",			RenderableSetModel},
+			{"SetMaterial",			RenderableSetMaterial},
+			{"SetMaterialDiffuse",	RenderableSetDiffuse},
+			{"SetMaterialSpecular", RenderableSetSpecular},
+			{"SetMaterialNormal",	RenderableSetNormal},
+			{"SetMaterialEffect",	RenderableSetEffect},
+			{"GetModel",			RenderableGetModel},
+			{"GetMaterial",			RenderableGetMaterial},
+			{"GetMaterialDiffuse",	RenderableGetDiffuse},
+			{"GetMaterialSpecular", RenderableGetSpecular},
+			{"GetMaterialNormal",	RenderableGetNormal},
+			{"GetMaterialEffect",	RenderableGetEffect},
 			{NULL, NULL}
 		};
 
 
 		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {
-			{"New", CreateTransformation},
+			{"New", TransformationCreate},
 			{NULL, NULL}
 		};
 		
 		static const struct luaL_Reg transformation_m [] = {
-			{"GetPos",		GetPos},
-			{"SetPos",		SetPos},
-			{"GetFront",	GetFront},
-			{"GetUp",		GetUp},
-			{"GetRight",	GetRight},
+			{"GetPos",		TransformationGetPos},
+			{"SetPos",		TransformationSetPos},
+			{"SetScale",	TransformationSetScale},
+			{"GetScale",	TransformationGetScale},
+			{"SetOrient",	TransformationSetOrient},
+			{"GetOrient",	TransformationGetOrient},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg collision_f [] = {
-			{"New", CreateCollision},
+			{"New", CollisionCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg collision_m [] = {
-			{"SetMeshHandle", SetMeshHandle},
-			{"CreateHandle", CreateHandle},
+			{"SetMeshHandle", CollisionSetMeshHandle},
+			{"CreateHandle", CollisionCreateHandle},
 			{NULL, NULL}
 		};
 
 		//Physics function & methods
 		static const struct luaL_Reg physicsaccessor_f [] = {
-			{"New", CreatePhysics},
+			{"New", PhysicsCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg physicsaccessor_m [] = {
-			{"SetMass", SetMass},
-			{"BindShape", BindShape},
-			{"SetPos", SetPhysPos},
-			{"SetVelocity", SetPhysVelocity},
+			{"SetMass", PhysicsSetMass},
+			{"BindShape", PhysicsBindShape},
+			{"SetPos", PhysicsSetPos},
+			{"SetVelocity", PhysicsSetVelocity},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg vec3_f [] = {
-			{"New", CreateVec3},
-			{"Dot", DotVec3},
-			{"Cross", CrossVec3},
-			{"Distance", DistanceVec3},
-			{"Length", LengthVec3},
-			{"Normalize", NormalizeVec3},
-			{"Reflect", ReflectVec3},
+			{"New",			Vec3Create},
+			{"Dot",			Vec3Dot},
+			{"Cross",		Vec3Cross},
+			{"Distance",	Vec3Distance},
+			{"Length",		Vec3Length},
+			{"Normalize",	Vec3Normalize},
+			{"Reflect",		Vec3Reflect},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg vec3_m [] = {
-			{"__newindex", SetVec3Value},
-			{"__add", AddVec3},
-			{"__sub", SubVec3},
-			{"__mul", MulVec3},
-			{"__div", DivVec3},
-			{"__index", GetVec3Value},
-			{"__len", LengthVec3},
+			{"__newindex",	Vec3SetValue},
+			{"__add",		Vec3Add},
+			{"__sub",		Vec3Sub},
+			{"__mul",		Vec3Mul},
+			{"__div",		Vec3Div},
+			{"__index",		Vec3GetValue},
+			{"__len",		Vec3Length},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg array_f [] = {
-			{"New", CreateArray},
+			{"New", ArrayCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg array_m [] = {
-			{"__newindex", SetArray},
-			{"__index", GetArray},
-			{"__len", GetArrayLength},
+			{"__newindex",	ArraySet},
+			{"__index",		ArrayGet},
+			{"__len",		ArrayGetLength},
 			{NULL, NULL}
 		};
 		static const struct luaL_Reg collisionresponder_f [] = {
-			{"New", CreateCollisionResponder},
+			{"New", CollisionResponderCreate},
 			{NULL, NULL}
 		};
 
@@ -582,13 +879,39 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg quat_f [] = {
-			{"New", CreateQuat},
+			{"New", QuatCreate},
 			{NULL, NULL}
 		};
 		
 		static const struct luaL_Reg quat_m [] = {
-			{"__newindex", SetQuatValue},
-			{"__index", GetQuatValue},
+			{"__newindex", QuatSetValue},
+			{"__index", QuatGetValue},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg orient_f [] = {
+			{"New", OrientCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg orient_m [] = {
+			{"GetQuaternion",	OrientGetQuaternion},
+			//{"GetMatrix",		OrientGetMatrix},
+			{"GetAxis",			OrientGetAxis},
+			{"GetAngle",		OrientGetAngle},
+			{"GetFront",		OrientGetFront},
+			{"GetUp",			OrientGetUp},
+			{"GetRight",		OrientGetRight},
+			{"SetOrientation",	OrientSetOrientation},
+			{"Pitch",	        OrientPitch},
+			{"Yaw",				OrientYaw},
+			{"Roll",			OrientRoll},
+			{"Rotate",			OrientRotate},
+			{"PitchGlobal",		OrientPitchGlobal},
+			{"YawGlobal",		OrientYawGlobal},
+			{"RollGlobal",		OrientRollGlobal},
+			{"RotateGlobal",	OrientRotateGlobal},
+			{"LookAt",			OrientLookAt},
 			{NULL, NULL}
 		};
 
