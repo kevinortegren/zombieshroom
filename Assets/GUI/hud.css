@@ -1,6 +1,12 @@
+@font-face
+{
+	font-family: 'Sherwood';
+	src: url("SHERWOOD.TTF");
+}
+
 body
 {
-	font-family: Comic Sans MS;
+	font-family: Sherwood;
 	font-size: 12px;
 	color: white;
 	margin: 0;
@@ -26,14 +32,14 @@ img
 	top:0;
 	left:0;
 	height: 75px;
-	width: 160px;
+	width: 220px;
 	padding: 5px;
 	background-color: rgba(60,60,60,0.5);
-	font-size: 24px;
+	font-size: 32px;
 }
 #timeleft
 {
-	width: 100px;
+	width: 120px;
 	height: 50px;
 	margin: auto;
 	text-align: center;
@@ -57,6 +63,7 @@ img
 {
 	height: 180px;
 	overflow: hidden;
+	font-family: Comic Sans MS;
 }
 #chatinput
 {
@@ -70,7 +77,7 @@ img
 #healthcontainer
 {
 	position: absolute;
-	width: 150px;
+	width: 180px;
 	height: 60px;
 	left: 100%;
 	margin-left: -200px;
@@ -98,11 +105,13 @@ img
 	width: 71px;
 	height: 71px;
 	border: 2px solid rgba(0,0,0,0);
-	font-size: 24px;
+	font-size: 18px;
 	margin: 0 5px;
 	display: inline-block;
 	text-align: right;
 	background-image: url('empty.png');
+	background-repeat: no-repeat;
+	background-position: -2px -2px;
 }
 .slotselected
 {
@@ -110,9 +119,9 @@ img
 }
 .cooldown
 {
-	padding: 36px 5px 0 5px;
+	padding: 50px 5px 0 5px;
 	width: 61px;
-	height: 35px;
+	height: 21px;
 	overflow: hidden;
 	background-image: url('cooldown.png');
 	background-size: 75px 75px;

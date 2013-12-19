@@ -1,20 +1,29 @@
+@font-face
+{
+	font-family: 'Sherwood';
+	src: url("SHERWOOD.TTF");
+}
+
 body, input
 {
   padding: 0;
   margin: 0;
-  font-family: Comic Sans MS;
+  font-family: Sherwood;
 }
 body
 {
   background-image: url('TygartsStateForest.jpg');
+  background-position: 50% 50%;
+  background-size: 100% 100%;
 }
 *
 {
   -webkit-user-select: none;
 }
-input
+input[type=text], input[type=password], input[type=number]
 {
   -webkit-user-select: text;
+  min-width: 150px;
 }
 a
 {
@@ -64,7 +73,7 @@ a
 }
 .button
 {
-  width: 100px;
+  width: 120px;
   height: 25px;
   border: 1px solid #666666;
   margin: 2px;
@@ -129,7 +138,7 @@ a
 }
 #lan-wrapper
 {
-  width: 800px;
+  width: 1200px;
   border: 1px solid #666666;
   padding: 5px;
   margin: auto;

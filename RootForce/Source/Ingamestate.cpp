@@ -132,8 +132,8 @@ namespace RootForce
 		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		m_hud->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
-		//m_chat = std::shared_ptr<RootForce::ChatSystem>(new RootForce::ChatSystem);
-		//m_chat->Initialize(m_engineContext->m_gui->LoadURL("hud.html"), m_engineContext->m_gui->GetDispatcher());
+		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetSelectedAbility(0);
 		
 		// Setup the network
 		m_client = p_client;
@@ -158,9 +158,8 @@ namespace RootForce
 	void Ingamestate::Update(float p_deltaTime)
 	{
 		m_world->SetDelta(p_deltaTime);
-		m_hud->Update();
 		m_engineContext->m_renderer->Clear();
-
+		m_hud->Update();
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -181,7 +180,8 @@ namespace RootForce
 
 		{
 			PROFILE("Player control system", m_engineContext->m_profiler);
-			m_playerControlSystem->Process();
+			if(!m_hud->GetChatSystem()->IsFocused())
+				m_playerControlSystem->Process();
 		}
 
         {
@@ -233,15 +233,15 @@ namespace RootForce
 		}
         
         g_engineContext.m_profiler->Update(p_deltaTime);
-
+		m_engineContext->m_debugOverlay->RenderOverlay();
 		{
 			PROFILE("GUI", m_engineContext->m_profiler);
 
 			m_engineContext->m_gui->Update();
 			m_engineContext->m_gui->Render();
 		}
-        
-		m_engineContext->m_debugOverlay->RenderOverlay();
+		
+		
 		m_engineContext->m_renderer->Swap();
 	}
 }
