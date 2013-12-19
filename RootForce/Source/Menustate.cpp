@@ -8,10 +8,11 @@ namespace RootForce
 	}
 
 
-	void Menustate::Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler)
+	void Menustate::Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler, std::string p_workingDir)
 	{
 		m_engineContext = p_engineContext;
 		m_client = p_client;
+		m_workingDir = p_workingDir;
 
 		//Initiate Gui
 		m_engineContext->m_gui->Initialize(m_engineContext->m_configManager->GetConfigValueAsInteger("ScreenWidth"),
@@ -23,6 +24,8 @@ namespace RootForce
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 		p_clientMessageHandler->SetLanList(m_lanList.get());
+
+		m_menu->LoadDefaults(m_engineContext->m_configManager, m_workingDir);
 	}
 
 	GameStates::GameStates Menustate::Update()
