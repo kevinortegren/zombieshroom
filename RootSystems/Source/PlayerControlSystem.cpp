@@ -149,6 +149,10 @@ namespace RootForce
 					}
 					
 					break;
+				case PlayerAction::JUMP:
+					m_physics->PlayerJump(*(collision->m_handle), 20.0f);
+					//m_physics->PlayerKnockback(*(collision->m_handle), glm::vec3(facing.x, 1, facing.z), 20.0f);
+					break;
 				default:
 					break;
 			}

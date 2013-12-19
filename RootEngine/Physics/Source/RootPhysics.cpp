@@ -235,14 +235,15 @@ namespace Physics
 		temp.m_radius = p_radius;
 		temp.m_type = PhysicsShape::SHAPE_SPHERE;
 		btCollisionShape* shape = CreateShape(temp);
+		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
-			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+			shape->calculateLocalInertia(p_mass, fallInertia);
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
 			
-			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
@@ -250,6 +251,8 @@ namespace Physics
 			m_dynamicWorld->addRigidBody(body);
 			m_dynamicObjects.push_back(body);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setActivationState(DISABLE_DEACTIVATION);
 			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 			return;
 		}
@@ -288,14 +291,15 @@ namespace Physics
 		temp.m_height = p_height;
 		temp.m_type = PhysicsShape::SHAPE_CYLINDER;
 		btCollisionShape* shape = CreateShape(temp);
+		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
-			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+			shape->calculateLocalInertia(p_mass, fallInertia);
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
 
-			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
@@ -341,14 +345,15 @@ namespace Physics
 		temp.m_height = p_height;
 		temp.m_type = PhysicsShape::SHAPE_CONE;
 		btCollisionShape* shape = CreateShape(temp);
+		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
-			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+			shape->calculateLocalInertia(p_mass, fallInertia);
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
 
-			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
@@ -395,14 +400,15 @@ namespace Physics
 		temp.m_scale = p_scale;
 		temp.m_type = PhysicsShape::SHAPE_CUSTOM_MESH;
 		btCollisionShape* shape = CreateShape(temp);
+		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
 		{
-			shape->calculateLocalInertia(p_mass, btVector3(0,0,0));
+			shape->calculateLocalInertia(p_mass, fallInertia);
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
 
-			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape);
+			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
@@ -776,6 +782,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(index)->SetJumpForce(p_jumpForce);
 		m_playerObjects.at(index)->Jump();
 	}
 	
@@ -1098,6 +1105,11 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
+		if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Can't change mass for static objects");
+			return;
+		}
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 			m_playerObjects.at(index)->SetMass(p_mass);

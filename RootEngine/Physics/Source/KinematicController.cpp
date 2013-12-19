@@ -79,9 +79,11 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
-	m_kinController->setGravity(9.82f * 6.0f);
+	m_kinController->setGravity(9.82f * 3.0f);
 	
-	m_kinController->setJumpSpeed(5);
+	m_kinController->setJumpSpeed(20.0f);
+	m_kinController->setFallSpeed(200.0f);
+	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
 
 	m_kinController->setMaxSlope(btRadians(45.0f));
 	
@@ -179,4 +181,9 @@ void KinematicController::SetGravity( float p_gravity )
 void KinematicController::SetPosition(const btVector3& p_position)
 {
 	m_kinController->warp(p_position);
+}
+
+void KinematicController::SetJumpForce( float p_jumpForce )
+{
+	m_kinController->setJumpSpeed(p_jumpForce);
 }
