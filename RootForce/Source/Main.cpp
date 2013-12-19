@@ -113,6 +113,10 @@ namespace RootForce
 
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
+		// Initialize GUI
+		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+
 
 		// Setup a client (but don't connect until we have connection details)
 		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));

@@ -10,15 +10,15 @@ namespace RootForce
 	class Menustate
 	{
 	public:
-		Menustate();
-		void Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
+		void Initialize(RootForce::Network::Client* p_client);
+		void Enter();
+		void Exit();
 		GameStates::GameStates Update();
-		GameStates::PlayData GetPlayData() { return m_playData; }
-		
-	private:
-		RootEngine::GameSharedContext* m_engineContext;
 
+		GameStates::PlayData GetPlayData() { return m_playData; }
+	private:
 		RootForce::Network::Client* m_client;
+		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
 		std::shared_ptr<RootSystems::LanList> m_lanList;
 
 		std::shared_ptr<Menu> m_menu;
