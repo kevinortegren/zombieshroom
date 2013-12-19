@@ -3,9 +3,6 @@
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
 
-#include <RootEngine/Include/GameSharedContext.h>
-extern RootEngine::GameSharedContext g_engineContext;
-
 namespace RootForce
 {
 	void PlayerSystem::CreatePlayer()
@@ -17,6 +14,7 @@ namespace RootForce
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
 		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+
 		RootForce::Physics* physics = entityManager->CreateComponent<RootForce::Physics>(entity);
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);
 		RootForce::CollisionResponder* collisionResponder = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);
@@ -29,10 +27,10 @@ namespace RootForce
 		renderable->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 
-		transform->m_position = glm::vec3(0, 100, 0);
+		transform->m_position = glm::vec3(0, 10, 0);
 
 		playerControl->m_mouseSensitivity = 0.3f;
-		playerControl->m_speed = 0.1f;
+		playerControl->m_speed = 10.0f;
 
 		player->m_abilities[0] = Abilitiy::ABILITY_TEST;
 		player->m_selectedAbility = Abilitiy::ABILITY_TEST;

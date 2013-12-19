@@ -18,7 +18,7 @@ namespace RootEngine
 			void ExecuteWholeScript(std::string p_scriptPath);
 			void SetFunction(std::string p_abilityName, std::string p_functionName);
 			void ExecuteScript();
-			void LoadScript(std::string p_scriptPath);
+			int LoadScript(std::string p_scriptPath);
 			void AddParameterString(std::string p_string);
 			void AddParameterNumber(double p_double);
 			void AddParameterBoolean(bool p_bool);

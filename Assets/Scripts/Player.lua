@@ -1,7 +1,7 @@
 
 Player = {}
 
-function Player.OnActivate (action, ...)
+function Player.Process (action, ...)
 
 	local arg = table.pack(...)
 

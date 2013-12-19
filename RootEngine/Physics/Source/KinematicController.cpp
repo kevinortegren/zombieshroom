@@ -87,7 +87,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_hasBeenKnockbacked = false;
 	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
 	//m_dynamicWorld->addAction(m_kinController);
 
 }
@@ -114,15 +114,16 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
 	
 	traveldist = to - from;
-	if(traveldist.length() > 3 )
+	//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Distance: %f. Delta movement: %f, %f, %f", traveldist.length(), traveldist.x(), traveldist.y(), traveldist.z());
+	/*if(traveldist.length() > 100 )
 	{
 		m_kinController->warp(to);
 		return;
-	}
+	}*/
 	//float temp = m_kinController->test(from, to, m_dynamicWorld);
 	//m_kinController->warp(to + traveldist * temp);
-	m_kinController->setVelocityForTimeInterval(traveldist/p_dt, p_dt);
-	m_kinController->playerStep(m_dynamicWorld, p_dt);
+	m_kinController->setVelocityForTimeInterval(traveldist, p_dt);
+	//m_kinController->playerStep(m_dynamicWorld, p_dt);
 }
 
 void KinematicController::Update(float p_dt)

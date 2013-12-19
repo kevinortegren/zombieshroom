@@ -20,7 +20,7 @@ void RootForce::ScriptSystem::ProcessEntity(ECS::Entity* p_entity)
 
 	for(auto itr = script->m_actions.begin(); itr != script->m_actions.end(); ++itr)
 	{
-		g_engineContext.m_script->SetFunction(script->m_name, "OnActivate");
+		g_engineContext.m_script->SetFunction(script->m_name, "Process");
 		g_engineContext.m_script->AddParameterNumber((*itr).m_action);
 
 		if((*itr).m_action == RootForce::ActionType::ACTION_COLLIDE)

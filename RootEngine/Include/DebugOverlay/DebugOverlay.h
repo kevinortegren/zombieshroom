@@ -15,6 +15,7 @@ namespace RootEngine
 		~DebugOverlay();
 
 		void SetView(Awesomium::WebView* p_view);
+
 		void AddHTMLToBuffer(const char* p_html, TextColor::TextColor p_color, bool p_leftSide = true);
 		void RenderOverlay();
 

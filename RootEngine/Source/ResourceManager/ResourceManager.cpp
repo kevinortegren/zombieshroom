@@ -66,9 +66,17 @@ namespace RootEngine
 	{
 		if(m_scripts.find(p_scriptName) == m_scripts.end())
 		{
-			m_context->m_script->LoadScript(p_scriptName + ".lua");
+			if(m_context->m_script->LoadScript(p_scriptName + ".lua") == 1)
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when loading script: '%s.lua'", p_scriptName.c_str());
+				return "";
+			}
+			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: '%s.lua'", p_scriptName.c_str());
+			}
 			m_scripts[p_scriptName] = p_scriptName;
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: %s.lua", p_scriptName.c_str());
+			
 			return p_scriptName;
 		}
 		else
@@ -81,7 +89,7 @@ namespace RootEngine
 
 	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
 	{
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: %s.lua, it may already exist in Resource Manager!", p_scriptName.c_str());
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: '%s.lua', it may already exist in Resource Manager!", p_scriptName.c_str());
 		m_context->m_script->LoadScript(p_scriptName + ".lua");
 		m_scripts[p_scriptName] = p_scriptName;
 		return p_scriptName;
@@ -92,16 +100,19 @@ namespace RootEngine
 	{
 		if(m_effects.find(p_path) == m_effects.end())
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading effect: %s", p_path.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading effect: %s", p_path.c_str());
 
 			m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
-
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded effect: '%s'", p_path.c_str());
 			m_effects[p_path] = m_effectImporter->m_effect;
 
 			if(m_effectImporter->m_effect)
 				return m_effects[p_path].get();
 			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading effect '%s'", p_path.c_str());
 				return nullptr;
+			}
 		}
 		else
 		{
@@ -234,7 +245,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating new material: %s", p_handle.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Created new material: %s", p_handle.c_str());
 			m_materials[p_handle] = m_context->m_renderer->CreateMaterial();
 			return m_materials[p_handle].get();
 		}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RootEngine/Include/GameSharedContext.h>
 #include <Utility\ECS\Include\Component.h>
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <array>
@@ -25,9 +26,12 @@ namespace RootForce
 	class PlayerSystem : public ECS::VoidSystem
 	{
 	public:
-		PlayerSystem(ECS::World* p_world)
-			: ECS::VoidSystem(p_world) {}
+		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_gameSharedContext)
+			: ECS::VoidSystem(p_world)
+			, m_gameSharedContext(p_gameSharedContext) {}
 		void CreatePlayer();
 		void Process();
+	private:
+		RootEngine::GameSharedContext* m_gameSharedContext;
 	};
 }

@@ -20,14 +20,14 @@ subject to the following restrictions:
 class btCollisionObject;
 struct btCollisionObjectWrapper;
 
-#include "BulletCollision/NarrowPhaseCollision/btPersistentManifold.h"
+#include "Bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h"
 class btManifoldPoint;
 
-#include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
+#include "Bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
 
-#include "LinearMath/btTransform.h"
-#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "Bullet/LinearMath/btTransform.h"
+#include "Bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
+#include "Bullet/BulletCollision/CollisionDispatch/btCollisionObject.h"
 
 typedef bool (*ContactAddedCallback)(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1);
 extern ContactAddedCallback		gContactAddedCallback;

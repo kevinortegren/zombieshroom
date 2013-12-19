@@ -1,19 +1,3 @@
--- C API
-
--- #ENTITY# --
--- CreateEntity()
-
--- #COMPONENT# --
--- CreateRenderable()
------- SetRenderableModel(string modelHandle, string effectHandle, Entity entity)
------- SetRenderableMaterial() - UNDER CONSTRUCTION
--- CreateTransformation()
------- SetTransformationPos(double x, double y, double z) - UNDER CONSTRUCTION
--- CreatePhysicsAccessor()
------- SetPhysicsAccessorInfo(PhysicsAccessor physiccomp, bool collideWorld, double dirX, double dirY, double dirZ, double gravX, double gravY, double gravZ, double orientX, double orientY, double orientZ, double orientW, double posX, double posY, double posZ, double height, double mass, double radius, double shape, double speed, double type)
----------- shape -> 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
----------- type  -> 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
-
 --[[
 	print( type(renderComp) )
 
@@ -22,50 +6,57 @@
 	  print("    ", k, v)
 	end
 --]]
+ACTION_CREATE = 0;
+ACTION_COLLIDE = 1;
 
-AbilityTest = {}
-AbilityTest.cooldown = 5.0;
+--Set table name
+AbilityTest = {};
 
-function AbilityTest.OnActivate (action)
-
-	local entity 		= Entity.New();
-	local playerEntity  = Entity.GetEntityByTag("Player");
-	local playerTrans   = playerEntity:GetTransformation();
-	x, y, z = playerTrans:GetPos();
-	local aimingDevice  = Entity.GetEntityByTag("AimingDevice");
-	local aimingTrans   = aimingDevice:GetTransformation();
-	aimx, aimy, aimz = aimingTrans:GetFront();
-	local renderComp 	= Renderable.New(entity);
-	local transform 	= Transformation.New(entity);
+function AbilityTest.Process (action, ...)
 	
-	transform:SetPos(x, y, z);
+	local args = table.pack(...);
+
+	if action == ACTION_CREATE then
+		AbilityTest.OnCreate();
+	elseif action == ACTION_COLLIDE then
+		AbilityTest.OnCollide(args);
+	end
+	
+end
+
+function AbilityTest.OnCreate ()
+
+	--Get data from Player & AimingDevice entities
+	local posVec  		= Entity.GetEntityByTag("Player"):GetTransformation():GetPos();
+	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetFront();
+
+	--Create entity
+	local entity 		= Entity.New();
+
+	--Create components and put them in our new entity
+	local renderComp 	= Renderable.New(entity);
+	local collisionComp = Collision.New(entity);
+	local colRespComp	= CollisionResponder.New(entity);
+	local physicsComp 	= Physics.New(entity);
+	local transformComp	= Transformation.New(entity);
+
+	--Set data in our new components
+	transformComp:SetPos(posVec);
 	
 	renderComp:SetModel("Primitives/sphereTangents");
 	renderComp:SetMaterial("Fireball");
-	renderComp:SetMaterialProperties("fireballDiffuse", "fireballSpecular", "fireballNormal", "Mesh_NormalMap");
-	local collision = Collision.New(entity);
-	local physics = Physics.New(entity);
-	physics:SetInfo(
-		collision,
-		true, --collideWorld
-		aimx, --dirx
-		aimy, --diry
-		aimz, --dirz
-		0, --gravx
-		-9.82, --gravy
-		0, --gravz
-		1, --orientX
-		0, --orientY
-		-1, --orientZ
-		0, --orientW
-		x + aimx * 3, --posX
-		4 + y + aimy * 3, --posY
-		z + aimz * 3, --posZ
-		entity:GetId(),
-		0.5, --height
-		3, --mass
-		1, --radius
-		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
-		40, --speed
-		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
+	renderComp:SetMaterialDiffuse("fireballDiffuse");
+	renderComp:SetMaterialSpecular("fireballSpecular");
+	renderComp:SetMaterialNormal("fireballNormal");
+	renderComp:SetMaterialEffect("Mesh_NormalMap");
+	
+	collisionComp:CreateHandle(entity:GetId(), 1, false);
+	physicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 30, true);
+	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 40, frontVec.y * 40, frontVec.z * 40));
+end
+
+function AbilityTest.OnCollide (args)
+end
+
+function AbilityTest.OnDestroy ()
 end

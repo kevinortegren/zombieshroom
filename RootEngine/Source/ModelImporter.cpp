@@ -20,9 +20,9 @@ namespace RootEngine
 	{
 		m_model = new Model(); //Owned by ResourceManager
 
+
 		Assimp::Importer importer;
 		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
-
 
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
@@ -50,7 +50,6 @@ namespace RootEngine
 			InitMesh(i, paiMesh, p_filename);
 		}
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load  %d textures to model", p_scene->mNumMaterials);
 
 		InitMaterials(p_scene, p_filename);
 	}
@@ -161,10 +160,12 @@ namespace RootEngine
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d materials to model", p_scene->mNumMaterials);
 		// Initialize the materials
 		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 
 		{
 			const aiMaterial* pMaterial = p_scene->mMaterials[i];
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d diffuse textures, %d specular textures and %d normal textures from material %d", pMaterial->GetTextureCount(aiTextureType_DIFFUSE), pMaterial->GetTextureCount(aiTextureType_SPECULAR), pMaterial->GetTextureCount(aiTextureType_NORMALS), i);
 
 			aiString path;
 			std::string texName;
