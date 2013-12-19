@@ -4,9 +4,9 @@
       uniforms:
       textures:
       programs:
-        - name: 2D_GUI
+        - name: particle_update
           shaders:
-            - name: 2D_GUI
+            - name: particle_update
               type: vertex
-            - name: 2D_GUI
-              type: fragment
+            - name: particle_update
+              type: geometry

@@ -2,8 +2,10 @@
 
 namespace Render
 {
-	void ParticleSystem::Init()
+	void ParticleSystem::Init(Render::EffectInterface* p_effect)
 	{
+		m_effect = p_effect;
+
 		ParticleVertex particles[RENDER_MAXPARTCILES];
 		memset(particles, 0, RENDER_MAXPARTCILES*sizeof(ParticleVertex));
 
@@ -11,7 +13,8 @@ namespace Render
 		particles[0].m_initialPos = glm::vec3(0);
 		particles[0].m_initialVel = glm::vec3(1,0,0);
 		particles[0].m_size = glm::vec2(1,1);
-		particles[0].m_life = -1;
+		particles[0].m_age = 0.0f;
+		particles[0].m_type = 0;
 
 		glGenTransformFeedbacks(2, m_transformFeedback);
 
@@ -24,11 +27,13 @@ namespace Render
 			m_vertexBuffer[i].BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vertexBuffer[i].GetBufferId());
 
-			m_attributes[i]->Init(4);
+			m_attributes[i]->Init(5);
 			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
 			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
 			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
 			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
+			m_attributes[i]->SetVertexAttribPointer(m_vertexBuffer[i].GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
+
 		} 
 
 		m_currentVB = 0;
@@ -36,7 +41,7 @@ namespace Render
 		m_first = true;
 	}
 
-	void ParticleSystem::Update(float dt)
+	void ParticleSystem::Update(float p_dt)
 	{
 		auto updateTechnique = m_effect->GetTechniques()[0];
 
