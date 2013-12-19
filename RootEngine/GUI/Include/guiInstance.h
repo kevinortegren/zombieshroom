@@ -9,6 +9,8 @@
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include "gl_texture_surface.h"
+#include "Dispatcher.h"
+
 
 #if defined(_WINDLL)
     #define SUBSYSTEM_DLL_EXPORT __declspec(dllexport)
@@ -29,15 +31,16 @@ namespace RootEngine
 			virtual void Update() = 0;
 			virtual void Render() = 0;
 
-			//loads a single .html file into the view
-			virtual void LoadURL(std::string p_path) = 0;
+			//loads a single .html file into the view new view and returns the view
+			virtual Awesomium::WebView* LoadURL(std::string p_path) = 0;
+			virtual void DestroyView(Awesomium::WebView* p_view) = 0;
 
 			virtual void SetWorkingDir(std::string p_path) = 0;
 
 			virtual void HandleEvents(SDL_Event p_event) = 0;
 
-			//returns the webView that displayes the .html file
-			virtual Awesomium::WebView* GetView() = 0;
+
+			virtual Dispatcher* GetDispatcher() = 0; 
 		};
 
 		class guiInstance : public GUISystemInterface
@@ -49,17 +52,18 @@ namespace RootEngine
 			void Initialize(int p_width, int p_height);
 			void Update();
 			void Render();
-			void LoadURL(std::string p_path);
+			Awesomium::WebView* LoadURL(std::string p_path);
+			void DestroyView(Awesomium::WebView* p_view);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 			void HandleEvents(SDL_Event p_event);
-			Awesomium::WebView* GetView() { return m_view; }
 
 			static guiInstance* GetInstance();
+			Dispatcher* GetDispatcher() { return m_dispatcher; } 
 
 		private:
 			static guiInstance* s_gui;
 			Awesomium::WebCore* m_core;
-			Awesomium::WebView* m_view;
+			std::vector<Awesomium::WebView*> m_viewBuffer;
 
 			std::string m_workingDir;
 			int m_width, m_height;
@@ -72,6 +76,7 @@ namespace RootEngine
 			void SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
+			Dispatcher* m_dispatcher;
 		};
 
 		//Classes used for testing the gui document load

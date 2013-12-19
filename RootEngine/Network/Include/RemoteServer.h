@@ -7,6 +7,7 @@ namespace RootEngine
 		class RemoteServerInterface abstract
 		{
 			virtual bool ConnectTo( const char* p_ip , USHORT p_port) = 0;
+			virtual void Initialize() = 0;
 		};
 
 		class RemoteServer : public Server , public RemoteServerInterface
@@ -17,6 +18,7 @@ namespace RootEngine
 			void Update();
 			bool Send( const Message& p_message );
 			bool ConnectTo( const char* p_ip , USHORT p_port);
+			void Initialize();
 		};
 	}
 }

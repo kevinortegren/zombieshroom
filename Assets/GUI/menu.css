@@ -1,0 +1,163 @@
+body, input
+{
+  padding: 0;
+  margin: 0;
+  font-family: Comic Sans MS;
+}
+body
+{
+  background-image: url('TygartsStateForest.jpg');
+}
+*
+{
+  -webkit-user-select: none;
+}
+input
+{
+  -webkit-user-select: text;
+}
+a
+{
+  text-decoration: none;
+  cursor: pointer;
+  color: #000000;
+}
+@-webkit-keyframes blinker
+{  
+  0% { color: #ff0000;}
+  16% { color: #aaaa00;}
+  33% { color: #00ff00;}
+  50% { color: #00aaaa;}
+  66% { color: #0000ff;}
+  83% { color: #aa00aa;}
+  100% { color: #ff0000;}
+}
+.blink
+{
+  -webkit-animation: blinker 5s linear infinite alternate;
+}
+.textcenter
+{
+  text-align: center;
+}
+.floatright
+{
+  float: right;
+}
+.clear
+{
+  clear: both;
+}
+.verticaltablehax
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.verticalcenterhax
+{
+  display: table-cell;
+  vertical-align: middle;
+}
+.button
+{
+  width: 100px;
+  height: 25px;
+  border: 1px solid #666666;
+  margin: 2px;
+}
+.button:active
+{
+  background-color: #CCCCCC;
+}
+#selected
+{
+  background-color: #FFCC66;
+}
+#overlay
+{
+  display: none;
+}
+.popup
+{
+  margin: auto;
+  border: 1px solid black;
+  background-color: #FFFFFF;
+  padding: 12px;
+  display: none;
+}
+.close
+{
+  float: right;
+  width: 50px;
+}
+.inline-100px
+{
+  display: inline-block;
+  width: 100px;
+}
+#connecting
+{
+  display: none;
+}
+#main-wrapper,
+#options-wrapper
+{
+  width: 300px;
+  margin: auto;
+}
+.main-button
+{
+  width: 200px;
+  height: 50px;
+  display: block;
+  margin: 10px auto 10px auto;
+  border: 1px solid #666666;
+  font-size: 24px;
+}
+.main-button:active
+{
+  background-color: #CCCCCC;
+}
+#options-menu,
+#lan-menu
+{
+  display: none;
+}
+#lan-wrapper
+{
+  width: 800px;
+  border: 1px solid #666666;
+  padding: 5px;
+  margin: auto;
+  background-color: #ffffff;
+}
+#lan-list
+{
+  padding: 2px;
+  width: 100%;
+}
+#lan-list-wrapper
+{
+  height: 600px;
+  overflow: auto;
+}
+#lan-direct-popup
+{
+  width: 300px;
+  height: 100px;
+}
+#lan-host-overlay
+{
+  width: 500px;
+  height: 300px;
+}
+#lan-host-map
+{
+  -webkit-appearance: listbox;
+  align-items: flex-start;
+  width: 200px;
+}

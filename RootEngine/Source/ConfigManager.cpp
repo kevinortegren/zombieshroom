@@ -12,9 +12,10 @@ namespace RootEngine
 		try
 		{
 			std::ifstream file(p_filepath, std::ifstream::in);
+			CreateDefaultConfig();
+
 			if(!file.good())
 			{
-				CreateDefaultConfig();
 				StoreConfig(p_filepath);
 				g_logger.LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "Couldnt find config, created one.");
 				return;
@@ -24,8 +25,10 @@ namespace RootEngine
 			YAML::Node doc;
 			parser.GetNextDocument(doc);
 
-			Parse(doc, "ScreenWidth");
-			Parse(doc, "ScreenHeight");
+			for(auto itr = m_values.begin(); itr != m_values.end(); ++itr)
+				Parse(doc, itr->first);
+			/*Parse(doc, "ScreenWidth");
+			Parse(doc, "ScreenHeight");*/
 		}
 		catch(YAML::ParserException& e) {
 			g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Config parser error: %s", e.what());
@@ -52,6 +55,13 @@ namespace RootEngine
 		// Default values.
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
+		m_values["ServerName"] = "RootForce server";
+		m_values["ServerMapfile"] = "test.world";
+		m_values["ServerPort"] = "5567";
+		m_values["ServerPassword"] = "";
+		m_values["ServerMaxPlayers"] = "12";
+		m_values["ServerMatchLength"] = "15";
+		m_values["ServerKillVictory"] = "0";
 	}
 
 	bool ConfigManager::GetConfigValueAsBool(const std::string& p_key)
@@ -89,7 +99,7 @@ namespace RootEngine
 
 	std::string ConfigManager::GetConfigValueAsString(const std::string& p_key)
 	{
-		if(m_values.find(p_key) == m_values.end())
+		if(m_values.find(p_key) != m_values.end())
 			return m_values[p_key];
 		return std::string("");
 	}

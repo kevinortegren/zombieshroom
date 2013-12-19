@@ -7,107 +7,74 @@ namespace RootForce
 {
 	namespace Network
 	{
-		int MessageChat::GetSerializedSize() const
+		void EntityCreated::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			int size = 0;
-			size += sizeof(Type);
-			size += sizeof(SenderID);
-			size += strlen(Message) + 1;
-
-			return size;
-		}
-
-		void MessageChat::Serialize(uint8_t* buffer) const
-		{
-			memcpy(buffer, &Type, sizeof(Type));
-			memcpy(buffer + sizeof(Type), &SenderID, sizeof(SenderID));
-			memcpy(buffer + sizeof(Type) + sizeof(SenderID), Message, strlen(Message) + 1);
-		}
-
-		/*
-		void MessageChat::Deserialize(uint8_t* buffer)
-		{
-			memcpy(&Type, buffer, sizeof(Type));
-			memcpy(&SenderID, buffer + sizeof(Type), sizeof(SenderID));
-			
-		}
-		*/
-
-
-
-		int MessageUserInfo::GetSerializedSize() const
-		{
-			int size = 0;
-			size += strlen(PlayerName) + 1;
-
-			return size;
-		}
-
-		void MessageUserInfo::Serialize(uint8_t* buffer) const
-		{
-			memcpy(buffer, PlayerName, strlen(PlayerName) + 1);
+			bs->Serialize(writeToBitstream, TemporaryID);
+			bs->Serialize(writeToBitstream, SynchronizedID);
+			bs->Serialize(writeToBitstream, EntityType);
 		}
 
 
 
-		int MessageUserConnected::GetSerializedSize() const
+		void EntityRemoved::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			int size = 0;
-			size += sizeof(UserID);
-			size += UserInfo.GetSerializedSize();
-
-			return size;
-		}
-
-		void MessageUserConnected::Serialize(uint8_t* buffer) const
-		{
-			memcpy(buffer, &UserID, sizeof(UserID));
-			UserInfo.Serialize(&buffer[sizeof(UserID)]);
+			bs->Serialize(writeToBitstream, SynchronizedID);
 		}
 
 
 
-		int MessageUserDisconnected::GetSerializedSize() const
-		{
-			int size = 0;
-			size += sizeof(UserID);
 
-			return size;
-		}
-
-		void MessageUserDisconnected::Serialize(uint8_t* buffer) const
+		void MessageGameStateSnapshot::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			memcpy(buffer, &UserID, sizeof(UserID));
+			// TODO: Implement
 		}
 
 
 
-		int MessageUserCommandOrient::GetSerializedSize() const
+		void MessageChat::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			int size = 0;
-			size += sizeof(Orientation);
+			bs->Serialize(writeToBitstream, Type);
+			bs->Serialize(writeToBitstream, SenderID);
+			bs->Serialize(writeToBitstream, Message);
+		}
+		
 
-			return size;
+
+
+		void MessageUserInfo::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
+		{
+			bs->Serialize(writeToBitstream, PlayerName);
+			PlayerEntity.Serialize(writeToBitstream, bs);
 		}
 
-		void MessageUserCommandOrient::Serialize(uint8_t* buffer) const
+
+
+		void MessageUserConnected::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			memcpy(buffer, &Orientation[0], sizeof(Orientation));
+			bs->Serialize(writeToBitstream, UserID);
+			UserInfo.Serialize(writeToBitstream, bs);
 		}
 
 
 
-		int MessageUserCommandSelectAbility::GetSerializedSize() const
+		void MessageUserDisconnected::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			int size = 0;
-			size += sizeof(Slot);
-
-			return size;
+			bs->Serialize(writeToBitstream, UserID);
 		}
 
-		void MessageUserCommandSelectAbility::Serialize(uint8_t* buffer) const
+
+
+		void MessageUserCommandOrient::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
-			memcpy(buffer, &Slot, sizeof(Slot));
+			for (int i = 0; i < 4; ++i)
+				bs->Serialize(writeToBitstream, Orientation[i]);
+		}
+
+
+
+		void MessageUserCommandSelectAbility::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
+		{
+			bs->Serialize(writeToBitstream, Slot);
 		}
 	}
 }
