@@ -369,7 +369,7 @@ namespace RootForce
 		{
 			NumberOfArgs(4);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((unsigned int)luaL_checknumber(p_luaState, 2), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) == 1 ? true : false );
+			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((unsigned int)luaL_checknumber(p_luaState, 2), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) != 0 );
 			return 0;
 		}
 
@@ -437,7 +437,7 @@ namespace RootForce
 			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
 			float radius = (float)luaL_checknumber(p_luaState, 5);
 			float mass = (float)luaL_checknumber(p_luaState, 6);
-			bool collideWorld = lua_toboolean(p_luaState, 7) == 1 ? true : false;
+			bool collideWorld = lua_toboolean(p_luaState, 7) != 0;
 			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, mass, collideWorld);
 			return 0;
 		}
