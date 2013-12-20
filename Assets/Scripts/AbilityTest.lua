@@ -32,9 +32,17 @@ function AbilityTest.OnCreate ()
 	local physicsComp 	= Physics.New(entity);
 	local transformComp	= Transformation.New(entity);
 	local scriptComp	= Script.New(entity, "AbilityTest");
+	
 
 	--Set data in our new components
 	transformComp:SetPos(posVec);
+
+	--[[
+	local lightComp		= PointLight.New(entity);
+	lightComp:SetRange(100);
+	lightComp:SetAttenuation(Vec3.New(0, 0.1, 0));
+	lightComp:SetColor(Vec4.New(1,0,0,0));
+	--]]
 	
 	renderComp:SetModel("Primitives/sphereTangents");
 	renderComp:SetMaterial("Fireball");
