@@ -83,11 +83,11 @@ namespace RootEngine
 				{
 					int depthWrite;
 					programs[i]["depth"]["write"] >> depthWrite;			
-					program->m_depthState.depthWrite = (bool)depthWrite;
+					program->m_depthState.depthWrite = depthWrite != 0;
 					
 					int depthTest;
 					programs[i]["depth"]["test"] >> depthTest;		
-					program->m_depthState.depthTest = (bool)depthTest;
+					program->m_depthState.depthTest = depthTest != 0;
 				}
 
 				program->Compile();
