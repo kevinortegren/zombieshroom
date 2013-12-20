@@ -26,7 +26,6 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			//Render::g_context.m_logger.LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 
@@ -192,14 +191,14 @@ namespace Render
 		return m_program;
 	}
 
-	void Technique::BufferUniforms(unsigned p_offset, unsigned p_size, void* p_data)
-	{
-		m_perTechniqueBuffer->BufferData(p_offset, p_size, p_data);
-	}
-
 	std::shared_ptr<Render::BufferInterface> Technique::GetUniformBuffer()
 	{
 		return m_perTechniqueBuffer;
+	}
+
+	void Technique::Apply()
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_perTechniqueBuffer->GetBufferId());
 	}
 
 	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)

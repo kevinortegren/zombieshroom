@@ -301,6 +301,7 @@ namespace Render
 		{
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 			(*itr).m_mesh->Bind();
 			Material* mat = (*itr).m_material;
@@ -308,8 +309,6 @@ namespace Render
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
 				//TEMP Static set of uniforms/textures.
-
-				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)

@@ -14,26 +14,19 @@ namespace RootForce
 		Render::Material* m_material;
 	};
 
-	struct ParticleSystem : public ECS::EntitySystem
+	class ParticleSystem : public ECS::EntitySystem
 	{
+	public:
 		ParticleSystem(ECS::World* p_world);
 
 		void Init();
 		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
-
+	private:
 		ECS::ComponentMapper<ParticleEmitter> m_emitters;
 		ECS::ComponentMapper<Transform> m_transforms;
-		
-	private:
-		Logging::LoggingInterface* m_logger;
-
-		struct 
-		{
-			float dt;
-		} m_perUpdateVariables;
-
-		Render::EffectInterface* m_updateEffect;
+	
+		float dt;
 	};
 }

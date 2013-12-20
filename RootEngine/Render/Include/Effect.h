@@ -77,9 +77,8 @@ namespace Render
 	public:
 		virtual std::shared_ptr<Program> CreateProgram() = 0;
 		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;
-		virtual void BufferUniforms(unsigned p_offset, unsigned p_size, void* p_data) = 0;
 		virtual std::shared_ptr<Render::BufferInterface> GetUniformBuffer() = 0;
-
+		virtual void Apply() = 0;
 	};
 
 	class Technique : public TechniqueInterface
@@ -88,8 +87,8 @@ namespace Render
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
 
-		void BufferUniforms(unsigned p_offset, unsigned p_size, void* p_data);
 		std::shared_ptr<Render::BufferInterface> GetUniformBuffer();
+		void Apply();
 
 		/* 
 			How per object uniforms should work.

@@ -12,3 +12,9 @@
               type: vertex
             - name: particle_update
               type: geometry
+          feedback:
+            - name: vert_initialPos1
+            - name: vert_initialVel1
+            - name: vert_scale1
+            - name: vert_age1
+            - name: vert_type1

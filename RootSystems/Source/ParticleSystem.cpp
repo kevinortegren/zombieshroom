@@ -10,8 +10,6 @@ namespace RootForce
 	{
 		SetUsage<ParticleEmitter>();
 		SetUsage<Transform>();
-
-		m_updateEffect = g_engineContext.m_resourceManager->LoadEffect("ParticleUpdate");
 	}
 
 	void ParticleSystem::Init()
@@ -22,35 +20,20 @@ namespace RootForce
 
 	void ParticleSystem::Begin()
 	{
-		auto technique = m_updateEffect->GetTechniques()[0];
-
-		// Update delta time in the gpu update technique.
-
-		m_perUpdateVariables.dt = m_world->GetDelta();
-		technique->BufferUniforms(1, sizeof(m_perUpdateVariables), &m_perUpdateVariables);
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, 3, technique->GetUniformBuffer()->GetBufferId());
-
-		technique->GetPrograms()[0]->Apply();
+		dt = m_world->GetDelta();
 	}
 
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		auto emitter = m_emitters.Get(p_entity);
+		ParticleEmitter* emitter = m_emitters.Get(p_entity);
+
+		std::shared_ptr<Render::TechniqueInterface> updateTech = emitter->m_material->m_effect->GetTechniques()[0];	
+		updateTech->GetUniformBuffer()->BufferData(1, sizeof(float), &dt);
+		updateTech->Apply();
+
+		updateTech->GetPrograms()[0]->Apply();
 
 		emitter->m_system->Update(m_world->GetDelta());
-
-		//TODO: Use a new system for more effiecent processing.
-		//Render::RenderJob job;
-		//job.m_mesh = emitter->m_system->GetMesh();
-		//job.m_material = emitter->m_material;
-
-		//TODO: Add flag for transform feedback.
-
-		//TODO: Set uniforms for the emitter job from transform when moving an emitter.
-		//job.m_uniforms = transform.
-
-		//g_engineContext.m_renderer->AddRenderJob(job);
 	}
 
 	void ParticleSystem::End()

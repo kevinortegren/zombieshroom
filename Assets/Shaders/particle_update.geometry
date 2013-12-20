@@ -30,7 +30,7 @@ void main()
 		if(age > 0.005f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 = gl_in[0].gl_Position;
+			vert_initialPos1 = gl_in[0].gl_Position.xyz;
 			vert_initialVel1 = vert_initialVel[0];
 			vert_scale1 = vert_scale[0];
 			vert_age1 = 0.0f;
@@ -43,7 +43,7 @@ void main()
 		}
 
 		// Always output the emitter particle with initial values.
-		vert_initialPos1 = gl_in[0].gl_Position;
+		vert_initialPos1 = gl_in[0].gl_Position.xyz;
 		vert_initialVel1 = vert_initialVel[0];
 		vert_scale1 = vert_scale[0];
 		vert_age1 = age;
@@ -57,7 +57,7 @@ void main()
 		if(age <= 1.0f)
 		{
 			// Update particles if they should live.
-			vert_initialPos1 = gl_in[0].gl_Position;
+			vert_initialPos1 = gl_in[0].gl_Position.xyz;
 			vert_initialVel1 = vert_initialVel[0];
 			vert_scale1 = vert_scale[0];
 			vert_age1 = age;
