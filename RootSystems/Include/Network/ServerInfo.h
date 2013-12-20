@@ -55,7 +55,8 @@ namespace RootSystems
 			NumPlayers = p_copy.NumPlayers;
 			MaxPlayers = p_copy.MaxPlayers;
 			PasswordProtected = p_copy.PasswordProtected;
-			strcpy(IP, p_copy.IP);
+			//strcpy(IP, p_copy.IP);
+			memcpy(IP, p_copy.IP, 16);
 			Port = p_copy.Port;
 
 			return (*this);
@@ -68,7 +69,8 @@ namespace RootSystems
 			NumPlayers = p_info.NumPlayers;
 			MaxPlayers = p_info.MaxPlayers;
 			PasswordProtected = p_info.PasswordProtected;
-			strcpy(IP, p_packet->systemAddress.ToString(false));
+			//strcpy(IP, p_packet->systemAddress.ToString(false));
+			memcpy(IP, p_packet->systemAddress.ToString(false), 16);
 			Port = p_packet->systemAddress.GetPort();
 		}
 	};
