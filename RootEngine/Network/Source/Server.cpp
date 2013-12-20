@@ -78,7 +78,8 @@ namespace RootEngine
 			message->Data = new uint8_t[p_packet->length + sizeof(char) * 16 + sizeof(USHORT)];
 			memcpy(message->Data, p_packet->data+5, p_packet->length-5);
 						
-			strcpy((char*)(message->Data + p_packet->length-5), p_packet->systemAddress.ToString(false)); // Append IP
+			//strcpy((char*)(message->Data + p_packet->length-5), p_packet->systemAddress.ToString(false)); // Append IP
+			memcpy(message->Data + p_packet->length - 5, p_packet->systemAddress.ToString(false), strlen(p_packet->systemAddress.ToString(false)));
 			*(USHORT*)(message->Data + p_packet->length-5 + sizeof(char) * 16) = p_packet->systemAddress.GetPort(); // and Port
 			message->DataSize = p_packet->length-5 + sizeof(char) * 16 + sizeof(USHORT);
 

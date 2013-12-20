@@ -20,21 +20,40 @@ The above copyright notice and this permission notice shall be included in all
 	CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "Dispatcher.h"
+#include <RootEngine/Include/SubsystemSharedContext.h>
 namespace RootEngine
 {
 	namespace GUISystem
 	{
-
+		extern RootEngine::SubsystemSharedContext g_context;
 		void RootEngine::GUISystem::Dispatcher::Bind( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegate p_callback )
 		{
 			// We can't bind methods to local JSObjects
 			if (p_object.type() == Awesomium::kJSObjectType_Local)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Cannot bind methods to local JSObjects");
 				return;
+			}
 
 			p_object.SetCustomMethod(p_name, false);
 
 			ObjectMethodKey key(p_object.remote_id(), p_name);
 			m_boundMethods[key] = p_callback;
+		}
+
+		void RootEngine::GUISystem::Dispatcher::BindWithRetVal( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegateWithRetval p_callback )
+		{
+			// We can't bind methods to local JSObjects
+			if (p_object.type() == Awesomium::kJSObjectType_Local)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Cannot bind methods to local JSObjects");
+				return;
+			}
+
+			p_object.SetCustomMethod(p_name, true);
+
+			ObjectMethodKey key(p_object.remote_id(), p_name);
+			m_boundMethodsWithRetVal[key] = p_callback;
 		}
 
 		void RootEngine::GUISystem::Dispatcher::OnMethodCall( Awesomium::WebView* caller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
@@ -46,11 +65,29 @@ namespace RootEngine
 			// Call the method
 			if (i != m_boundMethods.end())
 				i->second(caller, args);
+			else
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Callback method not found: %s", method_name);
+			}
+
 		}
 
 		Awesomium::JSValue RootEngine::GUISystem::Dispatcher::OnMethodCallWithReturnValue( Awesomium::WebView* caller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
 		{
-			return Awesomium::JSValue::Undefined();
+
+			// Find the method that matches the object id + method name
+			std::map<ObjectMethodKey, JSDelegateWithRetval>::iterator i =
+				m_boundMethodsWithRetVal.find(ObjectMethodKey(remote_object_id, method_name));
+
+			// Call the method
+			if (i != m_boundMethodsWithRetVal.end())
+				return i->second(caller, args);
+			else
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Callback method not found: %s", method_name);
+				return Awesomium::JSValue::Undefined();
+			}
+			
 		}
 
 	}
