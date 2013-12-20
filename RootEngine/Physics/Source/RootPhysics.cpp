@@ -170,7 +170,7 @@ namespace Physics
 		{
 			m_playerObjects.at(i)->Update(m_dt);
 		}
-		
+
 		if(m_debugDrawEnabled)
 			m_dynamicWorld->debugDrawWorld();
 		
@@ -807,7 +807,7 @@ namespace Physics
 		m_playerObjects.at(index)->Jump();
 	}
 	
-	void RootPhysics::PlayerKnockback( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
+	void RootPhysics::KnockbackObject( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -815,7 +815,18 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
-		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+		}
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
+		{
+			m_dynamicObjects.at(index)->setLinearVelocity(temp*p_pushForce);
+		}
+		else 
+		{
+			return; //Controlled object, how to knockback? Velocity variable?
+		}
 	}
 
 	bool RootPhysics::DoesObjectExist( int p_objectHandle )
