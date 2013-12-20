@@ -177,7 +177,9 @@ namespace RootForce
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
-
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+				g_engineContext.m_renderer->DisplayNormals(false);
+		
 		{
 			PROFILE("Player control system", m_engineContext->m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
