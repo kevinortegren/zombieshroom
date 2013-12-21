@@ -7,6 +7,6 @@ layout (location = 1) out vec3 normals;
 
 void main(void) {
 
-    diffuse = vec4(0,1,0,0);
-    normals = vec3(0);
+    diffuse = vec4(0.5f,0,0,0);
+	normals = vec3(0);
 }

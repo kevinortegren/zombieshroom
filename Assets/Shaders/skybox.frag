@@ -14,6 +14,5 @@ void main()
 	vec3 normal = normalize(vert_normal);
 
 	diffuse = vec4(frag_color, 1.0f);
-	//normals = vec3(normal * 0.5f + 0.5f);
-	normals = vec3(0);
+	normals = vec3(0.5f);
 }
