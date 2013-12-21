@@ -26,7 +26,5 @@ namespace RootForce
 	private:
 		ECS::ComponentMapper<ParticleEmitter> m_emitters;
 		ECS::ComponentMapper<Transform> m_transforms;
-	
-		float dt;
 	};
 }

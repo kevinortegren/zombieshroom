@@ -1,9 +1,12 @@
 #include <RootEngine\Render\Include\ParticleSystem.h>
 #include <RootEngine\Render\Include\Renderer.h>
 
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <RootEngine\Render\Include\RenderExtern.h>
+
+
 namespace Render
 {
-	
 	ParticleSystem::ParticleSystem()
 	{
 
@@ -11,7 +14,7 @@ namespace Render
 
 	ParticleSystem::~ParticleSystem()
 	{
-		glDeleteTransformFeedbacks(2, m_transformFeedback);
+		
 	}
 
 	void ParticleSystem::Init(GLRenderer* p_renderer)
@@ -21,15 +24,17 @@ namespace Render
 
 		// Emitter particle.
 		particles[0].m_initialPos = glm::vec3(0);
-		particles[0].m_initialVel = glm::vec3(1,0,0);
+		particles[0].m_initialVel = glm::vec3(0,0,0);
 		particles[0].m_size = glm::vec2(1,1);
 		particles[0].m_age = 0.0f;
 		particles[0].m_type = 0;
 
-		glGenTransformFeedbacks(2, m_transformFeedback);
-
 		m_meshes[0] = p_renderer->CreateMesh();
+		m_meshes[0]->SetPrimitiveType(GL_POINTS);
+		m_meshes[0]->SetTransformFeedback();
 		m_meshes[1] = p_renderer->CreateMesh();
+		m_meshes[1]->SetPrimitiveType(GL_POINTS);
+		m_meshes[1]->SetTransformFeedback();
 
 		std::shared_ptr<BufferInterface> vertexBuffer[2];
 		std::shared_ptr<VertexAttributesInterface> attributes[2];
@@ -41,7 +46,8 @@ namespace Render
 		vertexBuffer[1]->Init(GL_ARRAY_BUFFER);
 
 		for (unsigned i = 0; i < 2 ; i++) {
-			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[i]);
+
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[i]->GetTransformFeedback());
 			
 			vertexBuffer[i]->BufferData(RENDER_MAXPARTCILES, sizeof(ParticleVertex), particles);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
@@ -63,12 +69,10 @@ namespace Render
 		m_first = true;
 	}
 
-	void ParticleSystem::Update(float p_dt)
+	void ParticleSystem::Update()
 	{
-		glEnable(GL_RASTERIZER_DISCARD); 
-
 		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback[m_currentTFB]); 
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback()); 
 
 		 m_meshes[m_currentVB]->Bind();
 
@@ -79,7 +83,7 @@ namespace Render
 			m_first = false;
 		}
 		else {
-			glDrawTransformFeedback(GL_POINTS, m_transformFeedback[m_currentVB]);
+			glDrawTransformFeedback(GL_POINTS, m_meshes[m_currentVB]->GetTransformFeedback());
 		}
 
 		 glEndTransformFeedback();
@@ -87,12 +91,87 @@ namespace Render
 		 m_meshes[m_currentVB]->Unbind();
 
 		 std::swap(m_currentVB, m_currentTFB);
-
-		 glDisable(GL_RASTERIZER_DISCARD);
 	}
 
 	Render::MeshInterface* ParticleSystem::GetMesh()
 	{
-		return m_meshes[m_currentTFB].get();
+		return m_meshes[m_currentVB].get();
 	}
+
+	ParticleSystemHandler::ParticleSystemHandler()
+		: m_particleSystemsCount(0), m_gameTime(0)
+	{
+
+	}
+
+	void ParticleSystemHandler::Init( )
+	{
+		auto effect = g_context.m_resourceManager->LoadEffect("ParticleUpdate");
+
+		updateTechnique = effect->GetTechniques()[0].get();
+		updateTechnique->GetUniformBuffer()->BufferData(1, 8, 0);
+
+		m_floatDistrubution = std::uniform_real_distribution<float>(0.0f, 1.0f);
+
+		InitRandomTexture();
+
+		glActiveTexture(GL_TEXTURE0 + 4);
+		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
+	}
+
+	ParticleSystem* ParticleSystemHandler::Create( GLRenderer* p_renderer )
+	{
+		unsigned slot = m_particleSystemsCount;
+		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
+		{
+			unsigned slot = m_emptyParticleSlots.top();
+			m_emptyParticleSlots.pop();	
+		}
+
+		m_particleSystems[slot].Init( p_renderer );
+
+		return &m_particleSystems[slot++];
+	}
+
+	void ParticleSystemHandler::Free()
+	{
+
+	}
+
+	void ParticleSystemHandler::BeginTransform(float dt)
+	{
+		glEnable(GL_RASTERIZER_DISCARD); 
+
+		m_gameTime += dt;
+
+		updateTechnique->GetUniformBuffer()->BufferSubData(0, 4, &dt);
+		updateTechnique->GetUniformBuffer()->BufferSubData(4, 4, &m_gameTime);
+
+		updateTechnique->Apply();
+		updateTechnique->GetPrograms()[0]->Apply();
+	}
+
+	void ParticleSystemHandler::EndTransform()
+	{
+		 glDisable(GL_RASTERIZER_DISCARD);
+	}
+
+	void ParticleSystemHandler::InitRandomTexture()
+	{
+		std::vector<glm::vec3> randomVectors;
+		randomVectors.resize(100);
+
+		for (unsigned int i = 0 ; i < randomVectors.size() ; i++) {
+			randomVectors[i].x = m_floatDistrubution(m_generator);
+			randomVectors[i].y = m_floatDistrubution(m_generator);
+			randomVectors[i].z = m_floatDistrubution(m_generator);
+		}
+
+		glGenTextures(1, &m_randomTexture);
+		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, randomVectors.size(), 0.0f, GL_RGB, GL_FLOAT, randomVectors.data());
+		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	} 
 }

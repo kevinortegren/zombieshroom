@@ -1,0 +1,44 @@
+#version 400
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+};
+
+in vec2 vert_scale[];
+
+out vec2 gs_TexCoord;
+
+void main(void) {
+	
+	vec4 position = viewMatrix * gl_in[0].gl_Position;
+	vec4 corner;
+
+	float scale = 0.01f;
+
+	corner = position + scale * vec4(-1, -1, 0, 0);
+	gl_Position = projectionMatrix * corner;
+	gs_TexCoord = vec2(0, 0);
+	EmitVertex();
+
+	corner = position + scale * vec4(1, -1, 0, 0);
+	gl_Position = projectionMatrix * corner;
+	gs_TexCoord = vec2(1, 0);
+	EmitVertex();
+	
+	corner = position + scale * vec4(-1, 1, 0, 0);
+	gl_Position = projectionMatrix * corner;
+	gs_TexCoord = vec2(0, 1);
+	EmitVertex();
+	
+	corner = position + scale * vec4(1, 1, 0, 0);
+	gl_Position = projectionMatrix * corner;
+	gs_TexCoord = vec2(1, 1);
+	EmitVertex();
+	
+	EndPrimitive();
+}

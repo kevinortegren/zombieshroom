@@ -20,24 +20,25 @@ namespace RootForce
 
 	void ParticleSystem::Begin()
 	{
-		dt = m_world->GetDelta();
+		g_engineContext.m_renderer->BeginTransform(m_world->GetDelta());
 	}
 
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		ParticleEmitter* emitter = m_emitters.Get(p_entity);
 
-		std::shared_ptr<Render::TechniqueInterface> updateTech = emitter->m_material->m_effect->GetTechniques()[0];	
-		updateTech->GetUniformBuffer()->BufferData(1, sizeof(float), &dt);
-		updateTech->Apply();
+		emitter->m_system->Update();
 
-		updateTech->GetPrograms()[0]->Apply();
-
-		emitter->m_system->Update(m_world->GetDelta());
+		Render::RenderJob job;
+		job.m_mesh = emitter->m_system->GetMesh();
+		job.m_material = emitter->m_material;
+		job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
+		
+		g_engineContext.m_renderer->AddRenderJob(job);
 	}
 
 	void ParticleSystem::End()
 	{
-
+		g_engineContext.m_renderer->EndTransform();
 	}
 }

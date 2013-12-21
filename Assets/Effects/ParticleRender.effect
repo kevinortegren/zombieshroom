@@ -1,0 +1,16 @@
+- name: ParticleRender
+  techniques:
+    - name: ParticleRender
+      uniforms:
+        - name: PerFrame
+          slot: 0
+      textures:
+      programs:
+        - name: particle_render
+          shaders:
+            - name: particle-render
+              type: vertex
+            - name: particle-render
+              type: geometry
+            - name: particle-render
+              type: fragment

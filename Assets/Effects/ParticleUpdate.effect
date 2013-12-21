@@ -5,6 +5,8 @@
         - name: PerTech
           slot: 3
       textures:
+        - name: g_Random
+          slot: 4
       programs:
         - name: particle_update
           shaders:

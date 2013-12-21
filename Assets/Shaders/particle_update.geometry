@@ -4,9 +4,12 @@
 layout(points) in;
 layout(points, max_vertices = 30) out;
 
+uniform sampler1D g_Random;
+
 layout(std140) uniform PerTech
 {
 	float g_dt;
+	float g_time;
 };
 
 in vec3 vert_initialVel[];
@@ -21,6 +24,13 @@ out vec2 vert_scale1;
 out float vert_age1;
 out float vert_type1;
 
+vec3 GetRandomDir(float TexCoord)
+{
+    vec3 direction = texture(g_Random, TexCoord).xyz;
+    direction = direction * 2 - 1;
+    return direction;
+} 
+
 void main() 
 {	
 	float age = vert_age[0] + g_dt;
@@ -31,7 +41,7 @@ void main()
 		{
 			// Spawn new particles with new start values using the initial values.
 			vert_initialPos1 = gl_in[0].gl_Position.xyz;
-			vert_initialVel1 = vert_initialVel[0];
+			vert_initialVel1 = GetRandomDir(g_time);
 			vert_scale1 = vert_scale[0];
 			vert_age1 = 0.0f;
 			vert_type1 = 1.0f;
@@ -54,13 +64,20 @@ void main()
 	}
 	else
 	{
-		if(age <= 1.0f)
+		vec3 DeltaP = g_dt * vert_initialVel[0];
+
+		if(age <= 5.0f)
 		{
 			// Update particles if they should live.
-			vert_initialPos1 = gl_in[0].gl_Position.xyz;
+
+			vert_initialPos1 = gl_in[0].gl_Position.xyz + DeltaP;
+			
 			vert_initialVel1 = vert_initialVel[0];
+			
 			vert_scale1 = vert_scale[0];
+			
 			vert_age1 = age;
+			
 			vert_type1 = 1.0f;
 		 
 			EmitVertex();

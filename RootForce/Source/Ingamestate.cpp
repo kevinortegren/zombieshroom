@@ -117,7 +117,7 @@ namespace RootForce
 		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();	
 		e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
 		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TEXTURE_2D);
-		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("ParticleUpdate");
+		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("ParticleRender");
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(m_world);
@@ -226,11 +226,16 @@ namespace RootForce
             m_cameraSystem->Process();
         }
 		
+		{ 
+			PROFILE("_ParticleSystem", m_engineContext->m_profiler);
+			m_particleSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", m_engineContext->m_profiler);
             m_pointLightSystem->Process();
-			m_particleSystem->Process();
 			m_renderingSystem->Process();
+
 		}
         
 		m_engineContext->m_renderer->Render();

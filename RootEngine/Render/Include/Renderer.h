@@ -13,8 +13,7 @@
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
-#include <array>
-#include <stack>
+
 
 #if defined(_WINDLL)
 #define RENDERSYS_DLL_EXPORT __declspec(dllexport)
@@ -56,6 +55,8 @@ namespace Render
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 
 		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual void BeginTransform(float dt) = 0;
+		virtual void EndTransform() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -92,7 +93,10 @@ namespace Render
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 		std::shared_ptr<Material> CreateMaterial();
+
 		ParticleSystem* CreateParticleSystem();
+		void BeginTransform(float dt);
+		void EndTransform();
 
 	private:
 
@@ -148,10 +152,7 @@ namespace Render
 
 		bool m_displayNormals;
 
-		// Particle systems.
-		unsigned m_particleSystemsCount;
-		std::stack<unsigned> m_emptyParticleSlots;
-		std::array<ParticleSystem, 100> m_particleSystems;
+		ParticleSystemHandler m_particles;
 	};
 }
 

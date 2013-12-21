@@ -6,6 +6,10 @@
 #include <RootEngine\Render\Include\Mesh.h>
 #include <RootEngine\Render\Include\Effect.h>
 
+#include <array>
+#include <stack>
+#include <random>
+
 #define RENDER_MAXPARTCILES 1000
 
 namespace Render
@@ -25,7 +29,7 @@ namespace Render
 	{
 	public:
 		virtual void Init(GLRenderer* p_renderer) = 0;
-		virtual void Update(float p_dt) = 0;
+		virtual void Update() = 0;
 		virtual Render::MeshInterface* GetMesh() = 0;
 	};
 
@@ -35,14 +39,41 @@ namespace Render
 		ParticleSystem();
 		~ParticleSystem();
 		void Init(GLRenderer* p_renderer);
-		void Update(float p_dt);
+		void Update();
 		Render::MeshInterface* GetMesh();
 
 	private:
 		bool m_first;
 		int m_currentVB;
 		int m_currentTFB;
-		GLuint m_transformFeedback[2];
 		std::shared_ptr<Render::MeshInterface> m_meshes[2];
+	};
+
+	//TODO: Add descriptor for particles updates.
+
+	class ParticleSystemHandler
+	{
+	public:
+		ParticleSystemHandler();
+		void Init();
+		ParticleSystem* Create(GLRenderer* p_renderer);
+		void Free();
+		void BeginTransform(float dt);
+		void EndTransform();
+
+	private:
+
+		void InitRandomTexture();
+
+		unsigned m_particleSystemsCount;
+		std::stack<unsigned> m_emptyParticleSlots;
+		std::array<ParticleSystem, 100> m_particleSystems;
+		
+		TechniqueInterface* updateTechnique;
+		GLuint m_randomTexture;
+		float m_gameTime;
+
+		std::uniform_real_distribution<float> m_floatDistrubution;
+		std::default_random_engine m_generator;
 	};
 }

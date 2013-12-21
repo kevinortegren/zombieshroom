@@ -7,7 +7,6 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
-
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -58,8 +57,7 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_numDirectionalLights(0),
-		m_numPointLights(0),
-		m_particleSystemsCount(0)
+		m_numPointLights(0)
 	{
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::INIT_PRINT, "Renderer subsystem initialized!");
 	}
@@ -216,6 +214,8 @@ namespace Render
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
+		// Particle System handler.
+		m_particles.Init();
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -347,14 +347,22 @@ namespace Render
 				{
 					// Apply program.
 					(*itrP)->Apply();
-					(*itr).m_mesh->Draw();			
+
+					if(((*itr).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+					{
+						(*itr).m_mesh->DrawTransformFeedback();
+					}
+					else
+					{
+						(*itr).m_mesh->Draw();		
+					}
 				}
 
 				// Debug.
 				if(m_displayNormals)
 				{
 					m_normalTech->GetPrograms()[0]->Apply();	
-					(*itr).m_mesh->Draw();	
+					//(*itr).m_mesh->Draw();	
 				}
 			}
 
@@ -481,16 +489,17 @@ namespace Render
 
 	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
-		unsigned slot = m_particleSystemsCount;
-		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
-		{
-			unsigned slot = m_emptyParticleSlots.top();
-			m_emptyParticleSlots.pop();	
-		}
+		return m_particles.Create(this);
+	}
 
-		m_particleSystems[slot].Init( this );
+	void GLRenderer::BeginTransform(float dt)
+	{
+		m_particles.BeginTransform(dt);
+	}
 
-		return &m_particleSystems[slot++];
+	void GLRenderer::EndTransform()
+	{
+		m_particles.EndTransform();
 	}
 }
 
