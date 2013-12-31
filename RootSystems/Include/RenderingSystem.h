@@ -8,13 +8,25 @@
 
 namespace RootForce
 {
+	namespace RenderPass
+	{
+		enum RenderPass
+		{
+			RENDERPASS_SKYBOX,
+			RENDERPASS_TERRAIN,
+			RENDERPASS_DYNAMIC
+		};
+	}
+
+
 	struct Renderable : public ECS::Component<Renderable>
 	{
 		Renderable()
-			: m_model(nullptr), m_material(nullptr) {}
+			: m_model(nullptr), m_material(nullptr), m_pass(2) {}
 
 		RootEngine::Model* m_model;
 		Render::Material* m_material;
+		unsigned m_pass;
 	};
 
 	struct RenderingSystem : public ECS::EntitySystem

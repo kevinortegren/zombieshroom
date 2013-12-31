@@ -2,11 +2,13 @@
 
 in vec2 gs_TexCoord;
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
+uniform sampler2D g_Diffuse;
+
+layout (location = 2) out vec4 background;
 
 void main(void) {
 
-    diffuse = vec4(0.5f,0,0,0);
-	normals = vec3(0);
+	vec4 frag_color = texture(g_Diffuse, gs_TexCoord);
+
+	background = vec4(frag_color);
 }

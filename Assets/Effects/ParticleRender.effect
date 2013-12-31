@@ -5,6 +5,8 @@
         - name: PerFrame
           slot: 0
       textures:
+        - name: g_Diffuse
+          slot: 0
       programs:
         - name: particle_render
           shaders:
@@ -14,3 +16,7 @@
               type: geometry
             - name: particle-render
               type: fragment
+          blend: 1
+          depth:
+            write: 0
+            test: 1

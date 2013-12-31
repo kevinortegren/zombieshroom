@@ -71,7 +71,7 @@ namespace RootEngine
 					program->AttachShader(glType, shader.c_str());
 				}
 
-				if(programs[i].FindValue("feedback"))
+				if(programs[j].FindValue("feedback"))
 				{
 					std::vector<std::string> varyingsVector;
 					const YAML::Node& varyings = programs[i]["feedback"];
@@ -89,22 +89,21 @@ namespace RootEngine
 					glTransformFeedbackVaryings(program->GetHandle(), varingsChar.size(), varingsChar.data(), GL_INTERLEAVED_ATTRIBS);
 				}
 
-				if(programs[i].FindValue("blend"))
+				if(programs[j].FindValue("blend"))
 				{
 					int blendType;
-					programs[i]["blend"] >> blendType;
+					programs[j]["blend"] >> blendType;
 					program->m_blendState = (Render::Program::BlendState)blendType;
 				}
-
-				
-				if(programs[i].FindValue("depth"))
+	
+				if(programs[j].FindValue("depth"))
 				{
 					int depthWrite;
-					programs[i]["depth"]["write"] >> depthWrite;			
+					programs[j]["depth"]["write"] >> depthWrite;			
 					program->m_depthState.depthWrite = (bool)depthWrite;
 					
 					int depthTest;
-					programs[i]["depth"]["test"] >> depthTest;		
+					programs[j]["depth"]["test"] >> depthTest;		
 					program->m_depthState.depthTest = (bool)depthTest;
 				}
 

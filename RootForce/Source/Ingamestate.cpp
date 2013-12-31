@@ -109,16 +109,6 @@ namespace RootForce
 		m_particleSystem = new RootForce::ParticleSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
 
-		// Test particle entity.
-		ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
-		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
-		RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
-		
-		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();	
-		e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TEXTURE_2D);
-		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("ParticleRender");
-
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(m_world);
 		m_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
@@ -130,6 +120,17 @@ namespace RootForce
         // Create a world and player
         m_worldSystem->CreateWorld("level");
 		m_playerSystem->CreatePlayer();
+
+
+		// Test particle entity.
+		ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+		RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();	
+		e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("particle_diffuse", Render::TextureType::TEXTURE_2D);
+		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("ParticleRender");
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -250,8 +251,8 @@ namespace RootForce
 		{
 			PROFILE("GUI", m_engineContext->m_profiler);
 
-			m_engineContext->m_gui->Update();
-			m_engineContext->m_gui->Render();
+			//m_engineContext->m_gui->Update();
+			//m_engineContext->m_gui->Render();
 		}
         
 		m_engineContext->m_debugOverlay->RenderOverlay();

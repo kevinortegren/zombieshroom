@@ -18,24 +18,24 @@ void main(void) {
 	vec4 position = viewMatrix * gl_in[0].gl_Position;
 	vec4 corner;
 
-	float scale = 0.01f;
+	vec2 scale = vert_scale[0];
 
-	corner = position + scale * vec4(-1, -1, 0, 0);
+	corner = position + vec4(-scale.x, -scale.y, 0, 0);
 	gl_Position = projectionMatrix * corner;
 	gs_TexCoord = vec2(0, 0);
 	EmitVertex();
 
-	corner = position + scale * vec4(1, -1, 0, 0);
+	corner = position + vec4(scale.x, -scale.y, 0, 0);
 	gl_Position = projectionMatrix * corner;
 	gs_TexCoord = vec2(1, 0);
 	EmitVertex();
 	
-	corner = position + scale * vec4(-1, 1, 0, 0);
+	corner = position + vec4(-scale.y, scale.x, 0, 0);
 	gl_Position = projectionMatrix * corner;
 	gs_TexCoord = vec2(0, 1);
 	EmitVertex();
 	
-	corner = position + scale * vec4(1, 1, 0, 0);
+	corner = position + vec4(scale.x, scale.y, 0, 0);
 	gl_Position = projectionMatrix * corner;
 	gs_TexCoord = vec2(1, 1);
 	EmitVertex();

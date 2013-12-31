@@ -28,10 +28,11 @@ namespace RootForce
 		t->m_scale = glm::vec3(-100);
 
 		r->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
+		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_material = g_engineContext.m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-
+		
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 
