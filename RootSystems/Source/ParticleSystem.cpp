@@ -1,4 +1,4 @@
-#include <RootSystems\Include\ParticleSystem.h>
+#include <RootSystems/Include/ParticleSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
@@ -27,7 +27,15 @@ namespace RootForce
 	{
 		ParticleEmitter* emitter = m_emitters.Get(p_entity);
 
-		emitter->m_system->Update();
+		auto updateTechnique = emitter->m_material->m_effect->GetTechniques()[0];
+		updateTechnique->Apply();
+
+		for(unsigned i = 0; i <updateTechnique->GetPrograms().size(); ++i)
+		{
+			updateTechnique->GetPrograms()[i]->Apply();
+
+			emitter->m_system->Update();
+		}
 
 		Render::RenderJob job;
 		job.m_mesh = emitter->m_system->GetMesh();

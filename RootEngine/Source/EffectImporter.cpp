@@ -135,6 +135,20 @@ namespace RootEngine
 					program->BindTexture(name, slot);
 				}
 
+				if(techniques[i].FindValue("flags") != nullptr)
+				{
+					const YAML::Node& flags = techniques[i]["flags"];
+					for(size_t j = 0; j < flags.size(); ++j)
+					{
+						std::string name;
+						flags[j]["name"] >> name;
+
+						if(name == "RenderIgnore")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
+						}
+					}
+				}
 
 				if(techniques[i].FindValue("PerObject") != nullptr)
 				{

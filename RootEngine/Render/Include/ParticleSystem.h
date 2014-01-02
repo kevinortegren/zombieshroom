@@ -10,7 +10,9 @@
 #include <stack>
 #include <random>
 
-#define RENDER_MAXPARTCILES 1000
+#define RENDER_NUM_PARTCILES 1000
+#define RENDER_NUM_PARTICLESYSTEMS 100
+#define RENDER_NUM_RANDOMVECTORS 1000
 
 namespace Render
 {
@@ -25,10 +27,17 @@ namespace Render
 		float m_type; // 0 = emitter;
 	};
 
+	struct ParticleSystemDescription
+	{
+		glm::vec3 m_initalPos;
+		glm::vec3 m_initalVel;
+		glm::vec3 m_scale;
+	};
+
 	class ParticleSystemInterface
 	{
 	public:
-		virtual void Init(GLRenderer* p_renderer) = 0;
+		virtual void Init(GLRenderer* p_renderer, ParticleSystemDescription& p_desc, unsigned p_slot) = 0;
 		virtual void Update() = 0;
 		virtual Render::MeshInterface* GetMesh() = 0;
 	};
@@ -36,28 +45,28 @@ namespace Render
 	class ParticleSystem : public ParticleSystemInterface
 	{
 	public:
-		ParticleSystem();
-		~ParticleSystem();
-		void Init(GLRenderer* p_renderer);
+		friend class ParticleSystemHandler;
+
+		void Init(GLRenderer* p_renderer, ParticleSystemDescription& p_desc, unsigned p_slot);
 		void Update();
 		Render::MeshInterface* GetMesh();
 
 	private:
+		unsigned m_slot;
 		bool m_first;
 		int m_currentVB;
 		int m_currentTFB;
 		std::shared_ptr<Render::MeshInterface> m_meshes[2];
 	};
 
-	//TODO: Add descriptor for particles updates.
-
 	class ParticleSystemHandler
 	{
 	public:
+
 		ParticleSystemHandler();
 		void Init();
-		ParticleSystem* Create(GLRenderer* p_renderer);
-		void Free();
+		ParticleSystem* Create(GLRenderer* p_renderer, ParticleSystemDescription& p_desc);
+		void Free(ParticleSystem* p_system);
 		void BeginTransform(float dt);
 		void EndTransform();
 
@@ -65,15 +74,23 @@ namespace Render
 
 		void InitRandomTexture();
 
+		// Number of active particle systems.
 		unsigned m_particleSystemsCount;
-		std::stack<unsigned> m_emptyParticleSlots;
-		std::array<ParticleSystem, 100> m_particleSystems;
-		
-		TechniqueInterface* updateTechnique;
-		GLuint m_randomTexture;
-		float m_gameTime;
 
+		std::stack<unsigned> m_emptyParticleSlots;
+		std::array<ParticleSystem, RENDER_NUM_PARTICLESYSTEMS> m_particleSystems;
+		
+		GLuint m_randomTexture;
 		std::uniform_real_distribution<float> m_floatDistrubution;
 		std::default_random_engine m_generator;
+
+		struct
+		{
+			float m_dt;
+			float m_gameTime;
+
+		} m_perFrameVars;
+
+		Buffer m_perFrameBuffer;		
 	};
 }

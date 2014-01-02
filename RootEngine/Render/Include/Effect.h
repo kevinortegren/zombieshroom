@@ -72,6 +72,14 @@ namespace Render
 		GLuint m_glHandle;
 	};
 
+	namespace TechniqueFlags
+	{
+		enum TechniqueFlags
+		{
+			RENDER_IGNORE = 0x01
+		};
+	}
+
 	class TechniqueInterface
 	{
 	public:
@@ -84,11 +92,16 @@ namespace Render
 	class Technique : public TechniqueInterface
 	{
 	public:
+		Technique();
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
 
 		std::shared_ptr<Render::BufferInterface> GetUniformBuffer();
 		void Apply();
+
+		std::map<Semantic::Semantic, unsigned int> m_data;
+		std::shared_ptr<Render::BufferInterface> m_perTechniqueBuffer;
+		unsigned m_flags;
 
 		/* 
 			How per object uniforms should work.
@@ -107,8 +120,6 @@ namespace Render
 				read offset from technique using semantic
 					bufferSubData(offset, pointer)
 		*/
-		std::map<Semantic::Semantic, unsigned int> m_data;
-		std::shared_ptr<Render::BufferInterface> m_perTechniqueBuffer;
 		
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;

@@ -143,6 +143,7 @@ namespace Render
 
 	void Program::Apply( )
 	{
+		// Apply blending.
 		switch(m_blendState)
 		{
 			case BLEND_NONE:
@@ -201,6 +202,12 @@ namespace Render
 		glUniform1i(uniformLocation, slot);
 	}
 
+	Technique::Technique()
+		: m_flags(0)
+	{
+
+	}
+
 	std::shared_ptr<Program> Technique::CreateProgram()
 	{
 		auto program = std::shared_ptr<Program>(new Program);
@@ -220,6 +227,7 @@ namespace Render
 
 	void Technique::Apply()
 	{
+		// Per technique uniform binding.
 		glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_perTechniqueBuffer->GetBufferId());
 	}
 
@@ -250,40 +258,4 @@ namespace Render
 			}
 		}
 	}
-
-	/*GLint GetLocation( GLuint p_handle, const char* p_name );
-
-	void Effect::SetUniformInt( const char* _name, int _val )
-	{
-		glUniform1i( GetLocation( m_glHandle, _name ), _val );
-	}
-	void Effect::SetUniformFloat( const char* _name, float _val )
-	{
-		glUniform1f( GetLocation( m_glHandle, _name ), _val );
-	}
-	void Effect::SetUniformVector( const char* _name, glm::vec3& _val )
-	{
-		glUniform3fv( GetLocation( m_glHandle, _name ), 1, &_val[0] );
-	}
-	void Effect::SetUniformVector( const char* _name, glm::vec4& _val )
-	{
-		glUniform4fv( GetLocation( m_glHandle, _name ), 1, &_val[0] );
-	}
-	void Effect::SetUniformMatrix( const char* _name, glm::mat3& _val )
-	{
-		glUniformMatrix3fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
-	}
-	void Effect::SetUniformMatrix( const char* _name, const glm::mat4& _val )
-	{
-		glUniformMatrix4fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
-	}
-
-	GLint GetLocation( GLuint p_handle, const char* p_name )
-	{
-		GLint loc = glGetUniformLocation( p_handle, p_name );
-		if( loc == -1 )
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::NON_FATAL_ERROR, "Failed to locate GL variable %s.\n", p_name , __FUNCTION__, __LINE__ );
-		return loc;
-	} */
-
 }

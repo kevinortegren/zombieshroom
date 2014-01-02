@@ -268,6 +268,9 @@ namespace Render
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
+				if(((*itrT)->m_flags & Render::TechniqueFlags::RENDER_IGNORE) == Render::TechniqueFlags::RENDER_IGNORE)
+					continue;
+
 				//TEMP Static set of uniforms/textures.
 
 				glActiveTexture(GL_TEXTURE0 + 0);
@@ -425,7 +428,8 @@ namespace Render
 
 	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
-		return m_particles.Create(this);
+		ParticleSystemDescription desc;
+		return m_particles.Create(this, desc);
 	}
 
 	void GLRenderer::BeginTransform(float dt)
