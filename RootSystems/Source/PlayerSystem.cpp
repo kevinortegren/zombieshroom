@@ -5,7 +5,7 @@
 
 namespace RootForce
 {
-	void PlayerSystem::CreatePlayer()
+	void PlayerSystem::CreatePlayer(int p_teamID)
 	{
 		ECS::EntityManager* entityManager = m_world->GetEntityManager();
 		ECS::Entity* entity = entityManager->CreateEntity();
@@ -55,6 +55,7 @@ namespace RootForce
 		player->Health = 100;
 		player->Deaths = 0;
 		player->Score = 0;
+		player->TeamID = p_teamID;
 	}
 
 	void PlayerSystem::Process()

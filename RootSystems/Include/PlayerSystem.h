@@ -24,6 +24,8 @@ namespace RootForce
 		int Health;
 		int Score;
 		int Deaths;
+		int TeamID;
+		int LastDamageSourceID;
 	};
 
 	class PlayerSystem : public ECS::VoidSystem
@@ -32,7 +34,7 @@ namespace RootForce
 		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_gameSharedContext)
 			: ECS::VoidSystem(p_world)
 			, m_gameSharedContext(p_gameSharedContext) {}
-		void CreatePlayer();
+		void CreatePlayer(int p_teamID);
 		void Process();
 	private:
 		RootEngine::GameSharedContext* m_gameSharedContext;
