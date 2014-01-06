@@ -73,10 +73,10 @@ namespace RootEngine
 			lua_register(m_luaState, p_funcName.c_str(), p_func);
 		}
 
-		void ScriptManager::LoadScript( std::string p_scriptPath )
+		int ScriptManager::LoadScript( std::string p_scriptPath )
 		{
 			// Execute the script
-			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+			return luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 		}
 
 		lua_State* ScriptManager::GetLuaState()

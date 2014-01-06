@@ -19,8 +19,11 @@ namespace RootForce
 
 	struct Player : public ECS::Component<Player>
 	{
-		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> m_abilities;
-		Abilitiy::Ability m_selectedAbility;
+		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
+		Abilitiy::Ability SelectedAbility;
+		int Health;
+		int Score;
+		int Deaths;
 	};
 
 	class PlayerSystem : public ECS::VoidSystem

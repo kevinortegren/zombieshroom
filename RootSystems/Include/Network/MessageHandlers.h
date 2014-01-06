@@ -20,7 +20,7 @@ namespace RootForce
 			MessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger);
 			virtual ~MessageHandler();
 
-			virtual void ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet) = 0;
+			virtual bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet) = 0;
 		protected:
 			RakNet::RakPeerInterface* m_peer;
 			Logging* m_logger;
@@ -37,7 +37,7 @@ namespace RootForce
 			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetPlayerSystem(PlayerSystem* p_playerSystem);
 
-			void ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
+			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
 			ECS::World* m_world;
 			RootSystems::LanList* m_list;
@@ -53,7 +53,7 @@ namespace RootForce
 
 			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 
-			void ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
+			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
 			ECS::World* m_world;
 			NetworkEntityMap* m_networkEntityMap;

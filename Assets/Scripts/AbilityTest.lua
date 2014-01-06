@@ -1,20 +1,26 @@
---[[
-	print( type(renderComp) )
-
-	local meta = getmetatable(renderComp)
-	for k,v in pairs(meta) do
-	  print("    ", k, v)
-	end
---]]
+ACTION_CREATE = 0;
+ACTION_COLLIDE = 1;
 
 --Set table name
 AbilityTest = {};
 
-function AbilityTest.OnActivate (action)
+function AbilityTest.Process (action, ...)
+	
+	local args = table.pack(...);
+
+	if action == ACTION_CREATE then
+		AbilityTest.OnCreate();
+	elseif action == ACTION_COLLIDE then
+		AbilityTest.OnCollide(args);
+	end
+	
+end
+
+function AbilityTest.OnCreate ()
 
 	--Get data from Player & AimingDevice entities
 	local posVec  		= Entity.GetEntityByTag("Player"):GetTransformation():GetPos();
-	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetFront();
+	local frontVec  	= Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetOrient():GetFront();
 
 	--Create entity
 	local entity 		= Entity.New();
@@ -22,8 +28,10 @@ function AbilityTest.OnActivate (action)
 	--Create components and put them in our new entity
 	local renderComp 	= Renderable.New(entity);
 	local collisionComp = Collision.New(entity);
+	local colRespComp	= CollisionResponder.New(entity);
 	local physicsComp 	= Physics.New(entity);
 	local transformComp	= Transformation.New(entity);
+	local scriptComp	= Script.New(entity, "AbilityTest");
 
 	--Set data in our new components
 	transformComp:SetPos(posVec);
@@ -35,27 +43,16 @@ function AbilityTest.OnActivate (action)
 	renderComp:SetMaterialNormal("fireballNormal");
 	renderComp:SetMaterialEffect("Mesh_NormalMap");
 	
-	physicsComp:SetInfo(
-		collisionComp,
-		true, --collideWorld
-		frontVec.x, --dirx
-		frontVec.y, --diry
-		frontVec.z, --dirz
-		0, --gravx
-		-9.82, --gravy
-		0, --gravz
-		1, --orientX
-		0, --orientY
-		-1, --orientZ
-		0, --orientW
-		posVec.x + 		frontVec.x * 3, --posX
-		4 + posVec.y + 	frontVec.y * 3, --posY
-		posVec.z + 		frontVec.z * 3, --posZ
-		entity:GetId(),
-		0.5, --height
-		30, --mass
-		1, --radius
-		0, --shape, 0 = SHAPE_SPHERE, 1 = SHAPE_CONE, 2 = SHAPE_CYLINDER
-		40, --speed
-		1); --type, 0 = TYPE_STATIC, 1 = TYPE_ABILITY, 2 = TYPE_DYNAMIC, 3 = TYPE_PLAYER
+	collisionComp:CreateHandle(entity:GetId(), 1, false);
+	physicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 30, true);
+	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 40, frontVec.y * 40, frontVec.z * 40));
+	colRespComp:SetContainer(collisionComp);
+end
+
+function AbilityTest.OnCollide (args)
+	
+end
+
+function AbilityTest.OnDestroy ()
+
 end

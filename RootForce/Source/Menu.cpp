@@ -27,6 +27,7 @@ namespace RootForce
 	{
 		m_view->ExecuteJavascript(Awesomium::WSLit("Hide();"), Awesomium::WebString());
 		//m_view->PauseRendering(); // Calling this should save some processing power, but it doesn't wait until the view is updated as transparent
+		m_view->ReduceMemoryUsage();
 	}
 	void RootForce::Menu::Unhide()
 	{
@@ -49,6 +50,7 @@ namespace RootForce
 
 	void RootForce::Menu::LoadDefaults(RootEngine::ConfigManagerInterface* p_configMan, std::string p_workingDir)
 	{
+		m_workingDir = p_workingDir;
 		std::string command = "SetDefaults(";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerName") + "',";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerMapfile") + "',";
@@ -58,34 +60,9 @@ namespace RootForce
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerMatchLength")) + ",";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerKillVictory")) + ",";
 
-		// Create a list of available maps
-		DIR *dir;
-		struct dirent *ent;
-		command += "[";
-		if ((dir = opendir((p_workingDir+"Assets/Levels/").c_str())) != NULL)
-		{
-			bool first = true;
-			/* print all the files and directories within directory */
-			while ((ent = readdir(dir)) != NULL)
-			{
-				if (ent->d_type != DT_REG) // Not a regular file
-					continue;
-				std::string fname = ent->d_name;
-				std::string extension = "world";
-				if(fname.find(extension, (fname.length() - extension.length())) == std::string::npos) // Look for extension
-					continue; // Mismatching extension, skip file
-				if(!first)
-					command += ",";
-				else
-					first = !first;
-				command = command + "'" + fname + "'";
-			}
-			closedir (dir);
-		}
-		else
-		  m_context.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Could not open level directory");
+		command += GetMapList();
 
-		command += "]);";
+		command += ");";
 
 		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
 	}
@@ -141,9 +118,43 @@ namespace RootForce
 		m_event.push_back(event);
 	}
 
-	const Awesomium::JSValue& Menu::GetMapList(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	const Awesomium::JSValue& Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
 	{
-		return Awesomium::JSValue();
+		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
+	}
+
+	std::string Menu::GetMapList()
+	{
+		// Create a list of available maps
+		DIR *dir;
+		struct dirent *ent;
+		std::string command;
+		command += "[";
+		if ((dir = opendir((m_workingDir+"Assets/Levels/").c_str())) != NULL)
+		{
+			bool first = true;
+			/* print all the files and directories within directory */
+			while ((ent = readdir(dir)) != NULL)
+			{
+				if (ent->d_type != DT_REG) // Not a regular file
+					continue;
+				std::string fname = ent->d_name;
+				std::string extension = "world";
+				if(fname.find(extension, (fname.length() - extension.length())) == std::string::npos) // Look for extension
+					continue; // Mismatching extension, skip file
+				if(!first)
+					command += ",";
+				else
+					first = !first;
+				command = command + "'" + fname + "'";
+			}
+			closedir (dir);
+		}
+		else
+			m_context.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Could not open level directory");
+
+		command += "]";
+		return command;
 	}
 
 }

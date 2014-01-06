@@ -84,8 +84,13 @@ namespace RootForce
 
 
 		// Setup the screen states
-		m_menustate = std::shared_ptr<Menustate>(new Menustate());
-		m_gamestate = std::shared_ptr<Ingamestate>(new Ingamestate());
+		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_client, m_server));
+		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_client, m_server));
+		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_client, m_server));
+
+		m_menuState->Initialize(m_workingDirectory);
+		m_connectingState->Initialize();
+		m_ingameState->Initialize();
 
 		m_currentState = GameStates::Menu;
 	}
@@ -113,6 +118,7 @@ namespace RootForce
 
 		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
+
 		// Initialize GUI
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
@@ -120,8 +126,6 @@ namespace RootForce
 
 		// Setup a client (but don't connect until we have connection details)
 		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
-		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger, &m_world));
-		m_client->SetMessageHandler(m_clientMessageHandler.get());
 
 		while(m_running)
         {
@@ -129,22 +133,37 @@ namespace RootForce
 			{
 				case RootForce::GameStates::Menu:
 				{
-					// Initialize the network system
-					m_menustate->Initialize(&g_engineContext, m_client.get(), m_clientMessageHandler.get());
-            
-					g_engineContext.m_inputSys->LockMouseToCenter(false);
-
+					m_menuState->Enter();
+					
 					while (m_currentState == RootForce::GameStates::Menu && m_running)
 					{
 						HandleEvents();
-						m_currentState = m_menustate->Update();
+						m_currentState = m_menuState->Update();
 					}
+
+					m_menuState->Exit();
+				} break;
+
+				case RootForce::GameStates::Connecting:
+				{
+					m_connectingState->Enter();
+
+					while (m_currentState == RootForce::GameStates::Connecting && m_running)
+					{
+						HandleEvents();
+						m_currentState = m_connectingState->Update();
+					}
+
+					m_connectingState->Exit();
 				} break;
 
 				case RootForce::GameStates::Ingame:
 				{
+					
+
+					/*
 					// Start the main loop
-					m_gamestate->Initialize(&g_engineContext, &m_world, m_menustate->GetPlayData(), m_client.get(), m_clientMessageHandler.get());
+					//m_gamestate->Initialize(&g_engineContext, &m_world, m_menustate->GetPlayData(), m_client.get(), m_clientMessageHandler.get());
 					g_engineContext.m_inputSys->LockMouseToCenter(true);
                 
 					uint64_t old = SDL_GetPerformanceCounter();
@@ -163,6 +182,7 @@ namespace RootForce
                     
 						m_gamestate->Update(dt);
 					}
+					*/
 				} break;
 
 				case RootForce::GameStates::Exit:

@@ -38,7 +38,7 @@ namespace RootForce
 			m_playerSystem = p_playerSystem;
 		}
 
-		void ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
 			switch (p_id)
 			{
@@ -72,27 +72,27 @@ namespace RootForce
 					m.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
-				} break;
+				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection refused: server full");
-				} break;
+				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: booted");
-				} break;
+				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: connection to server lost");
-				} break;
+				} return true;
 
 				case ID_CONNECTION_ATTEMPT_FAILED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection attempt failed");
-				} break;
+				} return true;
 
 				case ID_UNCONNECTED_PONG:
 				{
@@ -107,7 +107,7 @@ namespace RootForce
 					RootSystems::ServerInfoInternal copy = internalInfo;
 
 					m_list->AddServer(internalInfo);
-				} break;
+				} return true;
 
 				case MessageType::ChatToClient:
 				{
@@ -115,7 +115,7 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					m_chatSystem->JSAddMessage(m.Message.C_String());
-				} break;
+				} return true;
 
 				case MessageType::UserConnected:
 				{
@@ -160,15 +160,17 @@ namespace RootForce
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "We have connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
 					}
-				} break;
+				} return true;
 
 				case MessageType::UserDisconnected:
 				{
 					// Another client has disconnected
 					MessageUserDisconnected m;
 					m.Serialize(false, p_bs);
-				} break;
+				} return true;
 			}
+
+			return false;
 		}
 
 
@@ -183,14 +185,14 @@ namespace RootForce
 			m_networkEntityMap = p_networkEntityMap;
 		}
 
-		void ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
 			switch (p_id)
 			{
 				case ID_NEW_INCOMING_CONNECTION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "SERVER: Client connected (%s)", p_packet->systemAddress.ToString());
-				} break;
+				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
@@ -204,7 +206,7 @@ namespace RootForce
 					m.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				} break;
+				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
@@ -218,19 +220,19 @@ namespace RootForce
 					m.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				} break;
+				} return true;
 
 				case ID_UNCONNECTED_PING:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "SERVER: A LAN-discovery request has been received from %s.", p_packet->systemAddress.ToString());
-				} break;
+				} return true;
 
 				case MessageType::ChatToServer:
 				{
 					MessageChat m;
 					m.Serialize(false, p_bs);
 
-					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Chat from client (%s): %s", p_packet->systemAddress.ToString(), m.Message.C_String());
+					m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "SERVER: Chat from client (%s): %s", p_packet->systemAddress.ToString(), m.Message.C_String());
 
 					// Forward the message to broadcast
 					RakNet::BitStream bs;
@@ -239,7 +241,7 @@ namespace RootForce
 					m.SenderID = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					m.Serialize(true, &bs);
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				} break;
+				} return true;
 
 				case MessageType::UserInfo:
 				{
@@ -294,7 +296,7 @@ namespace RootForce
 							ECS::Entity* otherPlayerEntity = m_networkEntityMap->GetPlayerEntityFromUserID(i);
 							if (otherPlayerEntity == nullptr)
 							{
-								m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Unidentified client (%s) encountered while sending connection list to connected client. User info has not been sent yet?", connectedAddresses[i].ToString(false));
+								m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "SERVER: Unidentified client (%s) encountered while sending connection list to connected client. User info has not been sent yet?", connectedAddresses[i].ToString(false));
 								continue;
 							}
 
@@ -319,8 +321,10 @@ namespace RootForce
 							m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 						}
 					}
-				} break;
+				} return true;
 			}
+
+			return false;
 		}
 	}
 }

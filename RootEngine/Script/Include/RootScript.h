@@ -26,7 +26,7 @@ namespace RootEngine
 			/* This sets a specific script that is to be used when doing a specific function call with added parameters. */
 			virtual void SetFunction(std::string p_abilityName, std::string p_functionName) = 0;
 			
-			virtual void LoadScript(std::string p_scriptPath) = 0;
+			virtual int LoadScript(std::string p_scriptPath) = 0;
 
 			/* This executes the script that has been set. */
 			virtual void ExecuteScript() = 0;

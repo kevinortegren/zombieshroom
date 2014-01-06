@@ -19,35 +19,30 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
+#include <RootForce/Include/HUD.h>
 
 namespace RootForce
 {
-	class Ingamestate
+	class IngameState
 	{
 	public:
-		Ingamestate();
-		void Initialize(RootEngine::GameSharedContext* p_engineContext, 
-			ECS::World* p_world, 
-			GameStates::PlayData p_playData, 
-			RootForce::Network::Client* p_client, 
-			RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
+		IngameState(std::shared_ptr<RootForce::Network::Client>& p_client, std::shared_ptr<RootForce::Network::Server>& p_server);
+
+		void Initialize();
 		void Update(float p_deltaTime);
 	private:
-		RootEngine::GameSharedContext* m_engineContext;
-
-		ECS::World* m_world;
-
-		std::shared_ptr<RootForce::ChatSystem> m_chat;
-		std::shared_ptr<RootForce::Network::Server> m_server;
+		std::shared_ptr<RootForce::Network::Client>& m_client;
+		std::shared_ptr<RootForce::Network::Server>& m_server;
 		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
+		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
 		std::shared_ptr<RootForce::Network::NetworkEntityMap> m_networkEntityMap;
-		RootForce::Network::Client* m_client;
-		RootForce::Network::ClientMessageHandler* m_clientMessageHandler;
 
 		bool m_displayNormals; // TODO: May not be needed?
 		bool m_displayPhysicsDebug; // TODO: May not be needed?
 
-		//Game systems
+		std::shared_ptr<RootForce::HUD> m_hud;
+
+		// Game systems
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;

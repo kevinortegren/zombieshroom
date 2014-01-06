@@ -19,6 +19,10 @@ namespace RootEngine
 		m_ouputList.clear();
 		m_ouputList.shrink_to_fit();
 
+		m_ouputList.push_back("<div style='text-align: left; display: inline-block;'>");
+
+		float averageFrameTime = (m_time/(float)m_frames)*1000.0f;
+		double collectedPercentages = 0;
 		std::string output	= "FPS: " + std::to_string(m_frames);
 		m_ouputList.push_back(output);
 
@@ -39,8 +43,9 @@ namespace RootEngine
 			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
 			double averageSample	= (collectedTime/itr->second.size()) / ((double)qfreq/1000.0f);
 			double maxSample		= maxTime / ((double)qfreq/1000.0f);
-			
-			std::string output	= "<div style='min-width: 200px; display: inline-block;'>" + itr->first + " :</div>" + "Time: " + std::to_string(averageSample) + " <div style='color: #FFFFFF; display: inline-block;'> MaxTime: "+ std::to_string(maxSample) + "</div> Samples: " + std::to_string(itr->second.size());
+			double percentage		= (averageSample/(double)averageFrameTime)*100;
+			collectedPercentages	+= percentage;
+			std::string output		= "<div style='min-width: 180px; display: inline-block;'>" + itr->first + " :</div>" + "T: " + std::to_string(averageSample) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxSample) + "</div> S: " + std::to_string(itr->second.size()) + " <div style='color: #FFFFFF; display: inline-block;'> P: "+ std::to_string(percentage) + "% </div>";
 
 			//Store output in vector for presenting 
 			m_ouputList.push_back(output);
@@ -49,6 +54,11 @@ namespace RootEngine
 			itr->second.clear();
 			itr->second.shrink_to_fit();
 		}
+
+		std::string otherOutput	= "Other: " + std::to_string(100 - collectedPercentages) + "%";
+		m_ouputList.push_back(otherOutput);
+
+		m_ouputList.push_back("</div>");
 
 	}
 
@@ -66,7 +76,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 		for(std::string s : m_ouputList)
 		{
-			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
+			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
 #endif
 	}
