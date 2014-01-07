@@ -5,6 +5,7 @@
 
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
+#include <RootSystems/Include/Components.h>
 
 #include <RootSystems/Include/Network/Messages.h>
 #include "ConfigLoader.h"
@@ -78,9 +79,22 @@ Main::~Main()
 
 void Main::Start() 
 {
+	// Register the components the server uses
+    RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+    RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+    RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
+    RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
+    RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
+    RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
+    RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
+    RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+    RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+
 	// Initialize the server
+	m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
 	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(m_engineContext.m_logger, "Dedicated Server", 5567));
-	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), m_engineContext.m_logger));
+	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), m_engineContext.m_logger, &m_world));
+	m_serverMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
 	m_server->SetMessageHandler(m_serverMessageHandler.get());
 
 	RootServer::ConsoleInput m_console;

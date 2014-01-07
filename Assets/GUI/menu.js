@@ -88,7 +88,7 @@ $(document).ready(function() {
   } );
   $("#lan-host-submit").click(function() {
     $("#lan-host-close").click();
-    Menu.Host($("#lan-host-port").val());
+    Menu.Host($("#lan-host-name").val(), $("#lan-host-port").val(), $("#lan-host-password").val(), $("#lan-host-maxplayers").val(), $("#lan-host-matchlength").val(), $("#lan-host-killvictory").val());
   } );
 } );
 function Hide()

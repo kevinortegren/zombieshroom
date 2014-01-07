@@ -12,7 +12,7 @@ body, input
 }
 body
 {
-  background-image: url('TygartsStateForest.jpg');
+  background-image: url('menubackground.jpg');
   background-position: 50% 50%;
   background-size: 100% 100%;
 }
@@ -73,14 +73,25 @@ a
 }
 .button
 {
-  width: 120px;
+  width: 140px;
   height: 25px;
-  border: 1px solid #666666;
+  border: 0;
   margin: 2px;
+  background: transparent url('menubutton.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
+}
+.button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 .button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 #selected
 {
@@ -117,6 +128,7 @@ a
 {
   width: 300px;
   margin: auto;
+  color: #FFFFFF;
 }
 .main-button
 {
@@ -124,12 +136,28 @@ a
   height: 50px;
   display: block;
   margin: 10px auto 10px auto;
-  border: 1px solid #666666;
+  border: 0;
+  color: #FFFFFF;
   font-size: 24px;
+  background: transparent url('menubutton.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
+}
+.main-button[disabled]
+{
+  color: #AAAAAA;
+}
+.main-button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 .main-button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 #options-menu,
 #lan-menu

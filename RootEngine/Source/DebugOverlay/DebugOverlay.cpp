@@ -14,6 +14,11 @@ namespace RootEngine
 	{
 	}
 
+	Awesomium::WebView* DebugOverlay::GetView()
+	{
+		return m_view;
+	}
+
 	void DebugOverlay::SetView(Awesomium::WebView* p_view)
 	{
 		m_view = p_view;

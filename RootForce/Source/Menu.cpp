@@ -34,6 +34,10 @@ namespace RootForce
 		m_view->ExecuteJavascript(Awesomium::WSLit("Unhide();"), Awesomium::WebString());
 		//m_view->ResumeRendering();
 	}
+	Awesomium::WebView* RootForce::Menu::GetView()
+	{
+		return m_view;
+	}
 	void RootForce::Menu::AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo)
 	{
 		std::string command = "AddServer(";
