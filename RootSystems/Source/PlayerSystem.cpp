@@ -14,6 +14,7 @@ namespace RootForce
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
 		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+		RootForce::ScoreComponent* player = entityManager->CreateComponent<RootForce::ScoreComponent>(entity);
 
 		RootForce::Physics* physics = entityManager->CreateComponent<RootForce::Physics>(entity);
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);

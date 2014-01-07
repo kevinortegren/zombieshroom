@@ -22,10 +22,14 @@ namespace RootForce
 		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
 		Abilitiy::Ability SelectedAbility;
 		int Health;
-		int Score;
-		int Deaths;
 		int TeamID;
 		int LastDamageSourceID;
+	};
+
+	struct ScoreComponent : public ECS::Component<ScoreComponent>
+	{
+		int Score;
+		int Deaths;
 	};
 
 	class PlayerSystem : public ECS::VoidSystem

@@ -159,6 +159,9 @@ namespace RootForce
 	{
 		m_world->SetDelta(p_deltaTime);
 		m_engineContext->m_renderer->Clear();
+		m_hud->SetValue("Health", std::to_string(m_world->GetEntityManager()->GetComponent<Player>( m_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
+		m_hud->SetValue("PlayerScore", std::to_string(m_world->GetEntityManager()->GetComponent<ScoreComponent>( m_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(m_world->GetEntityManager()->GetComponent<ScoreComponent>( m_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
 		m_hud->Update();
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
