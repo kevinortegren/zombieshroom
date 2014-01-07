@@ -43,7 +43,7 @@ namespace RootForce
 		: m_running(true)
 	{
 		m_workingDirectory = p_workingDirectory;
-
+		g_world = &m_world;
 
 		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
@@ -82,11 +82,31 @@ namespace RootForce
 			throw std::runtime_error("Failed to create window");
 		}
 
+		// Setup the SDL context
+		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		// Setup the importer and exporter
+		m_world.GetEntityImporter()->SetImporter(Importer);
+		m_world.GetEntityExporter()->SetExporter(Exporter);
+
+		// Initialize GUI
+		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+
+		// Initialize shared systems
+		m_sharedSystems.m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(g_world, &g_engineContext));
 
 		// Setup the screen states
-		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_client, m_server));
-		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_client, m_server));
-		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_client, m_server));
+		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
+		m_networkContext.m_server = nullptr;
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_engineContext.m_logger, g_world));
+		m_networkContext.m_serverMessageHandler = nullptr;
+		m_networkContext.m_networkEntityMap = nullptr;
+		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
+
+		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_networkContext));
+		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_networkContext, m_sharedSystems));
+		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_networkContext, m_sharedSystems));
 
 		m_menuState->Initialize(m_workingDirectory);
 		m_connectingState->Initialize();
@@ -104,29 +124,7 @@ namespace RootForce
 
 	void Main::Start() 
 	{
-		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
-		g_world = &m_world;
-        m_world.GetEntityImporter()->SetImporter(Importer);
-		m_world.GetEntityExporter()->SetExporter(Exporter);
-
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
-
-		Render::DirectionalLight dl;
-		dl.m_color = glm::vec4(1.0f,1.f,1.f,1);
-		dl.m_direction = glm::vec3(0,0,-1);
-
-		g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
-
-
-		// Initialize GUI
-		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
-
-
-		// Setup a client (but don't connect until we have connection details)
-		m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
-
+		// Start the main loop!
 		while(m_running)
         {
 			switch (m_currentState)
@@ -146,7 +144,7 @@ namespace RootForce
 
 				case RootForce::GameStates::Connecting:
 				{
-					m_connectingState->Enter();
+					m_connectingState->Enter(m_menuState->GetPlayData());
 
 					while (m_currentState == RootForce::GameStates::Connecting && m_running)
 					{
@@ -159,30 +157,20 @@ namespace RootForce
 
 				case RootForce::GameStates::Ingame:
 				{
-					
+					m_ingameState->Enter();
 
-					/*
-					// Start the main loop
-					//m_gamestate->Initialize(&g_engineContext, &m_world, m_menustate->GetPlayData(), m_client.get(), m_clientMessageHandler.get());
-					g_engineContext.m_inputSys->LockMouseToCenter(true);
-                
 					uint64_t old = SDL_GetPerformanceCounter();
 					while (m_currentState == RootForce::GameStates::Ingame && m_running)
-					{	
+					{
 						uint64_t now = SDL_GetPerformanceCounter();
 						float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 						old = now;
 
-                        HandleEvents();
-
-						if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-						{
-							m_running = false;
-						}
-                    
-						m_gamestate->Update(dt);
+						HandleEvents();
+						m_currentState = m_ingameState->Update(dt);
 					}
-					*/
+
+					m_ingameState->Exit();
 				} break;
 
 				case RootForce::GameStates::Exit:

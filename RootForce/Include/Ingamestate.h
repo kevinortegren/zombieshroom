@@ -26,16 +26,14 @@ namespace RootForce
 	class IngameState
 	{
 	public:
-		IngameState(std::shared_ptr<RootForce::Network::Client>& p_client, std::shared_ptr<RootForce::Network::Server>& p_server);
+		IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems);
 
 		void Initialize();
-		void Update(float p_deltaTime);
+		void Enter();
+		void Exit();
+		GameStates::GameStates Update(float p_deltaTime);
 	private:
-		std::shared_ptr<RootForce::Network::Client>& m_client;
-		std::shared_ptr<RootForce::Network::Server>& m_server;
-		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
-		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
-		std::shared_ptr<RootForce::Network::NetworkEntityMap> m_networkEntityMap;
+		NetworkContext& m_networkContext;
 
 		bool m_displayNormals; // TODO: May not be needed?
 		bool m_displayPhysicsDebug; // TODO: May not be needed?
@@ -43,9 +41,9 @@ namespace RootForce
 		std::shared_ptr<RootForce::HUD> m_hud;
 
 		// Game systems
+		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
-		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
 		RootForce::ScriptSystem* m_scriptSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;

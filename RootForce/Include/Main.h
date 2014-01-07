@@ -21,16 +21,8 @@ ECS::World* g_world;
 
 namespace RootForce
 {
-	struct NetworkContext
+	class Main 
 	{
-		std::shared_ptr<RootForce::Network::Server> m_server;
-		std::shared_ptr<RootForce::Network::Client> m_client;
-		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
-		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
-		std::shared_ptr<RootForce::Network::NetworkEntityMap> m_networkEntityMap;
-	};
-
-	class Main {
 	public:
 		Main(std::string p_workingDirectory);
 		~Main();
@@ -45,14 +37,12 @@ namespace RootForce
 		ECS::World m_world;
 
 		NetworkContext m_networkContext;
+		SharedSystems m_sharedSystems;
 
         GameStates::GameStates m_currentState;
 		std::shared_ptr<RootForce::MenuState> m_menuState;
 		std::shared_ptr<RootForce::ConnectingState> m_connectingState;
 		std::shared_ptr<RootForce::IngameState> m_ingameState;
-        
-		bool m_displayNormals;
-		bool m_displayPhysicsDebug;
 
 
 		void HandleEvents();

@@ -1,14 +1,14 @@
 #include <RootForce/Include/IngameState.h>
 #include <RootForce/Include/LuaAPI.h>
 
+extern RootEngine::GameSharedContext g_engineContext;
+extern ECS::World* g_world;
+
 namespace RootForce
 {
-	extern RootEngine::GameSharedContext g_engineContext;
-	extern ECS::World* g_world;
-
-	IngameState::IngameState(std::shared_ptr<RootForce::Network::Client>& p_client, std::shared_ptr<RootForce::Network::Server>& p_server)
-		: m_client(p_client)
-		, m_server(p_server)
+	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
+		: m_networkContext(p_networkContext)
+		, m_sharedSystems(p_sharedSystems)
 	{
 		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
         RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
@@ -80,9 +80,6 @@ namespace RootForce
 		// System responsible for updating the world.
 		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
 
-		// System responsible for updating the player.
-		m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(g_world, &g_engineContext));
-
 		// System responsible for executing script based on actions.
 		m_scriptSystem = new RootForce::ScriptSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
@@ -132,34 +129,30 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 		m_hud->SetAbility(1, "TestBall");
 		m_hud->SetSelectedAbility(0);
-		
-		// Setup the network
-		m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_client->GetPeerInterface(), g_engineContext.m_logger, g_world));
-		m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
-
-		if (m_server != nullptr)
-		{
-			m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger, g_world));
-			/*
-			m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(p_engineContext->m_logger, "Local Server", p_playData.p_port));
-			m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), g_engineContext.m_logger, g_world));
-			m_serverMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
-			m_server->SetMessageHandler(m_serverMessageHandler.get());
-			m_client->Connect("127.0.0.1", p_playData.p_port);
-			*/
-		}
-		else
-		{
-			m_client->Connect(p_playData.p_address.c_str(), p_playData.p_port); 
-		}
-
-		m_client->SetChatSystem(m_hud->GetChatSystem().get());
-		m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
-		m_clientMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
 	}
 
-	void IngameState::Update(float p_deltaTime)
+	void IngameState::Enter()
 	{
+		// Lock the mouse
+		g_engineContext.m_inputSys->LockMouseToCenter(true);
+
+		// Setup the network
+		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
+		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
+	}
+
+	void IngameState::Exit()
+	{
+
+	}
+
+	GameStates::GameStates IngameState::Update(float p_deltaTime)
+	{
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			return GameStates::Exit;
+		}
+
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 		m_hud->Update();
@@ -205,15 +198,15 @@ namespace RootForce
 			m_scriptSystem->Process();
 		}
 
-		if (m_server != nullptr)
+		if (m_networkContext.m_server != nullptr)
 		{
 			PROFILE("Server", g_engineContext.m_profiler);
-			m_server->Update();
+			m_networkContext.m_server->Update();
 		}
 
 		{
 			PROFILE("Client", g_engineContext.m_profiler);
-			m_client->Update();
+			m_networkContext.m_client->Update();
 		}
         
 		{
@@ -243,10 +236,13 @@ namespace RootForce
 			PROFILE("GUI", g_engineContext.m_profiler);
 
 			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render();
+			g_engineContext.m_gui->Render(m_hud->GetView());
+			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
 		
 		
 		g_engineContext.m_renderer->Swap();
+
+		return GameStates::Ingame;
 	}
 }

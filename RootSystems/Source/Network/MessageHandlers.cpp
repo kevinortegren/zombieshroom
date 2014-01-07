@@ -16,7 +16,8 @@ namespace RootForce
 
 		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
 			: MessageHandler(p_peer, p_logger)
-			, m_world(p_world) {}
+			, m_world(p_world)
+			, m_state(ClientState::UNCONNECTED) {}
 
 		void ClientMessageHandler::SetLanList(RootSystems::LanList* p_list)
 		{
@@ -36,6 +37,11 @@ namespace RootForce
 		void ClientMessageHandler::SetPlayerSystem(PlayerSystem* p_playerSystem)
 		{
 			m_playerSystem = p_playerSystem;
+		}
+
+		ClientState::ClientState ClientMessageHandler::GetClientState() const
+		{
+			return m_state;
 		}
 
 		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
@@ -72,6 +78,8 @@ namespace RootForce
 					m.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+
+					m_state = ClientState::AWAITING_CONFIRMATION;
 				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -159,6 +167,9 @@ namespace RootForce
 
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "We have connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
+
+						// We're connected
+						m_state = ClientState::CONNECTED;
 					}
 				} return true;
 

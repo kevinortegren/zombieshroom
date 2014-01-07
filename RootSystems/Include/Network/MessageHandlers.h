@@ -27,6 +27,16 @@ namespace RootForce
 		};
 
 
+		namespace ClientState
+		{
+			enum ClientState
+			{
+				UNCONNECTED,
+				AWAITING_CONFIRMATION,
+				CONNECTED
+			};
+		}
+
 		class ClientMessageHandler : public MessageHandler
 		{
 		public:
@@ -36,6 +46,7 @@ namespace RootForce
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetPlayerSystem(PlayerSystem* p_playerSystem);
+			ClientState::ClientState GetClientState() const;
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
@@ -44,6 +55,8 @@ namespace RootForce
 			RootForce::ChatSystem* m_chatSystem;
 			NetworkEntityMap* m_networkEntityMap;
 			PlayerSystem* m_playerSystem;
+
+			ClientState::ClientState m_state;
 		};
 
 		class ServerMessageHandler : public MessageHandler
