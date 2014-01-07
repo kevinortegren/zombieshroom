@@ -134,12 +134,18 @@ namespace RootForce
 					if (m.UserInfo.PlayerEntity.TemporaryID == TEMPORARY_ID_NONE)
 					{
 						// This is not a response to a join request. We do not have a temporary entity for this player. Create an entity.
-						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-						TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
-						SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
-						m_networkEntityMap->SetSynchronizedId(tId, sId);
-						m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
-						
+						ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.UserInfo.PlayerEntity.SynchronizedID);
+						if (entity == nullptr)
+						{
+							// This is a remote client, we need to create the entity ourselves
+							entity = m_world->GetEntityManager()->CreateEntity();
+							TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+							SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
+							m_networkEntityMap->SetSynchronizedId(tId, sId);
+							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+						}
+
+						// Add client specific components
 						NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
 						clientComponent->Name = m.UserInfo.PlayerName.C_String();
 						clientComponent->State = NetworkClientComponent::CONNECTED;
@@ -152,13 +158,17 @@ namespace RootForce
 					}
 					else
 					{
-						// This is a response to our join request, we should have a temporary player entity.
-						ECS::Entity* entity = m_networkEntityMap->GetTemporaryEntity(m.UserInfo.PlayerEntity.TemporaryID);
-						assert(entity != nullptr);
+						ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.UserInfo.PlayerEntity.SynchronizedID);
+						if (entity == nullptr)
+						{
+							// This is a response to our join request, we should have a temporary player entity.
+							entity = m_networkEntityMap->GetTemporaryEntity(m.UserInfo.PlayerEntity.TemporaryID);
+							assert(entity != nullptr);
 
-						// Synchronize our temporary entity with the ID the server has.
-						m_networkEntityMap->SetSynchronizedId(m.UserInfo.PlayerEntity.TemporaryID, m.UserInfo.PlayerEntity.SynchronizedID);
-						m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+							// Synchronize our temporary entity with the ID the server has.
+							m_networkEntityMap->SetSynchronizedId(m.UserInfo.PlayerEntity.TemporaryID, m.UserInfo.PlayerEntity.SynchronizedID);
+							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+						}
 
 						// Update the user info
 						NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
@@ -259,12 +269,32 @@ namespace RootForce
 					MessageUserInfo m;
 					m.Serialize(false, p_bs);
 
+
+					
+
+
 					// Create a synchronized entity for the connected player.
-					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+					// If loopback, we need to check if a temporary entity exists also
+					ECS::Entity* entity = nullptr;
+					TemporaryId_t tId = TEMPORARY_ID_NONE;
+					if (p_packet->systemAddress.IsLoopback())
+					{
+						// Local client, temporary entity has been created
+						entity = m_networkEntityMap->GetTemporaryEntity(m.PlayerEntity.TemporaryID);
+						assert(entity != nullptr);
+
+						tId = m.PlayerEntity.TemporaryID;
+					}
+					else
+					{
+						// Remote client, no entity exists in this application instance
+						entity = m_world->GetEntityManager()->CreateEntity();
+						tId = m_networkEntityMap->AddEntity(entity);
+					}
+
 					SynchronizedId_t sId = m_networkEntityMap->NextSynchronizedId();
 					m_networkEntityMap->SetSynchronizedId(tId, sId);
-					m_networkEntityMap->AssociatePlayerEntityWithUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), entity);
+					m_networkEntityMap->AssociatePlayerEntityWithUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), entity); 
 
 					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
 					clientComponent->Name = std::string(m.PlayerName.C_String());
