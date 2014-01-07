@@ -18,11 +18,15 @@ namespace RootForce
 	}
 
 	struct Player : public ECS::Component<Player>
+	{	
+		int Health;
+		int LastDamageSourceID;
+	};
+
+	struct Identity : public ECS::Component<Identity>
 	{
 		std::string Name; 
-		int Health;
 		int TeamID;
-		int LastDamageSourceID;
 	};
 
 	struct UserAbility : public ECS::Component<UserAbility>

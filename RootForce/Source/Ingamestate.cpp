@@ -25,6 +25,8 @@ namespace RootForce
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
+		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
+		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
 		//RootForce::TDMRules::SetTypeId(RootForce::ComponentType::TDMRULES);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());

@@ -34,7 +34,9 @@ namespace RootForce
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
-			SCORE
+			SCORE,
+			ABILITY,
+			IDENTITY
 			//TDMRULES //TODO: name might be inappropriate?
 		};
 	}
