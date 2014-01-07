@@ -12,6 +12,8 @@ namespace LogTag
 	{
 		RENDER,
 		NETWORK,
+		CLIENT,
+		SERVER,
 		GENERAL,
 		NOTAG,
 		PHYSICS,
