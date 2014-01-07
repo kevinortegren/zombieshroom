@@ -13,7 +13,7 @@ namespace RootForce
 		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
-		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+		RootForce::HealthComponent* health = entityManager->CreateComponent<RootForce::HealthComponent>(entity);
 		RootForce::ScoreComponent* score = entityManager->CreateComponent<RootForce::ScoreComponent>(entity);
 		RootForce::UserAbility* ability = entityManager->CreateComponent<RootForce::UserAbility>(entity);
 		RootForce::Identity* identity = entityManager->CreateComponent<RootForce::Identity>(entity);
@@ -55,7 +55,7 @@ namespace RootForce
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
-		player->Health = 100;
+		health->Health = 100;
 		score->Deaths = 0;
 		score->Score = 0;
 		identity->TeamID = p_teamID;

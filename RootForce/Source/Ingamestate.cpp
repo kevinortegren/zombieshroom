@@ -13,7 +13,7 @@ namespace RootForce
 		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
         RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
         RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
         RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
         RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
         RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
@@ -27,7 +27,7 @@ namespace RootForce
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
 		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
 		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
-		//RootForce::TDMRules::SetTypeId(RootForce::ComponentType::TDMRULES);
+		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -155,7 +155,7 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<Player>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)

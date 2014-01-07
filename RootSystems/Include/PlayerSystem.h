@@ -17,7 +17,7 @@ namespace RootForce
 		};
 	}
 
-	struct Player : public ECS::Component<Player>
+	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		int Health;
 		int LastDamageSourceID;

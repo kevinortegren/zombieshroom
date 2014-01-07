@@ -1,0 +1,48 @@
+#include "MatchStateSystem.h"
+
+namespace RootForce
+{
+
+
+	void MatchStateSystem::Process()
+	{
+		//State: team death match
+		//loop through all members of a team, adding their score together.
+		//If it equals or exceeeds the score limit of rule entity, set match over equal to true
+		//loop second team
+		//withdraw deltatime from rule entity's TimeLeft
+
+		//State: free for all
+		//Not to be implemented yet ;) 
+	}
+
+	void MatchStateSystem::SetLoggingInterface( Logging* p_logger )
+	{
+		m_logger = p_logger;
+	}
+
+	double MatchStateSystem::GetTimeLeft()
+	{
+		return m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->TimeLeft;
+	}
+
+	int MatchStateSystem::GetTeamScore( int p_team )
+	{
+		if(p_team == 1)
+			return m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->TeamOneScore;
+		else if(p_team == 2)
+			return m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->TeamTwoScore;
+	}
+
+	bool MatchStateSystem::IsMatchOver()
+	{
+		if(m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->TeamOneScore >=
+			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->ScoreLimit || 
+			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->TeamTwoScore >=
+			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("Player") )->ScoreLimit)
+			return true;
+		else
+			return false;
+	}
+
+}
