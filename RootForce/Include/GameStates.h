@@ -47,7 +47,7 @@ namespace RootForce
 	{
 		// System responsible for updating the player.
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
-		std::shared_ptr<RootForce::MatchStateSystem> m_gameLogicSystem;
+		std::shared_ptr<RootForce::MatchStateSystem> m_matchStateSystem;
 		// TODO: Add more
 	};
 }

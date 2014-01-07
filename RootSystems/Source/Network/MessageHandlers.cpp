@@ -2,6 +2,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 #include <cassert>
 
 namespace RootForce
@@ -170,6 +171,7 @@ namespace RootForce
 
 						// We're connected
 						m_state = ClientState::CONNECTED;
+
 					}
 				} return true;
 

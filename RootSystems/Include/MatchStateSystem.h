@@ -9,7 +9,7 @@ namespace RootForce
 
 	struct TDMRuleSet : public ECS::Component<TDMRuleSet>
 	{
-		double TimeLeft;
+		float TimeLeft;
 		int ScoreLimit;
 		int TeamOneScore;
 		int TeamTwoScore;
@@ -22,14 +22,14 @@ namespace RootForce
 			: ECS::VoidSystem(p_world)
 			, m_gameSharedContext(p_gameSharedContext) {}
 		void Process();
+		void UpdateDeltatime(float p_deltaTime);
 		bool IsMatchOver();
 		void SetLoggingInterface(Logging* p_logger);
 
-		double GetTimeLeft();
+		float GetTimeLeft();
 		int GetTeamScore(int p_team);
 	private:
 		RootEngine::GameSharedContext* m_gameSharedContext;
-		ECS::World* m_world;
 		Logging* m_logger;
 	};
 }
