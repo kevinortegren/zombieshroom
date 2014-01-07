@@ -90,6 +90,7 @@ namespace RootForce
 			case MenuEvent::EventType::Connect:
 			{
 				// Retrieve connection data and go into a connecting state.
+				m_playData.Host = false;
 				m_playData.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.Port = event.data[0].ToInteger();
 

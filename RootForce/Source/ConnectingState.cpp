@@ -37,11 +37,13 @@ namespace RootForce
 		// Set the network entity map on both message handlers
 		m_networkContext.m_clientMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 		m_networkContext.m_clientMessageHandler->SetPlayerSystem(m_sharedSystems.m_playerSystem.get());
-		m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
+		if (m_networkContext.m_serverMessageHandler != nullptr)
+			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 
 		// Set the connection message handler on the client.
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
-		m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
+		if (m_networkContext.m_server != nullptr)
+			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 	}
 
 	void ConnectingState::Exit()
@@ -49,7 +51,8 @@ namespace RootForce
 
 	GameStates::GameStates ConnectingState::Update()
 	{
-		m_networkContext.m_server->Update();
+		if (m_networkContext.m_server != nullptr)
+			m_networkContext.m_server->Update();
 		m_networkContext.m_client->Update();
 
 		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTED)
