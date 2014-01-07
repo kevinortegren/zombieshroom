@@ -135,7 +135,7 @@ namespace Physics
 		m_dispatcher = new btCollisionDispatcher(m_collisionConfig);
 		m_broadphase = new btDbvtBroadphase();
 		//m_broadphase = new btAxisSweep3(btVector3(-1000,-1000,-1000), btVector3(1000,1000,1000));
-		m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+		m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback()); //TODO:: We should send in a member variable so we can delete it in deconstructor
 		m_solver = new btSequentialImpulseConstraintSolver();
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
@@ -149,7 +149,7 @@ namespace Physics
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 		
-		
+		//m_dynamicWorld->getSolverInfo().m_numIterations = 4;
 		//btSetDebugDrawer(m_debugDrawer);
 
 	}
@@ -567,7 +567,7 @@ namespace Physics
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-
+	
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
