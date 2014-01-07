@@ -13,29 +13,29 @@
 			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=1;exportMaterialsOnly=0;
 			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/PlayerChar/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Documents/maya/projects/CharAnimations/untitled</source_data>
     </contributor>
-    <created>2013-12-19T09:11:11</created>
-    <modified>2013-12-19T09:11:11</modified>
+    <created>2014-01-07T11:20:53</created>
+    <modified>2014-01-07T11:20:53</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="lambert5" name="lambert5">
-      <instance_effect url="#lambert5-fx"/>
+    <material id="lambert2" name="lambert2">
+      <instance_effect url="#lambert2-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="lambert5-fx">
+    <effect id="lambert2-fx">
       <profile_COMMON>
-        <newparam sid="file4-surface">
+        <newparam sid="file1-surface">
           <surface type="2D">
-            <init_from>file4</init_from>
+            <init_from>file1</init_from>
           </surface>
         </newparam>
-        <newparam sid="file4-sampler">
+        <newparam sid="file1-sampler">
           <sampler2D>
-            <source>file4-surface</source>
+            <source>file1-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -47,7 +47,7 @@
               <color>0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="file4-sampler" texcoord="TEX0">
+              <texture texture="file1-sampler" texcoord="TEX0">
                 <extra>
                   <technique profile="OpenCOLLADAMaya">
                     <blend_mode>NONE</blend_mode>
@@ -85,13 +85,13 @@
     </effect>
   </library_effects>
   <library_images>
-    <image id="file4" name="file4">
+    <image id="file1" name="file1">
       <init_from>../Textures/grass.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
           <image_sequence>0</image_sequence>
-          <originalMayaNodeId>file4</originalMayaNodeId>
+          <originalMayaNodeId>file1</originalMayaNodeId>
         </technique>
       </extra>
     </image>
@@ -100,7 +100,7 @@
     <geometry id="pCubeShape1" name="pCubeShape1">
       <mesh>
         <source id="pCubeShape1-positions" name="pCubeShape1-positions">
-          <float_array id="pCubeShape1-positions-array" count="24">-0.5 -0.5 0.5 0.5 -0.5 0.5 -0.5 0.5 0.5 0.5 0.5 0.5 -0.5 0.5 -0.5 0.5 0.5 -0.5 -0.5 -0.5 -0.5 0.5 -0.5 -0.5</float_array>
+          <float_array id="pCubeShape1-positions-array" count="24">-1.514346 -2.252527 0.5321208 1.514346 -2.252527 0.5321208 -1.514346 2.252527 0.5321208 1.514346 2.252527 0.5321208 -1.514346 2.252527 -0.5321208 1.514346 2.252527 -0.5321208 -1.514346 -2.252527 -0.5321208 1.514346 -2.252527 -0.5321208</float_array>
           <technique_common>
             <accessor source="#pCubeShape1-positions-array" count="8" stride="3">
               <param name="X" type="float"/>
@@ -131,7 +131,7 @@
         <vertices id="pCubeShape1-vertices" name="pCubeShape1-vertices">
           <input semantic="POSITION" source="#pCubeShape1-positions"/>
         </vertices>
-        <polylist material="lambert5SG" count="6">
+        <polylist material="lambert2SG" count="6">
           <input semantic="VERTEX" source="#pCubeShape1-vertices" offset="0"/>
           <input semantic="NORMAL" source="#pCubeShape1-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#pCubeShape1-map1" offset="2" set="0"/>
@@ -150,7 +150,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="untitled">
       <node id="pCube1" name="pCube1" type="NODE">
-        <translate sid="translate">4.898994 0.6851619 -0.806857</translate>
+        <translate sid="translate">7.299955 2.252527 -0.4432985</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
@@ -158,7 +158,7 @@
         <instance_geometry url="#pCubeShape1">
           <bind_material>
             <technique_common>
-              <instance_material symbol="lambert5SG" target="#lambert5">
+              <instance_material symbol="lambert2SG" target="#lambert2">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>

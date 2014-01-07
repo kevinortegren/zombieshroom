@@ -13,10 +13,10 @@
 			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=1;exportMaterialsOnly=0;
 			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/PlayerChar/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Documents/maya/projects/CharAnimations/untitled</source_data>
     </contributor>
-    <created>2013-12-19T09:11:11</created>
-    <modified>2013-12-19T09:11:11</modified>
+    <created>2014-01-07T11:20:53</created>
+    <modified>2014-01-07T11:20:53</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -54,7 +54,7 @@
     <geometry id="pCylinderShape1" name="pCylinderShape1">
       <mesh>
         <source id="pCylinderShape1-positions" name="pCylinderShape1-positions">
-          <float_array id="pCylinderShape1-positions-array" count="54">2.004772 -2.638041 -2.004772 0 -2.638041 -2.835176 -2.004772 -2.638041 -2.004772 -2.835176 -2.638041 0 -2.004772 -2.638041 2.004772 0 -2.638041 2.835176 2.004772 -2.638041 2.004772 2.835176 -2.638041 0 2.004772 2.638041 -2.004772 0 2.638041 -2.835176 -2.004772 2.638041 -2.004772 -2.835176 2.638041 0 -2.004772 2.638041 2.004772 0 2.638041 2.835176 2.004772 2.638041 2.004772 2.835176 2.638041 0 0 -2.638041 0 0 2.638041 0</float_array>
+          <float_array id="pCylinderShape1-positions-array" count="54">2.904005 -2.852501 -2.904005 0 -2.852501 -4.106883 -2.904005 -2.852501 -2.904005 -4.106883 -2.852501 0 -2.904005 -2.852501 2.904005 0 -2.852501 4.106883 2.904005 -2.852501 2.904005 4.106884 -2.852501 0 2.904005 2.852501 -2.904005 0 2.852501 -4.106883 -2.904005 2.852501 -2.904005 -4.106883 2.852501 0 -2.904005 2.852501 2.904005 0 2.852501 4.106883 2.904005 2.852501 2.904005 4.106884 2.852501 0 0 -2.852501 0 0 2.852501 0</float_array>
           <technique_common>
             <accessor source="#pCylinderShape1-positions-array" count="18" stride="3">
               <param name="X" type="float"/>
@@ -64,7 +64,7 @@
           </technique_common>
         </source>
         <source id="pCylinderShape1-normals" name="pCylinderShape1-normals">
-          <float_array id="pCylinderShape1-normals-array" count="150">0.3826833 0 -0.9238795 0.3826833 0 -0.9238795 0.3826833 0 -0.9238795 0.3826833 0 -0.9238795 -0.3826833 0 -0.9238795 -0.3826833 0 -0.9238795 -0.3826833 0 -0.9238795 -0.3826833 0 -0.9238795 -0.9238795 0 -0.3826834 -0.9238795 0 -0.3826834 -0.9238795 0 -0.3826834 -0.9238795 0 -0.3826834 -0.9238795 0 0.3826834 -0.9238795 0 0.3826834 -0.9238795 0 0.3826834 -0.9238795 0 0.3826834 -0.3826833 0 0.9238795 -0.3826833 0 0.9238795 -0.3826833 0 0.9238795 -0.3826833 0 0.9238795 0.3826833 0 0.9238795 0.3826833 0 0.9238795 0.3826833 0 0.9238795 0.3826833 0 0.9238795 0.9238795 0 0.3826834 0.9238795 0 0.3826834 0.9238795 0 0.3826834 0.9238795 0 0.3826834 0.9238795 0 -0.3826834 0.9238795 0 -0.3826834 0.9238795 0 -0.3826834 0.9238795 0 -0.3826834 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0</float_array>
+          <float_array id="pCylinderShape1-normals-array" count="150">0.3826834 0 -0.9238796 0.3826834 0 -0.9238796 0.3826834 0 -0.9238796 0.3826834 0 -0.9238796 -0.3826834 0 -0.9238796 -0.3826834 0 -0.9238796 -0.3826834 0 -0.9238796 -0.3826834 0 -0.9238796 -0.9238796 0 -0.3826834 -0.9238796 0 -0.3826834 -0.9238796 0 -0.3826834 -0.9238796 0 -0.3826834 -0.9238796 0 0.3826834 -0.9238796 0 0.3826834 -0.9238796 0 0.3826834 -0.9238796 0 0.3826834 -0.3826834 0 0.9238796 -0.3826834 0 0.9238796 -0.3826834 0 0.9238796 -0.3826834 0 0.9238796 0.3826834 0 0.9238796 0.3826834 0 0.9238796 0.3826834 0 0.9238796 0.3826834 0 0.9238796 0.9238794 0 0.3826835 0.9238794 0 0.3826835 0.9238794 0 0.3826835 0.9238794 0 0.3826835 0.9238794 0 -0.3826835 0.9238794 0 -0.3826835 0.9238794 0 -0.3826835 0.9238794 0 -0.3826835 0 -1 0 0 -0.9999999 0 0 -1 0 0 -1 0 0 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -0.9999999 0 0 -0.9999999 0 0 0.9999999 0 0 1 0 0 1 0 0 1 0 0 0.9999999 0 0 1 0 0 0.9999999 0 0 0.9999999 0 0 0.9999999 0</float_array>
           <technique_common>
             <accessor source="#pCylinderShape1-normals-array" count="50" stride="3">
               <param name="X" type="float"/>
@@ -104,7 +104,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="untitled">
       <node id="pCylinder1" name="pCylinder1" type="NODE">
-        <translate sid="translate">-0.1050028 2.654165 0.317827</translate>
+        <translate sid="translate">-7.287711 2.852501 0.1079421</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>

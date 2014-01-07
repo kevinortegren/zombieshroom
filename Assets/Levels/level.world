@@ -1,15 +1,71 @@
 - Entities:
     - 1
     - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
 - Components:
     - Type: 0
       Data:
         - Entity: 1
-          Model: pPlaneShape1
+          Model: pCylinderShape1
           Material:
+            Name: lambert1
+            Effect: Mesh
+            Diffuse: grayLambert
+        - Entity: 2
+          Model: pCubeShape1
+          Material:
+            Name: lambert2
+            Effect: Mesh
+            Diffuse: grass
+    - Type: 1
+      Data:
+        - Entity: 1
+          Position: [-7.28771, 2.8525, 0.107942]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 2
+          Position: [7.29995, 2.25253, -0.443299]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+    - Type: 2
+      Data:
+        []
+    - Type: 3
+      Data:
+        []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        []
+    - Type: 12
+      Data:
+        - Entity: 1
+          MeshHandle: pCylinderShape10
+        - Entity: 2
+          MeshHandle: pCubeShape1
+- Tags:
+    []
+- Groups:
+    - Id: 1
+      Group: Static
+    - Id: 2
+      Group: Static
