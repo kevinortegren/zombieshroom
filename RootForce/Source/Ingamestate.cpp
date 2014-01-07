@@ -228,8 +228,11 @@ namespace RootForce
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 		}
-        
-		m_engineContext->m_renderer->Render();
+
+		{
+			PROFILE("Rendering", m_engineContext->m_profiler);
+			m_engineContext->m_renderer->Render();
+		}
 
 		{
 			PROFILE("Render Lines", m_engineContext->m_profiler);
@@ -245,7 +248,9 @@ namespace RootForce
 			m_engineContext->m_gui->Render();
 		}
 		
-		
-		m_engineContext->m_renderer->Swap();
+		{
+			PROFILE("Swap", m_engineContext->m_profiler);
+			m_engineContext->m_renderer->Swap();
+		}
 	}
 }
