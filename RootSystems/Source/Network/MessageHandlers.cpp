@@ -200,6 +200,14 @@ namespace RootForce
 					// Another client has disconnected
 					MessageUserDisconnected m;
 					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetPlayerEntityFromUserID(m.UserID);
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
+					
+					m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client (ID: %d, Name: %s) disconnected", m.UserID, clientComponent->Name.c_str());
+					
+					m_world->GetEntityManager()->RemoveAllComponents(entity);
+					m_world->GetEntityManager()->RemoveEntity(entity);
 				} return true;
 			}
 
@@ -280,10 +288,6 @@ namespace RootForce
 				{
 					MessageUserInfo m;
 					m.Serialize(false, p_bs);
-
-
-					
-
 
 					// Create a synchronized entity for the connected player.
 					// If loopback, we need to check if a temporary entity exists also
