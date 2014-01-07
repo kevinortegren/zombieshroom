@@ -55,14 +55,33 @@ namespace RootForce
 
 		void Client::Update()
 		{
-			for (RakNet::Packet* packet = m_peer->Receive(); packet; m_peer->DeallocatePacket(packet), packet = m_peer->Receive())
+			// Store all incoming packets in a temporary list (to defer parsing of packets that arrive during parsing)
+			std::vector<RakNet::Packet*> packets;
+			for (RakNet::Packet* packet = m_peer->Receive(); packet; packet = m_peer->Receive())
 			{
+				packets.push_back(packet);
+			}
+
+			// Parse all incoming packets
+			for (size_t i = 0; i < packets.size(); ++i)
+			{
+				RakNet::Packet* packet = packets[i];
+
 				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
 				bs.Read(id);
 
 				if (m_messageHandler != nullptr)
-					m_messageHandler->ParsePacket(id, &bs, packet);
+				{
+					if (!m_messageHandler->ParsePacket(id, &bs, packet))
+					{
+						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Message handler neglected to parse message with ID: %u", id);
+					}
+				}
+				else
+				{
+					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: No message handler to parse message with ID: %u", id);
+				}
 			}
 
 			// Send a chat message
@@ -82,6 +101,12 @@ namespace RootForce
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				}
+			}
+
+			// Deallocate the temporary list
+			for (size_t i = 0; i < packets.size(); ++i)
+			{
+				m_peer->DeallocatePacket(packets[i]);
 			}
 		}
 

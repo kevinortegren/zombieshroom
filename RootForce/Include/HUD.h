@@ -11,6 +11,7 @@ namespace RootForce
 		~HUD();
 		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher);
 		std::shared_ptr<ChatSystem> GetChatSystem() { return m_chatSystem; }
+		Awesomium::WebView* GetView() { return m_view; }
 
 		//updates a single status value internally
 		void SetValue(std::string p_key, std::string p_value);
