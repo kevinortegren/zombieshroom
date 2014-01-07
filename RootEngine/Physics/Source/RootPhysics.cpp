@@ -106,9 +106,9 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
-		if(!pointer1->m_modelHandle.compare("ground0"))
+		if(pointer1->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
-		else if(!pointer2->m_modelHandle.compare("ground0"))
+		else if(pointer2->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
 
 		if(pointer1->m_collidedEntityId != nullptr)
@@ -123,10 +123,6 @@ namespace Physics
 				pointer2->m_collidedEntityId->insert(pointer1->m_entityId);
 		}
 
-
-		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
-			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
-				int thisIsOnlyHereSoWeCanBreakHereIfWeWant = 2;
 
 		return true;
 	}
