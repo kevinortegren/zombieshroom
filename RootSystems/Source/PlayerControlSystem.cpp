@@ -145,7 +145,7 @@ namespace RootForce
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 		
-					if(player->m_selectedAbility == Abilitiy::ABILITY_TEST)
+					if(player->SelectedAbility == Abilitiy::ABILITY_TEST)
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);

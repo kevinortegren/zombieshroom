@@ -32,8 +32,8 @@ namespace RootForce
 		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 10.0f;
 
-		player->m_abilities[0] = Abilitiy::ABILITY_TEST;
-		player->m_selectedAbility = Abilitiy::ABILITY_TEST;
+		player->Abilities[0] = Abilitiy::ABILITY_TEST;
+		player->SelectedAbility = Abilitiy::ABILITY_TEST;
 
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";
@@ -52,6 +52,9 @@ namespace RootForce
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
+		player->Health = 100;
+		player->Deaths = 0;
+		player->Score = 0;
 	}
 
 	void PlayerSystem::Process()
