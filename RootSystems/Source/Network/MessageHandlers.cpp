@@ -2,6 +2,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Components.h>
 #include <cassert>
 
 namespace RootForce
@@ -14,8 +15,9 @@ namespace RootForce
 		MessageHandler::~MessageHandler() {}
 
 
-		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
+		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, RootEngine::GameSharedContext* p_engineContext, ECS::World* p_world)
 			: MessageHandler(p_peer, p_logger)
+			, m_engineContext(p_engineContext)
 			, m_world(p_world)
 			, m_state(ClientState::UNCONNECTED) {}
 
@@ -152,6 +154,16 @@ namespace RootForce
 						clientComponent->UserID = m.UserID;
 
 						NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
+
+						Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
+						
+						Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(entity);
+						renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
+						renderable->m_material = m_engineContext->m_resourceManager->GetMaterial("testchar");
+						renderable->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_normalMap = m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_specularMap = m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Remote player connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
