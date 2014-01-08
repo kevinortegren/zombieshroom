@@ -440,20 +440,23 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
-					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
-					transform->m_position = m.Position;
-					transform->m_orientation = m.Orientation;
-
-					// Get a list of the connected players
-					DataStructures::List<RakNet::SystemAddress> connectedAddresses;
-					DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
-					m_peer->GetSystemList(connectedAddresses, connectedGUIDs);
-
-					for (unsigned int i = 0; i < connectedAddresses.Size(); ++i)
+					if (player != nullptr)
 					{
-						if (connectedAddresses[i] != p_packet->systemAddress)
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						transform->m_position = m.Position;
+						transform->m_orientation = m.Orientation;
+
+						// Get a list of the connected players
+						DataStructures::List<RakNet::SystemAddress> connectedAddresses;
+						DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
+						m_peer->GetSystemList(connectedAddresses, connectedGUIDs);
+
+						for (unsigned int i = 0; i < connectedAddresses.Size(); ++i)
 						{
-							m_peer->Send(p_bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, connectedAddresses[i], false);
+							if (connectedAddresses[i] != p_packet->systemAddress)
+							{
+								m_peer->Send(p_bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, connectedAddresses[i], false);
+							}
 						}
 					}
 				} return true;
