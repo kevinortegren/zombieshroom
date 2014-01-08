@@ -13,7 +13,7 @@ namespace RootForce
 		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
         RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
         RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
         RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
         RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
         RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
@@ -25,7 +25,9 @@ namespace RootForce
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
-		//RootForce::TDMRules::SetTypeId(RootForce::ComponentType::TDMRULES);
+		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
+		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
+		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -166,9 +168,18 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<Player>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
+		//Update all the data that is displayed in the HUD
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
+		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			return GameStates::Exit;
+		}
 		m_hud->Update();
 
 #ifdef _DEBUG
@@ -251,6 +262,9 @@ namespace RootForce
 			PROFILE("Render Lines", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->RenderLines();
 		}
+
+		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+		m_sharedSystems.m_matchStateSystem->Process();
         
         g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();

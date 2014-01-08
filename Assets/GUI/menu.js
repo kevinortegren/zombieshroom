@@ -95,7 +95,7 @@ $(document).ready(function() {
               $("#lan-host-port").val(), 
               $("#lan-host-password").val(), 
               $("#lan-host-maxplayers").val(), 
-              $("#lan-host-matchlength").val(), 
+              $("#lan-host-matchlength").val() * 60, 
               $("#lan-host-killvictory").val(),
               map
               );

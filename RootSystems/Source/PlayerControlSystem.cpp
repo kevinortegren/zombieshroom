@@ -89,7 +89,7 @@ namespace RootForce
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
+		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
 		
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -145,7 +145,7 @@ namespace RootForce
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 		
-					if(player->SelectedAbility == Abilitiy::ABILITY_TEST)
+					if(ability->SelectedAbility == Abilitiy::ABILITY_TEST)
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);

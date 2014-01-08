@@ -81,7 +81,7 @@ void Main::Start()
 {
 	// Register the components the server uses
     RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-    RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+    RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
     RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
     RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
     RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);

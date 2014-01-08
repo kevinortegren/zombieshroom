@@ -131,5 +131,6 @@ namespace RootForce
 		};
 
 		// TODO: Add parameters for activate ability. Later.
+
 	}
 }

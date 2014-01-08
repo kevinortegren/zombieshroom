@@ -13,8 +13,10 @@ namespace RootForce
 		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
-		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+		RootForce::HealthComponent* health = entityManager->CreateComponent<RootForce::HealthComponent>(entity);
 		RootForce::ScoreComponent* score = entityManager->CreateComponent<RootForce::ScoreComponent>(entity);
+		RootForce::UserAbility* ability = entityManager->CreateComponent<RootForce::UserAbility>(entity);
+		RootForce::Identity* identity = entityManager->CreateComponent<RootForce::Identity>(entity);
 
 		RootForce::Physics* physics = entityManager->CreateComponent<RootForce::Physics>(entity);
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);
@@ -33,8 +35,8 @@ namespace RootForce
 		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 10.0f;
 
-		player->Abilities[0] = Abilitiy::ABILITY_TEST;
-		player->SelectedAbility = Abilitiy::ABILITY_TEST;
+		ability->Abilities[0] = Abilitiy::ABILITY_TEST;
+		ability->SelectedAbility = Abilitiy::ABILITY_TEST;
 
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";
@@ -53,10 +55,10 @@ namespace RootForce
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
-		player->Health = 100;
+		health->Health = 100;
 		score->Deaths = 0;
 		score->Score = 0;
-		player->TeamID = p_teamID;
+		identity->TeamID = p_teamID;
 	}
 
 	void PlayerSystem::Process()

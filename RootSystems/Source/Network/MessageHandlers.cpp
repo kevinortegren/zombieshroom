@@ -200,6 +200,7 @@ namespace RootForce
 
 						// We're connected
 						m_state = ClientState::CONNECTED;
+
 					}
 				} return true;
 
