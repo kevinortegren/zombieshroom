@@ -8,6 +8,8 @@ project(${ROOT_PROJECT_NAME})
 # Check if we want to compile just the level editor.
 option(COMPILE_LEVEL_EDITOR "Should we compile level editor?" OFF)
 
+#Check if we want to compile release build
+option(COMPILE_RELEASE_BUILD "Release Build" OFF)
 # Find external libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
@@ -37,20 +39,35 @@ if (NOT COMPILE_LEVEL_EDITOR)
 		${AWESOMIUM_INCLUDE_DIRS}
 		${LUA_INCLUDE_DIRS}	
 	)
-	    
-	set(EXTERNAL_LIBRARIES
-	    ${SDL2_LIBRARY}
-	    ${OPENGL_LIBRARIES}
-	    ${GLEW_LIBRARY}
-	    ${RAKNET_LIBRARY}
-	    ${ASSIMP_LIBRARY}
-		${BULLETCOLLISION_LIBRARY}
-		${BULLETDYNAMICS_LIBRARY}
-		${LINEARMATH_LIBRARY}
-		${YAML_LIBRARY_DEBUG}
-		${AWESOMIUM_LIBRARY}
-		${LUA_LIBRARY}
-	)
+	 if(NOT COMPILE_RELEASE_BUILD)   
+		set(EXTERNAL_LIBRARIES
+			${SDL2_LIBRARY}
+			${OPENGL_LIBRARIES}
+			${GLEW_LIBRARY}
+			${RAKNET_LIBRARY}
+			${ASSIMP_LIBRARY}
+			${BULLETCOLLISION_LIBRARY_DEBUG}
+			${BULLETDYNAMICS_LIBRARY_DEBUG}
+			${LINEARMATH_LIBRARY_DEBUG}
+			${YAML_LIBRARY_DEBUG}
+			${AWESOMIUM_LIBRARY}
+			${LUA_LIBRARY}
+		)
+		else()
+		set(EXTERNAL_LIBRARIES
+			${SDL2_LIBRARY}
+			${OPENGL_LIBRARIES}
+			${GLEW_LIBRARY}
+			${RAKNET_LIBRARY}
+			${ASSIMP_LIBRARY}
+			${BULLETCOLLISION_LIBRARY}
+			${BULLETDYNAMICS_LIBRARY}
+			${LINEARMATH_LIBRARY}
+			${YAML_LIBRARY}
+			${AWESOMIUM_LIBRARY}
+			${LUA_LIBRARY}
+		)
+		endif()
 else()
 	find_package(OpenGL REQUIRED)
 	find_package(SDL2 REQUIRED)
@@ -109,12 +126,24 @@ endif()
 # Copy the runtime dependencies to the output directory when dependency target is built
 # TODO: This is hardcoded to the Debug folder. We cannot use a Release build...
 if (NOT COMPILE_LEVEL_EDITOR)
-add_custom_target(_Dependencies ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
-)
+	if(NOT COMPILE_RELEASE_BUILD)
+		add_custom_target(_Dependencies ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+		)
+	else()
+		add_custom_target(_Dependencies ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+		)
+	endif()	
 else()
-add_custom_target(_Dependencies ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
-)
+	if(NOT COMPILE_RELEASE_BUILD)
+		add_custom_target(_Dependencies ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+		)
+	else()
+		add_custom_target(_Dependencies ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+		)
+	endif()	
 endif()
  
