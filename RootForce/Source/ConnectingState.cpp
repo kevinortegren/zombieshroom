@@ -14,7 +14,7 @@ namespace RootForce
 
 	void ConnectingState::Initialize()
 	{
-		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
+		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
@@ -25,6 +25,16 @@ namespace RootForce
 			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, p_playData.ServerName, p_playData.Port, p_playData.MaxPlayers));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_engineContext.m_logger, g_world));
 			m_networkContext.m_client->Connect("127.0.0.1", p_playData.Port);
+
+			// Setup server info response
+			RootForce::Network::MessagePlayData response;
+			response.ServerName = p_playData.ServerName.c_str();
+			response.MapName = p_playData.MapName.c_str();
+			response.MaxPlayers = (uint8_t) p_playData.MaxPlayers;
+			response.MatchLength = (uint16_t) p_playData.MatchLength;
+			response.KillCount = (uint8_t) p_playData.Killcount;
+
+			m_networkContext.m_serverMessageHandler->SetPlayDataResponse(response);
 		}
 		else
 		{
@@ -37,6 +47,7 @@ namespace RootForce
 		// Set the network entity map on both message handlers
 		m_networkContext.m_clientMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 		m_networkContext.m_clientMessageHandler->SetPlayerSystem(m_sharedSystems.m_playerSystem.get());
+		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 		if (m_networkContext.m_serverMessageHandler != nullptr)
 			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 
@@ -44,10 +55,6 @@ namespace RootForce
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 		if (m_networkContext.m_server != nullptr)
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
-
-		// Load the level
-		std::string levelName = p_playData.MapName.substr(0, p_playData.MapName.size() - std::string(".world").size());
-		m_sharedSystems.m_worldSystem->CreateWorld(levelName);
 	}
 
 	void ConnectingState::Exit()

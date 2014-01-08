@@ -19,6 +19,7 @@ namespace RootForce
 				GameStateSnapshot = ID_USER_PACKET_ENUM + 1,
 				ChatToServer,
 				ChatToClient,
+				PlayData,
 				UserConnected,
 				UserDisconnected,
 				UserInfo,
@@ -93,6 +94,18 @@ namespace RootForce
 		{
 			RakNet::RakString PlayerName;
 			EntityCreated PlayerEntity;
+
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+		};
+
+		/** Sent to a connecting client, containing static data about the game */
+		struct MessagePlayData
+		{
+			RakNet::RakString ServerName;
+			RakNet::RakString MapName;
+			uint8_t MaxPlayers;
+			uint16_t MatchLength;
+			uint8_t KillCount;
 
 			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};

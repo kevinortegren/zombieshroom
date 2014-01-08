@@ -41,6 +41,16 @@ namespace RootForce
 			m_playerSystem = p_playerSystem;
 		}
 
+		void ClientMessageHandler::SetWorldSystem(WorldSystem* p_worldSystem)
+		{
+			m_worldSystem = p_worldSystem;
+		}
+
+		const MessagePlayData& ClientMessageHandler::GetServerInfo() const
+		{
+			return m_serverInfo;
+		}
+
 		ClientState::ClientState ClientMessageHandler::GetClientState() const
 		{
 			return m_state;
@@ -53,35 +63,6 @@ namespace RootForce
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection accepted");
-
-					// Create temporary entity for player
-					const std::string PLAYER_NAME = "John Doe"; // TODO: Get this from config/options.
-
-					m_playerSystem->CreatePlayer(0);
-					ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
-					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
-
-					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
-					clientComponent->Name = PLAYER_NAME;
-					clientComponent->State = NetworkClientComponent::EXPECTING_USER_INFO;
-					clientComponent->UserID = -1;
-
-					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
-
-					// Send a user info message to the server
-					MessageUserInfo m;
-					m.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
-					m.PlayerEntity.SynchronizedID = SYNCHRONIZED_ID_NONE;
-					m.PlayerEntity.TemporaryID = tId;
-					m.PlayerName = PLAYER_NAME.c_str();
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) MessageType::UserInfo);
-					m.Serialize(true, &bs);
-
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
-
-					m_state = ClientState::AWAITING_CONFIRMATION;
 				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -198,9 +179,48 @@ namespace RootForce
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "We have connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
 
-						// We're connected
 						m_state = ClientState::CONNECTED;
 					}
+				} return true;
+
+				case MessageType::PlayData:
+				{
+					m_serverInfo.Serialize(false, p_bs);
+					
+					// Create the world
+					// TODO: Consider that a server will be creating an instance of the world itself. Hence, a local client will have duplicates.
+					std::string levelName;
+					levelName = m_serverInfo.MapName;
+					levelName = levelName.substr(0, levelName.size() - std::string(".world").size());
+					m_worldSystem->CreateWorld(levelName);
+
+
+					// Create temporary entity for player
+					const std::string PLAYER_NAME = "John Doe"; // TODO: Get this from config/options.
+
+					m_playerSystem->CreatePlayer(0);
+					ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
+					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
+					clientComponent->Name = PLAYER_NAME;
+					clientComponent->State = NetworkClientComponent::EXPECTING_USER_INFO;
+					clientComponent->UserID = -1;
+
+					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
+
+					// Send a user info message to the server
+					MessageUserInfo m;
+					m.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
+					m.PlayerEntity.SynchronizedID = SYNCHRONIZED_ID_NONE;
+					m.PlayerEntity.TemporaryID = tId;
+					m.PlayerName = PLAYER_NAME.c_str();
+
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::UserInfo);
+					m.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				} return true;
 
 				case MessageType::UserDisconnected:
@@ -245,6 +265,11 @@ namespace RootForce
 			m_networkEntityMap = p_networkEntityMap;
 		}
 
+		void ServerMessageHandler::SetPlayDataResponse(const MessagePlayData& p_response)
+		{
+			m_response = p_response;
+		}
+
 		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
 			switch (p_id)
@@ -252,6 +277,13 @@ namespace RootForce
 				case ID_NEW_INCOMING_CONNECTION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "SERVER: Client connected (%s)", p_packet->systemAddress.ToString());
+
+					// Send server info
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::PlayData);
+					m_response.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:

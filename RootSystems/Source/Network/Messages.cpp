@@ -49,6 +49,16 @@ namespace RootForce
 
 
 
+		void MessagePlayData::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
+		{
+			bs->Serialize(writeToBitstream, ServerName);
+			bs->Serialize(writeToBitstream, MapName);
+			bs->Serialize(writeToBitstream, MaxPlayers);
+			bs->Serialize(writeToBitstream, MatchLength);
+			bs->Serialize(writeToBitstream, KillCount);
+		}
+
+
 		void MessageUserConnected::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
 			bs->Serialize(writeToBitstream, UserID);
