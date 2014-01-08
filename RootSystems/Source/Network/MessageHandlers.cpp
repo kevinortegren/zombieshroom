@@ -373,6 +373,8 @@ namespace RootForce
 
 					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
 
+					Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
+
 					// Get a list of the connected players
 					DataStructures::List<RakNet::SystemAddress> connectedAddresses;
 					DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
