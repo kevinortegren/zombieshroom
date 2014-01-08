@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <glm/glm.hpp>
+#include <assimp/scene.h>  
 
 namespace RootEngine
 {
@@ -66,6 +67,7 @@ namespace RootEngine
 				virtual unsigned int GetIndexFromBoneName(std::string p_boneName) = 0;
 				virtual void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight) = 0;
 				virtual void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop) = 0;
+				virtual void BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms) = 0;
 			};
 
 			class Animation : public AnimationInterface
@@ -82,6 +84,8 @@ namespace RootEngine
 				void SetNumBones(unsigned int p_numBones);
 				void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight);
 				void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop);
+				void BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
+				void SetAiScene(aiScene* p_aiScene);
 
 			private:
 			//Map bone name to index
@@ -91,7 +95,7 @@ namespace RootEngine
 			std::vector<glm::vec2> m_animationKeyFrames;
 			glm::mat4x4 m_globalInverseTransform;
 			unsigned int m_numBones;
-
+			aiScene* m_aiScene;
 
 		};
 	}

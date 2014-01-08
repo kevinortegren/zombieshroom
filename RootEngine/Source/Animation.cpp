@@ -56,5 +56,29 @@ namespace RootEngine
 		{
 			m_animationKeyFrames.push_back(glm::vec2((float)p_start, (float)p_stop));
 		}
+
+		void Animation::BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
+		{
+			glm::mat4 Identity = glm::mat4(1.0);
+			
+
+			/*float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+			float TimeInTicks = TimeInSeconds * TicksPerSecond;
+			float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
+
+			ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
+
+			Transforms.resize(m_numBones);
+
+			for (uint i = 0 ; i < m_NumBones ; i++) {
+				Transforms[i] = m_BoneInfo[i].FinalTransformation;
+			}*/
+		}
+
+		void Animation::SetAiScene( aiScene* p_aiScene )
+		{
+			m_aiScene = p_aiScene;
+		}
+
 	}
 }

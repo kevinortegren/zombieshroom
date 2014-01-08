@@ -47,7 +47,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        g_engineContext.m_resourceManager->LoadCollada("AnimationReelAllKeys");
+        g_engineContext.m_resourceManager->LoadCollada("AnimationClipVersion");
         
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);

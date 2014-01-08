@@ -29,11 +29,17 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
-			for(unsigned int i = 0; i < aiscene->mAnimations[0]->mNumChannels; i++)
+			for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[0]->mChannels[i]->mNodeName.C_Str());
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[0]->mChannels[i]->mNumPositionKeys);
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "animation name: '%s'", aiscene->mAnimations[i]->mName.C_Str());
+
+				for(unsigned int j = 0; j < aiscene->mAnimations[i]->mNumChannels; j++)
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
+				}
 			}
+			
 		}
 		
 		char fileName[128];
@@ -285,14 +291,7 @@ namespace RootEngine
 
 	void ModelImporter::LoadAnimation(unsigned int p_index, const aiScene* p_scene )
 	{
-		for(unsigned int i = 0; i < p_scene->mAnimations[p_index]->mChannels[0]->mNumPositionKeys; i++)
-		{
-			for(unsigned int j = 0; j < p_scene->mAnimations[p_index]->mNumChannels; j++)
-			{
-				if(p_scene->mAnimations[i]->mChannels[j]->)
-			}
-			if(p_scene->mAnimations[i]->mChannels[0]->)
-		}
+		
 	}
 
 	std::string ModelImporter::GetNameFromPath( std::string p_path )
