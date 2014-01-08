@@ -244,12 +244,12 @@ namespace RootForce
 					HACK_MessageTransformUpdate m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
-					if (player != nullptr)
+					ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.EntityID);
+					if (entity != nullptr)
 					{
-						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 						transform->m_position = m.Position;
-						transform->m_orientation = m.Orientation;
+						transform->m_orientation.SetOrientation(m.Orientation);
 					}
 				} return true;
 			}
@@ -442,12 +442,12 @@ namespace RootForce
 					HACK_MessageTransformUpdate m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
-					if (player != nullptr)
+					ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.EntityID);
+					if (entity != nullptr)
 					{
-						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 						transform->m_position = m.Position;
-						transform->m_orientation = m.Orientation;
+						transform->m_orientation.SetOrientation(m.Orientation);
 
 						// Get a list of the connected players
 						DataStructures::List<RakNet::SystemAddress> connectedAddresses;

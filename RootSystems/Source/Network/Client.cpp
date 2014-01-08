@@ -55,6 +55,11 @@ namespace RootForce
 			m_chatSystem = p_chatSystem;
 		}
 
+		void Client::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
+		{
+			m_networkEntityMap = p_networkEntityMap;
+		}
+
 		void Client::Update()
 		{
 			// Store all incoming packets in a temporary list (to defer parsing of packets that arrive during parsing)
@@ -119,6 +124,7 @@ namespace RootForce
 					Transform* t = m_world->GetEntityManager()->GetComponent<Transform>(e);
 
 					HACK_MessageTransformUpdate m;
+					m.EntityID = m_networkEntityMap->GetSynchronizedId(e);
 					m.Position = t->m_position;
 					m.Orientation = t->m_orientation.GetQuaternion();
 

@@ -26,6 +26,7 @@ namespace RootForce
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void Update();
 
@@ -36,6 +37,7 @@ namespace RootForce
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
 			RootForce::ChatSystem* m_chatSystem;
+			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }

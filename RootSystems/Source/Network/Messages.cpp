@@ -91,6 +91,7 @@ namespace RootForce
 
 		void HACK_MessageTransformUpdate::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
+			bs->Serialize(writeToBitstream, EntityID);
 			for (int i = 0; i < 3; ++i)
 				bs->Serialize(writeToBitstream, Position[i]);
 			for (int i = 0; i < 4; ++i)

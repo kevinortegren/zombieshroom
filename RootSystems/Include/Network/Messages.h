@@ -147,6 +147,7 @@ namespace RootForce
 		/** Sent from client to server (this is a HACK) */
 		struct HACK_MessageTransformUpdate
 		{
+			SynchronizedId_t EntityID;
 			glm::vec3 Position;
 			glm::quat Orientation;
 
