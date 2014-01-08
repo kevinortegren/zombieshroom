@@ -2,6 +2,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Components.h>
 #include <cassert>
 
 namespace RootForce
@@ -14,8 +15,9 @@ namespace RootForce
 		MessageHandler::~MessageHandler() {}
 
 
-		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
+		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, RootEngine::GameSharedContext* p_engineContext, ECS::World* p_world)
 			: MessageHandler(p_peer, p_logger)
+			, m_engineContext(p_engineContext)
 			, m_world(p_world)
 			, m_state(ClientState::UNCONNECTED) {}
 
@@ -85,21 +87,29 @@ namespace RootForce
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection refused: server full");
+
+					m_state = ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: booted");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: connection to server lost");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_ATTEMPT_FAILED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection attempt failed");
+
+					m_state = ClientState::CONNECTION_FAILED;
 				} return true;
 
 				case ID_UNCONNECTED_PONG:
@@ -153,6 +163,16 @@ namespace RootForce
 
 						NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
 
+						Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
+						
+						Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(entity);
+						renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
+						renderable->m_material = m_engineContext->m_resourceManager->GetMaterial("testchar");
+						renderable->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_normalMap = m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_specularMap = m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
+
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Remote player connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
 					}
@@ -188,6 +208,14 @@ namespace RootForce
 					// Another client has disconnected
 					MessageUserDisconnected m;
 					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetPlayerEntityFromUserID(m.UserID);
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
+					
+					m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client (ID: %d, Name: %s) disconnected", m.UserID, clientComponent->Name.c_str());
+					
+					m_world->GetEntityManager()->RemoveAllComponents(entity);
+					m_world->GetEntityManager()->RemoveEntity(entity);
 				} return true;
 			}
 
@@ -268,10 +296,6 @@ namespace RootForce
 				{
 					MessageUserInfo m;
 					m.Serialize(false, p_bs);
-
-
-					
-
 
 					// Create a synchronized entity for the connected player.
 					// If loopback, we need to check if a temporary entity exists also

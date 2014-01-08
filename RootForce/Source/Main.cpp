@@ -99,7 +99,7 @@ namespace RootForce
 		// Setup the screen states
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger));
 		m_networkContext.m_server = nullptr;
-		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_engineContext.m_logger, g_world));
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_engineContext.m_logger, &g_engineContext, g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
 		m_networkContext.m_networkEntityMap = nullptr;
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());

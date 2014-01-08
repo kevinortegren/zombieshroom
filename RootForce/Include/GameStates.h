@@ -6,6 +6,8 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <RootSystems/Include/PlayerSystem.h>
+#include <RootSystems/Include/WorldSystem.h>
 
 namespace RootForce
 {
@@ -46,6 +48,9 @@ namespace RootForce
 	{
 		// System responsible for updating the player.
 		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
+
+		// System responsible for creating the world.
+		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		
 		// TODO: Add more
 	};
