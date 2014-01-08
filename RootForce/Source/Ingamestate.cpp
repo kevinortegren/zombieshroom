@@ -155,12 +155,14 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
+		//Update all the data that is displayed in the HUD
 		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			return GameStates::Exit;
