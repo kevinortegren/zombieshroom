@@ -11,6 +11,8 @@ Logging::Logging()
 
 	m_stringTagList.push_back("RENDER ");
 	m_stringTagList.push_back("NETWORK");
+	m_stringTagList.push_back("CLIENT ");
+	m_stringTagList.push_back("SERVER ");
 	m_stringTagList.push_back("GENERAL");
 	m_stringTagList.push_back("NOTAG  ");
 	m_stringTagList.push_back("PHYSICS");

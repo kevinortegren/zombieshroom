@@ -128,8 +128,8 @@ namespace Render
 		struct
 		{
 			glm::vec4 m_ambient;
-			DirectionalLight m_dlights[16];
-			PointLight m_plights[16];
+			DirectionalLight m_dlights[500];
+			PointLight m_plights[500];
 		
 		} m_lightVars;
 

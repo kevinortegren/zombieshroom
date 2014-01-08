@@ -122,7 +122,7 @@ namespace RootForce
 		m_event.push_back(event);
 	}
 
-	const Awesomium::JSValue& Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	Awesomium::JSValue Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
 	{
 		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
 	}

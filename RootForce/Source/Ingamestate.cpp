@@ -43,7 +43,9 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::pointLight_f, RootForce::LuaAPI::pointLight_m, "PointLight");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
+		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
@@ -81,9 +83,6 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for updating the world.
-		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
-
 		// System responsible for executing script based on actions.
 		m_scriptSystem = new RootForce::ScriptSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
@@ -115,9 +114,7 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-        // Create a world (defer creation of player to the network)
-		// WARNING: This means a player is not guaranteed to exist until an accept message is received.
-        m_worldSystem->CreateWorld("level");
+		//m_worldSystem->CreateWorld( "level" );
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -143,6 +140,10 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
+
+		// Load the level and create a world
+		
+        //m_worldSystem->CreateWorld( name );
 	}
 
 	void IngameState::Exit()
@@ -152,6 +153,18 @@ namespace RootForce
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
+		// Check for quitting condition
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			return GameStates::Exit;
+		}
+
+		// Check for disconnection from the server
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
+		{
+			return GameStates::Menu;
+		}
+		
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
@@ -168,6 +181,8 @@ namespace RootForce
 			return GameStates::Exit;
 		}
 		m_hud->Update();
+
+#ifdef _DEBUG
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -183,10 +198,13 @@ namespace RootForce
 			}
 		}
 
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			g_engineContext.m_resourceManager->ReloadAllScripts();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 				g_engineContext.m_renderer->DisplayNormals(false);
+#endif
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			g_engineContext.m_resourceManager->ReloadAllScripts();
+		
 		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
@@ -234,8 +252,11 @@ namespace RootForce
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 		}
-        
-		g_engineContext.m_renderer->Render();
+
+		{
+			PROFILE("Rendering", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
 
 		{
 			PROFILE("Render Lines", g_engineContext.m_profiler);
@@ -255,9 +276,10 @@ namespace RootForce
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
 		
-		
-		g_engineContext.m_renderer->Swap();
-
+		{
+			PROFILE("Swap", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Swap();
+		}
 		return GameStates::Ingame;
 	}
 }

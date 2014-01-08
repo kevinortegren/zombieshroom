@@ -82,6 +82,7 @@ namespace RootForce
 				m_playData.MaxPlayers = event.data[3].ToInteger();
 				m_playData.MatchLength = event.data[4].ToInteger();
 				m_playData.Killcount = event.data[5].ToInteger();
+				m_playData.MapName = Awesomium::ToString(event.data[6].ToString());
 
 				m_menu->Hide();
 				result = GameStates::Connecting;

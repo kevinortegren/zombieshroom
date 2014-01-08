@@ -708,7 +708,92 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Vec3");
 			return 1;
 		}
+		//////////////////////////////////////////////////////////////////////////
+		//VEC4
+		//////////////////////////////////////////////////////////////////////////
+		static int Vec4Create(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			glm::vec4 *s = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*s = glm::vec4((float)luaL_checknumber(p_luaState, 1), (float)luaL_checknumber(p_luaState, 2), (float)luaL_checknumber(p_luaState, 3), (float)luaL_checknumber(p_luaState, 4));
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
 
+		static int Vec4SetValue(lua_State* p_luaState)
+		{
+			glm::vec4* ptemp = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			float setValue = (float)luaL_checknumber(p_luaState, 3);
+			if(memberName == "x")
+				ptemp->x = setValue;
+			if(memberName == "y")
+				ptemp->y = setValue;
+			if(memberName == "z")
+				ptemp->z = setValue;
+			if(memberName == "w")
+				ptemp->w = setValue;
+			return 0;
+		}
+
+		static int Vec4GetValue(lua_State* p_luaState)
+		{
+			glm::vec4* ptemp = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			std::string memberName = luaL_checkstring(p_luaState, 2);
+			if(memberName == "x")
+				lua_pushnumber(p_luaState, ptemp->x);
+			if(memberName == "y")
+				lua_pushnumber(p_luaState, ptemp->y);
+			if(memberName == "z")
+				lua_pushnumber(p_luaState, ptemp->z);
+			if(memberName == "w")
+				lua_pushnumber(p_luaState, ptemp->w);
+			return 1;
+		}
+
+		static int Vec4Add(lua_State* p_luaState)
+		{
+			glm::vec4* v1 = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			glm::vec4* v2 = (glm::vec4*)luaL_checkudata(p_luaState, 2, "Vec4");
+			glm::vec4 v3 = (*v1)+(*v2);
+			glm::vec4 *s = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*s = glm::vec4(v3);
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
+
+		static int Vec4Sub(lua_State* p_luaState)
+		{
+			glm::vec4* v1 = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			glm::vec4* v2 = (glm::vec4*)luaL_checkudata(p_luaState, 2, "Vec4");
+			glm::vec4 v3 = (*v1)-(*v2);
+			glm::vec4 *s = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*s = glm::vec4(v3);
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
+
+		static int Vec4Mul(lua_State* p_luaState)
+		{
+			glm::vec4* v1 = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			glm::vec4* v2 = (glm::vec4*)luaL_checkudata(p_luaState, 2, "Vec4");
+			glm::vec4 v3 = (*v1)*(*v2);
+			glm::vec4 *s = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*s = glm::vec4(v3);
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
+
+		static int Vec4Div(lua_State* p_luaState)
+		{
+			glm::vec4* v1 = (glm::vec4*)luaL_checkudata(p_luaState, 1, "Vec4");
+			glm::vec4* v2 = (glm::vec4*)luaL_checkudata(p_luaState, 2, "Vec4");
+			glm::vec4 v3 = (*v1)/(*v2);
+			glm::vec4 *s = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*s = glm::vec4(v3);
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ARRAY
 		//////////////////////////////////////////////////////////////////////////
@@ -792,7 +877,65 @@ namespace RootForce
 			return 1;
 		}
 
-		//Entity functions
+		//////////////////////////////////////////////////////////////////////////
+		//POINTLIGHT
+		//////////////////////////////////////////////////////////////////////////
+		static int PointLightCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PointLight **s = (RootForce::PointLight**)lua_newuserdata(p_luaState, sizeof(RootForce::PointLight*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(*e);
+			luaL_setmetatable(p_luaState, "PointLight");
+			return 1;
+		}
+		static int PointLightSetColor(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			(*s)->m_color = *(glm::vec4*)luaL_checkudata(p_luaState, 2, "Vec4");
+			return 0;
+		}
+		static int PointLightSetAttenuation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			(*s)->m_attenuation = *(glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			return 0;
+		}
+		static int PointLightSetRange(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			(*s)->m_range = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int PointLightGetColor(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			glm::vec4 *v1 = (glm::vec4 *)lua_newuserdata(p_luaState, sizeof(glm::vec4));
+			*v1 = (*s)->m_color;
+			luaL_setmetatable(p_luaState, "Vec4");
+			return 1;
+		}
+		static int PointLightGetAttenuation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			glm::vec3 *v1 = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*v1 = (*s)->m_attenuation;
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+		static int PointLightGetRange(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PointLight **s = (RootForce::PointLight**)luaL_checkudata(p_luaState, 1, "PointLight");
+			lua_pushnumber(p_luaState, (*s)->m_range);
+			return 1;
+		}
+
 		static const struct luaL_Reg entity_f [] = {
 			{"New", EntityCreate},
 			{"GetEntityByTag", EntityGetByTag},
@@ -897,6 +1040,20 @@ namespace RootForce
 			{"__len",		Vec3Length},
 			{NULL, NULL}
 		};
+		static const struct luaL_Reg vec4_f [] = {
+			{"New",			Vec4Create},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg vec4_m [] = {
+			{"__newindex",	Vec4SetValue},
+			{"__add",		Vec4Add},
+			{"__sub",		Vec4Sub},
+			{"__mul",		Vec4Mul},
+			{"__div",		Vec4Div},
+			{"__index",		Vec4GetValue},
+			{NULL, NULL}
+		};
 
 		static const struct luaL_Reg array_f [] = {
 			{"New", ArrayCreate},
@@ -965,6 +1122,20 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg pointLight_f [] = {
+			{"New", PointLightCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg pointLight_m [] = {
+			{"SetColor",		PointLightSetColor},
+			{"SetAttenuation",	PointLightSetAttenuation},
+			{"SetRange",		PointLightSetRange},
+			{"GetColor",		PointLightGetColor},
+			{"GetAttenuation",	PointLightGetAttenuation},
+			{"GetRange",		PointLightGetRange},
+			{NULL, NULL}
+		};
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());

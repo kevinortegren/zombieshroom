@@ -43,7 +43,6 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		RootForce::ScriptSystem* m_scriptSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;

@@ -2,7 +2,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
-#include <RootSystems/Include/MatchStateSystem.h>
+#include <RootSystems/Include/Components.h>
 #include <cassert>
 
 namespace RootForce
@@ -15,8 +15,9 @@ namespace RootForce
 		MessageHandler::~MessageHandler() {}
 
 
-		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
+		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, RootEngine::GameSharedContext* p_engineContext, ECS::World* p_world)
 			: MessageHandler(p_peer, p_logger)
+			, m_engineContext(p_engineContext)
 			, m_world(p_world)
 			, m_state(ClientState::UNCONNECTED) {}
 
@@ -86,21 +87,29 @@ namespace RootForce
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection refused: server full");
+
+					m_state = ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: booted");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: connection to server lost");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_ATTEMPT_FAILED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection attempt failed");
+
+					m_state = ClientState::CONNECTION_FAILED;
 				} return true;
 
 				case ID_UNCONNECTED_PONG:
@@ -135,12 +144,18 @@ namespace RootForce
 					if (m.UserInfo.PlayerEntity.TemporaryID == TEMPORARY_ID_NONE)
 					{
 						// This is not a response to a join request. We do not have a temporary entity for this player. Create an entity.
-						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-						TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
-						SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
-						m_networkEntityMap->SetSynchronizedId(tId, sId);
-						m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
-						
+						ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.UserInfo.PlayerEntity.SynchronizedID);
+						if (entity == nullptr)
+						{
+							// This is a remote client, we need to create the entity ourselves
+							entity = m_world->GetEntityManager()->CreateEntity();
+							TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+							SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
+							m_networkEntityMap->SetSynchronizedId(tId, sId);
+							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+						}
+
+						// Add client specific components
 						NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
 						clientComponent->Name = m.UserInfo.PlayerName.C_String();
 						clientComponent->State = NetworkClientComponent::CONNECTED;
@@ -148,18 +163,32 @@ namespace RootForce
 
 						NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
 
+						Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
+						
+						Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(entity);
+						renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
+						renderable->m_material = m_engineContext->m_resourceManager->GetMaterial("testchar");
+						renderable->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_normalMap = m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_specularMap = m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
+
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Remote player connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
 					}
 					else
 					{
-						// This is a response to our join request, we should have a temporary player entity.
-						ECS::Entity* entity = m_networkEntityMap->GetTemporaryEntity(m.UserInfo.PlayerEntity.TemporaryID);
-						assert(entity != nullptr);
+						ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.UserInfo.PlayerEntity.SynchronizedID);
+						if (entity == nullptr)
+						{
+							// This is a response to our join request, we should have a temporary player entity.
+							entity = m_networkEntityMap->GetTemporaryEntity(m.UserInfo.PlayerEntity.TemporaryID);
+							assert(entity != nullptr);
 
-						// Synchronize our temporary entity with the ID the server has.
-						m_networkEntityMap->SetSynchronizedId(m.UserInfo.PlayerEntity.TemporaryID, m.UserInfo.PlayerEntity.SynchronizedID);
-						m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+							// Synchronize our temporary entity with the ID the server has.
+							m_networkEntityMap->SetSynchronizedId(m.UserInfo.PlayerEntity.TemporaryID, m.UserInfo.PlayerEntity.SynchronizedID);
+							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+						}
 
 						// Update the user info
 						NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
@@ -180,6 +209,14 @@ namespace RootForce
 					// Another client has disconnected
 					MessageUserDisconnected m;
 					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetPlayerEntityFromUserID(m.UserID);
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
+					
+					m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client (ID: %d, Name: %s) disconnected", m.UserID, clientComponent->Name.c_str());
+					
+					m_world->GetEntityManager()->RemoveAllComponents(entity);
+					m_world->GetEntityManager()->RemoveEntity(entity);
 				} return true;
 			}
 
@@ -262,11 +299,27 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					// Create a synchronized entity for the connected player.
-					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+					// If loopback, we need to check if a temporary entity exists also
+					ECS::Entity* entity = nullptr;
+					TemporaryId_t tId = TEMPORARY_ID_NONE;
+					if (p_packet->systemAddress.IsLoopback())
+					{
+						// Local client, temporary entity has been created
+						entity = m_networkEntityMap->GetTemporaryEntity(m.PlayerEntity.TemporaryID);
+						assert(entity != nullptr);
+
+						tId = m.PlayerEntity.TemporaryID;
+					}
+					else
+					{
+						// Remote client, no entity exists in this application instance
+						entity = m_world->GetEntityManager()->CreateEntity();
+						tId = m_networkEntityMap->AddEntity(entity);
+					}
+
 					SynchronizedId_t sId = m_networkEntityMap->NextSynchronizedId();
 					m_networkEntityMap->SetSynchronizedId(tId, sId);
-					m_networkEntityMap->AssociatePlayerEntityWithUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), entity);
+					m_networkEntityMap->AssociatePlayerEntityWithUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), entity); 
 
 					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
 					clientComponent->Name = std::string(m.PlayerName.C_String());
