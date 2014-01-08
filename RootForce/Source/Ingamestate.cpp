@@ -79,9 +79,6 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for updating the world.
-		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
-
 		// System responsible for executing script based on actions.
 		m_scriptSystem = new RootForce::ScriptSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
@@ -113,9 +110,7 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-        // Create a world (defer creation of player to the network)
-		// WARNING: This means a player is not guaranteed to exist until an accept message is received.
-        m_worldSystem->CreateWorld("level");
+		//m_worldSystem->CreateWorld( "level" );
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -141,6 +136,10 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
+
+		// Load the level and create a world
+		
+        //m_worldSystem->CreateWorld( name );
 	}
 
 	void IngameState::Exit()
@@ -150,17 +149,27 @@ namespace RootForce
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
+		// Check for quitting condition
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			return GameStates::Exit;
+		}
+
+		// Check for disconnection from the server
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
+		{
+			return GameStates::Menu;
+		}
+		
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
 		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<Player>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Exit;
-		}
 		m_hud->Update();
+
+#ifdef _DEBUG
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -176,10 +185,13 @@ namespace RootForce
 			}
 		}
 
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			g_engineContext.m_resourceManager->ReloadAllScripts();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 				g_engineContext.m_renderer->DisplayNormals(false);
+#endif
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			g_engineContext.m_resourceManager->ReloadAllScripts();
+		
 		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);

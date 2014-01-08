@@ -87,21 +87,29 @@ namespace RootForce
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection refused: server full");
+
+					m_state = ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: booted");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: connection to server lost");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_ATTEMPT_FAILED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection attempt failed");
+
+					m_state = ClientState::CONNECTION_FAILED;
 				} return true;
 
 				case ID_UNCONNECTED_PONG:

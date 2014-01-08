@@ -14,7 +14,7 @@ namespace RootForce
 
 	void ConnectingState::Initialize()
 	{
-		
+		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
@@ -44,6 +44,10 @@ namespace RootForce
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 		if (m_networkContext.m_server != nullptr)
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
+
+		// Load the level
+		std::string levelName = p_playData.MapName.substr(0, p_playData.MapName.size() - std::string(".world").size());
+		m_sharedSystems.m_worldSystem->CreateWorld(levelName);
 	}
 
 	void ConnectingState::Exit()
@@ -57,6 +61,12 @@ namespace RootForce
 
 		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTED)
 			return GameStates::Ingame;
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_FAILED)
+			return GameStates::Menu;
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS)
+			return GameStates::Menu;
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
+			return GameStates::Menu;
 
 		return GameStates::Connecting;
 	}
