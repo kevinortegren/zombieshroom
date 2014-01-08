@@ -56,7 +56,7 @@ namespace RootEngine
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
 		m_values["ServerName"] = "RootForce server";
-		m_values["ServerMapfile"] = "test.world";
+		m_values["ServerMapfile"] = "Nyaste.world";
 		m_values["ServerPort"] = "5567";
 		m_values["ServerPassword"] = "";
 		m_values["ServerMaxPlayers"] = "12";

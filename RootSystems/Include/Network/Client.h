@@ -19,22 +19,25 @@ namespace RootForce
 		class Client
 		{
 		public:
-			Client(Logging* p_logger);
+			Client(Logging* p_logger, ECS::World* p_world);
 			~Client();
 
 			bool Connect(const char* p_address, unsigned short p_port);
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void Update();
 
 			RakNet::RakPeerInterface* GetPeerInterface();
 		private:
+			ECS::World* m_world;
 			Logging* m_logger;
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
 			RootForce::ChatSystem* m_chatSystem;
+			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }

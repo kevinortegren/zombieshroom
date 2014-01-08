@@ -16,7 +16,9 @@ file(GLOB_RECURSE LEVELS Levels/*)
 # Add the target
 add_custom_target(${PROJECT_NAME} ALL
 	SOURCES ${SHADERS} ${EFFECTS} ${LEVELS} ${SCRIPTS}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Assets)
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Assets
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Assets)
+  
 
 source_group("Shaders" FILES ${SHADERS})
 source_group("Effects" FILES ${EFFECTS})
