@@ -65,6 +65,7 @@ namespace RootEngine
 				virtual void MapBone(std::string p_boneName, unsigned int p_index) = 0;
 				virtual unsigned int GetIndexFromBoneName(std::string p_boneName) = 0;
 				virtual void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight) = 0;
+				virtual void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop) = 0;
 			};
 
 			class Animation : public AnimationInterface
@@ -80,14 +81,17 @@ namespace RootEngine
 				unsigned int GetNumBones();
 				void SetNumBones(unsigned int p_numBones);
 				void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight);
+				void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop);
 
 			private:
 			//Map bone name to index
 			std::map<std::string, unsigned int> m_boneMapping;
 			std::vector<RootEngine::RootAnimation::BoneInfo> m_boneInfo;
 			std::vector<RootEngine::RootAnimation::VertexBoneData> m_boneData;
+			std::vector<glm::vec2> m_animationKeyFrames;
 			glm::mat4x4 m_globalInverseTransform;
 			unsigned int m_numBones;
+
 
 		};
 	}

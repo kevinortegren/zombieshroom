@@ -24,6 +24,18 @@ namespace RootEngine
 		Assimp::Importer importer;
 		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
+		if(aiscene->HasAnimations())
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
+			for(unsigned int i = 0; i < aiscene->mAnimations[0]->mNumChannels; i++)
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[0]->mChannels[i]->mNodeName.C_Str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[0]->mChannels[i]->mNumPositionKeys);
+			}
+		}
+		
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
@@ -52,6 +64,15 @@ namespace RootEngine
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
 
 		InitMaterials(p_scene, p_filename);
+		
+		if(p_scene->HasAnimations())
+		{
+			for (unsigned int i = 0 ; i < p_scene->mNumAnimations ; i++) 
+			{
+				LoadAnimation(i, p_scene);
+			}
+		}
+			
 	}
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
@@ -117,10 +138,11 @@ namespace RootEngine
 			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
 		}
 
+		
 		//Load bones
 		if(p_aiMesh->HasBones())
 			LoadBones(p_index, p_aiMesh);
-		
+
 		if(p_aiMesh->HasFaces())
 		{
 			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
@@ -232,10 +254,10 @@ namespace RootEngine
 				//Great code for converting atMatrix4x4 to glm::mat4x4!
 				aiMatrix4x4 am = p_aiMesh->mBones[i]->mOffsetMatrix;
 				glm::mat4x4 gm = glm::mat4x4();
-				gm[0][0] = am.a1; gm[0][1] = am.a2; gm[0][2] = am.a3; gm[0][3] = am.a4;
-				gm[1][0] = am.b1; gm[1][1] = am.b2; gm[1][2] = am.b3; gm[1][3] = am.b4;
-				gm[2][0] = am.c1; gm[2][1] = am.c2; gm[2][2] = am.c3; gm[2][3] = am.c4;
-				gm[3][0] = am.d1; gm[3][1] = am.d2; gm[3][2] = am.d3; gm[3][3] = am.d4;
+				gm[0][0] = am.a1; gm[0][1] = am.b1; gm[0][2] = am.c1; gm[0][3] = am.d1;
+				gm[1][0] = am.a2; gm[1][1] = am.b2; gm[1][2] = am.c2; gm[1][3] = am.d2;
+				gm[2][0] = am.a3; gm[2][1] = am.b3; gm[2][2] = am.c3; gm[2][3] = am.d3;
+				gm[3][0] = am.a4; gm[3][1] = am.b4; gm[3][2] = am.c4; gm[3][3] = am.d4;
 				bi.m_boneOffset = gm;
 
 				animation->MapBone(boneName, boneIndex);
@@ -261,6 +283,18 @@ namespace RootEngine
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded animation data!");
 	}
 
+	void ModelImporter::LoadAnimation(unsigned int p_index, const aiScene* p_scene )
+	{
+		for(unsigned int i = 0; i < p_scene->mAnimations[p_index]->mChannels[0]->mNumPositionKeys; i++)
+		{
+			for(unsigned int j = 0; j < p_scene->mAnimations[p_index]->mNumChannels; j++)
+			{
+				if(p_scene->mAnimations[i]->mChannels[j]->)
+			}
+			if(p_scene->mAnimations[i]->mChannels[0]->)
+		}
+	}
+
 	std::string ModelImporter::GetNameFromPath( std::string p_path )
 	{
 		std::string cutPath;
@@ -276,6 +310,9 @@ namespace RootEngine
 		cutPath		= cutPath.substr(0, dotIndex);
 		return cutPath;
 	}
+
+	
+
 }
 
 #endif

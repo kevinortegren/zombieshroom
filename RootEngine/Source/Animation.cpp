@@ -51,5 +51,10 @@ namespace RootEngine
 		{
 			m_boneData[p_vertexIndex].AddBoneData(p_boneIndex, p_weight);
 		}
+
+		void Animation::AddAnimationKeyFrames( unsigned int p_start, unsigned int p_stop )
+		{
+			m_animationKeyFrames.push_back(glm::vec2((float)p_start, (float)p_stop));
+		}
 	}
 }
