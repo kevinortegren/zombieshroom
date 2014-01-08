@@ -116,6 +116,9 @@ namespace RootForce
 
 		//m_worldSystem->CreateWorld( "level" );
 
+		//Set the network context to the matchstatesystem
+		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 

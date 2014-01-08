@@ -56,6 +56,8 @@ namespace RootForce
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
 		health->Health = 100;
+		health->IsDead = false;
+		health->WantsRespawn = true;
 		score->Deaths = 0;
 		score->Score = 0;
 		identity->TeamID = p_teamID;

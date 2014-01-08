@@ -6,13 +6,13 @@
 
 namespace RootForce
 {
+	struct NetworkContext;
 
 	struct TDMRuleSet : public ECS::Component<TDMRuleSet>
 	{
 		float TimeLeft;
 		int ScoreLimit;
-		int TeamOneScore;
-		int TeamTwoScore;
+		int TeamScore[3];
 	};
 
 	class MatchStateSystem : public ECS::VoidSystem
@@ -25,10 +25,14 @@ namespace RootForce
 		void UpdateDeltatime(float p_deltaTime);
 		bool IsMatchOver();
 		void SetLoggingInterface(Logging* p_logger);
+		void SetNetworkContext(NetworkContext* p_networkContext) { m_networkContext = p_networkContext; }
 
 		float GetTimeLeft();
 		int GetTeamScore(int p_team);
+
+		void AwardPlayerKill(int p_killerID, int p_deadID); //Assign score and death after a kills has been made
 	private:
+		NetworkContext* m_networkContext;
 		RootEngine::GameSharedContext* m_gameSharedContext;
 		Logging* m_logger;
 	};

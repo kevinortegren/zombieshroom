@@ -153,6 +153,13 @@ namespace RootForce
 							SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
 							m_networkEntityMap->SetSynchronizedId(tId, sId);
 							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+
+							//Attach components to connected entity
+							RootForce::ScoreComponent* score = m_world->GetEntityManager()->CreateComponent<RootForce::ScoreComponent>(entity);
+							RootForce::Identity* identity = m_world->GetEntityManager()->CreateComponent<RootForce::Identity>(entity);
+							score->Deaths = 0;
+							score->Score = 0;
+							identity->TeamID = 0; // 0 since team has not been chosen yet
 						}
 
 						// Add client specific components
