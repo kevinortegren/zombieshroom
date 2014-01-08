@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <assimp/scene.h>  
 
 namespace RootEngine
@@ -43,8 +44,10 @@ namespace RootEngine
 		
 			void AddBoneData(unsigned int p_boneID, float p_weight)
 			{
-				for (unsigned int i = 0 ; i < NUM_BONES_PER_VERTEX ; i++) {
-					if (m_weightList[i] == 0.0f) {
+				for (unsigned int i = 0 ; i < NUM_BONES_PER_VERTEX ; i++) 
+				{
+					if (m_weightList[i] == 0.0f) 
+					{
 						m_IDList[i]     = p_boneID;
 						m_weightList[i] = p_weight;
 						return;
@@ -68,6 +71,7 @@ namespace RootEngine
 				virtual void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight) = 0;
 				virtual void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop) = 0;
 				virtual void BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms) = 0;
+				virtual void SetAiScene(const aiScene* p_aiScene) = 0;
 			};
 
 			class Animation : public AnimationInterface
@@ -85,7 +89,7 @@ namespace RootEngine
 				void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight);
 				void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop);
 				void BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
-				void SetAiScene(aiScene* p_aiScene);
+				void SetAiScene(const aiScene* p_aiScene);
 
 			private:
 			//Map bone name to index
@@ -95,8 +99,16 @@ namespace RootEngine
 			std::vector<glm::vec2> m_animationKeyFrames;
 			glm::mat4x4 m_globalInverseTransform;
 			unsigned int m_numBones;
-			aiScene* m_aiScene;
+			const aiScene* m_aiScene;
 
+			void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
+			const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
+			unsigned int FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+			unsigned int FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
+			unsigned int FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
+			void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+			void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+			void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
 		};
 	}
 }

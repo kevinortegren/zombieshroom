@@ -291,7 +291,7 @@ namespace RootEngine
 
 	void ModelImporter::LoadAnimation(unsigned int p_index, const aiScene* p_scene )
 	{
-		
+		m_model->m_animations[0]->SetAiScene(p_scene);
 	}
 
 	std::string ModelImporter::GetNameFromPath( std::string p_path )
