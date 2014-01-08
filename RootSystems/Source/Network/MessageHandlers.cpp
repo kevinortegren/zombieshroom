@@ -217,6 +217,17 @@ namespace RootForce
 					m_world->GetEntityManager()->RemoveAllComponents(entity);
 					m_world->GetEntityManager()->RemoveEntity(entity);
 				} return true;
+
+				case MessageType::HACK_TransformUpdate:
+				{
+					HACK_MessageTransformUpdate m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+					transform->m_position = m.Position;
+					transform->m_orientation = m.Orientation;
+				} return true;
 			}
 
 			return false;
@@ -384,6 +395,30 @@ namespace RootForce
 							n.Serialize(true, &bs);
 
 							m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+						}
+					}
+				} return true;
+
+				case MessageType::HACK_TransformUpdate:
+				{
+					HACK_MessageTransformUpdate m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+					transform->m_position = m.Position;
+					transform->m_orientation = m.Orientation;
+
+					// Get a list of the connected players
+					DataStructures::List<RakNet::SystemAddress> connectedAddresses;
+					DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
+					m_peer->GetSystemList(connectedAddresses, connectedGUIDs);
+
+					for (unsigned int i = 0; i < connectedAddresses.Size(); ++i)
+					{
+						if (connectedAddresses[i] != p_packet->systemAddress)
+						{
+							m_peer->Send(p_bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, connectedAddresses[i], false);
 						}
 					}
 				} return true;

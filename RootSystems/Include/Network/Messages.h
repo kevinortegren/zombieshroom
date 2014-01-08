@@ -32,7 +32,8 @@ namespace RootForce
 				UserCommandDeactivateAbility,
 				UserCommandPickUpAbility,
 				UserCommandJump,
-				UserCommandStopJumping
+				UserCommandStopJumping,
+				HACK_TransformUpdate
 			};
 		}
 
@@ -126,6 +127,15 @@ namespace RootForce
 		struct MessageUserCommandSelectAbility
 		{
 			uint8_t Slot;
+
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+		};
+
+		/** Sent from client to server (this is a HACK) */
+		struct HACK_MessageTransformUpdate
+		{
+			glm::vec3 Position;
+			glm::quat Orientation;
 
 			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
