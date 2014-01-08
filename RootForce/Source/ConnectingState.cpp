@@ -61,6 +61,7 @@ namespace RootForce
 		m_networkContext.m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
 
 		// Set the network entity map on both message handlers
+		m_networkContext.m_client->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 		m_networkContext.m_clientMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
 		m_networkContext.m_clientMessageHandler->SetPlayerSystem(m_sharedSystems.m_playerSystem.get());
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
