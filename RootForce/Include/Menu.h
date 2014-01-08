@@ -34,6 +34,7 @@ namespace RootForce
 		MenuEvent::MenuEvent PollEvent();
 		void Hide();
 		void Unhide();
+		Awesomium::WebView* GetView();
 
 		void AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo);
         void LoadDefaults(RootEngine::ConfigManagerInterface* p_configMan, std::string p_workingDir);
@@ -42,7 +43,7 @@ namespace RootForce
 		void HostEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void ConnectEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void RefreshEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
-		const Awesomium::JSValue& GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
+		Awesomium::JSValue GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 
 		std::string GetMapList();
 

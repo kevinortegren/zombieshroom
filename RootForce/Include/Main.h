@@ -11,15 +11,18 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 
-#include <RootForce/Include/Menustate.h>
-#include <RootForce/Include/Ingamestate.h>
+#include <RootForce/Include/GameStates.h>
+#include <RootForce/Include/MenuState.h>
+#include <RootForce/Include/ConnectingState.h>
+#include <RootForce/Include/IngameState.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
 
 namespace RootForce
 {
-	class Main {
+	class Main 
+	{
 	public:
 		Main(std::string p_workingDirectory);
 		~Main();
@@ -33,15 +36,13 @@ namespace RootForce
 
 		ECS::World m_world;
 
-		std::shared_ptr<RootForce::Network::Client> m_client;
-		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
+		NetworkContext m_networkContext;
+		SharedSystems m_sharedSystems;
 
         GameStates::GameStates m_currentState;
-		std::shared_ptr<RootForce::Menustate> m_menustate;
-		std::shared_ptr<RootForce::Ingamestate> m_gamestate;
-        
-		bool m_displayNormals;
-		bool m_displayPhysicsDebug;
+		std::shared_ptr<RootForce::MenuState> m_menuState;
+		std::shared_ptr<RootForce::ConnectingState> m_connectingState;
+		std::shared_ptr<RootForce::IngameState> m_ingameState;
 
 
 		void HandleEvents();

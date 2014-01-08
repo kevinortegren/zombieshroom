@@ -87,8 +87,18 @@ $(document).ready(function() {
     $("#lan-host-overlay").css("display", "none");
   } );
   $("#lan-host-submit").click(function() {
+    var selectedIndex = $("#lan-host-map")[0].selectedIndex;
+    var map = $("#lan-host-map")[0].options[selectedIndex].text;
+
     $("#lan-host-close").click();
-    Menu.Host($("#lan-host-port").val());
+    Menu.Host($("#lan-host-name").val(), 
+              $("#lan-host-port").val(), 
+              $("#lan-host-password").val(), 
+              $("#lan-host-maxplayers").val(), 
+              $("#lan-host-matchlength").val(), 
+              $("#lan-host-killvictory").val(),
+              map
+              );
   } );
 } );
 function Hide()

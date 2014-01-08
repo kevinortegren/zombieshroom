@@ -24,6 +24,8 @@ namespace RootEngine
 	class DebugOverlayInterface abstract
 	{
 	public:
+		// Get the web view
+		virtual Awesomium::WebView* GetView() = 0;
 		// Initialize debug overlay to a loaded Awesomium view
 		virtual void SetView(Awesomium::WebView* p_view) = 0;
 		// Javascript call: Add HTML code (or plain text) to left or right side of the debug overlay

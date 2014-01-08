@@ -22,6 +22,12 @@ namespace RootForce
 		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
 		Abilitiy::Ability SelectedAbility;
 		int Health;
+		int TeamID;
+		int LastDamageSourceID;
+	};
+
+	struct ScoreComponent : public ECS::Component<ScoreComponent>
+	{
 		int Score;
 		int Deaths;
 	};
@@ -29,12 +35,12 @@ namespace RootForce
 	class PlayerSystem : public ECS::VoidSystem
 	{
 	public:
-		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_gameSharedContext)
+		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world)
-			, m_gameSharedContext(p_gameSharedContext) {}
-		void CreatePlayer();
+			, m_engineContext(p_engineContext) {}
+		void CreatePlayer(int p_teamID);
 		void Process();
 	private:
-		RootEngine::GameSharedContext* m_gameSharedContext;
+		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

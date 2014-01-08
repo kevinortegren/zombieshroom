@@ -33,7 +33,9 @@ namespace RootForce
 			THIRDPERSONBEHAVIOR,
 			SCRIPT,
 			COLLISION,
-			COLLISIONRESPONDER
+			COLLISIONRESPONDER,
+			SCORE
+			//TDMRULES //TODO: name might be inappropriate?
 		};
 	}
 }

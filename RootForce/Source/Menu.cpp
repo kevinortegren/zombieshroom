@@ -34,6 +34,10 @@ namespace RootForce
 		m_view->ExecuteJavascript(Awesomium::WSLit("Unhide();"), Awesomium::WebString());
 		//m_view->ResumeRendering();
 	}
+	Awesomium::WebView* RootForce::Menu::GetView()
+	{
+		return m_view;
+	}
 	void RootForce::Menu::AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo)
 	{
 		std::string command = "AddServer(";
@@ -118,7 +122,7 @@ namespace RootForce
 		m_event.push_back(event);
 	}
 
-	const Awesomium::JSValue& Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	Awesomium::JSValue Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
 	{
 		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
 	}
