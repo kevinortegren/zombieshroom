@@ -107,11 +107,11 @@ namespace RootForce
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
 
 		// Initialize camera systems.
-		m_cameraSystem = new RootForce::CameraSystem(g_world);
+		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
-		m_lookAtSystem = new RootForce::LookAtSystem(g_world);
+		m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
-		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world);
+		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
 		//m_worldSystem->CreateWorld( "level" );

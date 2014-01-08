@@ -19,7 +19,7 @@ namespace RootForce
 		class Client
 		{
 		public:
-			Client(Logging* p_logger);
+			Client(Logging* p_logger, ECS::World* p_world);
 			~Client();
 
 			bool Connect(const char* p_address, unsigned short p_port);
@@ -31,6 +31,7 @@ namespace RootForce
 
 			RakNet::RakPeerInterface* GetPeerInterface();
 		private:
+			ECS::World* m_world;
 			Logging* m_logger;
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;

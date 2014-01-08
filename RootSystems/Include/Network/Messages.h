@@ -19,6 +19,7 @@ namespace RootForce
 				GameStateSnapshot = ID_USER_PACKET_ENUM + 1,
 				ChatToServer,
 				ChatToClient,
+				PlayData,
 				UserConnected,
 				UserDisconnected,
 				UserInfo,
@@ -32,7 +33,8 @@ namespace RootForce
 				UserCommandDeactivateAbility,
 				UserCommandPickUpAbility,
 				UserCommandJump,
-				UserCommandStopJumping
+				UserCommandStopJumping,
+				HACK_TransformUpdate
 			};
 		}
 
@@ -96,6 +98,18 @@ namespace RootForce
 			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
 
+		/** Sent to a connecting client, containing static data about the game */
+		struct MessagePlayData
+		{
+			RakNet::RakString ServerName;
+			RakNet::RakString MapName;
+			uint8_t MaxPlayers;
+			uint16_t MatchLength;
+			uint8_t KillCount;
+
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+		};
+
 		/** Sent to all connected clients when a client connects. Also sent to the connecting client for each connected client. */
 		struct MessageUserConnected
 		{
@@ -126,6 +140,15 @@ namespace RootForce
 		struct MessageUserCommandSelectAbility
 		{
 			uint8_t Slot;
+
+			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+		};
+
+		/** Sent from client to server (this is a HACK) */
+		struct HACK_MessageTransformUpdate
+		{
+			glm::vec3 Position;
+			glm::quat Orientation;
 
 			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
 		};
