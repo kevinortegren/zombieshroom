@@ -244,9 +244,12 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					ECS::Entity* player = m_networkEntityMap->GetPlayerEntityFromUserID(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
-					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
-					transform->m_position = m.Position;
-					transform->m_orientation = m.Orientation;
+					if (player != nullptr)
+					{
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						transform->m_position = m.Position;
+						transform->m_orientation = m.Orientation;
+					}
 				} return true;
 			}
 
