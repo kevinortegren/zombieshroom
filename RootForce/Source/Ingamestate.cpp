@@ -156,6 +156,10 @@ namespace RootForce
 	{
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
+
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
