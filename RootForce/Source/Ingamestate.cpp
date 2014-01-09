@@ -159,7 +159,7 @@ namespace RootForce
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			return GameStates::Exit;
+			return GameStates::Menu;
 		}
 
 		// Check for disconnection from the server
@@ -179,10 +179,6 @@ namespace RootForce
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Exit;
-		}
 		m_hud->Update();
 
 #ifdef _DEBUG
