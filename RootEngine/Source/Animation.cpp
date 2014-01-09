@@ -11,7 +11,7 @@ namespace RootEngine
 
 		Animation::~Animation()
 		{
-
+			
 		}
 
 		bool Animation::BoneExists( std::string p_boneName )
@@ -57,21 +57,19 @@ namespace RootEngine
 			m_animationKeyFrames.push_back(glm::vec2((float)p_start, (float)p_stop));
 		}
 
-		void Animation::BoneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
+		void Animation::BoneTransform(float TimeInSeconds)
 		{
 			glm::mat4 Identity = glm::mat4(1.0);
 			
-			float TicksPerSecond = (float)(m_aiScene->mAnimations[0]->mTicksPerSecond != 0 ? m_aiScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+			float TicksPerSecond = (float)(m_aiImporter->GetScene()->mAnimations[0]->mTicksPerSecond != 0 ? m_aiImporter->GetScene()->mAnimations[0]->mTicksPerSecond : 25.0f);
 			float TimeInTicks = TimeInSeconds * TicksPerSecond;
-			float AnimationTime = fmod(TimeInTicks, (float)m_aiScene->mAnimations[0]->mDuration);
+			float AnimationTime = fmod(TimeInTicks, (float)m_aiImporter->GetScene()->mAnimations[0]->mDuration);
 
-			ReadNodeHeirarchy(AnimationTime, m_aiScene->mRootNode, Identity);
-
-			Transforms.resize(m_numBones);
+			ReadNodeHeirarchy(AnimationTime, m_aiImporter->GetScene()->mRootNode, Identity);
 
 			for (unsigned int i = 0 ; i < m_numBones ; i++) 
 			{
-				Transforms[i] = m_boneInfo[i].m_finalTransformation;
+				m_bones[i] = m_boneInfo[i].m_finalTransformation;
 			}
 		}
 
@@ -79,7 +77,7 @@ namespace RootEngine
 		{    
 			std::string NodeName(pNode->mName.data);
 
-			const aiAnimation* pAnimation = m_aiScene->mAnimations[0];
+			const aiAnimation* pAnimation = m_aiImporter->GetScene()->mAnimations[0];
 			
 			
 			aiMatrix4x4 am = pNode->mTransformation;
@@ -262,9 +260,27 @@ namespace RootEngine
 			return NULL;
 		}
 
-		void Animation::SetAiScene(const aiScene* p_aiScene )
+		
+
+		std::vector<glm::mat4> Animation::GetBones()
 		{
-			m_aiScene = p_aiScene;
+			return m_bones;
+		}
+
+		BoneInfo* Animation::GetBoneInfo( unsigned int p_index )
+		{
+			return &m_boneInfo[p_index];
+		}
+
+		void Animation::SetAiImporter( std::shared_ptr<Assimp::Importer> p_aiImporter )
+		{
+			m_bones.resize(m_numBones);
+			m_aiImporter = p_aiImporter;
+		}
+
+		RootEngine::RootAnimation::VertexBoneData* Animation::GetBoneData(unsigned int p_index)
+		{
+			return &m_boneData[p_index];
 		}
 
 	}

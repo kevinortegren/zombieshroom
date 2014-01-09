@@ -15,11 +15,17 @@ namespace Render
 		glm::mat4 m_normal;
 	};
 
+	struct AnimUniforms
+	{
+		std::vector<glm::mat4> m_bones;
+	};
+
 	struct RenderJob
 	{
 		Render::MeshInterface* m_mesh;
 
 		Material* m_material;	
 		Uniforms m_uniforms;
+		AnimUniforms m_animUniforms;
 	};
 }

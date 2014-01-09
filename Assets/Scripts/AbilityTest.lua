@@ -41,7 +41,7 @@ function AbilityTest.OnCreate ()
 	local lightComp		= PointLight.New(entity);
 	lightComp:SetRange(100);
 	lightComp:SetAttenuation(Vec3.New(0, 0.1, 0));
-	lightComp:SetColor(Vec4.New(1,0,0,0));
+	lightComp:SetColor(Vec4.New(1,1,1,0));
 	--]]
 	
 	renderComp:SetModel("Primitives/sphereTangents");

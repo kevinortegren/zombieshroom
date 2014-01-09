@@ -114,7 +114,7 @@ namespace Render
 		Buffer m_uniforms;
 		Buffer m_lights;
 		Buffer m_cameraBuffer;
-	
+		Buffer m_animuniforms;
 		struct
 		{
 			glm::mat4 m_projection;

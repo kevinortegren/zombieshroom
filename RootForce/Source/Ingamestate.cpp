@@ -25,6 +25,7 @@ namespace RootForce
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
+		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
 		//RootForce::TDMRules::SetTypeId(RootForce::ComponentType::TDMRULES);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
@@ -47,7 +48,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        g_engineContext.m_resourceManager->LoadCollada("AnimationClipVersion");
+       // g_engineContext.m_resourceManager->LoadCollada("AnimationReelAllKeys");
         
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
@@ -106,6 +107,12 @@ namespace RootForce
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+
+		// Initialize anim system
+		m_animationSystem = new RootForce::AnimationSystem(g_world);
+		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
+		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
+		
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world);
@@ -224,6 +231,11 @@ namespace RootForce
             m_cameraSystem->Process();
         }
 		
+		{
+			PROFILE("AnimationSystem", g_engineContext.m_profiler);
+			m_animationSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();

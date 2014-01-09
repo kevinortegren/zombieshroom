@@ -214,7 +214,7 @@ namespace Render
 
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
-
+		m_animuniforms.Init(GL_UNIFORM_BUFFER);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -298,6 +298,10 @@ namespace Render
 
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
+			//if((*itr).m_animUniforms.m_bones.size() > 0)
+				
+				//m_animuniforms.BufferData(1, sizeof(AnimUniforms), &(*itr).m_animUniforms);
+
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
 
@@ -309,6 +313,7 @@ namespace Render
 				//TEMP Static set of uniforms/textures.
 
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
+				//glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_animuniforms.GetBufferId());
 
 				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)

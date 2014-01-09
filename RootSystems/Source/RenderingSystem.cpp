@@ -45,11 +45,18 @@ namespace RootForce
 			uniforms.m_world = glm::scale(uniforms.m_world, transform->m_scale);
 			uniforms.m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(uniforms.m_world))));
 
+			Render::AnimUniforms animUniforms;
+			if(renderable->m_model->m_animations.size() > 0)
+			{
+				animUniforms.m_bones = renderable->m_model->m_animations[0]->GetBones();
+			}
+
 			for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)
 			{
 				Render::RenderJob job;
 				job.m_mesh = (*itr);
 				job.m_uniforms = uniforms;
+				job.m_animUniforms = animUniforms;
 				job.m_material = renderable->m_material;
 
 				m_renderer->AddRenderJob(job);

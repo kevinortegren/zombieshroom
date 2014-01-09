@@ -12,6 +12,7 @@
 #include <RootSystems\Include\PlayerSystem.h>
 #include <RootSystems\Include\Network\NetworkComponents.h>
 #include <RootSystems\Include\CollisionSystem.h>
+#include <RootSystems\Include\AnimationSystem.h>
 #endif
 
 namespace RootForce
@@ -34,7 +35,8 @@ namespace RootForce
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
-			SCORE
+			SCORE,
+			ANIMATION
 			//TDMRULES //TODO: name might be inappropriate?
 		};
 	}

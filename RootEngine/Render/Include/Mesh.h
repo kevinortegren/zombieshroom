@@ -34,7 +34,7 @@ namespace Render
 		virtual void CreateVertexBuffer1P1C(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices) = 0;
 		virtual void CreateVertexBuffer1P1N1UV(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices) = 0;
 		virtual void CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices) = 0;
-
+		virtual void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices) = 0;
 
 		//Get functions
 		virtual GLenum GetPrimitiveType() = 0;
@@ -68,7 +68,7 @@ namespace Render
 		void CreateVertexBuffer1P1C(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices);
 		void CreateVertexBuffer1P1N1UV(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices);
 		void CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices);
-
+		void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices);
 		//Get functions
 		GLenum GetPrimitiveType();
 

@@ -53,7 +53,7 @@ namespace RootEngine
 
 		GameSharedContext*			m_context;
 		Model*						m_model; 
-		
+	
 	};
 #endif
 }
