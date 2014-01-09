@@ -87,6 +87,7 @@ namespace RootEngine
 			virtual void Update(float p_dt) = 0;
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
+			virtual void RemoveAll() = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
@@ -190,6 +191,7 @@ namespace RootEngine
 			void SetPosition(int p_objectHandle , glm::vec3 p_position);
 			void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId);
 			void RemoveObject(int p_objectHandle);
+			void RemoveAll();
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
 		private:
