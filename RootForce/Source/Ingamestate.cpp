@@ -116,20 +116,18 @@ namespace RootForce
 
 		//m_worldSystem->CreateWorld( "level" );
 
+		//Set the network context to the matchstatesystem
+		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
-        
 		// Setup the skybox.
 		//auto e = g_world->GetTagManager()->GetEntityByTag("Skybox");
 		//auto r = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(e);
 		//r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
-		m_hud->SetSelectedAbility(0);
+		
 	}
 
 	void IngameState::Enter()
@@ -142,13 +140,27 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 
 		// Load the level and create a world
+
+		//Initialize the debug, setting the html view
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+
+		//Init the hud and set one test ability for now
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetSelectedAbility(0);
 		
         //m_worldSystem->CreateWorld( name );
 	}
 
 	void IngameState::Exit()
 	{
+		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
+		g_engineContext.m_physics->RemoveAll();
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
@@ -156,7 +168,7 @@ namespace RootForce
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			return GameStates::Exit;
+			return GameStates::Menu;
 		}
 
 		// Check for disconnection from the server
@@ -176,10 +188,6 @@ namespace RootForce
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Exit;
-		}
 		m_hud->Update();
 
 #ifdef _DEBUG

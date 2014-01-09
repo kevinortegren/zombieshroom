@@ -61,6 +61,24 @@ $(document).ready(function() {
       3000
     );
   } );
+  
+  $("#lan-list").dblclick(function() {
+	if($("#selected").length < 1)
+      return;
+    $("#overlay").css("display", "table");
+    $("#connecting").css("display", "block");
+    var address = $($("#selected").children()[0]).html().split(":");
+	if(!address[1] || !address[0])
+		return;
+    Menu.Connect(address[1], address[0]);
+    setTimeout( function() {
+        $("#overlay").css("display", "none");
+        $("#connecting").css("display", "none");
+      },
+      3000
+    );
+  } );
+  
   $("#lan-direct").click(function() {
     $("#overlay").css("display", "table");
     $("#lan-direct-popup").css("display", "block");
@@ -101,22 +119,16 @@ $(document).ready(function() {
               );
   } );
 } );
-function Hide()
-{
-  $("body").css("display", "none");
-}
-function Unide()
-{
-  $("body").css("display", "block");
-}
+
 function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
 {
   $("#lan-list").append("<tr><td>"+addr+"</td><td>"+name+"</td><td>"+mapfile+"</td><td>"+players+"</td><td>"+maxplayers+"</td><td>"+ping+"</td><td>"+password+"</td></tr>");
   $("#lan-list").tablesorter();
-  $("#lan-list tr").click(function() {
+  $("#lan-list tr").not("#lan-list thead tr").click(function() {
     $("#selected").attr("id", "");
     $(this).attr("id", "selected");
   } );
+ 
 }
 function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist)
 {

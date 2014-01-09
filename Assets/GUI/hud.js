@@ -47,6 +47,10 @@ function Set(p_id, p_value)
 		var time = parseFloat(value);
 		var minutes = Math.floor(time / 60);
 		var seconds = time - (minutes * 60);
+		if(minutes < 10)
+			minutes = "0" + minutes;
+		if(seconds < 10)
+			seconds = "0" + seconds;
 		value = "" + minutes + ":" + seconds;
 		/*if(parseInt(minutes) < 2) TODO: not working any more, have martins look at it
 			$("#"+p_id).class("blink");

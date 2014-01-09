@@ -31,9 +31,8 @@ namespace RootForce
 	{
 	public:
 		Menu(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext p_context);
+		~Menu();
 		MenuEvent::MenuEvent PollEvent();
-		void Hide();
-		void Unhide();
 		Awesomium::WebView* GetView();
 
 		void AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo);

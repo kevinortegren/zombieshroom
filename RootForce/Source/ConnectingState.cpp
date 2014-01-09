@@ -31,9 +31,8 @@ namespace RootForce
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);;
 			rules->ScoreLimit = p_playData.Killcount;
 			rules->TimeLeft = p_playData.MatchLength;
-			rules->TeamOneScore = 0;
-			rules->TeamTwoScore = 0;
-
+			rules->TeamScore[1] = 0;
+			rules->TeamScore[2] = 0;
 			// Setup server info response
 			RootForce::Network::MessagePlayData response;
 			response.ServerName = p_playData.ServerName.c_str();
@@ -53,8 +52,8 @@ namespace RootForce
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(ruleEntity);;
 			rules->ScoreLimit = 20; //TODO: this will be sent through the  gameState snapshot once this has been implemented
 			rules->TimeLeft = 20;   // hardcoded for now so that the game does not crash
-			rules->TeamOneScore = 0;
-			rules->TeamTwoScore = 0;
+			rules->TeamScore[1] = 0;
+			rules->TeamScore[2] = 0;
 		}
 
 		// Reset the network entity map

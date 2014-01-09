@@ -21,6 +21,8 @@ namespace RootForce
 	{	
 		int Health;
 		int LastDamageSourceID;
+		bool IsDead;
+		bool WantsRespawn;
 	};
 
 	struct Identity : public ECS::Component<Identity>
