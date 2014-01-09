@@ -165,7 +165,7 @@ namespace Render
 		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
-		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 1000.0f);
+		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
 
 		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
@@ -233,6 +233,12 @@ namespace Render
 			PROFILE("Lighting Pass", g_context.m_profiler);
 			LightingPass();	
 		}
+
+		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
+
 	}
 
 	void GLRenderer::Clear()
@@ -306,6 +312,9 @@ namespace Render
 					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
+				glActiveTexture(GL_TEXTURE0 + 5);
+				glBindTexture(GL_TEXTURE_2D, m_gbuffer.m_depthHandle);
+
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
@@ -341,6 +350,11 @@ namespace Render
 	void GLRenderer::LightingPass()
 	{
 		m_lighting.Process();
+	}
+
+	void GLRenderer::ForwardPass()
+	{
+
 	}
 
 	void GLRenderer::RenderLines()

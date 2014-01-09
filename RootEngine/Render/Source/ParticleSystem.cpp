@@ -16,9 +16,9 @@ namespace Render
 		//TODO: Set values from descriptor.
 
 		// Emitter particle.
-		particles[0].m_initialPos = glm::vec3(1, 9.1, 10);
+		particles[0].m_initialPos = glm::vec3(1, 2.0, 10);
 		particles[0].m_initialVel = glm::vec3(0,0,0);
-		particles[0].m_size = glm::vec2(0.3f,0.3f);
+		particles[0].m_size = glm::vec2(1.0f,1.0f);
 		particles[0].m_age = 0.0f;
 		particles[0].m_type = 0;
 

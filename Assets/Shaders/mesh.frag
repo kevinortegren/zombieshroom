@@ -20,5 +20,5 @@ void main()
 
 	diffuse = vec4(frag_color, specTerm);
 	normals = vec3(normal * 0.5 + 0.5);
-	background.w = 0.0f;
+	background = vec4(0.0f);
 }

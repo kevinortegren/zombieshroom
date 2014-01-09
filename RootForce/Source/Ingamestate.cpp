@@ -129,7 +129,7 @@ namespace RootForce
 		
 		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();	
 		e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("particle_diffuse", Render::TextureType::TEXTURE_2D);
+		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
 
 		m_displayPhysicsDebug = false;

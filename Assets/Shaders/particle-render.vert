@@ -9,6 +9,6 @@ layout(location = 4) in float in_type;
 out vec2 vert_scale;
 
 void main(void) {
-    gl_Position = vec4(vec3(in_initialPos), 1);
+    gl_Position = vec4(vec3(in_initialPos), 1.0f);
 	vert_scale = in_scale;
 }

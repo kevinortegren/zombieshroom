@@ -110,6 +110,8 @@ namespace Render
 
 		void GeometryPass();
 		void LightingPass();
+		void ForwardPass();
+
 		void BindMaterial(Material* p_material);
 	
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes

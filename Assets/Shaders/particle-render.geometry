@@ -7,36 +7,58 @@ layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
+	mat4 invView;
+	mat4 invProj;
+	mat4 invViewProj;
 };
 
 in vec2 vert_scale[];
 
 out vec2 gs_TexCoord;
+out vec2 gs_ScreenCoord;
+out float gs_Depth;
 
 void main(void) {
 	
-	vec4 position = viewMatrix * gl_in[0].gl_Position;
-	vec4 corner;
-
+	vec4 positionV = viewMatrix * gl_in[0].gl_Position;
 	vec2 scale = vert_scale[0];
 
-	corner = position + vec4(-scale.x, -scale.y, 0, 0);
-	gl_Position = projectionMatrix * corner;
+    //vec3 cameraPos = vec3(invView[1][4], invView[2][4], invView[3][4]);
+    
+    
+	vec4 corner = positionV + vec4(-scale.x, -scale.y, 0, 0);
+	vec4 positionH = projectionMatrix * corner;
+    gs_ScreenCoord = positionH.xy / positionH.w;
+    gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
+    gs_Depth = corner.z;
+    gl_Position = positionH;
 	gs_TexCoord = vec2(0, 0);
 	EmitVertex();
 
-	corner = position + vec4(scale.x, -scale.y, 0, 0);
-	gl_Position = projectionMatrix * corner;
+	corner = positionV + vec4(scale.x, -scale.y, 0, 0);
+	positionH = projectionMatrix * corner;
+    gs_ScreenCoord = positionH.xy / positionH.w;
+    gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
+    gs_Depth = corner.z;
+    gl_Position = positionH;
 	gs_TexCoord = vec2(1, 0);
 	EmitVertex();
 	
-	corner = position + vec4(-scale.y, scale.x, 0, 0);
-	gl_Position = projectionMatrix * corner;
+	corner = positionV + vec4(-scale.y, scale.x, 0, 0);
+	positionH = projectionMatrix * corner;
+    gs_ScreenCoord = positionH.xy / positionH.w;
+    gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
+    gs_Depth = corner.z;
+    gl_Position = positionH;
 	gs_TexCoord = vec2(0, 1);
 	EmitVertex();
 	
-	corner = position + vec4(scale.x, scale.y, 0, 0);
-	gl_Position = projectionMatrix * corner;
+	corner = positionV + vec4(scale.x, scale.y, 0, 0);
+	positionH = projectionMatrix * corner;
+    gs_ScreenCoord = positionH.xy / positionH.w;
+    gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
+    gs_Depth = corner.z;
+    gl_Position = positionH;
 	gs_TexCoord = vec2(1, 1);
 	EmitVertex();
 	

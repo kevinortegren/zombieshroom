@@ -54,7 +54,7 @@
               type: vertex
             - name: output
               type: fragment
-          blend: 3
+          blend: 2
         - name: output
           shaders:
             - name: output
