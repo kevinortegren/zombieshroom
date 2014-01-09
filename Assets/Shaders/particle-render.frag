@@ -36,5 +36,7 @@ void main(void) {
   
     float depthDiff = a - b;
     
-    color = vec4(frag_color);
+	depthDiff = clamp(depthDiff / 30.0f, 0.0f, 1.0f);
+
+    color = vec4(0,0,1, frag_color.a * depthDiff);
 }

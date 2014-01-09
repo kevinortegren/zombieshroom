@@ -6,7 +6,7 @@
 
 namespace Render
 {
-	void ParticleSystem::Init(GLRenderer* p_renderer, ParticleSystemDescription& p_desc, unsigned p_slot)
+	void ParticleSystem::Init(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc, unsigned p_slot)
 	{
 		m_slot = p_slot;
 
@@ -16,9 +16,9 @@ namespace Render
 		//TODO: Set values from descriptor.
 
 		// Emitter particle.
-		particles[0].m_initialPos = glm::vec3(1, 2.0, 10);
-		particles[0].m_initialVel = glm::vec3(0,0,0);
-		particles[0].m_size = glm::vec2(1.0f,1.0f);
+		particles[0].m_initialPos = p_desc.m_initalPos;
+		particles[0].m_initialVel = p_desc.m_initalVel;
+		particles[0].m_size = p_desc.m_size;
 		particles[0].m_age = 0.0f;
 		particles[0].m_type = 0;
 
@@ -110,7 +110,7 @@ namespace Render
 		m_perFrameBuffer.BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
 	}
 
-	ParticleSystem* ParticleSystemHandler::Create( GLRenderer* p_renderer, ParticleSystemDescription& p_desc )
+	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc)
 	{
 		unsigned slot = m_particleSystemsCount;
 		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
@@ -120,6 +120,7 @@ namespace Render
 		}
 
 		m_particleSystems[slot].Init( p_renderer, p_desc, slot );
+		m_particleSystemsCount++;
 
 		return &m_particleSystems[slot++];
 	}

@@ -440,10 +440,9 @@ namespace Render
 		return std::shared_ptr<Material>(mat); 
 	}
 
-	ParticleSystem* GLRenderer::CreateParticleSystem()
+	ParticleSystem* GLRenderer::CreateParticleSystem(const ParticleSystemDescription& p_desc)
 	{
-		ParticleSystemDescription desc;
-		return m_particles.Create(this, desc);
+		return m_particles.Create(this, p_desc);
 	}
 
 	void GLRenderer::BeginTransform(float dt)

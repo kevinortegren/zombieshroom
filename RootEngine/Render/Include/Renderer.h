@@ -54,7 +54,7 @@ namespace Render
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 
 		// Particle systems.
-		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
 
@@ -98,7 +98,7 @@ namespace Render
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 		std::shared_ptr<Material> CreateMaterial();
 
-		ParticleSystem* CreateParticleSystem();
+		ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc);
 		void BeginTransform(float dt);
 		void EndTransform();
 

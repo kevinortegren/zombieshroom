@@ -123,14 +123,81 @@ namespace RootForce
 
 
 		// Test particle entity.
-		ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
-		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
-		RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		{
+			ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 		
-		e->m_system = g_engineContext.m_renderer->CreateParticleSystem();	
-		e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-		e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-		e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = glm::vec3(0, 0, 0);
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+		{
+			ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = glm::vec3(0, 0, -8);
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+		{
+			ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = glm::vec3(0, 0, 8);
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+		{
+			ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = glm::vec3(-8, 0, 0);
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+		{
+			ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = glm::vec3(8, 0, 0);
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -251,8 +318,8 @@ namespace RootForce
 		{
 			PROFILE("GUI", m_engineContext->m_profiler);
 
-			//m_engineContext->m_gui->Update();
-			//m_engineContext->m_gui->Render();
+			m_engineContext->m_gui->Update();
+			m_engineContext->m_gui->Render();
 		}
         
 		m_engineContext->m_debugOverlay->RenderOverlay();
