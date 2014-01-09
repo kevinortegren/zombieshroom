@@ -13,9 +13,6 @@ namespace RootForce
 	{
         m_workingDir = p_workingDir;
 
-        // Initialize the menu
-        m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
-
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
@@ -24,6 +21,9 @@ namespace RootForce
 	{
 		// Allow the mouse to be moved while in the menu
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
+
+		// Initialize the menu
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
 
 		// Reset the menu
         m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
@@ -41,7 +41,8 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetLanList(nullptr);
 
 		// Free menu resources
-		//m_menu.reset();
+		g_engineContext.m_gui->DestroyView(m_menu->GetView());
+		m_menu.reset();
 	}
 
 	GameStates::GameStates MenuState::Update()
@@ -84,7 +85,6 @@ namespace RootForce
 				m_playData.Killcount = event.data[5].ToInteger();
 				m_playData.MapName = Awesomium::ToString(event.data[6].ToString());
 
-				m_menu->Hide();
 				result = GameStates::Connecting;
 			} break;
 
@@ -95,13 +95,11 @@ namespace RootForce
 				m_playData.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.Port = event.data[0].ToInteger();
 
-				m_menu->Hide();
 				result = GameStates::Connecting;
 			} break;
 
 			default:
 			{
-				m_menu->Unhide();
 				result = GameStates::Menu;
 			} break;
 		}

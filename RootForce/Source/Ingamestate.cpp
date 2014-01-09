@@ -122,17 +122,12 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
-        
 		// Setup the skybox.
 		//auto e = g_world->GetTagManager()->GetEntityByTag("Skybox");
 		//auto r = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(e);
 		//r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
 		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
-		m_hud->SetSelectedAbility(0);
+		
 	}
 
 	void IngameState::Enter()
@@ -145,13 +140,22 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 
 		// Load the level and create a world
+
+		//Initialize the debug, setting the html view
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+
+		//Init the hud and set one test ability for now
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetSelectedAbility(0);
 		
         //m_worldSystem->CreateWorld( name );
 	}
 
 	void IngameState::Exit()
 	{
-
+		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)

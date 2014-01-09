@@ -119,14 +119,7 @@ $(document).ready(function() {
               );
   } );
 } );
-function Hide()
-{
-  $("body").css("display", "none");
-}
-function Unide()
-{
-  $("body").css("display", "block");
-}
+
 function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
 {
   $("#lan-list").append("<tr><td>"+addr+"</td><td>"+name+"</td><td>"+mapfile+"</td><td>"+players+"</td><td>"+maxplayers+"</td><td>"+ping+"</td><td>"+password+"</td></tr>");
