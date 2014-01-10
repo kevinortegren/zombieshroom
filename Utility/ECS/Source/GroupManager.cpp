@@ -37,3 +37,8 @@ ECS::GroupManager::GroupRange ECS::GroupManager::GetEntitiesInGroup(const std::s
 {
 	return m_groups.equal_range(p_group);
 }
+
+void ECS::GroupManager::UnregisterAll()
+{
+	m_groups.clear();
+}

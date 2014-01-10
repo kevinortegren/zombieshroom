@@ -12,3 +12,7 @@
               type: vertex
             - name: 2D_GUI
               type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 3

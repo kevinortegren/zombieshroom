@@ -10,3 +10,4 @@
               type: vertex
             - name: Output
               type: fragment
+        blend: 2

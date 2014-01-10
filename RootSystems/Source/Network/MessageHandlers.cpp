@@ -2,6 +2,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Components.h>
 #include <cassert>
 
 namespace RootForce
@@ -14,8 +15,9 @@ namespace RootForce
 		MessageHandler::~MessageHandler() {}
 
 
-		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world)
+		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, RootEngine::GameSharedContext* p_engineContext, ECS::World* p_world)
 			: MessageHandler(p_peer, p_logger)
+			, m_engineContext(p_engineContext)
 			, m_world(p_world)
 			, m_state(ClientState::UNCONNECTED) {}
 
@@ -39,6 +41,16 @@ namespace RootForce
 			m_playerSystem = p_playerSystem;
 		}
 
+		void ClientMessageHandler::SetWorldSystem(WorldSystem* p_worldSystem)
+		{
+			m_worldSystem = p_worldSystem;
+		}
+
+		const MessagePlayData& ClientMessageHandler::GetServerInfo() const
+		{
+			return m_serverInfo;
+		}
+
 		ClientState::ClientState ClientMessageHandler::GetClientState() const
 		{
 			return m_state;
@@ -51,55 +63,34 @@ namespace RootForce
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "CLIENT: Connection accepted");
-
-					// Create temporary entity for player
-					const std::string PLAYER_NAME = "John Doe"; // TODO: Get this from config/options.
-
-					m_playerSystem->CreatePlayer(0);
-					ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
-					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
-
-					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
-					clientComponent->Name = PLAYER_NAME;
-					clientComponent->State = NetworkClientComponent::EXPECTING_USER_INFO;
-					clientComponent->UserID = -1;
-
-					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
-
-					// Send a user info message to the server
-					MessageUserInfo m;
-					m.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
-					m.PlayerEntity.SynchronizedID = SYNCHRONIZED_ID_NONE;
-					m.PlayerEntity.TemporaryID = tId;
-					m.PlayerName = PLAYER_NAME.c_str();
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) MessageType::UserInfo);
-					m.Serialize(true, &bs);
-
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
-
-					m_state = ClientState::AWAITING_CONFIRMATION;
 				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection refused: server full");
+
+					m_state = ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: booted");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_LOST:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection terminated: connection to server lost");
+
+					m_state = ClientState::CONNECTION_LOST;
 				} return true;
 
 				case ID_CONNECTION_ATTEMPT_FAILED:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Connection attempt failed");
+
+					m_state = ClientState::CONNECTION_FAILED;
 				} return true;
 
 				case ID_UNCONNECTED_PONG:
@@ -143,6 +134,13 @@ namespace RootForce
 							SynchronizedId_t sId = m.UserInfo.PlayerEntity.SynchronizedID;
 							m_networkEntityMap->SetSynchronizedId(tId, sId);
 							m_networkEntityMap->AssociatePlayerEntityWithUserID(m.UserID, entity);
+
+							//Attach components to connected entity
+							RootForce::ScoreComponent* score = m_world->GetEntityManager()->CreateComponent<RootForce::ScoreComponent>(entity);
+							RootForce::Identity* identity = m_world->GetEntityManager()->CreateComponent<RootForce::Identity>(entity);
+							score->Deaths = 0;
+							score->Score = 0;
+							identity->TeamID = 0; // 0 since team has not been chosen yet
 						}
 
 						// Add client specific components
@@ -152,6 +150,16 @@ namespace RootForce
 						clientComponent->UserID = m.UserID;
 
 						NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
+
+						Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
+						
+						Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(entity);
+						renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
+						renderable->m_material = m_engineContext->m_resourceManager->GetMaterial("testchar");
+						renderable->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_normalMap = m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_specularMap = m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Remote player connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
@@ -178,9 +186,49 @@ namespace RootForce
 						// Log the connection
 						m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "We have connected (ID: %d, Name: %s)", m.UserID, m.UserInfo.PlayerName.C_String());
 
-						// We're connected
 						m_state = ClientState::CONNECTED;
+
 					}
+				} return true;
+
+				case MessageType::PlayData:
+				{
+					m_serverInfo.Serialize(false, p_bs);
+					
+					// Create the world
+					// TODO: Consider that a server will be creating an instance of the world itself. Hence, a local client will have duplicates.
+					std::string levelName;
+					levelName = m_serverInfo.MapName;
+					levelName = levelName.substr(0, levelName.size() - std::string(".world").size());
+					m_worldSystem->CreateWorld(levelName);
+
+
+					// Create temporary entity for player
+					const std::string PLAYER_NAME = "John Doe"; // TODO: Get this from config/options.
+
+					m_playerSystem->CreatePlayer(0);
+					ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
+					TemporaryId_t tId = m_networkEntityMap->AddEntity(entity);
+
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<NetworkClientComponent>(entity);
+					clientComponent->Name = PLAYER_NAME;
+					clientComponent->State = NetworkClientComponent::EXPECTING_USER_INFO;
+					clientComponent->UserID = -1;
+
+					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
+
+					// Send a user info message to the server
+					MessageUserInfo m;
+					m.PlayerEntity.EntityType = EntityCreated::TYPE_PLAYER;
+					m.PlayerEntity.SynchronizedID = SYNCHRONIZED_ID_NONE;
+					m.PlayerEntity.TemporaryID = tId;
+					m.PlayerName = PLAYER_NAME.c_str();
+
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::UserInfo);
+					m.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				} return true;
 
 				case MessageType::UserDisconnected:
@@ -188,6 +236,28 @@ namespace RootForce
 					// Another client has disconnected
 					MessageUserDisconnected m;
 					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetPlayerEntityFromUserID(m.UserID);
+					NetworkClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<NetworkClientComponent>(entity);
+					
+					m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client (ID: %d, Name: %s) disconnected", m.UserID, clientComponent->Name.c_str());
+					
+					m_world->GetEntityManager()->RemoveAllComponents(entity);
+					m_world->GetEntityManager()->RemoveEntity(entity);
+				} return true;
+
+				case MessageType::HACK_TransformUpdate:
+				{
+					HACK_MessageTransformUpdate m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.EntityID);
+					if (entity != nullptr)
+					{
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
+					}
 				} return true;
 			}
 
@@ -206,6 +276,11 @@ namespace RootForce
 			m_networkEntityMap = p_networkEntityMap;
 		}
 
+		void ServerMessageHandler::SetPlayDataResponse(const MessagePlayData& p_response)
+		{
+			m_response = p_response;
+		}
+
 		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
 			switch (p_id)
@@ -213,6 +288,13 @@ namespace RootForce
 				case ID_NEW_INCOMING_CONNECTION:
 				{
 					m_logger->LogText(LogTag::NETWORK, LogLevel::SUCCESS, "SERVER: Client connected (%s)", p_packet->systemAddress.ToString());
+
+					// Send server info
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::PlayData);
+					m_response.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
@@ -269,10 +351,6 @@ namespace RootForce
 					MessageUserInfo m;
 					m.Serialize(false, p_bs);
 
-
-					
-
-
 					// Create a synchronized entity for the connected player.
 					// If loopback, we need to check if a temporary entity exists also
 					ECS::Entity* entity = nullptr;
@@ -302,6 +380,8 @@ namespace RootForce
 					clientComponent->UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
 					NetworkComponent* networkComponent = m_world->GetEntityManager()->CreateComponent<NetworkComponent>(entity);
+
+					Transform* transform = m_world->GetEntityManager()->CreateComponent<Transform>(entity);
 
 					// Get a list of the connected players
 					DataStructures::List<RakNet::SystemAddress> connectedAddresses;
@@ -360,6 +440,33 @@ namespace RootForce
 							n.Serialize(true, &bs);
 
 							m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+						}
+					}
+				} return true;
+
+				case MessageType::HACK_TransformUpdate:
+				{
+					HACK_MessageTransformUpdate m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = m_networkEntityMap->GetSynchronizedEntity(m.EntityID);
+					if (entity != nullptr)
+					{
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
+
+						// Get a list of the connected players
+						DataStructures::List<RakNet::SystemAddress> connectedAddresses;
+						DataStructures::List<RakNet::RakNetGUID> connectedGUIDs;
+						m_peer->GetSystemList(connectedAddresses, connectedGUIDs);
+
+						for (unsigned int i = 0; i < connectedAddresses.Size(); ++i)
+						{
+							if (connectedAddresses[i] != p_packet->systemAddress)
+							{
+								m_peer->Send(p_bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, connectedAddresses[i], false);
+							}
 						}
 					}
 				} return true;

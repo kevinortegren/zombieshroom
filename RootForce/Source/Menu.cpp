@@ -9,6 +9,10 @@ namespace RootForce
 	{
 		m_view = p_view;
 		m_context = p_context;
+		/*while(m_view->IsLoading())
+		{
+
+		}*/
 
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("Menu"));
 
@@ -23,17 +27,10 @@ namespace RootForce
 		m_view->Focus();
 	}
 
-	void RootForce::Menu::Hide()
+	Menu::~Menu()
 	{
-		m_view->ExecuteJavascript(Awesomium::WSLit("Hide();"), Awesomium::WebString());
-		//m_view->PauseRendering(); // Calling this should save some processing power, but it doesn't wait until the view is updated as transparent
-		m_view->ReduceMemoryUsage();
 	}
-	void RootForce::Menu::Unhide()
-	{
-		m_view->ExecuteJavascript(Awesomium::WSLit("Unhide();"), Awesomium::WebString());
-		//m_view->ResumeRendering();
-	}
+
 	Awesomium::WebView* RootForce::Menu::GetView()
 	{
 		return m_view;

@@ -13,9 +13,6 @@ namespace RootForce
 	{
         m_workingDir = p_workingDir;
 
-        // Initialize the menu
-        m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
-
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
@@ -25,11 +22,24 @@ namespace RootForce
 		// Allow the mouse to be moved while in the menu
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
+		// Initialize the menu
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
+
 		// Reset the menu
         m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
 		// Destroy any existing server
 		m_networkContext.m_server.reset();
+		m_networkContext.m_client.reset();
+		m_networkContext.m_clientMessageHandler.reset();
+
+		//Setup network client so we can search for lan-servers
+		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+		m_networkContext.m_server = nullptr;
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_engineContext.m_logger, &g_engineContext, g_world));
+		m_networkContext.m_serverMessageHandler = nullptr;
+		m_networkContext.m_networkEntityMap = nullptr;
+		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler
 		m_networkContext.m_clientMessageHandler->SetLanList(m_lanList.get());
@@ -41,7 +51,8 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetLanList(nullptr);
 
 		// Free menu resources
-		//m_menu.reset();
+		g_engineContext.m_gui->DestroyView(m_menu->GetView());
+		m_menu.reset();
 	}
 
 	GameStates::GameStates MenuState::Update()
@@ -82,8 +93,8 @@ namespace RootForce
 				m_playData.MaxPlayers = event.data[3].ToInteger();
 				m_playData.MatchLength = event.data[4].ToInteger();
 				m_playData.Killcount = event.data[5].ToInteger();
+				m_playData.MapName = Awesomium::ToString(event.data[6].ToString());
 
-				m_menu->Hide();
 				result = GameStates::Connecting;
 			} break;
 
@@ -94,13 +105,11 @@ namespace RootForce
 				m_playData.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.Port = event.data[0].ToInteger();
 
-				m_menu->Hide();
 				result = GameStates::Connecting;
 			} break;
 
 			default:
 			{
-				m_menu->Unhide();
 				result = GameStates::Menu;
 			} break;
 		}

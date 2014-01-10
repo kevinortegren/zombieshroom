@@ -5,6 +5,7 @@
 #include <RootSystems\Include\LightSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\PhysicsSystem.h>
+#include <RootSystems\Include\ParticleSystem.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems\Include\ScriptSystem.h>
@@ -25,7 +26,7 @@ namespace RootForce
 			TRANSFORM,
 			POINTLIGHT,
 			CAMERA,
-			PLAYER,
+			HEALTH,
 			PLAYERCONTROL,
 			PHYSICS,
 			NETWORK,
@@ -35,9 +36,13 @@ namespace RootForce
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
+			ANIMATION,
+			PARTICLE,
 			SCORE,
-			ANIMATION
-			//TDMRULES //TODO: name might be inappropriate?
+			ABILITY,
+			IDENTITY,
+			TDMRULES //TODO: name might be inappropriate?
+
 		};
 	}
 }

@@ -13,7 +13,7 @@ namespace RootForce
 		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
         RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
         RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
         RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
         RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
         RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
@@ -26,7 +26,11 @@ namespace RootForce
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
 		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
-		//RootForce::TDMRules::SetTypeId(RootForce::ComponentType::TDMRULES);
+		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
+		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
+		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
+		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -48,7 +52,6 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-       // g_engineContext.m_resourceManager->LoadCollada("AnimationReelAllKeys");
         
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
@@ -82,9 +85,6 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for updating the world.
-		m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world));
-
 		// System responsible for executing script based on actions.
 		m_scriptSystem = new RootForce::ScriptSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
@@ -112,34 +112,20 @@ namespace RootForce
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
-		
+
+		m_particleSystem = new RootForce::ParticleSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
 
 		// Initialize camera systems.
-		m_cameraSystem = new RootForce::CameraSystem(g_world);
+		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
-		m_lookAtSystem = new RootForce::LookAtSystem(g_world);
+		m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
-		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world);
+		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-        // Create a world (defer creation of player to the network)
-		// WARNING: This means a player is not guaranteed to exist until an accept message is received.
-        m_worldSystem->CreateWorld("level");
-
 		m_displayPhysicsDebug = false;
-		m_displayNormals = false;
-
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
-        
-		// Setup the skybox.
-		//auto e = g_world->GetTagManager()->GetEntityByTag("Skybox");
-		//auto r = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(e);
-		//r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
-		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
-		m_hud->SetSelectedAbility(0);
+		m_displayNormals = false;		
 	}
 
 	void IngameState::Enter()
@@ -150,26 +136,90 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
+
+		// Load the level and create a world
+
+		//Initialize the debug, setting the html view
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+
+		//Init the hud and set one test ability for now
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
+		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetSelectedAbility(0);
+
+		//Set the network context to the matchstatesystem
+		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
+		/* TEMP FROM HERE: */
+		
+		// Test positions:
+		glm::vec3 pos[5] = { 
+			glm::vec3(0,0,0),
+			glm::vec3(0,0,-8),
+			glm::vec3(0,0,8),
+			glm::vec3(8,0,0),
+			glm::vec3(-8,0,0)
+		};
+
+		for(int i = 0; i < 5; i++)
+		{
+			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = pos[i];
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+
+		/* TEMP END. */
 	}
 
 	void IngameState::Exit()
-	{
+		{
+		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
-	}
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
+		g_engineContext.m_physics->RemoveAll();
+		}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
+		// Check for quitting condition
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			return GameStates::Menu;
+	}
+
+		// Check for disconnection from the server
+		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
+	{
+			return GameStates::Menu;
+		}
+		
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<Player>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
+		//Update all the data that is displayed in the HUD
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Exit;
-		}
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
+		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+
 		m_hud->Update();
+
+#ifdef _DEBUG
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -185,15 +235,18 @@ namespace RootForce
 			}
 		}
 
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			g_engineContext.m_resourceManager->ReloadAllScripts();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 				g_engineContext.m_renderer->DisplayNormals(false);
+#endif
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			g_engineContext.m_resourceManager->ReloadAllScripts();
+		
 		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
-				m_playerControlSystem->Process();
+			m_playerControlSystem->Process();
 		}
 
         {
@@ -231,6 +284,11 @@ namespace RootForce
             m_cameraSystem->Process();
         }
 		
+		{ 
+			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			m_particleSystem->Process();
+		}
+
 		{
 			PROFILE("AnimationSystem", g_engineContext.m_profiler);
 			m_animationSystem->Process();
@@ -240,6 +298,7 @@ namespace RootForce
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
+
 		}
 
 		{
@@ -251,6 +310,9 @@ namespace RootForce
 			PROFILE("Render Lines", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->RenderLines();
 		}
+
+		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+		m_sharedSystems.m_matchStateSystem->Process();
         
         g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
@@ -261,11 +323,11 @@ namespace RootForce
 			g_engineContext.m_gui->Render(m_hud->GetView());
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
-		
+        
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
-		}
+	}
 		return GameStates::Ingame;
 	}
 }

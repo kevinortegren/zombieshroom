@@ -9,6 +9,7 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
@@ -43,15 +44,17 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		RootForce::ScriptSystem* m_scriptSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;
 		RootForce::RenderingSystem* m_renderingSystem;
 		RootForce::PointLightSystem* m_pointLightSystem;
+		RootForce::ParticleSystem* m_particleSystem;
 		RootForce::CameraSystem* m_cameraSystem;
 		RootForce::LookAtSystem* m_lookAtSystem;
 		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
 		RootForce::AnimationSystem* m_animationSystem;
+		RootForce::MatchStateSystem* m_gameLogicSystem;
+
 	};
 }

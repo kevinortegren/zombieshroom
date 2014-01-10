@@ -17,7 +17,7 @@ void Render::Buffer::Init(GLenum p_type)
 void Render::Buffer::BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data)
 {
 	glBindBuffer(m_type, m_id);
-	glBufferData(m_type, p_elementCount * p_elementSize, p_data, GL_STATIC_DRAW);
+	glBufferData(m_type, p_elementCount * p_elementSize, p_data, GL_DYNAMIC_DRAW);
 
 	m_numElements = p_elementCount;
 	m_size = p_elementCount * p_elementSize;

@@ -81,7 +81,7 @@ void Main::Start()
 {
 	// Register the components the server uses
     RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-    RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+    RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
     RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
     RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
     RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
@@ -90,19 +90,27 @@ void Main::Start()
     RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
     RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 
-	// Initialize the server
-	m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
-	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(m_engineContext.m_logger, "Dedicated Server", 5567));
-	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), m_engineContext.m_logger, &m_world));
-	m_serverMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
-	m_server->SetMessageHandler(m_serverMessageHandler.get());
-
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );
 		
 	// Load the server config file
 	RootSystems::ServerConfig conf = RootServer::ConfigLoader(m_engineContext.m_logger).Load(m_workingDir + "server.conf");
 	
+	RootForce::Network::MessagePlayData response;
+	response.ServerName = "Dedicated Server";
+	response.MapName = conf.LevelFile.c_str();
+	response.MaxPlayers = (uint8_t) conf.MaxPlayers;
+	response.MatchLength = (uint16_t) conf.MatchTime;
+	response.KillCount = (uint8_t) conf.KillCount;
+
+	// Initialize the server
+	m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(m_engineContext.m_logger, "Dedicated Server", 5567));
+	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), m_engineContext.m_logger, &m_world));
+	m_serverMessageHandler->SetNetworkEntityMap(m_networkEntityMap.get());
+	m_serverMessageHandler->SetPlayDataResponse(response);
+	m_server->SetMessageHandler(m_serverMessageHandler.get());
+
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
 	while (m_running)

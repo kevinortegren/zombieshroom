@@ -9,6 +9,7 @@ uniform sampler2D g_Specular;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec3 normals;
+layout (location = 2) out vec4 background;
 
 void main()
 {
@@ -19,4 +20,5 @@ void main()
 
 	diffuse = vec4(frag_color, specTerm);
 	normals = vec3(normal * 0.5 + 0.5);
+	background = vec4(0.0f);
 }

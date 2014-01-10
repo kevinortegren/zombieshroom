@@ -23,6 +23,7 @@ namespace ECS
 
 		Entity* CreateEntity();
 		void RemoveEntity(ECS::Entity* p_entity);
+		void RemoveAllEntitiesAndComponents();
 
 		template<class T> 
 		T* CreateComponent(Entity* p_entity)

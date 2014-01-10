@@ -41,12 +41,23 @@ function OnLoad()
 
 function Set(p_id, p_value)
 {
-	$("#"+p_id).html(p_value);
-	if(p_id == "timeleft")
-		if(parseInt(p_value.split(':')[0]) < 2)
+	var value = p_value;
+	if(p_id == "TimeLeft")
+	{
+		var time = parseFloat(value);
+		var minutes = Math.floor(time / 60);
+		var seconds = time - (minutes * 60);
+		if(minutes < 10)
+			minutes = "0" + minutes;
+		if(seconds < 10)
+			seconds = "0" + seconds;
+		value = "" + minutes + ":" + seconds;
+		/*if(parseInt(minutes) < 2) TODO: not working any more, have martins look at it
 			$("#"+p_id).class("blink");
 		else
-			$("#"+p_id).class("");
+			$("#"+p_id).class("");*/
+	}
+	$("#"+p_id).html(value);
 }
 
 function SetAbility(p_slot, p_ability)

@@ -10,7 +10,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-		int a = 0;
+		
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -59,6 +59,7 @@ namespace RootForce
 				job.m_uniforms = uniforms;
 				job.m_animUniforms = animUniforms;
 				job.m_material = renderable->m_material;
+				job.m_renderPass = renderable->m_pass;
 
 				m_renderer->AddRenderJob(job);
 			}
