@@ -124,7 +124,7 @@ namespace RootEngine
 				positions.push_back(v.m_pos);
 			}
 
-			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
+			mesh->CreateVertexBuffer1P1N1UV1T1BT1BID1W(&vertices[0], vertices.size());	
 
 		}
 		else if(p_aiMesh->HasTangentsAndBitangents())
@@ -293,13 +293,9 @@ namespace RootEngine
 			//Great code for converting atMatrix4x4 to glm::mat4x4!
 			aiMatrix4x4 am = p_aiMesh->mBones[i]->mOffsetMatrix;
 			glm::mat4x4 gm = glm::mat4x4();
-			gm[0][0] = am.a1; gm[0][1] = am.b1; gm[0][2] = am.c1; gm[0][3] = am.d1;
-			gm[1][0] = am.a2; gm[1][1] = am.b2; gm[1][2] = am.c2; gm[1][3] = am.d2;
-			gm[2][0] = am.a3; gm[2][1] = am.b3; gm[2][2] = am.c3; gm[2][3] = am.d3;
-			gm[3][0] = am.a4; gm[3][1] = am.b4; gm[3][2] = am.c4; gm[3][3] = am.d4;
-
+			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
 			animation->MapBone(boneName, boneIndex);
-			animation->GetBoneInfo(boneIndex)->m_boneOffset = gm;
+			animation->GetBoneInfo(boneIndex)->m_boneOffset = glm::transpose(gm);
 
 			//Loop through all weights in the bone and add weights and bone data to vertex slot
 			for(unsigned int j = 0; j < p_aiMesh->mBones[i]->mNumWeights; j++)

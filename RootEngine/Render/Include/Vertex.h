@@ -54,7 +54,7 @@ namespace Render
 
 	struct Vertex1P1N1UV1T1BT1BID1W : public Vertex1P1N1UV1T1BT
 	{
-		glm::ivec4 m_boneIDs;
+		glm::uvec4 m_boneIDs;
 		glm::vec4 m_weights;
 	};
 }

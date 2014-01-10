@@ -17,7 +17,7 @@ namespace Render
 
 	struct AnimUniforms
 	{
-		std::vector<glm::mat4> m_bones;
+		glm::mat4 m_bones[20];
 	};
 
 	struct RenderJob

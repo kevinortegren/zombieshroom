@@ -48,7 +48,8 @@ namespace RootForce
 			Render::AnimUniforms animUniforms;
 			if(renderable->m_model->m_animations.size() > 0)
 			{
-				animUniforms.m_bones = renderable->m_model->m_animations[0]->GetBones();
+				for(unsigned int i = 0; i < renderable->m_model->m_animations[0]->GetNumBones(); i++)
+					animUniforms.m_bones[i] = renderable->m_model->m_animations[0]->GetBones().at(i);
 			}
 
 			for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)

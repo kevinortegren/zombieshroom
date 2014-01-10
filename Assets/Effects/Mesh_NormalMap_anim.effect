@@ -6,6 +6,8 @@
           slot: 0
         - name: PerObject
           slot: 1
+        - name: PerAnimation
+          slot: 6
       PerObject:
           - sem: WORLD
             type: mat4

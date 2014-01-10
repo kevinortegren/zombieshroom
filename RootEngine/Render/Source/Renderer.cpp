@@ -298,9 +298,8 @@ namespace Render
 
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
-			//if((*itr).m_animUniforms.m_bones.size() > 0)
-				
-				//m_animuniforms.BufferData(1, sizeof(AnimUniforms), &(*itr).m_animUniforms);
+			//if((*itr).m_animUniforms.m_bones > 0)
+			m_animuniforms.BufferData(1, sizeof(AnimUniforms), &(*itr).m_animUniforms);
 
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
@@ -311,9 +310,9 @@ namespace Render
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
 				//TEMP Static set of uniforms/textures.
-
+				
 				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
-				//glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_animuniforms.GetBufferId());
+				glBindBufferBase(GL_UNIFORM_BUFFER, 6, m_animuniforms.GetBufferId());
 
 				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)

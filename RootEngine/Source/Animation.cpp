@@ -1,5 +1,5 @@
 #include <RootEngine/Include/Animation.h>
-
+#include <iostream>
 namespace RootEngine
 {
 	namespace RootAnimation
@@ -76,45 +76,43 @@ namespace RootEngine
 		void Animation::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
 		{    
 			std::string NodeName(pNode->mName.data);
-
+			//std::cout << NodeName << "\n";
+			if(NodeName == "Mesh2q" || NodeName == "Character1_Reference")
+				return;
 			const aiAnimation* pAnimation = m_aiImporter->GetScene()->mAnimations[0];
 			
 			
 			aiMatrix4x4 am = pNode->mTransformation;
 			glm::mat4x4 gm = glm::mat4x4();
-			gm[0][0] = am.a1; gm[0][1] = am.b1; gm[0][2] = am.c1; gm[0][3] = am.d1;
-			gm[1][0] = am.a2; gm[1][1] = am.b2; gm[1][2] = am.c2; gm[1][3] = am.d2;
-			gm[2][0] = am.a3; gm[2][1] = am.b3; gm[2][2] = am.c3; gm[2][3] = am.d3;
-			gm[3][0] = am.a4; gm[3][1] = am.b4; gm[3][2] = am.c4; gm[3][3] = am.d4;
-
-			glm::mat4 NodeTransformation(gm);
+			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
+			glm::mat4 NodeTransformation(glm::transpose(gm));
 
 			const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
 			if (pNodeAnim) 
 			{
+				
 				// Interpolate scaling and generate scaling transformation matrix
 				aiVector3D Scaling;
 				CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-				glm::mat4 ScalingM = glm::translate(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));
+				glm::mat4 ScalingM = glm::scale(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));
 				// Interpolate rotation and generate rotation transformation matrix
 				aiQuaternion RotationQ;
 				CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
 				aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
-				glm::mat3x3 gm3 = glm::mat3x3();
-				gm3[0][0] = am3.a1; gm3[0][1] = am3.b1; gm3[0][2] = am3.c1; 
-				gm3[1][0] = am3.a2; gm3[1][1] = am3.b2; gm3[1][2] = am3.c2; 
-				gm3[2][0] = am3.a3; gm3[2][1] = am3.b3; gm3[2][2] = am3.c3; 
-				
-				glm::mat4 RotationM = glm::mat4(gm);
+				glm::mat3 gm3 = glm::mat3();
+
+				memcpy(&gm3[0][0], &am3[0][0], sizeof(aiMatrix3x3));
+			
+				glm::mat4 RotationM = glm::mat4(glm::transpose(gm3));
 
 				// Interpolate translation and generate translation transformation matrix
 				aiVector3D Translation;
 				CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-				glm::mat4 TranslationM = glm::translate(glm::mat4(1.0f), glm::vec3(Translation.x, Translation.y, Translation.z)) ;
-
+				glm::mat4 TranslationM = glm::translate(glm::mat4(1.0f), glm::vec3(Translation.x, Translation.y, Translation.z));
+				
 				// Combine the above transformations
-				NodeTransformation = TranslationM * RotationM * ScalingM;
+				NodeTransformation =  TranslationM * RotationM * ScalingM ; 
 			}
 
 			glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
@@ -276,6 +274,10 @@ namespace RootEngine
 		{
 			m_bones.resize(m_numBones);
 			m_aiImporter = p_aiImporter;
+			aiMatrix4x4 am = m_aiImporter->GetScene()->mRootNode->mChildren[0]->mTransformation;
+			glm::mat4x4 gm = glm::mat4x4();
+			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
+			m_globalInverseTransform = glm::transpose(gm);
 		}
 
 		RootEngine::RootAnimation::VertexBoneData* Animation::GetBoneData(unsigned int p_index)

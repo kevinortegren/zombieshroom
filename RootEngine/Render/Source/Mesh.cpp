@@ -78,8 +78,8 @@ namespace Render
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 6 * sizeof(float));
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 8 * sizeof(float));
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 11 * sizeof(float));
-		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 5, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 14 * sizeof(unsigned int));
-		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 18 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 5, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 14 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 18 * sizeof(unsigned int));
 	}
 
 	void Mesh::Bind()
