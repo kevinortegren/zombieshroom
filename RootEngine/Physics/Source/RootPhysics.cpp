@@ -13,6 +13,27 @@ namespace RootEngine
 
 namespace Physics
 {
+
+	struct RayAgainstStaticCast : public btCollisionWorld::ClosestRayResultCallback
+	{
+		RayAgainstStaticCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
+		{
+
+		}
+		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
+		{
+			CustomUserPointer* ptr = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
+			if (ptr->m_type == PhysicsType::TYPE_STATIC)
+			{
+				return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+			}
+			else
+			{
+				return 1.0f;
+			}
+		}
+	};
+
 	RootEngine::SubsystemSharedContext g_context;
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
@@ -85,9 +106,9 @@ namespace Physics
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
 			return false;
-		if(!pointer1->m_modelHandle.compare("ground0"))
+		if(pointer1->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj1,p_obj2, p_id1,p_index1);
-		else if(!pointer2->m_modelHandle.compare("ground0"))
+		else if(pointer2->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
 
 		if(pointer1->m_collidedEntityId != nullptr)
@@ -103,10 +124,6 @@ namespace Physics
 		}
 
 
-		if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_PLAYER)
-			if(pointer1->m_type == PhysicsType::TYPE_ABILITY || pointer2->m_type == PhysicsType::TYPE_ABILITY )
-				int thisIsOnlyHereSoWeCanBreakHereIfWeWant = 2;
-
 		return true;
 	}
 
@@ -118,7 +135,7 @@ namespace Physics
 		m_dispatcher = new btCollisionDispatcher(m_collisionConfig);
 		m_broadphase = new btDbvtBroadphase();
 		//m_broadphase = new btAxisSweep3(btVector3(-1000,-1000,-1000), btVector3(1000,1000,1000));
-		m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+		m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback()); //TODO:: We should send in a member variable so we can delete it in deconstructor
 		m_solver = new btSequentialImpulseConstraintSolver();
 		m_dynamicWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfig);
 		m_dynamicWorld->setGravity(btVector3(0.0f, -9.82f, 0.0f));
@@ -132,7 +149,7 @@ namespace Physics
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 		
-		
+		//m_dynamicWorld->getSolverInfo().m_numIterations = 4;
 		//btSetDebugDrawer(m_debugDrawer);
 
 	}
@@ -149,7 +166,7 @@ namespace Physics
 		{
 			m_playerObjects.at(i)->Update(m_dt);
 		}
-		
+
 		if(m_debugDrawEnabled)
 			m_dynamicWorld->debugDrawWorld();
 		
@@ -205,6 +222,40 @@ namespace Physics
 	}
 
 
+	void RootPhysics::RemoveAll()
+	{
+		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
+		{
+			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
+			btRigidBody* body = btRigidBody::upcast(obj);
+			if (body && body->getMotionState())
+			{
+				delete body->getMotionState();
+			}
+			if(body && body->getCollisionShape())
+			{
+				btCollisionShape* temp = body->getCollisionShape();
+				delete temp;
+			}
+			m_dynamicWorld->removeCollisionObject( obj );
+			delete obj;
+		}
+		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
+		{
+			KinematicController* temp = m_playerObjects[i];
+			delete temp;
+		}
+		for(unsigned int i = 0; i < m_userPointer.size(); i++)
+		{
+			CustomUserPointer* temp = m_userPointer[i];
+			delete temp;
+		}
+		m_dynamicObjects.clear();
+		m_playerObjects.clear();
+		m_userPointer.clear();
+
+	}
+
 	int* RootPhysics::CreateHandle( unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled )
 	{
 		CustomUserPointer* userPointer = new CustomUserPointer();
@@ -251,8 +302,8 @@ namespace Physics
 			m_dynamicWorld->addRigidBody(body);
 			m_dynamicObjects.push_back(body);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				body->setActivationState(DISABLE_DEACTIVATION);
+			/*if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				body->setActivationState(DISABLE_DEACTIVATION);*/
 			body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 			return;
 		}
@@ -550,7 +601,7 @@ namespace Physics
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-
+	
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
@@ -786,7 +837,7 @@ namespace Physics
 		m_playerObjects.at(index)->Jump();
 	}
 	
-	void RootPhysics::PlayerKnockback( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
+	void RootPhysics::KnockbackObject( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -794,7 +845,18 @@ namespace Physics
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		btVector3 temp = btVector3(p_pushDirection[0], p_pushDirection[1], p_pushDirection[2]);
 		temp.normalize();
-		m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->Knockback(temp, p_pushForce);
+		}
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
+		{
+			m_dynamicObjects.at(index)->setLinearVelocity(temp*p_pushForce);
+		}
+		else 
+		{
+			return; //Controlled object, how to knockback? Velocity variable?
+		}
 	}
 
 	bool RootPhysics::DoesObjectExist( int p_objectHandle )
@@ -1170,6 +1232,14 @@ namespace Physics
 	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId )
 	{
 		m_userPointer.at(p_objectHandle)->m_collidedEntityId = p_enityCollidedId;
+	}
+
+	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
+	{
+		RayAgainstStaticCast rayResult;
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_endPos[0], p_endPos[1], p_endPos[2]), rayResult);
+
+		return rayResult.m_closestHitFraction;
 	}
 
 }

@@ -42,7 +42,7 @@ public:
 		if (dotUp < m_minSlopeDot) {
 			return btScalar(1.0);
 		}
-
+		
 		return ClosestConvexResultCallback::addSingleResult (convexResult, normalInWorldSpace);
 	}
 protected:
@@ -54,6 +54,7 @@ protected:
 BulletCharacter::BulletCharacter( btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btScalar p_stepHeight ) : btKinematicCharacterController(p_ghostObject,p_convexShape,p_stepHeight)
 {
 	m_addedMargin = 0.02f;
+	m_hasBeenKnockbacked = false;
 }
 
 BulletCharacter::~BulletCharacter( void )
@@ -81,7 +82,7 @@ void BulletCharacter::playerStep( btCollisionWorld* collisionWorld, btScalar dt 
 	
 	// vertical velocity or vertical offset != 0?
 	m_wasOnGround = onGround();
-	if(m_wasOnGround)
+	if(m_wasOnGround && m_hasBeenKnockbacked)
 	{
 		m_knockbackVelocity.setZero();
 		m_hasBeenKnockbacked = false;

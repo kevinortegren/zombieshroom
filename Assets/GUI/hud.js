@@ -39,7 +39,44 @@ function OnLoad()
 	});
 }
 
-function SetHealth(p_health)
+function Set(p_id, p_value)
 {
-	
+	var value = p_value;
+	if(p_id == "TimeLeft")
+	{
+		var time = parseFloat(value);
+		var minutes = Math.floor(time / 60);
+		var seconds = time - (minutes * 60);
+		if(minutes < 10)
+			minutes = "0" + minutes;
+		if(seconds < 10)
+			seconds = "0" + seconds;
+		value = "" + minutes + ":" + seconds;
+		/*if(parseInt(minutes) < 2) TODO: not working any more, have martins look at it
+			$("#"+p_id).class("blink");
+		else
+			$("#"+p_id).class("");*/
+	}
+	$("#"+p_id).html(value);
 }
+
+function SetAbility(p_slot, p_ability)
+{
+	$("#slot"+p_slot).css("background-image", "url('"+p_ability+".png')");
+}
+
+function SetAbilityFocus(p_slot)
+{
+	$(".slotselected").removeClass("slotselected");
+	$("#slot"+p_slot).addClass("slotselected");
+}
+function StartCooldown(p_slot, p_duration)
+{
+	$("#slot"+p_slot+"-cooldown").css("background-position", "50% 0px");
+	$("#slot"+p_slot+"-cooldown").animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
+}
+
+// $(document).ready(function(){
+	// SetAbilityFocus(0);
+	// SetAbility(1, "TestBall");
+// });

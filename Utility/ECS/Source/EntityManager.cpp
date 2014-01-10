@@ -46,3 +46,14 @@ std::vector<std::shared_ptr<ECS::ComponentInterface>>& ECS::EntityManager::GetCo
  {  
 	 return m_components[p_typeId]; 
 }
+
+void ECS::EntityManager::RemoveAllEntitiesAndComponents()
+{
+	int size = m_entities.size();
+	for(int i = m_entities.size() - 1; i > -1; i--)
+	{
+		RemoveAllComponents(m_entities[i].get());
+		m_recyledIds.push(m_entities[i]->GetId());
+	}
+	m_entities.clear();
+}

@@ -29,7 +29,7 @@ namespace RootEngine
 			virtual void Initialize(int p_width, int p_height) = 0;
 
 			virtual void Update() = 0;
-			virtual void Render() = 0;
+			virtual void Render(Awesomium::WebView* p_view) = 0;
 
 			//loads a single .html file into the view new view and returns the view
 			virtual Awesomium::WebView* LoadURL(std::string p_path) = 0;
@@ -51,7 +51,7 @@ namespace RootEngine
 
 			void Initialize(int p_width, int p_height);
 			void Update();
-			void Render();
+			void Render(Awesomium::WebView* p_view);
 			Awesomium::WebView* LoadURL(std::string p_path);
 			void DestroyView(Awesomium::WebView* p_view);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }

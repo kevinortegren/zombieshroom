@@ -9,7 +9,6 @@
   <body>
     <div id="main-menu" class="verticaltablehax"><div class="verticalcenterhax">
       <div id="main-wrapper">
-        <h1 class="textcenter blink">Root Force</h1>
         <input id="main-play" type="submit" class="main-button" value="Play" />
         <input id="main-options" type="submit" class="main-button" value="Options" />
         <input id="main-exit" type="submit" class="main-button" value="Exit" />
@@ -17,9 +16,9 @@
     </div></div>
     
     <div id="lan-menu" class="verticaltablehax"><div class="verticalcenterhax">
-      <div id="lan-wrapper">
+      <div id="lan-wrapper" >
         <div id="lan-list-wrapper">
-          <table id="lan-list" class="tablesorter-green">
+          <table id="lan-list"  class="tablesorter-green" >
             <thead><tr><td>Address</td><td style="width:230px;overflow:hidden;">Name</td><td style="width:70px;overflow:hidden;">Map</td><td>Players</td><td>Max Players</td><td>Ping</td><td>Password</td></tr></thead>
           </table>
         </div>
@@ -34,7 +33,7 @@
     
     <div id="options-menu" class="verticaltablehax"><div class="verticalcenterhax">
       <div id="options-wrapper">
-        <h1 class="textcenter blink">Options</h1>
+        <h1 class="textcenter">Options</h1>
         <input disabled id="options-player" type="submit" class="main-button" value="Player" />
         <input disabled id="options-graphics" type="submit" class="main-button" value="Graphics" />
         <input disabled id="options-sound" type="submit" class="main-button" value="Sound" />
@@ -50,7 +49,6 @@
         IP: <input type="text" id="lan-direct-input" value="127.0.0.1:5567"/> <input type="submit" class="button" id="lan-direct-submit" value="Connect" />
       </div>
       
-      <img src="http://jimpunk.net/Loading/wp-content/uploads/loading83.gif" id="connecting" class="popup" />
       
       <div id="lan-host-overlay" class="popup">
         <div id="lan-host-close" class="close">[Close]</div>
@@ -66,7 +64,6 @@
         <div><div class="inline-100px">Match Length</div><input disabled type="number" id="lan-host-matchlength" /></div>
         <div><div class="inline-100px">Kill Victory</div><input disabled type="number" id="lan-host-killvictory" /></div>
         <div><div class="inline-100px"></div><input type="submit" class="button" id="lan-host-submit" value="Host" /></div>
-        <div class="clear">Fix default values through C++? Also check for values existing, else use default.</div>
       </div>
     <div></div>
   </body>

@@ -25,7 +25,7 @@ namespace RootForce
 			TRANSFORM,
 			POINTLIGHT,
 			CAMERA,
-			PLAYER,
+			HEALTH,
 			PLAYERCONTROL,
 			PHYSICS,
 			NETWORK,
@@ -35,7 +35,11 @@ namespace RootForce
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
-			PARTICLE
+			PARTICLE,
+			SCORE,
+			ABILITY,
+			IDENTITY,
+			TDMRULES //TODO: name might be inappropriate?
 		};
 	}
 }

@@ -9,6 +9,7 @@
 
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 
 
@@ -28,6 +29,7 @@ private:
 	RootEngine::GameSharedContext m_engineContext;
 
 	ECS::World m_world;
+	std::shared_ptr<RootForce::Network::NetworkEntityMap> m_networkEntityMap;
 	std::shared_ptr<RootForce::Network::Server> m_server;
 	std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 

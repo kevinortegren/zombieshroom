@@ -6,15 +6,14 @@
 #include <RootSystems/Include/Transform.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
-extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
 	class CameraSystem : public ECS::EntitySystem
 	{
 	public:
-		CameraSystem(ECS::World* p_world)
-			: ECS::EntitySystem(p_world) 
+		CameraSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world), m_engineContext(p_engineContext)
 		{
 			SetUsage<Camera>();
 			SetUsage<Transform>();
@@ -47,14 +46,15 @@ namespace RootForce
 				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
 				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)g_engineContext.m_renderer->GetWidth(), (float)g_engineContext.m_renderer->GetHeight(), camera->m_near, camera->m_far);
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_near, camera->m_far);
 
-				g_engineContext.m_renderer->SetViewMatrix(viewMatrix);
-				g_engineContext.m_renderer->SetProjectionMatrix(projectionMatrix);
+				m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
+				m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
 			}
 		}
 
 	private:
+		RootEngine::GameSharedContext* m_engineContext;
 		ECS::ComponentMapper<Camera> m_cameras;
 		ECS::ComponentMapper<Transform> m_transforms;
 	};
@@ -71,8 +71,8 @@ namespace RootForce
 		//This system reorients all entities that have lookat behaviors
 		//so that they always point to their respective targets
 	public:
-		LookAtSystem(ECS::World* p_world)
-			: ECS::EntitySystem(p_world) 
+		LookAtSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world) , m_engineContext(p_engineContext)
 		{
 			SetUsage<Transform>();
 			SetUsage<LookAtBehavior>();
@@ -101,17 +101,18 @@ namespace RootForce
 						Orientation* tOr = &targetTransform->m_orientation;
 						targetPosition = targetTransform->m_position;
 						targetPosition += tOr->GetRight() * -lookAtBehavior->m_displacement.x + tOr->GetUp() * lookAtBehavior->m_displacement.y + tOr->GetFront() * lookAtBehavior->m_displacement.z;
-						transform->m_orientation.LookAt(targetPosition - transform->m_position, glm::vec3(0.0f, 1.0f, 0.0f));
+						transform->m_orientation.LookAt(targetPosition - transform->m_position, tOr->GetUp());
 					}
 					else
 					{
-						g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "LookAtBehavior target is missing a transform component!");
+						m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "LookAtBehavior target is missing a transform component!");
 					}
 				}
 			}
 		}
 
 	private:
+		RootEngine::GameSharedContext* m_engineContext;
 		ECS::ComponentMapper<Transform> m_transforms;
 		ECS::ComponentMapper<LookAtBehavior> m_lookAtBehaviors;
 	};
@@ -129,8 +130,8 @@ namespace RootForce
 		//This system positions an entity so that it follows another entity,
 		//this is used for the camera.
 	public:
-		ThirdPersonBehaviorSystem(ECS::World* p_world)
-			: ECS::EntitySystem(p_world) 
+		ThirdPersonBehaviorSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world), m_engineContext(p_engineContext)
 		{
 			SetUsage<Transform>();
 			SetUsage<ThirdPersonBehavior>();
@@ -162,17 +163,19 @@ namespace RootForce
 						localDisplacement.z = -thirdPersonBehavior->m_distance;
 						glm::vec3 worldDisplacement;
 						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-						transform->m_position = targetPosition + worldDisplacement;
+						float distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
+						transform->m_position = targetPosition + worldDisplacement*distFrac;
 					}
 					else
 					{
-						g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "ThirdPersonBehavior target is missing a transform component!");
+						m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "ThirdPersonBehavior target is missing a transform component!");
 					}
 				}
 			}
 		}
 
 	private:
+		RootEngine::GameSharedContext* m_engineContext;
 		ECS::ComponentMapper<Transform> m_transforms;
 		ECS::ComponentMapper<ThirdPersonBehavior> m_thirdPersonBehaviors;
 		glm::ivec2 m_deltaMouseMovement;

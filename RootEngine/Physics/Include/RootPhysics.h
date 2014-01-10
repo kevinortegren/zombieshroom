@@ -87,10 +87,15 @@ namespace RootEngine
 			virtual void Update(float p_dt) = 0;
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
+			virtual void RemoveAll() = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
 			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
+
+			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
+
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
 			virtual int* AddStaticObjectToWorld( unsigned int p_entityId) = 0; ///Legacy func, will be removed before release
@@ -146,9 +151,11 @@ namespace RootEngine
 			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
-			void PlayerKnockback(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
+			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
+
+			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 
 			int* CreateHandle(unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
@@ -184,6 +191,7 @@ namespace RootEngine
 			void SetPosition(int p_objectHandle , glm::vec3 p_position);
 			void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId);
 			void RemoveObject(int p_objectHandle);
+			void RemoveAll();
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }
 
 		private:

@@ -1,5 +1,6 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Transform.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <stdexcept>
@@ -8,8 +9,9 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Client::Client(Logging* p_logger)
-			: m_logger(p_logger)
+		Client::Client(Logging* p_logger, ECS::World* p_world)
+			: m_world(p_world)
+			, m_logger(p_logger)
 			, m_peer(nullptr)
 			, m_messageHandler(nullptr)
 			, m_chatSystem(nullptr)
@@ -53,16 +55,46 @@ namespace RootForce
 			m_chatSystem = p_chatSystem;
 		}
 
+		void Client::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
+		{
+			m_networkEntityMap = p_networkEntityMap;
+		}
+
 		void Client::Update()
 		{
-			for (RakNet::Packet* packet = m_peer->Receive(); packet; m_peer->DeallocatePacket(packet), packet = m_peer->Receive())
+			// Store all incoming packets in a temporary list (to defer parsing of packets that arrive during parsing)
+			std::vector<RakNet::Packet*> packets;
+			for (RakNet::Packet* packet = m_peer->Receive(); packet; packet = m_peer->Receive())
 			{
+				packets.push_back(packet);
+			}
+
+			// Parse all incoming packets
+			for (size_t i = 0; i < packets.size(); ++i)
+			{
+				RakNet::Packet* packet = packets[i];
+
 				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
 				bs.Read(id);
 
 				if (m_messageHandler != nullptr)
-					m_messageHandler->ParsePacket(id, &bs, packet);
+				{
+					if (!m_messageHandler->ParsePacket(id, &bs, packet))
+					{
+						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Message handler neglected to parse message with ID: %u", id);
+					}
+				}
+				else
+				{
+					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: No message handler to parse message with ID: %u", id);
+				}
+			}
+
+			// Deallocate the temporary list
+			for (size_t i = 0; i < packets.size(); ++i)
+			{
+				m_peer->DeallocatePacket(packets[i]);
 			}
 
 			// Send a chat message
@@ -79,6 +111,26 @@ namespace RootForce
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) MessageType::ChatToServer);
 					c.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+				}
+			}
+
+			// HACK: Send transform updates
+			{
+				ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
+				if (e != nullptr)
+				{
+					Transform* t = m_world->GetEntityManager()->GetComponent<Transform>(e);
+
+					HACK_MessageTransformUpdate m;
+					m.EntityID = m_networkEntityMap->GetSynchronizedId(e);
+					m.Position = t->m_position;
+					m.Orientation = t->m_orientation.GetQuaternion();
+
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) MessageType::HACK_TransformUpdate);
+					m.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				}

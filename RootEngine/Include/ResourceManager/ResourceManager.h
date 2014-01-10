@@ -31,6 +31,7 @@ namespace RootEngine
 			virtual std::string ForceLoadScript(std::string p_scriptName) = 0;
 			virtual std::string LoadScript(std::string p_scriptName) = 0;
 			virtual std::string GetScript(std::string p_scriptName) = 0;
+			virtual void		ReloadAllScripts() = 0;
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
@@ -70,6 +71,7 @@ namespace RootEngine
 			std::string ForceLoadScript(std::string p_scriptName);
 			std::string LoadScript(std::string p_scriptName);
 			std::string GetScript(std::string p_scriptName);
+			void		ReloadAllScripts();
 		#endif
 
 		Model* CreateModel(const std::string& p_path);

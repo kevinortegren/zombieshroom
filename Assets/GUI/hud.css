@@ -1,15 +1,50 @@
+@font-face
+{
+	font-family: 'Sherwood';
+	src: url("SHERWOOD.TTF");
+}
+
 body
 {
-	font-family: Comic Sans MS;
+	font-family: Sherwood;
 	font-size: 12px;
 	color: white;
 	margin: 0;
 }
-
-#statusbar
+img
 {
-	background-color:rgba(255,127,190,0.5);
+	vertical-align: middle;
+	display: inline-block;
+}
+@-webkit-keyframes blinker
+{  
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+.blink
+{
+  -webkit-animation: blinker 1s linear infinite alternate;
+}
+#score
+{
+	position: absolute;
+	top:0;
+	left:0;
 	height: 75px;
+	width: 220px;
+	padding: 5px;
+	background-color: rgba(60,60,60,0.5);
+	font-size: 32px;
+}
+#timeleft
+{
+	width: 120px;
+	height: 50px;
+	margin: auto;
+	text-align: center;
+	background-color: rgba(60,60,60,0.5);
+	font-size: 32px;
 }
 #chatbody
 {
@@ -20,13 +55,15 @@ body
 	position: absolute;
 	top: 100%;
 	left: 0;
-	margin-top: -285px;
-	margin-left: 25px;
+	margin-top: -210px;
+	margin-left: 10px;
+	z-index: 500;
 }
 #chatlog
 {
 	height: 180px;
 	overflow: hidden;
+	font-family: Comic Sans MS;
 }
 #chatinput
 {
@@ -37,15 +74,15 @@ body
 	font-family: Comic Sans MS;
 	color: white;
 }
-#health
+#healthcontainer
 {
 	position: absolute;
-	width: 150px;
+	width: 180px;
 	height: 60px;
 	left: 100%;
 	margin-left: -200px;
 	top: 100%;
-	margin-top: -145px;
+	margin-top: -85px;
 	//background-color:rgba(50,45,255,0.5);
 	color: rgba(255,45,57,0.5);
 	font-size: 50px;
@@ -58,13 +95,56 @@ body
 	top: 100%;
 	width: 100%;
 	margin-top: -75px;
-	background-color:rgba(127,190,255,0.5);
 	height: 75px;
+	text-align: center;
+	overflow: hidden;
+}
+.slot
+{
+	background-color:rgba(60,60,60,0.4);
+	width: 71px;
+	height: 71px;
+	border: 2px solid rgba(0,0,0,0);
+	font-size: 18px;
+	margin: 0 5px;
+	display: inline-block;
+	text-align: right;
+	background-image: url('empty.png');
+	background-repeat: no-repeat;
+	background-position: -2px -2px;
+}
+.slotselected
+{
+	border: 2px solid white;
+}
+.cooldown
+{
+	padding: 50px 5px 0 5px;
+	width: 61px;
+	height: 21px;
+	overflow: hidden;
+	background-image: url('cooldown.png');
+	background-size: 75px 75px;
+	background-repeat: no-repeat;
+	background-position: 50% 75px;
+}
+
+.verticaltablehax
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.verticalcenterhax
+{
+  display: table-cell;
+  vertical-align: middle;
 }
 
 :not(input)
 {
 	-webkit-user-select: none;
-	-moz-user-select: none;
-	user-select: none;
 }

@@ -59,6 +59,28 @@ namespace RootForce
 				return it->second;
 		}
 
+		ECS::Entity* NetworkEntityMap::GetTemporaryEntity(TemporaryId_t p_temporaryId) const
+		{
+			auto it = m_temporaryEntityMap.find(p_temporaryId);
+			if (it == m_temporaryEntityMap.end())
+				return nullptr;
+			else
+				return it->second;
+		}
+
+		void NetworkEntityMap::AssociatePlayerEntityWithUserID(int8_t p_userId, ECS::Entity* p_entity)
+		{
+			m_playerEntityMap[p_userId] = p_entity;
+		}
+
+		ECS::Entity* NetworkEntityMap::GetPlayerEntityFromUserID(int8_t p_userId) const
+		{
+			auto it = m_playerEntityMap.find(p_userId);
+			if (it == m_playerEntityMap.end())
+				return nullptr;
+			return it->second;
+		}
+
 		SynchronizedId_t NetworkEntityMap::NextSynchronizedId()
 		{
 			return m_nextSynchronizedId++;

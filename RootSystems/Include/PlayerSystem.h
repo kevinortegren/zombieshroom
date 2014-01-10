@@ -17,21 +17,41 @@ namespace RootForce
 		};
 	}
 
-	struct Player : public ECS::Component<Player>
+	struct HealthComponent : public ECS::Component<HealthComponent>
+	{	
+		int Health;
+		int LastDamageSourceID;
+		bool IsDead;
+		bool WantsRespawn;
+	};
+
+	struct Identity : public ECS::Component<Identity>
 	{
-		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> m_abilities;
-		Abilitiy::Ability m_selectedAbility;
+		std::string Name; 
+		int TeamID;
+	};
+
+	struct UserAbility : public ECS::Component<UserAbility>
+	{
+		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
+		Abilitiy::Ability SelectedAbility;
+	};
+
+	struct ScoreComponent : public ECS::Component<ScoreComponent>
+	{
+		int Score;
+		int Deaths;
 	};
 
 	class PlayerSystem : public ECS::VoidSystem
 	{
 	public:
-		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_gameSharedContext)
+		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world)
-			, m_gameSharedContext(p_gameSharedContext) {}
-		void CreatePlayer();
+			, m_engineContext(p_engineContext) {}
+		void CreatePlayer(int p_teamID);
 		void Process();
 	private:
-		RootEngine::GameSharedContext* m_gameSharedContext;
+		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

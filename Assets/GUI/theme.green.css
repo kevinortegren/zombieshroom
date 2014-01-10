@@ -11,7 +11,7 @@
 }
 .tablesorter-green th,
 .tablesorter-green td {
-	font: 12px/18px Arial, Sans-serif;
+	font: 12px/18px;/* Arial, Sans-serif;*/
 	border: #cdcdcd 1px solid;
 	border-width: 0 1px 1px 0;
 }

@@ -1,20 +1,29 @@
+@font-face
+{
+	font-family: 'Sherwood';
+	src: url("SHERWOOD.TTF");
+}
+
 body, input
 {
   padding: 0;
   margin: 0;
-  font-family: Comic Sans MS;
+  font-family: Sherwood;
 }
 body
 {
-  background-image: url('TygartsStateForest.jpg');
+  background-image: url('menubackground.jpg');
+  background-position: 50% 50%;
+  background-size: 100% 100%;
 }
 *
 {
   -webkit-user-select: none;
 }
-input
+input[type=text], input[type=password], input[type=number]
 {
   -webkit-user-select: text;
+  min-width: 150px;
 }
 a
 {
@@ -64,14 +73,25 @@ a
 }
 .button
 {
-  width: 100px;
+  width: 140px;
   height: 25px;
-  border: 1px solid #666666;
+  border: 0;
   margin: 2px;
+  background: transparent url('menubutton.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
+}
+.button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 .button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 #selected
 {
@@ -108,6 +128,7 @@ a
 {
   width: 300px;
   margin: auto;
+  color: #FFFFFF;
 }
 .main-button
 {
@@ -115,12 +136,28 @@ a
   height: 50px;
   display: block;
   margin: 10px auto 10px auto;
-  border: 1px solid #666666;
+  border: 0;
+  color: #FFFFFF;
   font-size: 24px;
+  background: transparent url('menubutton.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
+}
+.main-button[disabled]
+{
+  color: #AAAAAA;
+}
+.main-button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 .main-button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 #options-menu,
 #lan-menu
@@ -129,7 +166,7 @@ a
 }
 #lan-wrapper
 {
-  width: 800px;
+  width: 1200px;
   border: 1px solid #666666;
   padding: 5px;
   margin: auto;
