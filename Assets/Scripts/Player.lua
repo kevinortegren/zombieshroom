@@ -22,11 +22,7 @@ end
 
 
 function Player.OnCollide (args)
-	if args[1] ~= 3 then
-		local playerEnt = Entity.GetEntityByTag("Player");
-		local handle = playerEnt:GetCollision():GetHandle();
-		playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,1,0), 10);
-	end
+
 end
 
 function Player.OnDestroy ()
