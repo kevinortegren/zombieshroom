@@ -153,6 +153,7 @@ void Export()
 			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
 			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
+			//Herp
 		}
 		else
 		{
