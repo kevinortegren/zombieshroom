@@ -12,9 +12,11 @@
         - name: g_Diffuse
           slot: 0
         - name: g_Normals
-          slot: 1 
+          slot: 1
         - name: g_Depth
           slot: 2
+        - name: g_Background
+          slot: 3
       programs:
         - name: ambient
           shaders:
@@ -25,6 +27,7 @@
           depth:
             write: 0
             test: 0
+          blend: 2
         - name: directional
           shaders:
             - name: directional
@@ -34,6 +37,7 @@
           depth:
             write: 0
             test: 0
+          blend: 2
         - name: pointlight
           shaders:
             - name: pointlight
@@ -43,3 +47,18 @@
           depth:
             write: 0
             test: 0
+          blend: 2
+        - name: background
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          blend: 2
+        - name: output
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          blend: 2

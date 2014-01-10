@@ -5,6 +5,7 @@
 #include <RootSystems\Include\LightSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\PhysicsSystem.h>
+#include <RootSystems\Include\ParticleSystem.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems\Include\ScriptSystem.h>
@@ -34,6 +35,7 @@ namespace RootForce
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
+			PARTICLE,
 			SCORE,
 			ABILITY,
 			IDENTITY,

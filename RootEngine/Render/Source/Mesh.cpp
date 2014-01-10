@@ -5,6 +5,11 @@ namespace Render
 	Mesh::Mesh()
 		: m_primitive(GL_TRIANGLES) {}
 
+	Mesh::~Mesh()
+	{
+		glDeleteTransformFeedbacks(1, &m_transformFeedback);
+	}
+
 	void Mesh::CreateIndexBuffer(unsigned int* p_indices, unsigned int p_numberOfIndices)
 	{
 		m_elementBuffer->Init(GL_ELEMENT_ARRAY_BUFFER);
@@ -97,7 +102,14 @@ namespace Render
 
 	void Mesh::DrawInstanced(GLsizei p_instances)
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+	}
+
+	void Mesh::DrawTransformFeedback()
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
+
+		glDrawTransformFeedback(m_primitive, m_transformFeedback);
 	}
 
 	GLenum Mesh::GetPrimitiveType()
@@ -105,9 +117,19 @@ namespace Render
 		return m_primitive;
 	}
 
+	GLuint Mesh::GetTransformFeedback()
+	{
+		return m_transformFeedback;
+	}
+
 	void Mesh::SetPrimitiveType( GLenum p_type )
 	{
 		m_primitive = p_type;
+	}
+
+	void Mesh::SetTransformFeedback()
+	{
+		glGenTransformFeedbacks(1, &m_transformFeedback);
 	}
 
 	void Mesh::SetElementBuffer(std::shared_ptr<BufferInterface> p_buffer)

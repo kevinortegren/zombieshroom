@@ -1,6 +1,7 @@
 #include <RootEngine/Include/EffectImporter.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/Semantics.h>
+#include <functional>
 
 #include <RootEngine/Include/Logging/Logging.h>
 extern Logging g_logger;
@@ -24,8 +25,9 @@ namespace RootEngine
 		const YAML::Node& techniques = p_node["techniques"];
 		for(size_t i = 0; i < techniques.size(); ++i)
 		{
-			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique();
+			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique(m_renderer);
 
+			//TODO: Use params instead.
 			std::string techniqueName;
 			techniques[i]["name"] >> techniqueName;
 
@@ -33,6 +35,7 @@ namespace RootEngine
 			const YAML::Node& programs = techniques[i]["programs"];
 			for(size_t j = 0; j < programs.size(); ++j)
 			{
+				//TODO: Use the resource manager to share programs between effects.
 				std::shared_ptr<Render::Program> program = technique->CreateProgram();
 
 				program->CreateProgram();
@@ -66,34 +69,47 @@ namespace RootEngine
 
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());
-
 				}
 
+				if(programs[j].FindValue("feedback"))
+				{
+					std::vector<std::string> varyingsVector;
+					const YAML::Node& varyings = programs[i]["feedback"];
+					for(int k = 0; k < varyings.size(); k++)
+					{
+						std::string varying;
+						varyings[k]["name"] >> varying;
+						varyingsVector.push_back(varying);
+					}
+					std::vector<const char*> varingsChar;
+					varingsChar.reserve(varyingsVector.size());
+					std::transform(std::begin(varyingsVector), std::end(varyingsVector), 
+						 std::back_inserter(varingsChar), std::mem_fn(&std::string::c_str));
 
+					glTransformFeedbackVaryings(program->GetHandle(), varingsChar.size(), varingsChar.data(), GL_INTERLEAVED_ATTRIBS);
+				}
 
-				if(programs[i].FindValue("blend"))
+				if(programs[j].FindValue("blend"))
 				{
 					int blendType;
-					programs[i]["blend"] >> blendType;
+					programs[j]["blend"] >> blendType;
 					program->m_blendState = (Render::Program::BlendState)blendType;
 				}
-
-				
-				if(programs[i].FindValue("depth"))
+	
+				if(programs[j].FindValue("depth"))
 				{
 					int depthWrite;
-					programs[i]["depth"]["write"] >> depthWrite;			
+					programs[j]["depth"]["write"] >> depthWrite;			
 					program->m_depthState.depthWrite = depthWrite != 0;
 					
 					int depthTest;
-					programs[i]["depth"]["test"] >> depthTest;		
+					programs[j]["depth"]["test"] >> depthTest;		
 					program->m_depthState.depthTest = depthTest != 0;
 				}
 
 				program->Compile();
 				program->Apply();
 
-				// Create uniform buffer for this technique.
 				const YAML::Node& uniforms = techniques[i]["uniforms"];
 				for(size_t j = 0; j < uniforms.size(); ++j)
 				{
@@ -105,19 +121,35 @@ namespace RootEngine
 
 					// Bind shader name to slot.
 					program->BindUniformBuffer(name, slot);
-
-					// Create the buffer.
-					std::pair<int, std::shared_ptr<Render::BufferInterface>> bufferPair;
-
-					std::shared_ptr<Render::BufferInterface> buffer = m_renderer->CreateBuffer();
-					buffer->Init(GL_UNIFORM_BUFFER);
-
-					bufferPair.first = slot;
-					bufferPair.second = buffer;
-
-					technique->m_uniforms.push_back(bufferPair);
 				}
 		
+				const YAML::Node& texture = techniques[i]["textures"];
+				for(size_t j = 0; j < texture.size(); ++j)
+				{
+					std::string name;
+					texture[j]["name"] >> name;
+					
+					int slot;
+					texture[j]["slot"] >> slot;
+
+					program->BindTexture(name, slot);
+				}
+
+				if(techniques[i].FindValue("flags") != nullptr)
+				{
+					const YAML::Node& flags = techniques[i]["flags"];
+					for(size_t j = 0; j < flags.size(); ++j)
+					{
+						std::string name;
+						flags[j]["name"] >> name;
+
+						if(name == "RenderIgnore")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
+						}
+					}
+				}
+
 				if(techniques[i].FindValue("PerObject") != nullptr)
 				{
 					const YAML::Node& perObjects = techniques[i]["PerObject"];
@@ -137,18 +169,6 @@ namespace RootEngine
 						// Store the space based on semantic.
 						technique->m_data[Render::Semantic::WORLD] = size;
 					}
-				}
-
-				const YAML::Node& texture = techniques[i]["textures"];
-				for(size_t j = 0; j < texture.size(); ++j)
-				{
-					std::string name;
-					texture[j]["name"] >> name;
-					
-					int slot;
-					texture[j]["slot"] >> slot;
-
-					program->BindTexture(name, slot);
 				}
 			}
 		}

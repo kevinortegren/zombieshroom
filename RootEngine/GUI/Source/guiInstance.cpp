@@ -88,17 +88,11 @@ namespace RootEngine
 
 			glActiveTexture(GL_TEXTURE0);
 
-			glDisable(GL_DEPTH_TEST);
-			//glDisable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
 			//for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 			//{
 				SurfaceToTexture((GLTextureSurface*)p_view->surface());
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			//}
-
-			glEnable(GL_DEPTH_TEST);
 
 			glBindVertexArray(0);
 		}

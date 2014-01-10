@@ -28,6 +28,7 @@ namespace RootForce
 		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
 		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
 		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
+		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -106,6 +107,9 @@ namespace RootForce
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
 
+		m_particleSystem = new RootForce::ParticleSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
+
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
@@ -114,20 +118,8 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
-		//m_worldSystem->CreateWorld( "level" );
-
-		//Set the network context to the matchstatesystem
-		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-
 		m_displayPhysicsDebug = false;
-		m_displayNormals = false;
-
-		// Setup the skybox.
-		//auto e = g_world->GetTagManager()->GetEntityByTag("Skybox");
-		//auto r = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(e);
-		//r->m_material.m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(
-		//	"SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-		
+		m_displayNormals = false;		
 	}
 
 	void IngameState::Enter()
@@ -148,12 +140,43 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
 		m_hud->SetAbility(1, "TestBall");
 		m_hud->SetSelectedAbility(0);
+
+		//Set the network context to the matchstatesystem
+		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
+		/* TEMP FROM HERE: */
 		
-        //m_worldSystem->CreateWorld( name );
+		// Test positions:
+		glm::vec3 pos[5] = { 
+			glm::vec3(0,0,0),
+			glm::vec3(0,0,-8),
+			glm::vec3(0,0,8),
+			glm::vec3(8,0,0),
+			glm::vec3(-8,0,0)
+		};
+
+		for(int i = 0; i < 5; i++)
+		{
+			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
+			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
+		
+			Render::ParticleSystemDescription desc;
+			desc.m_initalPos = pos[i];
+			desc.m_initalVel = glm::vec3(0,0,0);
+			desc.m_size = glm::vec2(0.05f, 0.05f);
+
+			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+		}
+
+		/* TEMP END. */
 	}
 
 	void IngameState::Exit()
-	{
+		{
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
@@ -161,7 +184,7 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-	}
+		}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
@@ -169,11 +192,11 @@ namespace RootForce
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			return GameStates::Menu;
-		}
+	}
 
 		// Check for disconnection from the server
 		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
-		{
+	{
 			return GameStates::Menu;
 		}
 		
@@ -217,7 +240,7 @@ namespace RootForce
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
-				m_playerControlSystem->Process();
+			m_playerControlSystem->Process();
 		}
 
         {
@@ -255,10 +278,16 @@ namespace RootForce
             m_cameraSystem->Process();
         }
 		
+		{ 
+			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			m_particleSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
+
 		}
 
 		{
@@ -283,11 +312,11 @@ namespace RootForce
 			g_engineContext.m_gui->Render(m_hud->GetView());
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
-		
+        
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
-		}
+	}
 		return GameStates::Ingame;
 	}
 }

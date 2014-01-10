@@ -7,7 +7,6 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
-
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -57,8 +56,6 @@ namespace Render
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
-		: m_numDirectionalLights(0),
-		m_numPointLights(0) 
 	{
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::INIT_PRINT, "Renderer subsystem initialized!");
 	}
@@ -153,41 +150,13 @@ namespace Render
 		// Setup GBuffer.
 		m_gbuffer.Init(width, height);
 
-		// Setup fullscreen quad.
-		Render::Vertex1P1UV verts[4];
-		verts[0].m_pos = glm::vec3(-1.0f, -1.0f, 0.0f);
-		verts[1].m_pos = glm::vec3(+1.0f, -1.0f, 0.0f);
-		verts[2].m_pos = glm::vec3(-1.0f, +1.0f, 0.0f);
-		verts[3].m_pos = glm::vec3(+1.0f, +1.0f, 0.0f);
-
-		verts[0].m_UV = glm::vec2(0.0f, 0.0f);
-		verts[1].m_UV = glm::vec2(1.0f, 0.0f);
-		verts[2].m_UV = glm::vec2(0.0f, 1.0f);
-		verts[3].m_UV = glm::vec2(1.0f, 1.0f);
-		
-		unsigned int indices[6];
-		indices[0] = 0; 
-		indices[1] = 1; 
-		indices[2] = 2;
-		indices[3] = 2;
-		indices[4] = 1; 
-		indices[5] = 3;
-
-		m_fullscreenQuad.SetVertexBuffer(CreateBuffer());
-		m_fullscreenQuad.SetElementBuffer(CreateBuffer());
-		m_fullscreenQuad.SetVertexAttribute(CreateVertexAttributes());
-
-		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
-		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
+		// Setup lighting device.
+		m_lighting.Init(this, width, height);
 
 		m_lineMesh.SetVertexBuffer(CreateBuffer());
 		m_lineMesh.SetVertexAttribute(CreateVertexAttributes());
 		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
-
-		// Load effects.	
-		auto deferred = g_context.m_resourceManager->LoadEffect("Deferred");
-		m_lightingTech = deferred->GetTechniques()[0];
 
 		auto m_debugEffect = g_context.m_resourceManager->LoadEffect("Color");
 		m_debugTech = m_debugEffect->GetTechniques()[0];
@@ -196,7 +165,7 @@ namespace Render
 		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
-		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 1000.0f);
+		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
 
 		m_cameraVars.m_invView = glm::inverse(m_cameraVars.m_view);
 		m_cameraVars.m_invProj = glm::inverse(m_cameraVars.m_projection);
@@ -207,14 +176,11 @@ namespace Render
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cameraBuffer.GetBufferId());
 
-		// Light uniforms.
-		m_lights.Init(GL_UNIFORM_BUFFER);
-		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
-		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
-
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
 
+		// Particle System handler.
+		m_particles.Init();
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -236,21 +202,19 @@ namespace Render
 		
 	}
 
+	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
+	{
+		m_lighting.SetAmbientLight(p_color);
+	}
+
 	void GLRenderer::AddDirectionalLight(const DirectionalLight& p_light, int index)
 	{
-		m_lightVars.m_dlights[index] = p_light;
-		m_numDirectionalLights++;
+		m_lighting.AddDirectionalLight(p_light, index);
 	}
 
 	void GLRenderer::AddPointLight(const PointLight& p_light, int index)
 	{
-		m_lightVars.m_plights[index] = p_light;
-		m_numPointLights++;
-	}
-
-	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
-	{
-		m_lightVars.m_ambient = p_color;
+		m_lighting.AddPointLight(p_light, index);
 	}
 
 	void GLRenderer::AddLine( glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color )
@@ -269,15 +233,18 @@ namespace Render
 			PROFILE("Lighting Pass", g_context.m_profiler);
 			LightingPass();	
 		}
+
+		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
+
 	}
 
 	void GLRenderer::Clear()
 	{
 		glDepthMask(GL_TRUE);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//m_numDirectionalLights = 0;
-		m_numPointLights = 0;
 	}
 
 	void GLRenderer::Swap()
@@ -291,24 +258,26 @@ namespace Render
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
-		glDisable(GL_BLEND);
-
 		// Bind GBuffer.
 		m_gbuffer.Bind();
+
+		std::sort(m_jobs.begin(), m_jobs.end(), [](RenderJob& a, RenderJob& b)->bool{ return a.m_renderPass < b.m_renderPass; });
 
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			// Buffer object uniforms.
 			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
 
 			(*itr).m_mesh->Bind();
 			Material* mat = (*itr).m_material;
 
 			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
 			{
-				//TEMP Static set of uniforms/textures.
+				if(((*itrT)->m_flags & Render::TechniqueFlags::RENDER_IGNORE) == Render::TechniqueFlags::RENDER_IGNORE)
+					continue;
 
-				glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
+				//TEMP Static set of uniforms/textures.
 
 				glActiveTexture(GL_TEXTURE0 + 0);
 				if((*itr).m_material->m_diffuseMap != nullptr)
@@ -343,18 +312,29 @@ namespace Render
 					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
+				glActiveTexture(GL_TEXTURE0 + 5);
+				glBindTexture(GL_TEXTURE_2D, m_gbuffer.m_depthHandle);
+
 				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
 				{
 					// Apply program.
 					(*itrP)->Apply();
-					(*itr).m_mesh->Draw();			
+
+					if(((*itr).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+					{
+						(*itr).m_mesh->DrawTransformFeedback();
+					}
+					else
+					{
+						(*itr).m_mesh->Draw();		
+					}
 				}
 
 				// Debug.
 				if(m_displayNormals)
 				{
 					m_normalTech->GetPrograms()[0]->Apply();	
-					(*itr).m_mesh->Draw();	
+					//(*itr).m_mesh->Draw();	
 				}
 			}
 
@@ -369,31 +349,12 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		m_lighting.Process();
+	}
 
-		// Buffer light data.
-		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
+	void GLRenderer::ForwardPass()
+	{
 
-		auto ambient = m_lightingTech->GetPrograms()[0];
-		auto directional = m_lightingTech->GetPrograms()[1];
-		auto pointlight = m_lightingTech->GetPrograms()[2];
-
-		m_fullscreenQuad.Bind();
-
-		// Ambient.
-		ambient->Apply();
-		m_fullscreenQuad.Draw();
-
-		// Directional.
-		directional->Apply();
-		m_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
-
-		// Pointlights.
-		pointlight->Apply();
-		m_fullscreenQuad.DrawInstanced(m_numPointLights);
-
-		m_fullscreenQuad.Unbind();
 	}
 
 	void GLRenderer::RenderLines()
@@ -479,7 +440,20 @@ namespace Render
 		return std::shared_ptr<Material>(mat); 
 	}
 
+	ParticleSystem* GLRenderer::CreateParticleSystem(const ParticleSystemDescription& p_desc)
+	{
+		return m_particles.Create(this, p_desc);
+	}
 
+	void GLRenderer::BeginTransform(float dt)
+	{
+		m_particles.BeginTransform(dt);
+	}
+
+	void GLRenderer::EndTransform()
+	{
+		m_particles.EndTransform();
+	}
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

@@ -9,6 +9,14 @@
 
 namespace Render
 {
+	namespace RenderFlags
+	{
+		enum RenderFlags
+		{
+			RENDER_TRANSFORMFEEDBACK = 0x01
+		};
+	}
+
 	struct Uniforms
 	{
 		glm::mat4 m_world;
@@ -17,9 +25,15 @@ namespace Render
 
 	struct RenderJob
 	{
+		RenderJob()
+			: m_flags(0), m_renderPass(2) {}
+
 		Render::MeshInterface* m_mesh;
 
 		Material* m_material;	
 		Uniforms m_uniforms;
+
+		unsigned m_flags;
+		unsigned m_renderPass;
 	};
 }
