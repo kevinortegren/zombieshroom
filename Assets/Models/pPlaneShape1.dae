@@ -3,7 +3,7 @@
   <asset>
     <contributor>
       <author>BTH</author>
-      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
+      <authoring_tool>OpenCOLLADA2014</authoring_tool>
       <comments>
 			ColladaMaya export options: 
 			bakeTransforms=0;relativePaths=1;copyTextures=0;exportTriangles=0;exportCgfxFileReferences=1;
@@ -13,21 +13,31 @@
 			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=1;exportMaterialsOnly=0;
 			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/PlayerChar/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v11NewSceneAllImported.mb</source_data>
     </contributor>
-    <created>2013-12-19T09:11:11</created>
-    <modified>2013-12-19T09:11:11</modified>
+    <created>2014-01-10T10:03:42</created>
+    <modified>2014-01-10T10:03:42</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="lambert1" name="lambert1">
-      <instance_effect url="#lambert1-fx"/>
+    <material id="Water" name="Water">
+      <instance_effect url="#Water-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="lambert1-fx">
+    <effect id="Water-fx">
       <profile_COMMON>
+        <newparam sid="file4-surface">
+          <surface type="2D">
+            <init_from>file4</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="file4-sampler">
+          <sampler2D>
+            <source>file4-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
           <lambert>
             <emission>
@@ -37,7 +47,31 @@
               <color>0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color>0.4 0.4 0.4 1</color>
+              <texture texture="file4-sampler" texcoord="TEX0">
+                <extra>
+                  <technique profile="OpenCOLLADAMaya">
+                    <blend_mode>NONE</blend_mode>
+                    <coverageU>1</coverageU>
+                    <coverageV>1</coverageV>
+                    <fast>0</fast>
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <noiseU>0</noiseU>
+                    <noiseV>0</noiseV>
+                    <offsetU>0</offsetU>
+                    <offsetV>0</offsetV>
+                    <repeatU>1</repeatU>
+                    <repeatV>1</repeatV>
+                    <rotateFrame>0</rotateFrame>
+                    <rotateUV>0</rotateUV>
+                    <stagger>0</stagger>
+                    <translateFrameU>0</translateFrameU>
+                    <translateFrameV>0</translateFrameV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                  </technique>
+                </extra>
+              </texture>
             </diffuse>
             <transparent opaque="RGB_ZERO">
               <color>0 0 0 1</color>
@@ -50,11 +84,23 @@
       </profile_COMMON>
     </effect>
   </library_effects>
+  <library_images>
+    <image id="file4" name="file4">
+      <init_from>../../Build/Debug/Assets/Textures/water.dds</init_from>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <dgnode_type>kFile</dgnode_type>
+          <image_sequence>0</image_sequence>
+          <originalMayaNodeId>file4</originalMayaNodeId>
+        </technique>
+      </extra>
+    </image>
+  </library_images>
   <library_geometries>
     <geometry id="pPlaneShape1" name="pPlaneShape1">
       <mesh>
         <source id="pPlaneShape1-positions" name="pPlaneShape1-positions">
-          <float_array id="pPlaneShape1-positions-array" count="12">-9.651386 0 11.09047 9.651386 0 11.09047 -9.651386 0 -11.09047 9.651386 0 -11.09047</float_array>
+          <float_array id="pPlaneShape1-positions-array" count="12">-686.7717 0 783.6223 686.7717 0 783.6223 -686.7717 0 -783.6223 686.7717 0 -783.6223</float_array>
           <technique_common>
             <accessor source="#pPlaneShape1-positions-array" count="4" stride="3">
               <param name="X" type="float"/>
@@ -74,7 +120,7 @@
           </technique_common>
         </source>
         <source id="pPlaneShape1-map1" name="pPlaneShape1-map1">
-          <float_array id="pPlaneShape1-map1-array" count="8">0 0 0.8702413 0 0 1 0.8702413 1</float_array>
+          <float_array id="pPlaneShape1-map1-array" count="8">0 0 0.8764066 0 0 1 0.8764066 1</float_array>
           <technique_common>
             <accessor source="#pPlaneShape1-map1-array" count="4" stride="2">
               <param name="S" type="float"/>
@@ -86,7 +132,7 @@
           <input semantic="POSITION" source="#pPlaneShape1-positions"/>
           <input semantic="NORMAL" source="#pPlaneShape1-normals"/>
         </vertices>
-        <polylist material="initialShadingGroup" count="1">
+        <polylist material="lambert4SG" count="1">
           <input semantic="VERTEX" source="#pPlaneShape1-vertices" offset="0"/>
           <input semantic="TEXCOORD" source="#pPlaneShape1-map1" offset="1" set="0"/>
           <vcount>4</vcount>
@@ -102,9 +148,9 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="untitled">
+    <visual_scene id="VisualSceneNode" name="v11NewSceneAllImported">
       <node id="pPlane1" name="pPlane1" type="NODE">
-        <translate sid="translate">-2.310902 0 -0.9656804</translate>
+        <translate sid="translate">65.02735 -63.3743 65.10679</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
@@ -112,7 +158,9 @@
         <instance_geometry url="#pPlaneShape1">
           <bind_material>
             <technique_common>
-              <instance_material symbol="initialShadingGroup" target="#lambert1"/>
+              <instance_material symbol="lambert4SG" target="#Water">
+                <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
             </technique_common>
           </bind_material>
         </instance_geometry>

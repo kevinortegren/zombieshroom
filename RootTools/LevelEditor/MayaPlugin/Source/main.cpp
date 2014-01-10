@@ -151,6 +151,7 @@ void Export()
 		{
 			MFnMesh mesh = g_mayaMeshList[saveJ];
 			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
+			memset(SM.meshList[i].modelName, NULL, sizeof(SM.meshList[i].modelName));
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
 			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
 			//Herp

@@ -1,0 +1,1840 @@
+- Entities:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+    - 44
+    - 45
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+    - 51
+    - 52
+    - 53
+    - 54
+    - 55
+    - 56
+    - 57
+    - 58
+    - 59
+    - 60
+    - 61
+    - 62
+    - 63
+    - 64
+    - 65
+    - 66
+    - 67
+    - 68
+    - 69
+    - 70
+    - 71
+    - 72
+    - 73
+    - 74
+    - 75
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+    - 81
+    - 82
+    - 83
+    - 84
+    - 85
+    - 86
+    - 87
+    - 88
+    - 89
+    - 90
+    - 91
+    - 92
+    - 93
+    - 94
+    - 95
+    - 96
+    - 97
+    - 98
+    - 99
+    - 100
+    - 101
+    - 102
+    - 103
+    - 104
+    - 105
+    - 106
+    - 107
+    - 108
+    - 109
+    - 110
+    - 111
+    - 112
+    - 113
+    - 114
+    - 115
+    - 116
+    - 117
+    - 118
+    - 119
+    - 120
+    - 121
+- Components:
+    - Type: 0
+      Data:
+        - Entity: 1
+          Model: Terrain1Shape
+          Material:
+            Name: TerrainMaterial
+            Effect: Mesh
+            Diffuse: TerrainV2
+        - Entity: 2
+          Model: Terrain2Shape
+          Material:
+            Name: TerrainMaterial
+            Effect: Mesh
+            Diffuse: TerrainV2
+        - Entity: 3
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 4
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 5
+          Model: pPlaneShape1
+          Material:
+            Name: Water
+            Effect: Mesh
+            Diffuse: water
+        - Entity: 6
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 7
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 8
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 9
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 10
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 11
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 12
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 13
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 14
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 15
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 16
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 17
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 18
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 19
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 20
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 21
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 22
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 23
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 24
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 25
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 26
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 27
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 28
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 29
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 30
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 31
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 32
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 33
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 34
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 35
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 36
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 37
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 38
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 39
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 40
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 41
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 42
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 43
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 44
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 45
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 46
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 47
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 48
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 49
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 50
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 51
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 52
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 53
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 54
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 55
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 56
+          Model: Stone5Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 57
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 58
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 59
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 60
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 61
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 62
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 63
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 64
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 65
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 66
+          Model: Stone15Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 67
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 68
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 69
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 70
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 71
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 72
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 73
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 74
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 75
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 76
+          Model: TreeStump1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 77
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 78
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 79
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 80
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 81
+          Model: FlatStone4Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 82
+          Model: FlatStone5Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 83
+          Model: FlatStone6Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 84
+          Model: FlatStone6Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 85
+          Model: FlatStone5Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 86
+          Model: FlatStone4Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 87
+          Model: FlatStone6Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 88
+          Model: FlatStone4Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 89
+          Model: FlatStone4Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 90
+          Model: FlatStone5Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 91
+          Model: FlatStone6Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 92
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 93
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 94
+          Model: TreeShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh
+            Diffuse: V3
+        - Entity: 95
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 96
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 97
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 98
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 99
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 100
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 101
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 102
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 103
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 104
+          Model: Stone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 105
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 106
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 107
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 108
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 109
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 110
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 111
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 112
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 113
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 114
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 115
+          Model: Stone5Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 116
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 117
+          Model: Stone22Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 118
+          Model: Stone45Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh
+            Diffuse: RockTexture
+        - Entity: 119
+        - Entity: 120
+        - Entity: 121
+    - Type: 1
+      Data:
+        - Entity: 1
+          Position: [0, -92.1201, 0]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 2
+          Position: [-62.5252, -82.8392, 148.331]
+          Rotation: [0, -1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 3
+          Position: [113.407, -35.4153, 62.2365]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [-3.49416, -24.3458, -37.3912]
+          Rotation: [1, 0, 0]
+          Scale: [6.11339, 6.11339, 6.11339]
+        - Entity: 5
+          Position: [65.0274, -63.3743, 65.1068]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 6
+          Position: [48.7249, -21.6047, 14.2011]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 7
+          Position: [30.6303, -24.8336, -18.1189]
+          Rotation: [1, 0, 0]
+          Scale: [1.47157, 1.47157, 1.47157]
+        - Entity: 8
+          Position: [2.52541, -16.6053, -18.1189]
+          Rotation: [1, 0, 0]
+          Scale: [1.34337, 1.34337, 1.34337]
+        - Entity: 9
+          Position: [49.1038, -34.139, 45.4694]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 10
+          Position: [2.52541, -25.5334, -43.5174]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 11
+          Position: [-50.3251, -34.8812, 78.7275]
+          Rotation: [1, 0, 0]
+          Scale: [1.2756, 1.2756, 1.2756]
+        - Entity: 12
+          Position: [-8.24487, -34.579, 68.5482]
+          Rotation: [1, 0, 0]
+          Scale: [1.44161, 1.44161, 1.44161]
+        - Entity: 13
+          Position: [-0.79195, -24.4502, 42.0081]
+          Rotation: [1, 0, 0]
+          Scale: [1.52825, 1.52825, 1.52825]
+        - Entity: 14
+          Position: [-41.9685, -24.6279, 31.1822]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 15
+          Position: [-54.746, -42.7186, -72.3711]
+          Rotation: [0, 1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 16
+          Position: [-22.0791, -43.7409, -92.9131]
+          Rotation: [0, -1, 0]
+          Scale: [1.35574, 1.35574, 1.35574]
+        - Entity: 17
+          Position: [15.0039, -24.7342, 20.5174]
+          Rotation: [1, 0, 0]
+          Scale: [1.13647, 1.13647, 1.13647]
+        - Entity: 18
+          Position: [-83.9496, -15.4571, -82.8032]
+          Rotation: [0.571849, -0.301338, -0.76301]
+          Scale: [1.7406, 1.7406, 1.7406]
+        - Entity: 19
+          Position: [15.9944, -33.9966, -69.8767]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 20
+          Position: [-31.6758, -39.9469, -72.7606]
+          Rotation: [0, -1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 21
+          Position: [-66.6895, -21.5933, -41.5978]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 22
+          Position: [-75.5644, -24.2538, -7.954]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 23
+          Position: [-34.3514, -17.1102, 5.55112e-017]
+          Rotation: [0, 1, 0]
+          Scale: [1.58413, 1.58413, 1.58413]
+        - Entity: 24
+          Position: [-72.008, -35.7007, 46.4843]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 25
+          Position: [-72.008, -34.1887, 13.9516]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 26
+          Position: [-107.944, -36.5683, -11.6291]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 27
+          Position: [-107.944, -43.2286, 38.1738]
+          Rotation: [1, 0, 0]
+          Scale: [1.57679, 1.57679, 1.57679]
+        - Entity: 28
+          Position: [-101.695, -44.4272, 81.734]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 29
+          Position: [17.806, -17.3957, 5.42253]
+          Rotation: [1, 0, 0]
+          Scale: [1.30405, 1.30405, 1.30405]
+        - Entity: 30
+          Position: [-12.3943, -16.9258, 25.5132]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 31
+          Position: [-123.793, -44.5929, -39.8831]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 32
+          Position: [-115.379, -24.3265, 109.358]
+          Rotation: [1, 0, 0]
+          Scale: [1.61062, 1.61062, 1.61062]
+        - Entity: 33
+          Position: [-101.983, -7.58261, 146.778]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 34
+          Position: [-83.4961, -11.5174, 139.959]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 35
+          Position: [-42.2731, -10.9007, 155.002]
+          Rotation: [1, 0, 0]
+          Scale: [1.74586, 1.74586, 1.74586]
+        - Entity: 36
+          Position: [-25.4045, -14.4418, 155.002]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 37
+          Position: [-52.8082, -13.9662, 151.346]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 38
+          Position: [-6.32576, -24.5081, 132.779]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 39
+          Position: [9.77437, -30.1971, 151.19]
+          Rotation: [0, 1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 40
+          Position: [-16.724, -15.7607, 5.42253]
+          Rotation: [1, 0, 0]
+          Scale: [2.87216, 2.87216, 2.87216]
+        - Entity: 41
+          Position: [81.9591, -43.9085, 86.8919]
+          Rotation: [0, -1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 42
+          Position: [44.0904, -43.566, 86.8919]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 43
+          Position: [57.3329, -42.6199, 69.2376]
+          Rotation: [0, -1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 44
+          Position: [103.941, -45.0251, 86.8919]
+          Rotation: [0, -1, 0]
+          Scale: [1, 1, 1]
+        - Entity: 45
+          Position: [87.3063, -35.7087, 57.4067]
+          Rotation: [1, 0, 0]
+          Scale: [1.41423, 1.41423, 1.41423]
+        - Entity: 46
+          Position: [87.3063, -18.3141, -0.183734]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 47
+          Position: [107.591, -15.6215, -2.17017]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 48
+          Position: [73.8964, -19.8695, 13.2236]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 49
+          Position: [61.3442, -20.245, -0.620299]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 50
+          Position: [35.0331, -24.0009, 23.8849]
+          Rotation: [1, 0, 0]
+          Scale: [1.16204, 1.16204, 1.16204]
+        - Entity: 51
+          Position: [47.8479, -34.4403, -69.8767]
+          Rotation: [1, 0, 0]
+          Scale: [1.50477, 1.50477, 1.50477]
+        - Entity: 52
+          Position: [47.8479, -34.4451, -38.0238]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 53
+          Position: [59.3444, -34.6642, -23.5185]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 54
+          Position: [18.9157, -24.9746, -4.87633]
+          Rotation: [0, -1, 0]
+          Scale: [5.88272, 5.88272, 5.88272]
+        - Entity: 55
+          Position: [-28.1555, -26.0683, 25.2081]
+          Rotation: [-0.205007, -0.964205, -0.168171]
+          Scale: [4.6464, 4.6464, 4.6464]
+        - Entity: 56
+          Position: [-45.037, -25.1214, -7.23787]
+          Rotation: [-0.407332, -0.850573, -0.332576]
+          Scale: [4.77457, 4.77457, 4.77457]
+        - Entity: 57
+          Position: [4.5112, -28.5856, 141.84]
+          Rotation: [0, -1, 0]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 58
+          Position: [5.63936, -28.5856, 139.747]
+          Rotation: [0.237228, -0.968557, 0.0749737]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 59
+          Position: [5.59222, -27.6565, 134.555]
+          Rotation: [0.323209, 0.458675, -0.82774]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 60
+          Position: [13.4047, -30.9727, 144.747]
+          Rotation: [0.323209, 0.458675, -0.82774]
+          Scale: [1.40268, 1.40268, 1.40268]
+        - Entity: 61
+          Position: [-40.5428, -13.5157, 148.852]
+          Rotation: [0, -1, 0]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 62
+          Position: [-35.122, -13.5157, 149.563]
+          Rotation: [0, -1, 0]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 63
+          Position: [-35.122, -11.293, 152.39]
+          Rotation: [0, -1, 0]
+          Scale: [0.713882, 0.713882, 0.713882]
+        - Entity: 64
+          Position: [-59.9976, -14.7526, 147.108]
+          Rotation: [0, -1, 0]
+          Scale: [2.09847, 2.09847, 2.09847]
+        - Entity: 65
+          Position: [-81.6918, -12.1714, 148.049]
+          Rotation: [-0.00656706, -0.963729, -0.266804]
+          Scale: [2.09847, 2.09847, 2.09847]
+        - Entity: 66
+          Position: [-30.4758, -25.0381, -30.2508]
+          Rotation: [0, 1, 0]
+          Scale: [4.90574, 4.90574, 4.90574]
+        - Entity: 67
+          Position: [-13.835, -16.4848, 8.09435]
+          Rotation: [-0.195922, -0.83735, 0.510352]
+          Scale: [2.09304, 2.09304, 2.09304]
+        - Entity: 68
+          Position: [-13.0672, -15.5513, 3.37971]
+          Rotation: [-0.556826, 0.14433, 0.817993]
+          Scale: [2.09304, 2.09304, 2.09304]
+        - Entity: 69
+          Position: [-15.7389, -15.1579, -14.078]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 70
+          Position: [-15.7389, -24.3958, -48.1677]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 71
+          Position: [-60.9507, -21.3812, -60.7106]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 72
+          Position: [-98.7772, -34.895, -27.2286]
+          Rotation: [-0.276199, 0.0535148, 0.959609]
+          Scale: [1, 1, 1]
+        - Entity: 73
+          Position: [49.9022, -34.2742, -60.7106]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 74
+          Position: [49.9022, -20.82, 0.391814]
+          Rotation: [0.500636, -0.220826, 0.837018]
+          Scale: [1, 1, 1]
+        - Entity: 75
+          Position: [72.9116, -34.7751, 40.6034]
+          Rotation: [0.932125, -0.284939, 0.223499]
+          Scale: [1, 1, 1]
+        - Entity: 76
+          Position: [-43.1688, -34.1853, 77.6355]
+          Rotation: [0.932125, -0.284939, 0.223499]
+          Scale: [1, 1, 1]
+        - Entity: 77
+          Position: [-77.1022, -15.5026, 138.652]
+          Rotation: [-0.202394, -0.848098, -0.48966]
+          Scale: [4.85513, 4.85513, 4.85513]
+        - Entity: 78
+          Position: [-77.66, -14.2905, 136.743]
+          Rotation: [0.310497, -0.837574, 0.449513]
+          Scale: [4.85513, 4.85513, 4.85513]
+        - Entity: 79
+          Position: [-42.8459, -19.7838, 145.922]
+          Rotation: [-0.64211, -0.663715, -0.383636]
+          Scale: [8.91148, 8.91148, 8.91148]
+        - Entity: 80
+          Position: [-114.337, -40.52, 90.2889]
+          Rotation: [0.609936, -0.732649, 0.301998]
+          Scale: [4.85513, 4.85513, 4.85513]
+        - Entity: 81
+          Position: [-22.8484, -15.7247, -6.18989]
+          Rotation: [-0.949978, -0.16617, 0.264441]
+          Scale: [1, 1, 1]
+        - Entity: 82
+          Position: [-23.5667, -16.2403, -8.42848]
+          Rotation: [-0.524507, -0.564574, 0.637298]
+          Scale: [1, 1, 1]
+        - Entity: 83
+          Position: [-25.2507, -16.6903, -9.69457]
+          Rotation: [-0.36505, 0.00150001, 0.930987]
+          Scale: [1, 1, 1]
+        - Entity: 84
+          Position: [-30.6172, -18.8069, -12.4531]
+          Rotation: [-0.241795, 0.021424, 0.970091]
+          Scale: [1, 1, 1]
+        - Entity: 85
+          Position: [-26.9389, -17.4502, -10.8922]
+          Rotation: [-0.232581, -0.253396, 0.938987]
+          Scale: [1, 1, 1]
+        - Entity: 86
+          Position: [-28.7633, -18.1106, -11.71]
+          Rotation: [0.12438, -0.980866, 0.14977]
+          Scale: [1, 1, 1]
+        - Entity: 87
+          Position: [-32.0293, -19.3435, -12.7859]
+          Rotation: [0.116895, -0.975091, 0.1885]
+          Scale: [1, 1, 1]
+        - Entity: 88
+          Position: [-34.0959, -20.1114, -13.3569]
+          Rotation: [0.136276, -0.978595, 0.154213]
+          Scale: [1, 1, 1]
+        - Entity: 89
+          Position: [-40.4951, -22.5174, -15.3811]
+          Rotation: [0.0755447, -0.882293, 0.464598]
+          Scale: [1, 1, 1]
+        - Entity: 90
+          Position: [-38.0775, -21.6487, -14.7468]
+          Rotation: [-0.238199, -0.262386, 0.935101]
+          Scale: [1, 1, 1]
+        - Entity: 91
+          Position: [-36.2123, -20.8895, -14.0047]
+          Rotation: [-0.190039, 0.966812, 0.170761]
+          Scale: [1, 1, 1]
+        - Entity: 92
+          Position: [-27.1269, -16.8204, -23.524]
+          Rotation: [1, 0, 0]
+          Scale: [1.72311, 1.72311, 1.72311]
+        - Entity: 93
+          Position: [-9.15219, -16.6281, -29.6115]
+          Rotation: [1, 0, 0]
+          Scale: [1.78373, 1.78373, 1.78373]
+        - Entity: 94
+          Position: [-40.2559, -23.5438, -21.8776]
+          Rotation: [1, 0, 0]
+          Scale: [1.6392, 1.6392, 1.6392]
+        - Entity: 95
+          Position: [21.6943, -24.6543, -1.38778e-017]
+          Rotation: [0.12777, 0.838953, 0.528992]
+          Scale: [4.02255, 4.02255, 4.02255]
+        - Entity: 96
+          Position: [10.7863, -24.6543, -24.1055]
+          Rotation: [0.0798357, -0.996562, -0.0221303]
+          Scale: [4.02255, 4.02255, 4.02255]
+        - Entity: 97
+          Position: [-12.5706, -24.6543, -38.5928]
+          Rotation: [0.0344811, -0.993772, -0.105962]
+          Scale: [4.02255, 4.02255, 4.02255]
+        - Entity: 98
+          Position: [-42.8973, -24.3087, -12.1201]
+          Rotation: [-0.2742, -0.955721, 0.10683]
+          Scale: [3.01754, 3.01754, 3.01754]
+        - Entity: 99
+          Position: [-40.2045, -24.4653, 4.07645]
+          Rotation: [-0.0533287, -0.998567, 0.00445761]
+          Scale: [3.01754, 3.01754, 3.01754]
+        - Entity: 100
+          Position: [-24.1198, -24.7106, 28.6599]
+          Rotation: [0.00651426, -0.999682, -0.0243563]
+          Scale: [4.77336, 4.77336, 4.77336]
+        - Entity: 101
+          Position: [0.0916625, -24.4653, 24.3767]
+          Rotation: [0.190747, -0.95857, 0.211561]
+          Scale: [3.01754, 3.01754, 3.01754]
+        - Entity: 102
+          Position: [1.76039, -24.4653, 23.2664]
+          Rotation: [-0.34, -0.940044, -0.0267795]
+          Scale: [1.49145, 1.49145, 1.49145]
+        - Entity: 103
+          Position: [-21.5721, -26.0683, 31.2006]
+          Rotation: [-0.114866, -0.990342, -0.0776414]
+          Scale: [3.37311, 3.37311, 3.37311]
+        - Entity: 104
+          Position: [8.16759, -23.6994, -27.4048]
+          Rotation: [-0.743024, -0.528525, -0.410581]
+          Scale: [3.37544, 3.37544, 3.37544]
+        - Entity: 105
+          Position: [21.5098, -24.6543, 11.8724]
+          Rotation: [-0.0980701, -0.984499, 0.145411]
+          Scale: [4.02255, 4.02255, 4.02255]
+        - Entity: 106
+          Position: [21.5098, -31.4509, 37.1797]
+          Rotation: [-0.533562, -0.610195, -0.585639]
+          Scale: [8.70192, 8.70192, 8.70192]
+        - Entity: 107
+          Position: [-2.87875, -35.1677, 47.9116]
+          Rotation: [0.0332791, -0.999444, 0.00185281]
+          Scale: [4.90499, 4.90499, 4.90499]
+        - Entity: 108
+          Position: [55.7591, -35.1677, 31.1094]
+          Rotation: [0.0482953, -0.99403, 0.0978373]
+          Scale: [4.69225, 4.69225, 4.69225]
+        - Entity: 109
+          Position: [39.9754, -35.1677, -13.9264]
+          Rotation: [-0.00626744, 0.986107, 0.165995]
+          Scale: [4.69225, 4.69225, 4.69225]
+        - Entity: 110
+          Position: [75.2404, -42.898, -15.0019]
+          Rotation: [0.146965, -0.985031, -0.0900854]
+          Scale: [8.03631, 8.03631, 8.03631]
+        - Entity: 111
+          Position: [89.1594, -42.898, 17.8246]
+          Rotation: [0.0966127, -0.969419, 0.225593]
+          Scale: [8.61073, 8.61073, 8.61073]
+        - Entity: 112
+          Position: [33.8039, -31.7543, -37.1008]
+          Rotation: [-0.973632, -0.166039, -0.156436]
+          Scale: [4.69225, 4.69225, 4.69225]
+        - Entity: 113
+          Position: [35.8005, -34.5334, -33.3454]
+          Rotation: [-0.148502, 0.988896, -0.00566823]
+          Scale: [4.69225, 4.69225, 4.69225]
+        - Entity: 114
+          Position: [-62.0594, -34.5099, 14.0803]
+          Rotation: [0.0228939, -0.999106, -0.035536]
+          Scale: [4.39809, 4.39809, 4.39809]
+        - Entity: 115
+          Position: [-80.7971, -34.8702, -3.51859]
+          Rotation: [-0.179507, -0.972645, -0.147442]
+          Scale: [7.21247, 7.21247, 7.21247]
+        - Entity: 116
+          Position: [-80.5744, -34.9975, -12.5671]
+          Rotation: [-0.104646, -0.992878, -0.0569394]
+          Scale: [4.74373, 4.74373, 4.74373]
+        - Entity: 117
+          Position: [-42.8452, -34.5099, 39.378]
+          Rotation: [-0.0400402, -0.995445, -0.0865192]
+          Scale: [4.39809, 4.39809, 4.39809]
+        - Entity: 118
+          Position: [-45.7144, -34.6439, 37.1762]
+          Rotation: [-0.205007, -0.964205, -0.168171]
+          Scale: [4.6464, 4.6464, 4.6464]
+        - Entity: 119
+          Position: [51.8713, 69.4596, 9.31657]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 120
+          Position: [-127.426, 69.4596, -47.3276]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+        - Entity: 121
+          Position: [-122.101, 69.4596, 104.42]
+          Rotation: [1, 0, 0]
+          Scale: [1, 1, 1]
+    - Type: 2
+      Data:
+        - Entity: 119
+          Attenuation: [0, 0.01, 0]
+          Color: [1, 1, 1, 1]
+          Range: 1000
+        - Entity: 120
+          Attenuation: [0, 0.01, 0]
+          Color: [1, 1, 1, 1]
+          Range: 1000
+        - Entity: 121
+          Attenuation: [0, 0.01, 0]
+          Color: [1, 1, 1, 1]
+          Range: 1000
+    - Type: 3
+      Data:
+        []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        []
+    - Type: 12
+      Data:
+        - Entity: 1
+          MeshHandle: Terrain1Shape0
+        - Entity: 2
+          MeshHandle: Terrain2Shape0
+        - Entity: 3
+          MeshHandle: TreeShape0
+        - Entity: 4
+          MeshHandle: Stone2Shape0
+        - Entity: 5
+          MeshHandle: pPlaneShape10
+        - Entity: 6
+          MeshHandle: TreeShape0
+        - Entity: 7
+          MeshHandle: TreeShape0
+        - Entity: 8
+          MeshHandle: TreeShape0
+        - Entity: 9
+          MeshHandle: TreeShape0
+        - Entity: 10
+          MeshHandle: TreeShape0
+        - Entity: 11
+          MeshHandle: TreeShape0
+        - Entity: 12
+          MeshHandle: TreeShape0
+        - Entity: 13
+          MeshHandle: TreeShape0
+        - Entity: 14
+          MeshHandle: TreeShape0
+        - Entity: 15
+          MeshHandle: TreeShape0
+        - Entity: 16
+          MeshHandle: TreeShape0
+        - Entity: 17
+          MeshHandle: TreeShape0
+        - Entity: 18
+          MeshHandle: TreeShape0
+        - Entity: 19
+          MeshHandle: TreeShape0
+        - Entity: 20
+          MeshHandle: TreeShape0
+        - Entity: 21
+          MeshHandle: TreeShape0
+        - Entity: 22
+          MeshHandle: TreeShape0
+        - Entity: 23
+          MeshHandle: TreeShape0
+        - Entity: 24
+          MeshHandle: TreeShape0
+        - Entity: 25
+          MeshHandle: TreeShape0
+        - Entity: 26
+          MeshHandle: TreeShape0
+        - Entity: 27
+          MeshHandle: TreeShape0
+        - Entity: 28
+          MeshHandle: TreeShape0
+        - Entity: 29
+          MeshHandle: TreeShape0
+        - Entity: 30
+          MeshHandle: TreeShape0
+        - Entity: 31
+          MeshHandle: TreeShape0
+        - Entity: 32
+          MeshHandle: TreeShape0
+        - Entity: 33
+          MeshHandle: TreeShape0
+        - Entity: 34
+          MeshHandle: TreeShape0
+        - Entity: 35
+          MeshHandle: TreeShape0
+        - Entity: 36
+          MeshHandle: TreeShape0
+        - Entity: 37
+          MeshHandle: TreeShape0
+        - Entity: 38
+          MeshHandle: TreeShape0
+        - Entity: 39
+          MeshHandle: TreeShape0
+        - Entity: 40
+          MeshHandle: TreeShape0
+        - Entity: 41
+          MeshHandle: TreeShape0
+        - Entity: 42
+          MeshHandle: TreeShape0
+        - Entity: 43
+          MeshHandle: TreeShape0
+        - Entity: 44
+          MeshHandle: TreeShape0
+        - Entity: 45
+          MeshHandle: TreeShape0
+        - Entity: 46
+          MeshHandle: TreeShape0
+        - Entity: 47
+          MeshHandle: TreeShape0
+        - Entity: 48
+          MeshHandle: TreeShape0
+        - Entity: 49
+          MeshHandle: TreeShape0
+        - Entity: 50
+          MeshHandle: TreeShape0
+        - Entity: 51
+          MeshHandle: TreeShape0
+        - Entity: 52
+          MeshHandle: TreeShape0
+        - Entity: 53
+          MeshHandle: TreeShape0
+        - Entity: 54
+          MeshHandle: Stone2Shape0
+        - Entity: 55
+          MeshHandle: Stone2Shape0
+        - Entity: 56
+          MeshHandle: Stone5Shape0
+        - Entity: 57
+          MeshHandle: Stone2Shape0
+        - Entity: 58
+          MeshHandle: Stone2Shape0
+        - Entity: 59
+          MeshHandle: Stone2Shape0
+        - Entity: 60
+          MeshHandle: Stone2Shape0
+        - Entity: 61
+          MeshHandle: Stone2Shape0
+        - Entity: 62
+          MeshHandle: Stone2Shape0
+        - Entity: 63
+          MeshHandle: Stone2Shape0
+        - Entity: 64
+          MeshHandle: Stone2Shape0
+        - Entity: 65
+          MeshHandle: Stone2Shape0
+        - Entity: 66
+          MeshHandle: Stone15Shape0
+        - Entity: 67
+          MeshHandle: Stone2Shape0
+        - Entity: 68
+          MeshHandle: Stone2Shape0
+        - Entity: 69
+          MeshHandle: TreeStump1Shape0
+        - Entity: 70
+          MeshHandle: TreeStump1Shape0
+        - Entity: 71
+          MeshHandle: TreeStump1Shape0
+        - Entity: 72
+          MeshHandle: TreeStump1Shape0
+        - Entity: 73
+          MeshHandle: TreeStump1Shape0
+        - Entity: 74
+          MeshHandle: TreeStump1Shape0
+        - Entity: 75
+          MeshHandle: TreeStump1Shape0
+        - Entity: 76
+          MeshHandle: TreeStump1Shape0
+        - Entity: 77
+          MeshHandle: Stone2Shape0
+        - Entity: 78
+          MeshHandle: Stone2Shape0
+        - Entity: 79
+          MeshHandle: Stone2Shape0
+        - Entity: 80
+          MeshHandle: Stone2Shape0
+        - Entity: 81
+          MeshHandle: FlatStone4Shape0
+        - Entity: 82
+          MeshHandle: FlatStone5Shape0
+        - Entity: 83
+          MeshHandle: FlatStone6Shape0
+        - Entity: 84
+          MeshHandle: FlatStone6Shape0
+        - Entity: 85
+          MeshHandle: FlatStone5Shape0
+        - Entity: 86
+          MeshHandle: FlatStone4Shape0
+        - Entity: 87
+          MeshHandle: FlatStone6Shape0
+        - Entity: 88
+          MeshHandle: FlatStone4Shape0
+        - Entity: 89
+          MeshHandle: FlatStone4Shape0
+        - Entity: 90
+          MeshHandle: FlatStone5Shape0
+        - Entity: 91
+          MeshHandle: FlatStone6Shape0
+        - Entity: 92
+          MeshHandle: TreeShape0
+        - Entity: 93
+          MeshHandle: TreeShape0
+        - Entity: 94
+          MeshHandle: TreeShape0
+        - Entity: 95
+          MeshHandle: Stone22Shape0
+        - Entity: 96
+          MeshHandle: Stone22Shape0
+        - Entity: 97
+          MeshHandle: Stone22Shape0
+        - Entity: 98
+          MeshHandle: Stone22Shape0
+        - Entity: 99
+          MeshHandle: Stone22Shape0
+        - Entity: 100
+          MeshHandle: Stone22Shape0
+        - Entity: 101
+          MeshHandle: Stone22Shape0
+        - Entity: 102
+          MeshHandle: Stone22Shape0
+        - Entity: 103
+          MeshHandle: Stone2Shape0
+        - Entity: 104
+          MeshHandle: Stone2Shape0
+        - Entity: 105
+          MeshHandle: Stone22Shape0
+        - Entity: 106
+          MeshHandle: Stone22Shape0
+        - Entity: 107
+          MeshHandle: Stone22Shape0
+        - Entity: 108
+          MeshHandle: Stone22Shape0
+        - Entity: 109
+          MeshHandle: Stone22Shape0
+        - Entity: 110
+          MeshHandle: Stone22Shape0
+        - Entity: 111
+          MeshHandle: Stone22Shape0
+        - Entity: 112
+          MeshHandle: Stone22Shape0
+        - Entity: 113
+          MeshHandle: Stone22Shape0
+        - Entity: 114
+          MeshHandle: Stone22Shape0
+        - Entity: 115
+          MeshHandle: Stone5Shape0
+        - Entity: 116
+          MeshHandle: Stone22Shape0
+        - Entity: 117
+          MeshHandle: Stone22Shape0
+        - Entity: 118
+          MeshHandle: Stone45Shape
+- Tags:
+    []
+- Groups:
+    - Id: 1
+      Group: Static
+    - Id: 2
+      Group: Static
+    - Id: 3
+      Group: Static
+    - Id: 4
+      Group: Static
+    - Id: 5
+      Group: Static
+    - Id: 6
+      Group: Static
+    - Id: 7
+      Group: Static
+    - Id: 8
+      Group: Static
+    - Id: 9
+      Group: Static
+    - Id: 10
+      Group: Static
+    - Id: 11
+      Group: Static
+    - Id: 12
+      Group: Static
+    - Id: 13
+      Group: Static
+    - Id: 14
+      Group: Static
+    - Id: 15
+      Group: Static
+    - Id: 16
+      Group: Static
+    - Id: 17
+      Group: Static
+    - Id: 18
+      Group: Static
+    - Id: 19
+      Group: Static
+    - Id: 20
+      Group: Static
+    - Id: 21
+      Group: Static
+    - Id: 22
+      Group: Static
+    - Id: 23
+      Group: Static
+    - Id: 24
+      Group: Static
+    - Id: 25
+      Group: Static
+    - Id: 26
+      Group: Static
+    - Id: 27
+      Group: Static
+    - Id: 28
+      Group: Static
+    - Id: 29
+      Group: Static
+    - Id: 30
+      Group: Static
+    - Id: 31
+      Group: Static
+    - Id: 32
+      Group: Static
+    - Id: 33
+      Group: Static
+    - Id: 34
+      Group: Static
+    - Id: 35
+      Group: Static
+    - Id: 36
+      Group: Static
+    - Id: 37
+      Group: Static
+    - Id: 38
+      Group: Static
+    - Id: 39
+      Group: Static
+    - Id: 40
+      Group: Static
+    - Id: 41
+      Group: Static
+    - Id: 42
+      Group: Static
+    - Id: 43
+      Group: Static
+    - Id: 44
+      Group: Static
+    - Id: 45
+      Group: Static
+    - Id: 46
+      Group: Static
+    - Id: 47
+      Group: Static
+    - Id: 48
+      Group: Static
+    - Id: 49
+      Group: Static
+    - Id: 50
+      Group: Static
+    - Id: 51
+      Group: Static
+    - Id: 52
+      Group: Static
+    - Id: 53
+      Group: Static
+    - Id: 54
+      Group: Static
+    - Id: 55
+      Group: Static
+    - Id: 56
+      Group: Static
+    - Id: 57
+      Group: Static
+    - Id: 58
+      Group: Static
+    - Id: 59
+      Group: Static
+    - Id: 60
+      Group: Static
+    - Id: 61
+      Group: Static
+    - Id: 62
+      Group: Static
+    - Id: 63
+      Group: Static
+    - Id: 64
+      Group: Static
+    - Id: 65
+      Group: Static
+    - Id: 66
+      Group: Static
+    - Id: 67
+      Group: Static
+    - Id: 68
+      Group: Static
+    - Id: 69
+      Group: Static
+    - Id: 70
+      Group: Static
+    - Id: 71
+      Group: Static
+    - Id: 72
+      Group: Static
+    - Id: 73
+      Group: Static
+    - Id: 74
+      Group: Static
+    - Id: 75
+      Group: Static
+    - Id: 76
+      Group: Static
+    - Id: 77
+      Group: Static
+    - Id: 78
+      Group: Static
+    - Id: 79
+      Group: Static
+    - Id: 80
+      Group: Static
+    - Id: 81
+      Group: Static
+    - Id: 82
+      Group: Static
+    - Id: 83
+      Group: Static
+    - Id: 84
+      Group: Static
+    - Id: 85
+      Group: Static
+    - Id: 86
+      Group: Static
+    - Id: 87
+      Group: Static
+    - Id: 88
+      Group: Static
+    - Id: 89
+      Group: Static
+    - Id: 90
+      Group: Static
+    - Id: 91
+      Group: Static
+    - Id: 92
+      Group: Static
+    - Id: 93
+      Group: Static
+    - Id: 94
+      Group: Static
+    - Id: 95
+      Group: Static
+    - Id: 96
+      Group: Static
+    - Id: 97
+      Group: Static
+    - Id: 98
+      Group: Static
+    - Id: 99
+      Group: Static
+    - Id: 100
+      Group: Static
+    - Id: 101
+      Group: Static
+    - Id: 102
+      Group: Static
+    - Id: 103
+      Group: Static
+    - Id: 104
+      Group: Static
+    - Id: 105
+      Group: Static
+    - Id: 106
+      Group: Static
+    - Id: 107
+      Group: Static
+    - Id: 108
+      Group: Static
+    - Id: 109
+      Group: Static
+    - Id: 110
+      Group: Static
+    - Id: 111
+      Group: Static
+    - Id: 112
+      Group: Static
+    - Id: 113
+      Group: Static
+    - Id: 114
+      Group: Static
+    - Id: 115
+      Group: Static
+    - Id: 116
+      Group: Static
+    - Id: 117
+      Group: Static
+    - Id: 118
+      Group: Static
