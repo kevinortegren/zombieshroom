@@ -27,7 +27,7 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
-			for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
+			/*for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
 			{
 				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "animation name: '%s'", aiscene->mAnimations[i]->mName.C_Str());
 
@@ -36,7 +36,7 @@ namespace RootEngine
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
 				}
-			}
+			}*/
 			
 		}
 		
