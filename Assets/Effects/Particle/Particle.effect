@@ -6,13 +6,9 @@
   techniques:
 
     - name: Particle_Update
-
-      # The PerFrame uniform buffer contains lifetime of a system and current dt. 
-      uniforms:   
+      bindings:   
         - name: PerFrame
           slot: 5
-
-      # The texture bound to slot four is a 1D-texture with random normalized vectors.
       textures:
         - name: g_Random
           slot: 4
@@ -38,11 +34,9 @@
 
     - name: Particle_Render
     
-      # The PerFrame uniform buffer contains view/projection.  
-      uniforms:
+      bindings:
         - name: PerFrame
-          slot: 0
-          
+          slot: 0        
       textures:
         - name: g_Diffuse
           slot: 0

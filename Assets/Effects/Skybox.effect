@@ -4,7 +4,7 @@
       textures:
         - name: CubeMap
           slot: 0
-      uniforms:
+      bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject

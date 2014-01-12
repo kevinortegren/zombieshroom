@@ -18,10 +18,6 @@ layout(std140) uniform PerObject
 {
 	mat4 modelMatrix;
 	mat4 normalMatrix;
-};
-
-layout(std140) uniform PerAnimation
-{
 	mat4 bones[20];
 };
 

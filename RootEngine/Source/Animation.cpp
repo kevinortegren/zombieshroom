@@ -7,6 +7,7 @@ namespace RootEngine
 		Animation::Animation(unsigned int p_vertSize) : m_numBones(0)
 		{
 			m_boneData.resize(p_vertSize);
+			m_bones.reserve(20);
 		}
 
 		Animation::~Animation()
@@ -260,7 +261,7 @@ namespace RootEngine
 
 		
 
-		std::vector<glm::mat4> Animation::GetBones()
+		std::vector<glm::mat4>& Animation::GetBones()
 		{
 			return m_bones;
 		}

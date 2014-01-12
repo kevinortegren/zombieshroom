@@ -17,19 +17,22 @@ namespace RootEngine
 	{
 		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
 
-		std::string techName;
-
-		// Parsing technique.
-		p_node["name"] >> techName;
+		if(!p_node.FindValue("techniques"))
+		{
+			//TODO: Log error.
+			return;
+		}
 
 		const YAML::Node& techniques = p_node["techniques"];
 		for(size_t i = 0; i < techniques.size(); ++i)
 		{
 			std::shared_ptr<Render::Technique> technique = effect->CreateTechnique(m_renderer);
 
-			//TODO: Use params instead.
-			std::string techniqueName;
-			techniques[i]["name"] >> techniqueName;
+			if(!techniques[i].FindValue("programs"))
+			{
+				//TODO: Log error.
+				return;
+			}
 
 			// Create programs and link shaders.
 			const YAML::Node& programs = techniques[i]["programs"];
@@ -110,29 +113,61 @@ namespace RootEngine
 				program->Compile();
 				program->Apply();
 
-				const YAML::Node& uniforms = techniques[i]["uniforms"];
-				for(size_t j = 0; j < uniforms.size(); ++j)
+				if(techniques[i].FindValue("bindings"))
 				{
-					std::string name;
-					uniforms[j]["name"] >> name;
+					const YAML::Node& bindings = techniques[i]["bindings"];
+					for(size_t j = 0; j < bindings.size(); ++j)
+					{
+						std::string name;
+						bindings[j]["name"] >> name;
 					
-					int slot;
-					uniforms[j]["slot"] >> slot;
+						int slot;
+						bindings[j]["slot"] >> slot;
 
-					// Bind shader name to slot.
-					program->BindUniformBuffer(name, slot);
+						// Bind shader name to slot.
+						program->BindUniformBuffer(name, slot);
+					}
 				}
 		
-				const YAML::Node& texture = techniques[i]["textures"];
-				for(size_t j = 0; j < texture.size(); ++j)
+				if(techniques[i].FindValue("uniforms"))
 				{
-					std::string name;
-					texture[j]["name"] >> name;
+					const YAML::Node& uniforms = techniques[i]["uniforms"];
+					for(size_t j = 0; j < uniforms.size(); ++j)
+					{
+						std::string sem;
+						uniforms[j]["sem"] >> sem;
 					
-					int slot;
-					texture[j]["slot"] >> slot;
+						int offset;
+						uniforms[j]["offset"] >> offset;
 
-					program->BindTexture(name, slot);
+						if(sem == "MODEL")
+						{
+							technique->AddUniformParam(Render::Semantic::MODEL, offset);
+						}
+						else if(sem == "NORMAL")
+						{
+							technique->AddUniformParam(Render::Semantic::NORMAL, offset);
+						}
+						else if(sem == "BONES")
+						{
+							technique->AddUniformParam(Render::Semantic::BONES, offset);
+						}
+					}
+				}
+
+				if(techniques[i].FindValue("textures"))
+				{
+					const YAML::Node& texture = techniques[i]["textures"];
+					for(size_t j = 0; j < texture.size(); ++j)
+					{
+						std::string name;
+						texture[j]["name"] >> name;
+					
+						int slot;
+						texture[j]["slot"] >> slot;
+
+						program->BindTexture(name, slot);
+					}
 				}
 
 				if(techniques[i].FindValue("flags") != nullptr)
@@ -147,27 +182,6 @@ namespace RootEngine
 						{
 							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
 						}
-					}
-				}
-
-				if(techniques[i].FindValue("PerObject") != nullptr)
-				{
-					const YAML::Node& perObjects = techniques[i]["PerObject"];
-					for(size_t k = 0; k < perObjects.size(); ++k)
-					{
-						std::string sem;
-						perObjects[k]["sem"] >> sem;
-					
-						std::string type;
-						perObjects[k]["type"] >> type;
-
-						// Test.
-
-						// Allocate based on type.
-						unsigned int size = sizeof(glm::mat4);
-
-						// Store the space based on semantic.
-						technique->m_data[Render::Semantic::WORLD] = size;
 					}
 				}
 			}

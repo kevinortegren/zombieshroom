@@ -1,8 +1,6 @@
 - name: Output
   techniques:
     - name: bar
-      uniforms:
-      textures:
       programs:
         - name: Output
           shaders:

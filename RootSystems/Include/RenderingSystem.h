@@ -26,7 +26,14 @@ namespace RootForce
 
 		RootEngine::Model* m_model;
 		Render::Material* m_material;
+		std::map<Render::Semantic::Semantic, void*> m_params;
 		unsigned m_pass;
+	};
+
+	struct MatrixData
+	{
+		glm::mat4x4 m_model;
+		glm::mat4x4 m_normal;
 	};
 
 	struct RenderingSystem : public ECS::EntitySystem
@@ -48,7 +55,9 @@ namespace RootForce
 
 		ECS::ComponentMapper<Renderable> m_renderables;
 		ECS::ComponentMapper<Transform> m_transforms;
-	
+
+		std::map<ECS::Entity*, MatrixData> m_matrices;
+
 	private:
 		Render::RendererInterface* m_renderer;
 		Logging::LoggingInterface* m_logger;

@@ -74,7 +74,7 @@ namespace RootEngine
 				virtual void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop) = 0;
 				virtual void BoneTransform(float TimeInSeconds) = 0;
 				virtual void SetAiImporter(std::shared_ptr<Assimp::Importer> p_aiImporter) = 0;
-				virtual std::vector<glm::mat4> GetBones() = 0;
+				virtual std::vector<glm::mat4>& GetBones() = 0;
 				virtual BoneInfo* GetBoneInfo(unsigned int p_index) = 0;
 				virtual RootEngine::RootAnimation::VertexBoneData* GetBoneData(unsigned int p_index) = 0;
 			};
@@ -95,7 +95,7 @@ namespace RootEngine
 				void AddAnimationKeyFrames(unsigned int p_start, unsigned int p_stop);
 				void BoneTransform(float TimeInSeconds);
 				void SetAiImporter(std::shared_ptr<Assimp::Importer> p_aiImporter);
-				std::vector<glm::mat4> GetBones();
+				std::vector<glm::mat4>& GetBones();
 				BoneInfo* GetBoneInfo(unsigned int p_index);
 				RootEngine::RootAnimation::VertexBoneData* GetBoneData(unsigned int p_index);
 
