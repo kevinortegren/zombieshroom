@@ -27,7 +27,6 @@ void* g_engineModule;
 std::shared_ptr<SDL_Window> g_window;
 RootEngine::GameSharedContext g_engineContext;
 int entityExport;
-string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/Levels/";
 
 ReadMemory RM;
 
@@ -421,7 +420,8 @@ int main(int argc, char* argv[])
 
 					}
 
-					m_world.GetEntityExporter()->Export(g_savepath + "level.world");
+					m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
+					
 					entityExport = false;
 					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);

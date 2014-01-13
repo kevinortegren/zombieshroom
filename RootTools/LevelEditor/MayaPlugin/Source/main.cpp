@@ -3,12 +3,12 @@
 
 #include "SharedMemory.h"
 #include <algorithm>
+#include "Constants.h"
 SharedMemory SM;
 
 // Globala variabler.
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
-MString g_outputDirectory = "C:/Users/BTH/Documents/zombieshroom/Assets/Models/";
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights];
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0;
@@ -165,7 +165,10 @@ void Export()
 			realName = mesh.fullPathName();
 
 			MGlobal::executeCommand("select -r " + realName);
-			ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + g_outputDirectory + name + ".dae\"";
+
+			string outputDirectory = g_savepath + "Models/";
+			MString savepath = outputDirectory.c_str();
+			ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
 			Print(name);
 			MGlobal::executeCommand(ExportFunction);
 			Print(ExportFunction);
@@ -719,26 +722,6 @@ void MayaMeshToList(MObject node, int meshIndex)
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
 
 			Print(texturepath.asChar());
-			//MFnBlinnShader Blinn = material_objectNode;
-			//Print(Blinn.name().asChar());
-			//Print("New Material name: ", Blinn.name());
-			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyMeshNodeCB, nullptr, &status);
-			//AddCallbackID(status, id);
-			//for(int i = 0; i < 7; i++)
-			//{
-			//	
-			//	Child = mesh.child;
-			//	if(Child.hasFn(MFn::kFileTexture))
-			//	{
-			//	Print ("Herrow");
-			//	break;
-			//	}
-
-			//}
-
-			//MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(material_objectNode, dirtyTextureNode, nullptr, &status);
-			//AddCallbackID(status, id);
-
 
 			currNrMaterials++;
 			materialID = currNrMaterials;
