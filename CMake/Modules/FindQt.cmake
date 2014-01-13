@@ -12,3 +12,6 @@ find_library(QTCORE_LIBRARY
 find_library(QTWIDGETS_LIBRARY
     NAMES Qt5Widgetsd
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
+find_library(QTPROPWIDGET_LIBRARY
+    NAMES QtSolutions_PropertyBrowser-headd
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
