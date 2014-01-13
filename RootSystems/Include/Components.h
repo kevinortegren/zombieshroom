@@ -41,7 +41,8 @@ namespace RootForce
 			SCORE,
 			ABILITY,
 			IDENTITY,
-			TDMRULES //TODO: name might be inappropriate?
+			TDMRULES, //TODO: name might be inappropriate?
+			PLAYERACTION,
 
 		};
 	}

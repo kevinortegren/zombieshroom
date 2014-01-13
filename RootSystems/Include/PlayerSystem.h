@@ -17,6 +17,21 @@ namespace RootForce
 		};
 	}
 
+	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
+	{
+		float MovePower;
+		float StrafePower;
+		bool Jump;
+		glm::vec2 Angle;
+	};
+
+	struct PlayerControl : public ECS::Component<PlayerControl>
+	{
+		float m_speed;
+		float m_jumpForce;
+		float m_mouseSensitivity;
+	};
+
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		int Health;

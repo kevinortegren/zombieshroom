@@ -24,6 +24,8 @@ namespace RootForce
 		RootForce::Script* script = entityManager->CreateComponent<RootForce::Script>(entity);
 		RootForce::Animation* animation = entityManager->CreateComponent<RootForce::Animation>(entity);
 
+		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
+
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
 		renderable->m_params[Render::Semantic::BONES] = renderable->m_model->m_animations[0]->GetBones().data();
@@ -39,6 +41,12 @@ namespace RootForce
 
 		playerControl->m_mouseSensitivity = 0.3f;
 		playerControl->m_speed = 10.0f;
+		playerControl->m_jumpForce = 20.0f;
+
+		action->Jump = false;
+		action->MovePower = 0;
+		action->StrafePower = 0;
+		action->Angle = glm::vec2(0);
 
 		ability->Abilities[0] = Abilitiy::ABILITY_TEST;
 		ability->SelectedAbility = Abilitiy::ABILITY_TEST;

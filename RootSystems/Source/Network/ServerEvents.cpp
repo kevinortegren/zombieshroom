@@ -22,7 +22,7 @@ namespace RootServer
 			return;
 
 		std::string name = p_ss.str();
-		name = name.substr(p_ss.tellg());
+		name = name.substr((unsigned)p_ss.tellg());
 		p_ev.Data = (uint8_t*)new char[name.size()];
 		memcpy(p_ev.Data, name.data(), name.size());
 		p_ev.DataSize = name.size();
