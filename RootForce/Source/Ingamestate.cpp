@@ -111,6 +111,7 @@ namespace RootForce
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
+		m_animationSystem->SetGameSharedContext(&g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);

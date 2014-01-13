@@ -58,7 +58,7 @@ namespace RootEngine
 		{
 			for (unsigned int i = 0 ; i < aiscene->mNumAnimations ; i++) 
 			{
-				m_model->m_animations[i]->SetAiImporter(m_importer);
+				m_model->m_animation->SetAiImporter(m_importer);
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace RootEngine
 		std::vector<glm::vec3> positions;
 		if(p_aiMesh->HasBones())
 		{
-			LoadBones(p_index, p_aiMesh);
+			LoadBones(p_aiMesh);
 			std::vector<Render::Vertex1P1N1UV1T1BT1BID1W> vertices;
 
 			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
@@ -117,8 +117,8 @@ namespace RootEngine
 				v.m_UV			= glm::vec2(pTexCoord->x, pTexCoord->y);
 				v.m_tangent		= glm::vec3(pTangent->x, pTangent->y, pTangent->z);
 				v.m_bitangent	= glm::vec3(pBitangent->x, pBitangent->y, pBitangent->z);
-				v.m_boneIDs		= glm::uvec4(m_model->m_animations[0]->GetBoneData(i)->m_IDList[0], m_model->m_animations[0]->GetBoneData(i)->m_IDList[1], m_model->m_animations[0]->GetBoneData(i)->m_IDList[2], m_model->m_animations[0]->GetBoneData(i)->m_IDList[3]);
-				v.m_weights		= glm::vec4(m_model->m_animations[0]->GetBoneData(i)->m_weightList[0], m_model->m_animations[0]->GetBoneData(i)->m_weightList[1], m_model->m_animations[0]->GetBoneData(i)->m_weightList[2], m_model->m_animations[0]->GetBoneData(i)->m_weightList[3]);
+				v.m_boneIDs		= glm::uvec4(m_boneData[i].m_IDList[0], m_boneData[i].m_IDList[1], m_boneData[i].m_IDList[2], m_boneData[i].m_IDList[3]);
+				v.m_weights		= glm::vec4(m_boneData[i].m_weightList[0], m_boneData[i].m_weightList[1], m_boneData[i].m_weightList[2], m_boneData[i].m_weightList[3]);
 
 				vertices.push_back(v);
 				positions.push_back(v.m_pos);
@@ -263,12 +263,12 @@ namespace RootEngine
 		}
 	}
 
-	void ModelImporter::LoadBones( unsigned int p_index, const aiMesh* p_aiMesh )
+	void ModelImporter::LoadBones( const aiMesh* p_aiMesh )
 	{
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
 
-		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(p_aiMesh->mNumVertices);
-
+		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation();
+		m_boneData.resize(p_aiMesh->mNumVertices);
 		//Loop through all the bones in the mesh
 		for(unsigned int i = 0; i < p_aiMesh->mNumBones; i++)
 		{
@@ -302,13 +302,13 @@ namespace RootEngine
 			{
 				unsigned int vertexID =  p_aiMesh->mBones[i]->mWeights[j].mVertexId;
 				float vweight  = p_aiMesh->mBones[i]->mWeights[j].mWeight;                   
-				animation->AddBoneData(vertexID, boneIndex, vweight);
+				m_boneData[vertexID].AddBoneData(boneIndex, vweight);
 				//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "AddBoneData -> VertexID:  %d, BoneIndex: %d, Weight: %f", vertexID, boneIndex, vweight);
 			}
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Added bone: %s", boneName.c_str());
 		}
 
-		m_model->m_animations.push_back(animation);
+		m_model->m_animation = animation;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded animation data!");
 	}
 
