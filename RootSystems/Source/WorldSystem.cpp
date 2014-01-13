@@ -74,6 +74,8 @@ namespace RootForce
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
+
+		m_quadTree.Init(m_engineContext, m_world);
 	}
 
 	void WorldSystem::Process()

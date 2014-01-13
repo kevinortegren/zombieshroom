@@ -91,7 +91,6 @@ namespace RootEngine
 		}
 
 		//Load bones
-		
 
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
