@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RootSystems/Include/Math/Plane.h"
+
 #include "glm/glm.hpp"
 
 namespace RootForce
@@ -16,6 +18,8 @@ namespace RootForce
 		~Frustum(){}
 
 		void recalculatePlanes();
+
+		Plane m_planes[8];
 
 	private:
 		float m_near;
