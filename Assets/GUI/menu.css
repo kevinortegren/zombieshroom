@@ -104,9 +104,10 @@ a
 .popup
 {
   margin: auto;
-  border: 1px solid black;
-  background-color: #FFFFFF;
-  padding: 12px;
+  /*background-color: #FFFFFF;*/
+  background: url('Ram.png') transparent;
+  background-size: 100% 100%;
+  padding: 36px;
   display: none;
 }
 .close
@@ -173,10 +174,9 @@ a
 {
   width: 1200px;
   border: 0;
-  padding: 80px 120px 180px 120px;
+  padding: 14px 40px 44px 40px;
   margin: auto;
   background: url('Ram.png') transparent;
-  background-size: 100% 100%;
 }
 #lan-list
 {
@@ -185,7 +185,7 @@ a
 }
 #lan-list-wrapper
 {
-  height: 600px;
+  height: 633px;
   overflow: auto;
 }
 #lan-direct-popup
