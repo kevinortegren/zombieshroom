@@ -25,10 +25,12 @@ namespace RootForce
         RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
         RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
+		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
 		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
 		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
 		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -50,7 +52,6 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        g_engineContext.m_resourceManager->LoadCollada("AnimationTest");
         
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
@@ -106,6 +107,11 @@ namespace RootForce
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+
+		// Initialize anim system
+		m_animationSystem = new RootForce::AnimationSystem(g_world);
+		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
+		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
@@ -285,6 +291,11 @@ namespace RootForce
 		{ 
 			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
+		}
+
+		{
+			PROFILE("AnimationSystem", g_engineContext.m_profiler);
+			m_animationSystem->Process();
 		}
 
 		{

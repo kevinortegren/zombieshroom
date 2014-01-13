@@ -8,6 +8,7 @@
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
+#include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
@@ -52,6 +53,8 @@ namespace RootForce
 		RootForce::CameraSystem* m_cameraSystem;
 		RootForce::LookAtSystem* m_lookAtSystem;
 		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
+		RootForce::AnimationSystem* m_animationSystem;
 		RootForce::MatchStateSystem* m_gameLogicSystem;
+
 	};
 }

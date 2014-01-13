@@ -22,6 +22,21 @@
 #define RENDERSYS_DLL_EXPORT __declspec(dllimport)
 #endif
 
+#define RENDER_MAX_BONES 20
+#define RENDER_UNIFORMS_SIZE 1408
+
+#define RENDER_SLOT_PERFRAME 0
+#define RENDER_SLOT_PEROBJECT 1
+#define RENDER_SLOT_LIGHTS 2
+#define RENDER_SLOT_PEREFFECT 3 
+
+#define RENDER_TEXTURE_DIFFUSE 0
+#define RENDER_TEXTURE_SPECULAR 1
+#define RENDER_TEXTURE_NORMAL 2
+
+#define RENDER_TEXTURE_RANDOM 4
+#define RENDER_TEXTURE_DEPTH 5
+
 namespace Render
 {
 	class RendererInterface : public RootEngine::SubsystemInterface
@@ -47,7 +62,6 @@ namespace Render
 		// Resource creation.
 		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
-		virtual std::shared_ptr<EffectParams> CreateEffectParams() = 0;
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
 		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
 		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
@@ -92,7 +106,6 @@ namespace Render
 
 		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
 		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-		std::shared_ptr<EffectParams> CreateEffectParams() { return std::shared_ptr<EffectParams>(new EffectParams); }
 		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
 		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
@@ -112,8 +125,6 @@ namespace Render
 		void LightingPass();
 		void ForwardPass();
 
-		void BindMaterial(Material* p_material);
-	
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
 
 		static GLRenderer* s_rendererInstance;
@@ -122,16 +133,18 @@ namespace Render
 		int m_width;
 		int m_height;
 
-		GeometryBuffer m_gbuffer;
-		Mesh m_lineMesh;
-
-		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
 		std::vector<RenderJob> m_jobs;
+
+		GeometryBuffer m_gbuffer;
+		ParticleSystemHandler m_particles;
+		LightingDevice m_lighting;
+		
+		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
+		
+		// TODO: Create line drawer.
+		Mesh m_lineMesh;
 		std::vector<Line> m_lines;
 
-		Buffer m_uniforms;
-		Buffer m_cameraBuffer;
-	
 		struct
 		{
 			glm::mat4 m_projection;
@@ -142,13 +155,15 @@ namespace Render
 
 		} m_cameraVars;
 
+		Buffer m_cameraBuffer;
+		Buffer m_uniforms;
+
 		std::shared_ptr<TechniqueInterface> m_debugTech;
 		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		bool m_displayNormals;
 
-		ParticleSystemHandler m_particles;
-		LightingDevice m_lighting;
+
 	};
 }
 

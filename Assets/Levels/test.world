@@ -15,7 +15,7 @@
           Diffuse: sphere_diffuse
         - Entity: 2
           Model: testchar_t
-          Effect: Mesh_NormalMap
+          Effect: Mesh_NormalMap_Anim
           Diffuse: v6
           Specular: SpecularV1
           Normal: BumpV1

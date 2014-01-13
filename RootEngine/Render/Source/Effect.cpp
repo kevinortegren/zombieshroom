@@ -220,15 +220,15 @@ namespace Render
 		return m_program;
 	}
 
-	std::shared_ptr<Render::BufferInterface> Technique::GetUniformBuffer()
-	{
-		return m_perTechniqueBuffer;
-	}
-
 	void Technique::Apply()
 	{
 		// Per technique uniform binding.
 		glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_perTechniqueBuffer->GetBufferId());
+	}
+
+	void Technique::AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset)
+	{
+		m_uniformsParams[p_sem] = p_offset;
 	}
 
 	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)
@@ -246,16 +246,5 @@ namespace Render
 	std::vector<std::shared_ptr<Technique>>& Effect::GetTechniques()
 	{
 		return m_techniques;
-	}
-
-	void EffectParams::AllocateParams(EffectInterface* p_effect)
-	{
-		for(auto itr = p_effect->GetTechniques().begin(); itr != p_effect->GetTechniques().end(); ++itr)
-		{
-			for(auto itrD = (*itr)->m_data.begin(); itrD != (*itr)->m_data.end(); ++itrD)
-			{
-				//std::cout << "SEM: " << (*itrD).first << " Size: " << (*itrD).second << std::endl;
-			}
-		}
 	}
 }

@@ -22,14 +22,18 @@ namespace RootForce
 		RootForce::Collision* collision = entityManager->CreateComponent<RootForce::Collision>(entity);
 		RootForce::CollisionResponder* collisionResponder = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);
 		RootForce::Script* script = entityManager->CreateComponent<RootForce::Script>(entity);
-		
+		RootForce::Animation* animation = entityManager->CreateComponent<RootForce::Animation>(entity);
+
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
+		
+		renderable->m_params[Render::Semantic::BONES] = renderable->m_model->m_animations[0]->GetBones().data();
+
 		renderable->m_pass = RootForce::RenderPass::RENDERPASS_DYNAMIC;
 		renderable->m_material =  m_engineContext->m_resourceManager->GetMaterial("testchar");
 		renderable->m_material->m_diffuseMap =  m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_normalMap =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_specularMap =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
-		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
+		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap_Anim");
 
 		transform->m_position = glm::vec3(0, 10, 0);
 

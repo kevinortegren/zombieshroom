@@ -1,7 +1,7 @@
 @font-face
 {
-	font-family: 'Sherwood';
-	src: url("SHERWOOD.TTF");
+  font-family: 'Sherwood';
+  src: url("SHERWOOD.TTF");
 }
 
 body, input
@@ -119,6 +119,11 @@ a
   display: inline-block;
   width: 100px;
 }
+.inline-150px
+{
+  display: inline-block;
+  width: 150px;
+}
 #connecting
 {
   display: none;
@@ -167,10 +172,11 @@ a
 #lan-wrapper
 {
   width: 1200px;
-  border: 1px solid #666666;
-  padding: 5px;
+  border: 0;
+  padding: 80px 120px 180px 120px;
   margin: auto;
-  background-color: #ffffff;
+  background: url('Ram.png') transparent;
+  background-size: 100% 100%;
 }
 #lan-list
 {
@@ -189,7 +195,7 @@ a
 }
 #lan-host-overlay
 {
-  width: 500px;
+  width: 550px;
   height: 300px;
 }
 #lan-host-map

@@ -174,10 +174,17 @@ namespace Render
 		// PerFrame uniforms.
 		m_cameraBuffer.Init(GL_UNIFORM_BUFFER);
 		m_cameraBuffer.BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
-		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cameraBuffer.GetBufferId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_cameraBuffer.GetBufferId());
 
 		// PerObject uniforms.
 		m_uniforms.Init(GL_UNIFORM_BUFFER);
+		char data[RENDER_UNIFORMS_SIZE];
+		memset(&data, 0, RENDER_UNIFORMS_SIZE);
+
+		m_uniforms.BufferData(1, RENDER_UNIFORMS_SIZE, data);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms.GetBufferId());
+
+		InitializeSemanticSizes();
 
 		// Particle System handler.
 		m_particles.Init();
@@ -224,6 +231,10 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		// Buffer Per Frame data.
+		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
+		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
+
 		{
 			PROFILE("Geometry Pass", g_context.m_profiler);
 			GeometryPass();
@@ -254,91 +265,79 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
-		// Buffer Per Frame data.
-		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
-		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
-
 		// Bind GBuffer.
 		m_gbuffer.Bind();
 
 		std::sort(m_jobs.begin(), m_jobs.end(), [](RenderJob& a, RenderJob& b)->bool{ return a.m_renderPass < b.m_renderPass; });
 
-		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
-			// Buffer object uniforms.
-			m_uniforms.BufferData(1, sizeof(Uniforms), &(*itr).m_uniforms);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_uniforms.GetBufferId());
+			(*job).m_mesh->Bind();
 
-			(*itr).m_mesh->Bind();
-			Material* mat = (*itr).m_material;
-
-			for(auto itrT = (*itr).m_material->m_effect->GetTechniques().begin(); itrT != (*itr).m_material->m_effect->GetTechniques().end(); ++itrT)
+			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 			{
-				if(((*itrT)->m_flags & Render::TechniqueFlags::RENDER_IGNORE) == Render::TechniqueFlags::RENDER_IGNORE)
+				if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_IGNORE) == Render::TechniqueFlags::RENDER_IGNORE)
 					continue;
 
-				//TEMP Static set of uniforms/textures.
+				for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+				{	
+					m_uniforms.BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+				}
 
-				glActiveTexture(GL_TEXTURE0 + 0);
-				if((*itr).m_material->m_diffuseMap != nullptr)
+				glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_DIFFUSE);
+				if((*job).m_material->m_diffuseMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*itr).m_material->m_diffuseMap->GetTarget(), (*itr).m_material->m_diffuseMap->GetHandle());
+					glBindTexture((*job).m_material->m_diffuseMap->GetTarget(), (*job).m_material->m_diffuseMap->GetHandle());
 				}
 				else
 				{
 					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 				
-				glActiveTexture(GL_TEXTURE0 + 1);
-				if((*itr).m_material->m_specularMap != nullptr)
+				glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_SPECULAR);
+				if((*job).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*itr).m_material->m_specularMap->GetTarget(), (*itr).m_material->m_specularMap->GetHandle());
+					glBindTexture((*job).m_material->m_specularMap->GetTarget(), (*job).m_material->m_specularMap->GetHandle());
 				}
 				else
 				{
 					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
-				glActiveTexture(GL_TEXTURE0 + 2);
-				if((*itr).m_material->m_normalMap != nullptr)
+				glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_NORMAL);
+				if((*job).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*itr).m_material->m_normalMap->GetTarget(), (*itr).m_material->m_normalMap->GetHandle());
+					glBindTexture((*job).m_material->m_normalMap->GetTarget(), (*job).m_material->m_normalMap->GetHandle());
 				}
 				else
 				{
 					glBindTexture(GL_TEXTURE_2D, 0);
 				}
 
-				glActiveTexture(GL_TEXTURE0 + 5);
+				// Bind depth buffer.
+				glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_DEPTH);
 				glBindTexture(GL_TEXTURE_2D, m_gbuffer.m_depthHandle);
 
-				for(auto itrP = (*itrT)->GetPrograms().begin(); itrP != (*itrT)->GetPrograms().end(); ++itrP)
+				for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 				{
 					// Apply program.
-					(*itrP)->Apply();
+					(*program)->Apply();
 
-					if(((*itr).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+					if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
 					{
-						(*itr).m_mesh->DrawTransformFeedback();
+						(*job).m_mesh->DrawTransformFeedback();
 					}
 					else
 					{
-						(*itr).m_mesh->Draw();		
+						(*job).m_mesh->Draw();		
 					}
-				}
-
-				// Debug.
-				if(m_displayNormals)
-				{
-					m_normalTech->GetPrograms()[0]->Apply();	
-					//(*itr).m_mesh->Draw();	
 				}
 			}
 
-			(*itr).m_mesh->Unbind();
+			(*job).m_mesh->Unbind();
 		}
 
 		m_jobs.clear();
@@ -369,10 +368,10 @@ namespace Render
 			lineVertices[i*2+1].m_color = m_lines[i].m_color;
 		}
 
-		Uniforms uniforms;
-		uniforms.m_world = glm::mat4(1.0f);
+		glm::mat4 world;
+		world = glm::mat4(1.0f);
 
-		m_uniforms.BufferData(1, sizeof(Uniforms), &uniforms);
+		m_uniforms.BufferSubData(0, sizeof(glm::mat4), &world);
 		m_debugTech->GetPrograms()[0]->Apply();
 
 		m_lineMesh.GetVertexBuffer()->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
@@ -382,16 +381,6 @@ namespace Render
 
 		delete [] lineVertices;
 		m_lines.clear();
-	}
-
-	void GLRenderer::BindMaterial(Material* p_material)
-	{
-		/*p_material->m_effect->Apply();
-		p_material->m_effect->SetUniformBuffer(m_uniforms.GetBufferId(), "PerObject", 1);
-		p_material->m_effect->SetUniformBuffer(m_cameraBuffer.GetBufferId(), "PerFrame", 0);
-		p_material->m_effect->SetUniformBuffer(m_lights.GetBufferId(), "Lights", 2);*/
-
-		//p_material->m_diffuseMap->GetID();
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)

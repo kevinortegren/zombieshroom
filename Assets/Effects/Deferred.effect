@@ -1,7 +1,7 @@
 - name: DeferredLighting
   techniques:
     - name: Lighting
-      uniforms:
+      bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject

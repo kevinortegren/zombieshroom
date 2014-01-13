@@ -453,8 +453,8 @@ namespace RootForce
 					if (entity != nullptr)
 					{
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
-						transform->m_position = m.Position;
-						transform->m_orientation.SetOrientation(m.Orientation);
+						//wwtransform->m_position = m.Position;
+					//	transform->m_orientation.SetOrientation(m.Orientation);
 
 						// Get a list of the connected players
 						DataStructures::List<RakNet::SystemAddress> connectedAddresses;

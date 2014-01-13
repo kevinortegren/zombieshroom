@@ -17,22 +17,14 @@ namespace Render
 		};
 	}
 
-	struct Uniforms
-	{
-		glm::mat4 m_world;
-		glm::mat4 m_normal;
-	};
-
 	struct RenderJob
 	{
 		RenderJob()
 			: m_flags(0), m_renderPass(2) {}
 
-		Render::MeshInterface* m_mesh;
-
+		MeshInterface* m_mesh;
 		Material* m_material;	
-		Uniforms m_uniforms;
-
+		std::map<Semantic::Semantic, void*> m_params;
 		unsigned m_flags;
 		unsigned m_renderPass;
 	};

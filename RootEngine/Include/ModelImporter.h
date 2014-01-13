@@ -48,11 +48,12 @@ namespace RootEngine
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		void LoadBones(unsigned int p_index, const aiMesh* p_aiMesh);
+		void LoadAnimation(unsigned int p_index, const aiScene* p_scene);
 		std::string GetNameFromPath(std::string p_path);
 
 		GameSharedContext*			m_context;
 		Model*						m_model; 
-		
+	
 	};
 #endif
 }

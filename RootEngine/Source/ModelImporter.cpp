@@ -19,11 +19,27 @@ namespace RootEngine
 	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
 		m_model = new Model(); //Owned by ResourceManager
+		std::shared_ptr<Assimp::Importer> m_importer = std::shared_ptr<Assimp::Importer>(new Assimp::Importer);
+		const aiScene* aiscene = m_importer->ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+		
+		if(aiscene->HasAnimations())
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
+			/*for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "animation name: '%s'", aiscene->mAnimations[i]->mName.C_Str());
 
-
-		Assimp::Importer importer;
-		const aiScene* aiscene = importer.ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
-
+				for(unsigned int j = 0; j < aiscene->mAnimations[i]->mNumChannels; j++)
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
+				}
+			}*/
+			
+		}
+		
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
@@ -35,7 +51,15 @@ namespace RootEngine
 		}
 		else 
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, importer.GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, m_importer->GetErrorString());
+		}
+
+		if(aiscene->HasAnimations())
+		{
+			for (unsigned int i = 0 ; i < aiscene->mNumAnimations ; i++) 
+			{
+				m_model->m_animations[i]->SetAiImporter(m_importer);
+			}
 		}
 
 		return m_model;
@@ -51,7 +75,7 @@ namespace RootEngine
 		}
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
 
-		InitMaterials(p_scene, p_filename);
+		InitMaterials(p_scene, p_filename);	
 	}
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
@@ -66,13 +90,44 @@ namespace RootEngine
 			return;
 		}
 
+		//Load bones
+		
+
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
 		std::vector<glm::vec3> positions;
+		if(p_aiMesh->HasBones())
+		{
+			LoadBones(p_index, p_aiMesh);
+			std::vector<Render::Vertex1P1N1UV1T1BT1BID1W> vertices;
 
-		if(p_aiMesh->HasTangentsAndBitangents())
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
+				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
+				const aiVector3D* pTangent   = &(p_aiMesh->mTangents[i]);
+				const aiVector3D* pBitangent   = &(p_aiMesh->mBitangents[i]);
+				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+
+				Render::Vertex1P1N1UV1T1BT1BID1W v;
+				v.m_pos			= glm::vec3(pPos->x, pPos->y, pPos->z);
+				v.m_normal		= glm::vec3(pNormal->x, pNormal->y, pNormal->z);
+				v.m_UV			= glm::vec2(pTexCoord->x, pTexCoord->y);
+				v.m_tangent		= glm::vec3(pTangent->x, pTangent->y, pTangent->z);
+				v.m_bitangent	= glm::vec3(pBitangent->x, pBitangent->y, pBitangent->z);
+				v.m_boneIDs		= glm::uvec4(m_model->m_animations[0]->GetBoneData(i)->m_IDList[0], m_model->m_animations[0]->GetBoneData(i)->m_IDList[1], m_model->m_animations[0]->GetBoneData(i)->m_IDList[2], m_model->m_animations[0]->GetBoneData(i)->m_IDList[3]);
+				v.m_weights		= glm::vec4(m_model->m_animations[0]->GetBoneData(i)->m_weightList[0], m_model->m_animations[0]->GetBoneData(i)->m_weightList[1], m_model->m_animations[0]->GetBoneData(i)->m_weightList[2], m_model->m_animations[0]->GetBoneData(i)->m_weightList[3]);
+
+				vertices.push_back(v);
+				positions.push_back(v.m_pos);
+			}
+
+			mesh->CreateVertexBuffer1P1N1UV1T1BT1BID1W(&vertices[0], vertices.size());	
+
+		}
+		else if(p_aiMesh->HasTangentsAndBitangents())
 		{
 			std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
 
@@ -96,7 +151,7 @@ namespace RootEngine
 
 			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
 		}
-		else
+		else 
 		{
 			std::vector<Render::Vertex1P1N1UV> vertices;
 
@@ -117,10 +172,9 @@ namespace RootEngine
 			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
 		}
 
-		//Load bones
-		if(p_aiMesh->HasBones())
-			LoadBones(p_index, p_aiMesh);
 		
+		
+
 		if(p_aiMesh->HasFaces())
 		{
 			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
@@ -227,25 +281,22 @@ namespace RootEngine
 			{
 				boneIndex = animation->GetNumBones();
 				animation->SetNumBones(boneIndex + 1);
-
 				RootEngine::RootAnimation::BoneInfo bi;
-				//Great code for converting atMatrix4x4 to glm::mat4x4!
-				aiMatrix4x4 am = p_aiMesh->mBones[i]->mOffsetMatrix;
-				glm::mat4x4 gm = glm::mat4x4();
-				gm[0][0] = am.a1; gm[0][1] = am.a2; gm[0][2] = am.a3; gm[0][3] = am.a4;
-				gm[1][0] = am.b1; gm[1][1] = am.b2; gm[1][2] = am.b3; gm[1][3] = am.b4;
-				gm[2][0] = am.c1; gm[2][1] = am.c2; gm[2][2] = am.c3; gm[2][3] = am.c4;
-				gm[3][0] = am.d1; gm[3][1] = am.d2; gm[3][2] = am.d3; gm[3][3] = am.d4;
-				bi.m_boneOffset = gm;
-
-				animation->MapBone(boneName, boneIndex);
-				
+				animation->PushBoneInfo(bi);
 			}
 			else
 			{
 				//Get bone index if it exists
 				boneIndex = animation->GetIndexFromBoneName(boneName);
 			}
+			
+			//Great code for converting atMatrix4x4 to glm::mat4x4!
+			aiMatrix4x4 am = p_aiMesh->mBones[i]->mOffsetMatrix;
+			glm::mat4x4 gm = glm::mat4x4();
+			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
+			animation->MapBone(boneName, boneIndex);
+			animation->GetBoneInfo(boneIndex)->m_boneOffset = glm::transpose(gm);
+
 			//Loop through all weights in the bone and add weights and bone data to vertex slot
 			for(unsigned int j = 0; j < p_aiMesh->mBones[i]->mNumWeights; j++)
 			{
@@ -276,6 +327,9 @@ namespace RootEngine
 		cutPath		= cutPath.substr(0, dotIndex);
 		return cutPath;
 	}
+
+	
+
 }
 
 #endif

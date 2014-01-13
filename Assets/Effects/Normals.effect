@@ -1,12 +1,11 @@
 - name: Normals
   techniques:
     - name: Normals
-      uniforms:
+      bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject
           slot: 1
-      textures:
       programs:
         - name: Normals
           shaders:

@@ -37,12 +37,12 @@ namespace Render
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
 	};
 
+	//TODO: Store in resource manager.
 	class Program : public ProgramInterface
 	{
 	public:
 
 		enum BlendState { BLEND_NONE, BLEND_ALPHA, BLEND_ADDITIVE, BLEND_INV_ALPHA };
-
 		enum FillMode { FILL_SOLID, FILL_WIREFRAME };
 
 		struct DepthState {		
@@ -85,7 +85,7 @@ namespace Render
 	public:
 		virtual std::shared_ptr<Program> CreateProgram() = 0;
 		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;
-		virtual std::shared_ptr<Render::BufferInterface> GetUniformBuffer() = 0;
+		virtual void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset) = 0;
 		virtual void Apply() = 0;
 	};
 
@@ -96,31 +96,14 @@ namespace Render
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
 
-		std::shared_ptr<Render::BufferInterface> GetUniformBuffer();
 		void Apply();
+		void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset);
 
-		std::map<Semantic::Semantic, unsigned int> m_data;
+		std::map<Semantic::Semantic, unsigned int> m_uniformsParams;
 		std::shared_ptr<Render::BufferInterface> m_perTechniqueBuffer;
+
 		unsigned m_flags;
 
-		/* 
-			How per object uniforms should work.
-
-		   .vert
-			perObject { float4x4 g_matrix; }
-
-		   technique
-			BONES - 0
-
-		   material
-			addParam(BONES, &m_boneMatrix);
-
-		   rendering
-			foreach param
-				read offset from technique using semantic
-					bufferSubData(offset, pointer)
-		*/
-		
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;
 		
@@ -142,15 +125,5 @@ namespace Render
 	private:
 		std::vector<std::shared_ptr<Technique>> m_techniques;
 
-	};
-
-	struct EffectParamsInterface
-	{
-		virtual void AllocateParams(EffectInterface* p_effect) = 0;
-	};
-
-	struct EffectParams : public EffectParamsInterface
-	{
-		void AllocateParams(EffectInterface* p_effect);
 	};
 }

@@ -1,12 +1,11 @@
 - name: Color
   techniques:
     - name: Color
-      uniforms:
+      bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject
           slot: 1
-      textures:
       programs:
       - name: Color
         shaders:

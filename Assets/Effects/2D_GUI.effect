@@ -1,7 +1,6 @@
 - name: 2D_GUI
   techniques:
     - name: 2D_GUI
-      uniforms:
       textures:
         - name: texSampler
           slot: 0
@@ -15,4 +14,4 @@
           depth:
             write: 0
             test: 0
-          blend: 3
+          blend: 1

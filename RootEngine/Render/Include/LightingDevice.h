@@ -7,7 +7,6 @@
 #define RENDER_MAX_DIRECTIONALLIGHTS 16
 #define RENDER_MAX_POINTLIGHTS 16
 
-
 namespace Render
 {
 	class GLRenderer;
