@@ -1,7 +1,7 @@
 @font-face
 {
-	font-family: 'Sherwood';
-	src: url("SHERWOOD.TTF");
+  font-family: 'Sherwood';
+  src: url("SHERWOOD.TTF");
 }
 
 body, input
@@ -167,10 +167,11 @@ a
 #lan-wrapper
 {
   width: 1200px;
-  border: 1px solid #666666;
-  padding: 5px;
+  border: 0;
+  padding: 80px 120px 180px 120px;
   margin: auto;
-  background-color: #ffffff;
+  background: url('Ram.png') transparent;
+  background-size: 100% 100%;
 }
 #lan-list
 {
