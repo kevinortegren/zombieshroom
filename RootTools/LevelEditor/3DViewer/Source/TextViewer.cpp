@@ -286,7 +286,6 @@ int main(int argc, char* argv[])
 					m_vertices[j].m_pos = RM.PmeshList[i]->vertex[j];
 					m_vertices[j].m_normal = RM.PmeshList[i]->normal[j];
 					m_vertices[j].m_UV = RM.PmeshList[i]->UV[j];
-
 				}
 
 				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;

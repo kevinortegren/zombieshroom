@@ -46,6 +46,8 @@
 #include <maya/MFnBlinnShader.h>
 #include <maya/MPlugArray.h>
 
+#include <maya/MQuaternion.h>
+
 #ifdef _DEBUG
 	#define PrintMayaError
 #endif

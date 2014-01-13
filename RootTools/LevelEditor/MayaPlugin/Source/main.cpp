@@ -659,6 +659,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
+	MVector pivot;
 	MSpace::Space space_transform = MSpace::kTransform;
 	MSpace::Space space_local = MSpace::kObject;
 
@@ -824,12 +825,13 @@ void MayaMeshToList(MObject node, int meshIndex)
 			MFnTransform transform = mesh.parent(0, &status);
 
 			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, space_local);
+			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
+			pivot = transform.rotatePivotTranslation(space_transform);
 
 			SM.meshList[meshIndex].transformation.position.x = transform.getTranslation(space_transform).x;
 			SM.meshList[meshIndex].transformation.position.y = transform.getTranslation(space_transform).y;
 			SM.meshList[meshIndex].transformation.position.z = transform.getTranslation(space_transform).z;
-
+			
 			SM.meshList[meshIndex].transformation.scale.x = scale[0];
 			SM.meshList[meshIndex].transformation.scale.y = scale[1];
 			SM.meshList[meshIndex].transformation.scale.z = scale[2];
@@ -839,6 +841,9 @@ void MayaMeshToList(MObject node, int meshIndex)
 			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
 			SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
+			SM.meshList[meshIndex].transformation.pivot.x = pivot.x;
+			SM.meshList[meshIndex].transformation.pivot.y = pivot.y;
+			SM.meshList[meshIndex].transformation.pivot.z = pivot.z;
 		}
 	}
 }
