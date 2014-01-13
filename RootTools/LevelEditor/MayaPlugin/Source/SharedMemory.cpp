@@ -150,8 +150,7 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 	*NumberOfMeshes = nrOfMeshes;
-	MeshIdChange->x = index;	//Moved this codeblock up, didnt change shit.
-
+	MeshIdChange->x = index;
 	ReleaseMutex(IdMutexHandle);
 
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
@@ -166,21 +165,24 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->UV[i] = meshList[index].UV[i];
 		}
 
-		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
-		
+		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;		
 	}	
 
-	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
-	memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
-	memcpy(PmeshList[index]->materialName, materialList[PmeshList[index]->MaterialID].materialName, 30);
+	memset(PmeshList[index]->transformation.name, NULL, sizeof(PmeshList[index]->transformation.name));
+	memset(PmeshList[index]->modelName, NULL, sizeof(PmeshList[index]->modelName));
+	memset(PmeshList[index]->materialName, NULL, sizeof(PmeshList[index]->materialName));
+
+	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, g_maxNameLength);
+	memcpy(PmeshList[index]->modelName, meshList[index].modelName, g_maxNameLength);
+	memcpy(PmeshList[index]->materialName, materialList[PmeshList[index]->MaterialID].materialName, g_maxNameLength);
 
 	if(updateTransformation)
-	{
-		
+	{		
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
-	}	
+		PmeshList[index]->transformation.pivot = meshList[index].transformation.pivot;
+	}
 
 	ReleaseMutex(MeshMutexHandle);
 }
@@ -192,15 +194,19 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int materialID, int 
 
 	*NumberOfMaterials = nrOfMaterials;
 	PmeshList[meshID]->MaterialID = materialID;
+	memcpy(PmeshList[meshID]->materialName, materialList[PmeshList[meshID]->MaterialID].materialName, g_maxNameLength);
 
 	for(int i = 0; i < nrOfMaterials; i++)
 	{
-		memcpy(PmaterialList[i]->materialName, materialList[i].materialName, 30);
-		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, 100);
-		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, 100);
+		memcpy(PmaterialList[i]->materialName, materialList[i].materialName, g_maxNameLength);
+		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, g_maxPathLength);
+		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
 	}
 
-	ReleaseMutex(MeshMutexHandle);
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	MeshIdChange->x = meshID;
+	ReleaseMutex(IdMutexHandle);
 }
 
 void SharedMemory::RemoveMesh(int id, int nrOfMeshes)

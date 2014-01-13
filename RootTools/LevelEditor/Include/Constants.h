@@ -12,8 +12,8 @@ const int g_maxLights = 10;
 const int g_maxVerticesPerMesh = 30000;
 const int g_maxNameLength = 30;
 const int g_maxPathLength = 100;
-const string g_savepath = "C:/Users/BTH/Documents/zombieshroom/Assets/";
-const string g_levelName = "level";
+const string g_savepath = "C:/Users/BTH/Documents/MASTER/zombieshroom/Assets/";
+const string g_levelName = "myTestLevel";
 
 struct Transform
 {

@@ -21,6 +21,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
 void NodeRemovedCB(MObject &node, void *clientData);
 void viewCB(const MString &str, void *clientData);
+void updateAllMaterials();
 
 int cameraExists(MString name);
 
@@ -328,6 +329,14 @@ void viewCB(const MString &str, void *clientData)
 	{
 		MayaCameraToList(g_mayaCameraList[tempInt], tempInt);
 		SM.UpdateSharedCamera(tempInt);
+		
+		//Materials works but maybe not optimal ;)
+		//for(int i = 0; i < currNrMeshes; i++)
+		//{
+		//	MayaMeshToList(g_mayaMeshList[i], i);
+		//	Print("Updating all ", i);
+		//}
+		
 	}
 
 	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -728,10 +737,12 @@ void MayaMeshToList(MObject node, int meshIndex)
 			currNrMaterials++;
 			materialID = currNrMaterials;
 			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+			Print("Update new material");
 			
 		}else
 		{
 			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
+			Print("Update material");
 		}
 
 		///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
