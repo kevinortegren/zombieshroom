@@ -46,6 +46,8 @@ namespace RootForce
 	{
 		//JSAddMessage(Awesomium::ToString(p_array[0].ToString()).c_str()); //This line of code sounds retardeded :/
 
+		//TODO: check the first char for a / sign, if found it is a server event and should be treated differently
+		std::string temp = Awesomium::ToString(p_array[0].ToString());
 		m_messageBuffer.push_back(Awesomium::ToString(p_array[0].ToString()));
 	}
 
@@ -57,6 +59,14 @@ namespace RootForce
 		m_messageBuffer.erase(m_messageBuffer.begin());
 		return temp;
 	}
-	
+
+	RootServer::EventData ChatSystem::PollEvent()
+	{
+		RootServer::EventData temp = m_eventBuffer.at(0); 
+		m_eventBuffer.erase(m_eventBuffer.begin());
+		return temp;
+	}
+
+
 
 }
