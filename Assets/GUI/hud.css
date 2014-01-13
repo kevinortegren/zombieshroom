@@ -37,10 +37,10 @@ img
 	background-color: rgba(60,60,60,0.5);
 	font-size: 32px;
 }
-#timeleft
+#TimeLeftContainer
 {
 	width: 120px;
-	height: 50px;
+	height: 35px;
 	margin: auto;
 	text-align: center;
 	background-color: rgba(60,60,60,0.5);
@@ -84,7 +84,7 @@ img
 	top: 100%;
 	margin-top: -85px;
 	//background-color:rgba(50,45,255,0.5);
-	color: rgba(255,45,57,0.5);
+	color: rgba(255,90,114,0.7);
 	font-size: 50px;
 }
 

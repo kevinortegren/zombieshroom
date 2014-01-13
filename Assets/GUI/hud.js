@@ -52,10 +52,10 @@ function Set(p_id, p_value)
 		if(seconds < 10)
 			seconds = "0" + seconds;
 		value = "" + minutes + ":" + seconds;
-		/*if(parseInt(minutes) < 2) TODO: not working any more, have martins look at it
-			$("#"+p_id).class("blink");
+		if( minutes < 2 )
+			$("#"+p_id).addClass("blink");
 		else
-			$("#"+p_id).class("");*/
+			$("#"+p_id).removeClass("blink");
 	}
 	$("#"+p_id).html(value);
 }

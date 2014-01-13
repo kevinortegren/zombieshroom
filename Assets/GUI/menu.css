@@ -119,6 +119,11 @@ a
   display: inline-block;
   width: 100px;
 }
+.inline-150px
+{
+  display: inline-block;
+  width: 150px;
+}
 #connecting
 {
   display: none;
@@ -190,7 +195,7 @@ a
 }
 #lan-host-overlay
 {
-  width: 500px;
+  width: 550px;
   height: 300px;
 }
 #lan-host-map
