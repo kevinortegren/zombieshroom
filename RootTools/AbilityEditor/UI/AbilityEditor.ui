@@ -6,19 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>960</width>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>AbilityEditor</string>
   </property>
+  <property name="accessibleName">
+   <string/>
+  </property>
+  <property name="accessibleDescription">
+   <string/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>210</y>
+      <x>580</x>
+      <y>270</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -40,12 +46,37 @@
    <widget class="QDial" name="dial">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>160</y>
+      <x>320</x>
+      <y>60</y>
       <width>151</width>
       <height>131</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>400</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <row>
+     <property name="text">
+      <string/>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Props</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Valuz</string>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -53,7 +84,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>960</width>
      <height>21</height>
     </rect>
    </property>
@@ -72,22 +103,5 @@
  <resources>
   <include location="AbilityEditor.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>dial</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>lcdNumber</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>215</x>
-     <y>278</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>461</x>
-     <y>164</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

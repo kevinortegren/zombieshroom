@@ -2,6 +2,7 @@
 #define ABILITYEDITOR_H
 
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QBoxLayout>
 //#include "ui_AbilityEditor.h"
 #include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
 
