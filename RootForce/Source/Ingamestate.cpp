@@ -212,6 +212,10 @@ namespace RootForce
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 
 		m_hud->Update();
+		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
+
+		if(event.EventType == RootServer::UserCommands::CLIENT_RAGEQUIT)
+			return GameStates::Menu;
 
 #ifdef _DEBUG
 		//Debug drawing TODO: Remove for release

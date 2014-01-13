@@ -30,7 +30,7 @@ namespace RootForce
 			g_world->GetTagManager()->RegisterEntity("MatchState", entity);
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);;
 			rules->ScoreLimit = p_playData.Killcount;
-			rules->TimeLeft = p_playData.MatchLength;
+			rules->TimeLeft = (float)p_playData.MatchLength;
 			rules->TeamScore[1] = 0;
 			rules->TeamScore[2] = 0;
 			// Setup server info response
