@@ -308,10 +308,7 @@ namespace RootForce
 			g_engineContext.m_renderer->Render();
 		}
 
-		{
-			PROFILE("Render Lines", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->RenderLines();
-		}
+
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

@@ -100,10 +100,10 @@ namespace RootForce
 		}
 		
 		quadTreeBounds.m_maxX = maxX;
-		quadTreeBounds.m_maxY = maxY;
+		quadTreeBounds.m_maxY = QUADTREE_NODE_HEIGHT;
 		quadTreeBounds.m_maxZ = maxZ;
 		quadTreeBounds.m_minX = minX;
-		quadTreeBounds.m_minY = minY;
+		quadTreeBounds.m_minY = m_translation.y;
 		quadTreeBounds.m_minZ = minZ;
 
 		m_root = new QuadNode(quadTreeBounds, numTriangles);
@@ -133,10 +133,10 @@ namespace RootForce
 			Rectangle topLeft = Rectangle(aabb->m_minX, aabb->m_minZ + halfheight, halfwidth, halfheight);
 			Rectangle topRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ + halfheight, halfwidth, halfheight);
 
-			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomLeft.m_y, bottomLeft.m_y + halfheight);
-			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomRight.m_y, bottomRight.m_y + halfheight);
-			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topLeft.m_y, topLeft.m_y + halfheight);
-			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topRight.m_y, topRight.m_y + halfheight);
+			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, m_translation.y, QUADTREE_NODE_HEIGHT, bottomLeft.m_y, bottomLeft.m_y + halfheight);
+			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, m_translation.y, QUADTREE_NODE_HEIGHT, bottomRight.m_y, bottomRight.m_y + halfheight);
+			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_translation.y, QUADTREE_NODE_HEIGHT, topLeft.m_y, topLeft.m_y + halfheight);
+			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_translation.y, QUADTREE_NODE_HEIGHT, topRight.m_y, topRight.m_y + halfheight);
 
 			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, CountTriangles( bottomLeft ));
 			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, CountTriangles( bottomRight ));
@@ -172,7 +172,7 @@ namespace RootForce
 					verts[1] = entity->second.m_positions[v1];
 					verts[2] = entity->second.m_positions[v2];
 		
-					if( IsTriangleContained(verts, p_node->m_bounds.GetRect()) )
+					if( IsTriangleContained(verts, p_node->m_bounds.GetXZRect()) )
 					{
 						//TODO: Create new entity.
 						// Strip triangles not contained in the node.
@@ -257,7 +257,7 @@ namespace RootForce
 	QuadNode* QuadTree::PickNode(QuadNode* p_node, glm::vec2 p_position)
 	{
 		QuadNode* currentNode = p_node;
-		if( currentNode->m_bounds.GetRect().IsPointContained(p_position) )
+		if( currentNode->m_bounds.GetXZRect().IsPointContained(p_position) )
 		{
 			if(currentNode->m_childs.size() == 0)
 			{
@@ -284,14 +284,16 @@ namespace RootForce
 
 	void QuadTree::RenderNode(QuadNode* p_node)
 	{
-		glm::vec3 a = glm::vec3(p_node->m_bounds.m_minX, p_node->m_bounds.m_minY, p_node->m_bounds.m_minZ);
-		glm::vec3 b = glm::vec3(p_node->m_bounds.m_maxX, p_node->m_bounds.m_maxY, p_node->m_bounds.m_maxZ);
-
-		m_context->m_renderer->AddLine(a, b, glm::vec4(1,0,0,1));
+		p_node->m_bounds.DebugDraw(m_context->m_renderer);
 
 		for(int i = 0; i < p_node->m_childs.size(); ++i)
 		{
 			RenderNode(p_node->m_childs[i]);
 		}
+	}
+
+	void QuadTree::SetTranslation(glm::vec3 p_translation)
+	{
+		m_translation = p_translation;
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <RootSystems/Include/Shapes/Rectangle.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootForce
 {
@@ -13,7 +14,9 @@ namespace RootForce
 		int GetLengthY( void ) const;
 		int GetLengthZ( void ) const;
 
-		Rectangle GetRect( void ) const;
+		Rectangle GetXZRect( void ) const;
+
+		void DebugDraw(Render::RendererInterface* p_renderer);
 
 		int m_minX, m_maxX, m_minY, m_maxY, m_minZ, m_maxZ;
 	};
