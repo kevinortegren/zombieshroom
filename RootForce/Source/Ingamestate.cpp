@@ -248,6 +248,8 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		
+		m_sharedSystems.m_worldSystem->Process();
+
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
@@ -311,10 +313,7 @@ namespace RootForce
 			g_engineContext.m_renderer->Render();
 		}
 
-		{
-			PROFILE("Render Lines", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->RenderLines();
-		}
+
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

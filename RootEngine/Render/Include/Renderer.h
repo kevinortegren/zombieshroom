@@ -135,6 +135,9 @@ namespace Render
 
 		std::vector<RenderJob> m_jobs;
 
+		GLuint m_fbo;
+		GLuint m_color;
+
 		GeometryBuffer m_gbuffer;
 		ParticleSystemHandler m_particles;
 		LightingDevice m_lighting;
@@ -158,12 +161,13 @@ namespace Render
 		Buffer m_cameraBuffer;
 		Buffer m_uniforms;
 
+		Mesh m_fullscreenQuad;
+
+		std::shared_ptr<TechniqueInterface> m_renderTech;
 		std::shared_ptr<TechniqueInterface> m_debugTech;
 		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		bool m_displayNormals;
-
-
 	};
 }
 

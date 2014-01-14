@@ -150,13 +150,62 @@ namespace Render
 		// Setup GBuffer.
 		m_gbuffer.Init(width, height);
 
+		// Setup render target for forward renderer to use.
+		glGenFramebuffers(1, &m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		glGenTextures(1, &m_color);
+		glBindTexture(GL_TEXTURE_2D, m_color);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color, 0);
+		
+		// Share depth attachment between gbuffer and forward.
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthHandle, 0);
+
+		// Setup fullscreen quad.
+		Render::Vertex1P1UV verts[4];
+		verts[0].m_pos = glm::vec3(-1.0f, -1.0f, 0.0f);
+		verts[1].m_pos = glm::vec3(+1.0f, -1.0f, 0.0f);
+		verts[2].m_pos = glm::vec3(-1.0f, +1.0f, 0.0f);
+		verts[3].m_pos = glm::vec3(+1.0f, +1.0f, 0.0f);
+
+		verts[0].m_UV = glm::vec2(0.0f, 0.0f);
+		verts[1].m_UV = glm::vec2(1.0f, 0.0f);
+		verts[2].m_UV = glm::vec2(0.0f, 1.0f);
+		verts[3].m_UV = glm::vec2(1.0f, 1.0f);
+		
+		unsigned int indices[6];
+		indices[0] = 0; 
+		indices[1] = 1; 
+		indices[2] = 2;
+		indices[3] = 2;
+		indices[4] = 1; 
+		indices[5] = 3;
+
+		m_fullscreenQuad.SetVertexBuffer(CreateBuffer());
+		m_fullscreenQuad.SetElementBuffer(CreateBuffer());
+		m_fullscreenQuad.SetVertexAttribute(CreateVertexAttributes());
+
+		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
+		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
+
 		// Setup lighting device.
-		m_lighting.Init(this, width, height);
+		m_lighting.Init(width, height);
 
 		m_lineMesh.SetVertexBuffer(CreateBuffer());
 		m_lineMesh.SetVertexAttribute(CreateVertexAttributes());
 		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
+
+		// Load default rendering effects.
+		auto renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Forward");
+		m_renderTech = renderEffect->GetTechniques()[0];
 
 		auto m_debugEffect = g_context.m_resourceManager->LoadEffect("Color");
 		m_debugTech = m_debugEffect->GetTechniques()[0];
@@ -250,6 +299,26 @@ namespace Render
 			ForwardPass();
 		}
 
+		{
+			PROFILE("Render Lines", g_context.m_profiler);
+			RenderLines();
+		}
+
+		// Bind forward target.
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Read forward.
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, m_color);
+
+		m_renderTech->GetPrograms()[0]->Apply();
+
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
+
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLRenderer::Clear()
@@ -348,17 +417,36 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		m_lighting.Process();
+		m_lighting.Process(m_fullscreenQuad);
 	}
 
 	void GLRenderer::ForwardPass()
 	{
+		// Bind forward target.
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
+		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, buffers);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Read la-buffer.
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
+
+		// Output program.
+		m_renderTech->GetPrograms()[0]->Apply();
+
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
+
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLRenderer::RenderLines()
 	{
-		glEnable(GL_DEPTH_TEST);
 		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
 		for(unsigned int i = 0; i < m_lines.size(); i++)
 		{

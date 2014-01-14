@@ -31,8 +31,7 @@ namespace RootEngine
 
 		RootEngine::RootAnimation::AnimationInterface* m_animation;
 
-		std::string m_textureHandles[3];
-		
+		std::string m_textureHandles[3];	
 	};
 
 	struct VertexBoneData
