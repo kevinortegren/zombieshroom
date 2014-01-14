@@ -43,8 +43,8 @@
 #define QTVARIANTPROPERTY_H
 
 #include "qtpropertybrowser.h"
-#include <QVariant>
-#include <QIcon>
+#include <QtCore/QVariant>
+#include <QtGui/QIcon>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE

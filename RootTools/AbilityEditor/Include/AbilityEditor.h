@@ -13,9 +13,15 @@ class AbilityEditor : public QMainWindow
 public:
 	AbilityEditor(QWidget *parent = 0);
 	~AbilityEditor();
+	void Init();
+
+public slots:
+	void UpdatePropertyBrowser();
 
 private:
 	Ui::AbilityEditorClass ui;
+
+
 };
 
 #endif // ABILITYEDITOR_H

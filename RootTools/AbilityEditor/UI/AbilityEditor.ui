@@ -17,20 +17,20 @@
    <widget class="QTabWidget" name="abilityWidget">
     <property name="geometry">
      <rect>
-      <x>16</x>
+      <x>10</x>
       <y>10</y>
       <width>271</width>
       <height>381</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tabOnCreate">
      <attribute name="title">
       <string>On Create</string>
      </attribute>
-     <widget class="QListWidget" name="entityList">
+     <widget class="QTreeWidget" name="treeOnCreate">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -39,36 +39,18 @@
         <height>351</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="viewMode">
-       <enum>QListView::ListMode</enum>
-      </property>
-      <item>
+      <column>
        <property name="text">
-        <string>New Item</string>
+        <string>Entities</string>
        </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>New Item</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>New Item</string>
-       </property>
-      </item>
+      </column>
      </widget>
     </widget>
     <widget class="QWidget" name="tabOnCollide">
      <attribute name="title">
       <string>On Collide</string>
      </attribute>
-     <widget class="QTreeWidget" name="treeWidget">
+     <widget class="QTreeWidget" name="treeOnCollide">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -126,6 +108,21 @@
      <attribute name="title">
       <string>On Destroy</string>
      </attribute>
+     <widget class="QTreeWidget" name="treeOnDestroy">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>261</width>
+        <height>351</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>Entities</string>
+       </property>
+      </column>
+     </widget>
     </widget>
    </widget>
    <widget class="QTabWidget" name="toolBoxWidget">
@@ -159,6 +156,19 @@
       <width>571</width>
       <height>231</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>120</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
     </property>
    </widget>
   </widget>
