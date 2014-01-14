@@ -443,6 +443,12 @@ namespace Render
 	{
 		m_particles.EndTransform();
 	}
+
+	void GLRenderer::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster )
+	{
+
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

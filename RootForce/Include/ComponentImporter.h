@@ -143,6 +143,19 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				pointLight->m_range = range;
 			}
 			break;
+		case RootForce::ComponentType::DIRECTIONALLIGHT:
+			{
+				RootForce::DirectionalLight* directionalLight = p_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(p_entity);
+
+				glm::vec4 color;
+				p_node["Color"][0] >> color.r;
+				p_node["Color"][1] >> color.g;
+				p_node["Color"][2] >> color.b;
+				p_node["Color"][3] >> color.a;
+
+				directionalLight->m_color = color;
+			}
+			break;
 		case RootForce::ComponentType::PLAYERCONTROL:
 			{
 				RootForce::PlayerControl* input = p_world->GetEntityManager()->CreateComponent<RootForce::PlayerControl>(p_entity);

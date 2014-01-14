@@ -12,9 +12,16 @@ namespace RootForce
 		// Setup static lights.
 		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
+		ECS::Entity* sun = m_world->GetEntityManager()->CreateEntity();
+		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
+		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
+		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+		sunTransform->m_position = glm::vec3(0.0f, 100.0f, 100.0f);
+		sunTransform->m_orientation.LookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 		Render::DirectionalLight directionalLight;
-		directionalLight.m_color = glm::vec4(0.8f);
-		directionalLight.m_direction = glm::vec3(0, -1,-1);
+		directionalLight.m_color = sunLight->m_color;
+		directionalLight.m_direction = sunTransform->m_orientation.GetFront();
 
 		m_engineContext->m_renderer->AddDirectionalLight(directionalLight, 0);
 

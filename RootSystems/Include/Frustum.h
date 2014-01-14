@@ -6,20 +6,23 @@
 
 namespace RootForce
 {
-	struct Frustum
+	class Frustum
 	{
+	public:
 		Frustum(float p_fov, float p_near, float p_far, float p_aspectRatio = 1)
 		{
 			m_fov = p_fov;
 			m_near = p_near;
 			m_far = p_far;
 			m_aspectRatio = p_aspectRatio;
+			RecalculatePlanes();
 		}
 		~Frustum(){}
 
-		void recalculatePlanes();
+		void RecalculatePlanes();
+		void DrawLines(glm::mat4 p_space);
 
-		Plane m_planes[8];
+		Plane m_planes[6];
 
 	private:
 		float m_near;
@@ -36,5 +39,7 @@ namespace RootForce
 			NEARP,
 			FARP
 		};
+
+		glm::vec3 ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;
 	};
 }
