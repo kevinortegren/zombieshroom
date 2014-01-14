@@ -29,7 +29,7 @@ namespace RootForce
 
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
-		renderable->m_params[Render::Semantic::BONES] = renderable->m_model->m_animations[0]->GetBones().data();
+		renderable->m_params[Render::Semantic::BONES] = &animation->m_bones[0];
 
 		renderable->m_pass = RootForce::RenderPass::RENDERPASS_DYNAMIC;
 		renderable->m_material =  m_engineContext->m_resourceManager->GetMaterial("testchar");

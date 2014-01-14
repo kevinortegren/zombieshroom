@@ -133,6 +133,7 @@ namespace RootForce
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
+		m_animationSystem->SetGameSharedContext(&g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
@@ -280,6 +281,8 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		
+		m_sharedSystems.m_worldSystem->Process();
+
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
@@ -353,10 +356,7 @@ namespace RootForce
 			g_engineContext.m_renderer->Render();
 		}
 
-		{
-			PROFILE("Render Lines", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->RenderLines();
-		}
+
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();
