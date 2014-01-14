@@ -52,9 +52,15 @@ namespace RootForce
 			{
 				if(kb.Edge)
 				{
-					if (m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					RootEngine::InputManager::KeyState::KeyState keystate = m_inputManager->GetKeyState(sc);
+					if(keystate == RootEngine::InputManager::KeyState::DOWN_EDGE)
 					{
 						m_inputtedActionsCurrentFrame.push_back(kb.Action);
+						break;
+					}
+					if(keystate == RootEngine::InputManager::KeyState::UP_EDGE)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.ActionUp);
 						break;
 					}
 				}
@@ -84,22 +90,23 @@ namespace RootForce
 
 
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
-		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
+		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
 		Animation* animation = m_world->GetEntityManager()->GetComponent<Animation>(entity);
+		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
 		
 		glm::vec3 movement(0.0f);
-		m_angle.x = 0;
 
 		// Get the speed of the player
-		float speed = controller->m_speed;
+		float speed = playerphysics->MovementSpeed;
 
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
@@ -124,8 +131,6 @@ namespace RootForce
 						animation->m_animClip = 1;
 						//transform->m_orientation.YawGlobal(-90.0f * dt);
 					}
-					
-
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
@@ -133,6 +138,20 @@ namespace RootForce
 						animation->m_animClip = 2;
 						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
+				case PlayerAction::MOVE_BACKWARDS_STOP:
+					action->MovePower += 1;
+					break;
+				case PlayerAction::MOVE_BACKWARDS:
+				case PlayerAction::MOVE_FORWARDS_STOP:
+					action->MovePower -= 1;
+					break;
+				case PlayerAction::STRAFE_RIGHT:
+				case PlayerAction::STRAFE_LEFT_STOP:
+					action->StrafePower += 1;
+					break;
+				case PlayerAction::STRAFE_LEFT:
+				case PlayerAction::STRAFE_RIGHT_STOP:
+					action->StrafePower -= 1;
 					break;
 				case PlayerAction::ORIENTATE:
 					{
@@ -141,52 +160,35 @@ namespace RootForce
 						// TODO: Update a camera controller with m_deltaMouseMovement.
 						//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-						m_angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
-						m_angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
+						action->Angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
+						action->Angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
 
-						if(m_angle.y < -90.0f)
-							m_angle.y = -90;
-						else if(m_angle.y > 90.0f)
-							m_angle.y = 90;
+						if(action->Angle.y < -90.0f)
+							action->Angle.y = -90;
+						else if(action->Angle.y > 90.0f)
+							action->Angle.y = 90;
 					}
 					break;
-				case PlayerAction::SELECT_ABILITY:
-					// TODO: Implement selection of abilities.
-
+				case PlayerAction::SELECT_ABILITY1:
+					action->SelectedAbility = 1;
+					break;
+				case PlayerAction::SELECT_ABILITY2:
+					action->SelectedAbility = 2;
+					break;
+				case PlayerAction::SELECT_ABILITY3:
+					action->SelectedAbility = 3;
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
-		
-					if(ability->SelectedAbility == Abilitiy::ABILITY_TEST)
-					{
-						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
-						script->m_name = g_engineContext.m_resourceManager->GetScript("AbilityTest");
-						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
-					}
-					
+					action->ActivateAbility = true;
 					break;
 				case PlayerAction::JUMP:
-					{
-						m_physics->PlayerJump(*(collision->m_handle), 20.0f);
-						animation->m_animClip = 4;
-					}
-					
+					action->Jump = true;
 					break;
 				default:
 					break;
 			}
 		}
-		transform->m_orientation.YawGlobal(m_angle.x);
-		
 
-		if(movement != glm::vec3(0.0f))
-		{
-			movement = glm::normalize(movement) * speed;// * dt;
-			m_physics->SetPosition(*(collision->m_handle), movement  + transform->m_position);
-			//g_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "dt: %f", dt);
-		}
-		
-		m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 
@@ -194,9 +196,10 @@ namespace RootForce
 	{
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
+		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
 
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
+		aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
 
 		

@@ -13,6 +13,7 @@ namespace RootForce
 		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
+		RootForce::PlayerPhysics* playphys = entityManager->CreateComponent<RootForce::PlayerPhysics>(entity);
 		RootForce::HealthComponent* health = entityManager->CreateComponent<RootForce::HealthComponent>(entity);
 		RootForce::ScoreComponent* score = entityManager->CreateComponent<RootForce::ScoreComponent>(entity);
 		RootForce::UserAbility* ability = entityManager->CreateComponent<RootForce::UserAbility>(entity);
@@ -23,6 +24,8 @@ namespace RootForce
 		RootForce::CollisionResponder* collisionResponder = entityManager->CreateComponent<RootForce::CollisionResponder>(entity);
 		RootForce::Script* script = entityManager->CreateComponent<RootForce::Script>(entity);
 		RootForce::Animation* animation = entityManager->CreateComponent<RootForce::Animation>(entity);
+
+		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
@@ -38,10 +41,20 @@ namespace RootForce
 		transform->m_position = glm::vec3(0, 10, 0);
 
 		playerControl->m_mouseSensitivity = 0.3f;
-		playerControl->m_speed = 10.0f;
+		playphys->MovementSpeed = 10.0f;
+		playphys->JumpForce = 20.0f;
 
-		ability->Abilities[0] = Abilitiy::ABILITY_TEST;
-		ability->SelectedAbility = Abilitiy::ABILITY_TEST;
+		action->Jump = false;
+		action->MovePower = 0;
+		action->StrafePower = 0;
+		action->Angle = glm::vec2(0);
+		action->ActivateAbility = false;
+		action->SelectedAbility = 1;
+
+		ability->Abilities[0] = Ability::ABILITY_TEST;
+		ability->Abilities[1] = Ability::ABILITY_NONE;
+		ability->Abilities[2] = Ability::ABILITY_NONE;
+		ability->SelectedAbility = Ability::ABILITY_TEST;
 
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";
@@ -60,9 +73,9 @@ namespace RootForce
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
-		health->Health = 100;
+		health->Health = 0;
 		health->IsDead = false;
-		health->WantsRespawn = true;
+		health->WantsRespawn = false;
 		score->Deaths = 0;
 		score->Score = 0;
 		identity->TeamID = p_teamID;
