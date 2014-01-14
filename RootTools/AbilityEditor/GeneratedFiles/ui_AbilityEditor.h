@@ -93,7 +93,7 @@ public:
         propertyWidget->setGeometry(QRect(10, 410, 571, 231));
         pushButton = new QPushButton(centralWidget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(290, 120, 75, 23));
+        pushButton->setGeometry(QRect(290, 160, 75, 23));
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
