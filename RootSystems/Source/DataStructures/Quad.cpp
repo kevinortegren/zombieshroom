@@ -3,32 +3,28 @@
 
 namespace RootForce
 {
-	QuadNode::QuadNode(AABB& p_bounds, unsigned p_numTriangles, void* p_userData)
-		: m_numChilds(0), m_bounds(p_bounds), m_numTriangles(p_numTriangles), m_userData(p_userData)
+	QuadNode::QuadNode(AABB& p_bounds, unsigned p_numTriangles)
+		: m_bounds(p_bounds), m_numTriangles(p_numTriangles)
 	{
 
 	}
 
 	QuadNode::~QuadNode()
 	{
-		if(m_userData != nullptr)
-		{
-			delete m_userData;
-			m_userData = nullptr;
-		}
+
 	}
 
 	void QuadNode::AddChild(QuadNode* p_child)
 	{
-		assert(m_numChilds >= QUAD_MAX_CHILDS);
+		assert(m_childs.size() < QUAD_MAX_CHILDS);
 
 		m_childs.push_back(p_child);
-		m_numChilds++;
 	}
 
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
 		m_context = p_context;
+		m_world = p_world;
 
 		// Fill the global entity list with entities.
 
@@ -36,29 +32,43 @@ namespace RootForce
 
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
-			std::pair<ECS::Entity*, std::vector<glm::vec3>> entry;
+			std::pair<ECS::Entity*, MeshData> entry;
 
 			entry.first = (*itr).second;
 
 			RootForce::Renderable* renderable = p_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entry.first);
+			auto mesh = renderable->m_model->m_meshes[0];
+			
+			MeshData meshData;
 
-			for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)
+			// Parse vertex data.
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
+			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+			for(int i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
-				std::shared_ptr<Render::BufferInterface> buffer = (*itr)->GetVertexBuffer();
+				glm::vec3 pos;
+				memcpy(&pos, &data[i], sizeof(glm::vec3));
 
-				char* data = (char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-
-				for(int i = 0; i < buffer->GetBufferSize(); i += buffer->GetElementSize())
-				{
-					float x = (float)data[i];
-					float y = (float)data[i + sizeof(float)];
-					float z = (float)data[i + 2 * sizeof(float)];
-
-					entry.second.push_back(glm::vec3(x,y,z));
-				}
-
-				glUnmapBuffer(GL_ARRAY_BUFFER);
+				meshData.m_positions.push_back(pos);
 			}
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+
+			// Parse index data.
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
+			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+
+			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize())
+			{
+				int index = 0;
+				memcpy(&index, &data[i], sizeof(int));
+
+				meshData.m_indices.push_back(index);
+			}
+
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+			entry.second = meshData;
 
 			m_globalEntityList.push_back(entry);
 		}
@@ -74,9 +84,9 @@ namespace RootForce
 
 		for(auto itr = m_globalEntityList.begin(); itr != m_globalEntityList.end(); ++itr)
 		{
-			numTriangles += (*itr).second.size();
+			numTriangles += (*itr).second.m_indices.size() / 3;
 
-			for(auto pos = (*itr).second.begin(); pos != (*itr).second.end(); ++pos)
+			for(auto pos = (*itr).second.m_positions.begin(); pos != (*itr).second.m_positions.end(); ++pos)
 			{
 				if(pos->x > maxX) maxX = pos->x;
 				if(pos->x < minX) minX = pos->x;
@@ -96,7 +106,7 @@ namespace RootForce
 		quadTreeBounds.m_minY = minY;
 		quadTreeBounds.m_minZ = minZ;
 
-		m_root = new QuadNode(quadTreeBounds, numTriangles, nullptr);
+		m_root = new QuadNode(quadTreeBounds, numTriangles);
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", numTriangles);
 
@@ -107,33 +117,36 @@ namespace RootForce
 	{
 		if(p_node->m_numTriangles == 0)
 		{
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::FATAL_ERROR, "Attemt to subdivide node with 0 triangles.");
+			return;
 		}
 		else if(p_node->m_numTriangles > QUADTREE_TRIANGLES_PER_NODE)
 		{
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children.");
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Triangles: %d", p_node->m_numTriangles);
 
 			AABB* aabb = &p_node->m_bounds;
 
 			int halfwidth = aabb->GetLengthX() / 2;
 			int halfheight = aabb->GetLengthZ() / 2;
 
-			glm::ivec4 bottomLeft = glm::ivec4(aabb->m_minX, aabb->m_minZ, halfwidth, halfheight);
-			glm::ivec4 bottomRight = glm::ivec4(aabb->m_minX + halfwidth, aabb->m_minZ, halfwidth, halfheight);
-			glm::ivec4 topLeft = glm::ivec4(aabb->m_minX, aabb->m_minZ + halfheight, halfwidth, halfheight);
-			glm::ivec4 topRight = glm::ivec4(aabb->m_minX + halfwidth, aabb->m_minZ + halfheight, halfwidth, halfheight);
+			Rectangle bottomLeft = Rectangle(aabb->m_minX, aabb->m_minZ, halfwidth, halfheight);
+			Rectangle bottomRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ, halfwidth, halfheight);
+			Rectangle topLeft = Rectangle(aabb->m_minX, aabb->m_minZ + halfheight, halfwidth, halfheight);
+			Rectangle topRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ + halfheight, halfwidth, halfheight);
 
-			AABB bottomLeftAABB = AABB(bottomLeft.x, bottomLeft.x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomLeft.y, bottomLeft.y + halfheight);
-			AABB bottomRightAABB = AABB(bottomRight.x, bottomRight.x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomRight.z, bottomRight.w + halfheight);
-			AABB topLeftAABB = AABB(topLeft.x, topLeft.x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topLeft.z, topLeft.w + halfheight);
-			AABB topRightAABB = AABB(topRight.x, topRight.x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topRight.z, topRight.w + halfheight);
+			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomLeft.m_y, bottomLeft.m_y + halfheight);
+			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, bottomRight.m_y, bottomRight.m_y + halfheight);
+			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topLeft.m_y, topLeft.m_y + halfheight);
+			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, 0, QUADTREE_NODE_HEIGHT, topRight.m_y, topRight.m_y + halfheight);
 
-			// Count triangles for each child and send new triangles.
+			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, CountTriangles( bottomLeft ));
+			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, CountTriangles( bottomRight ));
+			QuadNode* topLeftChild = new QuadNode(topLeftAABB, CountTriangles( topLeft ));
+			QuadNode* topRightChild = new QuadNode(topRightAABB, CountTriangles( topRight ));
 
-			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, CountTriangles( bottomLeft ), nullptr);
-			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, CountTriangles( bottomRight ), nullptr);
-			QuadNode* topLeftChild = new QuadNode(topLeftAABB, CountTriangles( topLeft ), nullptr);
-			QuadNode* topRightChild = new QuadNode(topRightAABB, CountTriangles( topRight ), nullptr);
+			p_node->AddChild(bottomLeftChild);
+			p_node->AddChild(bottomRightChild);
+			p_node->AddChild(topLeftChild);
+			p_node->AddChild(topRightChild);
 
 			Subdivide( bottomLeftChild );
 			Subdivide( bottomRightChild );
@@ -142,37 +155,61 @@ namespace RootForce
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node.");
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Triangles: %d", p_node->m_numTriangles);
 
-			//TODO: Create new entities by checking if entities are contained in the regions.
+			bool createNewEntity = false;
+			
+			for(auto entity = m_globalEntityList.begin(); entity != m_globalEntityList.end(); ++entity)
+			{
+				for(unsigned i = 0; i < entity->second.m_indices.size(); i += 3)
+				{
+					unsigned v0 = entity->second.m_indices[i];
+					unsigned v1 = entity->second.m_indices[i+1];
+					unsigned v2 = entity->second.m_indices[i+2];
 
-			//MESSY: Modify the 
-
+					glm::vec3 verts[3];
+					verts[0] = entity->second.m_positions[v0];
+					verts[1] = entity->second.m_positions[v1];
+					verts[2] = entity->second.m_positions[v2];
+		
+					if( IsTriangleContained(verts, p_node->m_bounds.GetRect()) )
+					{
+						//TODO: Create new entity.
+						// Strip triangles not contained in the node.
+					}
+				}
+			}
 		}
 	}
 
-	int QuadTree::CountTriangles( glm::ivec4 p_rect )
+	int QuadTree::CountTriangles( Rectangle p_rect )
 	{
 		int numTriangles = 0;
 
-		// TODO: Foreach e 
-		// foreach pos
-		// check contained.
-		
-		for(int i = 0; i < 0; i+= 3)
+		for(auto entity = m_globalEntityList.begin(); entity != m_globalEntityList.end(); ++entity)
 		{
-			glm::vec3 verts[3];
-
-			if( IsTriangleContained(verts, p_rect) )
+			for(unsigned i = 0; i < entity->second.m_indices.size(); i += 3)
 			{
-				numTriangles++;
+				unsigned v0 = entity->second.m_indices[i];
+				unsigned v1 = entity->second.m_indices[i+1];
+				unsigned v2 = entity->second.m_indices[i+2];
+
+				glm::vec3 verts[3];
+				verts[0] = entity->second.m_positions[v0];
+				verts[1] = entity->second.m_positions[v1];
+				verts[2] = entity->second.m_positions[v2];
+		
+				if( IsTriangleContained(verts, p_rect) )
+				{
+					numTriangles++;
+				}
 			}
 		}
 
 		return numTriangles;
 	}
 
-	bool QuadTree::IsTriangleContained( glm::vec3 p_vertices[3], glm::ivec4 p_rect )
+	bool QuadTree::IsTriangleContained( glm::vec3 p_vertices[3], Rectangle p_rect )
 	{
 		float x1, x2, x3, z1, z2, z3;
 
@@ -186,29 +223,75 @@ namespace RootForce
 		z3 = p_vertices[2].z;
 
 		float minX = glm::min(x1, glm::min(x2, x3) );
-		if( minX > p_rect.x + p_rect.z )
+		if( minX > p_rect.m_x + p_rect.m_width )
 		{
 			return false;
 		}
 
 		float maxX = glm::max(x1, glm::max(x2, x3) );
-		if( maxX < p_rect.x )
+		if( maxX < p_rect.m_x )
 		{
 			return false;
 		}
 
 		float minZ = glm::min(z1, glm::min(z2, z3) );
-		if( minZ > p_rect.y + p_rect.w )
+		if( minZ > p_rect.m_y + p_rect.m_height )
 		{
 			return false;
 		}
 
 		float maxZ = glm::max(z1, glm::max(z2, z3) );
-		if( maxZ < p_rect.y )
+		if( maxZ < p_rect.m_y )
 		{
 			return false;
 		}
 
 		return true;
+	}
+
+	QuadNode* QuadTree::PickRoot(glm::vec2 p_position)
+	{
+		return PickNode(m_root, p_position);
+	}
+
+	QuadNode* QuadTree::PickNode(QuadNode* p_node, glm::vec2 p_position)
+	{
+		QuadNode* currentNode = p_node;
+		if( currentNode->m_bounds.GetRect().IsPointContained(p_position) )
+		{
+			if(currentNode->m_childs.size() == 0)
+			{
+				return currentNode;
+			}
+
+			for( unsigned i = 0; i < currentNode->m_childs.size(); ++i)
+			{
+				QuadNode* r = PickNode(currentNode->m_childs[i], p_position);
+				if(r != nullptr)
+				{
+					return r;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	void QuadTree::RenderDebug()
+	{
+		RenderNode(m_root);
+	}
+
+	void QuadTree::RenderNode(QuadNode* p_node)
+	{
+		glm::vec3 a = glm::vec3(p_node->m_bounds.m_minX, p_node->m_bounds.m_minY, p_node->m_bounds.m_minZ);
+		glm::vec3 b = glm::vec3(p_node->m_bounds.m_maxX, p_node->m_bounds.m_maxY, p_node->m_bounds.m_maxZ);
+
+		m_context->m_renderer->AddLine(a, b, glm::vec4(1,0,0,1));
+
+		for(int i = 0; i < p_node->m_childs.size(); ++i)
+		{
+			RenderNode(p_node->m_childs[i]);
+		}
 	}
 }

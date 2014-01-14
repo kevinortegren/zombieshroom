@@ -358,7 +358,6 @@ namespace Render
 
 	void GLRenderer::RenderLines()
 	{
-		glEnable(GL_DEPTH_TEST);
 		Vertex1P1C* lineVertices = new Vertex1P1C[m_lines.size()*2];
 		for(unsigned int i = 0; i < m_lines.size(); i++)
 		{

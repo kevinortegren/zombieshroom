@@ -3,10 +3,11 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Shapes/AABB.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Render/Include/Mesh.h>
 #include <vector>
 
 #define QUADTREE_NODE_HEIGHT 100
-#define QUADTREE_TRIANGLES_PER_NODE 100
+#define QUADTREE_TRIANGLES_PER_NODE 500
 
 #define QUAD_MAX_CHILDS 4
 
@@ -18,9 +19,7 @@ namespace RootForce
 
 		friend class QuadTree;
 
-		//TODO: Skip user data and use an entity array.
-
-		QuadNode(AABB& p_bounds, unsigned p_numTriangles, void* p_userData);
+		QuadNode(AABB& p_bounds, unsigned p_numTriangles);
 		~QuadNode();
 
 		void AddChild(QuadNode* p_child);
@@ -29,12 +28,13 @@ namespace RootForce
 
 		AABB m_bounds;
 		unsigned m_numTriangles;
-
-
-		void* m_userData;
-
 		std::vector<QuadNode*> m_childs;
-		unsigned m_numChilds;
+	};
+
+	struct MeshData
+	{
+		std::vector<unsigned int> m_indices;
+		std::vector<glm::vec3> m_positions;
 	};
 
 	class QuadTree
@@ -42,14 +42,23 @@ namespace RootForce
 	public:
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
 
+		QuadNode* PickRoot(glm::vec2 p_position);
+		void RenderDebug();
+
 	private:
+		
+		QuadNode* PickNode(QuadNode* p_node, glm::vec2 p_position);
+		void RenderNode(QuadNode* p_node);
+
 		void Subdivide( QuadNode* p_node );
-		int CountTriangles( glm::ivec4 p_rect );
-		bool IsTriangleContained( glm::vec3 p_vertices[3], glm::ivec4 p_rect ); 
+		int CountTriangles( Rectangle p_rect );
+		bool IsTriangleContained( glm::vec3 p_vertices[3], Rectangle p_rect ); 
 
 		RootEngine::GameSharedContext* m_context;
+		ECS::World* m_world;
+
 		QuadNode* m_root;
 
-		std::vector<std::pair<ECS::Entity*, std::vector<glm::vec3>>> m_globalEntityList;
+		std::vector<std::pair<ECS::Entity*, MeshData>> m_globalEntityList;
 	};
 }

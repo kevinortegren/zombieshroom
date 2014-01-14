@@ -26,9 +26,9 @@ namespace RootForce
 		return abs(  m_maxZ -  m_minZ ); 
 	}
 
-	glm::ivec4 AABB::GetRect( void ) const
+	Rectangle AABB::GetRect( void ) const
 	{
-		return glm::ivec4(m_minX, m_minZ, GetLengthX(), GetLengthZ());
+		return Rectangle(m_minX, m_minZ, GetLengthX(), GetLengthZ());
 	}
 }
 

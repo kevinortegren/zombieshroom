@@ -76,11 +76,13 @@ namespace RootForce
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
 		m_quadTree.Init(m_engineContext, m_world);
+
+		QuadNode* q = m_quadTree.PickRoot(glm::vec2(50,0));
 	}
 
 	void WorldSystem::Process()
 	{
-
+		m_quadTree.RenderDebug();
 	}
 }
 #endif

@@ -243,6 +243,8 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		
+		m_sharedSystems.m_worldSystem->Process();
+
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 			if(!m_hud->GetChatSystem()->IsFocused())
