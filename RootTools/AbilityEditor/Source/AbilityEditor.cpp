@@ -6,6 +6,7 @@
 #include <QtWidgets/QCheckBox>
 #include "OnCreate.h"
 #include "Exporter.h"
+#include "Importer.h"
 AbilityEditor::AbilityEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -35,6 +36,8 @@ void AbilityEditor::Init()
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
 	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
 	exporter->Export("Test.ability", test, nullptr, nullptr);
+	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+	importer->Import("Test.ability", test, nullptr, nullptr);
 	//connect(ui.treeOnCollide, SIGNAL(ui.treeOnCollide->itemClicked()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(UpdatePropertyBrowser()));
 		

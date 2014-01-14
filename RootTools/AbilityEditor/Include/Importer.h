@@ -10,8 +10,8 @@ namespace AbilityEditorNameSpace
 	public:
 		Importer();
 		~Importer();
-		void Import(std::string &p_filename, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
+		void Import(const std::string &p_filename, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
 	private:
-		AbilityEntity::Entity* ImportEntity(YAML::Emitter& p_emitter);
+		AbilityComponents::MainComponent* ImportComponents( const YAML::Node& p_node, unsigned int p_index);
 	};
 }

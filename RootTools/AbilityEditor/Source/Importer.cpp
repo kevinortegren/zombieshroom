@@ -14,7 +14,7 @@ namespace AbilityEditorNameSpace
 
 	}
 
-	void Importer::Import( std::string &p_filename, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
+	void Importer::Import(const std::string &p_filename, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
 		try
 		{
@@ -30,10 +30,17 @@ namespace AbilityEditorNameSpace
 			parser.GetNextDocument(doc);
 
 			//OnCreate
-			const YAML::Node& onCreate = doc[0]["onCreate"];
+			const YAML::Node& onCreate = doc[0]["OnCreate"];
 			for(unsigned int i = 0; i < onCreate.size() ; i++)
 			{
-
+				std::string entityName;
+				onCreate[i]["EntityName"] >> entityName;
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				const YAML::Node& comps = onCreate[0]["Components"];
+				for(unsigned int j = 0; j < comps.size(); j++)
+				{
+					entity->AddComponent(ImportComponents(comps, j));
+				}
 			}
 			
 		}
@@ -43,8 +50,13 @@ namespace AbilityEditorNameSpace
 		}
 	}
 
-	AbilityEntity::Entity* Importer::ImportEntity( YAML::Emitter& p_emitter )
+	AbilityComponents::MainComponent* Importer::ImportComponents(const YAML::Node& p_node, unsigned int p_index)
 	{
+		Todo you are here!
+		//Todo, to make it slightly more simple, aka easier to put data into the components, fix their constructors to take arguments and that cool stuff
+
+		int type;
+		p_node[p_index]["Type"] >> type;
 		return nullptr;
 	}
 
