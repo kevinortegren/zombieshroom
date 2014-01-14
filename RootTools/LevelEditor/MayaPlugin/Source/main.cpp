@@ -10,8 +10,8 @@ SharedMemory SM;
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
 
-MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights];
-int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0;
+MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes];
+int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyTextureNode(MObject &node, MPlug&, void *clientData);
@@ -21,7 +21,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData);
 void NodeAddedCB(MObject &node, void *clientData);
 void NodeRemovedCB(MObject &node, void *clientData);
 void viewCB(const MString &str, void *clientData);
-void updateAllMaterials();
+void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData);
 
 int cameraExists(MString name);
 
@@ -33,7 +33,7 @@ int nodeExists(MObject node);
 void printLists();
 void checkForNewLights(MObject &node, void *clientData);
 void GetMaterial(MObject node);
-void MayaMeshToList(MObject node, int id);
+void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, bool doMesh);
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
@@ -207,7 +207,7 @@ void sortObjectList()
 		{
 			MFnMesh tempMesh = g_objectList[i];
 			g_mayaMeshList[currNrMeshes] = g_objectList[i];
-			MayaMeshToList(g_mayaMeshList[currNrMeshes],currNrMeshes);
+			MayaMeshToList(g_mayaMeshList[currNrMeshes],currNrMeshes, true, true, true);
 			currNrMeshes ++;
 		}
 		else if(g_objectList[i].hasFn(MFn::kCamera))
@@ -224,6 +224,17 @@ void sortObjectList()
 			MayaLightToList(g_mayaLightList[currNrLights], currNrLights);		
 
 			currNrLights++;
+		}
+		else if(g_objectList[i].hasFn(MFn::kLambert))
+		{
+			MFnLambertShader Lambert = g_objectList[i];
+			g_mayaMaterialList[currNrMaterialObjects] = g_objectList[i];
+
+			Print("Adding CB to ", Lambert.name());
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_objectList[i], dirtyMaterialCB, nullptr, &status);
+			AddCallbackID(status, id);
+
+			currNrMaterialObjects++;
 		}
 	}
 }
@@ -280,7 +291,7 @@ void loadScene()
 			AddCallbackID(status, id);
 		}
 
-		MayaMeshToList(g_mayaMeshList[i], i);
+		MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
 		SM.UpdateSharedMesh(i, true, true, currNrMeshes);
 	}
 	//Light transformation CB
@@ -322,21 +333,15 @@ void loadScene()
 
 void viewCB(const MString &str, void *clientData)
 {
+	//Print("viewCB");
+
 	//Callback when moving camera
 	int tempInt = cameraExists(str);
 
 	if(tempInt!= -1)
 	{
 		MayaCameraToList(g_mayaCameraList[tempInt], tempInt);
-		SM.UpdateSharedCamera(tempInt);
-		
-		//Materials works but maybe not optimal ;)
-		//for(int i = 0; i < currNrMeshes; i++)
-		//{
-		//	MayaMeshToList(g_mayaMeshList[i], i);
-		//	Print("Updating all ", i);
-		//}
-		
+		SM.UpdateSharedCamera(tempInt);		
 	}
 
 	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -354,12 +359,14 @@ void viewCB(const MString &str, void *clientData)
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
+	Print("dirtyMeshNodeCB");
+
 	int index = nodeExists(node);
 
 	if(index != -1)
 	{
-		MayaMeshToList(node, index);
-		SM.UpdateSharedMesh(index, false, true, currNrMeshes);
+		MayaMeshToList(node, index, true, true, true);
+		SM.UpdateSharedMesh(index, true, true, currNrMeshes);
 	}
 }
 
@@ -370,6 +377,7 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
+	Print("dirtyLightNode");
 	MStatus status;
 	MFnLight Light = node;
 
@@ -384,6 +392,7 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
+	Print("dirtyTransformNodeCB");
 	MStatus status = MS::kSuccess;
 	MFnTransform trans = node;
 
@@ -394,8 +403,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 		if(trans.child(0, &status).hasFn(MFn::kMesh))
 		{
-			MayaMeshToList(trans.child(0, &status), index);
-			SM.UpdateSharedMesh(index, true, false, currNrMeshes);
+			MayaMeshToList(trans.child(0, &status), index, true, true, true);
 		}
 
 		if(trans.child(0, &status).hasFn(MFn::kLight))
@@ -407,9 +415,43 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 	}
 }
 
+void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
+{// Reagerar precis INNAN man bytt textur!
+	Print("dirtyMaterialCB");
+
+	string materialName = "";
+	if(node.hasFn(MFn::kLambert))
+	{
+		MFnLambertShader Lambert = node;
+		materialName = Lambert.name().asChar();
+	}
+
+	if(materialName != "")
+	{
+		for(int i = 0; i < currNrMeshes; i++)
+		{
+			string temp = SM.meshList[i].materialName;
+			Print("Comparing", temp.c_str(), " and ", materialName.c_str());
+			if(SM.meshList[i].materialName == materialName)
+			{
+				MFnMesh mesh = g_mayaMeshList[i];
+
+				Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
+				MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
+				SM.UpdateSharedMaterials(currNrMaterials, i);
+				SM.UpdateSharedMesh(i, true, true, currNrMeshes);
+			}
+		}
+	}
+
+	MStatus status = MS::kSuccess;	
+}
+
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
 void NodeAddedCB(MObject &node, void *clientData)
 {
+	Print("NodeAddedCB");
+
 	//Callback when node is added.
 	checkForNewCameras(node, clientData);
 	checkForNewLights(node, clientData);
@@ -418,6 +460,8 @@ void NodeAddedCB(MObject &node, void *clientData)
 
 void NodeRemovedCB(MObject &node, void *clientData)
 {
+	Print("NodeRemovedCB");
+
 	//Callback when node is removed
 	int removeID = 0;
 
@@ -437,7 +481,7 @@ void NodeRemovedCB(MObject &node, void *clientData)
 				for(int j = i; j < currNrMeshes; j++)
 				{
 					g_mayaMeshList[j] = g_mayaMeshList[j+1];
-					MayaMeshToList(g_mayaMeshList[j], j);
+					MayaMeshToList(g_mayaMeshList[j], j, true, true, true);
 					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);
 				}
 																					//Will crash if it reaches g_maxMeshes
@@ -469,28 +513,96 @@ void NodeRemovedCB(MObject &node, void *clientData)
 	}
 }
 
+void checkForNewMaterials(bool made, MObject source, MObject destination)
+{
+
+}
+
 // MESHES
 // CONNECTION CB FOR MESHES
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 {
+
 	MStatus status1 = MS::kSuccess;
 	MStatus status2 = MS::kSuccess;
 
 	MObject source = srcPlug.node(&status1);
 	MObject destination = destPlug.node(&status2);
 	
+	Print("-_-_-_-_-_-_-_ ConnectionCB _-_-_-_-_-_-_-_-_-_-_");
+	Print("source is ", source.apiTypeStr());
+	Print("destination is ", destination.apiTypeStr());
+	Print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+
 	if (Status(__LINE__, status1) && Status(__LINE__, status2))
 	{
 		checkForNewMeshes(made, source, destination);
-		Print("Updating all materials");
-		for(int i = 0; i < currNrMeshes; i++)
+		//Print("Updating all materials");
+		//for(int i = 0; i < currNrMeshes; i++)
+		//{
+		//	for(int j = 0; j < currNrMaterials; j++)
+		//	{
+		//		SM.UpdateSharedMaterials(currNrMaterials, j, i);
+		//	}
+		//}
+
+		//if (source.hasFn(MFn::kMesh))
+		//{
+		//	MFnMesh mesh = source;
+		//	Print("Updating material in ", mesh.fullPathName());
+		//	int updateID = nodeExists(source);
+		//	SM.UpdateSharedMesh(updateID, false, false, currNrMeshes);
+		//	SM.UpdateSharedMaterials(currNrMaterials, SM.meshList[updateID].MaterialID, updateID);
+		//}
+
+		//if(source.hasFn(MFn::kFileTexture))
+		//{
+		//	//string* materialName = new string();
+		//	string materialName = "";
+		//	if(destination.hasFn(MFn::kLambert))
+		//	{
+		//		MFnLambertShader Lambert = destination;
+		//		//*materialName = Lambert.name().asChar();
+		//		materialName = Lambert.name().asChar();
+		//	}
+
+		//	if(materialName != "")
+		//	{
+		//		MStatus status;
+		//		Print("Adding CB to ", materialName.c_str());
+		//		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(destination, dirtyMaterialCB, nullptr, &status);
+		//		AddCallbackID(status, id);
+		//	}
+
+		//}
+
+		if(source.hasFn(MFn::kMesh) && destination.hasFn(MFn::kShadingEngine))
 		{
-			for(int j = 0; j < currNrMaterials; j++)
+			int temp = nodeExists(source);
+
+			if(temp != -1)
 			{
-				SM.UpdateSharedMaterials(currNrMaterials, j, i);
+				MayaMeshToList(source, temp, true, true, true);
+				//SM.UpdateSharedMesh(temp, true, true, currNrMeshes);
+				//SM.UpdateSharedMaterials(currNrMaterials, -1, temp);
 			}
 		}
-		
+
+		if(destination.hasFn(MFn::kLambert))
+		{
+			MStatus status;
+			MFnLambertShader lambert = destination;
+
+			int id = nodeExists(destination);
+			if(id == -1)
+			{
+				Print("Adding CB to ", lambert.name());
+				MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(destination, dirtyMaterialCB, nullptr, &status);
+				AddCallbackID(status, id);
+				g_mayaMaterialList[currNrMaterialObjects] = destination;
+				currNrMaterialObjects++;
+			}
+		}
 	}
 }
 
@@ -515,7 +627,7 @@ void checkForNewMeshes(bool made, MObject source, MObject destination)
 			id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 
-			MayaMeshToList(destination, currNrMeshes);
+			MayaMeshToList(destination, currNrMeshes, true, true, true);
 			currNrMeshes++;		
 
 		}
@@ -644,6 +756,21 @@ int nodeExists(MObject node)
 		}	
 	}
 
+	if (node.hasFn(MFn::kLambert))
+	{
+		MFnLambertShader lambert = node;
+		for(int i = 0; i < currNrMaterialObjects; i++)
+		{
+			MFnLambertShader temp = g_mayaMaterialList[i];
+			Print("nodeExists() Comparing ", temp.name(), " and ", lambert.name());
+			if(temp.name() == lambert.name())
+			{
+				answer = i;
+				break;
+			}
+		}	
+	}
+
 	return answer;
 }
 
@@ -662,7 +789,7 @@ MString cleanFullPathName(const char * str)
 }
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
 
-void MayaMeshToList(MObject node, int meshIndex)
+void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, bool doMesh)
 {
 	//Get mesh and transformation information from the nodes. Used when editing a node / adding a new one.
 	MStatus status;
@@ -677,10 +804,7 @@ void MayaMeshToList(MObject node, int meshIndex)
 	///////////////////////	MESH
 	if (node.hasFn(MFn::kMesh))
 	{
-
 		MFnMesh mesh = node;
-		bool updateTrans = false;
-		bool updateMesh = false;
 
 		int numVertices = mesh.numVertices();
 		int numPolygons = mesh.numPolygons();
@@ -706,46 +830,56 @@ void MayaMeshToList(MObject node, int meshIndex)
 		memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
 
 
-		/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
+		if(doMaterial)
+		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
 		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode);
 		materialName = material_node.name();
 
-		//see if the material is already existing.
-		bool materialExists = false;
-		int materialID = 0;
+		//Check if the material already exists.
+		int materialID = -1;
 		for(int i = 0; i < currNrMaterials; i++)
 		{
 			std::string tempMaterialName = SM.materialList[i].materialName;
 			std::string tempMaterialName2 = materialName.asChar();
 			if(tempMaterialName == tempMaterialName2)
 			{
-				materialExists = true;
 				materialID = i;
 			}
 		}
 
 		//If it´s not existing then add it to the material array.
-		if(!materialExists)
-		{
+		if(materialID == -1)
+		{						
+			memset(SM.materialList[currNrMaterials].materialName, NULL, sizeof(SM.materialList[currNrMaterials].materialName));
 			memcpy(SM.materialList[currNrMaterials].materialName, materialName.asChar(), materialName.numChars());
+			memset(SM.materialList[currNrMaterials].texturePath, NULL, sizeof(SM.materialList[currNrMaterials].texturePath));
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
+			memset(SM.materialList[currNrMaterials].normalPath, NULL, sizeof(SM.materialList[currNrMaterials].normalPath));
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
-
-			Print(texturepath.asChar());
+			SM.meshList[meshIndex].MaterialID = currNrMaterials;
 
 			currNrMaterials++;
-			materialID = currNrMaterials;
-			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
-			Print("Update new material");
 			
-		}else
+		}
+		else
 		{
-			SM.UpdateSharedMaterials(currNrMaterials, materialID, meshIndex);
-			Print("Update material");
+			SM.meshList[meshIndex].MaterialID = materialID;
+			memset(SM.materialList[materialID].texturePath, NULL, sizeof(SM.materialList[materialID].texturePath));
+			memcpy(SM.materialList[materialID].texturePath, texturepath.asChar(), texturepath.numChars());
+			memset(SM.materialList[materialID].normalPath, NULL, sizeof(SM.materialList[materialID].normalPath));
+			memcpy(SM.materialList[materialID].normalPath, normalpath.asChar(),normalpath.numChars());
 		}
 
-		///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
+		memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
+		memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
+		SM.UpdateSharedMaterials(currNrMaterials, meshIndex);
+		Print("Updated material ", materialName.asChar());
+
+		}
+
+		if(doMesh)
+		{///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
 
 		//Get points from mesh
 		mesh.getPoints(points_, space_local);
@@ -830,7 +964,10 @@ void MayaMeshToList(MObject node, int meshIndex)
 			}
 		}
 
-		///////////////////////	MESH TRANSFORM ////////////////////////////////////////
+		}
+
+		if(doTrans)
+		{///////////////////////	MESH TRANSFORM ////////////////////////////////////////
 		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
 		{
 			MFnTransform transform = mesh.parent(0, &status);
@@ -856,7 +993,10 @@ void MayaMeshToList(MObject node, int meshIndex)
 			SM.meshList[meshIndex].transformation.pivot.y = pivot.y;
 			SM.meshList[meshIndex].transformation.pivot.z = pivot.z;
 		}
+		}
 	}
+
+	SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
 }
 
 void MayaLightToList(MObject node, int lightIndex)
