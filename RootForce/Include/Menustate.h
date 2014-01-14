@@ -1,5 +1,5 @@
 #pragma once
-#include "Menu.h"
+#include <RootForce/Include/Menu.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/LanList.h>
@@ -7,21 +7,24 @@
 
 namespace RootForce
 {
-	class Menustate
+	/** Handles the game menu */
+	class MenuState
 	{
 	public:
-		Menustate();
-		void Initialize(RootEngine::GameSharedContext* p_engineContext, RootForce::Network::Client* p_client, RootForce::Network::ClientMessageHandler* p_clientMessageHandler);
-		GameStates::GameStates Update();
-		GameStates::PlayData GetPlayData() { return m_playData; }
-		
-	private:
-		RootEngine::GameSharedContext* m_engineContext;
+		MenuState(NetworkContext& p_networkContext);
 
-		RootForce::Network::Client* m_client;
+		void Initialize(const std::string& p_workingDir);
+		void Enter();
+		void Exit();
+		GameStates::GameStates Update();
+
+		const GameStates::PlayData& GetPlayData() const;
+	private:
+		NetworkContext& m_networkContext;
 		std::shared_ptr<RootSystems::LanList> m_lanList;
+		GameStates::PlayData m_playData;
 
 		std::shared_ptr<Menu> m_menu;
-		GameStates::PlayData m_playData;
+		std::string m_workingDir;
 	};
 }

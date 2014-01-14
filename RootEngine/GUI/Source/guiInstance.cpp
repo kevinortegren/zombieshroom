@@ -80,7 +80,7 @@ namespace RootEngine
 			m_core->Update();
 		}
 
-		void guiInstance::Render()
+		void guiInstance::Render(Awesomium::WebView* p_view)
 		{
 			m_program->Apply();
 
@@ -88,15 +88,11 @@ namespace RootEngine
 
 			glActiveTexture(GL_TEXTURE0);
 
-			glDisable(GL_DEPTH_TEST);
-
-			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-			{
-				SurfaceToTexture((GLTextureSurface*)m_viewBuffer.at(i)->surface());
+			//for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+			//{
+				SurfaceToTexture((GLTextureSurface*)p_view->surface());
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			}
-
-			glEnable(GL_DEPTH_TEST);
+			//}
 
 			glBindVertexArray(0);
 		}
@@ -240,7 +236,7 @@ namespace RootEngine
 				return Awesomium::KeyCodes::AK_0;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_SPACE)
 				return Awesomium::KeyCodes::AK_SPACE;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN)
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN || p_key == SDL_Scancode::SDL_SCANCODE_KP_ENTER)
 				return Awesomium::KeyCodes::AK_RETURN;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
 				return Awesomium::KeyCodes::AK_BACK;

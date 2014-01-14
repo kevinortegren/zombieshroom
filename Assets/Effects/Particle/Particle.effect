@@ -1,0 +1,65 @@
+# Sample effect for a simple particle system.
+
+- name: Particle_SampleTechnique
+  
+  # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
+  techniques:
+
+    - name: Particle_Update
+      bindings:   
+        - name: PerFrame
+          slot: 5
+      textures:
+        - name: g_Random
+          slot: 4
+
+      # The update technqiues should be ignored by the render job processor.
+      flags:
+        - name: RenderIgnore
+
+      # Program specification and feedback.
+      programs:
+        - name: particle_update
+          shaders:
+            - name: particle_update
+              type: vertex
+            - name: particle_update
+              type: geometry
+          feedback:
+            - name: vert_initialPos1
+            - name: vert_initialVel1
+            - name: vert_scale1
+            - name: vert_age1
+            - name: vert_type1
+
+    - name: Particle_Render
+    
+      bindings:
+        - name: PerFrame
+          slot: 0        
+      textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Depth
+          slot: 5
+          
+      programs:
+        - name: particle_render
+          shaders:
+            - name: particle-render
+              type: vertex
+            - name: particle-render
+              type: geometry
+            - name: particle-render
+              type: fragment
+          
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Addative = 2
+          blend: 1
+          
+          # Depth settings.
+          depth:
+            write: 0
+            test: 1

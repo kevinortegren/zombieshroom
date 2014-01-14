@@ -17,3 +17,8 @@ ECS::Entity* ECS::TagManager::GetEntityByTag(const std::string& p_tag)
 
 	return m_tags[p_tag];
 }
+
+void ECS::TagManager::UnregisterAll()
+{
+	m_tags.clear();
+}

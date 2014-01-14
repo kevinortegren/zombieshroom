@@ -1,17 +1,15 @@
 #include <RootEngine/Include/Animation.h>
-
+#include <iostream>
 namespace RootEngine
 {
 	namespace RootAnimation
 	{
-		Animation::Animation(unsigned int p_vertSize) : m_numBones(0)
+		Animation::Animation() : m_numBones(0)
 		{
-			m_boneData.resize(p_vertSize);
 		}
 
 		Animation::~Animation()
 		{
-
 		}
 
 		bool Animation::BoneExists( std::string p_boneName )
@@ -47,9 +45,35 @@ namespace RootEngine
 			return m_boneMapping[p_boneName];
 		}
 
-		void Animation::AddBoneData( unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight )
+
+		BoneInfo* Animation::GetBoneInfo( unsigned int p_index )
 		{
-			m_boneData[p_vertexIndex].AddBoneData(p_boneIndex, p_weight);
+			return &m_boneInfo[p_index];
 		}
+
+		void Animation::SetAiImporter( std::shared_ptr<Assimp::Importer> p_aiImporter )
+		{
+			m_aiImporter = p_aiImporter;
+			aiMatrix4x4 am = m_aiImporter->GetScene()->mRootNode->mChildren[0]->mTransformation;
+			glm::mat4x4 gm = glm::mat4x4();
+			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
+			m_globalInverseTransform = glm::transpose(gm);
+		}
+
+		const aiScene* Animation::GetScene()
+		{
+			return m_aiImporter->GetScene();
+		}
+
+		glm::mat4x4 Animation::GetGlobalInverseTransform()
+		{
+			return m_globalInverseTransform;
+		}
+
+		glm::mat4x4 Animation::GetBoneOffset( unsigned int p_index )
+		{
+			return m_boneInfo[p_index].m_boneOffset;
+		}
+
 	}
 }

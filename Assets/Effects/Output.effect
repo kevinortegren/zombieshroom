@@ -1,8 +1,6 @@
 - name: Output
   techniques:
     - name: bar
-      uniforms:
-      textures:
       programs:
         - name: Output
           shaders:
@@ -10,3 +8,4 @@
               type: vertex
             - name: Output
               type: fragment
+        blend: 2

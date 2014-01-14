@@ -1,0 +1,60 @@
+- name: Deferred
+  techniques:
+    - name: Deferred
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+        - name: Lights
+          slot: 2
+      textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Normals
+          slot: 1
+        - name: g_Depth
+          slot: 2
+        - name: g_Background
+          slot: 3
+      programs:
+        - name: ambient
+          shaders:
+            - name: ambient
+              type: vertex
+            - name: ambient
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2
+        - name: directional
+          shaders:
+            - name: directional
+              type: vertex
+            - name: directional
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2
+        - name: pointlight
+          shaders:
+            - name: pointlight
+              type: vertex
+            - name: pointlight
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2
+        - name: background
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2

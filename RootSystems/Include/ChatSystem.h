@@ -2,9 +2,12 @@
 
 #include <Awesomium/WebView.h>
 #include <RootEngine/GUI/Include/Dispatcher.h>
+#include <RootSystems/Include/Network/ServerEvents.h>
 #include <vector>
 namespace RootForce
 {
+
+
 	class ChatSystem
 	{
 	public:
@@ -16,12 +19,14 @@ namespace RootForce
 		bool IsFocused() { return m_hasFocus; } //Returns true if the player is typing in the chat. If this is the case all other input should be locked
 
 		std::string PollMessage(); //Returns the last message from the internal buffer
+		RootServer::EventData PollEvent(); //Returns the last server command from the internal buffer
 
 	private:
 		void SetFocus(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void ProcessMessage(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		Awesomium::WebView* m_view;
 		std::vector<std::string> m_messageBuffer;
+		std::vector<RootServer::EventData> m_eventBuffer;
 		bool m_hasFocus;
 	};
 }

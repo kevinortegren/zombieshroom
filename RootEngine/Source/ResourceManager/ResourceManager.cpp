@@ -81,8 +81,8 @@ namespace RootEngine
 		}
 		else
 		{
-			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
-			return "";
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			return p_scriptName;
 		}
 		
 	}
@@ -335,5 +335,13 @@ namespace RootEngine
 	const std::string& ResourceManager::GetWorkingDirectory()
 	{
 		return m_workingDirectory;
+	}
+
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
+		}
 	}
 }

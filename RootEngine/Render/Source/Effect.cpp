@@ -1,6 +1,7 @@
 
 #include <RootEngine/Render/Include/Effect.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
+#include <RootEngine/Render/Include/Renderer.h>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -25,7 +26,6 @@ namespace Render
 		// validate creation
 		if( m_glHandle == 0 )
 		{
-			//Render::g_context.m_logger.LogText(LogTag::RENDER, 3, "Creating shader type %d", p_shaderType);
 			return GL_FALSE;
 		}
 
@@ -79,7 +79,7 @@ namespace Render
 
 	Program::Program(void)
 	{
-		m_blendState = BLEND_ALPHA;
+		m_blendState = BLEND_NONE;
 		m_depthState.depthTest = true;
 		m_depthState.depthWrite = true;
 	}
@@ -109,6 +109,7 @@ namespace Render
 	GLint Program::Compile( )
 	{
 		glUseProgram( 0 );
+
 		// link program
 		glLinkProgram( m_glHandle );
 
@@ -135,8 +136,36 @@ namespace Render
 		return GL_TRUE;
 	}
 
+	GLuint Program::GetHandle()
+	{
+		return m_glHandle;
+	}
+
 	void Program::Apply( )
 	{
+		// Apply blending.
+		switch(m_blendState)
+		{
+			case BLEND_NONE:
+				glDisable(GL_BLEND);
+				break;
+			case BLEND_ALPHA:
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				break;
+			case BLEND_ADDITIVE:
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_ONE, GL_ONE);
+				break;
+			case BLEND_INV_ALPHA:
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				break;
+			default:
+				glDisable(GL_BLEND);
+				break;
+		}
+
 		if(m_depthState.depthWrite)
 		{
 			glDepthMask(GL_TRUE);
@@ -173,6 +202,12 @@ namespace Render
 		glUniform1i(uniformLocation, slot);
 	}
 
+	Technique::Technique()
+		: m_flags(0)
+	{
+
+	}
+
 	std::shared_ptr<Program> Technique::CreateProgram()
 	{
 		auto program = std::shared_ptr<Program>(new Program);
@@ -185,27 +220,26 @@ namespace Render
 		return m_program;
 	}
 
-	void Technique::BindUniforms()
+	void Technique::Apply()
 	{
-		for(auto itr = m_uniforms.begin(); itr != m_uniforms.end(); ++itr)
-		{
-			//glBindBufferBase(GL_UNIFORM_BUFFER, (*itr).first, (*itr).second->GetBufferId());
-		}
+		// Per technique uniform binding.
+		glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_perTechniqueBuffer->GetBufferId());
 	}
 
-	void Technique::BindTextures()
+	void Technique::AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset)
 	{
-		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
-		{
-			//glActiveTexture(GL_TEXTURE0 + (*itr).first);
-			//glBindTexture(GL_TEXTURE_2D, (*itr).second);
-		}
+		m_uniformsParams[p_sem] = p_offset;
 	}
 
-	std::shared_ptr<Technique> Effect::CreateTechnique()
+	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);
+
+		technique->m_perTechniqueBuffer = p_renderer->CreateBuffer();
+		technique->m_perTechniqueBuffer->Init(GL_UNIFORM_BUFFER);
+
 		m_techniques.push_back(technique);
+
 		return technique;
 	}
 
@@ -213,51 +247,4 @@ namespace Render
 	{
 		return m_techniques;
 	}
-
-	void EffectParams::AllocateParams(EffectInterface* p_effect)
-	{
-		for(auto itr = p_effect->GetTechniques().begin(); itr != p_effect->GetTechniques().end(); ++itr)
-		{
-			for(auto itrD = (*itr)->m_data.begin(); itrD != (*itr)->m_data.end(); ++itrD)
-			{
-				//std::cout << "SEM: " << (*itrD).first << " Size: " << (*itrD).second << std::endl;
-			}
-		}
-	}
-
-	/*GLint GetLocation( GLuint p_handle, const char* p_name );
-
-	void Effect::SetUniformInt( const char* _name, int _val )
-	{
-		glUniform1i( GetLocation( m_glHandle, _name ), _val );
-	}
-	void Effect::SetUniformFloat( const char* _name, float _val )
-	{
-		glUniform1f( GetLocation( m_glHandle, _name ), _val );
-	}
-	void Effect::SetUniformVector( const char* _name, glm::vec3& _val )
-	{
-		glUniform3fv( GetLocation( m_glHandle, _name ), 1, &_val[0] );
-	}
-	void Effect::SetUniformVector( const char* _name, glm::vec4& _val )
-	{
-		glUniform4fv( GetLocation( m_glHandle, _name ), 1, &_val[0] );
-	}
-	void Effect::SetUniformMatrix( const char* _name, glm::mat3& _val )
-	{
-		glUniformMatrix3fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
-	}
-	void Effect::SetUniformMatrix( const char* _name, const glm::mat4& _val )
-	{
-		glUniformMatrix4fv( GetLocation( m_glHandle, _name ), 1, GL_FALSE, &_val[0][0] );
-	}
-
-	GLint GetLocation( GLuint p_handle, const char* p_name )
-	{
-		GLint loc = glGetUniformLocation( p_handle, p_name );
-		if( loc == -1 )
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::NON_FATAL_ERROR, "Failed to locate GL variable %s.\n", p_name , __FUNCTION__, __LINE__ );
-		return loc;
-	} */
-
 }

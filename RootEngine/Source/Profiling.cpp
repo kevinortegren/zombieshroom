@@ -15,14 +15,24 @@ namespace RootEngine
 
 	void Profiling::Present()
 	{
+		std::vector<double> avgTimes;
+		std::vector<double> maxTimes;
+		std::vector<unsigned int> samples;
+		std::vector<std::string> names;
+
 		//Clear output list
 		m_ouputList.clear();
 		m_ouputList.shrink_to_fit();
 
-		float averageFrameTime = (m_time/(float)m_frames)*1000.0f;
-		double collectedPercentages = 0;
+		m_ouputList.push_back("<div style='text-align: left; display: inline-block;'>");
+
 		std::string output	= "FPS: " + std::to_string(m_frames);
 		m_ouputList.push_back(output);
+
+		//Calculate average time
+		__int64 qfreq;
+		QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
+		double dFreq = (double)qfreq/1000.0f;
 
 		for(auto itr = m_sampleMap.begin(); itr != m_sampleMap.end(); itr++)
 		{
@@ -36,26 +46,37 @@ namespace RootEngine
 			}
 			if(itr->second.size() == 0)
 				continue;
-			//Calculate average time
-			__int64 qfreq;
-			QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
-			double averageSample	= (collectedTime/itr->second.size()) / ((double)qfreq/1000.0f);
-			double maxSample		= maxTime / ((double)qfreq/1000.0f);
-			double percentage		= (averageSample/(double)averageFrameTime)*100;
-			collectedPercentages	+= percentage;
-			std::string output		= "<div style='min-width: 180px; display: inline-block;'>" + itr->first + " :</div>" + "T: " + std::to_string(averageSample) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxSample) + "</div> S: " + std::to_string(itr->second.size()) + " <div style='color: #FFFFFF; display: inline-block;'> P: "+ std::to_string(percentage) + "% </div>";
-
-			//Store output in vector for presenting 
-			m_ouputList.push_back(output);
+			
+			avgTimes.push_back((collectedTime/itr->second.size()) / dFreq);
+			maxTimes.push_back(maxTime / dFreq);
+			names.push_back(itr->first);
+			samples.push_back(itr->second.size());
 
 			//Clear collected time vector
 			itr->second.clear();
 			itr->second.shrink_to_fit();
 		}
 
-		std::string otherOutput	= "Other: " + std::to_string(100 - collectedPercentages) + "%";
-		m_ouputList.push_back(otherOutput);
+		for(unsigned int i = 0; i < m_sampleMap.size(); i++)
+		{
+			unsigned int index = 0;
+			double currAvg = 0.0;
 
+			for(unsigned int j = 0; j < avgTimes.size(); j++)
+			{
+				if(avgTimes[j] > currAvg)
+				{
+					currAvg = avgTimes[j];
+					index = j;
+				}
+			}
+
+			//Store output in vector for presenting 
+			m_ouputList.push_back("<div style='min-width: 180px; display: inline-block;'>" + names[index] + " :</div>" + "T: " + std::to_string(avgTimes[index]) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxTimes[index]) + "</div> S: " + std::to_string(samples[index]));
+			avgTimes[index] = 0.0;
+		}
+	
+		m_ouputList.push_back("</div>");
 	}
 
 	void Profiling::Update( float p_dt )
@@ -72,7 +93,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 		for(std::string s : m_ouputList)
 		{
-			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, true);
+			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
 #endif
 	}

@@ -2,16 +2,17 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>     
 
 namespace RootEngine
 {
 	namespace RootAnimation
 	{
-
-		#define NUM_BONES_PER_VERTEX 4
-		
 		struct BoneInfo
 		{
 			glm::mat4x4 m_boneOffset;
@@ -24,71 +25,50 @@ namespace RootEngine
 			}
 		};
 		
-		struct VertexBoneData
-		{        
-			unsigned int m_IDList[NUM_BONES_PER_VERTEX];
-			float m_weightList[NUM_BONES_PER_VERTEX];
-		
-			VertexBoneData()
-			{
-				Reset();
-			};
-		
-			void Reset()
-			{
-				std::fill_n(m_IDList, NUM_BONES_PER_VERTEX, 0);
-				std::fill_n(m_weightList, NUM_BONES_PER_VERTEX, 0.0f);
-			}
-		
-			void AddBoneData(unsigned int p_boneID, float p_weight)
-			{
-				for (unsigned int i = 0 ; i < NUM_BONES_PER_VERTEX ; i++) {
-					if (m_weightList[i] == 0.0f) {
-						m_IDList[i]     = p_boneID;
-						m_weightList[i] = p_weight;
-						return;
-					}        
-				}
-		
-				// Should never get here! If it does, there are more bones per vertex than allowed.
-				assert(0);
-			}
-		};
-
 		class AnimationInterface
 		{
 			public:
 				virtual bool BoneExists(std::string p_boneName) = 0;
 				virtual void PushBoneInfo(RootEngine::RootAnimation::BoneInfo p_boneInfo) = 0;
-				virtual unsigned int GetNumBones() = 0;
+				virtual void SetAiImporter(std::shared_ptr<Assimp::Importer> p_aiImporter) = 0;
 				virtual void SetNumBones(unsigned int p_numBones) = 0;
 				virtual void MapBone(std::string p_boneName, unsigned int p_index) = 0;
+				virtual unsigned int GetNumBones() = 0;
 				virtual unsigned int GetIndexFromBoneName(std::string p_boneName) = 0;
-				virtual void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight) = 0;
+				virtual BoneInfo* GetBoneInfo(unsigned int p_index) = 0;
+				virtual const aiScene* GetScene() = 0;
+				virtual glm::mat4x4 GetGlobalInverseTransform() = 0;
+				virtual glm::mat4x4 GetBoneOffset(unsigned int p_index) = 0;
 			};
 
 			class Animation : public AnimationInterface
 			{
 			public:
-				Animation(unsigned int p_vertSize);
+				Animation();
 				~Animation();
 
 				bool BoneExists(std::string p_boneName);
 				void PushBoneInfo(RootEngine::RootAnimation::BoneInfo p_boneInfo);
 				void MapBone(std::string p_boneName, unsigned int p_index);
+				void SetNumBones(unsigned int p_numBones);
+				void SetAiImporter(std::shared_ptr<Assimp::Importer> p_aiImporter);
 				unsigned int GetIndexFromBoneName(std::string p_boneName);
 				unsigned int GetNumBones();
-				void SetNumBones(unsigned int p_numBones);
-				void AddBoneData(unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight);
+				BoneInfo* GetBoneInfo(unsigned int p_index);
+				const aiScene* GetScene();
+				glm::mat4x4 GetGlobalInverseTransform();
+				glm::mat4x4 GetBoneOffset(unsigned int p_index);
 
 			private:
 			//Map bone name to index
-			std::map<std::string, unsigned int> m_boneMapping;
-			std::vector<RootEngine::RootAnimation::BoneInfo> m_boneInfo;
-			std::vector<RootEngine::RootAnimation::VertexBoneData> m_boneData;
-			glm::mat4x4 m_globalInverseTransform;
-			unsigned int m_numBones;
+			std::map<std::string, unsigned int>					m_boneMapping;
+			std::vector<RootEngine::RootAnimation::BoneInfo>	m_boneInfo;
 
+			glm::mat4x4		m_globalInverseTransform;
+			unsigned int	m_numBones;
+
+			std::shared_ptr<Assimp::Importer> m_aiImporter;
+			
 		};
 	}
 }

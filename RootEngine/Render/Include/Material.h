@@ -20,7 +20,5 @@ namespace Render
 		Render::TextureInterface* m_specularMap;
 		Render::TextureInterface* m_normalMap;
 		Render::EffectInterface* m_effect;
-
-		std::shared_ptr<Render::EffectParams> m_params;
 	};
 }

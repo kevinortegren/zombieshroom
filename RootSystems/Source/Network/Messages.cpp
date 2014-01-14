@@ -49,6 +49,16 @@ namespace RootForce
 
 
 
+		void MessagePlayData::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
+		{
+			bs->Serialize(writeToBitstream, ServerName);
+			bs->Serialize(writeToBitstream, MapName);
+			bs->Serialize(writeToBitstream, MaxPlayers);
+			bs->Serialize(writeToBitstream, MatchLength);
+			bs->Serialize(writeToBitstream, KillCount);
+		}
+
+
 		void MessageUserConnected::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
 		{
 			bs->Serialize(writeToBitstream, UserID);
@@ -76,26 +86,18 @@ namespace RootForce
 		{
 			bs->Serialize(writeToBitstream, Slot);
 		}
+
+
+
+		void HACK_MessageTransformUpdate::Serialize(bool writeToBitstream, RakNet::BitStream* bs)
+		{
+			bs->Serialize(writeToBitstream, EntityID);
+			for (int i = 0; i < 3; ++i)
+				bs->Serialize(writeToBitstream, Position[i]);
+			for (int i = 0; i < 4; ++i)
+				bs->Serialize(writeToBitstream, Orientation[i]);
+		}
 	}
 }
-
-/*
-TEST(Messages, Serialize)
-{
-	RootForce::Network::MessageChat m;
-	m.Type = RootForce::Network::MessageChat::TYPE_DEBUG;
-	m.SenderID = 5;
-	m.Message = "Hello world";
-
-	uint8_t* buffer = new uint8_t[m.GetSerializedSize()];
-	m.Serialize(buffer);
-
-	RootForce::Network::MessageChat m2 = *(RootForce::Network::MessageChat*) buffer;
-
-	EXPECT_TRUE(m.Type == m2.Type);
-	EXPECT_TRUE(m.SenderID == m2.SenderID);
-	EXPECT_TRUE(m.Message == m2.Message);
-}
-*/
 
 #endif

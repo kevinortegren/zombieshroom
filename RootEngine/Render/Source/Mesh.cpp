@@ -5,6 +5,11 @@ namespace Render
 	Mesh::Mesh()
 		: m_primitive(GL_TRIANGLES) {}
 
+	Mesh::~Mesh()
+	{
+		glDeleteTransformFeedbacks(1, &m_transformFeedback);
+	}
+
 	void Mesh::CreateIndexBuffer(unsigned int* p_indices, unsigned int p_numberOfIndices)
 	{
 		m_elementBuffer->Init(GL_ELEMENT_ARRAY_BUFFER);
@@ -68,6 +73,20 @@ namespace Render
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT), (char*)0 + 11 * sizeof(float));
 	}
 
+	void Mesh::CreateVertexBuffer1P1N1UV1T1BT1BID1W( Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices )
+	{
+		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
+		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT1BID1W), p_vertices);
+		m_vertexAttributes->Init(7);
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), 0);
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 3 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 6 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 8 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 11 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 5, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 14 * sizeof(float));
+		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 18 * sizeof(unsigned int));
+	}
+
 	void Mesh::Bind()
 	{
 		m_vertexAttributes->Bind();
@@ -97,7 +116,14 @@ namespace Render
 
 	void Mesh::DrawInstanced(GLsizei p_instances)
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+	}
+
+	void Mesh::DrawTransformFeedback()
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
+
+		glDrawTransformFeedback(m_primitive, m_transformFeedback);
 	}
 
 	GLenum Mesh::GetPrimitiveType()
@@ -105,9 +131,19 @@ namespace Render
 		return m_primitive;
 	}
 
+	GLuint Mesh::GetTransformFeedback()
+	{
+		return m_transformFeedback;
+	}
+
 	void Mesh::SetPrimitiveType( GLenum p_type )
 	{
 		m_primitive = p_type;
+	}
+
+	void Mesh::SetTransformFeedback()
+	{
+		glGenTransformFeedbacks(1, &m_transformFeedback);
 	}
 
 	void Mesh::SetElementBuffer(std::shared_ptr<BufferInterface> p_buffer)
@@ -139,5 +175,7 @@ namespace Render
 	{
 		return m_vertexAttributes;
 	}
+
+	
 
 }

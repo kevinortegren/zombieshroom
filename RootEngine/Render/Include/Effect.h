@@ -12,6 +12,8 @@
 
 namespace Render
 {
+	class RendererInterface;
+
 	class Shader
 	{
 	public:
@@ -30,17 +32,17 @@ namespace Render
 		virtual GLint AttachShader( GLenum p_shaderType, const char* p_filename ) = 0;
 		virtual GLint Compile() = 0;
 		virtual void Apply() = 0;
-	
+		virtual GLuint GetHandle() = 0;
 		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
 	};
 
+	//TODO: Store in resource manager.
 	class Program : public ProgramInterface
 	{
 	public:
 
-		enum BlendState { BLEND_NONE, BLEND_ALPHA, BLEND_ADDITIVE };
-
+		enum BlendState { BLEND_NONE, BLEND_ALPHA, BLEND_ADDITIVE, BLEND_INV_ALPHA };
 		enum FillMode { FILL_SOLID, FILL_WIREFRAME };
 
 		struct DepthState {		
@@ -50,12 +52,14 @@ namespace Render
 
 		Program();
 		~Program();
+
 		void CreateProgram();
 
 		GLint AttachShader( GLenum p_shaderType, const char* p_filename );
 		GLint Compile();
 
 		void Apply();
+		GLuint GetHandle();
 
 		void BindUniformBuffer(const std::string& bufferName, unsigned int slot);
 		void BindTexture(const std::string& textureName, unsigned int slot);
@@ -68,54 +72,58 @@ namespace Render
 		GLuint m_glHandle;
 	};
 
+	namespace TechniqueFlags
+	{
+		enum TechniqueFlags
+		{
+			RENDER_IGNORE = 0x01
+		};
+	}
+
 	class TechniqueInterface
 	{
 	public:
 		virtual std::shared_ptr<Program> CreateProgram() = 0;
-		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;	
+		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;
+		virtual void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset) = 0;
+		virtual void Apply() = 0;
 	};
 
 	class Technique : public TechniqueInterface
 	{
 	public:
+		Technique();
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
 
-		std::vector<std::pair<int, std::shared_ptr<Render::BufferInterface>>> m_uniforms;
-		std::vector<std::pair<int, GLuint>> m_textures;
-		std::map<Semantic::Semantic, unsigned int> m_data; // offsets.
-		
-		void BindUniforms();
-		void BindTextures();
+		void Apply();
+		void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset);
+
+		std::map<Semantic::Semantic, unsigned int> m_uniformsParams;
+		std::shared_ptr<Render::BufferInterface> m_perTechniqueBuffer;
+
+		unsigned m_flags;
 
 	private:
 		std::vector<std::shared_ptr<Program>> m_program;
+		
 	};
 
 	class EffectInterface
 	{
 	public:
-		virtual std::shared_ptr<Technique> CreateTechnique() = 0;
+		virtual std::shared_ptr<Technique> CreateTechnique(RendererInterface* p_renderer) = 0;
 		virtual std::vector<std::shared_ptr<Technique>>& GetTechniques() = 0;
 	};
 
 	class Effect : public EffectInterface
 	{
 	public:
-		std::shared_ptr<Technique> CreateTechnique();
+		std::shared_ptr<Technique> CreateTechnique(RendererInterface* p_renderer);
 		std::vector<std::shared_ptr<Technique>>& GetTechniques();
 
 	private:
 		std::vector<std::shared_ptr<Technique>> m_techniques;
-	};
 
-	struct EffectParamsInterface
-	{
-		virtual void AllocateParams(EffectInterface* p_effect) = 0;
-	};
-
-	struct EffectParams : public EffectParamsInterface
-	{
-		void AllocateParams(EffectInterface* p_effect);
 	};
 }

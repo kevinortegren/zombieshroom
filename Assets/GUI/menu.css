@@ -1,20 +1,29 @@
+@font-face
+{
+  font-family: 'Sherwood';
+  src: url("SHERWOOD.TTF");
+}
+
 body, input
 {
   padding: 0;
   margin: 0;
-  font-family: Comic Sans MS;
+  font-family: Sherwood;
 }
 body
 {
-  background-image: url('TygartsStateForest.jpg');
+  background-image: url('menubackground.jpg');
+  background-position: 50% 50%;
+  background-size: 100% 100%;
 }
 *
 {
   -webkit-user-select: none;
 }
-input
+input[type=text], input[type=password], input[type=number]
 {
   -webkit-user-select: text;
+  min-width: 150px;
 }
 a
 {
@@ -64,14 +73,25 @@ a
 }
 .button
 {
-  width: 100px;
+  width: 140px;
   height: 25px;
-  border: 1px solid #666666;
+  border: 0;
   margin: 2px;
+  background: transparent url('menubutton.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
+}
+.button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 .button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 160px 25px;
+  background-position: 50% 50%;
 }
 #selected
 {
@@ -84,9 +104,10 @@ a
 .popup
 {
   margin: auto;
-  border: 1px solid black;
-  background-color: #FFFFFF;
-  padding: 12px;
+  /*background-color: #FFFFFF;*/
+  background: url('Ram.png') transparent;
+  background-size: 100% 100%;
+  padding: 36px;
   display: none;
 }
 .close
@@ -99,6 +120,11 @@ a
   display: inline-block;
   width: 100px;
 }
+.inline-150px
+{
+  display: inline-block;
+  width: 150px;
+}
 #connecting
 {
   display: none;
@@ -108,6 +134,7 @@ a
 {
   width: 300px;
   margin: auto;
+  color: #FFFFFF;
 }
 .main-button
 {
@@ -115,12 +142,28 @@ a
   height: 50px;
   display: block;
   margin: 10px auto 10px auto;
-  border: 1px solid #666666;
+  border: 0;
+  color: #FFFFFF;
   font-size: 24px;
+  background: transparent url('menubutton.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
+}
+.main-button[disabled]
+{
+  color: #AAAAAA;
+}
+.main-button:hover
+{
+  background: transparent url('menubutton_hover.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 .main-button:active
 {
-  background-color: #CCCCCC;
+  background: transparent url('menubutton_active.png');
+  background-size: 250px 50px;
+  background-position: 50% 50%;
 }
 #options-menu,
 #lan-menu
@@ -129,11 +172,11 @@ a
 }
 #lan-wrapper
 {
-  width: 800px;
-  border: 1px solid #666666;
-  padding: 5px;
+  width: 1200px;
+  border: 0;
+  padding: 14px 40px 44px 40px;
   margin: auto;
-  background-color: #ffffff;
+  background: url('Ram.png') transparent;
 }
 #lan-list
 {
@@ -142,7 +185,7 @@ a
 }
 #lan-list-wrapper
 {
-  height: 600px;
+  height: 633px;
   overflow: auto;
 }
 #lan-direct-popup
@@ -152,7 +195,7 @@ a
 }
 #lan-host-overlay
 {
-  width: 500px;
+  width: 550px;
   height: 300px;
 }
 #lan-host-map

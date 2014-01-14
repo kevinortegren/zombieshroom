@@ -13,6 +13,7 @@ namespace ECS
 		friend class EntityExporter;
 		void RegisterEntity(const std::string& p_tag, Entity* p_entity);
 		void Unregister(const std::string& p_tag);
+		void UnregisterAll();
 
 		Entity* GetEntityByTag(const std::string& p_tag);
 

@@ -23,6 +23,8 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					p_node["Model"] >> model;
 					g_engineContext.m_resourceManager->LoadCollada(model);
 					renderable->m_model = g_engineContext.m_resourceManager->GetModel(model);
+					renderable->m_pass = RootForce::RenderPass::RENDERPASS_TERRAIN;
+
 				}
 
 				const YAML::Node* materialNode = p_node.FindValue("Material");

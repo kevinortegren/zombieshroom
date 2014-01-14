@@ -1,12 +1,11 @@
 - name: Color
   techniques:
     - name: Color
-      uniforms:
+      bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject
           slot: 1
-      textures:
       programs:
       - name: Color
         shaders:
@@ -14,3 +13,7 @@
             type: vertex
           - name: Color
             type: fragment
+        depth:
+          test: 1
+          write: 0
+        blend: 0

@@ -6,4 +6,7 @@ find_path(LUA_INCLUDE_DIRS
 
 find_library(LUA_LIBRARY
     NAMES lua
-    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86")
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
+find_library(LUA_LIBRARY
+    NAMES lua
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Release")

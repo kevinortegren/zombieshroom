@@ -68,7 +68,10 @@ namespace Render
 
 		Bind();
 		glBindBuffer(GL_ARRAY_BUFFER,p_bufferId);
-		glVertexAttribPointer( p_location, p_size, p_type, p_normalized, p_stride, p_pointer );
+		if(p_type == GL_UNSIGNED_INT)
+			glVertexAttribIPointer( p_location, p_size, p_type, p_stride, p_pointer );
+		else
+			glVertexAttribPointer( p_location, p_size, p_type, p_normalized, p_stride, p_pointer );
 		Unbind();
 	}
 

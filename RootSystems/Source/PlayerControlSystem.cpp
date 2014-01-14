@@ -89,7 +89,7 @@ namespace RootForce
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
+		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
 		
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -132,6 +132,11 @@ namespace RootForce
 						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
 						m_angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
 						m_angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
+
+						if(m_angle.y < -90.0f)
+							m_angle.y = -90;
+						else if(m_angle.y > 90.0f)
+							m_angle.y = 90;
 					}
 					break;
 				case PlayerAction::SELECT_ABILITY:
@@ -140,7 +145,7 @@ namespace RootForce
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 		
-					if(player->m_selectedAbility == Abilitiy::ABILITY_TEST)
+					if(ability->SelectedAbility == Abilitiy::ABILITY_TEST)
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
@@ -148,6 +153,9 @@ namespace RootForce
 						script->m_actions.push_back(Action(ActionType::ACTION_CREATE));
 					}
 					
+					break;
+				case PlayerAction::JUMP:
+					m_physics->PlayerJump(*(collision->m_handle), 20.0f);
 					break;
 				default:
 					break;
@@ -175,6 +183,9 @@ namespace RootForce
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+
+		
+
 	}
 }
 

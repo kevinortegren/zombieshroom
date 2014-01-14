@@ -1,15 +1,30 @@
+ACTION_CREATE = 0;
+ACTION_COLLIDE = 1;
 
 Player = {}
 
 function Player.Process (action, ...)
+	
+	local args = table.pack(...);
 
-	local arg = table.pack(...)
-
-	if action == 1 then
-
-		if arg[1] ~= 3 then
-			-- print("Player collided with " .. arg[1])
-		end
+	if action == ACTION_CREATE then
+		Player.OnCreate();
+	elseif action == ACTION_COLLIDE then
+		Player.OnCollide(args);
 	end
+	
+end
 
+function Player.OnCreate ()
+
+
+end
+
+
+function Player.OnCollide (args)
+
+end
+
+function Player.OnDestroy ()
+	
 end
