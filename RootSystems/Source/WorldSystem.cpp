@@ -80,7 +80,7 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{
-		//m_quadTree.RenderDebug();
+		m_quadTree.RenderDebug();
 
 		ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
 
@@ -89,7 +89,7 @@ namespace RootForce
 		QuadNode* q = m_quadTree.PickRoot(glm::vec2(t->m_position.x,t->m_position.z));
 		if(q != nullptr)
 		{
-			q->GetBounds().DebugDraw(m_engineContext->m_renderer);
+			q->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,0,1));
 		}
 	}
 }

@@ -33,7 +33,7 @@ namespace RootForce
 
 		// Fill the global entity list with entities.
 
-		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Split");
+		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
@@ -95,10 +95,9 @@ namespace RootForce
 		
 			for(auto pos = (*itr).second.m_positions.begin(); pos != (*itr).second.m_positions.end(); ++pos)
 			{
-				float tx = (pos->x + transform->m_position.x) * transform->m_scale.x;
-				float ty = (pos->y + transform->m_position.y) * transform->m_scale.y;
-				float tz = (pos->z + transform->m_position.z) * transform->m_scale.z;
-
+				float tx = pos->x * transform->m_scale.x + transform->m_position.x;
+				float ty = pos->y * transform->m_scale.y + transform->m_position.y;
+				float tz = pos->z * transform->m_scale.z + transform->m_position.z;
 
 				if(tx > maxX) maxX = (int)tx;
 				if(tx < minX) minX = (int)tx;
@@ -114,18 +113,29 @@ namespace RootForce
 		m_maxY = maxY;
 		m_minY = minY;
 
-		quadTreeBounds.m_maxX = maxX;
+		quadTreeBounds.m_maxX = RoundToPow2(maxX);
+		quadTreeBounds.m_minX = -RoundToPow2(abs(minX));
+
 		quadTreeBounds.m_maxY = maxY;
-		quadTreeBounds.m_maxZ = maxZ;
-		quadTreeBounds.m_minX = minX;
 		quadTreeBounds.m_minY = minY;
-		quadTreeBounds.m_minZ = minZ;
+
+		quadTreeBounds.m_maxZ = RoundToPow2(maxZ);
+		quadTreeBounds.m_minZ = -RoundToPow2(abs(minZ));
+
+		Rectangle bottomLeft = Rectangle(quadTreeBounds.m_minX, quadTreeBounds.m_minZ, 2048, 2048);
+
+		int a = CountTriangles(bottomLeft);
 
 		m_root = new QuadNode(quadTreeBounds, numTriangles);
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", numTriangles);
 
 		Subdivide(m_root);
+	}
+
+	int QuadTree::RoundToPow2(int p_value)
+	{
+		return pow(2, ceil(log(p_value)/log(2)));
 	}
 
 	void QuadTree::Subdivide( QuadNode* p_node )
@@ -153,10 +163,15 @@ namespace RootForce
 			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_minY, m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
 			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_minY, m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
-			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, CountTriangles( bottomLeft ));
-			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, CountTriangles( bottomRight ));
-			QuadNode* topLeftChild = new QuadNode(topLeftAABB, CountTriangles( topLeft ));
-			QuadNode* topRightChild = new QuadNode(topRightAABB, CountTriangles( topRight ));
+			int bottomLeftTrisCount = CountTriangles( bottomLeft );
+			int bottomRightTrisCount = CountTriangles( bottomRight );
+			int topLeftTrisCount = CountTriangles( topLeft );
+			int topRightTrisCount = CountTriangles( topRight );
+
+			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, bottomLeftTrisCount);
+			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, bottomRightTrisCount);
+			QuadNode* topLeftChild = new QuadNode(topLeftAABB, topLeftTrisCount);
+			QuadNode* topRightChild = new QuadNode(topRightAABB, topRightTrisCount);
 
 			p_node->AddChild(bottomLeftChild);
 			p_node->AddChild(bottomRightChild);
@@ -203,16 +218,22 @@ namespace RootForce
 
 		for(auto entity = m_globalEntityList.begin(); entity != m_globalEntityList.end(); ++entity)
 		{
+			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*entity).first);
+
 			for(unsigned i = 0; i < entity->second.m_indices.size(); i += 3)
 			{
 				unsigned v0 = entity->second.m_indices[i];
 				unsigned v1 = entity->second.m_indices[i+1];
 				unsigned v2 = entity->second.m_indices[i+2];
 
+				glm::vec3 p0 = entity->second.m_positions[v0];
+				glm::vec3 p1 = entity->second.m_positions[v0];
+				glm::vec3 p2 = entity->second.m_positions[v0];
+
 				glm::vec3 verts[3];
-				verts[0] = entity->second.m_positions[v0];
-				verts[1] = entity->second.m_positions[v1];
-				verts[2] = entity->second.m_positions[v2];
+				verts[0] = p0 * transform->m_scale + transform->m_position;
+				verts[1] = p1 * transform->m_scale + transform->m_position;
+				verts[2] = p2 * transform->m_scale + transform->m_position;
 		
 				if( IsTriangleContained(verts, p_rect) )
 				{
@@ -299,7 +320,7 @@ namespace RootForce
 
 	void QuadTree::RenderNode(QuadNode* p_node)
 	{
-		p_node->m_bounds.DebugDraw(m_context->m_renderer);
+		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0));
 
 		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
 		{

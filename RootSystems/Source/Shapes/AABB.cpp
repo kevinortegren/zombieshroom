@@ -31,7 +31,7 @@ namespace RootForce
 		return Rectangle(m_minX, m_minZ, GetLengthX(), GetLengthZ());
 	}
 
-	void AABB::DebugDraw(Render::RendererInterface* p_renderer) const
+	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color) const
 	{
 		glm::vec3 positions[8];
 		positions[0] = glm::vec3(m_minX, m_minY, m_minZ);
@@ -53,7 +53,7 @@ namespace RootForce
 
 		for(int i = 0; i < 24; i += 2)
 		{
-			p_renderer->AddLine(positions[indices[i]], positions[indices[i+1]], glm::vec4(1,0,0,1));
+			p_renderer->AddLine(positions[indices[i]], positions[indices[i+1]], glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
 		}
 	}
 }
