@@ -2,7 +2,7 @@
 
 #include <PlayerControlSystem.h>
 #include <RootSystems\Include\ScriptSystem.h>
-
+#include <RootSystems/Include/AnimationSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -90,7 +90,7 @@ namespace RootForce
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-		
+		Animation* animation = m_world->GetEntityManager()->GetComponent<Animation>(entity);
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
@@ -106,20 +106,31 @@ namespace RootForce
 			switch (currentAction)
 			{
 				case PlayerAction::MOVE_FORWARDS:
-					movement += facing;// * speed;
+					{
+						movement += facing;// * speed;
+						animation->m_animClip = 0;
+					}
+					
 					break;
 				case PlayerAction::MOVE_BACKWARDS:
 					{
 						movement += -facing;// * speed;
+						animation->m_animClip = 0;
 					}
 					break;
 				case PlayerAction::STRAFE_RIGHT:
-					movement += right;// * speed;
-					//transform->m_orientation.YawGlobal(-90.0f * dt);
+					{
+						movement += right;// * speed;
+						animation->m_animClip = 1;
+						//transform->m_orientation.YawGlobal(-90.0f * dt);
+					}
+					
+
 					break;
 				case PlayerAction::STRAFE_LEFT:
 					{
 						movement += -right;// * speed;
+						animation->m_animClip = 2;
 						//m_physics->SetVelocity(*(physAcc->m_handle), -right);
 					}
 					break;
@@ -155,7 +166,11 @@ namespace RootForce
 					
 					break;
 				case PlayerAction::JUMP:
-					m_physics->PlayerJump(*(collision->m_handle), 20.0f);
+					{
+						m_physics->PlayerJump(*(collision->m_handle), 20.0f);
+						animation->m_animClip = 4;
+					}
+					
 					break;
 				default:
 					break;

@@ -56,10 +56,8 @@ namespace RootEngine
 
 		if(aiscene->HasAnimations())
 		{
-			for (unsigned int i = 0 ; i < aiscene->mNumAnimations ; i++) 
-			{
-				m_model->m_animation->SetAiImporter(m_importer);
-			}
+			m_model->m_animation->SetAiImporter(m_importer);
+			m_model->m_animation->SplitAnimation();
 		}
 
 		return m_model;

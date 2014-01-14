@@ -24,6 +24,14 @@ namespace RootEngine
 				m_finalTransformation = glm::mat4x4(0.0f);          
 			}
 		};
+
+		struct AnimClip 
+		{
+			double m_startTime;
+			double m_duration;
+			unsigned int m_startFrame;
+			unsigned int m_stopFrame;
+		};
 		
 		class AnimationInterface
 		{
@@ -39,6 +47,8 @@ namespace RootEngine
 				virtual const aiScene* GetScene() = 0;
 				virtual glm::mat4x4 GetGlobalInverseTransform() = 0;
 				virtual glm::mat4x4 GetBoneOffset(unsigned int p_index) = 0;
+				virtual void SplitAnimation() = 0;
+				virtual AnimClip* GetAnimClip(unsigned int p_index) = 0;
 			};
 
 			class Animation : public AnimationInterface
@@ -58,12 +68,14 @@ namespace RootEngine
 				const aiScene* GetScene();
 				glm::mat4x4 GetGlobalInverseTransform();
 				glm::mat4x4 GetBoneOffset(unsigned int p_index);
+				void SplitAnimation();
+				AnimClip* GetAnimClip(unsigned int p_index);
 
 			private:
 			//Map bone name to index
 			std::map<std::string, unsigned int>					m_boneMapping;
 			std::vector<RootEngine::RootAnimation::BoneInfo>	m_boneInfo;
-
+			std::vector<AnimClip>								m_animClips;
 			glm::mat4x4		m_globalInverseTransform;
 			unsigned int	m_numBones;
 
