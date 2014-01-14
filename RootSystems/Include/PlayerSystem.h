@@ -9,7 +9,7 @@
 
 namespace RootForce
 {
-	namespace Abilitiy
+	namespace Ability
 	{
 		enum Ability
 		{
@@ -23,12 +23,17 @@ namespace RootForce
 		float StrafePower;
 		bool Jump;
 		glm::vec2 Angle;
+		bool ActivateAbility;
+	};
+
+	struct PlayerPhysics : public ECS::Component<PlayerPhysics>
+	{
+		float MovementSpeed;
+		float JumpForce;
 	};
 
 	struct PlayerControl : public ECS::Component<PlayerControl>
 	{
-		float m_speed;
-		float m_jumpForce;
 		float m_mouseSensitivity;
 	};
 
@@ -48,8 +53,8 @@ namespace RootForce
 
 	struct UserAbility : public ECS::Component<UserAbility>
 	{
-		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
-		Abilitiy::Ability SelectedAbility;
+		std::array<Ability::Ability, PLAYER_NUM_ABILITIES> Abilities;
+		Ability::Ability SelectedAbility;
 	};
 
 	struct ScoreComponent : public ECS::Component<ScoreComponent>

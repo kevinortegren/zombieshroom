@@ -44,14 +44,11 @@ namespace RootSystems
 
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
-
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
 
-		RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
-
 		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-		RootForce::PlayerControl* controller = m_world->GetEntityManager()->GetComponent<RootForce::PlayerControl>(p_entity);
+		RootForce::PlayerPhysics* playphys = m_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(p_entity);
 		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
 		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
 		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
@@ -62,19 +59,32 @@ namespace RootSystems
 
 		action->Angle.x = 0;
 
-		// Get the speed of the player
-		float speed = controller->m_speed;
-
-		glm::vec3 movement = glm::normalize(facing * action->MovePower + right * action->StrafePower) * speed;
-		m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement  + transform->m_position);
+		// Calculate movement vector based on input values, the player's speed and delta time
+		glm::vec3 movement = glm::normalize(facing * action->MovePower + right * action->StrafePower) * playphys->MovementSpeed * dt;
+		m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement + transform->m_position);
 
 
 		if(action->Jump)
-			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), controller->m_jumpForce);
+			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
 
 		transform->m_orientation.YawGlobal(action->Angle.x);
 
 		m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
+		
+		if(action->ActivateAbility)
+			switch(ability->SelectedAbility)
+			{
+			case RootForce::Ability::ABILITY_TEST:
+				{
+					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+					RootForce::Script* script = m_world->GetEntityManager()->CreateComponent<RootForce::Script>(entity);
+					script->m_name = m_engineContext->m_resourceManager->GetScript("AbilityTest");
+					script->m_actions.push_back(RootForce::Action(RootForce::ActionType::ACTION_CREATE));
+				}
+				break;
+			default:
+				break;
+			}
 	}
 
 }

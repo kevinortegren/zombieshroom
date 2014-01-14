@@ -38,10 +38,8 @@ namespace RootSystems
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext) { }
 		void ProcessEntity(ECS::Entity* p_entity);
-		void SetNetworkContext(RootForce::NetworkContext* p_networkContext) { m_networkContext = p_networkContext; }
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
-		RootForce::NetworkContext* m_networkContext;
 	};
 
 }

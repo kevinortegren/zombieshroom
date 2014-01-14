@@ -31,6 +31,7 @@ namespace RootForce
 		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 		RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
+		RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
 
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());

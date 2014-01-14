@@ -43,7 +43,7 @@ namespace RootForce
 			IDENTITY,
 			TDMRULES, //TODO: name might be inappropriate?
 			PLAYERACTION,
-
+			PLAYERPHYSICS,
 		};
 	}
 }

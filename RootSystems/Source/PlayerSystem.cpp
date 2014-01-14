@@ -13,6 +13,7 @@ namespace RootForce
 		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
+		RootForce::PlayerPhysics* playphys = entityManager->CreateComponent<RootForce::PlayerPhysics>(entity);
 		RootForce::HealthComponent* health = entityManager->CreateComponent<RootForce::HealthComponent>(entity);
 		RootForce::ScoreComponent* score = entityManager->CreateComponent<RootForce::ScoreComponent>(entity);
 		RootForce::UserAbility* ability = entityManager->CreateComponent<RootForce::UserAbility>(entity);
@@ -40,16 +41,17 @@ namespace RootForce
 		transform->m_position = glm::vec3(0, 10, 0);
 
 		playerControl->m_mouseSensitivity = 0.3f;
-		playerControl->m_speed = 10.0f;
-		playerControl->m_jumpForce = 20.0f;
+		playphys->MovementSpeed = 10.0f;
+		playphys->JumpForce = 20.0f;
 
 		action->Jump = false;
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		action->Angle = glm::vec2(0);
+		action->ActivateAbility = false;
 
-		ability->Abilities[0] = Abilitiy::ABILITY_TEST;
-		ability->SelectedAbility = Abilitiy::ABILITY_TEST;
+		ability->Abilities[0] = Ability::ABILITY_TEST;
+		ability->SelectedAbility = Ability::ABILITY_TEST;
 
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";

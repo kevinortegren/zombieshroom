@@ -88,6 +88,7 @@ namespace RootForce
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
+		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
 		
@@ -99,7 +100,7 @@ namespace RootForce
 		m_angle.x = 0;
 
 		// Get the speed of the player
-		float speed = controller->m_speed;
+		float speed = playerphysics->MovementSpeed;
 
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
@@ -145,7 +146,7 @@ namespace RootForce
 					break;
 				case PlayerAction::ACTIVATE_ABILITY:
 		
-					if(ability->SelectedAbility == Abilitiy::ABILITY_TEST)
+					if(ability->SelectedAbility == Ability::ABILITY_TEST)
 					{
 						ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 						Script* script = m_world->GetEntityManager()->CreateComponent<Script>(entity);
@@ -155,7 +156,7 @@ namespace RootForce
 					
 					break;
 				case PlayerAction::JUMP:
-					m_physics->PlayerJump(*(collision->m_handle), 20.0f);
+					m_physics->PlayerJump(*(collision->m_handle), playerphysics->JumpForce);
 					break;
 				default:
 					break;
