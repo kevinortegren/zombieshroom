@@ -45,6 +45,7 @@ namespace RootForce
 		int LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
+		float RespawnDelay;
 	};
 
 	struct Identity : public ECS::Component<Identity>

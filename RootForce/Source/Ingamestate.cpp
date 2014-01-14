@@ -150,6 +150,10 @@ namespace RootForce
 		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem, "ActionSystem");
 
+		// Respawn system respawns players after they die
+		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
+
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;		
@@ -285,6 +289,11 @@ namespace RootForce
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
+        }
+
+        {
+            PROFILE("Respawn system", g_engineContext.m_profiler);
+            m_respawnSystem->Process();
         }
 
         {

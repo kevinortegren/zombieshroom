@@ -52,9 +52,18 @@ namespace RootSystems
 		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
 		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
 		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
+		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
 
-		if( !transform || !playphys || !collision || !ability || !action )
+		if( !transform || !playphys || !collision || !ability || !action || !health )
 			return;
+
+		if( health->IsDead )
+		{
+			if(action->ActivateAbility)
+				health->WantsRespawn = true;
+
+			return;
+		}
 
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
