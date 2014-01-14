@@ -75,15 +75,22 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
-		m_quadTree.SetTranslation(glm::vec3(0, -150.0f, 0));
 		m_quadTree.Init(m_engineContext, m_world);
-
-		QuadNode* q = m_quadTree.PickRoot(glm::vec2(50,0));
 	}
 
 	void WorldSystem::Process()
 	{
-		m_quadTree.RenderDebug();
+		//m_quadTree.RenderDebug();
+
+		ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
+
+		auto t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(e);
+
+		QuadNode* q = m_quadTree.PickRoot(glm::vec2(t->m_position.x,t->m_position.z));
+		if(q != nullptr)
+		{
+			q->GetBounds().DebugDraw(m_engineContext->m_renderer);
+		}
 	}
 }
 #endif

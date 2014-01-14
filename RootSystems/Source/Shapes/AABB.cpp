@@ -31,7 +31,7 @@ namespace RootForce
 		return Rectangle(m_minX, m_minZ, GetLengthX(), GetLengthZ());
 	}
 
-	void AABB::DebugDraw(Render::RendererInterface* p_renderer)
+	void AABB::DebugDraw(Render::RendererInterface* p_renderer) const
 	{
 		glm::vec3 positions[8];
 		positions[0] = glm::vec3(m_minX, m_minY, m_minZ);

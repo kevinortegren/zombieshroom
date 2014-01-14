@@ -247,8 +247,10 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-		
-		m_sharedSystems.m_worldSystem->Process();
+		{
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
+		}
 
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
