@@ -83,7 +83,7 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
-			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
+			if(p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
 				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());

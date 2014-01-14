@@ -53,25 +53,39 @@ namespace RootSystems
 		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
 		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
 
+		if( !transform || !playphys || !collision || !ability || !action )
+			return;
+
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
 
-		action->Angle.x = 0;
+		// Calculate movement vector based on input values, the player's speed
+		glm::vec3 movement = facing * action->MovePower + right * action->StrafePower;
+		if(movement != glm::vec3(0))
+		{
+			movement = glm::normalize(movement) * playphys->MovementSpeed;
+			m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement + transform->m_position);
+		}
 
-		// Calculate movement vector based on input values, the player's speed and delta time
-		glm::vec3 movement = glm::normalize(facing * action->MovePower + right * action->StrafePower) * playphys->MovementSpeed * dt;
-		m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement + transform->m_position);
-
-
+		// Issue a jump if applicable
 		if(action->Jump)
+		{
 			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+			action->Jump = false;
+		}
 
+		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
+		action->Angle.x = 0;
 
 		m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		
+		// Activate ability! Pew pew!
+		ability->SelectedAbility = ability->Abilities[action->SelectedAbility-1];
 		if(action->ActivateAbility)
+		{
+			action->ActivateAbility = false;
 			switch(ability->SelectedAbility)
 			{
 			case RootForce::Ability::ABILITY_TEST:
@@ -85,6 +99,7 @@ namespace RootSystems
 			default:
 				break;
 			}
+		}
 	}
 
 }

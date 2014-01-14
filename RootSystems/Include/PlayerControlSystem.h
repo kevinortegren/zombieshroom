@@ -25,11 +25,17 @@ namespace RootForce
 		{
 			NONE,
 			MOVE_FORWARDS,
+			MOVE_FORWARDS_STOP,
 			MOVE_BACKWARDS,
+			MOVE_BACKWARDS_STOP,
 			STRAFE_RIGHT,
+			STRAFE_RIGHT_STOP,
 			STRAFE_LEFT,
+			STRAFE_LEFT_STOP,
 			ORIENTATE,
-			SELECT_ABILITY,
+			SELECT_ABILITY1,
+			SELECT_ABILITY2,
+			SELECT_ABILITY3,
 			ACTIVATE_ABILITY,
 			JUMP
 		};
@@ -39,6 +45,7 @@ namespace RootForce
 	struct Keybinding
 	{
 		PlayerAction::PlayerAction Action;
+		PlayerAction::PlayerAction ActionUp;
 		std::vector<SDL_Scancode> Bindings;
 		bool Edge;
 

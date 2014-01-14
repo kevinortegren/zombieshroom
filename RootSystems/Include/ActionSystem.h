@@ -37,6 +37,7 @@ namespace RootSystems
 		ActionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext) { }
+		void Init() { }
 		void ProcessEntity(ECS::Entity* p_entity);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;

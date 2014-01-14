@@ -5,7 +5,7 @@
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <array>
 
-#define PLAYER_NUM_ABILITIES 1
+#define PLAYER_NUM_ABILITIES 3
 
 namespace RootForce
 {
@@ -13,7 +13,8 @@ namespace RootForce
 	{
 		enum Ability
 		{
-			ABILITY_TEST
+			ABILITY_NONE,
+			ABILITY_TEST,
 		};
 	}
 
@@ -24,6 +25,7 @@ namespace RootForce
 		bool Jump;
 		glm::vec2 Angle;
 		bool ActivateAbility;
+		uint8_t SelectedAbility;
 	};
 
 	struct PlayerPhysics : public ECS::Component<PlayerPhysics>

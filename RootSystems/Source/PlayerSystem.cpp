@@ -49,8 +49,11 @@ namespace RootForce
 		action->StrafePower = 0;
 		action->Angle = glm::vec2(0);
 		action->ActivateAbility = false;
+		action->SelectedAbility = 1;
 
 		ability->Abilities[0] = Ability::ABILITY_TEST;
+		ability->Abilities[1] = Ability::ABILITY_NONE;
+		ability->Abilities[2] = Ability::ABILITY_NONE;
 		ability->SelectedAbility = Ability::ABILITY_TEST;
 
 		physics->m_mass = 5.0f;
