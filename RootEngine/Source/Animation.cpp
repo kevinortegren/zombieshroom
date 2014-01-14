@@ -100,7 +100,6 @@ namespace RootEngine
 					clip.m_startFrame = startFrame;
 					clip.m_stopFrame = keyFrame - 1;
 					m_animClips.push_back(clip);
-					std::cout << "Clip " << m_animClips.size() << ": " << "Start frame: " << clip.m_startFrame << " " << "Stop frame: " << clip.m_stopFrame << " " << "Start time: " << clip.m_startTime << " " << "Duration: " << clip.m_duration <<"\n";
 					startTime = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mRotationKeys[keyFrame + 1].mTime;
 					startFrame = keyFrame + 1;
 				}
