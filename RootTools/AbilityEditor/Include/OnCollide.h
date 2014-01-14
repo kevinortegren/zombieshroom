@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AbilityComponents.h"
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 	class OnCollide
 	{

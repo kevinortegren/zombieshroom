@@ -5,7 +5,6 @@
 #include <QtWidgets/QBoxLayout>
 //#include "ui_AbilityEditor.h"
 #include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
-
 class AbilityEditor : public QMainWindow
 {
 	Q_OBJECT
@@ -21,7 +20,6 @@ public slots:
 private:
 	Ui::AbilityEditorClass ui;
 
-
+	
 };
-
 #endif // ABILITYEDITOR_H

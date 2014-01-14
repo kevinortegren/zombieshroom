@@ -1,6 +1,6 @@
 #include "OnCollide.h"
 
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 
 

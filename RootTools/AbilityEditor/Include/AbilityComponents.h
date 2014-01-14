@@ -2,7 +2,8 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <vector>
-namespace AbilityEditor
+#include <map>
+namespace AbilityEditorNameSpace
 {
 
 
@@ -64,12 +65,12 @@ namespace AbilityEditor
 			std::string m_materialEffect;
 			AbilityModel() : MainComponent(ComponentType::ABILITYMODEL)
 			{
-				m_modelName = "";
-				m_material = "";
-				m_materialDiffuse = "";
-				m_materialSpecular = "";
-				m_materialNormal = "";
-				m_materialEffect = "";
+				m_modelName = "a";
+				m_material = "a";
+				m_materialDiffuse = "a";
+				m_materialSpecular = "a";
+				m_materialNormal = "a";
+				m_materialEffect = "a";
 			}
 		};
 
@@ -135,8 +136,7 @@ namespace AbilityEditor
 			{
 
 			}
-		};
-
+		};	
 	}
 	namespace AbilityEntity
 	{
@@ -157,6 +157,67 @@ namespace AbilityEditor
 					m_components->pop_back();
 				}
 				delete m_components;
+			}
+			void AddComponent(AbilityComponents::ComponentType::ComponentType p_type)
+			{
+				switch (p_type)
+				{
+					
+				case AbilityComponents::ComponentType::TRANSFORM:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::Transform();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::COLLISION:			
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::Collision();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::ABILITYMODEL:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::AbilityModel();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::COLLISIONSHAPE:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::CollisionShape();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::PhysicsControlled();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::ABILITYPARTICLE:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::AbilityParticle();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::OFFENSIVEABILITY:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::OffensiveAbility();
+						AddComponent(temp);
+					}
+					break;
+				case AbilityComponents::ComponentType::EXPLOSIVE:
+					{
+						AbilityComponents::MainComponent* temp = new AbilityComponents::Explosive();
+						AddComponent(temp);
+					}
+					break;
+				default:
+					break; 
+				}
+			}
+			void AddComponent(AbilityComponents::MainComponent* p_component)
+			{
+				m_components->push_back(p_component);
 			}
 		};
 	}

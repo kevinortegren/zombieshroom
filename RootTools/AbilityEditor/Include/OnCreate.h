@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AbilityComponents.h"
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 	class OnCreate
 	{
@@ -9,10 +9,10 @@ namespace AbilityEditor
 		OnCreate();
 		~OnCreate();
 		void AddEntity(std::string p_name);
-		void AddComponent(AbilityComponents::ComponentType::ComponentType p_type);
+		void AddComponent(unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type);
 
-		std::vector<AbilityEntity::Entity>* GetEntities() { return &m_entities; }
+		std::vector<AbilityEntity::Entity*>* GetEntities() { return &m_entities; }
 	private:
-		std::vector<AbilityEntity::Entity> m_entities;
+		std::vector<AbilityEntity::Entity*> m_entities;
 	};
 }
