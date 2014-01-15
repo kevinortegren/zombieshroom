@@ -1,14 +1,11 @@
 #pragma once
-//#ifndef ABILITYEDITOR_H
-//#define ABILITYEDITOR_H
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QBoxLayout>
-#include <QtWidgets/QCheckBox>
 #include <QtCore/QStringList>
 #include <QtPropertyBrowser/QtTreePropertyBrowser>
 #include "GeneratedFiles/ui_AbilityEditor.h"
-
+#include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
 
 class AbilityEditor : public QMainWindow
 {
@@ -32,5 +29,3 @@ private:
 
 
 };
-//#include "GeneratedFiles/moc_AbilityEditor.cpp"
-//#endif // ABILITYEDITOR_H

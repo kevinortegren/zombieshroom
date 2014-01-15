@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 	Exporter::Exporter()
 	{
@@ -37,37 +37,42 @@ namespace AbilityEditor
 		out << YAML::BeginMap;
 		out << YAML::Key << "OnCreate";
 		out << YAML::Value << YAML::BeginSeq; 
-		for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
+		for(unsigned int i = 0 ; i < p_onCreate->GetEntities()->size(); i++)
 		{
 			out << YAML::BeginMap;
-			ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+			ExportEntity(out, p_onCreate->GetEntities()->at(i));
 			out << YAML::EndMap;
 		}
+		out << YAML::EndSeq;
 		out << YAML::EndMap;
 		//OnCollide
-		out << YAML::BeginMap;
-		out << YAML::Key << "OnCollide";
-		out << YAML::Value << YAML::BeginSeq; 
-		for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
+		if(p_onCollide != nullptr)
 		{
 			out << YAML::BeginMap;
-			ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+			out << YAML::Key << "OnCollide";
+			out << YAML::Value << YAML::BeginSeq; 
+			for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
+			{
+				out << YAML::BeginMap;
+				ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+				out << YAML::EndMap;
+			}
 			out << YAML::EndMap;
 		}
-		out << YAML::EndMap;
-
 		//OnDestroy
-		out << YAML::BeginMap;
-		out << YAML::Key << "OnCollide";
-		out << YAML::Value << YAML::BeginSeq; 
-		for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
+		if(p_onDestroy != nullptr)
 		{
 			out << YAML::BeginMap;
-			ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+			out << YAML::Key << "OnCollide";
+			out << YAML::Value << YAML::BeginSeq; 
+			for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
+			{
+				out << YAML::BeginMap;
+				ExportEntity(out, &p_onDestroy->GetEntities()->at(i));
+				out << YAML::EndMap;
+			}
 			out << YAML::EndMap;
 		}
-		out << YAML::EndMap;
-
 		//File done, prepare to write
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
@@ -76,26 +81,33 @@ namespace AbilityEditor
 		std::ofstream file;
 		file.open(p_filepath);
 		file << out.c_str();
+		file.close();
 	}
 
 	void Exporter::ExportEntity( YAML::Emitter& p_emitter, AbilityEntity::Entity* p_entity )
 	{
-		
-		p_emitter << YAML::Key << p_entity->m_name;
+		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name;
+		p_emitter << YAML::Key << "Components";
 		p_emitter << YAML::Value << YAML::BeginSeq;
+		
 		for (unsigned int j = 0; j < p_entity->m_components->size(); j++)
 		{
 			p_emitter << YAML::BeginMap;
-			p_emitter << YAML::Key << "Type" << YAML::Value << j;
+			p_emitter << YAML::Key << "Type" << YAML::Value << p_entity->m_components->at(j)->m_type;
 			p_emitter << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
+			p_emitter << YAML::BeginMap;
 			ExportComponent(p_emitter, p_entity->m_components->at(j), p_entity->m_components->at(j)->m_type );
+			p_emitter << YAML::EndMap;
 			p_emitter << YAML::EndSeq;
 			p_emitter << YAML::EndMap;
 		}
+		
+		p_emitter << YAML::EndSeq;
 	}
 
 	void Exporter::ExportComponent( YAML::Emitter& p_emitter, AbilityComponents::MainComponent* p_component, unsigned int p_type )
 	{
+		
 		switch (p_type)
 		{
 			case AbilityComponents::ComponentType::TRANSFORM:
@@ -133,18 +145,18 @@ namespace AbilityEditor
 					p_emitter << YAML::Key << "Height" << YAML::Value << shape->m_height;
 				}
 				break;
-			case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
-				{
-					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
-					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
-				}
-				break;
 			case AbilityComponents::ComponentType::ABILITYPARTICLE:
 				{
 					AbilityComponents::AbilityParticle* particle = static_cast<AbilityComponents::AbilityParticle*>(p_component);
 					p_emitter << YAML::Key << "ParticleName" << YAML::Value << particle->m_particleName;
 					p_emitter << YAML::Key << "Size" << YAML::Value << particle->m_size;
+				}
+				break;
+			case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+				{
+					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
+					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
+					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
 				}
 				break;
 			case AbilityComponents::ComponentType::OFFENSIVEABILITY:
@@ -163,6 +175,7 @@ namespace AbilityEditor
 			default:
 				break;
 		}
+		
 	}
 
 }

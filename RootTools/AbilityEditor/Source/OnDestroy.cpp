@@ -1,5 +1,5 @@
 #include "OnDestroy.h"
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 
 	OnDestroy::OnDestroy()
@@ -12,7 +12,7 @@ namespace AbilityEditor
 
 	}
 
-	void OnDestroy::AddComponent( AbilityComponents::ComponentType::ComponentType p_type )
+	void OnDestroy::AddComponent(unsigned int p_id,  AbilityComponents::ComponentType::ComponentType p_type )
 	{
 
 	}

@@ -3,7 +3,7 @@
 #include "OnCollide.h"
 #include "OnCreate.h"
 #include "OnDestroy.h"
-namespace AbilityEditor
+namespace AbilityEditorNameSpace
 {
 	class Exporter
 	{
