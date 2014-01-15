@@ -160,7 +160,7 @@ namespace RootForce
 			case PlayerAction::JUMP:
 				{
 					action->Jump = true;
-					animation->m_animClip = 4;
+					animation->m_animClip = AnimationClip::JUMP_START;
 				}
 				break;
 			default:
@@ -168,15 +168,15 @@ namespace RootForce
 			}
 
 			if(action->StrafePower == 0 && action->MovePower == 0)
-				animation->m_animClip = 1;
+				animation->m_animClip = AnimationClip::IDLE;
 			if(action->MovePower == -1)
-				animation->m_animClip = 0;
+				animation->m_animClip = AnimationClip::WALKING;
 			else if(action->MovePower == 1)
-				animation->m_animClip = 0;
+				animation->m_animClip = AnimationClip::WALKING;
 			if(action->StrafePower == 1)
-				animation->m_animClip = 3;
+				animation->m_animClip = AnimationClip::STRAFE_RIGHT;
 			else if(action->StrafePower == -1)
-				animation->m_animClip = 2;
+				animation->m_animClip = AnimationClip::STRAFE_LEFT;
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;

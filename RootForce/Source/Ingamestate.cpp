@@ -9,32 +9,8 @@ namespace RootForce
 	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
 		, m_sharedSystems(p_sharedSystems)
-	{
-		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-        RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-        RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
-		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
-        RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
-        RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
-        RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
-        RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
-        RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
-		RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
-        RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
-        RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
-        RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
-        RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-        RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
-		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
-		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
-		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
-		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
-		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
-		RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
-		RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
-
+	{	
+		ComponentType::Initialize();
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}

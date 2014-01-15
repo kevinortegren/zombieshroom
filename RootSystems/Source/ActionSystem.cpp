@@ -28,6 +28,7 @@ namespace RootSystems
 			{
 				health->WantsRespawn = true;
 				action->ActivateAbility = false;
+				action->Jump = false;
 			}
 
 			return;
