@@ -60,7 +60,10 @@ namespace RootSystems
 		if( health->IsDead )
 		{
 			if(action->ActivateAbility)
+			{
 				health->WantsRespawn = true;
+				action->ActivateAbility = false;
+			}
 
 			return;
 		}
