@@ -1,7 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
 #include <PlayerControlSystem.h>
-#include <RootSystems\Include\ScriptSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
