@@ -47,6 +47,42 @@ namespace AbilityEditorNameSpace
 				}
 				p_onCreate->AddEntity(entity);
 			}
+			//onCollide data
+			const YAML::Node& onCreate = doc[1]["OnCollide"];
+			for(unsigned int i = 0; i < onCreate.size() ; i++)
+			{
+				std::string entityName;
+				onCreate[i]["EntityName"] >> entityName;
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				const YAML::Node& comps = onCreate[i]["Components"];
+				for(unsigned int j = 0; j < comps.size(); j++)
+				{
+					int type;
+					comps[j]["Type"] >> type;
+					const YAML::Node& data = comps[j]["Data"];
+					for(unsigned int k = 0; k < data.size(); k++)
+						entity->AddComponent(ImportComponents(data[k], type));
+				}
+				p_onCreate->AddEntity(entity);
+			}
+			//OnDestroy data
+			const YAML::Node& onCreate = doc[2]["OnDestroy"];
+			for(unsigned int i = 0; i < onCreate.size() ; i++)
+			{
+				std::string entityName;
+				onCreate[i]["EntityName"] >> entityName;
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				const YAML::Node& comps = onCreate[i]["Components"];
+				for(unsigned int j = 0; j < comps.size(); j++)
+				{
+					int type;
+					comps[j]["Type"] >> type;
+					const YAML::Node& data = comps[j]["Data"];
+					for(unsigned int k = 0; k < data.size(); k++)
+						entity->AddComponent(ImportComponents(data[k], type));
+				}
+				p_onCreate->AddEntity(entity);
+			}
 			
 		}
 		catch(YAML::ParserException& e)
