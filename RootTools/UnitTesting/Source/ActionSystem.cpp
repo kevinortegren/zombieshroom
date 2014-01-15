@@ -21,12 +21,12 @@ TEST(ActionSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
 
-	RootSystems::ActionSystem system(world, &g_engineContext);
-	RootForce::PhysicsSystem pSystem(world); 
-	pSystem.SetPhysicsInterface(g_engineContext.m_physics);
-	pSystem.SetLoggingInterface(g_engineContext.m_logger);
-	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(&system, "ActionSystem");
-	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(&pSystem, "PhysicsSystem");
+	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
+	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
+	pSystem->SetPhysicsInterface(g_engineContext.m_physics);
+	pSystem->SetLoggingInterface(g_engineContext.m_logger);
+	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
+	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
 	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
@@ -46,9 +46,9 @@ TEST(ActionSystem, ProcessEntity)
 		action->Jump = true;
 		action->ActivateAbility = true;
 
-		system.Process();
+		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
-		pSystem.Process();
+		pSystem->Process();
 
 		EXPECT_TRUE(health->WantsRespawn);
 		EXPECT_FALSE(action->Jump);
@@ -60,7 +60,7 @@ TEST(ActionSystem, ProcessEntity)
 	for(int i = 0; i < 1000; i++)
 	{
 		g_engineContext.m_physics->Update(i*0.01f);
-		pSystem.Process();
+		pSystem->Process();
 	}
 
 	{
@@ -68,9 +68,9 @@ TEST(ActionSystem, ProcessEntity)
 		action->StrafePower = 0;
 		glm::vec3 pos = transform->m_position;
 
-		system.Process();
+		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
-		pSystem.Process();
+		pSystem->Process();
 
 		EXPECT_EQ(transform->m_position.x, pos.x);
 		EXPECT_EQ(transform->m_position.y, pos.y);
@@ -82,9 +82,9 @@ TEST(ActionSystem, ProcessEntity)
 		action->StrafePower = -1;
 		glm::vec3 pos = transform->m_position;
 
-		system.Process();
+		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
-		pSystem.Process();
+		pSystem->Process();
 
 		EXPECT_NE(transform->m_position.x, pos.x);
 		EXPECT_EQ(transform->m_position.y, pos.y);
@@ -95,9 +95,9 @@ TEST(ActionSystem, ProcessEntity)
 		glm::vec3 pos = transform->m_position;
 		action->Jump = true;
 
-		system.Process();
+		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
-		pSystem.Process();
+		pSystem->Process();
 
 		EXPECT_GT(transform->m_position.y, pos.y);
 		EXPECT_FALSE(action->Jump);
@@ -105,9 +105,14 @@ TEST(ActionSystem, ProcessEntity)
 
 	{
 		action->ActivateAbility = true;
-		system.Process();
+		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
-		pSystem.Process();
+		pSystem->Process();
 		EXPECT_FALSE(action->ActivateAbility);
 	}
+
+	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+	world->GetTagManager()->UnregisterAll();
+	world->GetGroupManager()->UnregisterAll();
+	delete world;
 }
