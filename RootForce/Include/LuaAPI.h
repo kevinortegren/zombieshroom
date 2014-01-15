@@ -871,7 +871,7 @@ namespace RootForce
 			RootForce::Script **s = (RootForce::Script **)lua_newuserdata(p_luaState, sizeof(RootForce::Script*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Script>(*e);
-			(*s)->m_name = g_engineContext.m_resourceManager->GetScript(luaL_checkstring(p_luaState, 2));
+			(*s)->Name = g_engineContext.m_resourceManager->GetScript(luaL_checkstring(p_luaState, 2));
 			luaL_setmetatable(p_luaState, "Script");
 			
 			return 1;

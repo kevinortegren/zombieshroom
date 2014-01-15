@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <Utility/ECS/Include/World.h>
@@ -12,20 +13,27 @@ namespace RootForce
 {
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation():m_animClip(0), m_animTime(0.0f){}
-		glm::mat4 m_bones[20];
-		unsigned int m_animClip;
-		float m_animTime;
+		Animation():m_animClip(0), m_prevAnimClip(0), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f){}
+
+		glm::mat4		m_bones[20];
+		unsigned int	m_animClip;
+		unsigned int	m_prevAnimClip;
+		float			m_animTime;
+		bool			m_blending;
+		float			m_blendTime;
+		std::map<std::string, aiVector3D> m_blendPos;
+		std::map<std::string, aiQuaternion> m_blendRot;
 	};
 
 	struct AnimationSystem : public ECS::EntitySystem
 	{
 		AnimationSystem(ECS::World* p_world)
-			: ECS::EntitySystem(p_world), m_time(0)
+			: ECS::EntitySystem(p_world)
 		{
 			SetUsage<Animation>();
 			SetUsage<Renderable>();
 			m_logger = nullptr;
+			m_blendTime = 0.1f;
 		}
 		void Init();
 		void Begin();
@@ -38,18 +46,21 @@ namespace RootForce
 		ECS::ComponentMapper<Renderable> m_renderables;
 
 	private:
-		void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene, unsigned int p_animClip );
+		void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 		const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
 		unsigned int FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
 		unsigned int FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
 		unsigned int FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-		void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-		void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+		void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim, Animation* p_anim);
+		void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim, Animation* p_anim);
 		void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		void CalcBlendedPosition(aiVector3D& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame);
+		void CalcBlendedRotation(aiQuaternion& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame);
 
 		Logging::LoggingInterface* m_logger;
 		RootEngine::GameSharedContext* m_context;
 
-		float m_time;
+		float m_blendTime;
 	};
 }

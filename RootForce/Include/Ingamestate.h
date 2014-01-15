@@ -10,6 +10,8 @@
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
+#include <RootSystems/Include/ActionSystem.h>
+#include <RootSystems/Include/RespawnSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
@@ -44,7 +46,6 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		RootForce::ScriptSystem* m_scriptSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;
 		RootForce::RenderingSystem* m_renderingSystem;
@@ -55,6 +56,8 @@ namespace RootForce
 		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
 		RootForce::AnimationSystem* m_animationSystem;
 		RootForce::MatchStateSystem* m_gameLogicSystem;
+		RootSystems::ActionSystem* m_actionSystem;
+		RootSystems::RespawnSystem* m_respawnSystem;
 
 	};
 }

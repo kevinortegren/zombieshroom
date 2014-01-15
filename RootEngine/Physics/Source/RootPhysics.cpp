@@ -1208,7 +1208,7 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::SetPosition( int p_objectHandle , glm::vec3 p_position )
+	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -1240,6 +1240,18 @@ namespace Physics
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_endPos[0], p_endPos[1], p_endPos[2]), rayResult);
 
 		return rayResult.m_closestHitFraction;
+	}
+
+	void RootPhysics::SetPosition( int p_objectHandle, glm::vec3 p_position )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		btVector3 temp (p_position[0], p_position[1], p_position[2]);
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->SetPosition(temp);
+		}
 	}
 
 }

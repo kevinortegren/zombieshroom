@@ -5,17 +5,39 @@
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <array>
 
-#define PLAYER_NUM_ABILITIES 1
+#define PLAYER_NUM_ABILITIES 3
 
 namespace RootForce
 {
-	namespace Abilitiy
+	namespace Ability
 	{
 		enum Ability
 		{
-			ABILITY_TEST
+			ABILITY_NONE,
+			ABILITY_TEST,
 		};
 	}
+
+	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
+	{
+		float MovePower;
+		float StrafePower;
+		bool Jump;
+		glm::vec2 Angle;
+		bool ActivateAbility;
+		uint8_t SelectedAbility;
+	};
+
+	struct PlayerPhysics : public ECS::Component<PlayerPhysics>
+	{
+		float MovementSpeed;
+		float JumpForce;
+	};
+
+	struct PlayerControl : public ECS::Component<PlayerControl>
+	{
+		float m_mouseSensitivity;
+	};
 
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
@@ -23,6 +45,7 @@ namespace RootForce
 		int LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
+		float RespawnDelay;
 	};
 
 	struct Identity : public ECS::Component<Identity>
@@ -33,8 +56,8 @@ namespace RootForce
 
 	struct UserAbility : public ECS::Component<UserAbility>
 	{
-		std::array<Abilitiy::Ability, PLAYER_NUM_ABILITIES> Abilities;
-		Abilitiy::Ability SelectedAbility;
+		std::array<Ability::Ability, PLAYER_NUM_ABILITIES> Abilities;
+		Ability::Ability SelectedAbility;
 	};
 
 	struct ScoreComponent : public ECS::Component<ScoreComponent>

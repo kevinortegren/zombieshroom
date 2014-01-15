@@ -30,6 +30,8 @@ namespace RootForce
 		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
 		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+		RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
+		RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
 
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
@@ -58,18 +60,26 @@ namespace RootForce
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+		keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
+		keybindings[0].Edge = true;
 
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+		keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
+		keybindings[1].Edge = true;
 
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
 		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+		keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
+		keybindings[2].Edge = true;
 
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+		keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
+		keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
 		keybindings[4].Action = RootForce::PlayerAction::JUMP;
@@ -78,6 +88,18 @@ namespace RootForce
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
 		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
 		keybindings[5].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
+		keybindings[keybindings.size()-1].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
+		keybindings[keybindings.size()-1].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
+		keybindings[keybindings.size()-1].Edge = true;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -85,17 +107,13 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for executing script based on actions.
-		m_scriptSystem = new RootForce::ScriptSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
-
 		// Initialize physics system
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-		m_collisionSystem = new RootForce::CollisionSystem(g_world);
+		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
 		// Initialize render and point light system.
@@ -124,6 +142,15 @@ namespace RootForce
 		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
+
+		// Action system handles local and remote player issued actions and updates the world accordingly
+		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem, "ActionSystem");
+
+		// Respawn system respawns players after they die
+		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
+
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;		
@@ -211,19 +238,28 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 
 		//Update all the data that is displayed in the HUD
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
-		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
-		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
+		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 
 		m_hud->Update();
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		if(event.EventType == RootServer::UserCommands::CLIENT_RAGEQUIT)
+		switch (event.EventType)
+		{
+		case RootServer::UserCommands::CLIENT_RAGEQUIT:
 			return GameStates::Menu;
-
+		case RootServer::UserCommands::CLIENT_SUICIDE:
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			break;
+		default:
+			break;
+		}
 #ifdef _DEBUG
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -259,6 +295,16 @@ namespace RootForce
 		}
 
         {
+            PROFILE("Action system", g_engineContext.m_profiler);
+            m_actionSystem->Process();
+        }
+
+		{
+			PROFILE("Respawn system", g_engineContext.m_profiler);
+			m_respawnSystem->Process();
+		}
+
+        {
             PROFILE("Physics", g_engineContext.m_profiler);
             g_engineContext.m_physics->Update(p_deltaTime);
             m_physicsSystem->Process();
@@ -268,11 +314,6 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
-        
-		{
-			PROFILE("Script system", g_engineContext.m_profiler);
-			m_scriptSystem->Process();
-		}
 
 		if (m_networkContext.m_server != nullptr)
 		{
