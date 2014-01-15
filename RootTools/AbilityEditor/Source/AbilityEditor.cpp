@@ -1,16 +1,25 @@
 #include "AbilityEditor.h"
-#include <QtPropertyBrowser/QtTreePropertyBrowser>
+
 #include <QtPropertyBrowser/QtVariantProperty>
 #include <QtPropertyBrowser/QtVariantPropertyManager>
 #include <QtPropertyBrowser/QtVariantEditorFactory>
-#include <QtWidgets/QCheckBox>
 #include "OnCreate.h"
 #include "Exporter.h"
 #include "Importer.h"
 AbilityEditor::AbilityEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
+	m_compNames.append("Transform");
+	m_compNames.append("Collision");
+	m_compNames.append("Ability Model");
+	m_compNames.append("Collision Shape");
+	m_compNames.append("Ability Particle");
+	m_compNames.append("Physics Controlled");
+	m_compNames.append("Offensive Ability");
+	m_compNames.append("Explosive");
 
+	
+	
 }
 
 AbilityEditor::~AbilityEditor()
@@ -21,10 +30,13 @@ AbilityEditor::~AbilityEditor()
 void AbilityEditor::Init()
 {
 	ui.setupUi(this);
-	AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
+
+	//////////////////////////////////////////////////////////////////////////
+	/*AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
 	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
 	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
-	/*test->AddEntity("Testus totalius");
+
+	test->AddEntity("Testus totalius");
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
@@ -37,42 +49,52 @@ void AbilityEditor::Init()
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
 
+	exporter->Export("Test.ability", test, nullptr, nullptr);
 
-
-	exporter->Export("Test.ability", test, nullptr, nullptr);*/
-	
 	importer->Import("Test.ability", test, nullptr, nullptr);
-	exporter->Export("Test2.ability", test, nullptr, nullptr);
-	//connect(ui.treeOnCollide, SIGNAL(ui.treeOnCollide->itemClicked()), this, SLOT(UpdatePropertyBrowser()));
-	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(UpdatePropertyBrowser()));
-		
+	exporter->Export("Test2.ability", test, nullptr, nullptr);*/
+	//////////////////////////////////////////////////////////////////////////
+
+	connect(ui.treeOnCollide, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(UpdatePropertyBrowser(QTreeWidgetItem*)));
+	
+	ui.listComponents->addItems(m_compNames);
+	ui.listAbilities->addItem("Empty Entity");
+	m_propBrows = new QtTreePropertyBrowser;
+	m_mainLayout = new QGridLayout();
+
+	
+	
+
 }
 
-void AbilityEditor::UpdatePropertyBrowser(  )
+void AbilityEditor::UpdatePropertyBrowser( QTreeWidgetItem* p_item )
 {
-	/*QTreeWidget* p_treeWidget = ui.treeOnCollide;
-	QtTreePropertyBrowser* propBrows;
-	propBrows = new QtTreePropertyBrowser();
-	propBrows->setGeometry(ui.propertyWidget->geometry());
-	this->layout()->addWidget(propBrows);
+
+	if (m_propBrows != 0)
+	{
+		delete m_propBrows;
+	}
+
+	m_propBrows = new QtTreePropertyBrowser(ui.propertyWidget);
+	m_propBrows->setGeometry(ui.propertyWidget->geometry());
+
+	m_mainLayout->addWidget(m_propBrows);
+	ui.propertyWidget->setLayout(m_mainLayout);
 
 	QtVariantPropertyManager* hej;
 	hej = new QtVariantPropertyManager;
 
+	QString temp = p_item->text(p_item->columnCount()-1);
 	QtVariantProperty* prop;
 	prop = hej->addProperty(QVariant::String, "Name");
-	prop->setAttribute("name", p_treeWidget->currentItem()->text(0));
+	hej->setValue(prop, temp);
+
 	
+
 	QtVariantEditorFactory* propFact;
 	propFact = new QtVariantEditorFactory;
-	propBrows->setFactoryForManager(hej, propFact);*/
-
-	QCheckBox* test;
-
-	test = new QCheckBox();
-	test->setObjectName(QStringLiteral("test"));
-	test->setGeometry(ui.propertyWidget->geometry());
-	test->setText(QApplication::translate("AbilityEditorClass", "BAJSBOX", 0));
-	layout()->addWidget(test);
+	m_propBrows->setFactoryForManager(hej, propFact);
+	m_propBrows->addProperty(prop);
+	
 }
 

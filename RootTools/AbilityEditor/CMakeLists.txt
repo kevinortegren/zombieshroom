@@ -27,6 +27,18 @@ foreach(it ${UI_FILES})
    # list(APPEND ${outfiles} ${outfile})
 endforeach()
 
+set(MOC_OPTIONS -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I${CMAKE_CURRENT_SOURCE_DIR}/GeneratedFiles" "-I${CMAKE_CURRENT_SOURCE_DIR}" "-I${QT_INCLUDE_DIRS}" "-I${CMAKE_CURRENT_SOURCE_DIR}/GeneratedFiles" "-I$(QT_INCLUDE_DIRS)/QtCore" "-I$(QT_INCLUDE_DIRS)/QtGui" "-I$(QT_INCLUDE_DIRS)/QtWidgets")
+foreach(it ${HEADERS})
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(infile ${it} ABSOLUTE)
+    set(outfile ${CMAKE_CURRENT_SOURCE_DIR}/GeneratedFiles/moc_${outfile}.cpp)
+    add_custom_command(OUTPUT ${outfile}
+      COMMAND ${CMAKE_SOURCE_DIR}/External/Bin/x86/moc.exe
+      ARGS ${MOC_OPTIONS} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile} VERBATIM)
+   # list(APPEND ${outfiles} ${outfile})
+endforeach()
+
 #message("${SOURCES}")
 #message("${HEADERS}")
 

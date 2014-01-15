@@ -14,9 +14,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTreeWidget>
@@ -27,6 +28,11 @@ QT_BEGIN_NAMESPACE
 class Ui_AbilityEditorClass
 {
 public:
+    QAction *actionSave_As;
+    QAction *actionSave;
+    QAction *actionLoad;
+    QAction *actionQuit;
+    QAction *actionGenerate_Script;
     QWidget *centralWidget;
     QTabWidget *abilityWidget;
     QWidget *tabOnCreate;
@@ -36,11 +42,14 @@ public:
     QWidget *tabOnDestroy;
     QTreeWidget *treeOnDestroy;
     QTabWidget *toolBoxWidget;
-    QWidget *tab_3;
+    QWidget *tabAbilities;
+    QListWidget *listAbilities;
     QWidget *tabComponents;
+    QListWidget *listComponents;
+    QWidget *tabConditions;
     QWidget *propertyWidget;
-    QPushButton *pushButton;
     QMenuBar *menuBar;
+    QMenu *menuFile;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *AbilityEditorClass)
@@ -48,6 +57,16 @@ public:
         if (AbilityEditorClass->objectName().isEmpty())
             AbilityEditorClass->setObjectName(QStringLiteral("AbilityEditorClass"));
         AbilityEditorClass->resize(592, 682);
+        actionSave_As = new QAction(AbilityEditorClass);
+        actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
+        actionSave = new QAction(AbilityEditorClass);
+        actionSave->setObjectName(QStringLiteral("actionSave"));
+        actionLoad = new QAction(AbilityEditorClass);
+        actionLoad->setObjectName(QStringLiteral("actionLoad"));
+        actionQuit = new QAction(AbilityEditorClass);
+        actionQuit->setObjectName(QStringLiteral("actionQuit"));
+        actionGenerate_Script = new QAction(AbilityEditorClass);
+        actionGenerate_Script->setObjectName(QStringLiteral("actionGenerate_Script"));
         centralWidget = new QWidget(AbilityEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         abilityWidget = new QTabWidget(centralWidget);
@@ -82,31 +101,46 @@ public:
         toolBoxWidget = new QTabWidget(centralWidget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
         toolBoxWidget->setGeometry(QRect(320, 10, 261, 381));
-        tab_3 = new QWidget();
-        tab_3->setObjectName(QStringLiteral("tab_3"));
-        toolBoxWidget->addTab(tab_3, QString());
+        tabAbilities = new QWidget();
+        tabAbilities->setObjectName(QStringLiteral("tabAbilities"));
+        listAbilities = new QListWidget(tabAbilities);
+        listAbilities->setObjectName(QStringLiteral("listAbilities"));
+        listAbilities->setGeometry(QRect(0, 0, 251, 351));
+        toolBoxWidget->addTab(tabAbilities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
+        listComponents = new QListWidget(tabComponents);
+        listComponents->setObjectName(QStringLiteral("listComponents"));
+        listComponents->setGeometry(QRect(0, 0, 251, 351));
         toolBoxWidget->addTab(tabComponents, QString());
+        tabConditions = new QWidget();
+        tabConditions->setObjectName(QStringLiteral("tabConditions"));
+        toolBoxWidget->addTab(tabConditions, QString());
         propertyWidget = new QWidget(centralWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
         propertyWidget->setGeometry(QRect(10, 410, 571, 231));
-        pushButton = new QPushButton(centralWidget);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(290, 160, 75, 23));
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 592, 21));
+        menuFile = new QMenu(menuBar);
+        menuFile->setObjectName(QStringLiteral("menuFile"));
         AbilityEditorClass->setMenuBar(menuBar);
         statusBar = new QStatusBar(AbilityEditorClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         AbilityEditorClass->setStatusBar(statusBar);
 
+        menuBar->addAction(menuFile->menuAction());
+        menuFile->addAction(actionSave_As);
+        menuFile->addAction(actionSave);
+        menuFile->addAction(actionLoad);
+        menuFile->addAction(actionGenerate_Script);
+        menuFile->addAction(actionQuit);
+
         retranslateUi(AbilityEditorClass);
 
         abilityWidget->setCurrentIndex(2);
-        toolBoxWidget->setCurrentIndex(0);
+        toolBoxWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(AbilityEditorClass);
@@ -115,6 +149,11 @@ public:
     void retranslateUi(QMainWindow *AbilityEditorClass)
     {
         AbilityEditorClass->setWindowTitle(QApplication::translate("AbilityEditorClass", "AbilityEditor", 0));
+        actionSave_As->setText(QApplication::translate("AbilityEditorClass", "Save As...", 0));
+        actionSave->setText(QApplication::translate("AbilityEditorClass", "Save", 0));
+        actionLoad->setText(QApplication::translate("AbilityEditorClass", "Load...", 0));
+        actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
+        actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
         QTreeWidgetItem *___qtreewidgetitem = treeOnCreate->headerItem();
         ___qtreewidgetitem->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnCreate), QApplication::translate("AbilityEditorClass", "On Create", 0));
@@ -143,9 +182,10 @@ public:
         QTreeWidgetItem *___qtreewidgetitem9 = treeOnDestroy->headerItem();
         ___qtreewidgetitem9->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "On Destroy", 0));
-        toolBoxWidget->setTabText(toolBoxWidget->indexOf(tab_3), QApplication::translate("AbilityEditorClass", "Tab 1", 0));
+        toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabAbilities), QApplication::translate("AbilityEditorClass", "Existing Abilities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
-        pushButton->setText(QApplication::translate("AbilityEditorClass", "PushButton", 0));
+        toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
+        menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
     } // retranslateUi
 
 };
