@@ -250,9 +250,16 @@ namespace RootForce
 		m_hud->Update();
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		if(event.EventType == RootServer::UserCommands::CLIENT_RAGEQUIT)
+		switch (event.EventType)
+		{
+		case RootServer::UserCommands::CLIENT_RAGEQUIT:
 			return GameStates::Menu;
-
+		case RootServer::UserCommands::CLIENT_SUICIDE:
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			break;
+		default:
+			break;
+		}
 #ifdef _DEBUG
 		//Debug drawing TODO: Remove for release
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -290,10 +297,10 @@ namespace RootForce
             m_actionSystem->Process();
         }
 
-        {
-            PROFILE("Respawn system", g_engineContext.m_profiler);
-            m_respawnSystem->Process();
-        }
+		{
+			PROFILE("Respawn system", g_engineContext.m_profiler);
+			m_respawnSystem->Process();
+		}
 
         {
             PROFILE("Physics", g_engineContext.m_profiler);

@@ -39,9 +39,12 @@ img
 }
 #TimeLeftContainer
 {
+	position: absolute;
+	top:0;
+	left:50%;
+	margin-left: -60px;
 	width: 120px;
 	height: 35px;
-	margin: auto;
 	text-align: center;
 	background-color: rgba(60,60,60,0.5);
 	font-size: 32px;
@@ -98,6 +101,29 @@ img
 	height: 75px;
 	text-align: center;
 	overflow: hidden;
+}
+#deathscreen
+{
+	display: none;
+}
+#deathtop
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 125px;
+	background: #000000;
+}
+#deathbottom
+{
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	height: 125px;
+	margin-top: -125px;
+	background: #000000;
 }
 .slot
 {
