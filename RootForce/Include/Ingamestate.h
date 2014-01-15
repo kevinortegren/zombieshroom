@@ -23,7 +23,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootForce/Include/HUD.h>
-
+#include <thread>
 namespace RootForce
 {
 	class IngameState

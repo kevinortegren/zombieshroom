@@ -293,7 +293,10 @@ namespace RootForce
 			if(!m_hud->GetChatSystem()->IsFocused())
 			m_playerControlSystem->Process();
 		}
-
+		
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
+		
+		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
@@ -338,19 +341,13 @@ namespace RootForce
 			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
-
-		{
-			PROFILE("AnimationSystem", g_engineContext.m_profiler);
-			m_animationSystem->Process();
-		}
-
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 
 		}
-
+		t.join();
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();
