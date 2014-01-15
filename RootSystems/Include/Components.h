@@ -41,8 +41,9 @@ namespace RootForce
 			SCORE,
 			ABILITY,
 			IDENTITY,
-			TDMRULES //TODO: name might be inappropriate?
-
+			TDMRULES,
+			SHADOWCASTER,
+			DIRECTIONALLIGHT
 		};
 	}
 }

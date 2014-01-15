@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Utility/ECS/Include/Component.h"
-#include "RootSystems/Include/Frustum.h"
+#include <Utility/ECS/Include/Component.h>
+#include <RootSystems/Include/Frustum.h>
 
 namespace RootForce
 {

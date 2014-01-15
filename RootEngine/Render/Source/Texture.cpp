@@ -25,6 +25,9 @@ namespace Render
 		glGenTextures(1, &m_textureHandle);
 		glBindTexture(m_target, m_textureHandle);
 
+		//glGenSamplers(1, &m_samplerHandle);
+		//glBindSampler(0, m_samplerHandle);
+
 		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(texture.levels() - 1)); 
 

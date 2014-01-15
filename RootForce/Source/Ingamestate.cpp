@@ -20,6 +20,7 @@ namespace RootForce
 		RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 		RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 		RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+		RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 		RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
 		RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 		RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);

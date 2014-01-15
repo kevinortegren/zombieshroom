@@ -52,6 +52,7 @@ namespace Render
 		
 	private:
 		GLuint m_textureHandle;
+		//GLuint m_samplerHandle;
 		GLenum m_target;
 		int m_textureWidth;
 		int m_textureHeight;
