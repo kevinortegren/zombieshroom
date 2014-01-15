@@ -47,6 +47,7 @@ public:
     QWidget *tabComponents;
     QListWidget *listComponents;
     QWidget *tabConditions;
+    QListWidget *listWidget;
     QWidget *propertyWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -57,6 +58,11 @@ public:
         if (AbilityEditorClass->objectName().isEmpty())
             AbilityEditorClass->setObjectName(QStringLiteral("AbilityEditorClass"));
         AbilityEditorClass->resize(592, 682);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(AbilityEditorClass->sizePolicy().hasHeightForWidth());
+        AbilityEditorClass->setSizePolicy(sizePolicy);
         actionSave_As = new QAction(AbilityEditorClass);
         actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
         actionSave = new QAction(AbilityEditorClass);
@@ -77,6 +83,9 @@ public:
         treeOnCreate = new QTreeWidget(tabOnCreate);
         treeOnCreate->setObjectName(QStringLiteral("treeOnCreate"));
         treeOnCreate->setGeometry(QRect(0, 0, 261, 351));
+        treeOnCreate->setDragEnabled(true);
+        treeOnCreate->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnCreate->setDefaultDropAction(Qt::MoveAction);
         abilityWidget->addTab(tabOnCreate, QString());
         tabOnCollide = new QWidget();
         tabOnCollide->setObjectName(QStringLiteral("tabOnCollide"));
@@ -90,6 +99,9 @@ public:
         new QTreeWidgetItem(__qtreewidgetitem1);
         treeOnCollide->setObjectName(QStringLiteral("treeOnCollide"));
         treeOnCollide->setGeometry(QRect(0, 0, 261, 351));
+        treeOnCollide->setDragEnabled(true);
+        treeOnCollide->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnCollide->setDefaultDropAction(Qt::MoveAction);
         treeOnCollide->setColumnCount(1);
         abilityWidget->addTab(tabOnCollide, QString());
         tabOnDestroy = new QWidget();
@@ -97,6 +109,9 @@ public:
         treeOnDestroy = new QTreeWidget(tabOnDestroy);
         treeOnDestroy->setObjectName(QStringLiteral("treeOnDestroy"));
         treeOnDestroy->setGeometry(QRect(0, 0, 261, 351));
+        treeOnDestroy->setDragEnabled(true);
+        treeOnDestroy->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnDestroy->setDefaultDropAction(Qt::MoveAction);
         abilityWidget->addTab(tabOnDestroy, QString());
         toolBoxWidget = new QTabWidget(centralWidget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
@@ -106,15 +121,22 @@ public:
         listAbilities = new QListWidget(tabAbilities);
         listAbilities->setObjectName(QStringLiteral("listAbilities"));
         listAbilities->setGeometry(QRect(0, 0, 251, 351));
+        listAbilities->setDragEnabled(true);
+        listAbilities->setDragDropMode(QAbstractItemView::DragOnly);
         toolBoxWidget->addTab(tabAbilities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
         listComponents = new QListWidget(tabComponents);
         listComponents->setObjectName(QStringLiteral("listComponents"));
         listComponents->setGeometry(QRect(0, 0, 251, 351));
+        listComponents->setDragEnabled(true);
+        listComponents->setDragDropMode(QAbstractItemView::DragOnly);
         toolBoxWidget->addTab(tabComponents, QString());
         tabConditions = new QWidget();
         tabConditions->setObjectName(QStringLiteral("tabConditions"));
+        listWidget = new QListWidget(tabConditions);
+        listWidget->setObjectName(QStringLiteral("listWidget"));
+        listWidget->setGeometry(QRect(0, 0, 251, 351));
         toolBoxWidget->addTab(tabConditions, QString());
         propertyWidget = new QWidget(centralWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
@@ -140,7 +162,7 @@ public:
         retranslateUi(AbilityEditorClass);
 
         abilityWidget->setCurrentIndex(2);
-        toolBoxWidget->setCurrentIndex(2);
+        toolBoxWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(AbilityEditorClass);
@@ -148,7 +170,7 @@ public:
 
     void retranslateUi(QMainWindow *AbilityEditorClass)
     {
-        AbilityEditorClass->setWindowTitle(QApplication::translate("AbilityEditorClass", "AbilityEditor", 0));
+        AbilityEditorClass->setWindowTitle(QApplication::translate("AbilityEditorClass", "Ability Editor", 0));
         actionSave_As->setText(QApplication::translate("AbilityEditorClass", "Save As...", 0));
         actionSave->setText(QApplication::translate("AbilityEditorClass", "Save", 0));
         actionLoad->setText(QApplication::translate("AbilityEditorClass", "Load...", 0));

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_AbilityEditor_t {
-    QByteArrayData data[5];
-    char stringdata[62];
+    QByteArrayData data[3];
+    char stringdata[38];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -31,12 +31,10 @@ static const qt_meta_stringdata_AbilityEditor_t qt_meta_stringdata_AbilityEditor
     {
 QT_MOC_LITERAL(0, 0, 13),
 QT_MOC_LITERAL(1, 14, 21),
-QT_MOC_LITERAL(2, 36, 0),
-QT_MOC_LITERAL(3, 37, 16),
-QT_MOC_LITERAL(4, 54, 6)
+QT_MOC_LITERAL(2, 36, 0)
     },
     "AbilityEditor\0UpdatePropertyBrowser\0"
-    "\0QTreeWidgetItem*\0p_item\0"
+    "\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -54,10 +52,10 @@ static const uint qt_meta_data_AbilityEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   19,    2, 0x0a,
+       1,    0,   19,    2, 0x08,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -67,10 +65,11 @@ void AbilityEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     if (_c == QMetaObject::InvokeMetaMethod) {
         AbilityEditor *_t = static_cast<AbilityEditor *>(_o);
         switch (_id) {
-        case 0: _t->UpdatePropertyBrowser((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1]))); break;
+        case 0: _t->UpdatePropertyBrowser(); break;
         default: ;
         }
     }
+    Q_UNUSED(_a);
 }
 
 const QMetaObject AbilityEditor::staticMetaObject = {

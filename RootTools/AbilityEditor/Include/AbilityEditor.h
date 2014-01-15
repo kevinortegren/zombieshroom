@@ -2,8 +2,12 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QBoxLayout>
-#include <QtCore/QStringList>
 #include <QtPropertyBrowser/QtTreePropertyBrowser>
+#include <QtCore/QStringList>
+#include <QtGui/QMouseEvent>
+#include <Qtgui/QPixmap>
+#include <Qtgui/QPainter>
+
 #include "GeneratedFiles/ui_AbilityEditor.h"
 #include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
 
@@ -18,8 +22,8 @@ public:
 
 	QStringList m_compNames;
 
-	public slots:
-		void UpdatePropertyBrowser(QTreeWidgetItem* p_item);
+private slots:
+		void UpdatePropertyBrowser();
 
 private:
 	Ui::AbilityEditorClass ui;
@@ -27,5 +31,9 @@ private:
 	QtTreePropertyBrowser* m_propBrows;
 	QLayout* m_mainLayout;
 
+	QPainter* m_painter;
+	QPixmap* m_pixmap;
+	bool event(QEvent* event);
+	//void mousePressEvent(QMouseEvent* event);
 
 };
