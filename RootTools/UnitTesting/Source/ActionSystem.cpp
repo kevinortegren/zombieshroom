@@ -1,6 +1,9 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootForce/Include/LuaAPI.h>
+
+ECS::World* g_world; // because LUA needs it
 
 TEST(ActionSystem, ProcessEmptyEntity) 
 {
@@ -20,6 +23,7 @@ TEST(ActionSystem, ProcessEmptyEntity)
 TEST(ActionSystem, ProcessEntity) 
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
 	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
@@ -28,7 +32,21 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
+	RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::pointLight_f, RootForce::LuaAPI::pointLight_m, "PointLight");
+	RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
+	RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
+	RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
+
 	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
+	g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
