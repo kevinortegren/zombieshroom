@@ -1,10 +1,14 @@
-#ifndef ABILITYEDITOR_H
-#define ABILITYEDITOR_H
+#pragma once
+//#ifndef ABILITYEDITOR_H
+//#define ABILITYEDITOR_H
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QBoxLayout>
-//#include "ui_AbilityEditor.h"
-#include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
+#include <QtWidgets/QCheckBox>
+#include <QtCore/QStringList>
+#include <QtPropertyBrowser/QtTreePropertyBrowser>
+#include "GeneratedFiles/ui_AbilityEditor.h"
+
 
 class AbilityEditor : public QMainWindow
 {
@@ -15,13 +19,18 @@ public:
 	~AbilityEditor();
 	void Init();
 
-public slots:
-	void UpdatePropertyBrowser();
+	QStringList m_compNames;
+
+	public slots:
+		void UpdatePropertyBrowser(QTreeWidgetItem* p_item);
 
 private:
 	Ui::AbilityEditorClass ui;
 
+	QtTreePropertyBrowser* m_propBrows;
+	QLayout* m_mainLayout;
+
 
 };
-
-#endif // ABILITYEDITOR_H
+//#include "GeneratedFiles/moc_AbilityEditor.cpp"
+//#endif // ABILITYEDITOR_H
