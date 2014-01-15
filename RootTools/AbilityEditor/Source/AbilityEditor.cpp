@@ -14,15 +14,11 @@
 AbilityEditor::AbilityEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
-	m_compNames.append("Transform");
-	m_compNames.append("Collision");
-	m_compNames.append("Ability Model");
-	m_compNames.append("Collision Shape");
-	m_compNames.append("Ability Particle");
-	m_compNames.append("Physics Controlled");
-	m_compNames.append("Offensive Ability");
-	m_compNames.append("Explosive");
-
+	for(unsigned i = 0; i < AbilityEditorNameSpace::AbilityComponents::ComponentType::END_OF_ENUM; i++)
+	{
+		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
+	}
+	
 }
 
 AbilityEditor::~AbilityEditor()
@@ -41,45 +37,50 @@ void AbilityEditor::Init()
 	/*AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
 	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
 	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+	//////////////////////////////////////////////////////////////////////////
+	//AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
+	//AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
+	//AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
 
-	test->AddEntity("Testus totalius");
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	test->AddEntity("Testus totalius 2");
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
+	//test->AddEntity("Testus totalius");
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
+	//test->AddEntity("Testus totalius 2");
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
 
-	exporter->Export("Test.ability", test, nullptr, nullptr);
+	//exporter->Export("Test.ability", test, nullptr, nullptr);
 
-	importer->Import("Test.ability", test, nullptr, nullptr);
+	/*importer->Import("Test.ability", test, nullptr, nullptr);
 	exporter->Export("Test2.ability", test, nullptr, nullptr);*/
 	//////////////////////////////////////////////////////////////////////////
 
-	//connect(ui.treeOnCollide, SIGNAL(currentItemChanged(QTreeWidgetItem*, int)), this, SLOT(UpdatePropertyBrowser(QTreeWidgetItem*)));
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
+
+	
 	ui.listComponents->addItems(m_compNames);
 	ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
 	m_mainLayout = new QGridLayout();
 
 
-	QPen pen(QColor("blue"));
+	/*QPen pen(QColor("blue"));
 	m_pixmap = new QPixmap(QSize(100, 20));
 	m_painter = new QPainter(m_pixmap);
-	m_painter->setPen(pen);
+	m_painter->setPen(pen);*/
 
 }
 
 void AbilityEditor::UpdatePropertyBrowser( )
 {
 	
-	if (m_propBrows != 0)
+	if (m_propBrows != nullptr)
 	{
 		delete m_propBrows;
 	}

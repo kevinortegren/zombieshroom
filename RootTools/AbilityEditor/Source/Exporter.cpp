@@ -37,42 +37,50 @@ namespace AbilityEditorNameSpace
 		out << YAML::BeginMap;
 		out << YAML::Key << "OnCreate";
 		out << YAML::Value << YAML::BeginSeq; 
-		for(unsigned int i = 0 ; i < p_onCreate->GetEntities()->size(); i++)
+		if(p_onCreate != nullptr)
 		{
-			out << YAML::BeginMap;
-			ExportEntity(out, p_onCreate->GetEntities()->at(i));
-			out << YAML::EndMap;
+			for(unsigned int i = 0 ; i < p_onCreate->GetEntities()->size(); i++)
+			{
+				out << YAML::BeginMap;
+				ExportEntity(out, p_onCreate->GetEntities()->at(i));
+				out << YAML::EndMap;
+			}
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 		//OnCollide
+		out << YAML::BeginMap;
+		out << YAML::Key << "OnCollide";
+		out << YAML::Value << YAML::BeginSeq; 
 		if(p_onCollide != nullptr)
 		{
-			out << YAML::BeginMap;
-			out << YAML::Key << "OnCollide";
-			out << YAML::Value << YAML::BeginSeq; 
+			
 			for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
 				ExportEntity(out, &p_onCollide->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
-			out << YAML::EndMap;
+			
 		}
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
 		//OnDestroy
+		out << YAML::BeginMap;
+		out << YAML::Key << "OnDestroy";
+		out << YAML::Value << YAML::BeginSeq; 
 		if(p_onDestroy != nullptr)
 		{
-			out << YAML::BeginMap;
-			out << YAML::Key << "OnCollide";
-			out << YAML::Value << YAML::BeginSeq; 
 			for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
 				ExportEntity(out, &p_onDestroy->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
-			out << YAML::EndMap;
+	
 		}
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
 		//File done, prepare to write
 		out << YAML::EndSeq;
 		out << YAML::EndMap;

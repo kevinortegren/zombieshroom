@@ -30,4 +30,19 @@ namespace AbilityEditorNameSpace
 		m_entities.at(p_id)->AddComponent(p_type);
 	}
 
+	void OnCreate::AddComponent( unsigned int p_id, QString p_name )
+	{
+		m_entities.at(p_id)->AddComponent(p_name);
+	}
+
+	void OnCreate::RemoveComponent( unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type )
+	{
+		m_entities.at(p_id)->RemoveComponent(p_type);
+	}
+
+	void OnCreate::RemoveComponent( unsigned int p_id, QString p_name )
+	{
+		m_entities.at(p_id)->RemoveComponent(p_name);
+	}
+
 }
