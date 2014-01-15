@@ -4,44 +4,6 @@
 namespace RootSystems
 {
 
-
-	/*void ActionSystem::Process()
-	{
-		ActionEvent event = m_frameActionQueue.back();
-		m_frameActionQueue.pop();
-
-		ECS::Entity entity =  m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(event.UserID);
-		RootForce::PlayerActionComponent* action =  m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(&entity);
-
-		bool jump = false;
-		switch(event.ActionType)
-		{
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveForward:
-			action->MovePower = 1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveBackward:
-			action->MovePower = -1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveStop:
-			action->MovePower = 0;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeLeft:
-			action->StrafePower = -1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeRight:
-			action->StrafePower = 1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeStop:
-			action->StrafePower = 0;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandJump:
-			action->Jump = true;
-			break;
-		};
-
-		UpdatePhysics();
-	}*/
-
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
 		// Get the properties we need.
@@ -77,7 +39,7 @@ namespace RootSystems
 		if(movement != glm::vec3(0))
 		{
 			movement = glm::normalize(movement) * playphys->MovementSpeed;
-			m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement + transform->m_position);
+			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
 
 		// Issue a jump if applicable

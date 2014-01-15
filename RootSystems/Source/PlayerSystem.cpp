@@ -38,7 +38,7 @@ namespace RootForce
 		renderable->m_material->m_specularMap =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap_Anim");
 
-		transform->m_position = glm::vec3(0, 10, 0);
+		transform->m_position = glm::vec3(100, 10, 0);
 
 		playerControl->m_mouseSensitivity = 0.3f;
 		playphys->MovementSpeed = 10.0f;
@@ -73,7 +73,7 @@ namespace RootForce
 
 		RootForce::Transform* aimingDeviceTransform = entityManager->CreateComponent<RootForce::Transform>(aimingDevice);
 
-		health->Health = 0;
+		health->Health = 100;
 		health->IsDead = false;
 		health->WantsRespawn = false;
 		score->Deaths = 0;

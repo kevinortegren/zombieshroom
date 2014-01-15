@@ -1,6 +1,7 @@
 #include "RespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/CollisionSystem.h>
 
 namespace RootSystems
 {
@@ -9,9 +10,9 @@ namespace RootSystems
 		float dt = m_world->GetDelta();
 
 		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
-		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
+		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
 
-		if( !health || !transform )
+		if( !health || !collision )
 			return;
 
 		//If the player has 0 health and is not already dead, kill him
@@ -28,7 +29,7 @@ namespace RootSystems
 			if(health->RespawnDelay <= 0)
 			{
 				// TODO: Find a spawn point
-				transform->m_position = glm::vec3(0, 10, 0);
+				m_engineContext->m_physics->SetPosition(*(collision->m_handle), glm::vec3(0, 10, 0));
 
 				health->Health = 100;
 				health->IsDead = false;

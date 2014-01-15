@@ -11,6 +11,10 @@ function Send(event)
 	event.preventDefault();
 	event.stopPropagation();
 }
+function SetDeathScreen(p_visible)
+{
+	$("#deathscreen").css("display", (p_visible?"block":"none"));
+}
 
 $(document).keydown(function(event)
 {
@@ -56,6 +60,10 @@ function Set(p_id, p_value)
 			$("#"+p_id).addClass("blink");
 		else
 			$("#"+p_id).removeClass("blink");
+	}
+	if(p_id == "Health")
+	{
+		SetDeathScreen(parseInt(value) <= 0);
 	}
 	$("#"+p_id).html(value);
 }
