@@ -184,7 +184,9 @@ namespace RootForce
 		aimingDeviceTransform->m_orientation.Pitch(m_angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
 
-		
+
+		glm::vec3 looky = aimingDeviceTransform->m_orientation.GetFront();
+		g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Looky looky: %f, %f, %f", looky.x, looky.y, looky.z);
 
 	}
 }

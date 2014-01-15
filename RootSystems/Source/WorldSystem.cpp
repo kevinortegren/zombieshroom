@@ -16,8 +16,14 @@ namespace RootForce
 		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
 		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
 		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
-		sunTransform->m_position = glm::vec3(0.0f, 100.0f, 100.0f);
-		sunTransform->m_orientation.LookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		sunTransform->m_position = glm::vec3(0.0f, 0.0f, 100.0f);
+		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
+		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
+		sunShadowcaster->m_resolution = 512;
+		sunShadowcaster->m_levels = 1;
+
+		glm::vec3 fro = sunTransform->m_orientation.GetFront();
+		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Sun direction: %f, %f, %f", fro.x, fro.y, fro.z);
 
 		Render::DirectionalLight directionalLight;
 		directionalLight.m_color = sunLight->m_color;
@@ -31,7 +37,8 @@ namespace RootForce
 		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
 		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
 	
-		t->m_scale = glm::vec3(-100);
+		t->m_scale = glm::vec3(-100, -100, -100);
+		t->m_orientation.Roll(180);
 
 		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;

@@ -3,6 +3,11 @@
 
 namespace Render
 {
+	Texture::Texture()
+	{
+		glGenTextures(1, &m_textureHandle);
+	}
+
 	Texture::~Texture()
 	{
 		glDeleteTextures(1, &m_textureHandle);
@@ -22,20 +27,14 @@ namespace Render
 		m_textureWidth = texture.dimensions().x;
 		m_textureHeight = texture.dimensions().y;
 
-		glGenTextures(1, &m_textureHandle);
 		glBindTexture(m_target, m_textureHandle);
 
-		//glGenSamplers(1, &m_samplerHandle);
-		//glBindSampler(0, m_samplerHandle);
-
-		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(texture.levels() - 1)); 
-
-		glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-
-		//glTexParameterf(m_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-		//glTexParameterf(m_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		SetParameter(GL_TEXTURE_BASE_LEVEL, 0);
+		SetParameter(GL_TEXTURE_MAX_LEVEL, GLint(texture.levels() - 1));; 
+		SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 		glTexStorage2D(m_target,
 			GLint(texture.levels()),
@@ -82,7 +81,6 @@ namespace Render
 
 		m_target = GL_TEXTURE_CUBE_MAP;
 
-		glGenTextures(1, &m_textureHandle);
 		glBindTexture(m_target, m_textureHandle);
 
 		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
@@ -115,10 +113,17 @@ namespace Render
 		return true;
 	}
 
-	void Texture::Enable(unsigned int slot)
+	void Texture::Enable(unsigned int p_slot)
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
+		glActiveTexture(GL_TEXTURE0 + p_slot);
 		glBindTexture(m_target, m_textureHandle);
+	}
+
+	void Texture::SetParameter(int p_name, int p_parameter)
+	{
+		glBindTexture(m_target, m_textureHandle);
+
+		glTexParameteri(m_target, p_name, p_parameter);
 	}
 
 	unsigned int Texture::GetID()

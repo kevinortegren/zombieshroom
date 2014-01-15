@@ -284,11 +284,11 @@ namespace Render
 					m_uniforms.BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 				}
 
-				glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_DIFFUSE);
 				if((*job).m_material->m_diffuseMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*job).m_material->m_diffuseMap->GetTarget(), (*job).m_material->m_diffuseMap->GetHandle());
+					(*job).m_material->m_diffuseMap->Enable(RENDER_TEXTURE_DIFFUSE);
+					//glBindTexture((*job).m_material->m_diffuseMap->GetTarget(), (*job).m_material->m_diffuseMap->GetHandle());
 				}
 				else
 				{
@@ -299,7 +299,8 @@ namespace Render
 				if((*job).m_material->m_specularMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*job).m_material->m_specularMap->GetTarget(), (*job).m_material->m_specularMap->GetHandle());
+					(*job).m_material->m_specularMap->Enable(RENDER_TEXTURE_SPECULAR);
+					//glBindTexture(GetTarget(), (*job).m_material->m_specularMap->GetHandle());
 				}
 				else
 				{
@@ -310,7 +311,8 @@ namespace Render
 				if((*job).m_material->m_normalMap != nullptr)
 				{
 					// Bind diffuse texture.
-					glBindTexture((*job).m_material->m_normalMap->GetTarget(), (*job).m_material->m_normalMap->GetHandle());
+					(*job).m_material->m_normalMap->Enable(RENDER_TEXTURE_NORMAL);
+					//glBindTexture(GetTarget(), (*job).m_material->m_normalMap->GetHandle());
 				}
 				else
 				{
