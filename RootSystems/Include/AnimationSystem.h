@@ -11,13 +11,29 @@
 #include <RootEngine/Include/GameSharedContext.h>
 namespace RootForce
 {
+	namespace AnimationClip
+	{
+		enum AnimationClip
+		{
+			WALKING,
+			IDLE,
+			STRAFE_LEFT,
+			STRAFE_RIGHT,
+			JUMP_START,
+			ASCEND,
+			DESCEND,
+			LANDING,
+			SHOOT
+		};
+	}
+
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation():m_animClip(0), m_prevAnimClip(0), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f){}
+		Animation():m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f){}
 
 		glm::mat4		m_bones[20];
-		unsigned int	m_animClip;
-		unsigned int	m_prevAnimClip;
+		AnimationClip::AnimationClip	m_animClip;
+		AnimationClip::AnimationClip	m_prevAnimClip;
 		float			m_animTime;
 		bool			m_blending;
 		float			m_blendTime;
