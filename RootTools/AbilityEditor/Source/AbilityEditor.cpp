@@ -30,14 +30,11 @@ void AbilityEditor::Init()
 	ui.setupUi(this);
 
 	connect(ui.treeOnCollide, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(UpdatePropertyBrowser(QTreeWidgetItem*)));
-	//connect(ui.pushButton, SIGNAL(clicked()), ui.treeOnCollide, SLOT(expandAll()));
-	//connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(UpdatePropertyBrowser()));
 	
 	ui.listComponents->addItems(m_compNames);
 	ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
 	m_mainLayout = new QGridLayout();
-	//this->centralWidget()->setLayout(mainLayout);
 }
 
 void AbilityEditor::UpdatePropertyBrowser( QTreeWidgetItem* p_item )
@@ -60,7 +57,6 @@ void AbilityEditor::UpdatePropertyBrowser( QTreeWidgetItem* p_item )
 	QString temp = p_item->text(p_item->columnCount()-1);
 	QtVariantProperty* prop;
 	prop = hej->addProperty(QVariant::String, "Name");
-	//prop->setValue(temp.c_str());
 	hej->setValue(prop, temp);
 
 	
@@ -70,16 +66,5 @@ void AbilityEditor::UpdatePropertyBrowser( QTreeWidgetItem* p_item )
 	m_propBrows->setFactoryForManager(hej, propFact);
 	m_propBrows->addProperty(prop);
 	
-	/*if (test != 0)
-	{
-		delete test;
-	}
-
-	test = new QCheckBox();
-	test->setObjectName(QStringLiteral("test"));
-	test->setGeometry(ui.propertyWidget->geometry());
-	std::string asdf = p_item->text(p_item->columnCount()-1).toStdString();
-	test->setText(QApplication::translate("AbilityEditorClass", asdf.c_str(), 0));
-	layout()->addWidget(test);*/
 }
 
