@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <map>
+#include <QtCore/QStringList>
 namespace AbilityEditorNameSpace
 {
 
@@ -20,9 +21,25 @@ namespace AbilityEditorNameSpace
 				ABILITYPARTICLE,
 				PHYSICSCONTROLLED,
 				OFFENSIVEABILITY,
-				EXPLOSIVE
+				EXPLOSIVE,
+				END_OF_ENUM
 			};
 		}
+		const struct ComponentNameList
+		{
+			QStringList m_compNames;
+			ComponentNameList()
+			{
+				m_compNames.append("Transform");
+				m_compNames.append("Collision");
+				m_compNames.append("Ability Model");
+				m_compNames.append("Collision Shape");
+				m_compNames.append("Ability Particle");
+				m_compNames.append("Physics Controlled");
+				m_compNames.append("Offensive Ability");
+				m_compNames.append("Explosive");
+			}
+		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
 		struct MainComponent
 		{
@@ -145,12 +162,18 @@ namespace AbilityEditorNameSpace
 	}
 	namespace AbilityEntity
 	{
+		//The one struct to rule them all
 		struct Entity
 		{
 			std::string m_name;
 			std::vector<AbilityComponents::MainComponent*>* m_components;
+			std::map<QString, int> m_nameToEnumMapper;
 			Entity(std::string p_name)
 			{
+				for(int i = 0 ; i < AbilityComponents::ComponentType::END_OF_ENUM; i++)
+				{
+					m_nameToEnumMapper[AbilityComponents::g_componentNameList.m_compNames.at(i)] = i;
+				}
 				m_name = p_name;
 				m_components = new std::vector<AbilityComponents::MainComponent*>();
 			}
@@ -162,6 +185,10 @@ namespace AbilityEditorNameSpace
 					m_components->pop_back();
 				}
 				delete m_components;
+			}
+			void AddComponent(QString p_componentName)
+			{
+				AddComponent((AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper.at(p_componentName));
 			}
 			void AddComponent(AbilityComponents::ComponentType::ComponentType p_type)
 			{
@@ -223,6 +250,20 @@ namespace AbilityEditorNameSpace
 			void AddComponent(AbilityComponents::MainComponent* p_component)
 			{
 				m_components->push_back(p_component);
+			}
+			void RemoveComponent(QString p_componentName)
+			{
+				RemoveComponent((AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper.at(p_componentName));
+			}
+			void RemoveComponent(AbilityComponents::ComponentType::ComponentType p_type)
+			{
+				for(unsigned int i = 0; i < m_components->size(); i++)
+					if(m_components->at(i)->m_type == p_type)
+					{
+						delete m_components->at(i);
+						m_components->erase(m_components->begin() + i);
+						break;
+					}
 			}
 		};
 	}

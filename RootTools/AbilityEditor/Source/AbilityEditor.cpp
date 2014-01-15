@@ -9,16 +9,10 @@
 AbilityEditor::AbilityEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
-	m_compNames.append("Transform");
-	m_compNames.append("Collision");
-	m_compNames.append("Ability Model");
-	m_compNames.append("Collision Shape");
-	m_compNames.append("Ability Particle");
-	m_compNames.append("Physics Controlled");
-	m_compNames.append("Offensive Ability");
-	m_compNames.append("Explosive");
-
-	
+	for(unsigned i = 0; i < AbilityEditorNameSpace::AbilityComponents::ComponentType::END_OF_ENUM; i++)
+	{
+		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
+	}
 	
 }
 
@@ -30,31 +24,36 @@ AbilityEditor::~AbilityEditor()
 void AbilityEditor::Init()
 {
 	ui.setupUi(this);
-
-	//////////////////////////////////////////////////////////////////////////
-	/*AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
+	AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
 	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
 	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+	//////////////////////////////////////////////////////////////////////////
+	//AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
+	//AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
+	//AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
 
-	test->AddEntity("Testus totalius");
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	test->AddEntity("Testus totalius 2");
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
+	//test->AddEntity("Testus totalius");
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
+	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
+	//test->AddEntity("Testus totalius 2");
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
+	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
 
-	exporter->Export("Test.ability", test, nullptr, nullptr);
+	//exporter->Export("Test.ability", test, nullptr, nullptr);
 
-	importer->Import("Test.ability", test, nullptr, nullptr);
+	/*importer->Import("Test.ability", test, nullptr, nullptr);
 	exporter->Export("Test2.ability", test, nullptr, nullptr);*/
 	//////////////////////////////////////////////////////////////////////////
 
+	importer->Import("Test.ability", test, nullptr, nullptr);
+	test->RemoveComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL );
+	exporter->Export("Test2.ability", test, nullptr, nullptr);
 	connect(ui.treeOnCollide, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(UpdatePropertyBrowser(QTreeWidgetItem*)));
 	
 	ui.listComponents->addItems(m_compNames);

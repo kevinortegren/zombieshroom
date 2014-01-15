@@ -25,11 +25,11 @@ namespace AbilityEditorNameSpace
 				throw("File is bad, get another file");
 			}
 			YAML::Parser parser(file);
-
+			
 			YAML::Node doc;
 			parser.GetNextDocument(doc);
-
 			//OnCreate
+
 			const YAML::Node& onCreate = doc[0]["OnCreate"];
 			for(unsigned int i = 0; i < onCreate.size() ; i++)
 			{
@@ -47,14 +47,17 @@ namespace AbilityEditorNameSpace
 				}
 				p_onCreate->AddEntity(entity);
 			}
-			//onCollide data
-			const YAML::Node& onCreate = doc[1]["OnCollide"];
-			for(unsigned int i = 0; i < onCreate.size() ; i++)
+
+		//onCollide data
+			
+				
+			const YAML::Node& onCollide = doc[1]["OnCollide"];
+			for(unsigned int i = 0; i < onCollide.size() ; i++)
 			{
 				std::string entityName;
-				onCreate[i]["EntityName"] >> entityName;
+				onCollide[i]["EntityName"] >> entityName;
 				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
-				const YAML::Node& comps = onCreate[i]["Components"];
+				const YAML::Node& comps = onCollide[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
 					int type;
@@ -65,14 +68,18 @@ namespace AbilityEditorNameSpace
 				}
 				p_onCreate->AddEntity(entity);
 			}
-			//OnDestroy data
-			const YAML::Node& onCreate = doc[2]["OnDestroy"];
-			for(unsigned int i = 0; i < onCreate.size() ; i++)
+			
+		//OnDestroy data
+			
+			
+			
+			const YAML::Node& onDestroy = doc[2]["OnDestroy"];
+			for(unsigned int i = 0; i < onDestroy.size() ; i++)
 			{
 				std::string entityName;
-				onCreate[i]["EntityName"] >> entityName;
+				onDestroy[i]["EntityName"] >> entityName;
 				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
-				const YAML::Node& comps = onCreate[i]["Components"];
+				const YAML::Node& comps = onDestroy[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
 					int type;
@@ -83,6 +90,7 @@ namespace AbilityEditorNameSpace
 				}
 				p_onCreate->AddEntity(entity);
 			}
+			
 			
 		}
 		catch(YAML::ParserException& e)
