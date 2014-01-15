@@ -112,48 +112,20 @@ namespace RootForce
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-				{
-					action->MovePower += 1;
-					animation->m_animClip = 0;
-				}
-				break;
 			case PlayerAction::MOVE_BACKWARDS_STOP:
-				{
 					action->MovePower += 1;
-				}
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-				{
-					action->MovePower -= 1;
-					animation->m_animClip = 0;
-				}
-				break;
 			case PlayerAction::MOVE_FORWARDS_STOP:
-				{
 					action->MovePower -= 1;
-				}
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-				{
-					action->StrafePower += 1;
-					animation->m_animClip = 3;
-				}
-				break;
 			case PlayerAction::STRAFE_LEFT_STOP:
-				{
 					action->StrafePower += 1;
-				}
 				break;
 			case PlayerAction::STRAFE_LEFT:
-				{
-					action->StrafePower -= 1;
-					animation->m_animClip = 2;
-				}
-				break;
 			case PlayerAction::STRAFE_RIGHT_STOP:
-				{
 					action->StrafePower -= 1;
-				}
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -183,7 +155,6 @@ namespace RootForce
 			case PlayerAction::ACTIVATE_ABILITY:
 				{
 					action->ActivateAbility = true;
-				//	animation->m_animClip = 8;
 				}
 				break;
 			case PlayerAction::JUMP:
@@ -195,8 +166,17 @@ namespace RootForce
 			default:
 				break;
 			}
-			if(action->StrafePower == 0 && action->MovePower == 0 && !action->Jump)
+
+			if(action->StrafePower == 0 && action->MovePower == 0)
 				animation->m_animClip = 1;
+			if(action->MovePower == -1)
+				animation->m_animClip = 0;
+			else if(action->MovePower == 1)
+				animation->m_animClip = 0;
+			if(action->StrafePower == 1)
+				animation->m_animClip = 3;
+			else if(action->StrafePower == -1)
+				animation->m_animClip = 2;
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
