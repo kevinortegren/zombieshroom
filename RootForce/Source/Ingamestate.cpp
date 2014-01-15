@@ -153,7 +153,8 @@ namespace RootForce
 
 
 		m_displayPhysicsDebug = false;
-		m_displayNormals = false;		
+		m_displayNormals = false;
+		m_displayWorldDebug = false;
 	}
 
 	void IngameState::Enter()
@@ -261,7 +262,21 @@ namespace RootForce
 			break;
 		}
 #ifdef _DEBUG
-		//Debug drawing TODO: Remove for release
+		
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			if(m_displayWorldDebug)
+			{
+				m_displayWorldDebug = false;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+			else
+			{
+				m_displayWorldDebug = true;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+		}
+
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayPhysicsDebug)
@@ -277,7 +292,18 @@ namespace RootForce
 		}
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-				g_engineContext.m_renderer->DisplayNormals(false);
+		{
+			if(m_displayNormals)
+			{
+				m_displayNormals = false;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+			else
+			{
+				m_displayNormals = true;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+		}
 #endif
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -352,8 +378,6 @@ namespace RootForce
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();
 		}
-
-
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

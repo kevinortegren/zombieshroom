@@ -38,8 +38,9 @@ namespace RootForce
 	private:
 		NetworkContext& m_networkContext;
 
-		bool m_displayNormals; // TODO: May not be needed?
-		bool m_displayPhysicsDebug; // TODO: May not be needed?
+		bool m_displayNormals;
+		bool m_displayPhysicsDebug; 
+		bool m_displayWorldDebug;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
 

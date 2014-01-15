@@ -28,6 +28,8 @@ namespace RootForce
 
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
+		m_globalEntityList.clear();
+
 		m_context = p_context;
 		m_world = p_world;
 

@@ -124,6 +124,7 @@ namespace Render
 		void GeometryPass();
 		void LightingPass();
 		void ForwardPass();
+		void Output();
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
 

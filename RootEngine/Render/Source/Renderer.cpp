@@ -300,25 +300,9 @@ namespace Render
 		}
 
 		{
-			PROFILE("Render Lines", g_context.m_profiler);
-			RenderLines();
+			PROFILE("Output", g_context.m_profiler);
+			Output();
 		}
-
-		// Bind forward target.
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Read forward.
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, m_color);
-
-		m_renderTech->GetPrograms()[0]->Apply();
-
-		m_fullscreenQuad.Bind();
-		m_fullscreenQuad.Draw();
-		m_fullscreenQuad.Unbind();
-
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLRenderer::Clear()
@@ -418,10 +402,7 @@ namespace Render
 	void GLRenderer::LightingPass()
 	{
 		m_lighting.Process(m_fullscreenQuad);
-	}
 
-	void GLRenderer::ForwardPass()
-	{
 		// Bind forward target.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -434,7 +415,7 @@ namespace Render
 		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
 
-		// Output program.
+		// Output lighting to forward buffer.
 		m_renderTech->GetPrograms()[0]->Apply();
 
 		m_fullscreenQuad.Bind();
@@ -443,6 +424,30 @@ namespace Render
 
 		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void GLRenderer::ForwardPass()
+	{
+		{
+			PROFILE("Render Lines", g_context.m_profiler);
+			RenderLines();
+		}
+	}
+
+	void GLRenderer::Output()
+	{
+		// Bind backbuffer.
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Read forward texture.
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, m_color);
+
+		m_renderTech->GetPrograms()[0]->Apply();
+
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
 	}
 
 	void GLRenderer::RenderLines()
