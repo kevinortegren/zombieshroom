@@ -1,46 +1,11 @@
 #include "ActionSystem.h"
-#include <RootSystems\Include\ScriptSystem.h>
+#include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootSystems
 {
-
-
-	/*void ActionSystem::Process()
-	{
-		ActionEvent event = m_frameActionQueue.back();
-		m_frameActionQueue.pop();
-
-		ECS::Entity entity =  m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(event.UserID);
-		RootForce::PlayerActionComponent* action =  m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(&entity);
-
-		bool jump = false;
-		switch(event.ActionType)
-		{
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveForward:
-			action->MovePower = 1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveBackward:
-			action->MovePower = -1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandMoveStop:
-			action->MovePower = 0;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeLeft:
-			action->StrafePower = -1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeRight:
-			action->StrafePower = 1;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandStrafeStop:
-			action->StrafePower = 0;
-			break;
-		case RootForce::Network::MessageType::MessageType::UserCommandJump:
-			action->Jump = true;
-			break;
-		};
-
-		UpdatePhysics();
-	}*/
 
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
@@ -77,7 +42,7 @@ namespace RootSystems
 		if(movement != glm::vec3(0))
 		{
 			movement = glm::normalize(movement) * playphys->MovementSpeed;
-			m_engineContext->m_physics->SetPosition(*(collision->m_handle), movement + transform->m_position);
+			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
 
 		// Issue a jump if applicable
@@ -102,10 +67,15 @@ namespace RootSystems
 			{
 			case RootForce::Ability::ABILITY_TEST:
 				{
+					/*
 					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 					RootForce::Script* script = m_world->GetEntityManager()->CreateComponent<RootForce::Script>(entity);
 					script->m_name = m_engineContext->m_resourceManager->GetScript("AbilityTest");
 					script->m_actions.push_back(RootForce::Action(RootForce::ActionType::ACTION_CREATE));
+					*/
+
+					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript("AbilityTest"), "OnCreate");
+					m_engineContext->m_script->ExecuteScript();
 				}
 				break;
 			default:

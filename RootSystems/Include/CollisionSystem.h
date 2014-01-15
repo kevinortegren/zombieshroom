@@ -1,7 +1,8 @@
 #pragma once
 
+#include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
-#include <RootSystems/Include/ScriptSystem.h>
+#include <RootSystems/Include/Script.h>
 #include <set>
 
 namespace RootForce
@@ -20,8 +21,9 @@ namespace RootForce
 	class CollisionSystem : public ECS::EntitySystem
 	{
 	public:
-		CollisionSystem(ECS::World* p_world)
+		CollisionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
+			, m_engineContext(p_engineContext)
 		{
 			SetUsage<Collision>();
 			SetUsage<CollisionResponder>();
@@ -35,6 +37,8 @@ namespace RootForce
 		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
+	private:
+		RootEngine::GameSharedContext* m_engineContext;
 	};
 
 }
