@@ -145,18 +145,18 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "Height" << YAML::Value << shape->m_height;
 				}
 				break;
-			case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
-				{
-					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
-					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
-				}
-				break;
 			case AbilityComponents::ComponentType::ABILITYPARTICLE:
 				{
 					AbilityComponents::AbilityParticle* particle = static_cast<AbilityComponents::AbilityParticle*>(p_component);
 					p_emitter << YAML::Key << "ParticleName" << YAML::Value << particle->m_particleName;
 					p_emitter << YAML::Key << "Size" << YAML::Value << particle->m_size;
+				}
+				break;
+			case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+				{
+					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
+					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
+					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
 				}
 				break;
 			case AbilityComponents::ComponentType::OFFENSIVEABILITY:

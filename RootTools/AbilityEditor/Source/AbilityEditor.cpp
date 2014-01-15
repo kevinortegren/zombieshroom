@@ -22,22 +22,27 @@ void AbilityEditor::Init()
 {
 	ui.setupUi(this);
 	AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
-	test->AddEntity("Testus totalius");
+	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
+	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+	/*test->AddEntity("Testus totalius");
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
 	test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
 	test->AddEntity("Testus totalius 2");
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
-	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
 	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
-	exporter->Export("Test.ability", test, nullptr, nullptr);
-	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
+	test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
+
+
+
+	exporter->Export("Test.ability", test, nullptr, nullptr);*/
+	
 	importer->Import("Test.ability", test, nullptr, nullptr);
+	exporter->Export("Test2.ability", test, nullptr, nullptr);
 	//connect(ui.treeOnCollide, SIGNAL(ui.treeOnCollide->itemClicked()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(UpdatePropertyBrowser()));
 		

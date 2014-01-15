@@ -20,6 +20,11 @@ namespace AbilityEditorNameSpace
 		m_entities.push_back(entity);
 	}
 
+	void OnCreate::AddEntity( AbilityEntity::Entity* p_entity )
+	{
+		m_entities.push_back(p_entity);
+	}
+
 	void OnCreate::AddComponent(unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type )
 	{
 		m_entities.at(p_id)->AddComponent(p_type);
