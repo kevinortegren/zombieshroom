@@ -117,6 +117,7 @@ namespace RootForce
 		ECS::ComponentMapper<LookAtBehavior> m_lookAtBehaviors;
 	};
 	
+#ifndef COMPILE_LEVEL_EDITOR
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
 		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 12.0f;}
@@ -180,4 +181,6 @@ namespace RootForce
 		ECS::ComponentMapper<ThirdPersonBehavior> m_thirdPersonBehaviors;
 		glm::ivec2 m_deltaMouseMovement;
 	};
+#endif
 }
+

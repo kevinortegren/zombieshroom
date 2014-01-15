@@ -32,8 +32,8 @@ struct PointLight
 layout(std140) uniform Lights
 {
 	vec4 g_Ambient;
-	DirectionalLight dlights[500];
-	PointLight plights[500];
+	DirectionalLight dlights[16];
+	PointLight plights[16];
 };
 
 out vec2 ex_TexCoord;

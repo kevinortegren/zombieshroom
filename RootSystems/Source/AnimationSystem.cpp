@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <AnimationSystem.h>
 
 namespace RootForce
@@ -231,3 +232,4 @@ namespace RootForce
 	}
 
 }
+#endif

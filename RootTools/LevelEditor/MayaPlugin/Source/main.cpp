@@ -393,8 +393,21 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	Print("dirtyTransformNodeCB");
+	
 	MStatus status = MS::kSuccess;
 	MFnTransform trans = node;
+
+	float matPos[4][4];
+
+	//trans.transformation().asMatrix().get(matPos);
+	//trans.transformationMatrix().get(matPos);
+	
+
+	for(int j = 0; j < 4; j++)
+	{
+		Print(matPos[j][0], " ", matPos[j][1], " ", matPos[j][2], " ", matPos[j][3]);
+	}
+
 
 	int index = nodeExists(trans.child(0, &status));
 
@@ -795,7 +808,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
-	MVector pivot;
+	MVector rotPivot, scalePivot;
 	MSpace::Space space_transform = MSpace::kTransform;
 	MSpace::Space space_local = MSpace::kObject;
 
@@ -970,16 +983,21 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		{///////////////////////	MESH TRANSFORM ////////////////////////////////////////
 		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
 		{
+			glm::vec3 position;
 			MFnTransform transform = mesh.parent(0, &status);
+			rotPivot = transform.rotatePivot(MSpace::kObject);
+			scalePivot = transform.scalePivot(MSpace::kObject);
 
 			transform.getScale(scale);
 			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-			pivot = transform.rotatePivotTranslation(space_transform);
+			position.x = transform.getTranslation(space_transform).x;
+			position.y = transform.getTranslation(space_transform).y;
+			position.z = transform.getTranslation(space_transform).z;
 
-			SM.meshList[meshIndex].transformation.position.x = transform.getTranslation(space_transform).x;
-			SM.meshList[meshIndex].transformation.position.y = transform.getTranslation(space_transform).y;
-			SM.meshList[meshIndex].transformation.position.z = transform.getTranslation(space_transform).z;
-			
+			SM.meshList[meshIndex].transformation.position.x = position.x;
+			SM.meshList[meshIndex].transformation.position.y = position.y;
+			SM.meshList[meshIndex].transformation.position.z = position.z;
+
 			SM.meshList[meshIndex].transformation.scale.x = scale[0];
 			SM.meshList[meshIndex].transformation.scale.y = scale[1];
 			SM.meshList[meshIndex].transformation.scale.z = scale[2];
@@ -989,9 +1007,14 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
 			SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
-			SM.meshList[meshIndex].transformation.pivot.x = pivot.x;
-			SM.meshList[meshIndex].transformation.pivot.y = pivot.y;
-			SM.meshList[meshIndex].transformation.pivot.z = pivot.z;
+			SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
+			SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
+			SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
+
+			SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
+			SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
+			SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
+			//Print("PIVOT ",pivot.x, " ", pivot.y, " ", pivot.z);
 		}
 		}
 	}

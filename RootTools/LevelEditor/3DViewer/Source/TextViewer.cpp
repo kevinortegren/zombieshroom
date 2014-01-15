@@ -108,6 +108,7 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
+	renderable->m_model->m_transform = glm::mat4x4(1);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
@@ -201,9 +202,13 @@ int main(int argc, char* argv[])
 			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
 			g_running = true;
 
-			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)); 
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+
 			Render::DirectionalLight dl;
+			dl.m_direction = glm::vec3(0,-1,0);
 			dl.m_color = glm::vec4(0,0,1,1);
+
+			//g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
 			// Initialize systems.
 			RootForce::RenderingSystem* renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -214,7 +219,7 @@ int main(int argc, char* argv[])
 			RootForce::PointLightSystem* pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
 			m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
 
-			RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world);
+			RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 			m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
 
 			std::vector<ECS::Entity*> cameras;
@@ -270,16 +275,18 @@ int main(int argc, char* argv[])
 				Entities.push_back(CreateMeshEntity(&m_world, name));	
 				cout << "LOADED: " << name  << " TO INDEX " << i << endl;
 
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_position = RM.PmeshList[i]->transformation.position;
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_scale = RM.PmeshList[i]->transformation.scale;
+				RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i]);
+
+				transform->m_position = RM.PmeshList[i]->transformation.position;
+				transform->m_scale = RM.PmeshList[i]->transformation.scale;
 
 				glm::quat rotation;
 				rotation.x = RM.PmeshList[i]->transformation.rotation.x;
 				rotation.y = RM.PmeshList[i]->transformation.rotation.y;
 				rotation.z = RM.PmeshList[i]->transformation.rotation.z;
 				rotation.w = RM.PmeshList[i]->transformation.rotation.w;
-
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i])->m_orientation.SetOrientation(rotation);
+		
+				transform->m_orientation.SetOrientation(rotation);
 
 				for(int j = 0; j < RM.PmeshList[i]->nrOfVertices; j++)
 				{
@@ -299,7 +306,21 @@ int main(int argc, char* argv[])
 
 				// Get material connected to mesh and set it from materiallist
 				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i]);
-				rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[i]->materialName));
+				rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[i]->materialName));				
+
+				glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[i]->transformation.rotPivot.x, -RM.PmeshList[i]->transformation.rotPivot.y, -RM.PmeshList[i]->transformation.rotPivot.z));
+				glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[i]->transformation.scalePivot.x, -RM.PmeshList[i]->transformation.scalePivot.y, -RM.PmeshList[i]->transformation.scalePivot.z));
+
+				glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
+				glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
+
+				glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+				glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
+
+				glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
+
+				glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
+				transform->m_position += modifiedPos;
 
 				ReleaseMutex(RM.MeshMutexHandle);
 
@@ -451,8 +472,11 @@ int main(int argc, char* argv[])
 					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 					// TRANSFORM AND SCALE
-					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_position = RM.PmeshList[MeshIndex]->transformation.position;
-					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
+
+					RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex]);
+
+					transform->m_position = RM.PmeshList[MeshIndex]->transformation.position;
+					transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 					////Update material list
 					CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
@@ -462,8 +486,9 @@ int main(int argc, char* argv[])
 					rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
 					rotation.y = RM.PmeshList[MeshIndex]->transformation.rotation.y;
 					rotation.z = RM.PmeshList[MeshIndex]->transformation.rotation.z;
-					rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;				
-					m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex])->m_orientation.SetOrientation(rotation);
+					rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;	
+
+					transform->m_orientation.SetOrientation(rotation);
 
 					// COPY VERTICES
 					for(int j = 0; j < RM.PmeshList[MeshIndex]->nrOfVertices; j++)
@@ -481,6 +506,20 @@ int main(int argc, char* argv[])
 
 					RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 					rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
+
+					glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.rotPivot.x, -RM.PmeshList[MeshIndex]->transformation.rotPivot.y, -RM.PmeshList[MeshIndex]->transformation.rotPivot.z));
+					glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.scalePivot.x, -RM.PmeshList[MeshIndex]->transformation.scalePivot.y, -RM.PmeshList[MeshIndex]->transformation.scalePivot.z));
+
+					glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
+					glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
+
+					glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+					glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
+
+					glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
+
+					glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
+					transform->m_position += modifiedPos;
 
 					ReleaseMutex(RM.MeshMutexHandle);
 				}

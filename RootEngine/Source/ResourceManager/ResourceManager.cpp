@@ -301,6 +301,13 @@ namespace RootEngine
 			return "";
 		}
 	}
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
+		}
+	}
 #endif
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)
 	{
@@ -337,11 +344,5 @@ namespace RootEngine
 		return m_workingDirectory;
 	}
 
-	void ResourceManager::ReloadAllScripts()
-	{
-		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
-		{
-			ForceLoadScript((*itr).second);
-		}
-	}
+
 }

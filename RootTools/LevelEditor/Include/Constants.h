@@ -23,7 +23,9 @@ struct Transform
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
-	glm::vec3 pivot;
+	glm::vec3 rotPivot;
+	glm::vec3 scalePivot;
+	glm::mat4x4 transform;
 };
 
 struct Mesh

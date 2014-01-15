@@ -28,7 +28,9 @@ namespace RootEngine
 	{
 		std::vector<Render::MeshInterface*> m_meshes;
 		std::vector<Physics::PhysicsMeshInterface*> m_physicsMeshes;
+#ifndef COMPILE_LEVEL_EDITOR
 		RootEngine::RootAnimation::AnimationInterface* m_animation;
+#endif
 		std::string m_textureHandles[3];
 		glm::mat4x4 m_transform;
 	};

@@ -181,7 +181,8 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
-		PmeshList[index]->transformation.pivot = meshList[index].transformation.pivot;
+		PmeshList[index]->transformation.rotPivot = meshList[index].transformation.rotPivot;
+		PmeshList[index]->transformation.scalePivot = meshList[index].transformation.scalePivot;
 	}
 
 	ReleaseMutex(MeshMutexHandle);

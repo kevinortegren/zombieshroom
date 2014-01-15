@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootEngine/Include/Animation.h>
 #include <iostream>
 namespace RootEngine
@@ -77,3 +78,4 @@ namespace RootEngine
 
 	}
 }
+#endif
