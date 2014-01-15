@@ -6,27 +6,27 @@
 	width: 100%;
 	text-align: left;
 	border-spacing: 0;
-	border: #cdcdcd 1px solid;
-	border-width: 1px 0 0 1px;
+	border: 0;/*#cdcdcd 1px solid;*/
+	/*border-width: 1px 0 0 1px;*/
 }
 .tablesorter-green th,
 .tablesorter-green td {
 	font: 12px/18px;/* Arial, Sans-serif;*/
-	border: #cdcdcd 1px solid;
-	border-width: 0 1px 1px 0;
+	border: 0;/*#cdcdcd 1px solid;*/
+	/*border-width: 0 1px 0 1px;*/
 }
 
 /* header */
 .tablesorter-green thead tr,
 .tablesorter-green tfoot tr {
 	background: center center repeat-x;
-	background-image: url(data:image/gif;base64,R0lGODlhAQBkAOYAAN/e39XU1fX19tTU1eXm5uTl5ePk5OLj4+Hi4vX29fT19PP08/Lz8vHy8fDx8O/w7+7v7uzt7Orr6ufo5/T08/Pz8ufn5uLi4eDg39/f3t3d3Nzc29HR0NDQz8/Pzuvq6urp6eno6Ojn5+fm5tfW1tbV1dTT09PS0tLR0dHQ0NDPz/f39/b29vX19fT09PPz8/Ly8vHx8e/v7+7u7u3t7ezs7Ovr6+rq6unp6ejo6Ofn5+bm5uXl5eTk5OPj4+Li4uHh4eDg4N/f397e3t3d3dzc3Nvb29ra2tnZ2djY2NfX19XV1dPT09LS0tHR0dDQ0M/Pz8rKysXFxf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAFMALAAAAAABAGQAAAdegCsrLC0tLi+ILi6FCSwsCS0KkhQVDA0OMjM0NTYfICEiIzw9P0AYGUQaG0ZHSEoDTU9Qs08pTk1MSyRJR0VDQT8+PTw7Ojg3NTMyMTAvi4WOhC0vMTI1OT9GTlFSgQA7);
+	/*background-image: url(data:image/gif;base64,R0lGODlhAQBkAOYAAN/e39XU1fX19tTU1eXm5uTl5ePk5OLj4+Hi4vX29fT19PP08/Lz8vHy8fDx8O/w7+7v7uzt7Orr6ufo5/T08/Pz8ufn5uLi4eDg39/f3t3d3Nzc29HR0NDQz8/Pzuvq6urp6eno6Ojn5+fm5tfW1tbV1dTT09PS0tLR0dHQ0NDPz/f39/b29vX19fT09PPz8/Ly8vHx8e/v7+7u7u3t7ezs7Ovr6+rq6unp6ejo6Ofn5+bm5uXl5eTk5OPj4+Li4uHh4eDg4N/f397e3t3d3dzc3Nvb29ra2tnZ2djY2NfX19XV1dPT09LS0tHR0dDQ0M/Pz8rKysXFxf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAFMALAAAAAABAGQAAAdegCsrLC0tLi+ILi6FCSwsCS0KkhQVDA0OMjM0NTYfICEiIzw9P0AYGUQaG0ZHSEoDTU9Qs08pTk1MSyRJR0VDQT8+PTw7Ojg3NTMyMTAvi4WOhC0vMTI1OT9GTlFSgQA7);*/
 	/* background-image: url(images/green-header.gif); */
 }
 .tablesorter-green th,
 .tablesorter-green thead td {
 	font-weight: bold;
-	border-right: #cdcdcd 1px solid;
+	border-right: 0;/*#cdcdcd 1px solid;*/
 	border-collapse: collapse;
 	padding: 6px;
 }
@@ -195,4 +195,8 @@ caption {
 .tablesorter .tablesorter-errorRow td {
 	cursor: pointer;
 	background-color: #e6bf99;
+}
+.tablesorter-header-inner
+{
+  color: #ffffff;
 }
