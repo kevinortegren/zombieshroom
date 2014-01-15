@@ -24,6 +24,7 @@ Logging::Logging()
 	m_stringTagList.push_back("INPUT  ");
 	m_stringTagList.push_back("RESSYS ");
 	m_stringTagList.push_back("SCRIPT ");
+	m_stringTagList.push_back("ANIM   ");
 
 	m_stringLevelList.push_back("FATAL_ERR  ");
 	m_stringLevelList.push_back("NON_FAT_ERR");

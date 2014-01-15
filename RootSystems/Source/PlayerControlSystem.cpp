@@ -1,8 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
 #include <PlayerControlSystem.h>
-#include <RootSystems\Include\ScriptSystem.h>
-
+#include <RootSystems/Include/AnimationSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -96,13 +95,13 @@ namespace RootForce
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-
+		Animation* animation = m_world->GetEntityManager()->GetComponent<Animation>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
-		
+
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
 		glm::vec3 right = transform->m_orientation.GetRight();
-		
+
 		glm::vec3 movement(0.0f);
 
 		// Get the speed of the player
@@ -112,56 +111,72 @@ namespace RootForce
 		{
 			switch (currentAction)
 			{
-				case PlayerAction::MOVE_FORWARDS:
-				case PlayerAction::MOVE_BACKWARDS_STOP:
+			case PlayerAction::MOVE_FORWARDS:
+			case PlayerAction::MOVE_BACKWARDS_STOP:
 					action->MovePower += 1;
-					break;
-				case PlayerAction::MOVE_BACKWARDS:
-				case PlayerAction::MOVE_FORWARDS_STOP:
+				break;
+			case PlayerAction::MOVE_BACKWARDS:
+			case PlayerAction::MOVE_FORWARDS_STOP:
 					action->MovePower -= 1;
-					break;
-				case PlayerAction::STRAFE_RIGHT:
-				case PlayerAction::STRAFE_LEFT_STOP:
+				break;
+			case PlayerAction::STRAFE_RIGHT:
+			case PlayerAction::STRAFE_LEFT_STOP:
 					action->StrafePower += 1;
-					break;
-				case PlayerAction::STRAFE_LEFT:
-				case PlayerAction::STRAFE_RIGHT_STOP:
+				break;
+			case PlayerAction::STRAFE_LEFT:
+			case PlayerAction::STRAFE_RIGHT_STOP:
 					action->StrafePower -= 1;
-					break;
-				case PlayerAction::ORIENTATE:
-					{
-						//m_physics->SetPlayerOrientation(playerID, orientation);
-						//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
-						// TODO: Update a camera controller with m_deltaMouseMovement.
-						//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
-						//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-						action->Angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
-						action->Angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
+				break;
+			case PlayerAction::ORIENTATE:
+				{
+					//m_physics->SetPlayerOrientation(playerID, orientation);
+					//m_logger->LogText(LogTag::INPUT, LogLevel::DEBUG_PRINT, "Reorienting: Delta (%d, %d)", m_deltaMouseMovement.x, m_deltaMouseMovement.y);
+					// TODO: Update a camera controller with m_deltaMouseMovement.
+					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
+					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
+					action->Angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
+					action->Angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
 
-						if(action->Angle.y < -90.0f)
-							action->Angle.y = -90;
-						else if(action->Angle.y > 90.0f)
-							action->Angle.y = 90;
-					}
-					break;
-				case PlayerAction::SELECT_ABILITY1:
-					action->SelectedAbility = 1;
-					break;
-				case PlayerAction::SELECT_ABILITY2:
-					action->SelectedAbility = 2;
-					break;
-				case PlayerAction::SELECT_ABILITY3:
-					action->SelectedAbility = 3;
-					break;
-				case PlayerAction::ACTIVATE_ABILITY:
+					if(action->Angle.y < -90.0f)
+						action->Angle.y = -90;
+					else if(action->Angle.y > 90.0f)
+						action->Angle.y = 90;
+				}
+				break;
+			case PlayerAction::SELECT_ABILITY1:
+				action->SelectedAbility = 1;
+				break;
+			case PlayerAction::SELECT_ABILITY2:
+				action->SelectedAbility = 2;
+				break;
+			case PlayerAction::SELECT_ABILITY3:
+				action->SelectedAbility = 3;
+				break;
+			case PlayerAction::ACTIVATE_ABILITY:
+				{
 					action->ActivateAbility = true;
-					break;
-				case PlayerAction::JUMP:
+				}
+				break;
+			case PlayerAction::JUMP:
+				{
 					action->Jump = true;
-					break;
-				default:
-					break;
+					animation->m_animClip = AnimationClip::JUMP_START;
+				}
+				break;
+			default:
+				break;
 			}
+
+			if(action->StrafePower == 0 && action->MovePower == 0)
+				animation->m_animClip = AnimationClip::IDLE;
+			if(action->MovePower == -1)
+				animation->m_animClip = AnimationClip::WALKING;
+			else if(action->MovePower == 1)
+				animation->m_animClip = AnimationClip::WALKING;
+			if(action->StrafePower == 1)
+				animation->m_animClip = AnimationClip::STRAFE_RIGHT;
+			else if(action->StrafePower == -1)
+				animation->m_animClip = AnimationClip::STRAFE_LEFT;
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
@@ -176,9 +191,6 @@ namespace RootForce
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
-
-		
-
 	}
 }
 

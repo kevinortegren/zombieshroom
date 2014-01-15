@@ -24,7 +24,8 @@ namespace LogTag
 		GUI,
 		INPUT,
 		RESOURCE,
-		SCRIPT
+		SCRIPT,
+		ANIMATION
 	};
 }
 

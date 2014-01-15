@@ -86,17 +86,13 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for executing script based on actions.
-		m_scriptSystem = new RootForce::ScriptSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
-
 		// Initialize physics system
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-		m_collisionSystem = new RootForce::CollisionSystem(g_world);
+		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
 		// Initialize render and point light system.
@@ -274,7 +270,10 @@ namespace RootForce
 			if(!m_hud->GetChatSystem()->IsFocused())
 			m_playerControlSystem->Process();
 		}
-
+		
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
+		
+		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
@@ -295,11 +294,6 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
-        
-		{
-			PROFILE("Script system", g_engineContext.m_profiler);
-			m_scriptSystem->Process();
-		}
 
 		if (m_networkContext.m_server != nullptr)
 		{
@@ -324,19 +318,13 @@ namespace RootForce
 			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
-
-		{
-			PROFILE("AnimationSystem", g_engineContext.m_profiler);
-			m_animationSystem->Process();
-		}
-
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 
 		}
-
+		t.join();
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();

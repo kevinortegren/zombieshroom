@@ -1,6 +1,9 @@
 #include "ActionSystem.h"
-#include <RootSystems\Include\ScriptSystem.h>
+#include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootSystems
 {
 
@@ -65,10 +68,15 @@ namespace RootSystems
 			{
 			case RootForce::Ability::ABILITY_TEST:
 				{
+					/*
 					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 					RootForce::Script* script = m_world->GetEntityManager()->CreateComponent<RootForce::Script>(entity);
 					script->m_name = m_engineContext->m_resourceManager->GetScript("AbilityTest");
 					script->m_actions.push_back(RootForce::Action(RootForce::ActionType::ACTION_CREATE));
+					*/
+
+					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript("AbilityTest"), "OnCreate");
+					m_engineContext->m_script->ExecuteScript();
 				}
 				break;
 			default:

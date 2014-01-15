@@ -62,7 +62,7 @@ namespace RootForce
 		collision->m_handle = m_engineContext->m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity->GetId(),
 			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionResponder->m_collidedEntityId);
 
-		script->m_name = m_engineContext->m_resourceManager->LoadScript("Player");
+		script->Name = m_engineContext->m_resourceManager->LoadScript("Player");
 	
 		m_world->GetTagManager()->RegisterEntity("Player", entity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", entity);

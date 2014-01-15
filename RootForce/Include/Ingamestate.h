@@ -23,7 +23,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootForce/Include/HUD.h>
-
+#include <thread>
 namespace RootForce
 {
 	class IngameState
@@ -46,7 +46,6 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		RootForce::ScriptSystem* m_scriptSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;
 		RootForce::RenderingSystem* m_renderingSystem;
