@@ -80,15 +80,15 @@ Main::~Main()
 void Main::Start() 
 {
 	// Register the components the server uses
-    RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-    RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
-    RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
-    RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
-    RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
-    RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
-    RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
-    RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-    RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+	RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
+	RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
+	RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
+	RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
+	RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
+	RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
 
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );

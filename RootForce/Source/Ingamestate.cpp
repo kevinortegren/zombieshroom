@@ -13,12 +13,14 @@ namespace RootForce
 		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
         RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
         RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+		RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
         RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
         RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
         RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
         RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
         RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+		RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
         RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
         RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
         RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
@@ -321,7 +323,7 @@ namespace RootForce
 		}
 		
 		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
-		
+
 		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);

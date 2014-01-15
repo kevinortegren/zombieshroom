@@ -6,15 +6,14 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/ParticleSystem.h>
-
-#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/ShadowSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
-#endif
+
 
 namespace RootForce
 {
@@ -44,6 +43,8 @@ namespace RootForce
 			TDMRULES, //TODO: name might be inappropriate?
 			PLAYERACTION,
 			PLAYERPHYSICS,
+			SHADOWCASTER,
+			DIRECTIONALLIGHT
 		};
 	}
 }

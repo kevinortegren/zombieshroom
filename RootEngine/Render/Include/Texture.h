@@ -33,12 +33,14 @@ namespace Render
 	class Texture : public TextureInterface
 	{
 	public:
+		Texture();
 		~Texture();
 
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);
 
-		void Enable(unsigned int slot);
+		void Enable(unsigned int p_slot);
+		void SetParameter(int p_name, int p_parameter);
 
 		unsigned int GetID();
 		unsigned int GetWidth();
