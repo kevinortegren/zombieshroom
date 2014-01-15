@@ -2,7 +2,7 @@
 
 #include <PlayerControlSystem.h>
 #include <RootSystems\Include\ScriptSystem.h>
-
+#include <RootSystems/Include/AnimationSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -96,7 +96,7 @@ namespace RootForce
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-
+		Animation* animation = m_world->GetEntityManager()->GetComponent<Animation>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
 
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
@@ -113,20 +113,48 @@ namespace RootForce
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
+				{
+					action->MovePower += 1;
+					animation->m_animClip = 0;
+				}
+				break;
 			case PlayerAction::MOVE_BACKWARDS_STOP:
-				action->MovePower += 1;
+				{
+					action->MovePower += 1;
+				}
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
+				{
+					action->MovePower -= 1;
+					animation->m_animClip = 0;
+				}
+				break;
 			case PlayerAction::MOVE_FORWARDS_STOP:
-				action->MovePower -= 1;
+				{
+					action->MovePower -= 1;
+				}
 				break;
 			case PlayerAction::STRAFE_RIGHT:
+				{
+					action->StrafePower += 1;
+					animation->m_animClip = 3;
+				}
+				break;
 			case PlayerAction::STRAFE_LEFT_STOP:
-				action->StrafePower += 1;
+				{
+					action->StrafePower += 1;
+				}
 				break;
 			case PlayerAction::STRAFE_LEFT:
+				{
+					action->StrafePower -= 1;
+					animation->m_animClip = 2;
+				}
+				break;
 			case PlayerAction::STRAFE_RIGHT_STOP:
-				action->StrafePower -= 1;
+				{
+					action->StrafePower -= 1;
+				}
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -154,14 +182,22 @@ namespace RootForce
 				action->SelectedAbility = 3;
 				break;
 			case PlayerAction::ACTIVATE_ABILITY:
-				action->ActivateAbility = true;
+				{
+					action->ActivateAbility = true;
+				//	animation->m_animClip = 8;
+				}
 				break;
 			case PlayerAction::JUMP:
-				action->Jump = true;
+				{
+					action->Jump = true;
+					animation->m_animClip = 4;
+				}
 				break;
 			default:
 				break;
 			}
+			if(action->StrafePower == 0 && action->MovePower == 0 && !action->Jump)
+				animation->m_animClip = 1;
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;

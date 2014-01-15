@@ -7,8 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>     
-
+#include <assimp/scene.h>  
+#include <RootEngine/Include/Logging/Logging.h>
 namespace RootEngine
 {
 	namespace RootAnimation
@@ -54,7 +54,7 @@ namespace RootEngine
 			class Animation : public AnimationInterface
 			{
 			public:
-				Animation();
+				Animation(Logging* p_logging);
 				~Animation();
 
 				bool BoneExists(std::string p_boneName);
@@ -78,7 +78,7 @@ namespace RootEngine
 			std::vector<AnimClip>								m_animClips;
 			glm::mat4x4		m_globalInverseTransform;
 			unsigned int	m_numBones;
-
+			Logging*		m_logging;
 			std::shared_ptr<Assimp::Importer> m_aiImporter;
 			
 		};

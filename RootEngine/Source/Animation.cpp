@@ -4,8 +4,9 @@ namespace RootEngine
 {
 	namespace RootAnimation
 	{
-		Animation::Animation() : m_numBones(0)
+		Animation::Animation(Logging* p_logging) : m_numBones(0)
 		{
+			m_logging = p_logging;
 		}
 
 		Animation::~Animation()
@@ -80,6 +81,7 @@ namespace RootEngine
 			unsigned int startFrame = 0;
 			double startTime = 0;
 			unsigned int numKeyFrames = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mNumPositionKeys;
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of key frames: %d", numKeyFrames);
 			for (unsigned int keyFrame = 0; keyFrame < numKeyFrames; keyFrame++)
 			{
 				bool tPose = true;
@@ -105,6 +107,7 @@ namespace RootEngine
 				}
 				
 			}
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of animation clips: %d", m_animClips.size());
 		}
 
 		AnimClip* Animation::GetAnimClip(unsigned int p_index)
