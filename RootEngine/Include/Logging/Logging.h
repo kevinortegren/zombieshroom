@@ -56,6 +56,8 @@ public:
 		virtual void LT(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
 		virtual void LT(std::string p_func, int p_line,const char* p_format, ...) = 0;
 
+		virtual void LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
+
 		virtual bool OpenLogStream() = 0;
 		virtual bool CloseLogStream() = 0;
 
@@ -86,6 +88,8 @@ class Logging : public LoggingInterface
 		void LT(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
 		void LT(std::string p_func, int p_line,const char* p_format, ...);
 
+		void LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
+
 		bool OpenLogStream();
 		bool CloseLogStream();
 
@@ -106,12 +110,14 @@ class Logging : public LoggingInterface
 		std::vector<std::string> m_stringLevelList;
 
 		void WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args);
-		void WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args);
+		void WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine = false);
 		
 		bool CheckTag(LogTag::LogTag p_tag);
 
 		std::string GetStringFromTag(LogTag::LogTag p_tag);
 		std::string GetStringFromLevel(LogLevel::LogLevel p_level);
+
+		std::string GetNameFromPath( std::string p_path );
 
 		LogLevel::LogLevel m_verboseLevel, m_defaultVerbose;
 
