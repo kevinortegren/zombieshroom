@@ -78,7 +78,7 @@ namespace RootEngine
 				{
 					std::vector<std::string> varyingsVector;
 					const YAML::Node& varyings = programs[i]["feedback"];
-					for(size_t k = 0; k < varyings.size(); k++)
+					for(unsigned k = 0; k < varyings.size(); k++)
 					{
 						std::string varying;
 						varyings[k]["name"] >> varying;
@@ -170,6 +170,7 @@ namespace RootEngine
 					}
 				}
 
+
 				if(techniques[i].FindValue("flags") != nullptr)
 				{
 					const YAML::Node& flags = techniques[i]["flags"];
@@ -182,7 +183,20 @@ namespace RootEngine
 						{
 							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
 						}
+						else if(name == "Forward")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+						}
+						else if(name == "Deferred")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+						}
 					}
+				}
+				else
+				{
+					// Assume deffered technique if no flags found.
+					technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
 				}
 			}
 		}

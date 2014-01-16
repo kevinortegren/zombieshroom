@@ -73,7 +73,6 @@ namespace Render
 		void CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices);
 		void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices);
 
-
 		void Bind();
 		void Unbind();
 		void Draw();
