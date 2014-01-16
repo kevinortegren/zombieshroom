@@ -52,10 +52,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				RootForce::Transform* transform = static_cast<RootForce::Transform*>(p_component);
 				glm::vec3 position = transform->m_position;
 				glm::vec3 scale = transform->m_scale;
-				glm::vec3 rotation = transform->m_orientation.GetAxis();
+				glm::mat3 rotation = transform->m_orientation.GetMatrix();
+
+				float x,y,z;
+				x = atan2(rotation[2][1], rotation[2][2]);
+				y = atan2(-rotation[2][0], sqrt(pow(rotation[2][1],2) + pow(rotation[2][2],2)));
+				z = atan2(rotation[1][0], rotation[0][0]);
 
 				p_emitter << YAML::Key << "Position" << YAML::Value << YAML::Flow << YAML::BeginSeq << position.x << position.y << position.z << YAML::EndSeq;
-				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
+				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << -glm::degrees(x) << -glm::degrees(y) << -glm::degrees(z) << YAML::EndSeq;
 				p_emitter << YAML::Key << "Scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
 			}
 			break;
