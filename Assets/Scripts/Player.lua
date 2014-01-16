@@ -10,7 +10,7 @@ end
 
 
 function Player.OnCollide (entityId)
-
+	
 end
 
 function Player.OnDestroy ()
