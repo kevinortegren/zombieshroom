@@ -143,7 +143,7 @@ namespace Render
 		GeometryBuffer m_gbuffer;
 		ParticleSystemHandler m_particles;
 		LightingDevice m_lighting;
-		//ShadowDevice m_shadowDevice;
+		ShadowDevice m_shadowDevice;
 		
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
 		

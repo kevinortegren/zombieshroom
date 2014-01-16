@@ -150,6 +150,9 @@ namespace Render
 		// Setup GBuffer.
 		m_gbuffer.Init(width, height);
 
+		// Setup shadow device.
+		m_shadowDevice.Init(this, 512, 512);
+
 		// Setup lighting device.
 		m_lighting.Init(this, width, height);
 

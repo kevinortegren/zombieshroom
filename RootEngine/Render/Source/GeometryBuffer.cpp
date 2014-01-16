@@ -1,5 +1,7 @@
 #include <RootEngine/Render/Include/GeometryBuffer.h>
 
+#include <RootEngine/Render/Include/RenderExtern.h>
+
 namespace Render
 {
 	GeometryBuffer::~GeometryBuffer()
@@ -29,6 +31,17 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthHandle, 0);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+			break;
+		default:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+			break;
+		}
 
 		glGenTextures(1, &m_diffuseHandle);
 		glBindTexture(GL_TEXTURE_2D, m_diffuseHandle);

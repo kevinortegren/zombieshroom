@@ -1,6 +1,8 @@
 #include <RootEngine/Render/Include/Texture.h>
 #include <gli/gli.hpp>
 
+#include <RootEngine/Render/Include/RenderExtern.h>
+
 namespace Render
 {
 	Texture::Texture()
@@ -126,9 +128,40 @@ namespace Render
 		glTexParameteri(m_target, p_name, p_parameter);
 	}
 
-	unsigned int Texture::GetID()
+	void Texture::CreateEmptyTexture(int p_width, int p_height, int p_format)
 	{
-		return m_textureHandle;
+		m_target = GL_TEXTURE_2D;
+		m_textureWidth = p_width;
+		m_textureHeight = p_height;
+		glBindTexture(m_target, m_textureHandle);
+		if(p_format == TextureFormat::TEXTURE_RGBA || p_format == TextureFormat::TEXTURE_BGRA)
+		{
+			GLenum format;
+			if(p_format == TextureFormat::TEXTURE_RGBA)
+				format = GL_RGBA;
+			else
+				format = GL_BGRA;
+			glTexImage2D(m_target, 0, GL_RGBA, p_width, p_height, 0, format, GL_UNSIGNED_BYTE, NULL);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGB || p_format == TextureFormat::TEXTURE_BGR)
+		{
+			GLenum format;
+			if(p_format == TextureFormat::TEXTURE_RGB)
+				format = GL_RGB;
+			else
+				format = GL_BGR;
+			glTexImage2D(m_target, 0, GL_RGB, p_width, p_height, 0, format, GL_UNSIGNED_BYTE, NULL);
+		}
+		else if(p_format == TextureFormat::TEXTURE_DEPTH_COMPONENT)
+		{
+			GLenum format;
+			format = GL_DEPTH_COMPONENT;
+			glTexImage2D(m_target, 0, GL_DEPTH_COMPONENT32, p_width, p_height, 0, format, GL_FLOAT, NULL);
+		}
+		else
+		{
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Tried to create empty texture with unsupported format!");
+		}
 	}
 
 	unsigned int Texture::GetWidth()
