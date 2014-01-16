@@ -7,6 +7,7 @@
 #include <RootEngine/Include/RootEngine.h>
 #include <SDL2/SDL_main.h>
 #include <SDL2/SDL_syswm.h> 
+
 #undef main
 int main(int argc, char *argv[])
 {
@@ -27,13 +28,14 @@ int main(int argc, char *argv[])
 		{
 			notExit = w.CheckExit();
 			
-			a.processEvents(QEventLoop::AllEvents);
+			
 
 			uint64_t now = SDL_GetPerformanceCounter();
 			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 			old = now;
+			w.Update(dt);
+			a.processEvents(QEventLoop::AllEvents);
 			m.Update(dt);
-			m.HandleEvents();
 		}
 	} 
 	catch (std::exception& e) 
@@ -144,31 +146,24 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	//m_world.GetEntityExporter()->SetExporter(Exporter);
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 
-	ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
-	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
-	RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
-
-	Render::ParticleSystemDescription desc;
-	desc.m_initalPos =glm::vec3(0,0,8);
-	desc.m_initalVel = glm::vec3(0,0,0);
-	desc.m_size = glm::vec2(0.05f, 0.05f);
-
-	e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
-	e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-	e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
-
 	// Add camera entity.	
 	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-
 	camera->m_near = 0.1f;
 	camera->m_far = 1000.0f;
 	camera->m_fov = 45.0f;
 
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+	cameraTransform->m_position = glm::vec3(10.0f, 0.0f, 0.0f);
+
+	RootForce::LookAtBehavior* lookAtComponent = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+	
+	
 	m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+
+	p_particleEditorQt->SetContext(&g_engineContext);
+	p_particleEditorQt->SetWorld(&m_world);
 }
 
 MainParticle::~MainParticle()
@@ -195,6 +190,9 @@ void MainParticle::Update( float p_delta )
 	g_world->SetDelta(p_delta);
 	g_engineContext.m_renderer->Clear();
 	HandleEvents();
+	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
+	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
+	trans->m_position.x -= (g_engineContext.m_inputSys->GetScroll()*4);
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
 	m_particleSystem->Process();
@@ -202,6 +200,4 @@ void MainParticle::Update( float p_delta )
 	m_renderingSystem->Process();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
-
-	
 }

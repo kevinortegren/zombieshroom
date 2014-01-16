@@ -1,10 +1,14 @@
-#ifndef PARTICLEEDITOR_H
-#define PARTICLEEDITOR_H
+#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include <RootTools/ParticleEditor/GeneratedFiles/ui_ParticleEditor.h>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QCloseEvent>
+#include <RootSystems/Include/Components.h>
+#include <RootEngine/Include/GameSharedContext.h>
+#include <Utility/ECS/Include/World.h>
+#include <vector>
+#include <RootTools/ParticleEditor/Include/StatWidget.h>
 
 class ParticleEditor : public QMainWindow
 {
@@ -13,16 +17,39 @@ class ParticleEditor : public QMainWindow
 public:
 	ParticleEditor(QWidget *parent = 0);
 	~ParticleEditor();
-	bool CheckExit();
+	//SETTERS
+	void SetWorld(ECS::World* p_world);
+	void SetContext(RootEngine::GameSharedContext* p_context);
 
+	//GETTERS
+
+	//METHODS
+	bool CheckExit();
+	void Update(float p_dt);
+
+	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
+	//METHODS
 	void closeEvent(QCloseEvent *event);
+
+	//MEMBERS
 	bool m_running;
+	ECS::World* m_world;
+	RootEngine::GameSharedContext* m_context;
+	std::vector<ECS::Entity*> m_emitterEntities;
+	StatWidget* m_statWidget;
+
 private slots:
+	void MenuNew();
+	void MenuOpen();
+	void MenuSave();
+	void ManuSaveAs();
 	void MenuExit();
+	void MenuViewStats();
+	void MenuHelpAbout();
+	void MenuCreateEmitter();
 
 	
 };
 
-#endif // PARTICLEEDITOR_H

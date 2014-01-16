@@ -160,7 +160,7 @@ namespace Render
 
 		glGenTextures(1, &m_randomTexture);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
-		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, randomVectors.size(), 0.0f, GL_RGB, GL_FLOAT, randomVectors.data());
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, randomVectors.size(), 0, GL_RGB, GL_FLOAT, randomVectors.data());
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);

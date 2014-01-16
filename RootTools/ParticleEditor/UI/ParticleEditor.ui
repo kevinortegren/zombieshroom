@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1194</width>
-    <height>888</height>
+    <width>1736</width>
+    <height>970</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>-1</x>
       <y>-1</y>
-      <width>921</width>
-      <height>841</height>
+      <width>1461</width>
+      <height>921</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -33,10 +33,10 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>926</x>
-      <y>-1</y>
+      <x>1460</x>
+      <y>0</y>
       <width>271</width>
-      <height>831</height>
+      <height>921</height>
      </rect>
     </property>
     <property name="font">
@@ -47,29 +47,55 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tabProperties">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Properties</string>
      </attribute>
-     <widget class="QDial" name="dial">
+     <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
-        <x>60</x>
-        <y>30</y>
-        <width>131</width>
-        <height>131</height>
+        <x>0</x>
+        <y>0</y>
+        <width>261</width>
+        <height>201</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QLCDNumber" name="lcdNumber">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>200</y>
-        <width>141</width>
-        <height>81</height>
-       </rect>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
+      <property name="title">
+       <string>Emitters</string>
+      </property>
+      <widget class="QPushButton" name="pushButton">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>20</y>
+         <width>61</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="listWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>20</y>
+         <width>181</width>
+         <height>181</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -84,7 +110,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1194</width>
+     <width>1736</width>
      <height>21</height>
     </rect>
    </property>
@@ -106,7 +132,21 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionStats"/>
+   </widget>
+   <widget class="QMenu" name="menuCreate">
+    <property name="title">
+     <string>Create</string>
+    </property>
+    <addaction name="actionEmitter"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuCreate"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -140,27 +180,20 @@
     <string>About</string>
    </property>
   </action>
+  <action name="actionStats">
+   <property name="text">
+    <string>Stats</string>
+   </property>
+  </action>
+  <action name="actionEmitter">
+   <property name="text">
+    <string>Emitter</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="ParticleEditor.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>dial</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>lcdNumber</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1053</x>
-     <y>149</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1038</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

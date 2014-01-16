@@ -33,6 +33,9 @@ namespace RootEngine
 			virtual glm::ivec2 GetGlobalMousePos() = 0;
 			virtual glm::ivec2 GetDeltaMousePos() = 0;
 
+			//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)
+			virtual int GetScroll() = 0;
+
 			virtual void LockMouseToCenter(bool p_enable) = 0;
 
 		};
