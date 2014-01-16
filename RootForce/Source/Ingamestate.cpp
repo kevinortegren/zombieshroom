@@ -130,6 +130,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -323,6 +327,11 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
 
 		if (m_networkContext.m_server != nullptr)
 		{

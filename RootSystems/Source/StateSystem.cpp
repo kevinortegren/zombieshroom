@@ -10,8 +10,13 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 	if( !transform || !playphys || !collision || !state )
 		return;
 	
-	if(m_engineContext->m_physics->IsOnGround(*(collision->m_handle)) && (state->CurrentState == RootForce::EntityState::DESCENDING || state->CurrentState == RootForce::EntityState::ASCENDING))
+	if(m_engineContext->m_physics->IsOnGround(*(collision->m_handle))
+		&& (state->CurrentState == RootForce::EntityState::DESCENDING
+			|| state->CurrentState == RootForce::EntityState::ASCENDING)
+		&& state->CurrentState != RootForce::EntityState::GROUNDED)
+	{
 		state->CurrentState = RootForce::EntityState::LANDING;
+	}
 	else if(!m_engineContext->m_physics->IsOnGround(*(collision->m_handle)))
 	{
 		if(state->PrevPosition.y < transform->m_position.y)
