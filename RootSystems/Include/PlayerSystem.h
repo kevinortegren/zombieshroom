@@ -18,6 +18,18 @@ namespace RootForce
 		};
 	}
 
+	namespace EntityState
+	{
+		enum EntityState
+		{
+			ASCENDING,
+			DESCENDING,
+			LANDING,
+			GROUNDED,
+			RAGDOLL,
+		};
+	}
+
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
 		float MovePower;
@@ -32,6 +44,12 @@ namespace RootForce
 	{
 		float MovementSpeed;
 		float JumpForce;
+	};
+
+	struct StateComponent : public ECS::Component<StateComponent>
+	{
+		EntityState::EntityState CurrentState;
+		glm::vec3 PrevPosition;
 	};
 
 	struct PlayerControl : public ECS::Component<PlayerControl>

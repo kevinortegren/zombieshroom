@@ -31,6 +31,7 @@ public:
 	float GetStepHeight() const {return m_stepHeight;}
 	float GetModelHeight() const {return m_heightOffset;}
 	void Move(glm::vec3 p_target, float p_dt);
+	bool IsOnGround();
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
 	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
 

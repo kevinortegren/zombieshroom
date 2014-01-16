@@ -12,6 +12,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 
 RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world; // because LUA needs it
 
 namespace UnitTesting
 {
