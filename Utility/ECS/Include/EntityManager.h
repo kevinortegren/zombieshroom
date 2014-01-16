@@ -95,6 +95,8 @@ namespace ECS
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());
 		}
 
+		std::vector<std::pair<unsigned int, ComponentInterface*>> GetAllComponents(Entity* p_entity);
+
 		template<class T>
 		void RemoveAllComponentsOfType()
 		{
