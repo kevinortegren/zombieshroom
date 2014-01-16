@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QMainWindow>
 #include <RootTools/ParticleEditor/GeneratedFiles/ui_ParticleEditor.h>
+#include <QtWidgets/QMessageBox>
+#include <QtGui/QCloseEvent>
 
 class ParticleEditor : public QMainWindow
 {
@@ -11,9 +13,16 @@ class ParticleEditor : public QMainWindow
 public:
 	ParticleEditor(QWidget *parent = 0);
 	~ParticleEditor();
+	bool CheckExit();
 
-private:
 	Ui::ParticleEditorClass ui;
+private:
+	void closeEvent(QCloseEvent *event);
+	bool m_running;
+private slots:
+	void MenuExit();
+
+	
 };
 
 #endif // PARTICLEEDITOR_H

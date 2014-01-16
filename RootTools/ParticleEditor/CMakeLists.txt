@@ -14,7 +14,7 @@ file(GLOB_RECURSE HEADERS Include/*.h)
 file(GLOB_RECURSE UI_FILES UI/*.ui)
 file(GLOB_RECURSE QRC_FILES UI/*.qrc)
 file(GLOB_RECURSE GEN_FILES GeneratedFiles/*.*)
-set(LIBRARIES ${EXTERNAL_LIBRARIES})
+set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 
 foreach(it ${UI_FILES})
     get_filename_component(outfile ${it} NAME_WE)
