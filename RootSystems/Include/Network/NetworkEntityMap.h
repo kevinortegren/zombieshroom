@@ -57,9 +57,18 @@ namespace RootForce
 			SynchronizedID_t SynchronizedID;
 		};
 
+		/*
+			Used to associate a NetworkEntityID with a local entity.
+		*/
+		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
+
+
 
 		/* 
-			Add this component onto every entity that you want to synchronize over the network. 
+			Add this component onto every entity that you want to synchronize over the network.
+
+			The AssociatedInNetworkEntityMap field is read by the NetworkRegistrationSystem and entities
+			are added to a network entity map if the field is false.
 		*/
 		struct NetworkComponent
 		{
@@ -68,48 +77,25 @@ namespace RootForce
 			static SequenceID_t sNextSequenceID;
 			
 			NetworkEntityID ID;
+			bool AssociatedInNetworkEntityMap;
 			
 			NetworkComponent()
 			{
 				ID.UserID = sUserID;
 				ID.ActionID = sCurrentActionID;
 				ID.SequenceID = sNextSequenceID++;
+				AssociatedInNetworkEntityMap = false;
 			}
 		};
 
-
-
-		/*
-			Used to serialize/deserialize a component.
-		*/
-		struct SerializableComponent
-		{
-			ComponentType::ComponentType Type;
-			ECS::ComponentInterface* Component;
-
-			void Serialize(bool p_write, RakNet::BitStream* p_bs);
-		};
-
-		struct SerializableEntity
-		{
-			ECS::Entity* Entity;
-
-			void Serialize(bool p_write, RakNet::BitStream* p_bs);
-		};
-		
-		
-
-		/*
-			Used to serialize/deserialize an entity.
-		*/
-		void Serialize(bool p_write, RakNet::BitStream* p_bs, ECS::Entity* p_entity, NetworkEntityID p_id);
-
-
+		void SerializeEntity(RakNet::BitStream* p_bs, ECS::Entity* p_entity, const std::string& p_entityScript, const NetworkEntityMap& p_map, ECS::World* p_world);
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, const NetworkEntityMap& p_map, ECS::World* p_world);
 
 
 		/*
 			Defines a serialized component that can be sent across the network
 		*/
+		/*
 		struct SerializedComponent
 		{
 			ComponentType::ComponentType Type;
@@ -120,10 +106,12 @@ namespace RootForce
 			void SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
 			void DeserializeComponent(ECS::ComponentInterface* p_component);
 		};
+		*/
 
 		/*
 			Defines a serialized entity that can be sent across the network
 		*/
+		/*
 		struct SerializedEntity
 		{
 			NetworkEntityID ID;
@@ -132,14 +120,18 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 			void SerializeEntity(ECS::Entity* p_entity);
+			void DeserializeEntity(ECS::Entity* p_entity);
 		};
+		*/
 
 		/*
 			Sent occasionally to clients to synchronize entities.
 		*/
+		/*
 		struct MessageDeltaGameState
 		{
 			std::vector<SerializedEntity> Entities;
 		};
+		*/
 	}
 }
