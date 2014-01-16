@@ -42,5 +42,65 @@ namespace RootForce
 			TemporaryId_t m_nextTemporaryId;
 			SynchronizedId_t m_nextSynchronizedId;
 		};
+
+
+		
+		/** Specifies reserved user IDs. Connected peers will start counting from index 0. */
+		namespace ReservedUserID
+		{
+			enum ReservedUserID
+			{
+				UNCONNECTED_USER = 0xFFFF
+			};
+		};
+		
+		/** Specifies reserved action IDs. Local action IDs will start counting from ACTION0. */
+		namespace ReservedActionID
+		{
+			enum ReservedActionID
+			{
+				NONE,
+				CONNECT,
+				ACTION0
+			};
+		}
+
+		/** 
+			Uniquely identifies an entity across all peers.
+
+			UserID - Identifies the peer, creator of the entity.
+			ActionID - Identifies the specific user command that created this entity.
+			SequenceID - Increases for every entity that an action created. Starts at 0.
+
+			SynchronizedID - A combination of all above, creating a unique entity ID across all peers.
+		*/
+		union NetworkEntityID
+		{
+			struct
+			{
+				uint16_t UserID;
+				uint32_t ActionID;
+				uint16_t SequenceID;
+			};
+
+			uint64_t SynchronizedID;
+		};
+
+		/** Add this component onto every entity that you want to synchronize over the network. */
+		struct NetworkComponent
+		{
+			static int16_t sUserID;
+			static int32_t sCurrentActionID;
+			static int16_t sNextSequenceID;
+			
+			NetworkEntityID ID;
+			
+			NetworkComponent()
+			{
+				ID.UserID = sUserID;
+				ID.ActionID = sCurrentActionID;
+				ID.SequenceID = sNextSequenceID++;
+			}
+		};
 	}
 }
