@@ -1,14 +1,15 @@
 #pragma once
 
-#include "RootSystems/Include/Math/Plane.h"
-
-#include "glm/glm.hpp"
+#include <RootSystems/Include/Shapes/Plane.h>
+#include <RootSystems/Include/Shapes/AABB.h>
+#include <glm/glm.hpp>
 
 namespace RootForce
 {
 	class Frustum
 	{
 	public:
+		Frustum(){};
 		Frustum(float p_fov, float p_near, float p_far, float p_aspectRatio = 1)
 		{
 			m_fov = p_fov;
@@ -17,18 +18,20 @@ namespace RootForce
 			m_aspectRatio = p_aspectRatio;
 			RecalculatePlanes();
 		}
-		~Frustum(){}
 
 		void RecalculatePlanes();
 		void DrawLines(glm::mat4 p_space);
 
+		bool CheckBox(const AABB& p_box);
+
 		Plane m_planes[6];
 
-	private:
 		float m_near;
 		float m_far;
 		float m_fov;
 		float m_aspectRatio;
+
+	private:
 
 		enum 
 		{

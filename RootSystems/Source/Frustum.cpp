@@ -1,8 +1,5 @@
-#include "RootSystems/Include/Frustum.h"
-
-#include "RootEngine/Include/GameSharedContext.h"
-
-extern RootEngine::GameSharedContext g_engineContext;
+#include <RootSystems/Include/Frustum.h>
+#include <glm/glm.hpp>
 
 using glm::vec3;
 
@@ -66,13 +63,63 @@ namespace RootForce
 
 	void Frustum::DrawLines(glm::mat4 p_space)
 	{
-		g_engineContext.m_renderer->AddLine(ntl, ntr, glm::vec4(1.0f));
+		/*g_engineContext.m_renderer->AddLine(ntl, ntr, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(nbl, nbr, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(ftl, ftr, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(fbl, fbr, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(ntl, nbl, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(ntr, nbr, glm::vec4(1.0f));
 		g_engineContext.m_renderer->AddLine(ntl, ntr, glm::vec4(1.0f));
-		g_engineContext.m_renderer->AddLine(ntl, ntr, glm::vec4(1.0f));
+		g_engineContext.m_renderer->AddLine(ntl, ntr, glm::vec4(1.0f));*/
 	}
+
+	bool Frustum::CheckBox(const AABB& p_box)
+	{
+		for( unsigned i = 0; i < 6; i++ )
+		{
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_minX, p_box.m_minY, p_box.m_minZ)) >= 0.0f)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_maxX, p_box.m_minY, p_box.m_minZ)) >= 0.0f)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_minX, p_box.m_minY, p_box.m_minZ)) >= 0.0f)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_maxX, p_box.m_minY, p_box.m_maxZ)) >= 0.0f)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_minX, p_box.m_maxY, p_box.m_minZ)) >= 0.0f)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_maxX, p_box.m_maxY, p_box.m_minZ)) >= 0)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_minX, p_box.m_maxY, p_box.m_maxZ)) >= 0)
+			{
+				continue;
+			}
+
+			if(glm::dot(m_planes[i].m_point, glm::vec3(p_box.m_maxX, p_box.m_maxY, p_box.m_maxZ)) >= 0)
+			{
+				continue;
+			}
+
+      		return false;
+		}
+		return true;
+	}
+
 }

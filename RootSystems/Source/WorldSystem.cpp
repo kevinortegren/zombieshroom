@@ -76,9 +76,7 @@ namespace RootForce
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
-		camera->m_near = 0.1f;
-		camera->m_far = 1000.0f;
-		camera->m_fov = 45.0f;
+		camera->m_frustrum = Frustum(45.0f, 0.1f, 1000.0f, m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight());
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);

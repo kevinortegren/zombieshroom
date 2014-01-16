@@ -46,7 +46,7 @@ namespace RootForce
 				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
 				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_near, camera->m_far);
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustrum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustrum.m_near, camera->m_frustrum.m_far);
 
 				m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 				m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);

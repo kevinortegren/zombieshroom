@@ -130,7 +130,6 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
-
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -144,8 +143,6 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
-
-		// Load the level and create a world
 
 		//Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
