@@ -267,7 +267,8 @@ namespace RootForce
 
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
 		
