@@ -9,7 +9,6 @@
 #include <Qtgui/QPainter>
 
 #include "GeneratedFiles/ui_AbilityEditor.h"
-#include "RootTools/AbilityEditor/GeneratedFiles/ui_AbilityEditor.h"
 
 class AbilityEditor : public QMainWindow
 {
@@ -27,7 +26,6 @@ private slots:
 
 private:
 	Ui::AbilityEditorClass ui;
-
 	QtTreePropertyBrowser* m_propBrows;
 	QLayout* m_mainLayout;
 

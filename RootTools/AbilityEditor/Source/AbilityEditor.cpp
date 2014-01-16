@@ -80,15 +80,17 @@ void AbilityEditor::Init()
 void AbilityEditor::UpdatePropertyBrowser( )
 {
 	
-	if (m_propBrows != nullptr)
-	{
-		delete m_propBrows;
-	}
+	
 	
 	/*QTreeWidget* asdf = new QTreeWidget();
 	asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
 	int bajs = asdf->selectedItems().count();*/
-
+	if(m_propBrows != nullptr)
+	{
+		delete m_propBrows;
+		m_propBrows = nullptr;
+	}
+	
 	/*QWidget* page = static_cast<QWidget*>(ui.abilityWidget->children().at(ui.abilityWidget->currentIndex()));
 	QTreeWidget* tree = static_cast<QTreeWidget*>(page->children().at(0));
 	QTreeWidgetItem* p_item = tree->selectedItems().at(0);*/
@@ -139,6 +141,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 	m_propBrows->addProperty(prop);
 }
 
+
 bool AbilityEditor::event( QEvent* event )
 {
 	if (event->type() == QEvent::KeyPress)
@@ -165,6 +168,7 @@ bool AbilityEditor::event( QEvent* event )
 	}
 	return QWidget::event(event);
 }
+
 
 
 
