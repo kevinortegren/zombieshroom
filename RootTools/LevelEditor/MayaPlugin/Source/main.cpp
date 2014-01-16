@@ -10,8 +10,8 @@ SharedMemory SM;
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
 
-MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes];
-int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0;
+MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators];
+int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyTextureNode(MObject &node, MPlug&, void *clientData);
@@ -36,6 +36,7 @@ void GetMaterial(MObject node);
 void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, bool doMesh);
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
+void MayaLocatorToList(MObject object);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
@@ -66,18 +67,6 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 	myInitMemoryCheck(); // Har koll på minnet och minnesläckor
 	MStatus status = MS::kSuccess;
-
-	//MItDependencyNodes it(MFn::kFileTexture);			/////////////////////////////////////////FUUUUUGLY///////////////////////////////////////////////////
-
-	//while(!it.isDone())
-	//{
-	//	Print("Herroooooow");
-	//	MObject obj = it.item();
-
-	//	it.next();
-	//	MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(obj, dirtyTextureNode, nullptr, &status);
-	//	AddCallbackID(status, id);
-	//}
 
 	// Registrera ett nytt plug-in till Maya.
 	MFnPlugin plugin(obj, "UD1414-Labb02", "1.0", "Any", &status);
@@ -155,7 +144,6 @@ void Export()
 			memset(SM.meshList[i].modelName, NULL, sizeof(SM.meshList[i].modelName));
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
 			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
-			//Herp
 		}
 		else
 		{
@@ -230,11 +218,21 @@ void sortObjectList()
 			MFnLambertShader Lambert = g_objectList[i];
 			g_mayaMaterialList[currNrMaterialObjects] = g_objectList[i];
 
-			Print("Adding CB to ", Lambert.name());
+			//Print("Adding CB to ", Lambert.name());
 			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_objectList[i], dirtyMaterialCB, nullptr, &status);
 			AddCallbackID(status, id);
 
 			currNrMaterialObjects++;
+		}
+		else if(g_objectList[i].hasFn(MFn::kLocator))
+		{
+			g_mayaLocatorList[currNrLocators] = g_objectList[i];
+			currNrLocators++;
+
+			MayaLocatorToList(g_objectList[i]);
+
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_objectList[i], dirtyTransformNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
 		}
 	}
 }
@@ -370,11 +368,6 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 	}
 }
 
- void dirtyTextureNode(MObject &node, MPlug&, void *clientData)					/////////////////////////////////////DONT DO SHIT//////////////////////////////////
- {
-	Print("DEEPSHIEEEEET IT WOOOORKS");
- }
-
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	Print("dirtyLightNode");
@@ -457,6 +450,11 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 		}
 
 	}
+
+	if(node.hasFn(MFn::kLocator))
+	{
+		MayaLocatorToList(node);
+	}
 }
 
 
@@ -501,6 +499,16 @@ void NodeAddedCB(MObject &node, void *clientData)
 	//Callback when node is added.
 	checkForNewCameras(node, clientData);
 	checkForNewLights(node, clientData);
+
+	if(node.hasFn(MFn::kLocator))
+	{
+		MStatus status;
+		g_mayaLocatorList[currNrLocators] = node;
+		MayaLocatorToList(node);
+
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyTransformNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
 	//printLists();
 }
 
@@ -817,6 +825,21 @@ int nodeExists(MObject node)
 		}	
 	}
 
+	if (node.hasFn(MFn::kLocator))
+	{
+		MFnDagNode locator = node;
+
+		for(int i = 0; i < currNrLocators; i++)
+		{
+			MFnDagNode temp = g_mayaLocatorList[i];
+			if(temp.name() == locator.name())
+			{
+				answer = i;
+				break;
+			}
+		}	
+	}
+
 	return answer;
 }
 
@@ -833,7 +856,48 @@ MString cleanFullPathName(const char * str)
 	MString TEMP = tmpString.c_str();
 	return TEMP;
 }
+
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
+void MayaLocatorToList(MObject object)
+{
+	int index = nodeExists(object);
+
+	MFnDagNode locator = object;
+
+	if(index != -1 && locator.parent(0).hasFn(MFn::kTransform))
+	{
+		double scale[3];
+		double rotX, rotY, rotZ, rotW;
+		glm::vec3 position;
+
+		MFnTransform trans = locator.parent(0);
+		MSpace::Space space_transform = MSpace::kTransform;
+
+		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
+		trans.getScale(scale);
+		trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
+
+		position.x = trans.getTranslation(space_transform).x;
+		position.y = trans.getTranslation(space_transform).y;
+		position.z = trans.getTranslation(space_transform).z;
+
+		SM.locatorList[index].transformation.position.x = position.x;
+		SM.locatorList[index].transformation.position.y = position.y;
+		SM.locatorList[index].transformation.position.z = position.z;
+
+		SM.locatorList[index].transformation.scale.x = scale[0];
+		SM.locatorList[index].transformation.scale.y = scale[1];
+		SM.locatorList[index].transformation.scale.z = scale[2];
+
+		SM.locatorList[index].transformation.rotation.x = rotX;
+		SM.locatorList[index].transformation.rotation.y = rotY;
+		SM.locatorList[index].transformation.rotation.z = rotZ;
+		SM.locatorList[index].transformation.rotation.w = rotW;
+
+		SM.UpdateSharedLocator(index, currNrLocators);
+	}
+
+}
 
 void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, bool doMesh)
 {

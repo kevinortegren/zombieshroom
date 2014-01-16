@@ -7,7 +7,8 @@ SharedMemory::SharedMemory()
 	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
-	export = nullptr;
+	NumberOfLocators = nullptr;
+	export = 0;
 	InitalizeSharedMemory();
 }
 
@@ -24,8 +25,10 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Material) * g_maxMeshes;
-	total_memory_size += sizeof(int) * 4;
-	total_memory_size += sizeof(glm::vec2) * 3;
+	total_memory_size += sizeof(Locator) * g_maxLocators;
+
+	total_memory_size += sizeof(int) * 5;
+	total_memory_size += sizeof(glm::vec2) * 4;
 	total_memory_size += sizeof(int);
 
 	shared_memory_handle = CreateFileMapping(
@@ -86,6 +89,20 @@ int SharedMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(Material) * g_maxMeshes);
 
 	NumberOfMaterials = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+
+	for(int i = 0; i < g_maxLocators; i++)
+	{
+		PlocatorList[i] = ((Locator*)mem) + i ;
+	}
+	mem = (unsigned char*)(mem + sizeof(Locator) * g_maxLocators);
+
+	LocatorIdChange = (glm::vec2*)(mem);
+	mem = (unsigned char*)(mem + sizeof(glm::vec2));
+
+	NumberOfLocators = (int*)(mem);
 
 	mem = (unsigned char*)(mem + sizeof(int));
 
@@ -193,6 +210,25 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 	}
 
 	ReleaseMutex(MeshMutexHandle);
+}
+
+void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	*NumberOfLocators = nrOfLocators;
+	LocatorIdChange->x = index;
+	ReleaseMutex(IdMutexHandle);
+
+	LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	
+	memcpy(PlocatorList[index]->transformation.name, locatorList[index].transformation.name, g_maxNameLength);
+	PlocatorList[index]->transformation.position = locatorList[index].transformation.position;
+	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
+	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
+
+	ReleaseMutex(LocatorMutexHandle);
 }
 
 void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)

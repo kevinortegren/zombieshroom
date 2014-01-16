@@ -20,23 +20,31 @@ public:
 	void RemoveLight(int id, int nrOfLights);
 	int InitalizeSharedMemory();
 	void UpdateSharedMaterials(int nrOfMaterials, int meshID);
+	void UpdateSharedLocator(int index, int nrOfLocators);
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];
 	Light lightList[g_maxLights];
 	Camera cameraList[g_maxCameras];
+	Material materialList[g_maxMeshes];
+	Locator locatorList[g_maxLocators];
+
 	int* NumberOfMeshes;
 	int* NumberOfLights;
 	int* NumberOfCameras;
+	int* NumberOfMaterials;
+	int* NumberOfLocators;
+
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
+	glm::vec2* LocatorIdChange;
+
 	int* export;
-	Material materialList[g_maxMeshes];
-	int* NumberOfMaterials;
+	
 	DWORD milliseconds;
 
-		HANDLE IdMutexHandle;
+	HANDLE IdMutexHandle;
 
 private:
 	//Functions
@@ -47,10 +55,12 @@ private:
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
 	HANDLE shared_memory_handle;
+	HANDLE LocatorMutexHandle;
 	unsigned char* raw_data;
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
 	Material* PmaterialList[g_maxMeshes];
+	Locator* PlocatorList[g_maxLocators];
 
 };

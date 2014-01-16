@@ -20,27 +20,35 @@ public:
 	Mesh meshList[g_maxMeshes];
 	Light lightList[g_maxLights];
 	Camera cameraList[g_maxCameras];
+	Material materialList[g_maxMeshes];
+	Locator locatorList[g_maxLocators];
+
 	int* NumberOfMeshes;
 	int* NumberOfLights;
 	int* NumberOfCameras;
-	Mesh* PmeshList[g_maxMeshes];
-	Light* PlightList[g_maxLights];
-	Camera* PcameraList[g_maxCameras];
-	Material* PmaterialList[g_maxMeshes];
 	int* NumberOfMaterials;
+	int* NumberOfLocators;
 
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
+	glm::vec2* LocatorIdChange;
+
+	Mesh* PmeshList[g_maxMeshes];
+	Light* PlightList[g_maxLights];
+	Camera* PcameraList[g_maxCameras];
+	Material* PmaterialList[g_maxMeshes];
+	Locator* PlocatorList[g_maxLocators];
+
 	int* export;
+
 	HANDLE MeshMutexHandle;
 	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
+	HANDLE LocatorMutexHandle;
 	DWORD milliseconds;
 	
-
-	//ALOT OF DIFFRENCE HERE COMPARED TO SharedMemory why?
 private:
 	//Functions
 	int shutdown();

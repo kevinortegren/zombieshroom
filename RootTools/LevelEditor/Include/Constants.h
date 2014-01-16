@@ -15,6 +15,7 @@ const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 100;
 const int g_maxNrOfFlags = 2;
+const int g_maxLocators = 20;
 const string g_savepath = "C:/Users/BTH/Documents/MASTER/zombieshroom/Assets/";
 const string g_levelName = "myTestLevel";
 
@@ -77,5 +78,10 @@ struct Light
 	Transform transformation;
 	glm::vec4 color;
 	float Intensity;
+};
+
+struct Locator
+{
+	Transform transformation;
 };
 

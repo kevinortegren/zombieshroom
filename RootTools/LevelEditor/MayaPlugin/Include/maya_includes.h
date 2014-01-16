@@ -47,6 +47,7 @@
 #include <maya/MPlugArray.h>
 
 #include <maya/MQuaternion.h>
+#include <maya/MPxLocatorNode.h>
 
 #ifdef _DEBUG
 	#define PrintMayaError

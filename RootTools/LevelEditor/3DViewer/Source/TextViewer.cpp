@@ -260,10 +260,25 @@ int main(int argc, char* argv[])
 
 			ReleaseMutex(RM.IdMutexHandle);
 
-			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+			
+
+			/////////////////////// LOAD LOCATORS /////////////////////////////////
+			RM.LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+			int nrLoc = *RM.NumberOfLocators;
+
+			for(int i = 0; i < nrLoc; i++)
+			{
+				cout << "Found locator " << i << " " << RM.PlocatorList[i]->transformation.name << endl;
+				cout << "POS X Y Z " << RM.PlocatorList[i]->transformation.position.x << RM.PlocatorList[i]->transformation.position.y << RM.PlocatorList[i]->transformation.position.z << endl;
+			}
+
+			ReleaseMutex(RM.LocatorMutexHandle);
 
 			/////////////////////// LOAD MATERIALS ////////////////////////////////
+
+			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 			int renderNrOfMaterials = *RM.NumberOfMaterials;
 
 			for(int i = 0; i < renderNrOfMaterials; i++)
