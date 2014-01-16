@@ -236,7 +236,7 @@ namespace RootEngine
 				return Awesomium::KeyCodes::AK_0;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_SPACE)
 				return Awesomium::KeyCodes::AK_SPACE;
-			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN)
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_RETURN || p_key == SDL_Scancode::SDL_SCANCODE_KP_ENTER)
 				return Awesomium::KeyCodes::AK_RETURN;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
 				return Awesomium::KeyCodes::AK_BACK;

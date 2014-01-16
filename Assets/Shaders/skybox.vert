@@ -21,7 +21,9 @@ out vec3 vert_normal;
 
 void main()
 {
-	gl_Position = (projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f )).xyww;
+	vec3 pos = (projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f )).xyz;
+
+	gl_Position = vec4(pos.xyz, pos.z + 0.001f);
 
 	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
 

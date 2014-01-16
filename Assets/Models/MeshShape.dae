@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v10TestExport.mb</source_data>
     </contributor>
-    <created>2014-01-07T13:30:53</created>
-    <modified>2014-01-07T13:30:53</modified>
+    <created>2014-01-07T14:25:26</created>
+    <modified>2014-01-07T14:25:26</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -149,11 +149,11 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="v10TestExport">
       <node id="Mesh" name="Mesh" type="NODE">
-        <translate sid="translate">13.79645 44.05201 1.353098</translate>
+        <translate sid="translate">13.06095 -62.69821 2.526508</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 30.82244</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">2.144148 2.144148 2.144148</scale>
+        <scale sid="scale">4.878932 4.878932 4.878932</scale>
         <instance_geometry url="#MeshShape">
           <bind_material>
             <technique_common>

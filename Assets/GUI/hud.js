@@ -11,6 +11,10 @@ function Send(event)
 	event.preventDefault();
 	event.stopPropagation();
 }
+function SetDeathScreen(p_visible)
+{
+	$("#deathscreen").css("display", (p_visible?"block":"none"));
+}
 
 $(document).keydown(function(event)
 {
@@ -52,10 +56,14 @@ function Set(p_id, p_value)
 		if(seconds < 10)
 			seconds = "0" + seconds;
 		value = "" + minutes + ":" + seconds;
-		/*if(parseInt(minutes) < 2) TODO: not working any more, have martins look at it
-			$("#"+p_id).class("blink");
+		if( minutes < 2 )
+			$("#"+p_id).addClass("blink");
 		else
-			$("#"+p_id).class("");*/
+			$("#"+p_id).removeClass("blink");
+	}
+	if(p_id == "Health")
+	{
+		SetDeathScreen(parseInt(value) <= 0);
 	}
 	$("#"+p_id).html(value);
 }

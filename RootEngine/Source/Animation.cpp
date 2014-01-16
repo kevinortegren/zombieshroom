@@ -4,15 +4,13 @@ namespace RootEngine
 {
 	namespace RootAnimation
 	{
-		Animation::Animation(unsigned int p_vertSize) : m_numBones(0)
+		Animation::Animation(Logging* p_logging) : m_numBones(0)
 		{
-			m_boneData.resize(p_vertSize);
-			m_bones.reserve(20);
+			m_logging = p_logging;
 		}
 
 		Animation::~Animation()
 		{
-			
 		}
 
 		bool Animation::BoneExists( std::string p_boneName )
@@ -48,223 +46,6 @@ namespace RootEngine
 			return m_boneMapping[p_boneName];
 		}
 
-		void Animation::AddBoneData( unsigned int p_vertexIndex, unsigned int p_boneIndex, float p_weight )
-		{
-			m_boneData[p_vertexIndex].AddBoneData(p_boneIndex, p_weight);
-		}
-
-		void Animation::AddAnimationKeyFrames( unsigned int p_start, unsigned int p_stop )
-		{
-			m_animationKeyFrames.push_back(glm::vec2((float)p_start, (float)p_stop));
-		}
-
-		void Animation::BoneTransform(float TimeInSeconds)
-		{
-			glm::mat4 Identity = glm::mat4(1.0);
-			
-			float TicksPerSecond = (float)(m_aiImporter->GetScene()->mAnimations[0]->mTicksPerSecond != 0 ? m_aiImporter->GetScene()->mAnimations[0]->mTicksPerSecond : 25.0f);
-			float TimeInTicks = TimeInSeconds * TicksPerSecond;
-			float AnimationTime = fmod(TimeInTicks, (float)m_aiImporter->GetScene()->mAnimations[0]->mDuration);
-
-			ReadNodeHeirarchy(AnimationTime, m_aiImporter->GetScene()->mRootNode, Identity);
-
-			for (unsigned int i = 0 ; i < m_numBones ; i++) 
-			{
-				m_bones[i] = m_boneInfo[i].m_finalTransformation;
-			}
-		}
-
-		void Animation::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
-		{    
-			std::string NodeName(pNode->mName.data);
-			//std::cout << NodeName << "\n";
-			if(NodeName == "Mesh2q" || NodeName == "Character1_Reference")
-				return;
-			const aiAnimation* pAnimation = m_aiImporter->GetScene()->mAnimations[0];
-			
-			
-			aiMatrix4x4 am = pNode->mTransformation;
-			glm::mat4x4 gm = glm::mat4x4();
-			memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
-			glm::mat4 NodeTransformation(glm::transpose(gm));
-
-			const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-			if (pNodeAnim) 
-			{
-				
-				// Interpolate scaling and generate scaling transformation matrix
-				aiVector3D Scaling;
-				CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-				glm::mat4 ScalingM = glm::scale(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));
-				// Interpolate rotation and generate rotation transformation matrix
-				aiQuaternion RotationQ;
-				CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-				aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
-				glm::mat3 gm3 = glm::mat3();
-
-				memcpy(&gm3[0][0], &am3[0][0], sizeof(aiMatrix3x3));
-			
-				glm::mat4 RotationM = glm::mat4(glm::transpose(gm3));
-
-				// Interpolate translation and generate translation transformation matrix
-				aiVector3D Translation;
-				CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-				glm::mat4 TranslationM = glm::translate(glm::mat4(1.0f), glm::vec3(Translation.x, Translation.y, Translation.z));
-				
-				// Combine the above transformations
-				NodeTransformation =  TranslationM * RotationM * ScalingM ; 
-			}
-
-			glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
-
-			if (m_boneMapping.find(NodeName) != m_boneMapping.end()) 
-			{
-				unsigned int BoneIndex = m_boneMapping[NodeName];
-				m_boneInfo[BoneIndex].m_finalTransformation = m_globalInverseTransform * GlobalTransformation * m_boneInfo[BoneIndex].m_boneOffset;
-			}
-
-			for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) 
-			{
-				ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-			}
-		}
-
-		unsigned int Animation::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{    
-			for (unsigned int i = 0 ; i < pNodeAnim->mNumPositionKeys - 1 ; i++) 
-			{
-				if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) 
-				{
-					return i;
-				}
-			}
-
-			assert(0);
-
-			return 0;
-		}
-
-
-		unsigned int Animation::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{
-			assert(pNodeAnim->mNumRotationKeys > 0);
-
-			for (unsigned int i = 0 ; i < pNodeAnim->mNumRotationKeys - 1 ; i++) 
-			{
-				if (AnimationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime) 
-				{
-					return i;
-				}
-			}
-
-			assert(0);
-
-			return 0;
-		}
-
-
-		unsigned int Animation::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{
-			assert(pNodeAnim->mNumScalingKeys > 0);
-
-			for (unsigned int i = 0 ; i < pNodeAnim->mNumScalingKeys - 1 ; i++)
-			{
-				if (AnimationTime < (float)pNodeAnim->mScalingKeys[i + 1].mTime) 
-				{
-					return i;
-				}
-			}
-
-			assert(0);
-
-			return 0;
-		}
-
-
-		void Animation::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{
-			if (pNodeAnim->mNumPositionKeys == 1) 
-			{
-				Out = pNodeAnim->mPositionKeys[0].mValue;
-				return;
-			}
-
-			unsigned int PositionIndex = FindPosition(AnimationTime, pNodeAnim);
-			unsigned int NextPositionIndex = (PositionIndex + 1);
-			assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
-			float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
-			float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
-			assert(Factor >= 0.0f && Factor <= 1.0f);
-			const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-			const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
-			aiVector3D Delta = End - Start;
-			Out = Start + Factor * Delta;
-		}
-
-
-		void Animation::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{
-			// we need at least two values to interpolate...
-			if (pNodeAnim->mNumRotationKeys == 1) 
-			{
-				Out = pNodeAnim->mRotationKeys[0].mValue;
-				return;
-			}
-
-			unsigned int RotationIndex = FindRotation(AnimationTime, pNodeAnim);
-			unsigned int NextRotationIndex = (RotationIndex + 1);
-			assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-			float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
-			float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-			assert(Factor >= 0.0f && Factor <= 1.0f);
-			const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-			const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;    
-			aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-			Out = Out.Normalize();
-		}
-
-
-		void Animation::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-		{
-			if (pNodeAnim->mNumScalingKeys == 1) 
-			{
-				Out = pNodeAnim->mScalingKeys[0].mValue;
-				return;
-			}
-
-			unsigned int ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
-			unsigned int NextScalingIndex = (ScalingIndex + 1);
-			assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
-			float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
-			float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-			assert(Factor >= 0.0f && Factor <= 1.0f);
-			const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
-			const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
-			aiVector3D Delta = End - Start;
-			Out = Start + Factor * Delta;
-		}
-		const aiNodeAnim* Animation::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
-		{
-			for (unsigned int i = 0 ; i < pAnimation->mNumChannels ; i++) 
-			{
-				const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
-
-				if (std::string(pNodeAnim->mNodeName.data) == NodeName) 
-				{
-					return pNodeAnim;
-				}
-			}
-
-			return NULL;
-		}
-
-		
-
-		std::vector<glm::mat4>& Animation::GetBones()
-		{
-			return m_bones;
-		}
 
 		BoneInfo* Animation::GetBoneInfo( unsigned int p_index )
 		{
@@ -273,7 +54,6 @@ namespace RootEngine
 
 		void Animation::SetAiImporter( std::shared_ptr<Assimp::Importer> p_aiImporter )
 		{
-			m_bones.resize(m_numBones);
 			m_aiImporter = p_aiImporter;
 			aiMatrix4x4 am = m_aiImporter->GetScene()->mRootNode->mChildren[0]->mTransformation;
 			glm::mat4x4 gm = glm::mat4x4();
@@ -281,9 +61,58 @@ namespace RootEngine
 			m_globalInverseTransform = glm::transpose(gm);
 		}
 
-		RootEngine::RootAnimation::VertexBoneData* Animation::GetBoneData(unsigned int p_index)
+		const aiScene* Animation::GetScene()
 		{
-			return &m_boneData[p_index];
+			return m_aiImporter->GetScene();
+		}
+
+		glm::mat4x4 Animation::GetGlobalInverseTransform()
+		{
+			return m_globalInverseTransform;
+		}
+
+		glm::mat4x4 Animation::GetBoneOffset( unsigned int p_index )
+		{
+			return m_boneInfo[p_index].m_boneOffset;
+		}
+
+		void Animation::SplitAnimation()
+		{
+			unsigned int startFrame = 0;
+			double startTime = 0;
+			unsigned int numKeyFrames = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mNumPositionKeys;
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of key frames: %d", numKeyFrames);
+			for (unsigned int keyFrame = 0; keyFrame < numKeyFrames; keyFrame++)
+			{
+				bool tPose = true;
+				for (unsigned int channel = 0; channel < m_aiImporter->GetScene()->mAnimations[0]->mNumChannels; channel++)
+				{
+					aiQuaternion rotkey = m_aiImporter->GetScene()->mAnimations[0]->mChannels[channel]->mRotationKeys[keyFrame].mValue;
+					if (!(rotkey == aiQuaternion(0,0,0)))
+					{
+						tPose = false;
+						break;
+					}
+				}
+				if(tPose)
+				{
+					AnimClip clip;
+					clip.m_startTime = startTime;
+					clip.m_duration = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mRotationKeys[keyFrame - 1].mTime - startTime;
+					clip.m_startFrame = startFrame;
+					clip.m_stopFrame = keyFrame - 1;
+					m_animClips.push_back(clip);
+					startTime = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mRotationKeys[keyFrame + 1].mTime;
+					startFrame = keyFrame + 1;
+				}
+				
+			}
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of animation clips: %d", m_animClips.size());
+		}
+
+		AnimClip* Animation::GetAnimClip(unsigned int p_index)
+		{
+			return &m_animClips[p_index];
 		}
 
 	}

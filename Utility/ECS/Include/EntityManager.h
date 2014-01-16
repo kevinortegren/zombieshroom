@@ -28,6 +28,12 @@ namespace ECS
 		template<class T> 
 		T* CreateComponent(Entity* p_entity)
 		{
+			// Check that the type id is initialized, otherwise the Cthulu will win the war!
+			if(Component<T>::GetTypeId() == UINT_MAX)
+			{
+				printf("Attempting to create a component without initialized type id. See ECS::Component<T>::SetTypeId(..)");
+				return nullptr;
+			}
 			// Allocate memory for component.
 			std::shared_ptr<T> component = std::shared_ptr<T>(new T);
 			
@@ -83,11 +89,13 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
-			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
+			if(p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
 				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());
 		}
+
+		std::vector<std::pair<unsigned int, ComponentInterface*>> GetAllComponents(Entity* p_entity);
 
 		template<class T>
 		void RemoveAllComponentsOfType()

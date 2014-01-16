@@ -1,7 +1,9 @@
 #pragma once
 
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\EntitySystem.h>
+#include <RootSystems/Include/DataStructures/Quad.h>
+
+#include <Utility/ECS/Include/Component.h>
+#include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <array>
 
@@ -13,10 +15,14 @@ namespace RootForce
 	{
 	public:
 		WorldSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
+			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_showDebug(false) {}
+
 		void CreateWorld(const std::string& p_worldName);
 		void Process();
+		void ShowDebug(bool p_value);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
+		QuadTree m_quadTree;
+		bool m_showDebug;
 	};
 }

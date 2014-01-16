@@ -6,6 +6,8 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/PhysicsSystem.h>
+#include <RootSystems/Include/LightSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -28,6 +30,24 @@ namespace RootForce
 				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Lua Error: Too few arguments when calling C function %s at line %s!", p_func.c_str(), std::to_string(p_line).c_str());
 				luaL_argerror(p_luaState, nargs, "Too few arguments!");
 			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//LOGGING
+		//////////////////////////////////////////////////////////////////////////
+		static int Log(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			const char* s = luaL_checkstring(p_luaState, 1);
+			int l = (int) luaL_checkint(p_luaState, 2);
+			
+			lua_Debug ar;
+			lua_getstack(p_luaState, 1, &ar);
+			lua_getinfo(p_luaState, "Sl", &ar);
+			
+			g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, (LogLevel::LogLevel) l, s);
+
+			return 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -871,7 +891,7 @@ namespace RootForce
 			RootForce::Script **s = (RootForce::Script **)lua_newuserdata(p_luaState, sizeof(RootForce::Script*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Script>(*e);
-			(*s)->m_name = g_engineContext.m_resourceManager->GetScript(luaL_checkstring(p_luaState, 2));
+			(*s)->Name = g_engineContext.m_resourceManager->GetScript(luaL_checkstring(p_luaState, 2));
 			luaL_setmetatable(p_luaState, "Script");
 			
 			return 1;
@@ -935,6 +955,15 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->m_range);
 			return 1;
 		}
+
+		static const struct luaL_Reg logging_f [] = {
+			{"Log", Log},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg logging_m [] = {
+			{NULL, NULL}
+		};
 
 		static const struct luaL_Reg entity_f [] = {
 			{"New", EntityCreate},

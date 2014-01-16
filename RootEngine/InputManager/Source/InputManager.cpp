@@ -8,6 +8,7 @@ namespace RootEngine
 		InputManager* InputManager::s_inputSys = nullptr;
 		void InputManager::Startup(void)
 		{
+			m_lockDownInput = false;
 			int err = SDL_SetRelativeMouseMode(SDL_TRUE);
 			m_globMousePos = glm::ivec2(0, 0);
 			m_deltaMousePos = glm::ivec2(0, 0);
@@ -26,6 +27,8 @@ namespace RootEngine
 
 		void InputManager::HandleInput(SDL_Event& p_event)
 		{
+			if(m_lockDownInput)
+				return;
 			switch(p_event.type)
 			{
 			case SDL_KEYDOWN:

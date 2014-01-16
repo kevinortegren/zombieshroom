@@ -29,6 +29,25 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 	m_entities.erase(m_entities.begin() + p_entity->m_id);
 }
 
+std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManager::GetAllComponents(Entity* p_entity)
+{
+	std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components;
+
+	for (int type = 0; type < m_components.size(); ++type)
+	{
+		if (p_entity->m_id < m_components[type].size() && m_components[type][p_entity->m_id] != nullptr)
+		{
+			std::pair<unsigned int, ECS::ComponentInterface*> c;
+			c.first = type;
+			c.second = m_components[type][p_entity->m_id].get();
+			
+			components.push_back(c);
+		}
+	}
+
+	return components;
+}
+
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
 	for(size_t i = 0; i < m_components.size(); ++i) 
