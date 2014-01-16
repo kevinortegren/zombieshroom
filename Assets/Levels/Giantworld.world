@@ -1598,7 +1598,7 @@
         - Entity: 117
           MeshHandle: Stone22Shape0
         - Entity: 118
-          MeshHandle: Stone2Shape
+          MeshHandle: Stone2Shape0
 - Tags:
     []
 - Groups:
@@ -2073,4 +2073,4 @@
     - Id: 118
       Group: Static
     - Id: 2
-      Group: duche
+      Group: Static
