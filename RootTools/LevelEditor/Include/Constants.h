@@ -15,12 +15,9 @@ const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 100;
 const int g_maxNrOfFlags = 2;
-<<<<<<< HEAD
 const int g_maxLocators = 20;
 const string g_savepath = "C:/Users/BTH/Documents/MASTER/zombieshroom/Assets/";
-=======
-const string g_savepath = "C:/Users/BTH/Documents/zombieshroomMain/Assets/";
->>>>>>> 520960fe720c9963c52a07684da41c9a7df8185e
+
 const string g_levelName = "myTestLevel";
 
 struct Transform
