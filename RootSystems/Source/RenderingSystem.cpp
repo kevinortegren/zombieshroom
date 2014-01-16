@@ -41,8 +41,6 @@ namespace RootForce
 		m_matrices[p_entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[p_entity].m_model))));
 
 		m_matrices[p_entity].m_model = m_matrices[p_entity].m_model;
-		//m_matrices[p_entity].m_model = m_matrices[p_entity].m_model * renderable->m_model->m_transform;
-
 
 		for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)
 		{

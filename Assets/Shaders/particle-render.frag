@@ -16,8 +16,7 @@ in float gs_Depth;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Depth;
 
-//layout (location = 0) out vec4 color;
-layout (location = 2) out vec4 color;
+out vec4 out_Color;
 
 void main(void) {
 
@@ -38,5 +37,5 @@ void main(void) {
     
 	depthDiff = clamp(depthDiff / 30.0f, 0.0f, 1.0f);
 
-    color = vec4(0,0,1, frag_color.a * depthDiff);
+    out_Color = vec4(frag_color.xyz, frag_color.a * depthDiff);
 }
