@@ -7,5 +7,6 @@ int main(int argc, char *argv[])
 	AbilityEditor w;
 	w.Init();
 	w.show();
+
 	return a.exec();
 }

@@ -30,13 +30,13 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tabOnCreate">
      <attribute name="title">
       <string>On Create</string>
      </attribute>
-     <widget class="QTreeWidget" name="treeOnCreate">
+     <widget class="CustomTreeWidget" name="treeOnCreate">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -65,7 +65,7 @@
      <attribute name="title">
       <string>On Collide</string>
      </attribute>
-     <widget class="QTreeWidget" name="treeOnCollide">
+     <widget class="CustomTreeWidget" name="treeOnCollide">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -77,11 +77,14 @@
       <property name="dragEnabled">
        <bool>true</bool>
       </property>
+      <property name="dragDropOverwriteMode">
+       <bool>true</bool>
+      </property>
       <property name="dragDropMode">
        <enum>QAbstractItemView::DragDrop</enum>
       </property>
       <property name="defaultDropAction">
-       <enum>Qt::MoveAction</enum>
+       <enum>Qt::IgnoreAction</enum>
       </property>
       <property name="columnCount">
        <number>1</number>
@@ -91,48 +94,13 @@
         <string>Entities</string>
        </property>
       </column>
-      <item>
-       <property name="text">
-        <string>New Item</string>
-       </property>
-       <item>
-        <property name="text">
-         <string>New Item</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>New Item</string>
-        </property>
-       </item>
-      </item>
-      <item>
-       <property name="text">
-        <string>New Item</string>
-       </property>
-       <item>
-        <property name="text">
-         <string>New Subitem</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>New Item</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>New Item</string>
-        </property>
-       </item>
-      </item>
      </widget>
     </widget>
     <widget class="QWidget" name="tabOnDestroy">
      <attribute name="title">
       <string>On Destroy</string>
      </attribute>
-     <widget class="QTreeWidget" name="treeOnDestroy">
+     <widget class="CustomTreeWidget" name="treeOnDestroy">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -168,13 +136,13 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tabAbilities">
      <attribute name="title">
       <string>Existing Abilities</string>
      </attribute>
-     <widget class="QListWidget" name="listAbilities">
+     <widget class="CustomListWidget" name="listAbilities">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -195,7 +163,7 @@
      <attribute name="title">
       <string>Components</string>
      </attribute>
-     <widget class="QListWidget" name="listComponents">
+     <widget class="CustomListWidget" name="listComponents">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -216,7 +184,7 @@
      <attribute name="title">
       <string>Conditions</string>
      </attribute>
-     <widget class="QListWidget" name="listWidget">
+     <widget class="CustomListWidget" name="listWidget">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -288,6 +256,18 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>CustomTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomListWidget</class>
+   <extends>QListWidget</extends>
+   <header>CustomListWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="AbilityEditor.qrc"/>
  </resources>

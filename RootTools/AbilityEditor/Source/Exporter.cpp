@@ -58,7 +58,7 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+				ExportEntity(out, p_onCollide->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
 			
@@ -74,7 +74,7 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, &p_onDestroy->GetEntities()->at(i));
+				ExportEntity(out, p_onDestroy->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
 	

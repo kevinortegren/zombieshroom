@@ -6,10 +6,10 @@
 #include <QtGui/QDrag>
 #include <QtCore/QMimeData>
 #include <QtGui/QPen>
-
 #include "OnCreate.h"
 #include "Exporter.h"
 #include "Importer.h"
+#include "CustomTreeWidget.h"
 
 AbilityEditor::AbilityEditor(QWidget *parent)
 	: QMainWindow(parent)
@@ -18,21 +18,26 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 	{
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
-	
 }
 
 AbilityEditor::~AbilityEditor()
 {
-
+	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
+	exporter->Export("Test.ability", m_onCreate, m_onCollide, m_onDestroy);
 }
 
 void AbilityEditor::Init()
 {
 	ui.setupUi(this);
-
+	m_onCreate = new AbilityEditorNameSpace::OnCreate();
+	m_onCollide =new AbilityEditorNameSpace::OnCollide();
+	m_onDestroy= new AbilityEditorNameSpace::OnDestroy();
+	ui.treeOnCollide->SetOnEventClass(m_onCreate);
+	ui.treeOnCreate->SetOnEventClass(m_onCollide);
+	ui.treeOnDestroy->SetOnEventClass(m_onDestroy);
 	this->setFixedSize(this->size());
 	this->statusBar()->setSizeGripEnabled(false);
-
+	
 	//////////////////////////////////////////////////////////////////////////
 	/*AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
 	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
@@ -62,7 +67,7 @@ void AbilityEditor::Init()
 	//////////////////////////////////////////////////////////////////////////
 
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
-
+	
 	
 	ui.listComponents->addItems(m_compNames);
 	ui.listAbilities->addItem("Empty Entity");
@@ -118,8 +123,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		if(ui.treeOnDestroy->selectedItems().at(0) != 0)
 			p_item = ui.treeOnDestroy->selectedItems().at(0);
 	}
-
-
+	
 	m_propBrows = new QtTreePropertyBrowser(ui.propertyWidget);
 	m_propBrows->setGeometry(ui.propertyWidget->geometry());
 
@@ -130,15 +134,18 @@ void AbilityEditor::UpdatePropertyBrowser( )
 	hej = new QtVariantPropertyManager;
 
 	QString temp = p_item->text(p_item->columnCount()-1);
-	QtVariantProperty* prop;
-	prop = hej->addProperty(QVariant::String, "Name");
-	hej->setValue(prop, temp);
-
+	QtVariantProperty* prop, *prop1;
+	prop = hej->addProperty(QVariant::String, "fafaf");
+	prop1 = hej->addProperty(QVariant::String, "test");
 	
+	//prop->setPropertyName("test");
+	hej->setValue(prop, temp);
+	hej->setValue(prop1, temp);
 	QtVariantEditorFactory* propFact;
 	propFact = new QtVariantEditorFactory;
 	m_propBrows->setFactoryForManager(hej, propFact);
 	m_propBrows->addProperty(prop);
+	m_propBrows->addProperty(prop1);
 }
 
 
@@ -166,7 +173,22 @@ bool AbilityEditor::event( QEvent* event )
 			}
 		}
 	}
+	if(event->type() == QEvent::Drop)
+		return false;
 	return QWidget::event(event);
+}
+
+
+
+bool AbilityEditor::eventFilter( QObject * p_object, QEvent * p_event )
+{
+	if(p_object->objectName().compare(ui.tabOnCollide->objectName()) == 0 && p_event->type() == QEvent::Drop)
+	{
+		int test = 0;
+		test*=2;
+		//qDebug() << "Winning";
+	}
+	return true;
 }
 
 

@@ -14,14 +14,14 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QWidget>
+#include "CustomListWidget.h"
+#include "CustomTreeWidget.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -36,18 +36,18 @@ public:
     QWidget *centralWidget;
     QTabWidget *abilityWidget;
     QWidget *tabOnCreate;
-    QTreeWidget *treeOnCreate;
+    CustomTreeWidget *treeOnCreate;
     QWidget *tabOnCollide;
-    QTreeWidget *treeOnCollide;
+    CustomTreeWidget *treeOnCollide;
     QWidget *tabOnDestroy;
-    QTreeWidget *treeOnDestroy;
+    CustomTreeWidget *treeOnDestroy;
     QTabWidget *toolBoxWidget;
     QWidget *tabAbilities;
-    QListWidget *listAbilities;
+    CustomListWidget *listAbilities;
     QWidget *tabComponents;
-    QListWidget *listComponents;
+    CustomListWidget *listComponents;
     QWidget *tabConditions;
-    QListWidget *listWidget;
+    CustomListWidget *listWidget;
     QWidget *propertyWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -80,7 +80,7 @@ public:
         abilityWidget->setGeometry(QRect(10, 10, 271, 381));
         tabOnCreate = new QWidget();
         tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
-        treeOnCreate = new QTreeWidget(tabOnCreate);
+        treeOnCreate = new CustomTreeWidget(tabOnCreate);
         treeOnCreate->setObjectName(QStringLiteral("treeOnCreate"));
         treeOnCreate->setGeometry(QRect(0, 0, 261, 351));
         treeOnCreate->setDragEnabled(true);
@@ -89,24 +89,18 @@ public:
         abilityWidget->addTab(tabOnCreate, QString());
         tabOnCollide = new QWidget();
         tabOnCollide->setObjectName(QStringLiteral("tabOnCollide"));
-        treeOnCollide = new QTreeWidget(tabOnCollide);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem(treeOnCollide);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        new QTreeWidgetItem(__qtreewidgetitem);
-        QTreeWidgetItem *__qtreewidgetitem1 = new QTreeWidgetItem(treeOnCollide);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        new QTreeWidgetItem(__qtreewidgetitem1);
-        new QTreeWidgetItem(__qtreewidgetitem1);
+        treeOnCollide = new CustomTreeWidget(tabOnCollide);
         treeOnCollide->setObjectName(QStringLiteral("treeOnCollide"));
         treeOnCollide->setGeometry(QRect(0, 0, 261, 351));
         treeOnCollide->setDragEnabled(true);
+        treeOnCollide->setDragDropOverwriteMode(true);
         treeOnCollide->setDragDropMode(QAbstractItemView::DragDrop);
-        treeOnCollide->setDefaultDropAction(Qt::MoveAction);
+        treeOnCollide->setDefaultDropAction(Qt::IgnoreAction);
         treeOnCollide->setColumnCount(1);
         abilityWidget->addTab(tabOnCollide, QString());
         tabOnDestroy = new QWidget();
         tabOnDestroy->setObjectName(QStringLiteral("tabOnDestroy"));
-        treeOnDestroy = new QTreeWidget(tabOnDestroy);
+        treeOnDestroy = new CustomTreeWidget(tabOnDestroy);
         treeOnDestroy->setObjectName(QStringLiteral("treeOnDestroy"));
         treeOnDestroy->setGeometry(QRect(0, 0, 261, 351));
         treeOnDestroy->setDragEnabled(true);
@@ -118,7 +112,7 @@ public:
         toolBoxWidget->setGeometry(QRect(320, 10, 261, 381));
         tabAbilities = new QWidget();
         tabAbilities->setObjectName(QStringLiteral("tabAbilities"));
-        listAbilities = new QListWidget(tabAbilities);
+        listAbilities = new CustomListWidget(tabAbilities);
         listAbilities->setObjectName(QStringLiteral("listAbilities"));
         listAbilities->setGeometry(QRect(0, 0, 251, 351));
         listAbilities->setDragEnabled(true);
@@ -126,7 +120,7 @@ public:
         toolBoxWidget->addTab(tabAbilities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
-        listComponents = new QListWidget(tabComponents);
+        listComponents = new CustomListWidget(tabComponents);
         listComponents->setObjectName(QStringLiteral("listComponents"));
         listComponents->setGeometry(QRect(0, 0, 251, 351));
         listComponents->setDragEnabled(true);
@@ -134,7 +128,7 @@ public:
         toolBoxWidget->addTab(tabComponents, QString());
         tabConditions = new QWidget();
         tabConditions->setObjectName(QStringLiteral("tabConditions"));
-        listWidget = new QListWidget(tabConditions);
+        listWidget = new CustomListWidget(tabConditions);
         listWidget->setObjectName(QStringLiteral("listWidget"));
         listWidget->setGeometry(QRect(0, 0, 251, 351));
         toolBoxWidget->addTab(tabConditions, QString());
@@ -161,8 +155,8 @@ public:
 
         retranslateUi(AbilityEditorClass);
 
-        abilityWidget->setCurrentIndex(2);
-        toolBoxWidget->setCurrentIndex(1);
+        abilityWidget->setCurrentIndex(0);
+        toolBoxWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(AbilityEditorClass);
@@ -181,28 +175,9 @@ public:
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnCreate), QApplication::translate("AbilityEditorClass", "On Create", 0));
         QTreeWidgetItem *___qtreewidgetitem1 = treeOnCollide->headerItem();
         ___qtreewidgetitem1->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
-
-        const bool __sortingEnabled = treeOnCollide->isSortingEnabled();
-        treeOnCollide->setSortingEnabled(false);
-        QTreeWidgetItem *___qtreewidgetitem2 = treeOnCollide->topLevelItem(0);
-        ___qtreewidgetitem2->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        QTreeWidgetItem *___qtreewidgetitem3 = ___qtreewidgetitem2->child(0);
-        ___qtreewidgetitem3->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        QTreeWidgetItem *___qtreewidgetitem4 = ___qtreewidgetitem2->child(1);
-        ___qtreewidgetitem4->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        QTreeWidgetItem *___qtreewidgetitem5 = treeOnCollide->topLevelItem(1);
-        ___qtreewidgetitem5->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        QTreeWidgetItem *___qtreewidgetitem6 = ___qtreewidgetitem5->child(0);
-        ___qtreewidgetitem6->setText(0, QApplication::translate("AbilityEditorClass", "New Subitem", 0));
-        QTreeWidgetItem *___qtreewidgetitem7 = ___qtreewidgetitem5->child(1);
-        ___qtreewidgetitem7->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        QTreeWidgetItem *___qtreewidgetitem8 = ___qtreewidgetitem5->child(2);
-        ___qtreewidgetitem8->setText(0, QApplication::translate("AbilityEditorClass", "New Item", 0));
-        treeOnCollide->setSortingEnabled(__sortingEnabled);
-
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnCollide), QApplication::translate("AbilityEditorClass", "On Collide", 0));
-        QTreeWidgetItem *___qtreewidgetitem9 = treeOnDestroy->headerItem();
-        ___qtreewidgetitem9->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
+        QTreeWidgetItem *___qtreewidgetitem2 = treeOnDestroy->headerItem();
+        ___qtreewidgetitem2->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "On Destroy", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabAbilities), QApplication::translate("AbilityEditorClass", "Existing Abilities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));

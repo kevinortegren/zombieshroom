@@ -1,9 +1,8 @@
 #pragma once
-
-#include "AbilityComponents.h"
+#include "MainOnEvent.h"
 namespace AbilityEditorNameSpace
 {
-	class OnCreate
+	class OnCreate : public MainOnEvent
 	{
 	public:
 		OnCreate();
@@ -14,7 +13,7 @@ namespace AbilityEditorNameSpace
 		void AddComponent(unsigned int p_id, QString p_name);
 		void RemoveComponent(unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type);
 		void RemoveComponent(unsigned int p_id, QString p_name);
-	
+		void ManipulateData(QtTreePropertyBrowser* p_propBrows);
 		std::vector<AbilityEntity::Entity*>* GetEntities() { return &m_entities; }
 	private:
 		std::vector<AbilityEntity::Entity*> m_entities;

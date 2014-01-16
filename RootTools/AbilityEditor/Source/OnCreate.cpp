@@ -45,4 +45,9 @@ namespace AbilityEditorNameSpace
 		m_entities.at(p_id)->RemoveComponent(p_name);
 	}
 
+	void OnCreate::ManipulateData( QtTreePropertyBrowser* p_propBrows )
+	{
+
+	}
+
 }
