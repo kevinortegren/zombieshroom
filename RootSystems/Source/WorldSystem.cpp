@@ -12,9 +12,22 @@ namespace RootForce
 		// Setup static lights.
 		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
+		ECS::Entity* sun = m_world->GetEntityManager()->CreateEntity();
+		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
+		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
+		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+		sunTransform->m_position = glm::vec3(0.0f, 0.0f, 100.0f);
+		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
+		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
+		sunShadowcaster->m_resolution = 512;
+		sunShadowcaster->m_levels = 1;
+
+		glm::vec3 fro = sunTransform->m_orientation.GetFront();
+		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Sun direction: %f, %f, %f", fro.x, fro.y, fro.z);
+
 		Render::DirectionalLight directionalLight;
-		directionalLight.m_color = glm::vec4(0.8f);
-		directionalLight.m_direction = glm::vec3(0, -1,-1);
+		directionalLight.m_color = sunLight->m_color;
+		directionalLight.m_direction = sunTransform->m_orientation.GetFront();
 
 		m_engineContext->m_renderer->AddDirectionalLight(directionalLight, 0);
 
@@ -24,7 +37,8 @@ namespace RootForce
 		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
 		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
 	
-		t->m_scale = glm::vec3(-100);
+		t->m_scale = glm::vec3(-100, -100, -100);
+		t->m_orientation.Roll(180);
 
 		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
@@ -75,15 +89,31 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
-		m_quadTree.SetTranslation(glm::vec3(0, -150.0f, 0));
 		m_quadTree.Init(m_engineContext, m_world);
-
-		QuadNode* q = m_quadTree.PickRoot(glm::vec2(50,0));
 	}
 
 	void WorldSystem::Process()
 	{
-		m_quadTree.RenderDebug();
+		if(m_showDebug)
+		{
+			m_quadTree.RenderDebug();
+
+			ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
+
+			auto t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(e);
+
+			QuadNode* q = m_quadTree.PickRoot(glm::vec2(t->m_position.x,t->m_position.z));
+			if(q != nullptr)
+			{
+				q->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,0,1));
+			}
+		}
 	}
+
+	void WorldSystem::ShowDebug(bool p_value)
+	{
+		m_showDebug = p_value;
+	}
+
 }
 #endif

@@ -6,16 +6,14 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/ParticleSystem.h>
-
-#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/ShadowSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
-#endif
 
 namespace RootForce
 {
@@ -46,6 +44,8 @@ namespace RootForce
 			PLAYERACTION,
 			PLAYERPHYSICS,
 			ENTITYSTATE,
+			SHADOWCASTER,
+			DIRECTIONALLIGHT,
 		};
 		
 		inline void Initialize()
@@ -73,6 +73,8 @@ namespace RootForce
 			RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
 			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
 			RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
+			RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
+			RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 		};
 	}
 

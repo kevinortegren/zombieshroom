@@ -33,6 +33,24 @@ namespace RootForce
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		//LOGGING
+		//////////////////////////////////////////////////////////////////////////
+		static int Log(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			const char* s = luaL_checkstring(p_luaState, 1);
+			int l = (int) luaL_checkint(p_luaState, 2);
+			
+			lua_Debug ar;
+			lua_getstack(p_luaState, 1, &ar);
+			lua_getinfo(p_luaState, "Sl", &ar);
+			
+			g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, (LogLevel::LogLevel) l, s);
+
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//ENTITY
 		//////////////////////////////////////////////////////////////////////////
 		static int EntityCreate(lua_State* p_luaState)
@@ -475,13 +493,13 @@ namespace RootForce
 		}
 
 		static int RenderableSetMaterial(lua_State* p_luaState)
-        {
+		{
 			NumberOfArgs(2);
-            RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-            std::string handle = luaL_checkstring(p_luaState, 2);
-            (*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
-            return 0;
-        }
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			std::string handle = luaL_checkstring(p_luaState, 2);
+			(*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
+			return 0;
+		}
 		static int RenderableSetModel(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -937,6 +955,15 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->m_range);
 			return 1;
 		}
+
+		static const struct luaL_Reg logging_f [] = {
+			{"Log", Log},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg logging_m [] = {
+			{NULL, NULL}
+		};
 
 		static const struct luaL_Reg entity_f [] = {
 			{"New", EntityCreate},

@@ -177,6 +177,7 @@ namespace RootForce
 				animation->m_animClip = AnimationClip::STRAFE_RIGHT;
 			else if(action->StrafePower == -1)
 				animation->m_animClip = AnimationClip::STRAFE_LEFT;
+
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
