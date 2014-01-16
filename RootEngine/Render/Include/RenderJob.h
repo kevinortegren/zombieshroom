@@ -13,7 +13,7 @@ namespace Render
 	{
 		enum RenderFlags
 		{
-			RENDER_TRANSFORMFEEDBACK = 0x01
+			RENDER_TRANSFORMFEEDBACK = 0x01,
 		};
 	}
 

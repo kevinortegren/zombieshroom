@@ -6,17 +6,17 @@
       <authoring_tool>OpenCOLLADA2013 x64</authoring_tool>
       <comments>
 			ColladaMaya export options: 
-			bakeTransforms=0;relativePaths=1;copyTextures=0;exportTriangles=1;exportCgfxFileReferences=0;
+			bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;exportCgfxFileReferences=0;
 			isSampling=0;curveConstrainSampling=0;removeStaticCurves=0;exportPolygonMeshes=1;exportLights=0;
 			exportCameras=0;exportJointsAndSkin=1;exportAnimations=1;exportInvisibleNodes=0;exportDefaultCameras=0;
 			exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=1;exportVertexColorsPerVertex=1;
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
-			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=1;cameraYFov=1;doublePrecision=0
+			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/default/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Desktop/Maya%20stuff/Animation/ExportedFromThisVersion.mb</source_data>
     </contributor>
-    <created>2014-01-15T10:57:16</created>
-    <modified>2014-01-15T10:57:16</modified>
+    <created>2014-01-16T15:09:34</created>
+    <modified>2014-01-16T15:09:34</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -177,7 +177,7 @@
   </library_effects>
   <library_images>
     <image id="file1" name="file1">
-      <init_from>../../../Documents/zombieshroomMain/Assets/Textures/WStexture.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Textures/WStexture.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -187,7 +187,7 @@
       </extra>
     </image>
     <image id="file2" name="file2">
-      <init_from>../../../Documents/zombieshroom/Assets/Textures/WSnormal.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/WSnormal.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -197,7 +197,7 @@
       </extra>
     </image>
     <image id="file3" name="file3">
-      <init_from>../../../Documents/zombieshroom/Assets/Textures/WSspecular.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/WSspecular.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -326,24 +326,24 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="untitled">
+    <visual_scene id="VisualSceneNode" name="ExportedFromThisVersion">
       <node id="Character1_Hips" name="Character1_Hips" sid="Character1_Hips" type="JOINT">
-        <translate sid="translate">-0.0166985 -0.04483162 0</translate>
+        <translate sid="translate">0 0 0</translate>
         <rotate sid="jointOrientZ">0 0 1 0</rotate>
         <rotate sid="jointOrientY">0 1 0 0</rotate>
         <rotate sid="jointOrientX">1 0 0 0</rotate>
-        <rotate sid="rotateZ">0 0 1 0.8211891</rotate>
-        <rotate sid="rotateY">0 1 0 0.6903003</rotate>
-        <rotate sid="rotateX">1 0 0 12.49016</rotate>
+        <rotate sid="rotateZ">0 0 1 0</rotate>
+        <rotate sid="rotateY">0 1 0 0</rotate>
+        <rotate sid="rotateX">1 0 0 0</rotate>
         <scale sid="scale">1 1 1</scale>
         <node id="Character1_LeftUpLeg" name="Character1_LeftUpLeg" sid="Character1_LeftUpLeg" type="JOINT">
           <translate sid="translate">0.223 -0.2201177 0</translate>
           <rotate sid="jointOrientZ">0 0 1 0</rotate>
           <rotate sid="jointOrientY">0 1 0 0</rotate>
           <rotate sid="jointOrientX">1 0 0 0</rotate>
-          <rotate sid="rotateZ">0 0 1 -0.7901663</rotate>
-          <rotate sid="rotateY">0 1 0 -0.4595982</rotate>
-          <rotate sid="rotateX">1 0 0 5.28673</rotate>
+          <rotate sid="rotateZ">0 0 1 0</rotate>
+          <rotate sid="rotateY">0 1 0 0</rotate>
+          <rotate sid="rotateX">1 0 0 -0.2479522</rotate>
           <scale sid="scale">1 1 1</scale>
           <node id="Character1_LeftLeg" name="Character1_LeftLeg" sid="Character1_LeftLeg" type="JOINT">
             <translate sid="translate">0 -0.6517737 0</translate>
@@ -352,7 +352,7 @@
             <rotate sid="jointOrientX">1 0 0 0</rotate>
             <rotate sid="rotateZ">0 0 1 0</rotate>
             <rotate sid="rotateY">0 1 0 0</rotate>
-            <rotate sid="rotateX">1 0 0 23.98897</rotate>
+            <rotate sid="rotateX">1 0 0 7.707181</rotate>
             <scale sid="scale">1 1 1</scale>
             <node id="Character1_LeftFoot" name="Character1_LeftFoot" sid="Character1_LeftFoot" type="JOINT">
               <translate sid="translate">0 -0.7374057 0</translate>
@@ -361,7 +361,7 @@
               <rotate sid="jointOrientX">1 0 0 0</rotate>
               <rotate sid="rotateZ">0 0 1 0</rotate>
               <rotate sid="rotateY">0 1 0 0</rotate>
-              <rotate sid="rotateX">1 0 0 26.76709</rotate>
+              <rotate sid="rotateX">1 0 0 11.88091</rotate>
               <scale sid="scale">1 1 1</scale>
               <extra>
                 <technique profile="OpenCOLLADAMaya">
@@ -389,9 +389,9 @@
           <rotate sid="jointOrientZ">0 0 1 0</rotate>
           <rotate sid="jointOrientY">0 1 0 0</rotate>
           <rotate sid="jointOrientX">1 0 0 0</rotate>
-          <rotate sid="rotateZ">0 0 1 -0.2119047</rotate>
-          <rotate sid="rotateY">0 1 0 -3.507935</rotate>
-          <rotate sid="rotateX">1 0 0 -29.50383</rotate>
+          <rotate sid="rotateZ">0 0 1 0</rotate>
+          <rotate sid="rotateY">0 1 0 0</rotate>
+          <rotate sid="rotateX">1 0 0 4.309544</rotate>
           <scale sid="scale">1 1 1</scale>
           <node id="Character1_RightLeg" name="Character1_RightLeg" sid="Character1_RightLeg" type="JOINT">
             <translate sid="translate">0 -0.6517737 0</translate>
@@ -400,16 +400,16 @@
             <rotate sid="jointOrientX">1 0 0 0</rotate>
             <rotate sid="rotateZ">0 0 1 0</rotate>
             <rotate sid="rotateY">0 1 0 0</rotate>
-            <rotate sid="rotateX">1 0 0 38.33086</rotate>
+            <rotate sid="rotateX">1 0 0 13.0854</rotate>
             <scale sid="scale">1 1 1</scale>
             <node id="Character1_RightFoot" name="Character1_RightFoot" sid="Character1_RightFoot" type="JOINT">
               <translate sid="translate">0 -0.7374057 0</translate>
               <rotate sid="jointOrientZ">0 0 1 0</rotate>
               <rotate sid="jointOrientY">0 1 0 0</rotate>
               <rotate sid="jointOrientX">1 0 0 0</rotate>
-              <rotate sid="rotateZ">0 0 1 0</rotate>
-              <rotate sid="rotateY">0 1 0 0</rotate>
-              <rotate sid="rotateX">1 0 0 21.60689</rotate>
+              <rotate sid="rotateZ">0 0 1 -2.188482</rotate>
+              <rotate sid="rotateY">0 1 0 -1.201618</rotate>
+              <rotate sid="rotateX">1 0 0 16.3681</rotate>
               <scale sid="scale">1 1 1</scale>
               <extra>
                 <technique profile="OpenCOLLADAMaya">
@@ -437,27 +437,27 @@
           <rotate sid="jointOrientZ">0 0 1 0</rotate>
           <rotate sid="jointOrientY">0 1 0 0</rotate>
           <rotate sid="jointOrientX">1 0 0 0</rotate>
-          <rotate sid="rotateZ">0 0 1 -0.2498765</rotate>
-          <rotate sid="rotateY">0 1 0 4.971668</rotate>
-          <rotate sid="rotateX">1 0 0 -3.584697</rotate>
+          <rotate sid="rotateZ">0 0 1 -0.6263788</rotate>
+          <rotate sid="rotateY">0 1 0 -2.764655</rotate>
+          <rotate sid="rotateX">1 0 0 -1.852579</rotate>
           <scale sid="scale">1 1 1</scale>
           <node id="Character1_LeftArm" name="Character1_LeftArm" sid="Character1_LeftArm" type="JOINT">
             <translate sid="translate">0.563 0.6177015 0</translate>
             <rotate sid="jointOrientZ">0 0 1 0</rotate>
             <rotate sid="jointOrientY">0 1 0 0</rotate>
             <rotate sid="jointOrientX">1 0 0 0</rotate>
-            <rotate sid="rotateZ">0 0 1 -81.75951</rotate>
-            <rotate sid="rotateY">0 1 0 23.71087</rotate>
-            <rotate sid="rotateX">1 0 0 15.33348</rotate>
+            <rotate sid="rotateZ">0 0 1 -73.4639</rotate>
+            <rotate sid="rotateY">0 1 0 -5.167845</rotate>
+            <rotate sid="rotateX">1 0 0 -3.251224</rotate>
             <scale sid="scale">1 1 1</scale>
             <node id="Character1_LeftForeArm" name="Character1_LeftForeArm" sid="Character1_LeftForeArm" type="JOINT">
               <translate sid="translate">0.555 0 0</translate>
               <rotate sid="jointOrientZ">0 0 1 0</rotate>
               <rotate sid="jointOrientY">0 1 0 0</rotate>
               <rotate sid="jointOrientX">1 0 0 0</rotate>
-              <rotate sid="rotateZ">0 0 1 -3.212733</rotate>
-              <rotate sid="rotateY">0 1 0 -38.94146</rotate>
-              <rotate sid="rotateX">1 0 0 4.83621</rotate>
+              <rotate sid="rotateZ">0 0 1 1.622371</rotate>
+              <rotate sid="rotateY">0 1 0 -22.52494</rotate>
+              <rotate sid="rotateX">1 0 0 -3.655075</rotate>
               <scale sid="scale">1 1 1</scale>
               <node id="Character1_LeftHand" name="Character1_LeftHand" sid="Character1_LeftHand" type="JOINT">
                 <translate sid="translate">0.4599999 0 0</translate>
@@ -494,18 +494,18 @@
             <rotate sid="jointOrientZ">0 0 1 0</rotate>
             <rotate sid="jointOrientY">0 1 0 0</rotate>
             <rotate sid="jointOrientX">1 0 0 0</rotate>
-            <rotate sid="rotateZ">0 0 1 80.72173</rotate>
-            <rotate sid="rotateY">0 1 0 10.59513</rotate>
-            <rotate sid="rotateX">1 0 0 18.44009</rotate>
+            <rotate sid="rotateZ">0 0 1 66.41823</rotate>
+            <rotate sid="rotateY">0 1 0 -20.41414</rotate>
+            <rotate sid="rotateX">1 0 0 -0.2976872</rotate>
             <scale sid="scale">1 1 1</scale>
             <node id="Character1_RightForeArm" name="Character1_RightForeArm" sid="Character1_RightForeArm" type="JOINT">
               <translate sid="translate">-0.5546435 0 0</translate>
               <rotate sid="jointOrientZ">0 0 1 0</rotate>
               <rotate sid="jointOrientY">0 1 0 0</rotate>
               <rotate sid="jointOrientX">1 0 0 0</rotate>
-              <rotate sid="rotateZ">0 0 1 19.63541</rotate>
-              <rotate sid="rotateY">0 1 0 56.75783</rotate>
-              <rotate sid="rotateX">1 0 0 40.44232</rotate>
+              <rotate sid="rotateZ">0 0 1 1.344955</rotate>
+              <rotate sid="rotateY">0 1 0 33.71785</rotate>
+              <rotate sid="rotateX">1 0 0 -0.1044492</rotate>
               <scale sid="scale">1 1 1</scale>
               <node id="Character1_RightHand" name="Character1_RightHand" sid="Character1_RightHand" type="JOINT">
                 <translate sid="translate">-0.4596586 0 0</translate>
@@ -563,6 +563,7 @@
         <extra>
           <technique profile="OpenCOLLADAMaya">
             <originalMayaNodeId>Character1_Hips</originalMayaNodeId>
+            <visibility>1</visibility>
           </technique>
         </extra>
       </node>
@@ -605,9 +606,9 @@
   <library_animations>
     <animation id="Character1_Hips.translate_Character1_Hips">
       <source id="Character1_Hips.translate_Character1_Hips_translate-input" name="Character1_Hips.translate_Character1_Hips_translate-input">
-        <float_array id="Character1_Hips.translate_Character1_Hips_translate-input-array" count="40">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
+        <float_array id="Character1_Hips.translate_Character1_Hips_translate-input-array" count="43">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-input-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-input-array" count="43" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -617,9 +618,9 @@
         </technique>
       </source>
       <source id="Character1_Hips.translate_Character1_Hips_translate-output" name="Character1_Hips.translate_Character1_Hips_translate-output">
-        <float_array id="Character1_Hips.translate_Character1_Hips_translate-output-array" count="120">0.023 -0.07681143 0 2.37102e-4 -0.009682834 0 -0.02252578 -0.06392472 0 2.37102e-4 -0.03169327 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.02323573 -0.07312417 0 0 0 0 0 0 0 0 0 0 0 0 0 0.023 -0.07238221 0 0.022152 -0.06971359 0 0.009258747 -0.02913784 0 0.022152 -0.06971359 0 0.023 -0.07238221 0 0 -0.2099999 0 0 -0.42 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 </float_array>
+        <float_array id="Character1_Hips.translate_Character1_Hips_translate-output-array" count="129">0.023 -0.07681143 0 2.37102e-4 -0.009682834 0 -0.02252578 -0.06392472 0 2.37102e-4 -0.009572207 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07681143 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.01692563 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.02302968 -0.07247573 0 0.02308297 -0.07264339 0 0.0232076 -0.07303553 0 0.02323573 -0.07312417 0 0 0 0 0 0 0 0 0 0 0 0 0 0.023 -0.07238221 0 0.022152 -0.06971359 0 0.009258747 -0.02913784 0 0.022152 -0.06971359 0 0.023 -0.07238221 0 0 -0.2099999 0 0 -0.42 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 0.023 -0.07238221 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-output-array" count="40" stride="3">
+          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-output-array" count="43" stride="3">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="Z" type="float"/>
@@ -627,17 +628,17 @@
         </technique_common>
       </source>
       <source id="Character1_Hips.translate_Character1_Hips_translate-interpolation" name="Character1_Hips.translate_Character1_Hips_translate-interpolation">
-        <Name_array id="Character1_Hips.translate_Character1_Hips_translate-interpolation-array" count="40">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <Name_array id="Character1_Hips.translate_Character1_Hips_translate-interpolation-array" count="43">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-interpolation-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-interpolation-array" count="43" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.translate_Character1_Hips_translate-intangent" name="Character1_Hips.translate_Character1_Hips_translate-intangent">
-        <float_array id="Character1_Hips.translate_Character1_Hips_translate-intangent-array" count="240">-0.3333333 0.023 -0.3333333 -0.07681143 -0.3333333 0 0.1388888 0.007824718 0.1388888 -0.009682834 0.1388888 0 0.3472222 -0.02252578 0.3472222 -0.06392472 0.3472222 0 0.5555556 -0.009247422 0.5555556 -0.03169327 0.5555556 0 0.7638889 0.023 0.7638889 -0.07681143 0.7638889 0 0.8611111 0.023 0.8611111 -0.07681143 0.8611111 0 0.9027778 0.023 0.9027778 -0.07681143 0.9027778 0 1.416667 0.023 1.416667 -0.07681143 1.416667 0 1.944444 0.023 1.944444 -0.07681143 1.944444 0 2.472222 0.023 2.472222 -0.07681143 2.472222 0 3.222222 0.023 3.222222 -0.07681143 3.222222 0 3.527778 0.023 3.527778 -0.07681143 3.527778 0 3.569444 0.023 3.569444 -0.07238221 3.569444 0 3.722222 0.023 3.722222 -0.01692563 3.722222 0 3.930556 0.023 3.930556 -0.07238221 3.930556 0 4.138889 0.023 4.138889 -0.01692563 4.138889 0 4.319445 0.023 4.319445 -0.07238221 4.319445 0 4.402778 0.023 4.402778 -0.07238221 4.402778 0 4.444445 0.023 4.444445 -0.07238221 4.444445 0 4.597222 0.023 4.597222 -0.01692563 4.597222 0 4.805555 0.023 4.805555 -0.07238221 4.805555 0 5.013889 0.023 5.013889 -0.01692563 5.013889 0 5.194445 0.023 5.194445 -0.07238221 5.194445 0 5.277778 0.023 5.277778 -0.07238221 5.277778 0 5.430555 0.02323573 5.430555 -0.07312417 5.430555 0 5.500111 3.83854e-6 5.500111 -1.20801e-5 5.500111 0 5.527833 0 5.527833 0 5.527833 0 5.708333 0 5.708333 0 5.708333 0 5.958333 0 5.958333 0 5.958333 0 6.069445 0.023 6.069445 -0.07238221 6.069445 0 6.111111 0.02243465 6.111111 -0.07060313 6.111111 0 6.430556 0.01279026 6.430556 -0.04025161 6.430556 0 6.916667 0.02554392 6.916667 -0.08038806 6.916667 0 7.111111 0.023 7.111111 -0.07238221 7.111111 0 7.152778 0 7.152778 -0.1868255 7.152778 0 7.277778 0 7.277778 -0.42 7.277778 0 7.361111 0.023 7.361111 -0.07238221 7.361111 0 7.402778 0.023 7.402778 -0.07238221 7.402778 0 7.444445 0.023 7.444445 -0.07238221 7.444445 0 7.486111 0.023 7.486111 -0.07238221 7.486111 0 </float_array>
+        <float_array id="Character1_Hips.translate_Character1_Hips_translate-intangent-array" count="258">-0.3333333 0.023 -0.3333333 -0.07681143 -0.3333333 0 0.1388888 0.007824718 0.1388888 -0.009682834 0.1388888 0 0.3472222 -0.02252578 0.3472222 -0.06392472 0.3472222 0 0.5555556 -0.009247422 0.5555556 -0.009572207 0.5555556 0 0.7638889 0.023 0.7638889 -0.07681143 0.7638889 0 0.8611111 0.023 0.8611111 -0.07681143 0.8611111 0 0.9027778 0.023 0.9027778 -0.07681143 0.9027778 0 1.416667 0.023 1.416667 -0.07681143 1.416667 0 1.944444 0.023 1.944444 -0.07681143 1.944444 0 2.472222 0.023 2.472222 -0.07681143 2.472222 0 3.222222 0.023 3.222222 -0.07681143 3.222222 0 3.527778 0.023 3.527778 -0.07681143 3.527778 0 3.569444 0.023 3.569444 -0.07238221 3.569444 0 3.722222 0.023 3.722222 -0.01692563 3.722222 0 3.930556 0.023 3.930556 -0.07238221 3.930556 0 4.138889 0.023 4.138889 -0.01692563 4.138889 0 4.319445 0.023 4.319445 -0.07238221 4.319445 0 4.402778 0.023 4.402778 -0.07238221 4.402778 0 4.444445 0.023 4.444445 -0.07238221 4.444445 0 4.597222 0.023 4.597222 -0.01692563 4.597222 0 4.805555 0.023 4.805555 -0.07238221 4.805555 0 5.013889 0.023 5.013889 -0.01692563 5.013889 0 5.194445 0.023 5.194445 -0.07238221 5.194445 0 5.277778 0.023 5.277778 -0.07238221 5.277778 0 5.319445 0.02301585 5.319445 -0.07243216 5.319445 0 5.361111 0.02306318 5.361111 -0.07258117 5.361111 0 5.430556 0.02317363 5.430556 -0.07292872 5.430556 0 5.486111 0.02323573 5.486111 -0.07312417 5.486111 0 5.500111 3.83854e-6 5.500111 -1.20801e-5 5.500111 0 5.527833 0 5.527833 0 5.527833 0 5.708333 0 5.708333 0 5.708333 0 5.958333 0 5.958333 0 5.958333 0 6.069445 0.023 6.069445 -0.07238221 6.069445 0 6.111111 0.02243465 6.111111 -0.07060313 6.111111 0 6.430556 0.01279026 6.430556 -0.04025161 6.430556 0 6.916667 0.02554392 6.916667 -0.08038806 6.916667 0 7.111111 0.023 7.111111 -0.07238221 7.111111 0 7.152778 0 7.152778 -0.1868255 7.152778 0 7.277778 0 7.277778 -0.42 7.277778 0 7.361111 0.023 7.361111 -0.07238221 7.361111 0 7.402778 0.023 7.402778 -0.07238221 7.402778 0 7.444445 0.023 7.444445 -0.07238221 7.444445 0 7.486111 0.023 7.486111 -0.07238221 7.486111 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-intangent-array" count="40" stride="6">
+          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-intangent-array" count="43" stride="6">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="X" type="float"/>
@@ -648,9 +649,9 @@
         </technique_common>
       </source>
       <source id="Character1_Hips.translate_Character1_Hips_translate-outtangent" name="Character1_Hips.translate_Character1_Hips_translate-outtangent">
-        <float_array id="Character1_Hips.translate_Character1_Hips_translate-outtangent-array" count="240">0.06944441 0.023 0.06944441 -0.07681143 0.06944441 0 0.2777777 -0.007350504 0.2777777 -0.009682834 0.2777777 0 0.4861111 -0.02252578 0.4861111 -0.06392472 0.4861111 0 0.6944444 0.009721636 0.6944444 -0.03169327 0.6944444 0 0.8472222 0.023 0.8472222 -0.07681143 0.8472222 0 0.8888889 0.023 0.8888889 -0.07681143 0.8888889 0 1.166667 0.023 1.166667 -0.07681143 1.166667 0 1.805555 0.023 1.805555 -0.07681143 1.805555 0 2.277778 0.023 2.277778 -0.07681143 2.277778 0 2.944444 0.023 2.944444 -0.07681143 2.944444 0 3.513889 0.023 3.513889 -0.07681143 3.513889 0 3.555556 0.023 3.555556 -0.07681143 3.555556 0 3.652778 0.023 3.652778 -0.07238221 3.652778 0 3.861111 0.023 3.861111 -0.01692563 3.861111 0 4.069445 0.023 4.069445 -0.07238221 4.069445 0 4.263889 0.023 4.263889 -0.01692563 4.263889 0 4.388889 0.023 4.388889 -0.07238221 4.388889 0 4.430555 0.023 4.430555 -0.07238221 4.430555 0 4.527778 0.023 4.527778 -0.07238221 4.527778 0 4.736111 0.023 4.736111 -0.01692563 4.736111 0 4.944445 0.023 4.944445 -0.07238221 4.944445 0 5.138889 0.023 5.138889 -0.01692563 5.138889 0 5.263889 0.023 5.263889 -0.07238221 5.263889 0 5.361111 0.023 5.361111 -0.07238221 5.361111 0 5.500056 0.02323573 5.500056 -0.07312417 5.500056 0 5.514 -9.54491e-4 5.514 0.003003776 5.514 0 5.625 0 5.625 0 5.625 0 5.875 0 5.875 0 5.875 0 6.055555 0 6.055555 0 6.055555 0 6.097222 0.023 6.097222 -0.07238221 6.097222 0 6.277778 0.01904273 6.277778 -0.05992865 6.277778 0 6.75 0.0054062 6.75 -0.01701372 6.75 0 7.097222 0.02186936 7.097222 -0.06882405 7.097222 0 7.138889 0.023 7.138889 -0.07238221 7.138889 0 7.222222 0 7.222222 -0.3026981 7.222222 0 7.347222 3.19449e-4 7.347222 -0.4098248 7.347222 0 7.388889 0.023 7.388889 -0.07238221 7.388889 0 7.430555 0.023 7.430555 -0.07238221 7.430555 0 7.472222 0.023 7.472222 -0.07238221 7.472222 0 7.833333 0.023 7.833333 -0.07238221 7.833333 0 </float_array>
+        <float_array id="Character1_Hips.translate_Character1_Hips_translate-outtangent-array" count="258">0.06944441 0.023 0.06944441 -0.07681143 0.06944441 0 0.2777777 -0.007350504 0.2777777 -0.009682834 0.2777777 0 0.4861111 -0.02252578 0.4861111 -0.06392472 0.4861111 0 0.6944444 0.009721636 0.6944444 -0.009572207 0.6944444 0 0.8472222 0.023 0.8472222 -0.07681143 0.8472222 0 0.8888889 0.023 0.8888889 -0.07681143 0.8888889 0 1.166667 0.023 1.166667 -0.07681143 1.166667 0 1.805555 0.023 1.805555 -0.07681143 1.805555 0 2.277778 0.023 2.277778 -0.07681143 2.277778 0 2.944444 0.023 2.944444 -0.07681143 2.944444 0 3.513889 0.023 3.513889 -0.07681143 3.513889 0 3.555556 0.023 3.555556 -0.07681143 3.555556 0 3.652778 0.023 3.652778 -0.07238221 3.652778 0 3.861111 0.023 3.861111 -0.01692563 3.861111 0 4.069445 0.023 4.069445 -0.07238221 4.069445 0 4.263889 0.023 4.263889 -0.01692563 4.263889 0 4.388889 0.023 4.388889 -0.07238221 4.388889 0 4.430555 0.023 4.430555 -0.07238221 4.430555 0 4.527778 0.023 4.527778 -0.07238221 4.527778 0 4.736111 0.023 4.736111 -0.01692563 4.736111 0 4.944445 0.023 4.944445 -0.07238221 4.944445 0 5.138889 0.023 5.138889 -0.01692563 5.138889 0 5.263889 0.023 5.263889 -0.07238221 5.263889 0 5.305555 0.023 5.305555 -0.07238221 5.305555 0 5.347222 0.02304351 5.347222 -0.07251924 5.347222 0 5.402778 0.02312248 5.402778 -0.07276779 5.402778 0 5.472222 0.02322453 5.472222 -0.073089 5.472222 0 5.500056 0.02323573 5.500056 -0.07312417 5.500056 0 5.514 -9.54491e-4 5.514 0.003003776 5.514 0 5.625 0 5.625 0 5.625 0 5.875 0 5.875 0 5.875 0 6.055555 0 6.055555 0 6.055555 0 6.097222 0.023 6.097222 -0.07238221 6.097222 0 6.277778 0.01904273 6.277778 -0.05992865 6.277778 0 6.75 0.0054062 6.75 -0.01701372 6.75 0 7.097222 0.02186936 7.097222 -0.06882405 7.097222 0 7.138889 0.023 7.138889 -0.07238221 7.138889 0 7.222222 0 7.222222 -0.3026981 7.222222 0 7.347222 3.19449e-4 7.347222 -0.4098248 7.347222 0 7.388889 0.023 7.388889 -0.07238221 7.388889 0 7.430555 0.023 7.430555 -0.07238221 7.430555 0 7.472222 0.023 7.472222 -0.07238221 7.472222 0 7.833333 0.023 7.833333 -0.07238221 7.833333 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-outtangent-array" count="40" stride="6">
+          <accessor source="#Character1_Hips.translate_Character1_Hips_translate-outtangent-array" count="43" stride="6">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="X" type="float"/>
@@ -671,9 +672,9 @@
     </animation>
     <animation id="Character1_Hips.rotateZ_Character1_Hips">
       <source id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input" name="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input">
-        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input-array" count="40">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
+        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input-array" count="43">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-input-array" count="43" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -683,34 +684,34 @@
         </technique>
       </source>
       <source id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output" name="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output">
-        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output-array" count="40">-0.8606417 0.2407991 1.023667 -0.04113674 -0.8606417 0 0 0 0 0 0 0 2.633481 -0.7801358 -0.9140483 1.301076 2.633481 0 -2.633481 0.7801358 0.9140483 -1.301076 -2.633481 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
+        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output-array" count="43">-0.8606417 0.2407991 1.023667 -0.04113674 -0.8606417 0 0 0 0 0 0 0 2.633481 -0.7801358 -0.9140483 1.301076 2.633481 0 -2.633481 0.7801358 0.9140483 -1.301076 -2.633481 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-output-array" count="43" stride="1">
             <param name="ANGLE" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation" name="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation">
-        <Name_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation-array" count="40">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <Name_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation-array" count="43">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-interpolation-array" count="43" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent" name="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent">
-        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent-array" count="80">-0.3333333 -0.8606417 0.1388888 -0.01299077 0.3472222 1.023667 0.5555556 0.2761007 0.7638889 -0.8606417 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 2.633481 3.722222 -0.6462232 3.930556 -0.9140483 4.138889 0.6592759 4.319445 2.633481 4.402778 0 4.444445 -2.633481 4.597222 0.6462236 4.805555 0.9140483 5.013889 -0.6592755 5.194445 -2.633481 5.277778 0 5.430555 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
+        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent-array" count="86">-0.3333333 -0.8606417 0.1388888 -0.01299077 0.3472222 1.023667 0.5555556 0.2761007 0.7638889 -0.8606417 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 2.633481 3.722222 -0.6462232 3.930556 -0.9140483 4.138889 0.6592759 4.319445 2.633481 4.402778 0 4.444445 -2.633481 4.597222 0.6462236 4.805555 0.9140483 5.013889 -0.6592755 5.194445 -2.633481 5.277778 0 5.319445 0 5.361111 0 5.430556 0 5.486111 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-intangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent" name="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent">
-        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent-array" count="80">0.06944441 -0.8606417 0.2777777 0.4945892 0.4861111 1.023667 0.6944444 -0.3583742 0.8472222 -0.8606417 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 2.633481 3.861111 -0.9140483 4.069445 -0.9140483 4.263889 1.814516 4.388889 2.633481 4.430555 0 4.527778 -2.633481 4.736111 0.9140483 4.944445 0.9140483 5.138889 -1.814516 5.263889 -2.633481 5.361111 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
+        <float_array id="Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent-array" count="86">0.06944441 -0.8606417 0.2777777 0.4945892 0.4861111 1.023667 0.6944444 -0.3583742 0.8472222 -0.8606417 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 2.633481 3.861111 -0.9140483 4.069445 -0.9140483 4.263889 1.814516 4.388889 2.633481 4.430555 0 4.527778 -2.633481 4.736111 0.9140483 4.944445 0.9140483 5.138889 -1.814516 5.263889 -2.633481 5.305555 0 5.347222 0 5.402778 0 5.472222 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateZ_Character1_Hips_Character1_Hips.rotateZ_Character1_Hips-outtangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -727,9 +728,9 @@
     </animation>
     <animation id="Character1_Hips.rotateY_Character1_Hips">
       <source id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input" name="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input">
-        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input-array" count="40">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
+        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input-array" count="43">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-input-array" count="43" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -739,34 +740,34 @@
         </technique>
       </source>
       <source id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output" name="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output">
-        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output-array" count="40">-0.8185737 0.8223339 0.6443401 -0.575946 -0.8185737 0 0 0 0 0 0 0 68.02359 69.79009 72.20093 73.73265 68.02359 0 -68.02359 -69.79009 -72.20093 -73.73265 -68.02359 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
+        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output-array" count="43">-0.8185737 0.8223339 0.6443401 -0.575946 -0.8185737 0 0 0 0 0 0 0 68.02359 69.79009 72.20093 73.73265 68.02359 0 -68.02359 -69.79009 -72.20093 -73.73265 -68.02359 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-output-array" count="43" stride="1">
             <param name="ANGLE" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation" name="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation">
-        <Name_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation-array" count="40">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <Name_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation-array" count="43">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-interpolation-array" count="43" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent" name="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent">
-        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent-array" count="80">-0.3333333 -0.8185737 0.1388888 0.8802979 0.3472222 0.6443401 0.5555556 -0.648401 0.7638889 -0.8185737 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 68.02359 3.722222 69.09387 3.930556 71.54383 4.138889 73.73265 4.319445 68.02359 4.402778 0 4.444445 -68.02359 4.597222 -69.09387 4.805555 -71.54383 5.013889 -73.73265 5.194445 -68.02359 5.277778 0 5.430555 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
+        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent-array" count="86">-0.3333333 -0.8185737 0.1388888 0.8802979 0.3472222 0.6443401 0.5555556 -0.648401 0.7638889 -0.8185737 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 68.02359 3.722222 69.09387 3.930556 71.54383 4.138889 73.73265 4.319445 68.02359 4.402778 0 4.444445 -68.02359 4.597222 -69.09387 4.805555 -71.54383 5.013889 -73.73265 5.194445 -68.02359 5.277778 0 5.319445 0 5.361111 0 5.430556 0 5.486111 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-intangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent" name="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent">
-        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent-array" count="80">0.06944441 -0.8185737 0.2777777 0.7643699 0.4861111 0.6443401 0.6944444 -0.503491 0.8472222 -0.8185737 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 68.02359 3.861111 70.48631 4.069445 72.85803 4.263889 73.73265 4.388889 68.02359 4.430555 0 4.527778 -68.02359 4.736111 -70.48631 4.944445 -72.85803 5.138889 -73.73265 5.263889 -68.02359 5.361111 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
+        <float_array id="Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent-array" count="86">0.06944441 -0.8185737 0.2777777 0.7643699 0.4861111 0.6443401 0.6944444 -0.503491 0.8472222 -0.8185737 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 68.02359 3.861111 70.48631 4.069445 72.85803 4.263889 73.73265 4.388889 68.02359 4.430555 0 4.527778 -68.02359 4.736111 -70.48631 4.944445 -72.85803 5.138889 -73.73265 5.263889 -68.02359 5.305555 0 5.347222 0 5.402778 0 5.472222 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateY_Character1_Hips_Character1_Hips.rotateY_Character1_Hips-outtangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -783,9 +784,9 @@
     </animation>
     <animation id="Character1_Hips.rotateX_Character1_Hips">
       <source id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input" name="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input">
-        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input-array" count="40">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
+        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input-array" count="43">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-input-array" count="43" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -795,34 +796,34 @@
         </technique>
       </source>
       <source id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output" name="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output">
-        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output-array" count="40">9.93488 11.40031 12.8651 11.3997 9.93488 0 0 0 0 0 0 0 7.185173 3.858287 3.709987 5.837753 7.185173 0 7.185173 3.858287 3.709987 5.837753 7.185173 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
+        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output-array" count="43">9.93488 11.40031 12.8651 11.3997 9.93488 0 0 0 0 0 0 0 7.185173 3.858287 3.709987 5.837753 7.185173 0 7.185173 3.858287 3.709987 5.837753 7.185173 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-output-array" count="43" stride="1">
             <param name="ANGLE" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation" name="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation">
-        <Name_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation-array" count="40">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <Name_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation-array" count="43">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-interpolation-array" count="43" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent" name="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent">
-        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent-array" count="80">-0.3333333 9.93488 0.1388888 10.9119 0.3472222 12.8651 0.5555556 12.01022 0.7638889 9.93488 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 7.185173 3.722222 4.006587 3.930556 3.709987 4.138889 5.209853 4.319445 7.185173 4.402778 0 4.444445 7.185173 4.597222 4.006586 4.805555 3.709987 5.013889 5.209853 5.194445 7.185173 5.277778 0 5.430555 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
+        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent-array" count="86">-0.3333333 9.93488 0.1388888 10.9119 0.3472222 12.8651 0.5555556 12.01022 0.7638889 9.93488 0.8611111 0 0.9027778 0 1.416667 0 1.944444 0 2.472222 0 3.222222 0 3.527778 0 3.569444 7.185173 3.722222 4.006587 3.930556 3.709987 4.138889 5.209853 4.319445 7.185173 4.402778 0 4.444445 7.185173 4.597222 4.006586 4.805555 3.709987 5.013889 5.209853 5.194445 7.185173 5.277778 0 5.319445 0 5.361111 0 5.430556 0 5.486111 0 5.500111 0 5.527833 0 5.708333 0 5.958333 0 6.069445 0 6.111111 0 6.430556 0 6.916667 0 7.111111 0 7.152778 0 7.277778 0 7.361111 0 7.402778 0 7.444445 0 7.486111 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-intangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent" name="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent">
-        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent-array" count="80">0.06944441 9.93488 0.2777777 11.88872 0.4861111 12.8651 0.6944444 10.78919 0.8472222 9.93488 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 7.185173 3.861111 3.709987 4.069445 3.709987 4.263889 6.340072 4.388889 7.185173 4.430555 0 4.527778 7.185173 4.736111 3.709987 4.944445 3.709987 5.138889 6.340072 5.263889 7.185173 5.361111 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
+        <float_array id="Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent-array" count="86">0.06944441 9.93488 0.2777777 11.88872 0.4861111 12.8651 0.6944444 10.78919 0.8472222 9.93488 0.8888889 0 1.166667 0 1.805555 0 2.277778 0 2.944444 0 3.513889 0 3.555556 0 3.652778 7.185173 3.861111 3.709987 4.069445 3.709987 4.263889 6.340072 4.388889 7.185173 4.430555 0 4.527778 7.185173 4.736111 3.709987 4.944445 3.709987 5.138889 6.340072 5.263889 7.185173 5.305555 0 5.347222 0 5.402778 0 5.472222 0 5.500056 0 5.514 0 5.625 0 5.875 0 6.055555 0 6.097222 0 6.277778 0 6.75 0 7.097222 0 7.138889 0 7.222222 0 7.347222 0 7.388889 0 7.430555 0 7.472222 0 7.833333 0 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent-array" count="40" stride="2">
+          <accessor source="#Character1_Hips.rotateX_Character1_Hips_Character1_Hips.rotateX_Character1_Hips-outtangent-array" count="43" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -839,9 +840,9 @@
     </animation>
     <animation id="Character1_Hips.scale_Character1_Hips">
       <source id="Character1_Hips.scale_Character1_Hips_scale-input" name="Character1_Hips.scale_Character1_Hips_scale-input">
-        <float_array id="Character1_Hips.scale_Character1_Hips_scale-input-array" count="40">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
+        <float_array id="Character1_Hips.scale_Character1_Hips_scale-input-array" count="43">0 0.2083333 0.4166666 0.625 0.8333333 0.875 0.9166667 1.666667 2.083333 2.666667 3.5 3.541667 3.583333 3.791667 4 4.208333 4.375 4.416666 4.458333 4.666666 4.875 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.500167 5.541666 5.791666 6.041666 6.083333 6.125 6.583333 7.083333 7.125 7.166666 7.333333 7.375 7.416666 7.458333 7.5 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-input-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-input-array" count="43" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -851,9 +852,9 @@
         </technique>
       </source>
       <source id="Character1_Hips.scale_Character1_Hips_scale-output" name="Character1_Hips.scale_Character1_Hips_scale-output">
-        <float_array id="Character1_Hips.scale_Character1_Hips_scale-output-array" count="120">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </float_array>
+        <float_array id="Character1_Hips.scale_Character1_Hips_scale-output-array" count="129">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-output-array" count="40" stride="3">
+          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-output-array" count="43" stride="3">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="Z" type="float"/>
@@ -861,17 +862,17 @@
         </technique_common>
       </source>
       <source id="Character1_Hips.scale_Character1_Hips_scale-interpolation" name="Character1_Hips.scale_Character1_Hips_scale-interpolation">
-        <Name_array id="Character1_Hips.scale_Character1_Hips_scale-interpolation-array" count="40">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <Name_array id="Character1_Hips.scale_Character1_Hips_scale-interpolation-array" count="43">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-interpolation-array" count="40" stride="1">
+          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-interpolation-array" count="43" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Hips.scale_Character1_Hips_scale-intangent" name="Character1_Hips.scale_Character1_Hips_scale-intangent">
-        <float_array id="Character1_Hips.scale_Character1_Hips_scale-intangent-array" count="240">-0.3333333 1 -0.3333333 1 -0.3333333 1 0.1388888 1 0.1388888 1 0.1388888 1 0.3472222 1 0.3472222 1 0.3472222 1 0.5555556 1 0.5555556 1 0.5555556 1 0.7638889 1 0.7638889 1 0.7638889 1 0.8611111 1 0.8611111 1 0.8611111 1 0.9027778 1 0.9027778 1 0.9027778 1 1.416667 1 1.416667 1 1.416667 1 1.944444 1 1.944444 1 1.944444 1 2.472222 1 2.472222 1 2.472222 1 3.222222 1 3.222222 1 3.222222 1 3.527778 1 3.527778 1 3.527778 1 3.569444 1 3.569444 1 3.569444 1 3.722222 1 3.722222 1 3.722222 1 3.930556 1 3.930556 1 3.930556 1 4.138889 1 4.138889 1 4.138889 1 4.319445 1 4.319445 1 4.319445 1 4.402778 1 4.402778 1 4.402778 1 4.444445 1 4.444445 1 4.444445 1 4.597222 1 4.597222 1 4.597222 1 4.805555 1 4.805555 1 4.805555 1 5.013889 1 5.013889 1 5.013889 1 5.194445 1 5.194445 1 5.194445 1 5.277778 1 5.277778 1 5.277778 1 5.430555 1 5.430555 1 5.430555 1 5.500111 1 5.500111 1 5.500111 1 5.527833 1 5.527833 1 5.527833 1 5.708333 1 5.708333 1 5.708333 1 5.958333 1 5.958333 1 5.958333 1 6.069445 1 6.069445 1 6.069445 1 6.111111 1 6.111111 1 6.111111 1 6.430556 1 6.430556 1 6.430556 1 6.916667 1 6.916667 1 6.916667 1 7.111111 1 7.111111 1 7.111111 1 7.152778 1 7.152778 1 7.152778 1 7.277778 1 7.277778 1 7.277778 1 7.361111 1 7.361111 1 7.361111 1 7.402778 1 7.402778 1 7.402778 1 7.444445 1 7.444445 1 7.444445 1 7.486111 1 7.486111 1 7.486111 1 </float_array>
+        <float_array id="Character1_Hips.scale_Character1_Hips_scale-intangent-array" count="258">-0.3333333 1 -0.3333333 1 -0.3333333 1 0.1388888 1 0.1388888 1 0.1388888 1 0.3472222 1 0.3472222 1 0.3472222 1 0.5555556 1 0.5555556 1 0.5555556 1 0.7638889 1 0.7638889 1 0.7638889 1 0.8611111 1 0.8611111 1 0.8611111 1 0.9027778 1 0.9027778 1 0.9027778 1 1.416667 1 1.416667 1 1.416667 1 1.944444 1 1.944444 1 1.944444 1 2.472222 1 2.472222 1 2.472222 1 3.222222 1 3.222222 1 3.222222 1 3.527778 1 3.527778 1 3.527778 1 3.569444 1 3.569444 1 3.569444 1 3.722222 1 3.722222 1 3.722222 1 3.930556 1 3.930556 1 3.930556 1 4.138889 1 4.138889 1 4.138889 1 4.319445 1 4.319445 1 4.319445 1 4.402778 1 4.402778 1 4.402778 1 4.444445 1 4.444445 1 4.444445 1 4.597222 1 4.597222 1 4.597222 1 4.805555 1 4.805555 1 4.805555 1 5.013889 1 5.013889 1 5.013889 1 5.194445 1 5.194445 1 5.194445 1 5.277778 1 5.277778 1 5.277778 1 5.319445 1 5.319445 1 5.319445 1 5.361111 1 5.361111 1 5.361111 1 5.430556 1 5.430556 1 5.430556 1 5.486111 1 5.486111 1 5.486111 1 5.500111 1 5.500111 1 5.500111 1 5.527833 1 5.527833 1 5.527833 1 5.708333 1 5.708333 1 5.708333 1 5.958333 1 5.958333 1 5.958333 1 6.069445 1 6.069445 1 6.069445 1 6.111111 1 6.111111 1 6.111111 1 6.430556 1 6.430556 1 6.430556 1 6.916667 1 6.916667 1 6.916667 1 7.111111 1 7.111111 1 7.111111 1 7.152778 1 7.152778 1 7.152778 1 7.277778 1 7.277778 1 7.277778 1 7.361111 1 7.361111 1 7.361111 1 7.402778 1 7.402778 1 7.402778 1 7.444445 1 7.444445 1 7.444445 1 7.486111 1 7.486111 1 7.486111 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-intangent-array" count="40" stride="6">
+          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-intangent-array" count="43" stride="6">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="X" type="float"/>
@@ -882,9 +883,9 @@
         </technique_common>
       </source>
       <source id="Character1_Hips.scale_Character1_Hips_scale-outtangent" name="Character1_Hips.scale_Character1_Hips_scale-outtangent">
-        <float_array id="Character1_Hips.scale_Character1_Hips_scale-outtangent-array" count="240">0.06944441 1 0.06944441 1 0.06944441 1 0.2777777 1 0.2777777 1 0.2777777 1 0.4861111 1 0.4861111 1 0.4861111 1 0.6944444 1 0.6944444 1 0.6944444 1 0.8472222 1 0.8472222 1 0.8472222 1 0.8888889 1 0.8888889 1 0.8888889 1 1.166667 1 1.166667 1 1.166667 1 1.805555 1 1.805555 1 1.805555 1 2.277778 1 2.277778 1 2.277778 1 2.944444 1 2.944444 1 2.944444 1 3.513889 1 3.513889 1 3.513889 1 3.555556 1 3.555556 1 3.555556 1 3.652778 1 3.652778 1 3.652778 1 3.861111 1 3.861111 1 3.861111 1 4.069445 1 4.069445 1 4.069445 1 4.263889 1 4.263889 1 4.263889 1 4.388889 1 4.388889 1 4.388889 1 4.430555 1 4.430555 1 4.430555 1 4.527778 1 4.527778 1 4.527778 1 4.736111 1 4.736111 1 4.736111 1 4.944445 1 4.944445 1 4.944445 1 5.138889 1 5.138889 1 5.138889 1 5.263889 1 5.263889 1 5.263889 1 5.361111 1 5.361111 1 5.361111 1 5.500056 1 5.500056 1 5.500056 1 5.514 1 5.514 1 5.514 1 5.625 1 5.625 1 5.625 1 5.875 1 5.875 1 5.875 1 6.055555 1 6.055555 1 6.055555 1 6.097222 1 6.097222 1 6.097222 1 6.277778 1 6.277778 1 6.277778 1 6.75 1 6.75 1 6.75 1 7.097222 1 7.097222 1 7.097222 1 7.138889 1 7.138889 1 7.138889 1 7.222222 1 7.222222 1 7.222222 1 7.347222 1 7.347222 1 7.347222 1 7.388889 1 7.388889 1 7.388889 1 7.430555 1 7.430555 1 7.430555 1 7.472222 1 7.472222 1 7.472222 1 7.833333 1 7.833333 1 7.833333 1 </float_array>
+        <float_array id="Character1_Hips.scale_Character1_Hips_scale-outtangent-array" count="258">0.06944441 1 0.06944441 1 0.06944441 1 0.2777777 1 0.2777777 1 0.2777777 1 0.4861111 1 0.4861111 1 0.4861111 1 0.6944444 1 0.6944444 1 0.6944444 1 0.8472222 1 0.8472222 1 0.8472222 1 0.8888889 1 0.8888889 1 0.8888889 1 1.166667 1 1.166667 1 1.166667 1 1.805555 1 1.805555 1 1.805555 1 2.277778 1 2.277778 1 2.277778 1 2.944444 1 2.944444 1 2.944444 1 3.513889 1 3.513889 1 3.513889 1 3.555556 1 3.555556 1 3.555556 1 3.652778 1 3.652778 1 3.652778 1 3.861111 1 3.861111 1 3.861111 1 4.069445 1 4.069445 1 4.069445 1 4.263889 1 4.263889 1 4.263889 1 4.388889 1 4.388889 1 4.388889 1 4.430555 1 4.430555 1 4.430555 1 4.527778 1 4.527778 1 4.527778 1 4.736111 1 4.736111 1 4.736111 1 4.944445 1 4.944445 1 4.944445 1 5.138889 1 5.138889 1 5.138889 1 5.263889 1 5.263889 1 5.263889 1 5.305555 1 5.305555 1 5.305555 1 5.347222 1 5.347222 1 5.347222 1 5.402778 1 5.402778 1 5.402778 1 5.472222 1 5.472222 1 5.472222 1 5.500056 1 5.500056 1 5.500056 1 5.514 1 5.514 1 5.514 1 5.625 1 5.625 1 5.625 1 5.875 1 5.875 1 5.875 1 6.055555 1 6.055555 1 6.055555 1 6.097222 1 6.097222 1 6.097222 1 6.277778 1 6.277778 1 6.277778 1 6.75 1 6.75 1 6.75 1 7.097222 1 7.097222 1 7.097222 1 7.138889 1 7.138889 1 7.138889 1 7.222222 1 7.222222 1 7.222222 1 7.347222 1 7.347222 1 7.347222 1 7.388889 1 7.388889 1 7.388889 1 7.430555 1 7.430555 1 7.430555 1 7.472222 1 7.472222 1 7.472222 1 7.833333 1 7.833333 1 7.833333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-outtangent-array" count="40" stride="6">
+          <accessor source="#Character1_Hips.scale_Character1_Hips_scale-outtangent-array" count="43" stride="6">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
             <param name="X" type="float"/>
@@ -902,6 +903,42 @@
         <input semantic="OUT_TANGENT" source="#Character1_Hips.scale_Character1_Hips_scale-outtangent"/>
       </sampler>
       <channel source="#Character1_Hips.scale_Character1_Hips_scale-sampler" target="Character1_Hips/scale"/>
+    </animation>
+    <animation id="Character1_Hips.visibility_Character1_Hips">
+      <source id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-input" name="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-input">
+        <float_array id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-input-array" count="9">0.625 5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.541666 5.791666 </float_array>
+        <technique_common>
+          <accessor source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-input-array" count="9" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="OpenCOLLADAMaya">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-output" name="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-output">
+        <float_array id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-output-array" count="9">1 1 1 1 1 1 1 1 1 </float_array>
+        <technique_common>
+          <accessor source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-output-array" count="9" stride="1">
+            <param type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-interpolation" name="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-interpolation">
+        <Name_array id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-interpolation-array" count="9">STEP STEP STEP STEP STEP STEP STEP STEP STEP </Name_array>
+        <technique_common>
+          <accessor source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-interpolation-array" count="9" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-sampler">
+        <input semantic="INPUT" source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-input"/>
+        <input semantic="OUTPUT" source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-output"/>
+        <input semantic="INTERPOLATION" source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-interpolation"/>
+      </sampler>
+      <channel source="#Character1_Hips.visibility_Character1_Hips_Character1_Hips.visibility_Character1_Hips-sampler" target="Character1_Hips/visibility"/>
     </animation>
     <animation id="Character1_LeftUpLeg.translate_Character1_LeftUpLeg">
       <source id="Character1_LeftUpLeg.translate_Character1_LeftUpLeg_translate-input" name="Character1_LeftUpLeg.translate_Character1_LeftUpLeg_translate-input">
@@ -1205,9 +1242,9 @@
     </animation>
     <animation id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg">
       <source id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input" name="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input">
-        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -1217,34 +1254,34 @@
         </technique>
       </source>
       <source id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output" name="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output">
-        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation" name="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation">
-        <Name_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent" name="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent">
-        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent" name="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent">
-        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftUpLeg.visibility_Character1_LeftUpLeg_Character1_LeftUpLeg.visibility_Character1_LeftUpLeg-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -1561,9 +1598,9 @@
     </animation>
     <animation id="Character1_LeftLeg.visibility_Character1_LeftLeg">
       <source id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input" name="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input">
-        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -1573,34 +1610,34 @@
         </technique>
       </source>
       <source id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output" name="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output">
-        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation" name="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation">
-        <Name_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent" name="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent">
-        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent" name="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent">
-        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftLeg.visibility_Character1_LeftLeg_Character1_LeftLeg.visibility_Character1_LeftLeg-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -1917,9 +1954,9 @@
     </animation>
     <animation id="Character1_LeftFoot.visibility_Character1_LeftFoot">
       <source id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input" name="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input">
-        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -1929,34 +1966,34 @@
         </technique>
       </source>
       <source id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output" name="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output">
-        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation" name="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation">
-        <Name_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent" name="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent">
-        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent" name="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent">
-        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftFoot.visibility_Character1_LeftFoot_Character1_LeftFoot.visibility_Character1_LeftFoot-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -2273,9 +2310,9 @@
     </animation>
     <animation id="Character1_RightUpLeg.visibility_Character1_RightUpLeg">
       <source id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input" name="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input">
-        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -2285,34 +2322,34 @@
         </technique>
       </source>
       <source id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output" name="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output">
-        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation" name="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation">
-        <Name_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent" name="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent">
-        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent" name="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent">
-        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightUpLeg.visibility_Character1_RightUpLeg_Character1_RightUpLeg.visibility_Character1_RightUpLeg-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -2629,9 +2666,9 @@
     </animation>
     <animation id="Character1_RightLeg.visibility_Character1_RightLeg">
       <source id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input" name="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input">
-        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -2641,34 +2678,34 @@
         </technique>
       </source>
       <source id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output" name="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output">
-        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation" name="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation">
-        <Name_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent" name="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent">
-        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent" name="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent">
-        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightLeg.visibility_Character1_RightLeg_Character1_RightLeg.visibility_Character1_RightLeg-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -2985,9 +3022,9 @@
     </animation>
     <animation id="Character1_RightFoot.visibility_Character1_RightFoot">
       <source id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input" name="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input">
-        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -2997,34 +3034,34 @@
         </technique>
       </source>
       <source id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output" name="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output">
-        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation" name="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation">
-        <Name_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent" name="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent">
-        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent" name="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent">
-        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightFoot.visibility_Character1_RightFoot_Character1_RightFoot.visibility_Character1_RightFoot-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -3341,9 +3378,9 @@
     </animation>
     <animation id="Character1_Spine.visibility_Character1_Spine">
       <source id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input" name="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input">
-        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input-array" count="2" stride="1">
+          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -3353,34 +3390,34 @@
         </technique>
       </source>
       <source id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output" name="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output">
-        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output-array" count="2" stride="1">
+          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation" name="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation">
-        <Name_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent" name="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent">
-        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent" name="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent">
-        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_Spine.visibility_Character1_Spine_Character1_Spine.visibility_Character1_Spine-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -3697,9 +3734,9 @@
     </animation>
     <animation id="Character1_LeftArm.visibility_Character1_LeftArm">
       <source id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input" name="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input">
-        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -3709,34 +3746,34 @@
         </technique>
       </source>
       <source id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output" name="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output">
-        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation" name="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation">
-        <Name_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent" name="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent">
-        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent" name="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent">
-        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftArm.visibility_Character1_LeftArm_Character1_LeftArm.visibility_Character1_LeftArm-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -4053,9 +4090,9 @@
     </animation>
     <animation id="Character1_LeftForeArm.visibility_Character1_LeftForeArm">
       <source id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input" name="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input">
-        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -4065,34 +4102,34 @@
         </technique>
       </source>
       <source id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output" name="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output">
-        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation" name="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation">
-        <Name_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent" name="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent">
-        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent" name="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent">
-        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftForeArm.visibility_Character1_LeftForeArm_Character1_LeftForeArm.visibility_Character1_LeftForeArm-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -4409,9 +4446,9 @@
     </animation>
     <animation id="Character1_LeftHand.visibility_Character1_LeftHand">
       <source id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input" name="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input">
-        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input-array" count="2" stride="1">
+          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -4421,34 +4458,34 @@
         </technique>
       </source>
       <source id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output" name="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output">
-        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output-array" count="2" stride="1">
+          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation" name="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation">
-        <Name_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent" name="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent">
-        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent" name="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent">
-        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_LeftHand.visibility_Character1_LeftHand_Character1_LeftHand.visibility_Character1_LeftHand-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -4765,9 +4802,9 @@
     </animation>
     <animation id="Character1_RightArm.visibility_Character1_RightArm">
       <source id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input" name="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input">
-        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -4777,34 +4814,34 @@
         </technique>
       </source>
       <source id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output" name="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output">
-        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation" name="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation">
-        <Name_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent" name="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent">
-        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent" name="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent">
-        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightArm.visibility_Character1_RightArm_Character1_RightArm.visibility_Character1_RightArm-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -5121,9 +5158,9 @@
     </animation>
     <animation id="Character1_RightForeArm.visibility_Character1_RightForeArm">
       <source id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input" name="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input">
-        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -5133,34 +5170,34 @@
         </technique>
       </source>
       <source id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output" name="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output">
-        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation" name="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation">
-        <Name_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent" name="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent">
-        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent" name="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent">
-        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightForeArm.visibility_Character1_RightForeArm_Character1_RightForeArm.visibility_Character1_RightForeArm-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -5477,9 +5514,9 @@
     </animation>
     <animation id="Character1_RightHand.visibility_Character1_RightHand">
       <source id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input" name="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input">
-        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input-array" count="2" stride="1">
+          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -5489,34 +5526,34 @@
         </technique>
       </source>
       <source id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output" name="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output">
-        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output-array" count="2" stride="1">
+          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation" name="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation">
-        <Name_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent" name="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent">
-        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent" name="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent">
-        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_RightHand.visibility_Character1_RightHand_Character1_RightHand.visibility_Character1_RightHand-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
@@ -5833,9 +5870,9 @@
     </animation>
     <animation id="Character1_Head.visibility_Character1_Head">
       <source id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input" name="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input">
-        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input-array" count="2">5.5 7.166666 </float_array>
+        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input-array" count="10">5.083333 5.25 5.291666 5.333333 5.375 5.458333 5.5 5.541666 5.791666 7.166666 </float_array>
         <technique_common>
-          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input-array" count="2" stride="1">
+          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-input-array" count="10" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
@@ -5845,34 +5882,34 @@
         </technique>
       </source>
       <source id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output" name="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output">
-        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output-array" count="2">1 1 </float_array>
+        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output-array" count="10">1 1 1 1 1 1 1 1 1 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output-array" count="2" stride="1">
+          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-output-array" count="10" stride="1">
             <param type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation" name="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation">
-        <Name_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation-array" count="2">STEP BEZIER </Name_array>
+        <Name_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation-array" count="10">STEP STEP STEP STEP STEP STEP STEP STEP STEP BEZIER </Name_array>
         <technique_common>
-          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation-array" count="2" stride="1">
+          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-interpolation-array" count="10" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent" name="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent">
-        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent-array" count="4">5.4999 1 6.611111 1 </float_array>
+        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent-array" count="20">5.083233 1 5.2499 1 5.291566 1 5.333233 1 5.3749 1 5.458233 1 5.4999 1 5.541566 1 5.791566 1 6.708333 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent-array" count="2" stride="2">
+          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-intangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
       <source id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent" name="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent">
-        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent-array" count="4">5.5001 1 7.5 1 </float_array>
+        <float_array id="Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent-array" count="20">5.083434 1 5.2501 1 5.291767 1 5.333434 1 5.3751 1 5.458434 1 5.5001 1 5.541767 1 5.791767 1 7.5 1 </float_array>
         <technique_common>
-          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent-array" count="2" stride="2">
+          <accessor source="#Character1_Head.visibility_Character1_Head_Character1_Head.visibility_Character1_Head-outtangent-array" count="10" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>

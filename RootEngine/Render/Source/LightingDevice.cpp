@@ -71,7 +71,6 @@ namespace Render
 		auto ambient = m_lightingTech->GetPrograms()[0];
 		auto directional = m_lightingTech->GetPrograms()[1];
 		auto pointlight = m_lightingTech->GetPrograms()[2];
-		auto background = m_lightingTech->GetPrograms()[3];
 
 		p_fullscreenQuad.Bind();
 
@@ -86,10 +85,6 @@ namespace Render
 		// Pointlights.
 		pointlight->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numPointLights);
-
-		// Forward blending.
-		background->Apply();
-		p_fullscreenQuad.Draw();
 
 		p_fullscreenQuad.Unbind();
 

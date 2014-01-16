@@ -4,6 +4,7 @@
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/LightSystem.h>
+#include <RootSystems/Include/Shadowcaster.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
@@ -12,6 +13,7 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/RespawnSystem.h>
+#include <RootSystems/Include/StateSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
@@ -38,8 +40,9 @@ namespace RootForce
 	private:
 		NetworkContext& m_networkContext;
 
-		bool m_displayNormals; // TODO: May not be needed?
-		bool m_displayPhysicsDebug; // TODO: May not be needed?
+		bool m_displayNormals;
+		bool m_displayPhysicsDebug; 
+		bool m_displayWorldDebug;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
 
@@ -58,6 +61,7 @@ namespace RootForce
 		RootForce::MatchStateSystem* m_gameLogicSystem;
 		RootSystems::ActionSystem* m_actionSystem;
 		RootSystems::RespawnSystem* m_respawnSystem;
+		RootSystems::StateSystem* m_stateSystem;
 
 	};
 }

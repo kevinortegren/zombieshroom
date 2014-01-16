@@ -16,7 +16,7 @@ namespace RootForce
 
 		Rectangle GetXZRect( void ) const;
 
-		void DebugDraw(Render::RendererInterface* p_renderer);
+		void DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color) const;
 
 		int m_minX, m_maxX, m_minY, m_maxY, m_minZ, m_maxZ;
 	};

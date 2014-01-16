@@ -9,30 +9,8 @@ namespace RootForce
 	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
 		, m_sharedSystems(p_sharedSystems)
-	{
-		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-        RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-        RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
-        RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
-        RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
-        RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
-        RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
-        RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
-        RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
-        RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
-        RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
-        RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-        RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
-		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
-		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
-		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
-		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
-		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
-		RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
-		RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
-
+	{	
+		ComponentType::Initialize();
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -40,6 +18,7 @@ namespace RootForce
 	void IngameState::Initialize()
 	{
 		//Bind c++ functions and members to Lua
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::logging_f, RootForce::LuaAPI::logging_m, "Logging");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
@@ -151,9 +130,14 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 
 		m_displayPhysicsDebug = false;
-		m_displayNormals = false;		
+		m_displayNormals = false;
+		m_displayWorldDebug = false;
 	}
 
 	void IngameState::Enter()
@@ -261,7 +245,21 @@ namespace RootForce
 			break;
 		}
 #ifdef _DEBUG
-		//Debug drawing TODO: Remove for release
+		
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			if(m_displayWorldDebug)
+			{
+				m_displayWorldDebug = false;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+			else
+			{
+				m_displayWorldDebug = true;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+		}
+
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayPhysicsDebug)
@@ -277,23 +275,37 @@ namespace RootForce
 		}
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-				g_engineContext.m_renderer->DisplayNormals(false);
+		{
+			if(m_displayNormals)
+			{
+				m_displayNormals = false;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+			else
+			{
+				m_displayNormals = true;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+		}
 #endif
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-		
-		m_sharedSystems.m_worldSystem->Process();
+		{
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
+		}
 
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
 		
 		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
-		
+
 		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
@@ -315,6 +327,11 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
 
 		if (m_networkContext.m_server != nullptr)
 		{
@@ -350,8 +367,6 @@ namespace RootForce
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();
 		}
-
-
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

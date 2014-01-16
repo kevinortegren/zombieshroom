@@ -43,10 +43,13 @@ namespace RootEngine
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
+		
+
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
 		{
-			InitFromScene(aiscene, p_fileName);
+			TraverseSceneHierarchy(aiscene, p_fileName);
+
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
@@ -63,13 +66,34 @@ namespace RootEngine
 		return m_model;
 	}
 
+	void ModelImporter::TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_filename )
+	{
+		Traverse(p_scene->mRootNode, p_scene,p_filename);
+	}
+
+	void ModelImporter::Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename )
+	{
+		for(unsigned i = 0; i < p_node->mNumMeshes; ++i)
+		{
+			InitMesh(i, p_scene->mMeshes[i], p_filename);
+
+			memcpy(&m_model->m_transform, &p_node->mTransformation, sizeof(aiMatrix4x4));
+			m_model->m_transform = glm::transpose(m_model->m_transform);
+		}
+
+		for(unsigned i = 0; i < p_node->mNumChildren; ++i)
+		{
+			Traverse(p_node->mChildren[i], p_scene, p_filename);
+		}
+	}
+
 	void ModelImporter::InitFromScene( const aiScene* p_scene, const std::string p_filename )
 	{
 		// Initialize the meshes in the scene one by one
 		for (unsigned int i = 0 ; i < p_scene->mNumMeshes ; i++) 
 		{
 			const aiMesh* paiMesh = p_scene->mMeshes[i];
-			InitMesh(i, paiMesh, p_filename);
+			//InitMesh(i, paiMesh, p_filename);
 		}
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
 

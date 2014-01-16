@@ -4,7 +4,7 @@ namespace Render
 {
 
 	void Camera::Initialize(glm::vec3 p_position, glm::vec3 p_target, glm::vec3 p_up,
-                        float p_fov, float p_near, float p_far, int p_width, int p_height)
+						float p_fov, float p_near, float p_far, int p_width, int p_height)
 	{
 		m_position = p_position;
 		m_target = p_target;

@@ -15,13 +15,14 @@ namespace RootForce
 	{
 	public:
 		WorldSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
+			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_showDebug(false) {}
 
 		void CreateWorld(const std::string& p_worldName);
 		void Process();
-	
+		void ShowDebug(bool p_value);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;
+		bool m_showDebug;
 	};
 }

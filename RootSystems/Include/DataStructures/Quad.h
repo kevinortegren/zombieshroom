@@ -6,9 +6,7 @@
 #include <RootEngine/Render/Include/Mesh.h>
 #include <vector>
 
-#define QUADTREE_NODE_HEIGHT 150
-#define QUADTREE_TRIANGLES_PER_NODE 1000
-
+#define QUADTREE_TRIANGLES_PER_NODE 3000
 #define QUAD_MAX_CHILDS 4
 
 namespace RootForce
@@ -23,6 +21,8 @@ namespace RootForce
 		~QuadNode();
 
 		void AddChild(QuadNode* p_child);
+		
+		const AABB& GetBounds() const;
 
 	private:
 
@@ -41,7 +41,6 @@ namespace RootForce
 	{
 	public:
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
-		void SetTranslation(glm::vec3 p_translation);
 
 		QuadNode* PickRoot(glm::vec2 p_position);
 		void RenderDebug();
@@ -49,18 +48,17 @@ namespace RootForce
 	private:
 		
 		QuadNode* PickNode(QuadNode* p_node, glm::vec2 p_position);
-		void RenderNode(QuadNode* p_node);
-
+		void RenderNode(QuadNode* p_node);	
+		int RoundToPow2(int p_value);
 		void Subdivide( QuadNode* p_node );
 		int CountTriangles( Rectangle p_rect );
 		bool IsTriangleContained( glm::vec3 p_vertices[3], Rectangle p_rect ); 
 
 		RootEngine::GameSharedContext* m_context;
 		ECS::World* m_world;
+		int m_minY, m_maxY;
 
 		QuadNode* m_root;
-		glm::vec3 m_translation;
-
 		std::vector<std::pair<ECS::Entity*, MeshData>> m_globalEntityList;
 	};
 }

@@ -155,6 +155,23 @@ void Logging::LT(std::string p_func, int p_line,const char* p_format, ... )
 }
 
 //////////////////////////////////////////////////////////////////////////
+//SCRIPT LOGGING
+//////////////////////////////////////////////////////////////////////////
+void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)
+{
+	p_luaFunc = GetNameFromPath(p_luaFunc);
+
+	va_list args;
+	va_start (args, p_format);
+	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+	{
+		WriteToConsole(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args, true);
+		WriteToFile(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args);
+	}
+	va_end (args);
+}
+
+//////////////////////////////////////////////////////////////////////////
 //Set verbose level ( defualt is LogLevel::DEBUG_PRINT)
 //////////////////////////////////////////////////////////////////////////
 void Logging::SetVerboseLevel( LogLevel::LogLevel p_vLevel )
@@ -186,9 +203,13 @@ void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, 
 	//fflush(m_commaFile);
 }
 
-void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args )
+void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine )
 {
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  +"\n";
+	std::string output;
+	if (!writeFileLine)
+		output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  +"\n";
+	else
+		output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	switch (p_vLevel)
 	{
@@ -292,4 +313,19 @@ std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
 	return m_stringLevelList.at(p_level);
 }
 
+std::string Logging::GetNameFromPath( std::string p_path )
+{
+	std::string cutPath;
+	std::string::size_type slashIndex, dotIndex;
+
+	// Extract the file name
+	cutPath		= p_path;
+	slashIndex	= cutPath.find_last_of("/")+1;
+	if(slashIndex == 0)
+		slashIndex	= cutPath.find_last_of("\\")+1;
+	cutPath		= cutPath.substr(slashIndex, cutPath.size());
+	dotIndex	= cutPath.find_last_of(".");
+	cutPath		= cutPath.substr(0, dotIndex);
+	return cutPath;
+}
 

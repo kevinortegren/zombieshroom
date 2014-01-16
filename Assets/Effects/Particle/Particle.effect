@@ -13,7 +13,7 @@
         - name: g_Random
           slot: 4
 
-      # The update technqiues should be ignored by the render job processor.
+      # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
 
@@ -42,6 +42,9 @@
           slot: 0
         - name: g_Depth
           slot: 5
+          
+      flags:
+        - name: Forward
           
       programs:
         - name: particle_render
