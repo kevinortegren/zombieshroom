@@ -102,7 +102,7 @@ void CreateMaterial(string textureName, string materialName)
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
 }
 
-ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
@@ -114,7 +114,12 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name)
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
-	p_world->GetGroupManager()->RegisterEntity("Static", entity);
+	for(int i = 0; i < g_maxNrOfFlags; i++)
+	{
+		p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
+	}
+	//p_world->GetGroupManager()->RegisterEntity("Static", entity);
+	//p_world->GetGroupManager()->UnregisterEntity("Static", entity);
 
 	return entity;
 }
@@ -272,7 +277,7 @@ int main(int argc, char* argv[])
 			for(int i = 0; i < numberMeshes; i++)
 			{
 				string name = RM.PmeshList[i]->modelName;
-				Entities.push_back(CreateMeshEntity(&m_world, name));	
+				Entities.push_back(CreateMeshEntity(&m_world, name, i));	
 				cout << "LOADED: " << name  << " TO INDEX " << i << endl;
 
 				RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[i]);
@@ -452,6 +457,9 @@ int main(int argc, char* argv[])
 				/////////////////////// UPDATE MESHES ////////////////////////////////
 				if(MeshIndex != -1)					
 				{
+					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
+					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
 					bool newMaterial = false;
 					int size = Entities.size()-1;
 					if(MeshIndex > size)
@@ -459,17 +467,15 @@ int main(int argc, char* argv[])
 						string name = RM.PmeshList[MeshIndex]->transformation.name;
 						if(name != "")
 						{
-							Entities.push_back(CreateMeshEntity(&m_world, name));
+							Entities.push_back(CreateMeshEntity(&m_world, name, MeshIndex));
 							cout << "Adding " << name << " to index: " << MeshIndex << endl;
 						}
 					}
 					else
 					{
 						cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
-					}
-				
-					RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
-					WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+					}	
+					
 
 					// TRANSFORM AND SCALE
 
@@ -504,6 +510,7 @@ int main(int argc, char* argv[])
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 					m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 
+					//PIVOT
 					RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 					rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
 
@@ -515,7 +522,7 @@ int main(int argc, char* argv[])
 
 					glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 					glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
-
+					
 					glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
 
 					glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);

@@ -183,6 +183,13 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
 		PmeshList[index]->transformation.rotPivot = meshList[index].transformation.rotPivot;
 		PmeshList[index]->transformation.scalePivot = meshList[index].transformation.scalePivot;
+
+		for(int i = 0; i < g_maxNrOfFlags; i++)
+		{
+			memset(PmeshList[index]->transformation.flags[i], NULL, sizeof(PmeshList[index]->transformation.flags[i]));
+			memcpy(PmeshList[index]->transformation.flags[i], meshList[index].transformation.flags[i], g_shortMaxNameLength);
+		}
+		
 	}
 
 	ReleaseMutex(MeshMutexHandle);

@@ -12,7 +12,9 @@ const int g_maxLights = 10;
 
 const int g_maxVerticesPerMesh = 30000;
 const int g_maxNameLength = 30;
+const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 100;
+const int g_maxNrOfFlags = 2;
 const string g_savepath = "C:/Users/BTH/Documents/MASTER/zombieshroom/Assets/";
 const string g_levelName = "myTestLevel";
 
@@ -26,6 +28,8 @@ struct Transform
 	glm::vec3 rotPivot;
 	glm::vec3 scalePivot;
 	glm::mat4x4 transform;
+	char flags[g_maxNrOfFlags][g_shortMaxNameLength];
+	int nrOfFlags;
 };
 
 struct Mesh

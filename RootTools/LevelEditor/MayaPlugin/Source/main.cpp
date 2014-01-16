@@ -53,7 +53,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 {	
 	//SM.InitalizeSharedMemory();
 	sortObjectList();
-	printLists();
+	//printLists();
 	loadScene();
 
 	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -390,24 +390,55 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 }
 
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
+void getFlags(MObject object, int index)
+{
+	if(object.hasFn(MFn::kTransform))
+	{
+		MFnTransform trans = object;
+		Print("Getting flags for: ", SM.meshList[index].modelName);
+
+		for(int i = 0; i < trans.parentCount(); i++)
+		{
+			if(trans.parent(i).hasFn(MFn::kTransform))
+			{
+				MFnTransform temp = trans.parent(i);
+				Print("Found parent: ", temp.name());
+
+				bool alreadyExists = false;
+				string name = temp.name().asChar();
+
+				for(int j = 0; j < g_maxNrOfFlags; j ++)
+				{
+					if(alreadyExists == false)
+					{					
+						if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
+						{
+							alreadyExists = true;
+							Print("Flag exists skipping...");
+						}
+						else
+						{
+							if(SM.meshList[index].transformation.flags[j][0] == NULL)
+							{
+								memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+								Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
+								alreadyExists = true;
+							}
+						}
+					}
+				}
+				getFlags(trans.parent(i), index);
+			}
+		}
+	}
+}
+
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
 	Print("dirtyTransformNodeCB");
 	
 	MStatus status = MS::kSuccess;
 	MFnTransform trans = node;
-
-	float matPos[4][4];
-
-	//trans.transformation().asMatrix().get(matPos);
-	//trans.transformationMatrix().get(matPos);
-	
-
-	for(int j = 0; j < 4; j++)
-	{
-		Print(matPos[j][0], " ", matPos[j][1], " ", matPos[j][2], " ", matPos[j][3]);
-	}
-
 
 	int index = nodeExists(trans.child(0, &status));
 
@@ -427,6 +458,8 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	}
 }
+
+
 
 void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 {// Reagerar precis INNAN man bytt textur!
@@ -887,7 +920,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
 		memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
 		SM.UpdateSharedMaterials(currNrMaterials, meshIndex);
-		Print("Updated material ", materialName.asChar());
+		//Print("Updated material ", materialName.asChar());
 
 		}
 
@@ -1014,7 +1047,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
 			SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
 			SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
-			//Print("PIVOT ",pivot.x, " ", pivot.y, " ", pivot.z);
+
+			getFlags(mesh.parent(0,&status), meshIndex);
 		}
 		}
 	}
