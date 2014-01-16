@@ -78,7 +78,7 @@ namespace RootEngine
 				{
 					std::vector<std::string> varyingsVector;
 					const YAML::Node& varyings = programs[i]["feedback"];
-					for(int k = 0; k < varyings.size(); k++)
+					for(unsigned k = 0; k < varyings.size(); k++)
 					{
 						std::string varying;
 						varyings[k]["name"] >> varying;
