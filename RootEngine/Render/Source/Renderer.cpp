@@ -93,7 +93,7 @@ namespace Render
 			g_context.m_logger->LogText("%s", SDL_GetError());
 		}
 
-		SDL_GL_SetSwapInterval(0);
+		SDL_GL_SetSwapInterval(1);
 
 		int width, height;
 		SDL_GetWindowSize(p_window, &width, &height);

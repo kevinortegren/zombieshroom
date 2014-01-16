@@ -13,8 +13,10 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDial>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -37,6 +39,8 @@ public:
     QFrame *frame;
     QTabWidget *tabWidget;
     QWidget *tab;
+    QDial *dial;
+    QLCDNumber *lcdNumber;
     QWidget *tab_2;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -75,6 +79,12 @@ public:
         tabWidget->setFont(font);
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
+        dial = new QDial(tab);
+        dial->setObjectName(QStringLiteral("dial"));
+        dial->setGeometry(QRect(60, 30, 131, 131));
+        lcdNumber = new QLCDNumber(tab);
+        lcdNumber->setObjectName(QStringLiteral("lcdNumber"));
+        lcdNumber->setGeometry(QRect(40, 200, 141, 81));
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
@@ -104,6 +114,7 @@ public:
         menuHelp->addAction(actionAbout);
 
         retranslateUi(ParticleEditorClass);
+        QObject::connect(dial, SIGNAL(valueChanged(int)), lcdNumber, SLOT(display(int)));
 
         tabWidget->setCurrentIndex(0);
 

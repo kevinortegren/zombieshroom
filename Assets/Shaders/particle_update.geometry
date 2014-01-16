@@ -37,7 +37,7 @@ void main()
 
 	if(vert_type[0] == 0)
 	{
-		if(age > 0.0000001f)
+		if(age > 0.05f)
 		{
 			// Spawn new particles with new start values using the initial values.
 			vert_initialPos1 = gl_in[0].gl_Position.xyz;
