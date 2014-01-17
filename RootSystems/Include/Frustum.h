@@ -2,6 +2,7 @@
 
 #include <RootSystems/Include/Shapes/Plane.h>
 #include <RootSystems/Include/Shapes/AABB.h>
+#include <RootEngine/Render/Include/Renderer.h>
 #include <glm/glm.hpp>
 
 namespace RootForce
@@ -20,11 +21,15 @@ namespace RootForce
 		}
 
 		void RecalculatePlanes();
-		void DrawLines(glm::mat4 p_space);
+		void RecalculatePlanesEx(glm::mat4x4& p_view, glm::mat4x4& p_proj);
+
+		void DrawLines(glm::mat4 p_space, Render::RendererInterface* p_renderer);
 
 		bool CheckBox(const AABB& p_box);
+		bool CheckBoxEx(const AABB& p_box);
 
 		Plane m_planes[6];
+		PlaneEx m_planesEx[6];
 
 		float m_near;
 		float m_far;

@@ -1,5 +1,6 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -18,8 +19,10 @@ namespace RootSystems
 		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
 		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
 		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
+		RootForce::StateComponent* state = m_world->GetEntityManager()->GetComponent<RootForce::StateComponent>(p_entity);
+		RootForce::Animation* animation = m_world->GetEntityManager()->GetComponent<RootForce::Animation>(p_entity);
 
-		if( !transform || !playphys || !collision || !ability || !action || !health )
+		if( !transform || !playphys || !collision || !ability || !action || !health || !animation )
 			return;
 
 		if( health->IsDead )
@@ -50,6 +53,7 @@ namespace RootSystems
 		if(action->Jump)
 		{
 			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+			animation->m_animClip = RootForce::AnimationClip::JUMP_START;
 			action->Jump = false;
 		}
 
@@ -83,6 +87,30 @@ namespace RootSystems
 				break;
 			}
 		}
+
+		if(state->CurrentState == RootForce::EntityState::ASCENDING)
+			animation->m_animClip = RootForce::AnimationClip::ASCEND;
+		else if(state->CurrentState == RootForce::EntityState::DESCENDING)
+			animation->m_animClip = RootForce::AnimationClip::DESCEND;
+		else if(state->CurrentState == RootForce::EntityState::LANDING)
+		{
+			animation->m_animClip = RootForce::AnimationClip::LANDING;
+			state->CurrentState = RootForce::EntityState::GROUNDED;
+		}
+		else
+		{
+			//if(action->StrafePower == 0 && action->MovePower == 0)
+			animation->m_animClip = RootForce::AnimationClip::IDLE;
+			if(action->MovePower == -1)
+				animation->m_animClip = RootForce::AnimationClip::WALKING;
+			else if(action->MovePower == 1)
+				animation->m_animClip = RootForce::AnimationClip::WALKING;
+			if(action->StrafePower == 1)
+				animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+			else if(action->StrafePower == -1)
+				animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+		}
+
 	}
 
 }

@@ -50,6 +50,8 @@ namespace Render
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
 
+		virtual glm::mat4 GetViewMatrix() = 0;
+
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster) = 0;
 		
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
@@ -94,6 +96,9 @@ namespace Render
 
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
+		
+		glm::mat4 GetViewMatrix() { return m_cameraVars.m_view; }
+
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster);
 
 		void Clear();

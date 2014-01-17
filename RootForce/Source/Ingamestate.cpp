@@ -130,6 +130,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -149,7 +153,7 @@ namespace RootForce
 
 		//Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetAbility(1, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -286,13 +290,9 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		{
-			PROFILE("World System", g_engineContext.m_profiler);
-			m_sharedSystems.m_worldSystem->Process();
-		}
-
-		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
 		
@@ -320,6 +320,11 @@ namespace RootForce
             m_collisionSystem->Process();
         }
 
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
+
 		if (m_networkContext.m_server != nullptr)
 		{
 			PROFILE("Server", g_engineContext.m_profiler);
@@ -340,9 +345,15 @@ namespace RootForce
         }
 		
 		{ 
-			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			PROFILE("ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
+
+		{
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
             m_pointLightSystem->Process();

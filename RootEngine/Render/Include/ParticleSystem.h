@@ -91,6 +91,6 @@ namespace Render
 
 		} m_perFrameVars;
 
-		Buffer m_perFrameBuffer;		
+		Buffer m_perFrameBuffer;
 	};
 }

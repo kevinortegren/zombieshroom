@@ -27,6 +27,7 @@ namespace RootEngine
 			// Returns the key state of a specific keyboard key (SDL_SCANCODE_XXX) or mouse button
 			virtual KeyState::KeyState GetKeyState(SDL_Scancode p_key) = 0;
 			virtual KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button) = 0;
+			virtual void LockInput(bool p_lock) = 0;
 
 			// Returns the global and delta mouse position
 			virtual glm::ivec2 GetGlobalMousePos() = 0;

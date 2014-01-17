@@ -21,6 +21,7 @@ namespace RootForce
 		~QuadNode();
 
 		void AddChild(QuadNode* p_child);
+		const std::vector<QuadNode*>& GetChilds();
 		
 		const AABB& GetBounds() const;
 
@@ -44,6 +45,7 @@ namespace RootForce
 
 		QuadNode* PickRoot(glm::vec2 p_position);
 		void RenderDebug();
+		QuadNode* GetRoot() const;
 
 	private:
 		

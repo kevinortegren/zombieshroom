@@ -20,6 +20,7 @@ namespace RootEngine
 
 			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);
+			void LockInput(bool p_lock) { m_lockDownInput = p_lock; } 
 
 			glm::ivec2 GetGlobalMousePos();
 			glm::ivec2 GetDeltaMousePos();
@@ -34,6 +35,7 @@ namespace RootEngine
 			glm::ivec2 m_globMousePos;
 			glm::ivec2 m_deltaMousePos;
 			bool m_lockMouseEnabled;
+			bool m_lockDownInput;
 
 			static InputManager* s_inputSys;
 		};

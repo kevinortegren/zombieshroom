@@ -86,7 +86,7 @@ namespace Render
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
@@ -120,6 +120,11 @@ namespace Render
 		glEnable(GL_DEPTH_TEST);
 		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	
+		GLint test;
+		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &test);
+		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Max Vertex Uniforms %d.", test);
+
 
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallbackARB)

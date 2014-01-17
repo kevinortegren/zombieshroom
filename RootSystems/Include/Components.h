@@ -43,8 +43,9 @@ namespace RootForce
 			TDMRULES, //TODO: name might be inappropriate?
 			PLAYERACTION,
 			PLAYERPHYSICS,
+			ENTITYSTATE,
 			SHADOWCASTER,
-			DIRECTIONALLIGHT
+			DIRECTIONALLIGHT,
 		};
 		
 		inline void Initialize()
@@ -71,9 +72,9 @@ namespace RootForce
 			RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 			RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
 			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
+			RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
 			RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 			RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
-			
 		};
 	}
 

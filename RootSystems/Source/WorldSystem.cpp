@@ -76,7 +76,9 @@ namespace RootForce
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
-		camera->m_frustrum = Frustum(45.0f, 0.1f, 1000.0f, m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight());
+		float apsectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
+
+		camera->m_frustrum = Frustum(45.0f, 0.1f, 1000.0f, apsectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -104,6 +106,37 @@ namespace RootForce
 			if(q != nullptr)
 			{
 				q->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,0,1));
+			}
+		}
+
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+
+		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum;
+		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+		
+		glm::mat4x4 model;
+		model = glm::translate(glm::mat4(1.0f), transform->m_position);
+		model = glm::rotate(model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+
+		frustrum->DrawLines(model, m_engineContext->m_renderer);
+
+		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
+	}
+
+	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
+	{
+		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
+			}
+			else
+			{
+				for(unsigned int i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					CullNode( p_frustrum, p_node->GetChilds().at(i)); 
+				}
 			}
 		}
 	}

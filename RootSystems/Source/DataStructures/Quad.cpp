@@ -26,6 +26,11 @@ namespace RootForce
 		return m_bounds;
 	}
 
+	const std::vector<QuadNode*>& QuadNode::GetChilds()
+	{
+		return m_childs;
+	}
+
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
 		m_globalEntityList.clear();
@@ -328,5 +333,10 @@ namespace RootForce
 		{
 			RenderNode(p_node->m_childs[i]);
 		}
+	}
+
+	QuadNode* QuadTree::GetRoot() const
+	{
+		return m_root;
 	}
 }
