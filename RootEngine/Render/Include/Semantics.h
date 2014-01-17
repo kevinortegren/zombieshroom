@@ -8,16 +8,9 @@ namespace Render
 		{
 			NORMAL,
 			MODEL,
-			BONES
+			BONES,
+			POSITION,
+			AGE
 		};
-	}
-
-	static std::map<Semantic::Semantic, unsigned> s_sizes;
-
-	inline void InitializeSemanticSizes()
-	{
-		s_sizes[Semantic::MODEL] = 64;
-		s_sizes[Semantic::NORMAL] = 64;
-		s_sizes[Semantic::BONES] = 1280;
 	}
 }

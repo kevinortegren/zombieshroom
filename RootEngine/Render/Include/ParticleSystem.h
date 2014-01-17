@@ -13,6 +13,7 @@
 #define RENDER_NUM_PARTCILES 10000
 #define RENDER_NUM_PARTICLESYSTEMS 100
 #define RENDER_NUM_RANDOMVECTORS 1000
+#define RENDER_PARTICLES_UNIFORM_SIZE 1024
 
 namespace Render
 {
@@ -66,6 +67,7 @@ namespace Render
 		ParticleSystemHandler();
 		void Init();
 		ParticleSystem* Create(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc);
+		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void Free(ParticleSystem* p_system);
 		void BeginTransform(float dt);
 		void EndTransform();
@@ -91,6 +93,7 @@ namespace Render
 
 		} m_perFrameVars;
 
-		Buffer m_perFrameBuffer;		
+		Buffer m_perFrameBuffer;
+		Buffer m_perObjectBuffer;
 	};
 }

@@ -9,10 +9,18 @@
       bindings:   
         - name: PerFrame
           slot: 5
+        - name: PerObject
+          slot: 1
       textures:
         - name: g_Random
           slot: 4
-
+      
+      uniforms:
+        - sem: POSITION
+          offset: 0
+        - sem: AGE
+          offset: 12
+      
       # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore

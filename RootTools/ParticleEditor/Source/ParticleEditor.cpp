@@ -125,10 +125,13 @@ void ParticleEditor::MenuCreateEmitter()
 	desc.m_initalVel = glm::vec3(0,0,0);
 	desc.m_size = glm::vec2(0.05f, 0.05f);
 
-	e->m_system = m_context->m_renderer->CreateParticleSystem(desc);	
-	e->m_material = m_context->m_resourceManager->GetMaterial("particle");
-	e->m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	e->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+	RootForce::ParticleSystemStruct particleSystem;
+	particleSystem.m_system = m_context->m_renderer->CreateParticleSystem(desc);	
+	particleSystem.m_material = m_context->m_resourceManager->GetMaterial("particle");
+	particleSystem.m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+	particleSystem.m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+
+	particleSystem.m_params[Render::Semantic::POSITION] = &t->m_position;
 
 	m_emitterEntities.push_back(p);
 	ui.listWidget->addItem(new QListWidgetItem(ui.nameEmitterLineEdit->text()));

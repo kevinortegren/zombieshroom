@@ -53,6 +53,8 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 
 namespace Render
 {
+	std::map<Semantic::Semantic, unsigned> GLRenderer::s_sizes;
+
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
@@ -234,6 +236,14 @@ namespace Render
 		m_lineRenderer.Init(this);
 	}
 
+	void GLRenderer::InitializeSemanticSizes()
+	{
+		s_sizes[Semantic::MODEL] = sizeof(glm::mat4);
+		s_sizes[Semantic::NORMAL] = sizeof(glm::mat4);
+		s_sizes[Semantic::BONES] = 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::POSITION] = 12;
+	}
+
 	void GLRenderer::SetResolution(int p_width, int p_height)
 	{
 		/*SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -275,6 +285,8 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms.GetBufferId());
+
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
@@ -507,6 +519,11 @@ namespace Render
 	ParticleSystem* GLRenderer::CreateParticleSystem(const ParticleSystemDescription& p_desc)
 	{
 		return m_particles.Create(this, p_desc);
+	}
+
+	void GLRenderer::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
+	{
+		m_particles.SetParticleUniforms(p_technique, p_params);
 	}
 
 	void GLRenderer::BeginTransform(float dt)

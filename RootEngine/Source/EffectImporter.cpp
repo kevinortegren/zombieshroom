@@ -152,6 +152,14 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::BONES, offset);
 						}
+						else if(sem == "POSITION")
+						{
+							technique->AddUniformParam(Render::Semantic::POSITION, offset);
+						}
+						else if(sem == "AGE")
+						{
+							technique->AddUniformParam(Render::Semantic::AGE, offset);
+						}
 					}
 				}
 
