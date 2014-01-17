@@ -5,6 +5,7 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/CollisionSystem.h>
+#include <RootSystems/Include/Transform.h>
 
 namespace RootSystems
 {
@@ -21,9 +22,12 @@ namespace RootSystems
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
 	private:
+		RootForce::Transform* GetRandomSpawnpoint();
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
+
+		ECS::GroupManager::GroupRange m_spawnPoints;
 	};
 }
