@@ -114,12 +114,50 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
-	for(int i = 0; i < g_maxNrOfFlags; i++)
+	for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
 	{
 		p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
 	}
 	//p_world->GetGroupManager()->RegisterEntity("Static", entity);
 	//p_world->GetGroupManager()->UnregisterEntity("Static", entity);
+
+	return entity;
+}
+
+ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index)
+{
+	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
+
+	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
+	{
+		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
+	}
+
+	return entity;
+}
+
+ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int index)
+{
+	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
+	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
+	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
+	
+	Render::ParticleSystemDescription desc;
+	desc.m_initalPos = RM.PlocatorList[index]->transformation.position;
+	desc.m_initalVel = glm::vec3(0,0,0);
+	desc.m_size = glm::vec2(0.5f, 0.5f);
+
+	particle->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);
+	particle->m_material = g_engineContext.m_resourceManager->GetMaterial("test");
+	particle->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+	particle->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+
+	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
+	{
+		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
+	}
 
 	return entity;
 }
@@ -156,7 +194,8 @@ int main(int argc, char* argv[])
     RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
     RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-	
+	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+
 	// Setup world.
 	ECS::World m_world;
 
@@ -207,7 +246,7 @@ int main(int argc, char* argv[])
 			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
 			g_running = true;
 
-			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 			Render::DirectionalLight dl;
 			dl.m_direction = glm::vec3(0,-1,0);
@@ -227,9 +266,14 @@ int main(int argc, char* argv[])
 			RootForce::CameraSystem* cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 			m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
 
+			RootForce::ParticleSystem* particleSystem = new RootForce::ParticleSystem(&m_world);
+			m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem, "ParticleSystem");
+
 			std::vector<ECS::Entity*> cameras;
 			std::vector<ECS::Entity*> LightEntities;
 			std::vector<ECS::Entity*> Entities;
+			std::vector<ECS::Entity*> particleEntities;
+			std::vector<ECS::Entity*> spawnPointEntities;
 
 			//Create camera entity
 			cameras.push_back(m_world.GetEntityManager()->CreateEntity());
@@ -271,6 +315,27 @@ int main(int argc, char* argv[])
 			{
 				cout << "Found locator " << i << " " << RM.PlocatorList[i]->transformation.name << endl;
 				cout << "POS X Y Z " << RM.PlocatorList[i]->transformation.position.x << RM.PlocatorList[i]->transformation.position.y << RM.PlocatorList[i]->transformation.position.z << endl;
+
+				for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
+				{
+					string flagName = "Particle";
+					if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
+					{
+						particleEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
+					}
+				}
+
+				for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
+				{
+					string flagName = "SpawnPoint";
+					string flagName2 = RM.PlocatorList[i]->transformation.flags[j];
+
+					if(flagName == flagName2)
+					{
+						spawnPointEntities.push_back(CreateTransformEntity(&m_world, i));
+					}
+				}
+				
 			}
 
 			ReleaseMutex(RM.LocatorMutexHandle);
@@ -411,12 +476,16 @@ int main(int argc, char* argv[])
 				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 				old = now;
 
+				m_world.SetDelta(dt);
+
 				// GET MESH CHANGE AND REMOVE INDEX
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				int MeshIndex = RM.MeshIdChange->x;
 				int RemoveMeshIndex = RM.MeshIdChange->y;
 				int RemoveLightIndex = RM.LightIdChange->y;
+				int locatorIdChange = RM.LocatorIdChange->x;
+				RM.LocatorIdChange->x = -1;
 				entityExport = *RM.export;
 				
 				*RM.MeshIdChange = glm::vec2(-1, -1);
@@ -438,16 +507,6 @@ int main(int argc, char* argv[])
 						//CreateMaterial(shortPath, materialName);
 						mesh->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
-						//if(shortPath == "NONE")
-						//{
-						//	mesh->m_material = *defaultMaterial;
-						//}
-						//else
-						//{
-						//	mesh->m_material.m_diffuseMap = g_engineContext.m_resourceManager->GetTexture(shortPath);
-						//	mesh->m_material.m_effect = g_engineContext.m_resourceManager->GetEffect("Mesh"); 
-						//}
-
 						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 						string name = RM.PmeshList[i]->modelName;
@@ -467,6 +526,11 @@ int main(int argc, char* argv[])
 					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 					*RM.export = 0;
 					ReleaseMutex(RM.IdMutexHandle);
+				}
+				/////////////////////// UPDATE LOCATORS //////////////////////////////
+				if(locatorIdChange != -1)
+				{
+					cout << RM.PlocatorList[locatorIdChange]->transformation.name << " updated!" << endl;
 				}
 
 				/////////////////////// UPDATE MESHES ////////////////////////////////
@@ -632,6 +696,7 @@ int main(int argc, char* argv[])
 				g_engineContext.m_renderer->Clear();
 				cameraSystem->Process();
 				pointLightSystem->Process();
+				particleSystem->Process();
 				renderingSystem->Process();
 				g_engineContext.m_renderer->Render();
 

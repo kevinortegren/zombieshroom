@@ -228,10 +228,11 @@ void sortObjectList()
 		{
 			g_mayaLocatorList[currNrLocators] = g_objectList[i];
 			currNrLocators++;
-
 			MayaLocatorToList(g_objectList[i]);
 
-			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_objectList[i], dirtyTransformNodeCB, nullptr, &status);
+			MFnDagNode locator = g_objectList[i];
+
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(locator.parent(0), dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 		}
 	}
@@ -383,7 +384,7 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 }
 
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
-void getFlags(MObject object, int index)
+void getMeshFlags(MObject object, int index)
 {
 	if(object.hasFn(MFn::kTransform))
 	{
@@ -415,12 +416,57 @@ void getFlags(MObject object, int index)
 							{
 								memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
 								Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
+								SM.meshList[index].transformation.nrOfFlags ++;
 								alreadyExists = true;
 							}
 						}
 					}
 				}
-				getFlags(trans.parent(i), index);
+				getMeshFlags(trans.parent(i), index);
+			}
+		}
+	}
+}
+
+void getLocatorFlags(MObject object, int index)
+{
+	if(object.hasFn(MFn::kTransform))
+	{
+		MFnTransform trans = object;
+		Print("Getting flags for: ", SM.locatorList[index].transformation.name);
+
+		for(int i = 0; i < trans.parentCount(); i++)
+		{
+			if(trans.parent(i).hasFn(MFn::kTransform))
+			{
+				MFnTransform temp = trans.parent(i);
+				Print("Found parent: ", temp.name());
+
+				bool alreadyExists = false;
+				string name = temp.name().asChar();
+
+				for(int j = 0; j < g_maxNrOfFlags; j ++)
+				{
+					if(alreadyExists == false)
+					{					
+						if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
+						{
+							alreadyExists = true;
+							Print("Flag exists skipping...");
+						}
+						else
+						{
+							if(SM.locatorList[index].transformation.flags[j][0] == NULL)
+							{
+								memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+								Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
+								SM.locatorList[index].transformation.nrOfFlags ++;
+								alreadyExists = true;
+							}
+						}
+					}
+				}
+				getLocatorFlags(trans.parent(i), index);
 			}
 		}
 	}
@@ -451,9 +497,10 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	}
 
-	if(node.hasFn(MFn::kLocator))
-	{
-		MayaLocatorToList(node);
+	if(trans.child(0, &status).hasFn(MFn::kLocator))
+	{		
+		Print("U moved a locator! Index ", nodeExists(trans.child(0)));
+		MayaLocatorToList(trans.child(0));
 	}
 }
 
@@ -506,7 +553,9 @@ void NodeAddedCB(MObject &node, void *clientData)
 		g_mayaLocatorList[currNrLocators] = node;
 		MayaLocatorToList(node);
 
-		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyTransformNodeCB, nullptr, &status);
+		MFnDagNode locator = node;
+
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(locator.parent(0), dirtyTransformNodeCB, nullptr, &status);
 		AddCallbackID(status, id);
 	}
 	//printLists();
@@ -591,44 +640,6 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 	if (Status(__LINE__, status1) && Status(__LINE__, status2))
 	{
 		checkForNewMeshes(made, source, destination);
-		//Print("Updating all materials");
-		//for(int i = 0; i < currNrMeshes; i++)
-		//{
-		//	for(int j = 0; j < currNrMaterials; j++)
-		//	{
-		//		SM.UpdateSharedMaterials(currNrMaterials, j, i);
-		//	}
-		//}
-
-		//if (source.hasFn(MFn::kMesh))
-		//{
-		//	MFnMesh mesh = source;
-		//	Print("Updating material in ", mesh.fullPathName());
-		//	int updateID = nodeExists(source);
-		//	SM.UpdateSharedMesh(updateID, false, false, currNrMeshes);
-		//	SM.UpdateSharedMaterials(currNrMaterials, SM.meshList[updateID].MaterialID, updateID);
-		//}
-
-		//if(source.hasFn(MFn::kFileTexture))
-		//{
-		//	//string* materialName = new string();
-		//	string materialName = "";
-		//	if(destination.hasFn(MFn::kLambert))
-		//	{
-		//		MFnLambertShader Lambert = destination;
-		//		//*materialName = Lambert.name().asChar();
-		//		materialName = Lambert.name().asChar();
-		//	}
-
-		//	if(materialName != "")
-		//	{
-		//		MStatus status;
-		//		Print("Adding CB to ", materialName.c_str());
-		//		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(destination, dirtyMaterialCB, nullptr, &status);
-		//		AddCallbackID(status, id);
-		//	}
-
-		//}
 
 		if(source.hasFn(MFn::kMesh) && destination.hasFn(MFn::kShadingEngine))
 		{
@@ -860,9 +871,9 @@ MString cleanFullPathName(const char * str)
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
 void MayaLocatorToList(MObject object)
 {
-	int index = nodeExists(object);
-
 	MFnDagNode locator = object;
+	int index = nodeExists(object);
+	Print("LOCATOR INDEX: ", nodeExists(object));
 
 	if(index != -1 && locator.parent(0).hasFn(MFn::kTransform))
 	{
@@ -893,6 +904,8 @@ void MayaLocatorToList(MObject object)
 		SM.locatorList[index].transformation.rotation.y = rotY;
 		SM.locatorList[index].transformation.rotation.z = rotZ;
 		SM.locatorList[index].transformation.rotation.w = rotW;
+
+		getLocatorFlags(locator.parent(0), index);
 
 		SM.UpdateSharedLocator(index, currNrLocators);
 	}
@@ -1112,7 +1125,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
 			SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
 
-			getFlags(mesh.parent(0,&status), meshIndex);
+			getMeshFlags(mesh.parent(0,&status), meshIndex);
 		}
 		}
 	}

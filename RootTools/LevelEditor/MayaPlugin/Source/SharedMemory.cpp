@@ -200,6 +200,7 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
 		PmeshList[index]->transformation.rotPivot = meshList[index].transformation.rotPivot;
 		PmeshList[index]->transformation.scalePivot = meshList[index].transformation.scalePivot;
+		PmeshList[index]->transformation.nrOfFlags = meshList[index].transformation.nrOfFlags;
 
 		for(int i = 0; i < g_maxNrOfFlags; i++)
 		{
@@ -227,6 +228,13 @@ void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
 	PlocatorList[index]->transformation.position = locatorList[index].transformation.position;
 	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
 	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
+	PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
+
+	for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
+	{
+		memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
+		memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
+	}
 
 	ReleaseMutex(LocatorMutexHandle);
 }
