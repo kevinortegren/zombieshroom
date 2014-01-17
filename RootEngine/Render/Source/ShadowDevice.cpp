@@ -1,12 +1,14 @@
 #include <RootEngine/Render/Include/ShadowDevice.h>
 
 #include <RootEngine/Render/Include/RenderExtern.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace Render
 {
 	ShadowDevice::ShadowDevice()
 	{
 		m_depthTexture = nullptr;
+		m_numberOfShadowcasters = 0;
 	}
 
 	ShadowDevice::~ShadowDevice()
@@ -49,5 +51,22 @@ namespace Render
 		glDrawBuffer(GL_BACK);
 		glReadBuffer(GL_BACK);
 
+		//auto effect = g_context.m_resourceManager->LoadEffect("Shadow");
+		//m_technique = effect->GetTechniques()[0];
 	}
+
+	void ShadowDevice::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster, int p_index)
+	{
+		if(p_index > RENDER_MAX_SHADOWCASTERS)
+			return;
+
+		m_shadowcasters[p_index] = p_shadowcaster;
+		m_numberOfShadowcasters++;
+	}
+
+	void ShadowDevice::Process()
+	{
+
+	}
+
 }

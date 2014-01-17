@@ -4,8 +4,8 @@
 #include <RootEngine\Render\Include\Effect.h>
 #include <RootEngine\Render\Include\Light.h>
 
-#define RENDER_MAX_DIRECTIONALLIGHTS 16
-#define RENDER_MAX_POINTLIGHTS 16
+#define RENDER_MAX_DIRECTIONALLIGHTS 5
+#define RENDER_MAX_POINTLIGHTS 1000
 
 namespace Render
 {

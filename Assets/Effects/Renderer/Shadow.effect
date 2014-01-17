@@ -1,0 +1,11 @@
+- name: Shadow
+  techniques:
+    - name: ShadowGenerate
+      programs:
+        - name: output
+          shaders:
+            - name: shadow
+              type: vertex
+          depth:
+            write: 1
+            test: 1

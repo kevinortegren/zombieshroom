@@ -17,6 +17,13 @@ namespace RootForce
 			m_aspectRatio = p_aspectRatio;
 			RecalculatePlanes();
 		}
+		Frustum(){
+			m_fov = 0;
+			m_near = 0;
+			m_far = 0;
+			m_aspectRatio = 1;
+			//RecalculatePlanes();
+		}
 		~Frustum(){}
 
 		void RecalculatePlanes();

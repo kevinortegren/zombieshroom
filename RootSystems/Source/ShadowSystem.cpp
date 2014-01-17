@@ -18,7 +18,12 @@ namespace RootForce
 		Transform* transform = m_transforms.Get(p_entity);
 		Shadowcaster* shadowcaster = m_shadowcasters.Get(p_entity);
 
-		
+		Render::Shadowcaster sc;
+		//sc.m_projectionMatrix = glm::perspectiveFov(shadowcaster->m_frustum.)
+
+		//g_engineContext.m_renderer->AddShadowcaster(sc, m_shadowcasterCount);
+
+		//m_shadowcasterCount++;
 	}
 
 	void ShadowSystem::End()
