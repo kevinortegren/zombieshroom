@@ -117,15 +117,19 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::Transform* tempcomp = new AbilityComponents::Transform();
 				if(p_node.FindValue("Rotation"))
 				{
-					p_node["Rotation"][0] >> tempcomp->m_rotation.x;
-					p_node["Rotation"][1] >> tempcomp->m_rotation.y;
-					p_node["Rotation"][2] >> tempcomp->m_rotation.z;
+					float x,y,z;
+					p_node["Rotation"][0] >> x;
+					p_node["Rotation"][1] >> y;
+					p_node["Rotation"][2] >> z;
+					tempcomp->m_rotation = QVector3D(x,y,z);
 				}
 				if(p_node.FindValue("scale"))
 				{
-					p_node["scale"][0] >> tempcomp->m_scale.x;
-					p_node["scale"][1] >> tempcomp->m_scale.y;
-					p_node["scale"][2] >> tempcomp->m_scale.z;
+					float x,y,z;
+					p_node["Rotation"][0] >> x;
+					p_node["Rotation"][1] >> y;
+					p_node["Rotation"][2] >> z;
+					tempcomp->m_scale = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

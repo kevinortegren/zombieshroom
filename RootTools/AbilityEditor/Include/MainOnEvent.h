@@ -1,9 +1,6 @@
 #pragma once
 #include "AbilityComponents.h"
-#include <QtPropertyBrowser/QtTreePropertyBrowser>
-#include <QtPropertyBrowser/QtVariantProperty>
-#include <QtPropertyBrowser/QtVariantPropertyManager>
-#include <QtPropertyBrowser/QtVariantEditorFactory>
+
 namespace AbilityEditorNameSpace
 {
 	class  MainOnEvent

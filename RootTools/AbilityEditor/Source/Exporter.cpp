@@ -121,8 +121,8 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::TRANSFORM:
 				{
 					AbilityComponents::Transform* transform = static_cast<AbilityComponents::Transform*>(p_component);
-					glm::vec3 rotation = transform->m_rotation;
-					glm::vec3 scale = transform->m_scale;
+					glm::vec3 rotation = glm::vec3(transform->m_rotation.x(), transform->m_rotation.y(), transform->m_rotation.z());
+					glm::vec3 scale = glm::vec3(transform->m_scale.x(), transform->m_scale.y(), transform->m_scale.z());
 					p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
 					

@@ -64,32 +64,20 @@ namespace AbilityEditorNameSpace
 
 	void MainOnEvent::ViewEntityData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows )
 	{
-		//QtVariantPropertyManager* hej;
-		//hej = new QtVariantPropertyManager;
+
 		QString name = m_entities.at(p_id)->m_name;
 		QtVariantProperty* prop;
 		prop = m_propManager->addProperty(QVariant::String, "Name" );
 		m_propManager->setValue(prop, name);
 		p_propBrows->setFactoryForManager(m_propManager, m_propFactory);
 		p_propBrows->addProperty(prop);
-		//QString temp = p_item->text(p_item->columnCount()-1);
-		//QtVariantProperty* prop, *prop1;
-		//prop = hej->addProperty(QVariant::String, "fafaf");
-		//prop1 = hej->addProperty(QVariant::String, "test");
 
-		////prop->setPropertyName("test");
-		//hej->setValue(prop, temp);
-		//hej->setValue(prop1, temp);
-		//QtVariantEditorFactory* propFact;
-		//propFact = new QtVariantEditorFactory;
-		//m_propBrows->setFactoryForManager(hej, propFact);
-		//m_propBrows->addProperty(prop);
-		//m_propBrows->addProperty(prop1);
 		
 	}
 
 	void MainOnEvent::ViewComponentData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name )
 	{
+		m_entities.at(p_id)->ViewComponentData(m_propManager,p_propBrows, m_propFactory , p_name);
 
 	}
 
@@ -102,7 +90,7 @@ namespace AbilityEditorNameSpace
 
 	void MainOnEvent::EditComponentData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name )
 	{
-
+		m_entities.at(p_id)->SaveComponentData(m_propManager,p_propBrows, m_propFactory , p_name);
 	}
 
 }

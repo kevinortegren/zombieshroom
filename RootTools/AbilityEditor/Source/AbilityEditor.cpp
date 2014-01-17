@@ -86,12 +86,13 @@ void AbilityEditor::Init()
 	m_propBrows = new QtTreePropertyBrowser;
 	m_mainLayout = new QGridLayout();
 	m_LastSelectedItem = nullptr;
-
 	/*QPen pen(QColor("blue"));
 	m_pixmap = new QPixmap(QSize(100, 20));
 	m_painter = new QPainter(m_pixmap);
 	m_painter->setPen(pen);*/
-
+	//AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
+#pragma warning (OY! Fixa så att saker faktikst laddas grafikst också när mna importar nåt)
+//	importer->Import("test.ability", m_onCreate, m_onCollide, m_onDestroy);
 }
 
 void AbilityEditor::ChangedTab()

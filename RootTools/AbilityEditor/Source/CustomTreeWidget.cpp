@@ -93,7 +93,7 @@ void CustomTreeWidget::ViewSelectedData( QTreeWidgetItem* p_item, QtTreeProperty
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
-	
+		m_onEvent->ViewComponentData(this->indexOfTopLevelItem(p_item->parent()),p_propBrows, p_item->text(0));
 	}
 }
 
@@ -105,6 +105,6 @@ void CustomTreeWidget::SaveSelectedData( QTreeWidgetItem* p_item, QtTreeProperty
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
-
+		m_onEvent->EditComponentData(this->indexOfTopLevelItem(p_item->parent()),p_propBrows ,p_item->text(0));
 	}
 }
