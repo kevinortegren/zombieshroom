@@ -44,6 +44,199 @@ std::vector<ECS::Entity*> Entities;
 std::vector<ECS::Entity*> particleEntities;
 std::vector<ECS::Entity*> spawnPointEntities;
 
+void HandleEvents();
+std::string GetNameFromPath( std::string p_path );
+void Initialize(RootEngine::GameSharedContext g_engineContext);
+
+void CreateMaterial(string textureName, string materialName);
+ECS::Entity* CreateLightEntity(ECS::World* p_world);
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
+ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
+ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int index);
+void CreateCameraEntity();
+
+void UpdateCamera();
+void LoadLocators();
+void UpdateMesh(int index, bool getIndexFromMaya);
+void UpdateLight(int index, bool getIndexFromMaya);
+
+void ExportToLevel();
+
+int main(int argc, char* argv[]) 
+{
+	std::string path(argv[0]);
+	std::string rootforcename = "Level3DViewer.exe";
+	path = path.substr(0, path.size() - rootforcename.size());
+	try 
+	{
+		if (argc > 1 && strcmp(argv[1], "-test") == 0)
+		{
+			//testing::InitGoogleTest(&argc, argv);
+
+			//int result = RUN_ALL_TESTS();
+			std::cin.get();
+			//return result;
+		}
+		else
+		{
+			g_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+
+			INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(g_engineModule, "InitializeEngine");
+
+			g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, path);
+
+			if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
+			{
+				// TODO: Log error and throw exception (?)
+			}
+
+			// TODO: Make these parameters more configurable.
+			g_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
+					"Root Force",
+					SDL_WINDOWPOS_UNDEFINED,
+					SDL_WINDOWPOS_UNDEFINED,
+					1280,
+					720,
+					SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
+				SDL_DestroyWindow);
+			if (g_window == nullptr) 
+			{
+				// TODO: Log error and throw exception (?)
+			}
+
+			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
+			g_running = true;
+
+			Initialize(g_engineContext);
+
+			//LOAD
+			CreateCameraEntity();			
+			LoadLocators();
+
+
+			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+			int renderNrOfMaterials = *RM.NumberOfMaterials;
+
+			for(int i = 0; i < renderNrOfMaterials; i++)
+			{
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName));
+			}
+
+			ReleaseMutex(RM.MeshMutexHandle);
+
+			// Set to update all materials
+			//renderNrOfMaterials = -1;
+
+			/////////////////////// LOAD MESHES ////////////////////////////////
+
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+			numberMeshes = *RM.NumberOfMeshes;
+			*RM.MeshIdChange = glm::vec2(-1, -1);
+
+			ReleaseMutex(RM.IdMutexHandle);
+
+			for(int i = 0; i < numberMeshes; i++)
+			{				
+				string name = RM.PmeshList[i]->modelName;
+				Entities.push_back(CreateMeshEntity(&m_world, name, i));
+				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
+				auto mesh = model->m_meshes[0];
+				auto buffer = g_engineContext.m_renderer->CreateBuffer();
+				mesh->SetVertexBuffer(buffer);
+
+				UpdateMesh(i, false);
+			}			
+
+			///////////////////////// Load Lights ////////////////////////////////
+
+			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+			numberLights = *RM.NumberOfLights;
+			*RM.LightIdChange = glm::vec2(-1,-1);
+			ReleaseMutex(RM.IdMutexHandle);
+
+			for(int i = 0; i < numberLights; i++)
+			{
+				LightEntities.push_back(CreateLightEntity(&m_world));
+
+				UpdateLight(i, false);
+			}
+
+			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			uint64_t old = SDL_GetPerformanceCounter();
+			while (g_running)
+			{
+				uint64_t now = SDL_GetPerformanceCounter();
+				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
+				old = now;
+
+				m_world.SetDelta(dt);
+
+				// GET LOCATOR ID CHANGE AND EXPORT STATE
+				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				int locatorIdChange = RM.LocatorIdChange->x;
+				RM.LocatorIdChange->x = -1;
+				entityExport = *RM.export;
+				
+				ReleaseMutex(RM.IdMutexHandle);
+
+				/////////////  EXPORT   ///////////////////////
+				if(entityExport == 2)
+				{			
+					ExportToLevel();
+				}
+				/////////////////////// UPDATE LOCATORS //////////////////////////////
+				if(locatorIdChange != -1)
+				{
+					cout << RM.PlocatorList[locatorIdChange]->transformation.name << " updated!" << endl;
+				}
+
+				//UPDATE
+				UpdateMesh(-1, true);
+				UpdateLight(-1, true);								
+				UpdateCamera();
+
+				HandleEvents();
+				g_engineContext.m_renderer->Clear();
+				cameraSystem->Process();
+				pointLightSystem->Process();
+				particleSystem->Process();
+				renderingSystem->Process();
+				g_engineContext.m_renderer->Render();
+
+				g_engineContext.m_renderer->Swap();
+			}
+
+		}
+	} 
+	catch (std::exception& e) 
+	{
+		// TODO: Log exception message
+		std::cout << e.what() << "\n";
+		std::cin.get();
+		return 1;
+	} 
+	catch (...) 
+	{
+		// TODO: Log unknown exception message
+		std::cin.get();
+		return 1;
+	}
+	
+	SDL_Quit();
+	DynamicLoader::FreeSharedLibrary(g_engineModule);
+
+	return 0;
+}
+
+/////////////////////////////////////////////////////////// FUNCTION DEFINITIONS ////////////////////////////////////////////
+
 void HandleEvents()
 {
 	SDL_Event event;
@@ -70,7 +263,7 @@ void HandleEvents()
 				}
 			}
 			break;
-		//default:
+			//default:
 			//if (m_engineContext.m_inputSys != nullptr)
 			//	m_engineContext.m_inputSys->HandleInput(event);
 			//if (m_engineContext.m_gui != nullptr)
@@ -79,12 +272,56 @@ void HandleEvents()
 	}
 }
 
+void Initialize(RootEngine::GameSharedContext g_engineContext)
+{
+	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+
+	*RM.export = 0;
+	entityExport = 0;
+
+	ReleaseMutex(RM.IdMutexHandle);
+
+	// Enable components to use.
+	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
+	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
+	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+	m_world.GetEntityExporter()->SetExporter(Exporter);
+	RM.InitalizeSharedMemory();
+
+	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	Render::DirectionalLight dl;
+	dl.m_direction = glm::vec3(0,-1,0);
+	dl.m_color = glm::vec4(0,0,1,1);
+
+	//g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
+
+	// Initialize systems.
+	renderingSystem = new RootForce::RenderingSystem(&m_world);
+	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
+
+	pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+
+	cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
+	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+
+	particleSystem = new RootForce::ParticleSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem, "ParticleSystem");
+}
+
 ECS::Entity* CreateLightEntity(ECS::World* p_world)	
 {
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
-	
+
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
 
 	RootForce::PointLight* pl = p_world->GetEntityManager()->CreateComponent<RootForce::PointLight>(lightEntity);
@@ -168,7 +405,7 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
-	
+
 	Render::ParticleSystemDescription desc;
 	desc.m_initalPos = RM.PlocatorList[index]->transformation.position;
 	desc.m_initalVel = glm::vec3(0,0,0);
@@ -187,6 +424,18 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	return entity;
 }
 
+void CreateCameraEntity()
+{
+	//Create camera entity
+	cameras.push_back(m_world.GetEntityManager()->CreateEntity());
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
+	m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
+
+	UpdateCamera();
+}
+
 std::string GetNameFromPath( std::string p_path )
 {
 	std::string cutPath;
@@ -203,49 +452,7 @@ std::string GetNameFromPath( std::string p_path )
 	return cutPath;
 } 
 
-void Initialize(RootEngine::GameSharedContext g_engineContext)
-{
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 
-	*RM.export = 0;
-	entityExport = 0;
-
-	ReleaseMutex(RM.IdMutexHandle);
-
-	// Enable components to use.
-	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
-	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
-	m_world.GetEntityExporter()->SetExporter(Exporter);
-	RM.InitalizeSharedMemory();
-
-	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight dl;
-	dl.m_direction = glm::vec3(0,-1,0);
-	dl.m_color = glm::vec4(0,0,1,1);
-
-	//g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
-
-	// Initialize systems.
-	renderingSystem = new RootForce::RenderingSystem(&m_world);
-	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
-	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
-	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
-
-	pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
-	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
-
-	cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
-	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
-
-	particleSystem = new RootForce::ParticleSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem, "ParticleSystem");
-}
 
 void UpdateCamera()
 {
@@ -260,43 +467,29 @@ void UpdateCamera()
 
 	//if(cameraIDchange != -1)
 	//{
-		RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-		WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+	WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
 
-		glm::quat rotation;
-		rotation.x = RM.PcameraList[0]->transformation.rotation.x;
-		rotation.y = RM.PcameraList[0]->transformation.rotation.y;
-		rotation.z = RM.PcameraList[0]->transformation.rotation.z;
-		rotation.w = RM.PcameraList[0]->transformation.rotation.w;
+	glm::quat rotation;
+	rotation.x = RM.PcameraList[0]->transformation.rotation.x;
+	rotation.y = RM.PcameraList[0]->transformation.rotation.y;
+	rotation.z = RM.PcameraList[0]->transformation.rotation.z;
+	rotation.w = RM.PcameraList[0]->transformation.rotation.w;
 
-		cameraTransform->m_position.x = RM.PcameraList[0]->transformation.position.x;
-		cameraTransform->m_position.y = RM.PcameraList[0]->transformation.position.y;
-		cameraTransform->m_position.z = RM.PcameraList[0]->transformation.position.z;
-		cameraTransform->m_orientation.SetOrientation(rotation);
-		//Rotate 180 to fix camera
-		cameraTransform->m_orientation.Yaw(180);
+	cameraTransform->m_position.x = RM.PcameraList[0]->transformation.position.x;
+	cameraTransform->m_position.y = RM.PcameraList[0]->transformation.position.y;
+	cameraTransform->m_position.z = RM.PcameraList[0]->transformation.position.z;
+	cameraTransform->m_orientation.SetOrientation(rotation);
+	//Rotate 180 to fix camera
+	cameraTransform->m_orientation.Yaw(180);
 
-		camera->m_far = RM.PcameraList[0]->farClippingPlane;					
-		camera->m_near = RM.PcameraList[0]->nearClippingPlane;
-		camera->m_fov = glm::degrees(RM.PcameraList[0]->verticalFieldOfView);
+	camera->m_far = RM.PcameraList[0]->farClippingPlane;					
+	camera->m_near = RM.PcameraList[0]->nearClippingPlane;
+	camera->m_fov = glm::degrees(RM.PcameraList[0]->verticalFieldOfView);
 
-		ReleaseMutex(RM.CameraMutexHandle);
+	ReleaseMutex(RM.CameraMutexHandle);
 	//}
 }
-
-void CreateCameraEntity()
-{
-	//Create camera entity
-	cameras.push_back(m_world.GetEntityManager()->CreateEntity());
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
-	m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
-
-	UpdateCamera();
-}
-
-
 
 void LoadLocators()
 {
@@ -334,7 +527,7 @@ void LoadLocators()
 	ReleaseMutex(RM.LocatorMutexHandle);
 }
 
-void UpdateMeshes(int index, bool getIndexFromMaya)
+void UpdateMesh(int index, bool getIndexFromMaya)
 {
 	int MeshIndex = index;
 	int RemoveMeshIndex = -1;
@@ -486,220 +679,32 @@ void UpdateLight(int index, bool getIndexFromMaya)
 	}
 }
 
-int main(int argc, char* argv[]) 
+void ExportToLevel()
 {
-	std::string path(argv[0]);
-	std::string rootforcename = "Level3DViewer.exe";
-	path = path.substr(0, path.size() - rootforcename.size());
-	try 
+	for(int i = 0; i < Entities.size()-1; i++)
 	{
-		if (argc > 1 && strcmp(argv[1], "-test") == 0)
-		{
-			//testing::InitGoogleTest(&argc, argv);
+		//UPDATE modelName for all Entities from shared memory
 
-			//int result = RUN_ALL_TESTS();
-			std::cin.get();
-			//return result;
-		}
-		else
-		{
-			g_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
+		string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
+		mesh->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
-			INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(g_engineModule, "InitializeEngine");
+		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		string name = RM.PmeshList[i]->modelName;
+		ReleaseMutex(RM.MeshMutexHandle);
 
-			g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, path);
+		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
+		collision->m_meshHandle = name + "0";
 
-			if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
-			{
-				// TODO: Log error and throw exception (?)
-			}
-
-			// TODO: Make these parameters more configurable.
-			g_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
-					"Root Force",
-					SDL_WINDOWPOS_UNDEFINED,
-					SDL_WINDOWPOS_UNDEFINED,
-					1280,
-					720,
-					SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
-				SDL_DestroyWindow);
-			if (g_window == nullptr) 
-			{
-				// TODO: Log error and throw exception (?)
-			}
-
-			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
-			g_running = true;
-
-			Initialize(g_engineContext);
-
-			/////////////////////// LOAD SCENE ////////////////////////////////	
-			//////////////////////// LOAD CAMERA  /////////////////////////////////////////
-			CreateCameraEntity();			
-
-			/////////////////////// LOAD LOCATORS /////////////////////////////////
-
-			LoadLocators();
-
-			/////////////////////// LOAD MATERIALS ////////////////////////////////
-
-			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-			int renderNrOfMaterials = *RM.NumberOfMaterials;
-
-			for(int i = 0; i < renderNrOfMaterials; i++)
-			{
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName));
-			}
-			// Set to update all materials
-			//renderNrOfMaterials = -1;
-
-			/////////////////////// LOAD MESHES ////////////////////////////////
-
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-
-			numberMeshes = *RM.NumberOfMeshes;
-			*RM.MeshIdChange = glm::vec2(-1, -1);
-
-			ReleaseMutex(RM.IdMutexHandle);
-
-			for(int i = 0; i < numberMeshes; i++)
-			{				
-				string name = RM.PmeshList[i]->modelName;
-				Entities.push_back(CreateMeshEntity(&m_world, name, i));
-				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
-				auto mesh = model->m_meshes[0];
-				auto buffer = g_engineContext.m_renderer->CreateBuffer();
-				mesh->SetVertexBuffer(buffer);
-
-				UpdateMeshes(i, false);
-			}			
-
-			///////////////////////// Load Lights ////////////////////////////////
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-			numberLights = *RM.NumberOfLights;
-			*RM.LightIdChange = glm::vec2(-1,-1);
-			ReleaseMutex(RM.IdMutexHandle);
-
-			for(int i = 0; i < numberLights; i++)
-			{
-				LightEntities.push_back(CreateLightEntity(&m_world));
-
-				UpdateLight(i, false);
-			}
-
-
-
-
-			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			uint64_t old = SDL_GetPerformanceCounter();
-			while (g_running)
-			{
-				uint64_t now = SDL_GetPerformanceCounter();
-				float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
-				old = now;
-
-				m_world.SetDelta(dt);
-
-				// GET MESH CHANGE AND REMOVE INDEX
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-				//int MeshIndex = RM.MeshIdChange->x;
-				int RemoveMeshIndex = RM.MeshIdChange->y;
-				int RemoveLightIndex = RM.LightIdChange->y;
-				int locatorIdChange = RM.LocatorIdChange->x;
-				RM.LocatorIdChange->x = -1;
-				entityExport = *RM.export;
-				
-				ReleaseMutex(RM.IdMutexHandle);
-
-				/////////////  EXPORT   ///////////////////////
-				if(entityExport == 2)
-				{			
-					//m_world.GetEntityManager()->RemoveAllComponentsOfType<RootForce::Renderable>();
-
-					for(int i = 0; i < Entities.size()-1; i++)
-					{
-						//UPDATE modelName for all Entities from shared memory
-
-						RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
-
-						//string shortPath = GetNameFromPath(RM.PmaterialList[RM.PmeshList[i]->MaterialID]->texturePath);
-						string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
-						//CreateMaterial(shortPath, materialName);
-						mesh->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
-
-						RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-						WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-						string name = RM.PmeshList[i]->modelName;
-						ReleaseMutex(RM.MeshMutexHandle);
-
-						RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
-						collision->m_meshHandle = name + "0";
-
-						mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
-
-					}
-
-					m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
-					
-					entityExport = false;
-					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-					*RM.export = 0;
-					ReleaseMutex(RM.IdMutexHandle);
-				}
-				/////////////////////// UPDATE LOCATORS //////////////////////////////
-				if(locatorIdChange != -1)
-				{
-					cout << RM.PlocatorList[locatorIdChange]->transformation.name << " updated!" << endl;
-				}
-
-				/////////////////////// UPDATE MESHES ////////////////////////////////
-
-				UpdateMeshes(-1, true);
-
-				/////////////////////// UPDATE LIGHTS ////////////////////////////////
-
-				UpdateLight(-1, true);				
-
-				/////////////////////// UPDATE CAMERAS ////////////////////////////////
-				
-				UpdateCamera();
-
-				HandleEvents();
-				g_engineContext.m_renderer->Clear();
-				cameraSystem->Process();
-				pointLightSystem->Process();
-				particleSystem->Process();
-				renderingSystem->Process();
-				g_engineContext.m_renderer->Render();
-
-				g_engineContext.m_renderer->Swap();
-			}
-
-		}
-	} 
-	catch (std::exception& e) 
-	{
-		// TODO: Log exception message
-		std::cout << e.what() << "\n";
-		std::cin.get();
-		return 1;
-	} 
-	catch (...) 
-	{
-		// TODO: Log unknown exception message
-		std::cin.get();
-		return 1;
+		mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 	}
-	
-	SDL_Quit();
-	DynamicLoader::FreeSharedLibrary(g_engineModule);
 
-	return 0;
+	m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
+
+	entityExport = false;
+	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+	*RM.export = 0;
+	ReleaseMutex(RM.IdMutexHandle);
 }
