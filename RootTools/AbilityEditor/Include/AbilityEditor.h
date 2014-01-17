@@ -24,6 +24,7 @@ public:
 
 private slots:
 		void UpdatePropertyBrowser();
+		void ChangedTab();
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;
@@ -33,8 +34,9 @@ private:
 	AbilityEditorNameSpace::OnCreate* m_onCreate;
 	AbilityEditorNameSpace::OnCollide* m_onCollide;
 	AbilityEditorNameSpace::OnDestroy* m_onDestroy;
+	unsigned int m_LastSelectedTab;
 	bool event(QEvent* event);
-	bool eventFilter(QObject * p_object, QEvent * p_event);
+	QTreeWidgetItem* m_LastSelectedItem;
 	//void mousePressEvent(QMouseEvent* event);
 
 };

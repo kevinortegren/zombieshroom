@@ -10,6 +10,9 @@ class CustomTreeWidget : public QTreeWidget
 	public:
 		explicit CustomTreeWidget(QWidget* parent = 0);
 		void SetOnEventClass(AbilityEditorNameSpace::MainOnEvent* p_onEvent);
+		void RemoveSelected(QTreeWidgetItem* p_item);
+		void ViewSelectedData(QTreeWidgetItem* p_item, QtTreePropertyBrowser* p_propBrows);
+		void SaveSelectedData(QTreeWidgetItem* p_item, QtTreePropertyBrowser* p_propBrows);
 	protected:
 		void dropEvent(QDropEvent* event);
 		void dragEnterEvent(QDragEnterEvent* event);

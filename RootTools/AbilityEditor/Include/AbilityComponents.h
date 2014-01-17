@@ -48,6 +48,8 @@ namespace AbilityEditorNameSpace
 			{
 				m_type = p_type;
 			}
+			
+
 		};
 	
 		////////////////////////////////////////////////////////On create components ////////////////////////////////////////////////////////
@@ -165,10 +167,10 @@ namespace AbilityEditorNameSpace
 		//The one struct to rule them all
 		struct Entity
 		{
-			std::string m_name;
+			QString m_name;
 			std::vector<AbilityComponents::MainComponent*>* m_components;
 			std::map<QString, int> m_nameToEnumMapper;
-			Entity(std::string p_name)
+			Entity(QString p_name)
 			{
 				for(int i = 0 ; i < AbilityComponents::ComponentType::END_OF_ENUM; i++)
 				{
@@ -179,10 +181,13 @@ namespace AbilityEditorNameSpace
 			}
 			~Entity()
 			{
-				for(unsigned int i = m_components->size() -1; i > 0; i --)
+				if(m_components->size() > 0)
 				{
-					delete m_components->at(i);
-					m_components->pop_back();
+					for(unsigned int i = m_components->size() -1 ; i > 0; i --)
+					{
+						delete m_components->at(i);
+						m_components->pop_back();
+					}
 				}
 				delete m_components;
 			}
@@ -264,6 +269,19 @@ namespace AbilityEditorNameSpace
 						m_components->erase(m_components->begin() + i);
 						break;
 					}
+			}
+			bool DoesComponentExist(QString p_componentName)
+			{
+				return DoesComponentExist((AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper.at(p_componentName));
+			}
+			bool DoesComponentExist(AbilityComponents::ComponentType::ComponentType p_type)
+			{
+				for(unsigned int i = 0; i < m_components->size(); i++)
+				{
+					if(m_components->at(i)->m_type == p_type)
+						return true;
+				}
+				return false;
 			}
 		};
 	}

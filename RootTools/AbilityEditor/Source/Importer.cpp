@@ -35,7 +35,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onCreate[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onCreate[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
@@ -56,7 +58,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onCollide[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onCollide[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
@@ -78,7 +82,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onDestroy[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onDestroy[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{

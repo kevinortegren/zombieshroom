@@ -94,7 +94,7 @@ namespace AbilityEditorNameSpace
 
 	void Exporter::ExportEntity( YAML::Emitter& p_emitter, AbilityEntity::Entity* p_entity )
 	{
-		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name;
+		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name.toStdString();
 		p_emitter << YAML::Key << "Components";
 		p_emitter << YAML::Value << YAML::BeginSeq;
 		

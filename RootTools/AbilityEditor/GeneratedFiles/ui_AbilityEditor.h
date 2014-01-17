@@ -84,7 +84,7 @@ public:
         treeOnCreate->setObjectName(QStringLiteral("treeOnCreate"));
         treeOnCreate->setGeometry(QRect(0, 0, 261, 351));
         treeOnCreate->setDragEnabled(true);
-        treeOnCreate->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnCreate->setDragDropMode(QAbstractItemView::DropOnly);
         treeOnCreate->setDefaultDropAction(Qt::MoveAction);
         abilityWidget->addTab(tabOnCreate, QString());
         tabOnCollide = new QWidget();
@@ -94,7 +94,7 @@ public:
         treeOnCollide->setGeometry(QRect(0, 0, 261, 351));
         treeOnCollide->setDragEnabled(true);
         treeOnCollide->setDragDropOverwriteMode(true);
-        treeOnCollide->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnCollide->setDragDropMode(QAbstractItemView::DropOnly);
         treeOnCollide->setDefaultDropAction(Qt::IgnoreAction);
         treeOnCollide->setColumnCount(1);
         abilityWidget->addTab(tabOnCollide, QString());
@@ -104,7 +104,7 @@ public:
         treeOnDestroy->setObjectName(QStringLiteral("treeOnDestroy"));
         treeOnDestroy->setGeometry(QRect(0, 0, 261, 351));
         treeOnDestroy->setDragEnabled(true);
-        treeOnDestroy->setDragDropMode(QAbstractItemView::DragDrop);
+        treeOnDestroy->setDragDropMode(QAbstractItemView::DropOnly);
         treeOnDestroy->setDefaultDropAction(Qt::MoveAction);
         abilityWidget->addTab(tabOnDestroy, QString());
         toolBoxWidget = new QTabWidget(centralWidget);
@@ -116,7 +116,7 @@ public:
         listAbilities->setObjectName(QStringLiteral("listAbilities"));
         listAbilities->setGeometry(QRect(0, 0, 251, 351));
         listAbilities->setDragEnabled(true);
-        listAbilities->setDragDropMode(QAbstractItemView::DragOnly);
+        listAbilities->setDragDropMode(QAbstractItemView::NoDragDrop);
         toolBoxWidget->addTab(tabAbilities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
@@ -124,7 +124,7 @@ public:
         listComponents->setObjectName(QStringLiteral("listComponents"));
         listComponents->setGeometry(QRect(0, 0, 251, 351));
         listComponents->setDragEnabled(true);
-        listComponents->setDragDropMode(QAbstractItemView::DragOnly);
+        listComponents->setDragDropMode(QAbstractItemView::NoDragDrop);
         toolBoxWidget->addTab(tabComponents, QString());
         tabConditions = new QWidget();
         tabConditions->setObjectName(QStringLiteral("tabConditions"));

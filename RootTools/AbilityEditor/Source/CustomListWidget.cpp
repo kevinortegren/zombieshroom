@@ -18,7 +18,7 @@ void CustomListWidget::mousePressEvent( QMouseEvent* event )
 		if(currentItem() != nullptr && (currentItem() == this->itemAt(event->pos())))
 		{	
 			//Remove list from the objectname to get the name of the object types in this list, assumes the list name starts with "list"
-			QString type = &(this->objectName().toStdString().at(4));
+			QString type = &(this->objectName().toStdString().at(4)); //TODO : Maybe change this to a less hacky solution
 			QPixmap	pixmap(QSize(100, 20));
 			QPainter painter(&pixmap);
 			painter.setPen(m_pen);
