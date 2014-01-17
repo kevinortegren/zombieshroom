@@ -112,24 +112,25 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum;
-		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
-		
-		glm::mat4x4 model;
-		model = glm::translate(glm::mat4(1.0f), transform->m_position);
-		model = glm::rotate(model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 
-		frustrum->DrawLines(model, m_engineContext->m_renderer);
+		frustrum->DrawLines(glm::mat4(1), m_engineContext->m_renderer);
+
+		m_culledNodes = 0;
 
 		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
+
+		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
 	}
 
 	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
 	{
+
 		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
 				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
+				m_culledNodes++;
 			}
 			else
 			{

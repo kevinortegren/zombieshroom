@@ -26,5 +26,6 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;
 		bool m_showDebug;
+		unsigned m_culledNodes;
 	};
 }

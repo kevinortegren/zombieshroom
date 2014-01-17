@@ -64,11 +64,11 @@ namespace RootForce
 	{
 		glm::mat4 matrix;
 
-		/*float zMinimum = -p_proj[3][2] / p_proj[2][2];
-		float r = m_far / (m_far / zMinimum);
+		float a = -(m_far + m_near) / (m_far - m_near);
+		float b = -(2 * m_far * m_near) / (m_far - m_near);
 
-		p_proj[2][2] = r;
-		p_proj[3][2] = -r;*/
+		float c = p_proj[2][2];
+		float d = p_proj[3][2];
 
 		matrix = p_proj * p_view;
 
@@ -76,34 +76,70 @@ namespace RootForce
 		m_planesEx[NEARP].b = matrix[1][3] + matrix[1][2];
 		m_planesEx[NEARP].c = matrix[2][3] + matrix[2][2];
 		m_planesEx[NEARP].d = matrix[3][3] + matrix[3][2];
+		NormalizePlane(m_planesEx[NEARP]);
 
-		m_planesEx[FARP].a = matrix[0][3] + matrix[0][2];
-		m_planesEx[FARP].b = matrix[1][3] + matrix[1][2];
-		m_planesEx[FARP].c = matrix[2][3] + matrix[2][2];
-		m_planesEx[FARP].d = matrix[3][3] + matrix[3][2];
+		m_planesEx[FARP].a = matrix[0][3] - matrix[0][2];
+		m_planesEx[FARP].b = matrix[1][3] - matrix[1][2];
+		m_planesEx[FARP].c = matrix[2][3] - matrix[2][2];
+		m_planesEx[FARP].d = matrix[3][3] - matrix[3][2];
+		NormalizePlane(m_planesEx[FARP]);
 
 		m_planesEx[LEFT].a = matrix[0][3] + matrix[0][0];
 		m_planesEx[LEFT].b = matrix[1][3] + matrix[1][0];
 		m_planesEx[LEFT].c = matrix[2][3] + matrix[2][0];
 		m_planesEx[LEFT].d = matrix[3][3] + matrix[3][0];
+		NormalizePlane(m_planesEx[LEFT]);
 
-		m_planesEx[RIGHT].a = matrix[0][3] + matrix[0][0];
-		m_planesEx[RIGHT].b = matrix[1][3] + matrix[1][0];
-		m_planesEx[RIGHT].c = matrix[2][3] + matrix[2][0];
-		m_planesEx[RIGHT].d = matrix[3][3] + matrix[3][0];
+		m_planesEx[RIGHT].a = matrix[0][3] - matrix[0][0];
+		m_planesEx[RIGHT].b = matrix[1][3] - matrix[1][0];
+		m_planesEx[RIGHT].c = matrix[2][3] - matrix[2][0];
+		m_planesEx[RIGHT].d = matrix[3][3] - matrix[3][0];
+		NormalizePlane(m_planesEx[RIGHT]);
 
-		m_planesEx[TOP].a = matrix[0][3] + matrix[0][1];
-		m_planesEx[TOP].b = matrix[1][3] + matrix[1][1];
-		m_planesEx[TOP].c = matrix[2][3] + matrix[2][1];
-		m_planesEx[TOP].d = matrix[3][3] + matrix[3][1];
-
+		m_planesEx[TOP].a = matrix[0][3] - matrix[0][1];
+		m_planesEx[TOP].b = matrix[1][3] - matrix[1][1];
+		m_planesEx[TOP].c = matrix[2][3] - matrix[2][1];
+		m_planesEx[TOP].d = matrix[3][3] - matrix[3][1];
+		NormalizePlane(m_planesEx[TOP]);
+		
 		m_planesEx[BOTTOM].a = matrix[0][3] + matrix[0][1];
 		m_planesEx[BOTTOM].b = matrix[1][3] + matrix[1][1];
 		m_planesEx[BOTTOM].c = matrix[2][3] + matrix[2][1];
 		m_planesEx[BOTTOM].d = matrix[3][3] + matrix[3][1];
+		NormalizePlane(m_planesEx[BOTTOM]);
 
-		//TODO: Calculate corners.
+		ftl = Intersect3Planes(m_planesEx[LEFT], m_planesEx[TOP], m_planesEx[FARP]);
+		fbl = Intersect3Planes(m_planesEx[LEFT], m_planesEx[BOTTOM], m_planesEx[FARP]);
 
+		fbr = Intersect3Planes(m_planesEx[RIGHT], m_planesEx[BOTTOM], m_planesEx[FARP]);
+		ftr = Intersect3Planes(m_planesEx[RIGHT], m_planesEx[TOP], m_planesEx[FARP]);
+
+		ntl = Intersect3Planes(m_planesEx[LEFT], m_planesEx[TOP], m_planesEx[NEARP]);
+		nbl = Intersect3Planes(m_planesEx[LEFT], m_planesEx[BOTTOM], m_planesEx[NEARP]);
+
+		nbr = Intersect3Planes(m_planesEx[RIGHT], m_planesEx[BOTTOM], m_planesEx[NEARP]);
+		ntr = Intersect3Planes(m_planesEx[RIGHT], m_planesEx[TOP], m_planesEx[NEARP]);
+	}
+
+	glm::vec3 Frustum::Intersect3Planes(PlaneEx& a, PlaneEx& b, PlaneEx& c)
+	{
+		glm::vec3 an = glm::vec3(a.a, a.b, a.c);
+		glm::vec3 bn = glm::vec3(b.a, b.b, b.c);
+		glm::vec3 cn = glm::vec3(c.a, c.b, c.c);
+
+		glm::vec3 n2xn3;
+		n2xn3 = glm::cross(bn, cn);
+
+		glm::vec3 n3xn1;
+		n3xn1 = glm::cross(cn, an);
+
+		glm::vec3 n1xn2;
+		n1xn2 = glm::cross(an, bn);
+		
+		float n1dotn2xn3 = glm::dot(an, n2xn3);
+
+		// Calculate intersection point. Can be assumed to exist!
+		return (-a.d*(n2xn3) - b.d*(n3xn1) - c.d*(n1xn2))/(n1dotn2xn3);
 	}
 
 	void Frustum::DrawLines(glm::mat4 p_space, Render::RendererInterface* p_renderer)
@@ -113,10 +149,10 @@ namespace RootForce
 		glm::vec4 tntr = p_space * glm::vec4(ntr.x, ntr.y, ntr.z, 1.0f);
 		glm::vec4 tnbr = p_space * glm::vec4(nbr.x, nbr.y, nbr.z, 1.0f);
 
-		glm::vec4 tftl = p_space * glm::vec4(ftl * 0.001f, 1.0f);
-		glm::vec4 tfbl = p_space * glm::vec4(fbl * 0.001f, 1.0f);
-		glm::vec4 tftr = p_space * glm::vec4(ftr * 0.001f, 1.0f);
-		glm::vec4 tfbr = p_space * glm::vec4(fbr * 0.001f, 1.0f);
+		glm::vec4 tftl = p_space * glm::vec4(ftl.x, ftl.y, ftl.z, 1.0f);
+		glm::vec4 tfbl = p_space * glm::vec4(fbl.x, fbl.y, fbl.z, 1.0f);
+		glm::vec4 tftr = p_space * glm::vec4(ftr.x, ftr.y, ftr.z, 1.0f);
+		glm::vec4 tfbr = p_space * glm::vec4(fbr.x, fbr.y, fbr.z, 1.0f);
 
 		p_renderer->AddLine(glm::vec3(tntl), glm::vec3(tntr), glm::vec4(1,1,0,1));
 		p_renderer->AddLine(glm::vec3(tnbl), glm::vec3(tnbr), glm::vec4(1,1,0,1));

@@ -22,6 +22,7 @@ namespace RootForce
 
 		void RecalculatePlanes();
 		void RecalculatePlanesEx(glm::mat4x4& p_view, glm::mat4x4& p_proj);
+		glm::vec3 Intersect3Planes(PlaneEx& a, PlaneEx& b, PlaneEx& c);
 
 		void DrawLines(glm::mat4 p_space, Render::RendererInterface* p_renderer);
 
