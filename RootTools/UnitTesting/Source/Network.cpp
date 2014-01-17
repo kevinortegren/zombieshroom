@@ -4,6 +4,8 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
 
+using namespace RootForce::Network;
+
 TEST(Network, SerializeEntity)
 {
 	RakNet::BitStream bs;
@@ -33,4 +35,19 @@ TEST(Network, SerializeEntity)
 	ASSERT_EQ(tB->m_position, tA->m_position);
 	ASSERT_EQ(tB->m_orientation, tA->m_orientation);
 	ASSERT_EQ(tB->m_scale, tA->m_scale);
+}
+
+TEST(Network, SequenceIDs)
+{
+	RootForce::Network::NetworkComponent::s_sequenceIDMap.clear();
+
+	RootForce::Network::NetworkComponent n1(0, 0);
+	RootForce::Network::NetworkComponent n2(0, 1);
+	RootForce::Network::NetworkComponent n3(0, 1);
+	RootForce::Network::NetworkComponent n4(&n3);
+
+	ASSERT_EQ(n1.ID.SequenceID, 0);
+	ASSERT_EQ(n2.ID.SequenceID, 0);
+	ASSERT_EQ(n3.ID.SequenceID, 1);
+	ASSERT_EQ(n4.ID.SequenceID, 2);
 }

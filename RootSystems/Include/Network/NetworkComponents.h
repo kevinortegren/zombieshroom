@@ -19,9 +19,11 @@ namespace RootForce
 			std::string Name;
 		};
 
+		/*
 		struct NetworkComponent : public ECS::Component<NetworkComponent>
 		{
 
 		};
+		*/
 	}
 }

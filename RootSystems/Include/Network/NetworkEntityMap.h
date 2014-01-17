@@ -15,6 +15,7 @@ namespace RootForce
 		typedef uint32_t ActionID_t;
 		typedef uint16_t SequenceID_t;
 		typedef uint64_t SynchronizedID_t;
+		typedef uint64_t UserActionKey_t;
 
 		/** Specifies reserved user IDs. Connected peers will start counting from index 0. */
 		namespace ReservedUserID
@@ -35,6 +36,7 @@ namespace RootForce
 				ACTION0
 			};
 		}
+
 
 		/*
 			Uniquely identifies an entity across all peers.
@@ -61,6 +63,8 @@ namespace RootForce
 			Used to associate a NetworkEntityID with a local entity.
 		*/
 		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
+		typedef std::map<UserActionKey_t, SequenceID_t> SequenceIDMap;
+		
 
 
 
@@ -72,18 +76,30 @@ namespace RootForce
 		*/
 		struct NetworkComponent
 		{
-			static UserID_t sUserID;
-			static ActionID_t sCurrentActionID;
-			static SequenceID_t sNextSequenceID;
+			static SequenceIDMap s_sequenceIDMap;
 			
 			NetworkEntityID ID;
 			bool AssociatedInNetworkEntityMap;
 			
-			NetworkComponent()
+			NetworkComponent(UserID_t p_userID, ActionID_t p_actionID)
 			{
-				ID.UserID = sUserID;
-				ID.ActionID = sCurrentActionID;
-				ID.SequenceID = sNextSequenceID++;
+				ID.UserID = p_userID;
+				ID.ActionID = p_actionID;
+
+				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
+				ID.SequenceID = s_sequenceIDMap[key]++;
+
+				AssociatedInNetworkEntityMap = false;
+			}
+
+			NetworkComponent(NetworkComponent* p_parent)
+			{
+				ID.UserID = p_parent->ID.UserID;
+				ID.ActionID = p_parent->ID.ActionID;
+				
+				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
+				ID.SequenceID = s_sequenceIDMap[key]++;
+
 				AssociatedInNetworkEntityMap = false;
 			}
 		};
