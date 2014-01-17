@@ -1,19 +1,25 @@
 #include "RespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
-#include <RootSystems/Include/CollisionSystem.h>
+
 
 namespace RootSystems
 {
+
+	void RespawnSystem::Init()
+	{
+		m_health.Init(m_world->GetEntityManager());
+		m_collision.Init(m_world->GetEntityManager());
+	}
+
+
 	void RespawnSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		float dt = m_world->GetDelta();
 
-		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
-		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+		RootForce::HealthComponent* health = m_health.Get(p_entity);
+		RootForce::Collision* collision = m_collision.Get(p_entity);
 
-		if( !health || !collision )
-			return;
 
 		//If the player has 0 health and is not already dead, kill him
 		if(health->Health <= 0 && !health->IsDead)

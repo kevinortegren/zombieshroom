@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RootEngine/Include/GameSharedContext.h>
 #include <Awesomium/WebView.h>
 #include <RootEngine/GUI/Include/Dispatcher.h>
 #include <RootSystems/Include/Network/ServerEvents.h>
@@ -11,7 +12,7 @@ namespace RootForce
 	class ChatSystem
 	{
 	public:
-		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher); //Load a WebView into the chatsystem together with a gui dispatcher for the javascript
+		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext); //Load a WebView into the chatsystem together with a gui dispatcher for the javascript
 
 		void JSAddMessage(std::string p_message);
 		void JSAddMessage(const char* p_message); //Adds a message to the hud html chatlog, not to the internal message buffer.
@@ -28,5 +29,6 @@ namespace RootForce
 		std::vector<std::string> m_messageBuffer;
 		std::vector<RootServer::EventData> m_eventBuffer;
 		bool m_hasFocus;
+		RootEngine::GameSharedContext* m_engineContext;
 	};
 }
