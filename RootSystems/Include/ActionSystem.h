@@ -23,14 +23,6 @@ namespace RootForce
 
 namespace RootSystems
 {
-
-	struct ActionEvent
-	{
-		uint32_t UserID;
-		RootForce::Network::MessageType::MessageType ActionType;
-		RakNet::BitStream ParameterStream;
-	};
-
 	class ActionSystem : public ECS::EntitySystem
 	{
 	public:

@@ -135,6 +135,60 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
 		}
+		static int EntityGetPlayerPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(*e);
+			luaL_setmetatable(p_luaState, "PlayerPhysics");
+			return 1;
+		}
+		static int EntityGetHealth(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::HealthComponent **s = (RootForce::HealthComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::HealthComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(*e);
+			luaL_setmetatable(p_luaState, "Health");
+			return 1;
+		}
+		static int EntityGetPlayer(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Player **s = (RootForce::Player **)lua_newuserdata(p_luaState, sizeof(RootForce::Player *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Player>(*e);
+			luaL_setmetatable(p_luaState, "Player");
+			return 1;
+		}
+		static int EntityGetPlayerAction(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerActionComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
+			luaL_setmetatable(p_luaState, "PlayerAction");
+			return 1;
+		}
+		static int EntityGetNetwork(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
+			luaL_setmetatable(p_luaState, "Network");
+			return 1;
+		}
+		static int EntityGetAnimation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Animation **s = (RootForce::Animation **)lua_newuserdata(p_luaState, sizeof(RootForce::Animation *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Animation>(*e);
+			luaL_setmetatable(p_luaState, "Animation");
+			return 1;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//TRANSFORMATION
@@ -586,6 +640,16 @@ namespace RootForce
 			return 1;
 		}
 
+		static int RenderableSetAnimation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			RootForce::Animation** atemp = (RootForce::Animation**)luaL_checkudata(p_luaState, 2, "Animation");
+			(*rtemp)->m_params[Render::Semantic::BONES] = &(*atemp)->m_bones[0];
+			return 0;
+		}
+
+
 		//////////////////////////////////////////////////////////////////////////
 		//VEC3
 		//////////////////////////////////////////////////////////////////////////
@@ -953,6 +1017,163 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->m_range);
 			return 1;
 		}
+		//////////////////////////////////////////////////////////////////////////
+		//PLAYERPHYSICS
+		//////////////////////////////////////////////////////////////////////////
+		static int PlayerPhysicsCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::PlayerPhysics>(*e);
+			luaL_setmetatable(p_luaState, "PlayerPhysics");
+			return 1;
+		}
+		static int PlayerPhysicsSetMovementSpeed(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			(*s)->MovementSpeed = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int PlayerPhysicsSetJumpForce(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			(*s)->JumpForce = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int PlayerPhysicsGetMovementSpeed(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			lua_pushnumber(p_luaState, (*s)->MovementSpeed);
+			return 1;
+		}
+		static int PlayerPhysicsGetJumpForce(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			lua_pushnumber(p_luaState, (*s)->JumpForce);
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//HEALTH
+		//////////////////////////////////////////////////////////////////////////
+		static int HealthCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::HealthComponent **s = (RootForce::HealthComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::HealthComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HealthComponent>(*e);
+			luaL_setmetatable(p_luaState, "Health");
+			return 1;
+		}
+		static int HealthDamage(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
+			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
+			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
+			return 0;
+		}
+		static int HealthGetHealth(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
+			lua_pushnumber(p_luaState, (*s)->Health);
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//PLAYER
+		//////////////////////////////////////////////////////////////////////////
+		static int PlayerCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Player **s = (RootForce::Player**)lua_newuserdata(p_luaState, sizeof(RootForce::Player*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Player>(*e);
+			luaL_setmetatable(p_luaState, "Player");
+			return 1;
+		}
+		static int PlayerSetName(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			(*s)->Name = std::string(luaL_checkstring(p_luaState, 2));
+			return 0;
+		}
+		static int PlayerSetAbility(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			(*s)->AbilityScripts[luaL_checknumber(p_luaState, 2)] = std::string(luaL_checkstring(p_luaState, 3));
+			return 0;
+		}
+		static int PlayerSelectAbility(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
+		}
+		static int PlayerGetName(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			lua_pushnumber(p_luaState, (*s)->Name);
+			return 1;
+		}
+		static int PlayerGetAbility(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			lua_pushstring(p_luaState, (*s)->AbilityScripts[(size_t)luaL_checknumber(p_luaState, 2)].c_str());
+			return 1;
+		}
+		static int PlayerGetSelectedAbility(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
+			lua_pushnumber(p_luaState, (*s)->SelectedAbility);
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//PLAYERACTION
+		//////////////////////////////////////////////////////////////////////////
+		static int PlayerActionCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerActionComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::PlayerActionComponent>(*e);
+			luaL_setmetatable(p_luaState, "PlayerAction");
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//NETWORK
+		//////////////////////////////////////////////////////////////////////////
+		static int NetworkCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Network::NetworkComponent>(*e);
+			(*s)->SetID(luaL_checknumber(p_luaState, 2), luaL_checknumber(p_luaState, 3));
+			luaL_setmetatable(p_luaState, "Network");
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//ANIMATION
+		//////////////////////////////////////////////////////////////////////////
+		static int AnimationCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Animation **s = (RootForce::Animation**)lua_newuserdata(p_luaState, sizeof(RootForce::Animation*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Animation>(*e);
+			luaL_setmetatable(p_luaState, "Animation");
+			return 1;
+		}
 
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
@@ -999,6 +1220,7 @@ namespace RootForce
 			{"GetMaterialSpecular", RenderableGetSpecular},
 			{"GetMaterialNormal",	RenderableGetNormal},
 			{"GetMaterialEffect",	RenderableGetEffect},
+			{"SetAnimation",		RenderableSetAnimation},
 			{NULL, NULL}
 		};
 
@@ -1163,6 +1385,73 @@ namespace RootForce
 			{"GetRange",		PointLightGetRange},
 			{NULL, NULL}
 		};
+
+		static const struct luaL_Reg playerphysics_f [] = {
+			{"New", PlayerPhysicsCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg playerphysics_m [] = {
+			{"SetMovementSpeed",	PlayerPhysicsSetMovementSpeed},
+			{"SetJumpForce",		PlayerPhysicsSetJumpForce},
+			{"GetMovementSpeed",	PlayerPhysicsGetMovementSpeed},
+			{"GetJumpForce",		PlayerPhysicsGetJumpForce},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg health_f [] = {
+			{"New", HealthCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg health_m [] = {
+			{"Damage",		HealthDamage},
+			{"GetHealth",	HealthGetHealth},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg player_f [] = {
+			{"New", PlayerCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg player_m [] = {
+			{"SetName",				PlayerSetName},
+			{"SetAbility",			PlayerSetAbility},
+			{"SelectAbility",		PlayerSelectAbility},
+			{"GetName",				PlayerGetName},
+			{"GetAbility",			PlayerGetAbility},
+			{"GetSelectedAbility",	PlayerGetSelectedAbility},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg playeraction_f [] = {
+			{"New", PlayerActionCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg playeraction_m [] = {
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg network_f [] = {
+			{"New", NetworkCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg network_m [] = {
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg animation_f [] = {
+			{"New", AnimationCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg animation_m [] = {
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());

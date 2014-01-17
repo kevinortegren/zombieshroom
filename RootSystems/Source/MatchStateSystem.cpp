@@ -45,9 +45,10 @@ namespace RootForce
 
 	void MatchStateSystem::AwardPlayerKill( int p_killerID, int p_deadID )
 	{
-		m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_killerID))->Score ++;
+		// TODO: Uncomment this
+		//m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_killerID))->Score ++;
 
-		m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_deadID))->Deaths ++;
+		//m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_deadID))->Deaths ++;
 	}
 
 	

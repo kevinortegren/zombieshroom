@@ -3,21 +3,13 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility\ECS\Include\Component.h>
 #include <Utility\ECS\Include\EntitySystem.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
 #define PLAYER_NUM_ABILITIES 3
 
 namespace RootForce
 {
-	namespace Ability
-	{
-		enum Ability
-		{
-			ABILITY_NONE,
-			ABILITY_TEST,
-		};
-	}
-
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
 		float MovePower;
@@ -42,26 +34,20 @@ namespace RootForce
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		int Health;
-		int LastDamageSourceID;
+		Network::UserID_t LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
 	};
 
-	struct Identity : public ECS::Component<Identity>
+	struct Player : public ECS::Component<Player>
 	{
-		std::string Name; 
+		std::string Name;
 		int TeamID;
-	};
 
-	struct UserAbility : public ECS::Component<UserAbility>
-	{
-		std::array<Ability::Ability, PLAYER_NUM_ABILITIES> Abilities;
-		Ability::Ability SelectedAbility;
-	};
+		std::array<std::string, PLAYER_NUM_ABILITIES> AbilityScripts;
+		int SelectedAbility;
 
-	struct ScoreComponent : public ECS::Component<ScoreComponent>
-	{
 		int Score;
 		int Deaths;
 	};

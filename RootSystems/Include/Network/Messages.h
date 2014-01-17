@@ -2,161 +2,221 @@
 
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
-#include <glm/gtc/quaternion.hpp>
 #include <stdint.h>
 #include <vector>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <Utility/ECS/Include/Entity.h>
+#include <RootSystems/Include/Components.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/PlayerSystem.h>
+
+
 
 namespace RootForce
 {
-	namespace Network
+	namespace NetworkMessage
 	{
 		/** Define the message types */
 		namespace MessageType
 		{
 			enum MessageType
 			{
-				GameStateSnapshot = ID_USER_PACKET_ENUM + 1,
-				ChatToServer,
-				ChatToClient,
-				PlayData,
+				GameStateDelta = ID_USER_PACKET_ENUM + 1,
+				Chat,
 				UserConnected,
 				UserDisconnected,
-				UserInfo,
-				UserCommandMoveForward,
-				UserCommandMoveBackward,
-				UserCommandStrafeRight,
-				UserCommandStrafeLeft,
-				UserCommandOrient,
-				UserCommandSelectAbility,
-				UserCommandActivateAbility,
-				UserCommandDeactivateAbility,
-				UserCommandPickUpAbility,
-				UserCommandJump,
-				UserCommandStopJumping,
-				HACK_TransformUpdate,
-				UserCommandMoveStop,
-				UserCommandStrafeStop,
+				PlayerCommand,
+				DestroyEntities,
+				SpawnUser,
+				LoadMap,
+				LoadMapStatus,
+				SetMaxPlayers,
+				SetGameMode,
+				SetMatchTime,
+				SetKillCount,
+				ServerInformation
 			};
 		}
 
-		struct MessageGameStateSnapshot;
-		struct MessageChat;
-		struct MessageUserConnected;
-		struct MessageUserDisconnected;
-		struct MessageUserInfo;
-		struct MessageUserCommandOrient;
-		struct MessageUserCommandSelectAbility;
-
-
-		struct EntityCreated
+		/*
+			Sent at regular intervals from the server to the clients.
+		*/
+		struct GameStateDelta
 		{
-			static const uint8_t TYPE_PLAYER = 0;
+			struct SerializableComponent
+			{
+				ComponentType::ComponentType Type;
+				unsigned int DataSize;
+				char* Data;
 
-			TemporaryId_t TemporaryID;
-			SynchronizedId_t SynchronizedID;
-			uint8_t EntityType;
+				SerializableComponent();
+				~SerializableComponent();
+				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+				void SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
+				ECS::ComponentInterface* DeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
+			};
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			struct SerializableEntity
+			{
+				Network::NetworkEntityID ID;
+				RakNet::RakString ScriptName;
+				std::vector<SerializableComponent> Components;
+
+				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+				void SerializeEntity(ECS::Entity* p_entity);
+				ECS::Entity* DeserializeEntity(const Network::NetworkEntityMap& p_map);
+			};
+
+			std::vector<SerializableEntity> Entities;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		struct EntityRemoved
-		{
-			uint16_t SynchronizedID;
-
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
-		};
-
-
-		/** Header for the game state snapshot message. Following in the data stream is the actual updated components. */
-		struct MessageGameStateSnapshot
-		{
-			std::vector<EntityCreated> CreatedEntities;
-			std::vector<EntityRemoved> RemovedEntities;
-
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
-		};
-
-		/** Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. */
-		struct MessageChat
+		/* 
+			Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. 
+		*/
+		struct Chat
 		{
 			static const uint8_t TYPE_CHAT = 0;
 			static const uint8_t TYPE_SERVER_MESSAGE = 1;
 			static const uint8_t TYPE_DEBUG = 2;
 
 			uint8_t Type;
-			int8_t SenderID;
+			Network::UserID_t Sender;
 			RakNet::RakString Message;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to all clients when a user connects to the server. Also sent to a connecting client for each already connected client.
+		*/
+		struct UserConnected
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to all clients when a client disconnects or the connection to the client is lost.
+		*/
+		struct UserDisconnected
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent every frame from the client to the server. Also forwarded by the server to all other clients.
+		*/
+		struct PlayerCommand
+		{
+			Network::UserID_t User;
+			PlayerActionComponent Action;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 		
-		/** Sent to the server when connecting (in order to identify yourself). Also sent from the server as part of the MessageUserConnected message. */
-		struct MessageUserInfo
+		/*
+			Sent by the server to destroy a set of entities matching the given ID on a client.
+		*/
+		struct DestroyEntities
 		{
-			RakNet::RakString PlayerName;
-			EntityCreated PlayerEntity;
+			Network::NetworkEntityID ID;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		/** Sent to a connecting client, containing static data about the game */
-		struct MessagePlayData
+		/*
+			Sent by the server to a client to spawn the player associated with the given UserID on the map.
+		*/
+		struct SpawnUser
 		{
-			RakNet::RakString ServerName;
+			Network::UserID_t User;
+			unsigned int SpawnPointIndex;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by the server to a client to load a specific map.
+		*/
+		struct LoadMap
+		{
 			RakNet::RakString MapName;
-			uint8_t MaxPlayers;
-			uint16_t MatchLength;
-			uint8_t KillCount;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		/** Sent to all connected clients when a client connects. Also sent to the connecting client for each connected client. */
-		struct MessageUserConnected
+		/*
+			Sent by the client to the server to announce its map loading status.
+		*/
+		struct LoadMapStatus
 		{
-			int8_t UserID;
-			MessageUserInfo UserInfo;
+			static const uint8_t STATUS_LOADING = 0;
+			static const uint8_t STATUS_COMPLETED = 1;
+			static const uint8_t STATUS_FAILED_MAP_NOT_FOUND = 2;
+			static const uint8_t STATUS_FAILED_INVALID_HASH = 3;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			uint8_t Status;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-
-		/** Sent to all connected clients when a client disconnects. */
-		struct MessageUserDisconnected
+		/*
+			Sent by the server to a client to change the maximum amount of players.
+		*/
+		struct SetMaxPlayers
 		{
-			int8_t UserID;
+			Network::UserID_t MaxPlayers;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		/** Sent to the server when the player reorients the character. */
-		struct MessageUserCommandOrient
+		/*
+			Sent by the server to a client to change the game mode.
+		*/
+		struct SetGameMode
 		{
-			glm::quat Orientation;
+			uint8_t GameMode;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		/** Sent to the server when the player selects a new ability. */
-		struct MessageUserCommandSelectAbility
+		/*
+			Sent by the server to a client to change the match time.
+		*/
+		struct SetMatchTime
 		{
-			uint8_t Slot;
+			uint32_t Seconds;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		/** Sent from client to server (this is a HACK) */
-		struct HACK_MessageTransformUpdate
+		/*
+			Sent by the server to a client to change the kill count.
+		*/
+		struct SetKillCount
 		{
-			SynchronizedId_t EntityID;
-			glm::vec3 Position;
-			glm::quat Orientation;
+			uint32_t Count;
 
-			void Serialize(bool writeToBitstream, RakNet::BitStream* bs);
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
-		// TODO: Add parameters for activate ability. Later.
 
+		/*
+			Sent by the server to a connecting client.
+		*/
+		struct ServerInformation
+		{
+			RakNet::RakString MapName;
+			Network::UserID_t MaxPlayers;
+			uint8_t GameMode;
+			uint32_t MatchTimeSeconds;
+			uint32_t KillCount;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 	}
 }

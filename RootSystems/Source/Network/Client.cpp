@@ -55,11 +55,6 @@ namespace RootForce
 			m_chatSystem = p_chatSystem;
 		}
 
-		void Client::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
-		{
-			m_networkEntityMap = p_networkEntityMap;
-		}
-
 		void Client::Update()
 		{
 			// Store all incoming packets in a temporary list (to defer parsing of packets that arrive during parsing)
@@ -97,6 +92,7 @@ namespace RootForce
 				m_peer->DeallocatePacket(packets[i]);
 			}
 
+			// TODO: Maybe put outside?
 			// Send a chat message
 			if (m_chatSystem != nullptr)
 			{
@@ -117,6 +113,7 @@ namespace RootForce
 			}
 
 			// HACK: Send transform updates
+			/*
 			{
 				ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
 				if (e != nullptr)
@@ -135,6 +132,7 @@ namespace RootForce
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				}
 			}
+			*/
 		}
 
 		RakNet::RakPeerInterface* Client::GetPeerInterface()

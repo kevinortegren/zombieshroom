@@ -5,12 +5,11 @@ namespace RootForce
 {
 	namespace Network
 	{
-		UserID_t NetworkComponent::sUserID = ReservedUserID::UNCONNECTED_USER;
-		ActionID_t NetworkComponent::sCurrentActionID = ReservedActionID::NONE;
-		SequenceID_t NetworkComponent::sNextSequenceID = 0;
+		SequenceIDMap NetworkComponent::s_sequenceIDMap;
 
 		void SerializeEntity(RakNet::BitStream* p_bs, ECS::Entity* p_entity, const std::string& p_entityScript, const NetworkEntityMap& p_map, ECS::World* p_world)
 		{
+			/*
 			// Serialize the type
 			{
 				auto it = std::find(p_map.begin(), p_map.end(), p_entity);
@@ -62,10 +61,12 @@ namespace RootForce
 
 				}
 			}
+			*/
 		}
 
 		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, const NetworkEntityMap& p_map, ECS::World* p_world)
 		{
+			/*
 			NetworkEntityID id;
 			p_bs->Serialize(false, id);
 
@@ -85,6 +86,8 @@ namespace RootForce
 				}
 			}
 
+			return nullptr;
+			*/
 			return nullptr;
 		}
 	}

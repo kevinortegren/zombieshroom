@@ -29,17 +29,14 @@ namespace RootForce
 			PLAYERCONTROL,
 			PHYSICS,
 			NETWORK,
-			NETWORKCLIENT,
 			LOOKATBEHAVIOR,
 			THIRDPERSONBEHAVIOR,
 			SCRIPT,
 			COLLISION,
 			COLLISIONRESPONDER,
+			PLAYER,
 			ANIMATION,
 			PARTICLE,
-			SCORE,
-			ABILITY,
-			IDENTITY,
 			TDMRULES, //TODO: name might be inappropriate?
 			PLAYERACTION,
 			PLAYERPHYSICS,
@@ -55,7 +52,6 @@ namespace RootForce
 			RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
 			RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
 			RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
-			RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
 			RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
 			RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 			RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
@@ -63,10 +59,8 @@ namespace RootForce
 			RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 			RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 			RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-			RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
+			RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
 			RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
-			RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
-			RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
 			RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 			RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 			RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
