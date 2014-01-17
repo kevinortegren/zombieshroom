@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
 	{
 		QApplication a(argc, argv);
 		ParticleEditor w;
-		w.show();
+		
 		MainParticle m(path, &w);
-
+		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
 		bool notExit = true;
 		while(notExit)
@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 			a.processEvents(QEventLoop::AllEvents);
 			m.Update(dt);
 		}
+		
 	} 
 	catch (std::exception& e) 
 	{

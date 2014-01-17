@@ -1,15 +1,13 @@
 #include <RootTools/ParticleEditor/Include/StatWidget.h>
 
 StatWidget::StatWidget(QWidget *parent)
-	: QDockWidget(parent)
+	: QWidget(parent)
 {
+	m_samples = 0;
+	m_collectedTime = 0.0f;
+
 	setObjectName(QStringLiteral("dockWidget"));
 	setGeometry(QRect(0, 100, 271, 291));
-	setAllowedAreas(Qt::NoDockWidgetArea);
-
-	//m_widget = new QWidget(this);
-	//m_widget->setObjectName(QStringLiteral("m_widget"));
-	//m_widget->show();
 
 	m_fpsLCD = new QLCDNumber(this);
 	m_fpsLCD->setObjectName(QStringLiteral("m_fpsLCD"));
@@ -28,13 +26,21 @@ StatWidget::~StatWidget()
 {
 	delete m_labelLCD;
 	delete m_fpsLCD;
-	//delete m_widget;
 }
 
 void StatWidget::Update( float p_dt )
 {
-	int fps = (int)(1.0f/p_dt);
-	m_fpsLCD->display(fps);
+	
+	m_samples++;
+	m_collectedTime += p_dt;
+	if(m_collectedTime >= 0.5f)
+	{
+		int fps = (int)(1.0f/(m_collectedTime/(float)m_samples));
+		m_fpsLCD->display(fps);
+		m_samples = 0;
+		m_collectedTime = 0;
+	}
+	
 }
 
 void StatWidget::SetStatStruct( StatStruct* p_statStruct )

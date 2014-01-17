@@ -9,6 +9,7 @@
 #include <Utility/ECS/Include/World.h>
 #include <vector>
 #include <RootTools/ParticleEditor/Include/StatWidget.h>
+#include <RootTools/ParticleEditor/Include/ParticleTab.h>
 
 class ParticleEditor : public QMainWindow
 {
@@ -39,6 +40,7 @@ private:
 	RootEngine::GameSharedContext* m_context;
 	std::vector<ECS::Entity*> m_emitterEntities;
 	StatWidget* m_statWidget;
+	ParticleTab* m_particleTab;
 
 private slots:
 	void MenuNew();
@@ -49,6 +51,8 @@ private slots:
 	void MenuViewStats();
 	void MenuHelpAbout();
 	void MenuCreateEmitter();
+	void DeleteEmitter();
+	void RenameEmitter();
 
 	
 };

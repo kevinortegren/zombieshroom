@@ -60,7 +60,7 @@ void StatWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 }
 
 const QMetaObject StatWidget::staticMetaObject = {
-    { &QDockWidget::staticMetaObject, qt_meta_stringdata_StatWidget.data,
+    { &QWidget::staticMetaObject, qt_meta_stringdata_StatWidget.data,
       qt_meta_data_StatWidget,  qt_static_metacall, 0, 0}
 };
 
@@ -75,12 +75,12 @@ void *StatWidget::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_StatWidget.stringdata))
         return static_cast<void*>(const_cast< StatWidget*>(this));
-    return QDockWidget::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
 int StatWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QDockWidget::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     return _id;

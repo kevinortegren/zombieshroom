@@ -12,7 +12,7 @@ struct StatStruct
 	unsigned int m_numTotalParticles;
 };
 
-class StatWidget : public QDockWidget
+class StatWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -30,8 +30,9 @@ private:
 	void closeEvent(QCloseEvent *event);
 	//MEMBERS
 	StatStruct*		m_statStruct;
-	QWidget*		m_widget;
 	QLCDNumber*		m_fpsLCD;
 	QLabel*			m_labelLCD;
+	float			m_collectedTime;
+	int				m_samples;
 };
 
