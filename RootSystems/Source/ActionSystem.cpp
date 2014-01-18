@@ -115,8 +115,11 @@ namespace RootSystems
 		if(action->Jump)
 		{
 			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
-			animation->m_animClip = RootForce::AnimationClip::JUMP_START;
-			animation->m_locked = 1;
+			if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+			{
+				animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+				animation->m_locked = 1;
+			}
 			action->Jump = false;
 		}
 
