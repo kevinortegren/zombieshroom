@@ -66,7 +66,7 @@ TEST(StateSystem, ProcessEntity)
 	}
 
 	{
-		EXPECT_EQ(state->CurrentState, RootForce::EntityState::LANDING);
+		EXPECT_EQ(state->CurrentState, RootForce::EntityState::GROUNDED);
 		action->Jump = true;
 		aSystem->Process();
 		g_engineContext.m_physics->Update(0.1f);

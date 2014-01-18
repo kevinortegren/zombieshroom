@@ -17,10 +17,21 @@ namespace RootSystems
 	public:
 		StateSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
-			, m_engineContext(p_engineContext) { }
-		void Init() { }
+			, m_engineContext(p_engineContext) 
+		{ 
+			SetUsage<RootForce::Collision>();
+			SetUsage<RootForce::Transform>();
+			SetUsage<RootForce::StateComponent>();
+			SetUsage<RootForce::PlayerPhysics>();
+		}
+		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
+
+		ECS::ComponentMapper<RootForce::Collision> m_collision;
+		ECS::ComponentMapper<RootForce::Transform> m_transform;
+		ECS::ComponentMapper<RootForce::StateComponent> m_state;
+		ECS::ComponentMapper<RootForce::PlayerPhysics> m_physic;
 	};
 }

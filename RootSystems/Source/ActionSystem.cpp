@@ -1,6 +1,5 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
-#include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -8,22 +7,31 @@ extern RootEngine::GameSharedContext g_engineContext;
 namespace RootSystems
 {
 
+	void ActionSystem::Init()
+	{
+		m_action.Init(m_world->GetEntityManager());
+		m_animation.Init(m_world->GetEntityManager());
+		m_collision.Init(m_world->GetEntityManager());
+		m_transform.Init(m_world->GetEntityManager());
+		m_state.Init(m_world->GetEntityManager());
+		m_physic.Init(m_world->GetEntityManager());
+		m_ability.Init(m_world->GetEntityManager());
+		m_health.Init(m_world->GetEntityManager());
+	}
+
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
 
-		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-		RootForce::PlayerPhysics* playphys = m_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(p_entity);
-		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
-		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
-		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
-		RootForce::StateComponent* state = m_world->GetEntityManager()->GetComponent<RootForce::StateComponent>(p_entity);
-		RootForce::Animation* animation = m_world->GetEntityManager()->GetComponent<RootForce::Animation>(p_entity);
-
-		if( !transform || !playphys || !collision || !ability || !action || !health || !animation )
-			return;
+		RootForce::Transform* transform = m_transform.Get(p_entity);
+		RootForce::PlayerPhysics* playphys = m_physic.Get(p_entity);
+		RootForce::Collision* collision = m_collision.Get(p_entity);
+		RootForce::UserAbility* ability = m_ability.Get(p_entity);
+		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
+		RootForce::HealthComponent* health = m_health.Get(p_entity);
+		RootForce::StateComponent* state = m_state.Get(p_entity);
+		RootForce::Animation* animation = m_animation.Get(p_entity);
 
 		if( health->IsDead )
 		{
