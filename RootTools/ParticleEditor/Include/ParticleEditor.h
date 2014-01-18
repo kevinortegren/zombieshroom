@@ -59,6 +59,8 @@ private slots:
 	void PositionXChanged(double p_x);
 	void PositionYChanged(double p_y);
 	void PositionZChanged(double p_z);
+	void SizeStartChanged(double p_val);
+	void SizeEndChanged(double p_val);
 
 	
 };

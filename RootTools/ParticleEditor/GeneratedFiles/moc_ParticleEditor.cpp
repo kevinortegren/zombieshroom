@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ParticleEditor_t {
-    QByteArrayData data[20];
-    char stringdata[233];
+    QByteArrayData data[23];
+    char stringdata[271];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,7 +48,10 @@ QT_MOC_LITERAL(15, 186, 3),
 QT_MOC_LITERAL(16, 190, 16),
 QT_MOC_LITERAL(17, 207, 3),
 QT_MOC_LITERAL(18, 211, 16),
-QT_MOC_LITERAL(19, 228, 3)
+QT_MOC_LITERAL(19, 228, 3),
+QT_MOC_LITERAL(20, 232, 16),
+QT_MOC_LITERAL(21, 249, 5),
+QT_MOC_LITERAL(22, 255, 14)
     },
     "ParticleEditor\0MenuNew\0\0MenuOpen\0"
     "MenuSave\0ManuSaveAs\0MenuExit\0MenuViewStats\0"
@@ -56,7 +59,7 @@ QT_MOC_LITERAL(19, 228, 3)
     "DeleteEmitter\0RenameEmitter\0EmitterSelected\0"
     "QListWidgetItem*\0PositionXChanged\0p_x\0"
     "PositionYChanged\0p_y\0PositionZChanged\0"
-    "p_z\0"
+    "p_z\0SizeStartChanged\0p_val\0SizeEndChanged\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -66,7 +69,7 @@ static const uint qt_meta_data_ParticleEditor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -74,20 +77,22 @@ static const uint qt_meta_data_ParticleEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   84,    2, 0x08,
-       3,    0,   85,    2, 0x08,
-       4,    0,   86,    2, 0x08,
-       5,    0,   87,    2, 0x08,
-       6,    0,   88,    2, 0x08,
-       7,    0,   89,    2, 0x08,
-       8,    0,   90,    2, 0x08,
-       9,    0,   91,    2, 0x08,
-      10,    0,   92,    2, 0x08,
-      11,    0,   93,    2, 0x08,
-      12,    1,   94,    2, 0x08,
-      14,    1,   97,    2, 0x08,
-      16,    1,  100,    2, 0x08,
-      18,    1,  103,    2, 0x08,
+       1,    0,   94,    2, 0x08,
+       3,    0,   95,    2, 0x08,
+       4,    0,   96,    2, 0x08,
+       5,    0,   97,    2, 0x08,
+       6,    0,   98,    2, 0x08,
+       7,    0,   99,    2, 0x08,
+       8,    0,  100,    2, 0x08,
+       9,    0,  101,    2, 0x08,
+      10,    0,  102,    2, 0x08,
+      11,    0,  103,    2, 0x08,
+      12,    1,  104,    2, 0x08,
+      14,    1,  107,    2, 0x08,
+      16,    1,  110,    2, 0x08,
+      18,    1,  113,    2, 0x08,
+      20,    1,  116,    2, 0x08,
+      22,    1,  119,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -104,6 +109,8 @@ static const uint qt_meta_data_ParticleEditor[] = {
     QMetaType::Void, QMetaType::Double,   15,
     QMetaType::Void, QMetaType::Double,   17,
     QMetaType::Void, QMetaType::Double,   19,
+    QMetaType::Void, QMetaType::Double,   21,
+    QMetaType::Void, QMetaType::Double,   21,
 
        0        // eod
 };
@@ -127,6 +134,8 @@ void ParticleEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 11: _t->PositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 12: _t->PositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 13: _t->PositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 14: _t->SizeStartChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 15: _t->SizeEndChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -157,13 +166,13 @@ int ParticleEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 16;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 16)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 16;
     }
     return _id;
 }

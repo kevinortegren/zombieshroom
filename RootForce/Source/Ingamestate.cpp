@@ -310,14 +310,14 @@ namespace RootForce
 			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
-		
-		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
         }
+
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);

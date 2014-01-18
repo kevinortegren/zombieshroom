@@ -228,3 +228,13 @@ void ParticleEditor::PositionZChanged( double p_z )
 	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEmitterIndex));
 	t->m_position.z = (float)p_z;
 }
+
+void ParticleEditor::SizeStartChanged( double p_val )
+{
+
+}
+
+void ParticleEditor::SizeEndChanged( double p_val )
+{
+
+}
