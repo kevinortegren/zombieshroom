@@ -238,10 +238,22 @@ namespace Render
 
 	void GLRenderer::InitializeSemanticSizes()
 	{
-		s_sizes[Semantic::MODEL] = sizeof(glm::mat4);
-		s_sizes[Semantic::NORMAL] = sizeof(glm::mat4);
-		s_sizes[Semantic::BONES] = 20 * sizeof(glm::mat4);
-		s_sizes[Semantic::POSITION] = 12;
+		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
+		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
+		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::POSITION]		= sizeof(glm::vec3);
+		s_sizes[Semantic::LIFETIMEMIN]	= sizeof(float);
+		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);
+		s_sizes[Semantic::SPEEDMIN]		= sizeof(float);
+		s_sizes[Semantic::SPEEDMAX]		= sizeof(float);
+		s_sizes[Semantic::SIZEMIN]		= sizeof(float);
+		s_sizes[Semantic::SIZEMAX]		= sizeof(float);
+		s_sizes[Semantic::SIZEEND]		= sizeof(float);
+		s_sizes[Semantic::COLOR]		= sizeof(glm::vec4);
+		s_sizes[Semantic::COLOREND]		= sizeof(glm::vec4);
+		s_sizes[Semantic::GRAVITY]		= sizeof(glm::vec3);
+		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
+		s_sizes[Semantic::SPREAD]		= sizeof(float);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)

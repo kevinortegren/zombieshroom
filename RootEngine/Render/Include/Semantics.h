@@ -10,7 +10,18 @@ namespace Render
 			MODEL,
 			BONES,
 			POSITION,
-			AGE
+			LIFETIMEMIN,
+			LIFETIMEMAX,
+			SPEEDMIN,
+			SPEEDMAX,
+			SIZEMIN,
+			SIZEMAX,
+			SIZEEND,
+			COLOR,
+			COLOREND,
+			GRAVITY,
+			DIRECTION,
+			SPREAD,
 		};
 	}
 }

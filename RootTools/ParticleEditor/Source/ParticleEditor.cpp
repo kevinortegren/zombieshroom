@@ -14,6 +14,10 @@ ParticleEditor::ParticleEditor(QWidget *parent)
 	connect(ui.actionStats, SIGNAL(triggered()), this, SLOT(MenuViewStats()));
 	connect(ui.deleteEmitterButton, SIGNAL(clicked()), this, SLOT(DeleteEmitter()));
 	connect(ui.renameEmitterButton, SIGNAL(clicked()), this, SLOT(RenameEmitter()));
+	connect(ui.listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(EmitterSelected(QListWidgetItem*)));
+	connect(ui.posSpinBoxX, SIGNAL(valueChanged(double)), this, SLOT(PositionXChanged(double)));
+	connect(ui.posSpinBoxY, SIGNAL(valueChanged(double)), this, SLOT(PositionYChanged(double)));
+	connect(ui.posSpinBoxZ, SIGNAL(valueChanged(double)), this, SLOT(PositionZChanged(double)));
 
 	m_statWidget = new StatWidget();
 	m_statWidget->hide();
@@ -118,10 +122,12 @@ void ParticleEditor::MenuCreateEmitter()
 
 	ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+	t->m_position = glm::vec3(0,0,5);
+
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 
 	Render::ParticleSystemDescription desc;
-	desc.m_initalPos = glm::vec3(0,0,0);
+	desc.m_initalPos = glm::vec3(0.0f);
 	desc.m_initalVel = glm::vec3(0,0,0);
 	desc.m_size = glm::vec2(0.05f, 0.05f);
 
@@ -133,8 +139,11 @@ void ParticleEditor::MenuCreateEmitter()
 
 	particleSystem.m_params[Render::Semantic::POSITION] = &t->m_position;
 
+	e->m_particleSystems.push_back(particleSystem);
+
 	m_emitterEntities.push_back(p);
 	ui.listWidget->addItem(new QListWidgetItem(ui.nameEmitterLineEdit->text()));
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter created: %s", ui.nameEmitterLineEdit->text().toStdString().c_str());
 	ui.nameEmitterLineEdit->setText("");
 }
 
@@ -158,8 +167,9 @@ void ParticleEditor::DeleteEmitter(  )
 	m_world->GetEntityManager()->RemoveAllComponents(m_emitterEntities.at(index));
 	m_world->GetEntityManager()->RemoveEntity(m_emitterEntities.at(index));
 	m_emitterEntities.erase(m_emitterEntities.begin()+index);
-	delete ui.listWidget->takeItem(index);
-
+	QListWidgetItem* deleteItem =  ui.listWidget->takeItem(index);
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter deleted: %s", deleteItem->text().toStdString().c_str());
+	delete deleteItem;
 	if (ui.listWidget->count() == 0)
 	{
 		ui.deleteEmitterButton->setEnabled(false);
@@ -181,7 +191,40 @@ void ParticleEditor::RenameEmitter()
 	QListWidgetItem* temp = ui.listWidget->currentItem();
 	if(temp)
 	{
-		ui.listWidget->currentItem()->setText(ui.nameEmitterLineEdit->text());
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter renamed from '%s' to '%s'", temp->text().toStdString().c_str(), ui.nameEmitterLineEdit->text().toStdString().c_str() );
+		temp->setText(ui.nameEmitterLineEdit->text());
 		ui.nameEmitterLineEdit->setText("");
 	}
+}
+
+void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
+{
+	m_selectedEmitterIndex = ui.listWidget->row(p_item);
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter selected: %d", m_selectedEmitterIndex);
+
+	ECS::Entity* entity = m_emitterEntities.at(m_selectedEmitterIndex);
+	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
+
+	ui.posSpinBoxX->setValue(t->m_position.x);
+	ui.posSpinBoxY->setValue(t->m_position.y);
+	ui.posSpinBoxZ->setValue(t->m_position.z);
+}
+
+void ParticleEditor::PositionXChanged( double p_x )
+{
+	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEmitterIndex));
+	t->m_position.x = (float)p_x;
+}
+
+void ParticleEditor::PositionYChanged( double p_y )
+{
+	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEmitterIndex));
+	t->m_position.y = (float)p_y;
+}
+
+void ParticleEditor::PositionZChanged( double p_z )
+{
+	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEmitterIndex));
+	t->m_position.z = (float)p_z;
 }

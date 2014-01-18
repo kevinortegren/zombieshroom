@@ -3,6 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include <RootTools/ParticleEditor/GeneratedFiles/ui_ParticleEditor.h>
 #include <QtWidgets/QMessageBox>
+#include <QtCore/QString>
 #include <QtGui/QCloseEvent>
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -41,6 +42,7 @@ private:
 	std::vector<ECS::Entity*> m_emitterEntities;
 	StatWidget* m_statWidget;
 	ParticleTab* m_particleTab;
+	int m_selectedEmitterIndex;
 
 private slots:
 	void MenuNew();
@@ -53,6 +55,10 @@ private slots:
 	void MenuCreateEmitter();
 	void DeleteEmitter();
 	void RenameEmitter();
+	void EmitterSelected(QListWidgetItem*);
+	void PositionXChanged(double p_x);
+	void PositionYChanged(double p_y);
+	void PositionZChanged(double p_z);
 
 	
 };
