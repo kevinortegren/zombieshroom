@@ -31,13 +31,6 @@ namespace RootForce
 			m_chatSystem = p_chatSystem;
 		}
 
-		/*
-		void ClientMessageHandler::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
-		{
-			m_networkEntityMap = p_networkEntityMap;
-		}
-		*/
-
 		void ClientMessageHandler::SetPlayerSystem(PlayerSystem* p_playerSystem)
 		{
 			m_playerSystem = p_playerSystem;
@@ -47,13 +40,6 @@ namespace RootForce
 		{
 			m_worldSystem = p_worldSystem;
 		}
-
-		/*
-		const MessagePlayData& ClientMessageHandler::GetServerInfo() const
-		{
-			return m_serverInfo;
-		}
-		*/
 
 		ClientState::ClientState ClientMessageHandler::GetClientState() const
 		{

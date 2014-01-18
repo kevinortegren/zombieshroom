@@ -7,7 +7,7 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Server::Server(Logging* p_logger, const std::string& p_name, unsigned short p_port, unsigned int p_maxConnections)
+		Server::Server(Logging* p_logger, const std::string& p_name, const std::string& p_password, unsigned short p_port, unsigned int p_maxConnections)
 			: m_logger(p_logger)
 			, m_messageHandler(nullptr)
 		{
@@ -19,6 +19,8 @@ namespace RootForce
 				throw std::runtime_error("Failed to create RakNet server");
 
 			m_peer->SetMaximumIncomingConnections(p_maxConnections);
+			m_peer->SetOccasionalPing(true);
+			m_peer->SetIncomingPassword(p_password.c_str(), p_password.size() + 1);
 
 			// Setup the ping response (for network discovery)
 			RootSystems::ServerInfo info;

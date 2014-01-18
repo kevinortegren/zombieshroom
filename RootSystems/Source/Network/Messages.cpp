@@ -381,8 +381,11 @@ namespace RootForce
 
 		void ServerInformation::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
+			p_bs->Serialize(p_writeToBitstream, ServerName);
 			p_bs->Serialize(p_writeToBitstream, MapName);
+			p_bs->Serialize(p_writeToBitstream, CurrentPlayers);
 			p_bs->Serialize(p_writeToBitstream, MaxPlayers);
+			p_bs->Serialize(p_writeToBitstream, PasswordProtected);
 			p_bs->Serialize(p_writeToBitstream, GameMode);
 			p_bs->Serialize(p_writeToBitstream, MatchTimeSeconds);
 			p_bs->Serialize(p_writeToBitstream, KillCount);

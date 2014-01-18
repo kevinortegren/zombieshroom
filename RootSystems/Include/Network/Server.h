@@ -13,7 +13,7 @@ namespace RootForce
 		class Server
 		{
 		public:
-			Server(Logging* p_logger, const std::string& p_name, unsigned short p_port, unsigned int p_maxConnections = 12);
+			Server(Logging* p_logger, const std::string& p_name, const std::string& p_password, unsigned short p_port, unsigned int p_maxConnections = 12);
 			~Server();
 			
 			RootSystems::ServerInfo GetServerInfo() const;

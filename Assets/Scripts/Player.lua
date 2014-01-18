@@ -1,8 +1,4 @@
-ACTION_CREATE = 0;
-ACTION_COLLIDE = 1;
-
 Player = {}
-
 
 function Player.OnCreate (userId, actionId)
 	local playerEntity = Entity.New();

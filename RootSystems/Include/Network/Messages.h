@@ -206,12 +206,15 @@ namespace RootForce
 
 
 		/*
-			Sent by the server to a connecting client.
+			Sent by the server to a connecting client or as a response to a ping.
 		*/
 		struct ServerInformation
 		{
+			RakNet::RakString ServerName;
 			RakNet::RakString MapName;
+			Network::UserID_t CurrentPlayers;
 			Network::UserID_t MaxPlayers;
+			bool PasswordProtected;
 			uint8_t GameMode;
 			uint32_t MatchTimeSeconds;
 			uint32_t KillCount;

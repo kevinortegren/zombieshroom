@@ -37,10 +37,12 @@ namespace RootForce
 			p_list->Start();
 		}
 
-		bool Client::Connect(const char* p_address, unsigned short p_port)
+		bool Client::Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port)
 		{
-			if (m_peer->Connect(p_address, p_port, nullptr, 0) != RakNet::CONNECTION_ATTEMPT_STARTED)
+			if (m_peer->Connect(p_address.c_str(), p_port, p_password.c_str(), p_password.size() + 1) != RakNet::CONNECTION_ATTEMPT_STARTED)
 				return false;
+
+			m_peer->SetOccasionalPing(true);
 
 			return true;
 		}

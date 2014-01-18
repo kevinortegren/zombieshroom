@@ -1,6 +1,7 @@
 #include <RootForce/Include/ConnectingState.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/ServerConfig.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -22,10 +23,11 @@ namespace RootForce
 		// Connect the client and create a server if necessary
 		if (p_playData.Host)
 		{
-			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, p_playData.ServerName, p_playData.Port, p_playData.MaxPlayers));
+			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, p_playData.ServerName, p_playData.Password, p_playData.Port, p_playData.MaxPlayers));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_engineContext.m_logger, g_world));
-			m_networkContext.m_client->Connect("127.0.0.1", p_playData.Port);
+			m_networkContext.m_client->Connect("127.0.0.1", p_playData.Password, p_playData.Port);
 
+			// Setup the rules
 			ECS::Entity* entity = g_world->GetEntityManager()->CreateEntity();
 			g_world->GetTagManager()->RegisterEntity("MatchState", entity);
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);;
@@ -33,20 +35,25 @@ namespace RootForce
 			rules->TimeLeft = (float)p_playData.MatchLength;
 			rules->TeamScore[1] = 0;
 			rules->TeamScore[2] = 0;
+
 			// Setup server info response
-			RootForce::Network::MessagePlayData response;
+			RootForce::NetworkMessage::ServerInformation response;
 			response.ServerName = p_playData.ServerName.c_str();
 			response.MapName = p_playData.MapName.c_str();
-			response.MaxPlayers = (uint8_t) p_playData.MaxPlayers;
-			response.MatchLength = (uint16_t) p_playData.MatchLength;
-			response.KillCount = (uint8_t) p_playData.Killcount;
+			response.CurrentPlayers = 0;
+			response.MaxPlayers = p_playData.MaxPlayers;
+			response.PasswordProtected = p_playData.Password != "";
+			response.GameMode = RootSystems::GameMode::DEATHMATCH;
+			response.MatchTimeSeconds = rules->TimeLeft;
+			response.KillCount = rules->ScoreLimit;
 
-			m_networkContext.m_serverMessageHandler->SetPlayDataResponse(response);
+			m_networkContext.m_serverMessageHandler->SetServerInformation(response);
 		}
 		else
 		{
-			m_networkContext.m_client->Connect(p_playData.Address.c_str(), p_playData.Port);
+			m_networkContext.m_client->Connect(p_playData.Address, p_playData.Password, p_playData.Port);
 
+			// Setup the rules
 			ECS::Entity* ruleEntity = g_world->GetEntityManager()->CreateEntity();
 			g_world->GetTagManager()->RegisterEntity("MatchState", ruleEntity);
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(ruleEntity);;
