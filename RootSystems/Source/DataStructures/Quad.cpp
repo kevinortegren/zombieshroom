@@ -31,6 +31,17 @@ namespace RootForce
 		return m_childs;
 	}
 
+	const std::vector<ECS::Entity*>& QuadNode::GetEntities()
+	{
+		return m_entities;
+	}
+
+	QuadTree::QuadTree()
+		: m_split(0)
+	{
+
+	}
+
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
 		m_globalEntityList.clear();
@@ -129,10 +140,6 @@ namespace RootForce
 		quadTreeBounds.m_maxZ = RoundToPow2(maxZ);
 		quadTreeBounds.m_minZ = -RoundToPow2(abs(minZ));
 
-		Rectangle bottomLeft = Rectangle(quadTreeBounds.m_minX, quadTreeBounds.m_minZ, 2048, 2048);
-
-		int a = CountTriangles(bottomLeft);
-
 		m_root = new QuadNode(quadTreeBounds, numTriangles);
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", numTriangles);
@@ -194,8 +201,8 @@ namespace RootForce
 		{
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Triangles: %d", p_node->m_numTriangles);
 
-			bool createNewEntity = false;
-			
+			ECS::Entity* newEntity = nullptr;
+			RootEngine::Model* model;
 			for(auto entity = m_globalEntityList.begin(); entity != m_globalEntityList.end(); ++entity)
 			{
 				for(unsigned i = 0; i < entity->second.m_indices.size(); i += 3)
@@ -211,8 +218,17 @@ namespace RootForce
 		
 					if( IsTriangleContained(verts, p_node->m_bounds.GetXZRect()) )
 					{
-						//TODO: Create new entity.
-						// Strip triangles not contained in the node.
+						if(newEntity == nullptr)
+						{
+							ECS::Entity* newEntity = m_world->GetEntityManager()->CreateEntity();
+							
+							// Get renderable data for the entity to split.
+							RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*entity).first);
+				
+							RootEngine::Model* model = m_context->m_resourceManager->CreateModel("terrain" + m_split);
+
+							
+						}
 					}
 				}
 			}

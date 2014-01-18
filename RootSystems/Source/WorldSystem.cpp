@@ -119,7 +119,7 @@ namespace RootForce
 
 		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
 
-		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
+		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
 	}
 
 	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
@@ -130,7 +130,8 @@ namespace RootForce
 			if(p_node->GetChilds().size() == 0)
 			{
 				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
-				m_culledNodes++;
+				m_culledNodes += p_node->GetEntities().size();
+
 			}
 			else
 			{

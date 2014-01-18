@@ -22,7 +22,7 @@ namespace RootForce
 
 		void AddChild(QuadNode* p_child);
 		const std::vector<QuadNode*>& GetChilds();
-		
+		const std::vector<ECS::Entity*>& GetEntities();
 		const AABB& GetBounds() const;
 
 	private:
@@ -30,6 +30,7 @@ namespace RootForce
 		AABB m_bounds;
 		unsigned m_numTriangles;
 		std::vector<QuadNode*> m_childs;
+		std::vector<ECS::Entity*> m_entities;
 	};
 
 	struct MeshData
@@ -41,6 +42,7 @@ namespace RootForce
 	class QuadTree
 	{
 	public:
+		QuadTree();
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
 
 		QuadNode* PickRoot(glm::vec2 p_position);
@@ -62,5 +64,7 @@ namespace RootForce
 
 		QuadNode* m_root;
 		std::vector<std::pair<ECS::Entity*, MeshData>> m_globalEntityList;
+
+		int m_split;
 	};
 }

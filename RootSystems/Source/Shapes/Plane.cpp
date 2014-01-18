@@ -13,4 +13,25 @@ namespace RootForce
 		float D = glm::dot(-m_normal, m_point);
 		return glm::dot(m_normal, p_position) + D;
 	}
+
+	void NormalizePlane(PlaneEx& p_plane)
+	{
+		float mag;
+		mag = sqrt(p_plane.a * p_plane.a + p_plane.b * p_plane.b + p_plane.c * p_plane.c);
+
+		p_plane.a = p_plane.a / mag;
+		p_plane.b = p_plane.b / mag;
+		p_plane.c = p_plane.c / mag;
+		p_plane.d = p_plane.d / mag;
+	}
+
+	float PlaneIntersectLine(PlaneEx& p_plane, Line& p_line)
+	{
+		glm::vec3 point = glm::vec3(p_plane.d / p_plane.a, 0, 0);
+		glm::vec3 normal = glm::vec3(p_plane.a, p_plane.b, p_plane.c);
+
+		float f = glm::dot((point - p_line.m_origin), normal) / glm::dot(p_line.m_direction, normal); 
+
+		return f;
+	}
 }
