@@ -177,7 +177,7 @@ namespace RootForce
 		{
 			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
 			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
-			t->m_position = glm::vec3(5,5,5);
+			t->m_position =pos[i];
 
 			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 		
