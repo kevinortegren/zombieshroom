@@ -985,6 +985,7 @@
      <string>View</string>
     </property>
     <addaction name="actionStats"/>
+    <addaction name="actionGrid_2"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -1057,6 +1058,31 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionRed">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionGreen">
+   <property name="text">
+    <string>Green</string>
+   </property>
+  </action>
+  <action name="actionYellow">
+   <property name="text">
+    <string>Yellow</string>
+   </property>
+  </action>
+  <action name="actionWhite">
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="actionGrid_2">
+   <property name="text">
+    <string>Grid</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,7 @@
 #include "ParticleEditor.h"
 
 ParticleEditor::ParticleEditor(QWidget *parent)
-	: QMainWindow(parent), m_running(true)
+	: QMainWindow(parent), m_running(true), m_showGrid(false)
 {
 	ui.setupUi(this);
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(MenuExit()));
@@ -18,7 +18,7 @@ ParticleEditor::ParticleEditor(QWidget *parent)
 	connect(ui.posSpinBoxX, SIGNAL(valueChanged(double)), this, SLOT(PositionXChanged(double)));
 	connect(ui.posSpinBoxY, SIGNAL(valueChanged(double)), this, SLOT(PositionYChanged(double)));
 	connect(ui.posSpinBoxZ, SIGNAL(valueChanged(double)), this, SLOT(PositionZChanged(double)));
-
+	connect(ui.actionGrid_2, SIGNAL(triggered()), this, SLOT(GridToggled()));
 	m_statWidget = new StatWidget();
 	m_statWidget->hide();
 
@@ -61,6 +61,8 @@ void ParticleEditor::closeEvent( QCloseEvent *event )
 void ParticleEditor::Update( float p_dt )
 {
 	m_statWidget->Update(p_dt);
+	if(m_showGrid)
+		DrawGrid(2);
 }
 
 void ParticleEditor::MenuExit()
@@ -122,7 +124,7 @@ void ParticleEditor::MenuCreateEmitter()
 
 	ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
-	t->m_position = glm::vec3(0,0,5);
+	t->m_position = glm::vec3(0,0,0);
 
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 
@@ -237,4 +239,27 @@ void ParticleEditor::SizeStartChanged( double p_val )
 void ParticleEditor::SizeEndChanged( double p_val )
 {
 
+}
+
+void ParticleEditor::DrawGrid(int p_spacing)
+{
+	for (int i = -5; i < 6; i++)
+	{
+		m_context->m_renderer->AddLine(glm::vec3((float)(-5*p_spacing), 0, (float)(i*p_spacing)), glm::vec3((float)(5*p_spacing), 0, (float)(i*p_spacing)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+		m_context->m_renderer->AddLine(glm::vec3((float)(i*p_spacing), 0, (float)(-5*p_spacing)), glm::vec3((float)(i*p_spacing), 0, (float)(5*p_spacing)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	}
+}
+
+void ParticleEditor::GridToggled()
+{
+	if(m_showGrid)
+	{
+		m_showGrid = false;
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Grid toggled off");
+	}
+	else
+	{
+		m_showGrid = true;
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Grid toggled on");
+	}
 }

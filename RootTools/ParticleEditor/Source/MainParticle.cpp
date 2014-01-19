@@ -156,7 +156,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	camera->m_fov = 45.0f;
 
 	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-	cameraTransform->m_position = glm::vec3(0.0f, 0.0f, -10.0f);
+	cameraTransform->m_position = glm::vec3(0.0f, 20.0f, 0.0f);
 
 	RootForce::LookAtBehavior* lookAtComponent = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 	
@@ -193,7 +193,8 @@ void MainParticle::Update( float p_delta )
 	HandleEvents();
 	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
 	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
-	trans->m_position.x -= (g_engineContext.m_inputSys->GetScroll()*4);
+	trans->m_position.y -= (g_engineContext.m_inputSys->GetScroll()*4);
+
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
 	m_particleSystem->Process();

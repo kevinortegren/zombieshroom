@@ -34,7 +34,7 @@ public:
 private:
 	//METHODS
 	void closeEvent(QCloseEvent *event);
-
+	void DrawGrid(int p_spacing);
 	//MEMBERS
 	bool m_running;
 	ECS::World* m_world;
@@ -43,6 +43,7 @@ private:
 	StatWidget* m_statWidget;
 	ParticleTab* m_particleTab;
 	int m_selectedEmitterIndex;
+	bool m_showGrid;
 
 private slots:
 	void MenuNew();
@@ -61,7 +62,6 @@ private slots:
 	void PositionZChanged(double p_z);
 	void SizeStartChanged(double p_val);
 	void SizeEndChanged(double p_val);
-
-	
+	void GridToggled();
 };
 

@@ -45,6 +45,11 @@ public:
     QAction *actionAbout;
     QAction *actionStats;
     QAction *actionEmitter;
+    QAction *actionRed;
+    QAction *actionGreen;
+    QAction *actionYellow;
+    QAction *actionWhite;
+    QAction *actionGrid_2;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *tabProperties;
@@ -170,6 +175,16 @@ public:
         actionEmitter = new QAction(ParticleEditorClass);
         actionEmitter->setObjectName(QStringLiteral("actionEmitter"));
         actionEmitter->setShortcutContext(Qt::ApplicationShortcut);
+        actionRed = new QAction(ParticleEditorClass);
+        actionRed->setObjectName(QStringLiteral("actionRed"));
+        actionGreen = new QAction(ParticleEditorClass);
+        actionGreen->setObjectName(QStringLiteral("actionGreen"));
+        actionYellow = new QAction(ParticleEditorClass);
+        actionYellow->setObjectName(QStringLiteral("actionYellow"));
+        actionWhite = new QAction(ParticleEditorClass);
+        actionWhite->setObjectName(QStringLiteral("actionWhite"));
+        actionGrid_2 = new QAction(ParticleEditorClass);
+        actionGrid_2->setObjectName(QStringLiteral("actionGrid_2"));
         centralWidget = new QWidget(ParticleEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
@@ -569,6 +584,7 @@ public:
         menuFile->addAction(actionExit);
         menuHelp->addAction(actionAbout);
         menuView->addAction(actionStats);
+        menuView->addAction(actionGrid_2);
 
         retranslateUi(ParticleEditorClass);
         QObject::connect(templateComboBox, SIGNAL(currentIndexChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
@@ -595,6 +611,11 @@ public:
         actionStats->setText(QApplication::translate("ParticleEditorClass", "Stats", 0));
         actionEmitter->setText(QApplication::translate("ParticleEditorClass", "Emitter", 0));
         actionEmitter->setShortcut(QApplication::translate("ParticleEditorClass", "Ctrl+E", 0));
+        actionRed->setText(QApplication::translate("ParticleEditorClass", "Red", 0));
+        actionGreen->setText(QApplication::translate("ParticleEditorClass", "Green", 0));
+        actionYellow->setText(QApplication::translate("ParticleEditorClass", "Yellow", 0));
+        actionWhite->setText(QApplication::translate("ParticleEditorClass", "White", 0));
+        actionGrid_2->setText(QApplication::translate("ParticleEditorClass", "Grid", 0));
         groupBox_3->setTitle(QApplication::translate("ParticleEditorClass", "Properties", 0));
         groupBox_5->setTitle(QApplication::translate("ParticleEditorClass", "Template properties", 0));
         label_15->setText(QApplication::translate("ParticleEditorClass", "Hej", 0));
