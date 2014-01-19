@@ -119,7 +119,7 @@ namespace RootForce
 
 		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
 
-		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
+		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
 	}
 
 	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
