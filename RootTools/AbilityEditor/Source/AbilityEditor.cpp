@@ -6,9 +6,7 @@
 #include <QtGui/QDrag>
 #include <QtCore/QMimeData>
 #include <QtGui/QPen>
-#include "OnCreate.h"
-#include "Exporter.h"
-#include "Importer.h"
+#include <QtWidgets/QFileDialog>
 #include "CustomTreeWidget.h"
 
 AbilityEditor::AbilityEditor(QWidget *parent)
@@ -22,96 +20,74 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 
 AbilityEditor::~AbilityEditor()
 {
-	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
 	
 	if(m_LastSelectedItem != nullptr)
 	{
 
 		if(m_LastSelectedTab == 0) //On Create list
-			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 		else if(m_LastSelectedTab == 1) //On Collide list
-			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 		else if(m_LastSelectedTab == 2) //On Destroy list
-			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 	}
-	exporter->Export("Test.ability", m_onCreate, m_onCollide, m_onDestroy);
 }
 
 void AbilityEditor::Init()
 {
 	ui.setupUi(this);
 	m_onCreate = new AbilityEditorNameSpace::OnCreate();
-	m_onCollide =new AbilityEditorNameSpace::OnCollide();
-	m_onDestroy= new AbilityEditorNameSpace::OnDestroy();
+	m_onCollide = new AbilityEditorNameSpace::OnCollide();
+	m_onDestroy = new AbilityEditorNameSpace::OnDestroy();
+
+	m_scriptGenerator = new AbilityEditorNameSpace::ScriptGenerator();
+	m_exporter = new AbilityEditorNameSpace::Exporter();
+	m_importer = new AbilityEditorNameSpace::Importer();
+
+	ui.listComponents->addItems(m_compNames);
+	ui.listAbilities->addItem("Empty Entity");
+	m_propBrows = new QtTreePropertyBrowser;
+	m_propMan = new QtVariantPropertyManager;
+	m_mainLayout = new QGridLayout();
+	m_LastSelectedItem = nullptr;
+
 	ui.treeOnCreate->SetOnEventClass(m_onCreate);
 	ui.treeOnCollide->SetOnEventClass(m_onCollide);
 	ui.treeOnDestroy->SetOnEventClass(m_onDestroy);
 	this->setFixedSize(this->size());
 	this->statusBar()->setSizeGripEnabled(false);
 	
-	//////////////////////////////////////////////////////////////////////////
-	/*AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
-	AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
-	AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
-	//////////////////////////////////////////////////////////////////////////
-	//AbilityEditorNameSpace::OnCreate* test = new AbilityEditorNameSpace::OnCreate();
-	//AbilityEditorNameSpace::Exporter* exporter = new AbilityEditorNameSpace::Exporter();
-	//AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
-
-	//test->AddEntity("Testus totalius");
-	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
-	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	//test->AddComponent(0, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	//test->AddEntity("Testus totalius 2");
-	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISIONSHAPE);
-	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::COLLISION);
-	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::TRANSFORM);
-	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYMODEL);
-	//test->AddComponent(1, AbilityEditorNameSpace::AbilityComponents::ComponentType::ABILITYPARTICLE);
-
-	//exporter->Export("Test.ability", test, nullptr, nullptr);
-
-	/*importer->Import("Test.ability", test, nullptr, nullptr);
-	exporter->Export("Test2.ability", test, nullptr, nullptr);*/
-	//////////////////////////////////////////////////////////////////////////
 
 	connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.abilityWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
-	ui.listComponents->addItems(m_compNames);
-	ui.listAbilities->addItem("Empty Entity");
-	m_propBrows = new QtTreePropertyBrowser;
-	m_mainLayout = new QGridLayout();
-	m_LastSelectedItem = nullptr;
-	/*QPen pen(QColor("blue"));
-	m_pixmap = new QPixmap(QSize(100, 20));
-	m_painter = new QPainter(m_pixmap);
-	m_painter->setPen(pen);*/
-	//AbilityEditorNameSpace::Importer* importer = new AbilityEditorNameSpace::Importer();
-#pragma warning (OY! Fixa så att saker faktikst laddas grafikst också när mna importar nåt)
-//	importer->Import("test.ability", m_onCreate, m_onCollide, m_onDestroy);
+	//connect(m_propMan, SIGNAL(valueChanged(QtProperty*, const QVariant&)), this, SLOT(ChangedTab()));
+	connect(ui.actionGenerate_Script, SIGNAL(triggered()), this, SLOT(GenerateScript()));
+	connect(ui.actionSave_As, SIGNAL(triggered()), this, SLOT(SaveAs()));
+	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(Save()));
+	connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(Load()));
+
+	
 }
 
 void AbilityEditor::ChangedTab()
 {
-	int test = ui.abilityWidget->currentIndex();
+	//int test = ui.abilityWidget->currentIndex();
 	if(m_LastSelectedItem != nullptr)
 	{
 		
 		if(m_LastSelectedTab == 0) //On Create list
-			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 		else if(m_LastSelectedTab == 1) //On Collide list
-			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 		else if(m_LastSelectedTab == 2) //On Destroy list
-			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 	}
 	m_LastSelectedItem = nullptr;
 	delete m_propBrows;
 	m_propBrows = nullptr;
-	UpdatePropertyBrowser();
+	//UpdatePropertyBrowser();
 }
 
 void AbilityEditor::UpdatePropertyBrowser( )
@@ -127,11 +103,11 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		if(m_LastSelectedItem != nullptr)
 		{
 			if(ui.abilityWidget->currentIndex() == 0 && ui.treeOnCreate->hasFocus()) //On Create list
-				ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+				ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 			else if(ui.abilityWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
-				ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+				ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 			else if(ui.abilityWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
-				ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows);
+				ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
 		}
 		delete m_propBrows;
 		m_propBrows = nullptr;
@@ -152,7 +128,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		if(ui.treeOnCreate->selectedItems().at(0) != nullptr)
 		{
 			m_LastSelectedItem = ui.treeOnCreate->selectedItems().at(0);
-			ui.treeOnCreate->ViewSelectedData(m_LastSelectedItem, m_propBrows);
+			ui.treeOnCreate->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
 		}
 	}
 	else if(ui.abilityWidget->currentIndex() == 1/* && ui.treeOnCollide->hasFocus()*/) //On Collide list
@@ -162,7 +138,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		if(ui.treeOnCollide->selectedItems().at(0) != nullptr)
 		{
 			m_LastSelectedItem = ui.treeOnCollide->selectedItems().at(0);
-			ui.treeOnCollide->ViewSelectedData(m_LastSelectedItem, m_propBrows);
+			ui.treeOnCollide->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
 		}
 	}
 	else if(ui.abilityWidget->currentIndex() == 2/* && ui.treeOnDestroy->hasFocus()*/) //On Destroy list
@@ -172,7 +148,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		if(ui.treeOnDestroy->selectedItems().at(0) != 0)
 		{
 			m_LastSelectedItem = ui.treeOnDestroy->selectedItems().at(0);
-			ui.treeOnDestroy->ViewSelectedData(m_LastSelectedItem, m_propBrows);
+			ui.treeOnDestroy->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
 		}
 	}
 	
@@ -184,26 +160,6 @@ void AbilityEditor::UpdatePropertyBrowser( )
 
 }
 
-
-/*
-void AbilityEditor::mousePressEvent( QMouseEvent* event )
-{
-	if (event->button() == Qt::LeftButton && ui.listComponents->geometry().contains(event->pos())) 
-	{
-		QPoint hotSpot = event->pos() - childAt(event->pos())->pos();
-		QDrag *drag = new QDrag(this);
-		QMimeData *mimeData = new QMimeData;
-		QString text = ui.listComponents->itemAt(event->pos())->text();
-		mimeData->setText(text);
-		drag->setMimeData(mimeData);
-		m_painter->fillRect(QRect(0, 0, 100, 20), QBrush(QColor("orange")));
-		m_painter->drawText(QRect(10, 0, 170, 20), text );
-		drag->setPixmap(*m_pixmap);
-		drag->setHotSpot(hotSpot);
-
-		Qt::DropAction dropAction = drag->exec();
-	}
-}*/
 
 bool AbilityEditor::event( QEvent* event )
 {
@@ -245,4 +201,52 @@ bool AbilityEditor::event( QEvent* event )
 	if(event->type() == QEvent::Drop)
 		return false;
 	return QWidget::event(event);
+}
+
+void AbilityEditor::GenerateScript()
+{
+	QFileDialog dial(this);
+	dial.setFileMode(QFileDialog::AnyFile);
+	dial.setAcceptMode(QFileDialog::AcceptSave);
+	dial.setNameFilter("*.lua");
+	QString path = dial.getSaveFileName();
+	if(path.compare("") != 0)
+	{
+		QString name = &(path.toStdString().at(path.lastIndexOf("/")+1));
+		m_scriptGenerator->GenerateScript(path, name, m_onCreate, m_onCollide, m_onDestroy);
+	}
+}
+
+void AbilityEditor::SaveAs()
+{
+	QFileDialog dial(this);
+	dial.setFileMode(QFileDialog::AnyFile);
+	dial.setAcceptMode(QFileDialog::AcceptSave);
+	m_currentSavePath = dial.getSaveFileName();
+	if(m_currentSavePath.compare("") != 0)
+		m_exporter->Export(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+}
+
+void AbilityEditor::Save()
+{
+	if(m_currentSavePath.compare("") != 0)
+		m_exporter->Export(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+}
+
+void AbilityEditor::Load()
+{
+	QFileDialog dial(this);
+	dial.setFileMode(QFileDialog::AnyFile);
+	dial.setAcceptMode(QFileDialog::AcceptOpen);
+	m_currentSavePath = dial.getOpenFileName();
+	if(m_currentSavePath.compare("") != 0)
+	{
+		ui.treeOnCreate->Clear();
+		ui.treeOnCollide->Clear();
+		ui.treeOnDestroy->Clear();
+		m_importer->Import(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+		ui.treeOnCreate->LoadData();
+		ui.treeOnCollide->LoadData();
+		ui.treeOnDestroy->LoadData();
+	}
 }

@@ -131,18 +131,25 @@ namespace AbilityEditorNameSpace
 
 		struct Collision : MainComponent
 		{
-			//bool m_externallyControlled;
-			Collision() : MainComponent(ComponentType::COLLISION)
+			bool m_collidesWithWorld;
+			Collision(bool p_colWithWorld = true) : MainComponent(ComponentType::COLLISION)
 			{
-
+				m_collidesWithWorld = p_colWithWorld;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-			
+				QtVariantProperty* collidesWithWorld;
+
+				collidesWithWorld = p_propMan->addProperty(QVariant::Bool, "Collides with world" );
+				p_propMan->setValue(collidesWithWorld, m_collidesWithWorld);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(collidesWithWorld);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_collidesWithWorld = props.at(0)->valueText().compare("True") == 0 ? true : false;
 			}
 		};
 
@@ -237,9 +244,9 @@ namespace AbilityEditorNameSpace
 				collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
 				p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
 				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere or Mesh");
-				radius = p_propMan->addProperty(QVariant::Point, "Radius");
+				radius = p_propMan->addProperty(QVariant::Double, "Radius");
 				p_propMan->setValue(radius, m_radius);
-				height = p_propMan->addProperty(QVariant::Point, "Height");
+				height = p_propMan->addProperty(QVariant::Double, "Height");
 				p_propMan->setValue(height, m_height);
 				collisionModelname = p_propMan->addProperty(QVariant::String, "CollisionModel name");
 				p_propMan->setValue(collisionModelname, m_collisionModelShapeName.c_str());
@@ -330,8 +337,8 @@ namespace AbilityEditorNameSpace
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_speed = atof(props.at(0)->valueText().toStdString().c_str());
-				m_mass =  atof(props.at(1)->valueText().toStdString().c_str());
+				m_mass = atof(props.at(0)->valueText().toStdString().c_str());
+				m_speed = atof(props.at(1)->valueText().toStdString().c_str());
 			}
 		};
 
@@ -533,6 +540,27 @@ namespace AbilityEditorNameSpace
 					{
 						m_components->at(i)->SaveData(p_propMan,p_propBrows, p_factory);
 					}
+				}
+			}
+			QString GetComponentNameFromId(unsigned int p_id)
+			{
+				AbilityComponents::ComponentType::ComponentType findType = m_components->at(p_id)->m_type;
+				std::map<QString, AbilityComponents::ComponentType::ComponentType>::const_iterator it;
+				for(it = m_nameToEnumMapper.begin(); it != m_nameToEnumMapper.end(); ++it)
+				{
+					if(it->second == findType)
+					{
+						return it->first;
+					}
+				}
+				return "";
+			}
+			void RemoveAllComponents()
+			{
+				for(unsigned int i = 0; i < m_components->size(); i++)
+				{	
+					delete m_components->at(i);
+					m_components->erase(m_components->begin() + i);
 				}
 			}
 		};

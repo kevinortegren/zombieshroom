@@ -167,7 +167,7 @@ public:
         AbilityEditorClass->setWindowTitle(QApplication::translate("AbilityEditorClass", "Ability Editor", 0));
         actionSave_As->setText(QApplication::translate("AbilityEditorClass", "Save As...", 0));
         actionSave->setText(QApplication::translate("AbilityEditorClass", "Save", 0));
-        actionLoad->setText(QApplication::translate("AbilityEditorClass", "Load...", 0));
+        actionLoad->setText(QApplication::translate("AbilityEditorClass", "Open...", 0));
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
         actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
         QTreeWidgetItem *___qtreewidgetitem = treeOnCreate->headerItem();
