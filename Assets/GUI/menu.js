@@ -45,21 +45,23 @@ $(document).ready(function() {
     ClearTable();
     Menu.Refresh();
   } );
+  var PromptPassword = function() {
+    $("#overlay").css("display", "table");
+    $("#lan-password-popup").css("display", "block");
+  };
   var LanConnect = function() {
     if($("#selected").length < 1)
       return;
-    $("#overlay").css("display", "table");
-    $("#connecting").css("display", "block");
     var address = $($("#selected").children()[0]).html().split(":");
     if(!address[1] || !address[0])
       return;
+    if($($("#selected").children()[0]).html() == "Yes")
+    {
+      $("#lan-password-address").val($($("#selected").children()[0]).html());
+      PromptPassword();
+      return;
+    }
     Menu.Connect(address[1], address[0]);
-    setTimeout( function() {
-        $("#overlay").css("display", "none");
-        $("#connecting").css("display", "none");
-      },
-      3000
-    );
   };
   $("#lan-connect").click( LanConnect );
   $("#lan-list").dblclick( LanConnect );
@@ -72,6 +74,13 @@ $(document).ready(function() {
     $("#overlay").css("display", "table");
     $("#lan-host-overlay").css("display", "block");
   } );
+  // Error message
+  var ErrorClose = function() {
+    $("#overlay").css("display", "none");
+    $("#error-popup").css("display", "none");
+  };
+  $("#error-close").click(ErrorClose);
+  $("#error-submit").click(ErrorClose);
   // Lan menu - Direct connect popup
   $("#lan-direct-close").click(function() {
     $("#overlay").css("display", "none");
@@ -79,10 +88,20 @@ $(document).ready(function() {
   } );
   $("#lan-direct-submit").click(function() {
     $("#lan-direct-close").click();
-    $("#overlay").css("display", "table");
-    $("#connecting").css("display", "block");
-    var input = $("#lan-direct-input").val().split(':');
-    Menu.Connect(input[1], input[0]);
+    var input = $("#lan-direct-address").val().split(':');
+    var password = $("#lan-direct-password").val();
+    Menu.Connect(input[1], input[0], password);
+  } );
+  // Lan menu - Password prompted
+  $("#lan-password-close").click(function() {
+    $("#overlay").css("display", "none");
+    $("#lan-password-popup").css("display", "none");
+  } );
+  $("#lan-password-submit").click(function() {
+    $("#lan-password-close").click();
+    var input = $("#lan-password-address").val().split(':');
+    var password = $("#lan-password-password").val();
+    Menu.Connect(input[1], input[0], password);
   } );
   // Lan menu - Host popup
   $("#lan-host-close").click(function() {
@@ -113,7 +132,6 @@ function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
     $("#selected").attr("id", "");
     $(this).attr("id", "selected");
   } );
- 
 }
 function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist)
 {
@@ -127,4 +145,11 @@ function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvicto
   $("#lan-host-maxplayers").val(maxplayers);
   $("#lan-host-matchlength").val(matchlength);
   $("#lan-host-killvictory").val(killvictory);
+}
+function ShowError(errorInfo, errorTitle)
+{
+  $("#error-title").html(errorTitle?errorTitle:"Error");
+  $("#error-info").html(errorInfo);
+  $("#overlay").css("display", "table");
+  $("#error-popup").css("display", "block");
 }

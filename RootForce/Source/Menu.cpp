@@ -67,6 +67,16 @@ namespace RootForce
 
 		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
 	}
+	
+    void Menu::ShowError(std::string p_errorMessage, std::string p_errorTitle)
+	{
+		std::string command = "ShowError(";
+		command += "'" + p_errorMessage + "',";
+		command += "'" + p_errorTitle + "'";
+		command += ");";
+
+		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
+	}
 
 	MenuEvent::MenuEvent RootForce::Menu::PollEvent()
 	{
@@ -140,14 +150,14 @@ namespace RootForce
 				if (ent->d_type != DT_REG) // Not a regular file
 					continue;
 				std::string fname = ent->d_name;
-				std::string extension = "world";
+				std::string extension = ".world";
 				if(fname.find(extension, (fname.length() - extension.length())) == std::string::npos) // Look for extension
 					continue; // Mismatching extension, skip file
 				if(!first)
 					command += ",";
 				else
 					first = !first;
-				command = command + "'" + fname + "'";
+				command = command + "'" + fname.substr(0,fname.length() - extension.length()) + "'";
 			}
 			closedir (dir);
 		}

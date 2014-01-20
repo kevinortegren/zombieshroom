@@ -98,7 +98,7 @@ namespace RootForce
 				// Retrieve connection data and go into a connecting state.
 				m_playData.Host = false;
 				m_playData.ClientInfo.Address = Awesomium::ToString(event.data[1].ToString());
-				m_playData.ClientInfo.Password = "";
+				m_playData.ClientInfo.Password = Awesomium::ToString(event.data[2].ToString());
 				m_playData.ClientInfo.Port = event.data[0].ToInteger();
 
 				result = GameStates::Connecting;

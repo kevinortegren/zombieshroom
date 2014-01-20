@@ -43,12 +43,28 @@
     </div></div>
     
     <div id="overlay" class="verticaltablehax"><div class="verticalcenterhax">
+      <div id="error-popup" class="popup">
+        <div id="error-close" class="close">[Close]</div>
+        <h3 id="error-title">Error</h3>
+        <div id="error-info"></div>
+        <div class="textcenter"><input type="submit" class="button" id="error-submit" value="OK" /></div>
+      </div>
+      
       <div id="lan-direct-popup" class="popup">
         <div id="lan-direct-close" class="close">[Close]</div>
         <h3>Direct connect</h3>
-        IP: <input type="text" id="lan-direct-input" value="127.0.0.1:5567"/> <input type="submit" class="button" id="lan-direct-submit" value="Connect" />
+        <div><div class="inline-100px">IP:</div><input type="text" id="lan-direct-address" value="127.0.0.1:5567"/></div>
+        <div><div class="inline-100px">Password:</div><input type="password" id="lan-direct-password" value=""/></div>
+        <div class="inline-100px"></div><input type="submit" class="button" id="lan-direct-submit" value="Connect" />
       </div>
       
+      <div id="lan-password-popup" class="popup">
+        <div id="lan-password-close" class="close">[Close]</div>
+        <h3>Enter password</h3>
+        <input type="hidden" id="lan-password-address" value="127.0.0.1:5567"/>
+        <div><div class="inline-100px">Password:</div><input type="password" id="lan-password-password" value=""/></div>
+        <div class="inline-100px"></div><input type="submit" class="button" id="lan-password-submit" value="Connect" />
+      </div>
       
       <div id="lan-host-overlay" class="popup">
         <div id="lan-host-close" class="close">[Close]</div>
