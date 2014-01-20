@@ -135,6 +135,7 @@ void SharedMemory::UpdateSharedLight(int index, int nrOfLights)
 		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
 		PlightList[index]->color = lightList[index].color;
 		PlightList[index]->Intensity = lightList[index].Intensity;
+		memcpy(PlightList[index]->LightType, lightList[index].LightType,30);
 
 	ReleaseMutex(LightMutexHandle);
 }
@@ -249,6 +250,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		memcpy(PmaterialList[i]->materialName, materialList[i].materialName, g_maxNameLength);
 		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, g_maxPathLength);
 		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
+		memcpy(PmaterialList[i]->specularPath, materialList[i].specularPath, g_maxPathLength);
 	}
 
 	*NumberOfMaterials = nrOfMaterials;		

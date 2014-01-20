@@ -28,6 +28,7 @@ public:
 	Camera cameraList[g_maxCameras];
 	Material materialList[g_maxMeshes];
 	Locator locatorList[g_maxLocators];
+	Paint PaintList[g_maxPaint];
 
 	int* NumberOfMeshes;
 	int* NumberOfLights;

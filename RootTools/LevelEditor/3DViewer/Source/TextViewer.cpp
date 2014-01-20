@@ -48,7 +48,7 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName);
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
@@ -61,6 +61,8 @@ void UpdateMesh(int index, bool getIndexFromMaya);
 void UpdateLight(int index, bool getIndexFromMaya);
 
 void ExportToLevel();
+
+string PL = "PointLight";
 
 int main(int argc, char* argv[]) 
 {
@@ -120,7 +122,7 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < renderNrOfMaterials; i++)
 			{
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName));
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath));
 			}
 
 			ReleaseMutex(RM.MeshMutexHandle);
@@ -160,8 +162,6 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberLights; i++)
 			{
-				LightEntities.push_back(CreateLightEntity(&m_world));
-
 				UpdateLight(i, false);
 			}
 
@@ -335,7 +335,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
-void CreateMaterial(string textureName, string materialName)
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap)
 {
 	if(textureName == "" || textureName == "NONE")
 	{
@@ -347,7 +347,15 @@ void CreateMaterial(string textureName, string materialName)
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+		if(normalMap != "" && normalMap != "NONE")
+		{
+		mat->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+		}
+		if(specularMap != "" && specularMap != "NONE")
+		{
+		mat->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
+		}
+		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh"); //Måste ha tangenter (använd Mesh_NormalMap)
 	}
 
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
@@ -571,7 +579,7 @@ void UpdateMesh(int index, bool getIndexFromMaya)
 		transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 		////Update material list
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
+		CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath));
 
 		/// ROTATION
 		glm::quat rotation;

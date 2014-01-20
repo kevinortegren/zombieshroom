@@ -8,7 +8,9 @@ const int g_maxSceneObjects = 1000;
 const int g_maxMeshes = 300;
 const int g_maxCameras = 15;
 const int g_maxLights = 10;
-
+//textureBawlsheit
+const int g_MaxResolution = 512;
+const int g_maxPaint = 2;
 
 const int g_maxVerticesPerMesh = 30000;
 const int g_maxNameLength = 30;
@@ -16,7 +18,7 @@ const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 100;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 20;
-const string g_savepath = "C:/Users/BTH/Documents/MASTER/zombieshroom/Assets/";
+const string g_savepath = "C:/Users/BTH/Documents/zombieshroomMain/Assets/";
 
 const string g_levelName = "myTestLevel";
 
@@ -47,13 +49,15 @@ struct Mesh
 	//int indices[g_maxVerticesPerMesh*3];
 	char materialName[g_maxNameLength];
 	char modelName[g_maxNameLength];
+	int paintIndex;	//ska sätta om -1 så har den ingen.
 };
 
 struct Material
 {
 	char materialName[g_maxNameLength];
 	char texturePath[g_maxPathLength];
-	char normalPath[g_maxPathLength];	
+	char normalPath[g_maxPathLength];
+	char specularPath[g_maxPathLength];
 };
 
 struct Camera
@@ -76,6 +80,7 @@ struct Camera
 
 struct Light
 {
+	char LightType[g_maxNameLength];
 	Transform transformation;
 	glm::vec4 color;
 	float Intensity;
@@ -86,3 +91,7 @@ struct Locator
 	Transform transformation;
 };
 
+struct Paint
+{
+	glm::vec4 Pixels[g_MaxResolution];
+};

@@ -4,11 +4,16 @@
 #include "SharedMemory.h"
 #include <algorithm>
 #include "Constants.h"
+
+// Threshold for determining if two vertices are identical
+#define THRESHOLD 0.01f
+
 SharedMemory SM;
 
 // Globala variabler.
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
+MSelectionList derp();
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators];
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
@@ -37,10 +42,18 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode);
+void DuplicationCb(void *clientData);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode, MString &out_specular_path);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
+
+void PaintModel(int index);
+int paintCount = 0;
+
+////////////////MIMAGE TEST///////////////
+MImage paintTexture;
+
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -81,9 +94,52 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 		id = MDGMessage::addNodeRemovedCallback(NodeRemovedCB, "dependNode", nullptr, &status);
 		AddCallbackID(status, id);
+
+		//id = MModelMessage::addAfterDuplicateCallback(DuplicationCb, nullptr, &status);
+		//AddCallbackID(status, id);	//Unresolved external symbol
+
+
 	}
 
 	return status;
+}
+void GivePaintId(int index)
+{
+	string herp = "Paint";
+	
+		for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)				//VARNING FUL LÖSNING!!!!!
+		{
+			if(herp.compare(SM.meshList[index].transformation.flags[i]) == 0)
+			{
+				PaintModel(index);
+				if(SM.meshList[index].paintIndex = 0)
+				{
+				SM.meshList[index].paintIndex = paintCount;
+
+				paintCount++;
+
+				}
+			}
+			else
+			{
+				SM.meshList[index].paintIndex =-1;
+			}
+		}
+}
+
+void PaintModel(int index)
+{
+	//Print(paintCount);
+	//SM.materialList[SM.meshList[index].MaterialID]
+	//Hämtar ut vilken texturnod som gäller och kopplar
+		//paintTexture.readFromTextureNode(
+		unsigned int x,y;
+		paintTexture.getSize(x,y);
+		Print("Painting");
+
+		/*När man skapar en textur så ska man titta på om nament på materialet är paint (som avgör om vi ska måla den eller inte),
+		och i så fall ska vi lägga den som painttexture, sen tar vi en dirty node cb på den. och när det händer får vi skicka över pixel datan till
+		andra sidan*/
 }
 
 void Export()
@@ -107,7 +163,10 @@ void Export()
 				{
 					for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
 					{
-						if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
+						
+
+						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
+						if ((SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length() <= THRESHOLD)
 						{
 							exists = false;
 						}
@@ -264,8 +323,6 @@ void printLists()
 		Print(tempLight.fullPathName());
 		
 	}
-
-
 }
 
 void loadScene()
@@ -354,6 +411,11 @@ void viewCB(const MString &str, void *clientData)
 		exportMaya = 0;
 	}	
 }
+
+//void duplicationCb(void* clientdata)
+//{
+//	Print("herrow");
+//}
 
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
@@ -940,6 +1002,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MString texturepath = "";
 		MString normalpath = "";
 		MString materialName = "";
+		MString specularName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
 		MObject material_objectNode;
@@ -951,12 +1014,12 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 		MString name = cleanFullPathName(mesh.name().asChar());
 		memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
-
+		GivePaintId(meshIndex);
 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode, specularName);
 		materialName = material_node.name();
 
 		//Check if the material already exists.
@@ -980,6 +1043,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].texturePath, texturepath.asChar(), texturepath.numChars());
 			memset(SM.materialList[currNrMaterials].normalPath, NULL, sizeof(SM.materialList[currNrMaterials].normalPath));
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
+			memset(SM.materialList[currNrMaterials].specularPath, NULL, sizeof(SM.materialList[currNrMaterials].specularPath));
+			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
 			SM.meshList[meshIndex].MaterialID = currNrMaterials;
 
 			currNrMaterials++;
@@ -992,6 +1057,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[materialID].texturePath, texturepath.asChar(), texturepath.numChars());
 			memset(SM.materialList[materialID].normalPath, NULL, sizeof(SM.materialList[materialID].normalPath));
 			memcpy(SM.materialList[materialID].normalPath, normalpath.asChar(),normalpath.numChars());
+			memset(SM.materialList[currNrMaterials].specularPath, NULL, sizeof(SM.materialList[currNrMaterials].specularPath));
+			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
 		}
 
 		memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
@@ -1140,10 +1207,20 @@ void MayaLightToList(MObject node, int lightIndex)
 	double rotX, rotY, rotZ, rotW;
 	MSpace::Space space_transform = MSpace::kTransform;
 	MSpace::Space space_local = MSpace::kObject;
+	const MString PL = "PointLight";
+	const MString DL = "DirectionalLight";
 
 	///////////////////////	LIGHT
 	if(node.hasFn(MFn::kLight))
 	{
+		if(node.hasFn(MFn::kPointLight))
+		{
+		memcpy(SM.lightList[lightIndex].LightType, PL.asChar(), PL.numChars());
+		}
+		if(node.hasFn(MFn::kDirectionalLight))
+		{
+		memcpy(SM.lightList[lightIndex].LightType, DL.asChar(), DL.numChars());
+		}
 		MFnLight light = node;
 		SM.lightList[lightIndex].color.r = light.color(&status).r;
 		SM.lightList[lightIndex].color.g = light.color(&status).g;
@@ -1359,7 +1436,40 @@ void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float
 	}
 }
 
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode)
+void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_path)
+{
+	MStatus status = MS::kSuccess;;
+	
+	MPlug normal_plug;
+	MPlugArray connections;
+	normal_plug = material_node.findPlug("specularColor", true, &status);
+	if(status == true)
+	Print("This Is TRUEEE");
+
+	MPlugArray bv_connections;
+	normal_plug.connectedTo(bv_connections, true, false, &status);
+
+	bool found_Specular = false;
+
+	for(unsigned int j=0; j<bv_connections.length(); ++j)
+	{
+		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
+		{
+			Print("FoundTexture!");
+			MFnDependencyNode test1(bv_connections[j].node(&status));
+			MPlug ftn = test1.findPlug("ftn", &status);
+			out_specular_path = ftn.asString(MDGContext::fsNormal);
+			found_Specular = true;
+		}
+	}
+
+	if (!found_Specular)
+	{
+		out_specular_path = "NONE";
+	}
+
+}
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode, MString &out_specular_path)
 {
 	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
@@ -1377,7 +1487,8 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		{
 			GetMaterialNode(shaders[j], material_node);
 			ExtractColor(material_node, out_color_path, out_materialNode);
-			ExtractBump(material_node, out_bump_path, out_bump_depth);			
+			ExtractBump(material_node, out_bump_path, out_bump_depth);
+			ExtractSpecular(material_node, out_specular_path);
 		}
 	}
 }
