@@ -8,7 +8,7 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-#define QUADTREE_POLYGONS_PER_NODE 3000
+#define QUADTREE_POLYGONS_PER_NODE 500
 #define QUAD_MAX_CHILDS 4
 
 namespace RootForce
@@ -44,12 +44,27 @@ namespace RootForce
 		glm::vec3 m_scale;
 	};
 
+	namespace Side
+	{
+		enum Side
+		{
+			FRONT,
+			BACK,
+			NONE
+		};
+	}
 
 	// Resulting polygons from a split with plane.
 	struct PolygonSplit
 	{
 		Polygon m_front;
 		Polygon m_back;
+	};
+
+	struct PolygonRecord
+	{
+		int m_list;
+		int count;
 	};
 
 	class QuadTree
@@ -68,11 +83,10 @@ namespace RootForce
 		void RenderNode(QuadNode* p_node);	
 		int RoundToPow2(int p_value);
 		void Subdivide( QuadNode* p_node, std::vector<Polygon> p_polygons );
-		int CountTriangles( Rectangle p_rect );
-		bool IsTriangleContained( glm::vec3 p_vertices[3], Rectangle p_rect ); 
+		std::vector<Polygon> DividePolygons( Rectangle p_rect, std::vector<Polygon> p_polygons );
 
 		PolygonSplit SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon);
-		bool ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);
+		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);
 		int SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1);
 
 		RootEngine::GameSharedContext* m_context;

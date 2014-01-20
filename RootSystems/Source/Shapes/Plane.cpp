@@ -27,10 +27,9 @@ namespace RootForce
 
 	float PlaneIntersectLine(PlaneEx& p_plane, Line& p_line)
 	{
-		glm::vec3 point = glm::vec3(p_plane.d / p_plane.a, 0, 0);
 		glm::vec3 normal = glm::vec3(p_plane.a, p_plane.b, p_plane.c);
 
-		float f = glm::dot((point - p_line.m_origin), normal) / glm::dot(p_line.m_direction, normal); 
+		float f = -glm::dot((p_line.m_origin + p_plane.d), normal) / glm::dot(p_line.m_direction, normal); 
 
 		return f;
 	}

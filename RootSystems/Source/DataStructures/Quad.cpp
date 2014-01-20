@@ -49,7 +49,7 @@ namespace RootForce
 		m_world = p_world;
 
 		// Find Static entities.
-		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Split");
 
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
@@ -70,10 +70,12 @@ namespace RootForce
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
 				Render::Vertex1P1N1UV v;
+				memcpy(&v, &data[i], sizeof(Render::Vertex1P1N1UV));
 
-				memcpy(&v.m_pos, &data[i], sizeof(glm::vec3));
-				memcpy(&v.m_normal, &data[i + 12], sizeof(glm::vec3));
-				memcpy(&v.m_UV, &data[i + 24], sizeof(glm::vec2));
+				v.m_pos.x = v.m_pos.x * transform->m_scale.x + transform->m_position.x;
+				v.m_pos.y = v.m_pos.y * transform->m_scale.y + transform->m_position.y;
+				v.m_pos.z = v.m_pos.z * transform->m_scale.z + transform->m_position.z;
+
 
 				m_vertices.push_back(v);
 			}
@@ -101,7 +103,7 @@ namespace RootForce
 				p.m_translation = translation;
 				p.m_scale = scale;
 
-				m_globalPolygonList.push_back(p);
+				m_globalPolygonList.push_back(std::move(p));
 			}
 
 			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -126,9 +128,9 @@ namespace RootForce
 
 			for(int i = 0; i < 3; i++)
 			{
-				float tx = ps[i].m_pos.x * (*itr).m_scale.x + (*itr).m_translation.x;
-				float ty = ps[i].m_pos.y * (*itr).m_scale.y + (*itr).m_translation.y;
-				float tz = ps[i].m_pos.z * (*itr).m_scale.z + (*itr).m_translation.z;
+				float tx = ps[i].m_pos.x;
+				float ty = ps[i].m_pos.y;
+				float tz = ps[i].m_pos.z;
 
 				if(tx > maxX) maxX = (int)tx;
 				if(tx < minX) minX = (int)tx;
@@ -145,13 +147,13 @@ namespace RootForce
 		m_minY = minY;
 
 		quadTreeBounds.m_maxX = RoundToPow2(maxX);
-		quadTreeBounds.m_minX = -RoundToPow2(abs(minX));
+		quadTreeBounds.m_minX = -RoundToPow2(maxX);
 
 		quadTreeBounds.m_maxY = maxY;
 		quadTreeBounds.m_minY = minY;
 
 		quadTreeBounds.m_maxZ = RoundToPow2(maxZ);
-		quadTreeBounds.m_minZ = -RoundToPow2(abs(minZ));
+		quadTreeBounds.m_minZ = -RoundToPow2(maxZ);
 
 		m_root = new QuadNode(quadTreeBounds, numTriangles);
 
@@ -196,40 +198,39 @@ namespace RootForce
 			xp.d = -glm::dot(center, splittingNormals[1]);
 			
 			// Create a new polygon list.
-			std::vector<Polygon> polygons;
+			std::vector<Polygon> polygonsAfterZSplit;
 
 			// Split all polygons with the x-plane.
-			for(auto itr = p_polygons.begin(); itr != p_polygons.end(); ++itr)
+			for(int i = 0; i < p_polygons.size(); ++i)
 			{
-				PolygonSplit result = SplitPolygon(zp, (*itr));
+				PolygonSplit result = SplitPolygon(zp, p_polygons[i]);
 
 				if(result.m_back.m_indices.size() > 0)
-					polygons.push_back(result.m_back);
+					polygonsAfterZSplit.push_back(result.m_back);
 
 				if(result.m_front.m_indices.size() > 0)
-					polygons.push_back(result.m_front);
+					polygonsAfterZSplit.push_back(result.m_front);
 			}
 
-			// Split all polygons with the z-plane.
-			for(auto itr = polygons.begin(); itr != p_polygons.end(); ++itr)
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Created %d new Polygons.", polygonsAfterZSplit.size() - p_polygons.size());
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after ZSplit: %d", polygonsAfterZSplit.size());
+
+			std::vector<Polygon> polygonsAfterXSplit;
+
+			// Split all polygons with the x-plane.
+			for(int i = 0; i < polygonsAfterZSplit.size(); ++i)
 			{
-				PolygonSplit result = SplitPolygon(xp, (*itr));
+				PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
 
 				if(result.m_back.m_indices.size() > 0)
-					polygons.push_back(result.m_back);
+					polygonsAfterXSplit.push_back(result.m_back);
 
 				if(result.m_front.m_indices.size() > 0)
-					polygons.push_back(result.m_front);
+					polygonsAfterXSplit.push_back(result.m_front);
 			}
 
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons: %d", p_polygons.size());
-
-			std::vector<Polygon> bl;
-			std::vector<Polygon> br;
-			std::vector<Polygon> tl;
-			std::vector<Polygon> tr;
-
-
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Created %d new Polygons.", polygonsAfterXSplit.size() - polygonsAfterZSplit.size());
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after XSplit: %d", polygonsAfterXSplit.size());
 
 			int halfwidth = aabb->GetLengthX() / 2;
 			int halfheight = aabb->GetLengthZ() / 2;
@@ -244,82 +245,106 @@ namespace RootForce
 			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_minY, m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
 			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_minY, m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
-			int bottomLeftTrisCount = CountTriangles( bottomLeft );
-			int bottomRightTrisCount = CountTriangles( bottomRight );
-			int topLeftTrisCount = CountTriangles( topLeft );
-			int topRightTrisCount = CountTriangles( topRight );
+			std::vector<Polygon> bl = DividePolygons(bottomLeft, polygonsAfterXSplit);
+			std::vector<Polygon> br = DividePolygons(bottomRight, polygonsAfterXSplit);
+			std::vector<Polygon> tl = DividePolygons(topLeft, polygonsAfterXSplit);
+			std::vector<Polygon> tr = DividePolygons(topRight, polygonsAfterXSplit);
 
-			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, bottomLeftTrisCount);
-			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, bottomRightTrisCount);
-			QuadNode* topLeftChild = new QuadNode(topLeftAABB, topLeftTrisCount);
-			QuadNode* topRightChild = new QuadNode(topRightAABB, topRightTrisCount);
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Left Polygons: %d", bl.size());
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Right Polygons: %d", br.size());
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Top Left Polygons: %d", tl.size());
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Top Right Polygons: %d", tr.size());
+
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polycount: %d", bl.size() + br.size() + tl.size() + tr.size());
+
+			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB, bl.size());
+			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB, br.size());
+			QuadNode* topLeftChild = new QuadNode(topLeftAABB, tl.size());
+			QuadNode* topRightChild = new QuadNode(topRightAABB, tr.size());
 
 			p_node->AddChild(bottomLeftChild);
 			p_node->AddChild(bottomRightChild);
 			p_node->AddChild(topLeftChild);
 			p_node->AddChild(topRightChild);
 
-			Subdivide( bottomLeftChild, p_polygons);
-			Subdivide( bottomRightChild, p_polygons );
-			Subdivide( topLeftChild, p_polygons );
-			Subdivide( topRightChild, p_polygons );
+			Subdivide( bottomLeftChild, bl);
+			Subdivide( bottomRightChild, br );
+			Subdivide( topLeftChild, tl );
+			Subdivide( topRightChild, tr );
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Triangles: %d", p_node->m_numTriangles);
+			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Polygons: %d", p_polygons.size());
+
+
+
 		}
 	}
 
-	int QuadTree::CountTriangles( Rectangle p_rect )
+	std::vector<Polygon> QuadTree::DividePolygons( Rectangle p_rect, std::vector<Polygon> p_polygons )
 	{
-		/*int numTriangles = 0;
+		std::vector<Polygon> polygons;
 
-		for(auto entity = m_globalEntityList.begin(); entity != m_globalEntityList.end(); ++entity)
+		for(auto polygon = p_polygons.begin(); polygon != p_polygons.end(); ++polygon)
 		{
-			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*entity).first);
-
-			for(unsigned i = 0; i < entity->second.m_indices.size(); i += 3)
+			bool add = true;
+			int a = 0;
+			for(unsigned i = 0; i < (*polygon).m_indices.size(); ++i)
 			{
-				unsigned v0 = entity->second.m_indices[i];
-				unsigned v1 = entity->second.m_indices[i+1];
-				unsigned v2 = entity->second.m_indices[i+2];
+				glm::vec3 position = m_vertices[(*polygon).m_indices[i]].m_pos;
+	
+				glm::vec2 point = glm::vec2(position.x, position.z);
 
-				glm::vec3 p0 = entity->second.m_positions[v0];
-				glm::vec3 p1 = entity->second.m_positions[v0];
-				glm::vec3 p2 = entity->second.m_positions[v0];
-
-				glm::vec3 verts[3];
-				verts[0] = p0 * transform->m_scale + transform->m_position;
-				verts[1] = p1 * transform->m_scale + transform->m_position;
-				verts[2] = p2 * transform->m_scale + transform->m_position;
-		
-				if( IsTriangleContained(verts, p_rect) )
+				if(!p_rect.IsPointContained(point))
 				{
-					numTriangles++;
+					add = false;
+					break;
 				}
+				else
+				{
+					a++;
+				}
+			}
+
+			if(add)
+			{
+				polygons.push_back((*polygon));
+			}
+			else
+			{
+				if(a > 0)
+				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Failed to add polygon %d of %d.", a, (*polygon).m_indices.size());
 			}
 		}
 
-		return numTriangles;*/
-
-		return 0;
+		return polygons;
 	}
 
 	PolygonSplit QuadTree::SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon)
 	{
 		PolygonSplit split;
-		
+
+		split.m_back.m_scale = p_polygon.m_scale;
+		split.m_back.m_translation = p_polygon.m_translation;
+		split.m_back.m_material = p_polygon.m_material;
+
+		split.m_front.m_scale = p_polygon.m_scale;
+		split.m_front.m_translation = p_polygon.m_translation;
+		split.m_front.m_material = p_polygon.m_material;
+
 		Render::Vertex1P1N1UV pa = m_vertices[p_polygon.m_indices[p_polygon.m_indices.size()-1]];
+
 		int sa = ClassifyPoint(p_divider, pa.m_pos);
 
 		for(int i = 0; i < p_polygon.m_indices.size(); ++i)
 		{
 			Render::Vertex1P1N1UV pb = m_vertices[p_polygon.m_indices[i]];
+
 			int sb = ClassifyPoint(p_divider, pb.m_pos);
 
-			if(sb == 0) // Behind
+			if(sb == Side::BACK) // Behind
 			{
-				if(sa == 1) // Infront
+				if(sa == Side::FRONT) // Infront
 				{
 					int index = SplitVertex(p_divider, pa, pb);
 
@@ -330,9 +355,9 @@ namespace RootForce
 				split.m_back.m_indices.push_back(p_polygon.m_indices[i]);
 
 			}
-			else // Infront
+			else if(sb == Side::FRONT)// Infront
 			{
-				if(sa == 0) // Behind
+				if(sa == Side::BACK) // Behind
 				{
 					int index = SplitVertex(p_divider, pa, pb);
 
@@ -341,6 +366,11 @@ namespace RootForce
 				}
 
 				split.m_front.m_indices.push_back(p_polygon.m_indices[i]);
+			}
+			else
+			{
+				split.m_front.m_indices.push_back(p_polygon.m_indices[i]);
+				split.m_back.m_indices.push_back(p_polygon.m_indices[i]);
 			}
 
 			pa = pb;
@@ -359,7 +389,7 @@ namespace RootForce
 		float t = PlaneIntersectLine(p_divider, l);
 
 		Render::Vertex1P1N1UV newVertex;
-		newVertex.m_pos = p_p0.m_pos + t * l.m_direction;
+		newVertex.m_pos = p_p0.m_pos + l.m_direction * t;
 		newVertex.m_normal = p_p0.m_normal;
 		newVertex.m_UV = p_p0.m_UV + (p_p1.m_UV - p_p0.m_UV) * t;
 
@@ -369,56 +399,24 @@ namespace RootForce
 		return index;
 	}
 
-	bool QuadTree::ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position)
+	Side::Side QuadTree::ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position)
 	{
 		glm::vec4 plane = glm::vec4(p_divider.a, p_divider.b, p_divider.c, p_divider.d);
 
-		if(glm::dot(plane, glm::vec4(p_position, 1.0f)) < 0.0f)
+		float result = glm::dot(plane, glm::vec4(p_position, 1.0f));
+
+		if(result < 0.0f)
 		{
-			return true;
+			return Side::BACK;
 		}
-
-		return false;
-	}
-
-	bool QuadTree::IsTriangleContained( glm::vec3 p_vertices[3], Rectangle p_rect )
-	{
-		float x1, x2, x3, z1, z2, z3;
-
-		x1 = p_vertices[0].x;
-		z1 = p_vertices[0].z;
-
-		x2 = p_vertices[1].x;
-		z2 = p_vertices[1].z;
-
-		x3 = p_vertices[2].x;
-		z3 = p_vertices[2].z;
-
-		float minX = glm::min(x1, glm::min(x2, x3) );
-		if( minX > p_rect.m_x + p_rect.m_width )
+		else if(result == 0.0f)
 		{
-			return false;
+			return Side::NONE;
 		}
-
-		float maxX = glm::max(x1, glm::max(x2, x3) );
-		if( maxX < p_rect.m_x )
+		else
 		{
-			return false;
+			return Side::FRONT;
 		}
-
-		float minZ = glm::min(z1, glm::min(z2, z3) );
-		if( minZ > p_rect.m_y + p_rect.m_height )
-		{
-			return false;
-		}
-
-		float maxZ = glm::max(z1, glm::max(z2, z3) );
-		if( maxZ < p_rect.m_y )
-		{
-			return false;
-		}
-
-		return true;
 	}
 
 	QuadNode* QuadTree::PickRoot(glm::vec2 p_position)
