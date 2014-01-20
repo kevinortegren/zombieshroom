@@ -13,6 +13,19 @@ namespace RootForce
 		Render::ParticleSystemInterface* m_system;
 		Render::Material* m_material;
 		std::map<Render::Semantic::Semantic, void*> m_params;
+		float 		m_lifeTimeMin;
+		float 		m_lifeTimeMax;
+		float 		m_speedMin;
+		float 		m_speedMax;
+		glm::vec2 	m_sizeMin;
+		glm::vec2 	m_sizeMax;
+		glm::vec2 	m_sizeEnd;
+		glm::vec4 	m_color;
+		glm::vec4 	m_colorEnd;
+		glm::vec3 	m_gravity;
+		glm::vec3 	m_direction;
+		float 		m_spread;
+		float		m_spawnTime;
 	};
 
 	struct ParticleEmitter : public ECS::Component<ParticleEmitter>
