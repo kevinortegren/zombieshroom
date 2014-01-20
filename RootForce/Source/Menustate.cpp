@@ -99,6 +99,7 @@ namespace RootForce
 				m_playData.Host = false;
 				m_playData.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.Port = event.data[0].ToInteger();
+				m_playData.Password = Awesomium::ToString(event.data[2].ToString());
 
 				result = GameStates::Connecting;
 			} break;
