@@ -67,6 +67,16 @@ namespace RootForce
 
 		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
 	}
+	
+    void Menu::ShowError(std::string p_errorMessage, std::string p_errorTitle)
+	{
+		std::string command = "ShowError(";
+		command += "'" + p_errorMessage + "',";
+		command += "'" + p_errorTitle + "'";
+		command += ");";
+
+		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
+	}
 
 	MenuEvent::MenuEvent RootForce::Menu::PollEvent()
 	{

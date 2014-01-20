@@ -74,6 +74,13 @@ $(document).ready(function() {
     $("#overlay").css("display", "table");
     $("#lan-host-overlay").css("display", "block");
   } );
+  // Error message
+  var ErrorClose = function() {
+    $("#overlay").css("display", "none");
+    $("#error-popup").css("display", "none");
+  };
+  $("#error-close").click(ErrorClose);
+  $("#error-submit").click(ErrorClose);
   // Lan menu - Direct connect popup
   $("#lan-direct-close").click(function() {
     $("#overlay").css("display", "none");
@@ -125,7 +132,6 @@ function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
     $("#selected").attr("id", "");
     $(this).attr("id", "selected");
   } );
- 
 }
 function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist)
 {
@@ -139,4 +145,11 @@ function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvicto
   $("#lan-host-maxplayers").val(maxplayers);
   $("#lan-host-matchlength").val(matchlength);
   $("#lan-host-killvictory").val(killvictory);
+}
+function ShowError(errorInfo, errorTitle)
+{
+  $("#error-title").html(errorTitle?errorTitle:"Error");
+  $("#error-info").html(errorInfo);
+  $("#overlay").css("display", "table");
+  $("#error-popup").css("display", "block");
 }
