@@ -22,7 +22,7 @@ namespace RootForce
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)
 				throw std::runtime_error("Failed to create RakNet client");
 
-			m_logger->LogText(LogTag::NETWORK, LogLevel::INIT_PRINT, "Client initialized successfully");
+			m_logger->LogText(LogTag::CLIENT, LogLevel::INIT_PRINT, "Client initialized successfully");
 		}
 
 		Client::~Client()
@@ -79,12 +79,12 @@ namespace RootForce
 				{
 					if (!m_messageHandler->ParsePacket(id, &bs, packet))
 					{
-						m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: Message handler neglected to parse message with ID: %u", id);
+						m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
 					}
 				}
 				else
 				{
-					m_logger->LogText(LogTag::NETWORK, LogLevel::WARNING, "CLIENT: No message handler to parse message with ID: %u", id);
+					m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
 				}
 			}
 
@@ -101,40 +101,21 @@ namespace RootForce
 				std::string chatMessage = m_chatSystem->PollMessage();
 				if (chatMessage != "")
 				{
-					MessageChat c;
+					ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+					NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(player);
+
+					NetworkMessage::Chat c;
 					c.Message = chatMessage.c_str();
-					c.SenderID = -1;
-					c.Type = MessageChat::TYPE_CHAT;
+					c.Sender = network->ID.UserID;
+					c.Type = NetworkMessage::Chat::TYPE_CHAT;
 
 					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) MessageType::ChatToServer);
+					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Chat);
 					c.Serialize(true, &bs);
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 				}
 			}
-
-			// HACK: Send transform updates
-			/*
-			{
-				ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
-				if (e != nullptr)
-				{
-					Transform* t = m_world->GetEntityManager()->GetComponent<Transform>(e);
-
-					HACK_MessageTransformUpdate m;
-					m.EntityID = m_networkEntityMap->GetSynchronizedId(e);
-					m.Position = t->m_position;
-					m.Orientation = t->m_orientation.GetQuaternion();
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) MessageType::HACK_TransformUpdate);
-					m.Serialize(true, &bs);
-
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
-				}
-			}
-			*/
 		}
 
 		RakNet::RakPeerInterface* Client::GetPeerInterface()

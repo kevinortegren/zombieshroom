@@ -6,7 +6,7 @@
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/GeometryBuffer.h>
-#include <RootEngine/Render/Include/Line.h>
+#include <RootEngine/Render/Include/LineRenderer.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
 #include <RootEngine/Render/Include/ParticleSystem.h>
@@ -56,7 +56,6 @@ namespace Render
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
-		virtual void RenderLines() = 0;
 		virtual void Swap() = 0;
 		virtual void DisplayNormals(bool p_display) = 0;
 
@@ -73,6 +72,7 @@ namespace Render
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc) = 0;
+		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
 
@@ -101,7 +101,6 @@ namespace Render
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
-		void RenderLines();
 		void Swap();
 		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		bool CheckExtension(const char* p_extension);
@@ -117,6 +116,7 @@ namespace Render
 		std::shared_ptr<Material> CreateMaterial();
 
 		ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc);
+		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
 
@@ -124,7 +124,12 @@ namespace Render
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
 
+		static std::map<Semantic::Semantic, unsigned> s_sizes;
+
 	private:
+
+		void InitializeSemanticSizes();
+		void RenderGeometry();
 
 		void GeometryPass();
 		void LightingPass();
@@ -133,27 +138,27 @@ namespace Render
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
 
-		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 		int m_width;
 		int m_height;
 
-		std::vector<RenderJob> m_jobs;
-
 		GLuint m_fbo;
 		GLuint m_color;
 
-		GeometryBuffer m_gbuffer;
-		ParticleSystemHandler m_particles;
+		std::vector<RenderJob> m_jobs;
+		unsigned m_renderFlags;
+		
+		GeometryBuffer m_geometryPass;
 		LightingDevice m_lighting;
+		LineRenderer m_lineRenderer;
+
+		Mesh m_fullscreenQuad;
+	
+		ParticleSystemHandler m_particles;
 		//ShadowDevice m_shadowDevice;
 		
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
-		
-		// TODO: Create line drawer.
-		Mesh m_lineMesh;
-		std::vector<Line> m_lines;
 
 		struct
 		{
@@ -168,10 +173,7 @@ namespace Render
 		Buffer m_cameraBuffer;
 		Buffer m_uniforms;
 
-		Mesh m_fullscreenQuad;
-
 		std::shared_ptr<TechniqueInterface> m_renderTech;
-		std::shared_ptr<TechniqueInterface> m_debugTech;
 		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		bool m_displayNormals;

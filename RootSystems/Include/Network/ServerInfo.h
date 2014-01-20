@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include <string>
 #include <RakNet/BitStream.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 namespace RootSystems
 {
+	/*
 	struct ServerInfoInternal
 	{
 		RakNet::RakString Name;
@@ -15,6 +17,14 @@ namespace RootSystems
 		bool PasswordProtected;
 		char IP[16];
 		USHORT Port;
+	};
+	*/
+
+	struct ServerInfoInternal
+	{
+		RootForce::NetworkMessage::ServerInformation Information;
+		std::string IP;
+		uint16_t Port;
 	};
 
 	/*

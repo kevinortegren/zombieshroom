@@ -6,11 +6,10 @@
 #include <RakNet/BitStream.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/ChatSystem.h>
-#include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/Network/LanList.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 namespace RootForce
 {
@@ -19,27 +18,13 @@ namespace RootForce
 		class MessageHandler
 		{
 		public:
-			MessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger);
+			MessageHandler(RakNet::RakPeerInterface* p_peer);
 			virtual ~MessageHandler();
 
 			virtual bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet) = 0;
 		protected:
 			RakNet::RakPeerInterface* m_peer;
-			Logging* m_logger;
 		};
-
-
-		namespace ClientState
-		{
-			enum ClientState
-			{
-				UNCONNECTED,
-				CONNECTED,
-				CONNECTION_LOST,
-				CONNECTION_FAILED,
-				CONNECTION_FAILED_TOO_MANY_PLAYERS
-			};
-		}
 
 
 		/*
@@ -48,30 +33,23 @@ namespace RootForce
 		class ClientMessageHandler : public MessageHandler
 		{
 		public:
-			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, Logging* p_logger, RootEngine::GameSharedContext* p_engineContext, ECS::World* p_world);
+			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
+			void SetIsRemote(bool p_isRemote);
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetLanList(RootSystems::LanList* p_list);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
-			//void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
-			void SetPlayerSystem(PlayerSystem* p_playerSystem);
 			void SetWorldSystem(WorldSystem* p_worldSystem);
-			
-			ClientState::ClientState GetClientState() const;
-			const NetworkMessage::ServerInformation& GetServerInformation() const;
-
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
-			RootEngine::GameSharedContext* m_engineContext;
+			bool m_isRemote;
+
 			ECS::World* m_world;
+			NetworkEntityMap* m_networkEntityMap;
 			RootSystems::LanList* m_list;
 			RootForce::ChatSystem* m_chatSystem;
-			PlayerSystem* m_playerSystem;
 			WorldSystem* m_worldSystem;
-			NetworkMessage::ServerInformation m_serverInformation;
-
-
-			ClientState::ClientState m_state;
 		};
 
 
@@ -81,15 +59,14 @@ namespace RootForce
 		class ServerMessageHandler : public MessageHandler
 		{
 		public:
-			ServerMessageHandler(RootEngine::GameSharedContext* p_engineContext, RakNet::RakPeerInterface* p_peer, Logging* p_logger, ECS::World* p_world);
+			ServerMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
-			void SetServerInformation(const NetworkMessage::ServerInformation& p_information);
+			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
-			RootEngine::GameSharedContext* m_engineContext;
 			ECS::World* m_world;
-			NetworkMessage::ServerInformation m_information;
+			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }

@@ -14,12 +14,18 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 }
 
 TEST(RespawnSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
+
+	ECS::Entity* mockSpawn = world->GetEntityManager()->CreateEntity();
+	RootForce::Transform* mockSpawnTransform = world->GetEntityManager()->CreateComponent<RootForce::Transform>(mockSpawn);
+	mockSpawnTransform->m_position = glm::vec3(5, 5, 10);
+	world->GetGroupManager()->RegisterEntity("SpawnPoint", mockSpawn);
 
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
@@ -52,6 +58,7 @@ TEST(RespawnSystem, ProcessEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 
 }

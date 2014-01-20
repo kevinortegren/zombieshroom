@@ -1,7 +1,8 @@
 #include "MatchStateSystem.h"
 #include <RootSystems/Include/PlayerSystem.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootForce/Include/GameStates.h>
+
 namespace RootForce
 {
 

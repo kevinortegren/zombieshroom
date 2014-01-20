@@ -36,7 +36,7 @@ namespace RootServer
 				if(node.FindValue("Password"))
 					node["Password"]  >> conf.Password;
 				if(node.FindValue("LevelFile"))
-					node["LevelFile"]  >> conf.LevelFile;
+					node["LevelFile"]  >> conf.MapName;
 				if(node.FindValue("GameMode"))
 				{
 					node["GameMode"]  >> utmp;

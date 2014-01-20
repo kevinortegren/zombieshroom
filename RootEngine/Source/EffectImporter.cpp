@@ -78,7 +78,7 @@ namespace RootEngine
 				{
 					std::vector<std::string> varyingsVector;
 					const YAML::Node& varyings = programs[i]["feedback"];
-					for(size_t k = 0; k < varyings.size(); k++)
+					for(unsigned k = 0; k < varyings.size(); k++)
 					{
 						std::string varying;
 						varyings[k]["name"] >> varying;
@@ -152,6 +152,58 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::BONES, offset);
 						}
+						else if(sem == "POSITION")
+						{
+							technique->AddUniformParam(Render::Semantic::POSITION, offset);
+						}
+						else if(sem == "LIFETIMEMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::LIFETIMEMIN, offset);
+						}
+						else if(sem == "LIFETIMEMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::LIFETIMEMAX, offset);
+						}
+						else if(sem == "SPEEDMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::SPEEDMIN, offset);
+						}
+						else if(sem == "SPEEDMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::SPEEDMAX, offset);
+						}
+						else if(sem == "SIZEMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEMIN, offset);
+						}
+						else if(sem == "SIZEMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEMAX, offset);
+						}
+						else if(sem == "SIZEEND")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEEND, offset);
+						}
+						else if(sem == "COLOR")
+						{
+							technique->AddUniformParam(Render::Semantic::COLOR, offset);
+						}
+						else if(sem == "COLOREND")
+						{
+							technique->AddUniformParam(Render::Semantic::COLOREND, offset);
+						}
+						else if(sem == "GRAVITY")
+						{
+							technique->AddUniformParam(Render::Semantic::GRAVITY, offset);
+						}
+						else if(sem == "DIRECTION")
+						{
+							technique->AddUniformParam(Render::Semantic::DIRECTION, offset);
+						}
+						else if(sem == "SPREAD")
+						{
+							technique->AddUniformParam(Render::Semantic::SPREAD, offset);
+						}
 					}
 				}
 
@@ -170,6 +222,7 @@ namespace RootEngine
 					}
 				}
 
+
 				if(techniques[i].FindValue("flags") != nullptr)
 				{
 					const YAML::Node& flags = techniques[i]["flags"];
@@ -182,7 +235,20 @@ namespace RootEngine
 						{
 							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
 						}
+						else if(name == "Forward")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+						}
+						else if(name == "Deferred")
+						{
+							technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+						}
 					}
+				}
+				else
+				{
+					// Assume deffered technique if no flags found.
+					technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
 				}
 			}
 		}

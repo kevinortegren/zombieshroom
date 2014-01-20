@@ -1,7 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
 #include <PlayerControlSystem.h>
-#include <RootSystems/Include/AnimationSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -91,12 +90,12 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-		Animation* animation = m_world->GetEntityManager()->GetComponent<Animation>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
 
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -160,23 +159,13 @@ namespace RootForce
 			case PlayerAction::JUMP:
 				{
 					action->Jump = true;
-					animation->m_animClip = AnimationClip::JUMP_START;
 				}
 				break;
 			default:
 				break;
 			}
-
-			if(action->StrafePower == 0 && action->MovePower == 0)
-				animation->m_animClip = AnimationClip::IDLE;
-			if(action->MovePower == -1)
-				animation->m_animClip = AnimationClip::WALKING;
-			else if(action->MovePower == 1)
-				animation->m_animClip = AnimationClip::WALKING;
-			if(action->StrafePower == 1)
-				animation->m_animClip = AnimationClip::STRAFE_RIGHT;
-			else if(action->StrafePower == -1)
-				animation->m_animClip = AnimationClip::STRAFE_LEFT;
+			
+			
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;

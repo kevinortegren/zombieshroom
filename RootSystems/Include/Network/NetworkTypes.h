@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <map>
+#include <Utility/ECS/Include/Entity.h>
+
 
 namespace RootForce
 {
@@ -12,6 +14,11 @@ namespace RootForce
 		typedef uint16_t SequenceID_t;
 		typedef uint64_t SynchronizedID_t;
 		typedef uint64_t UserActionKey_t;
+
+		static_assert(sizeof(uint8_t) == 1, "Invalid maximum number of bits in uint8_t");
+		static_assert(sizeof(uint16_t) == 2, "Invalid maximum number of bits in uint16_t");
+		static_assert(sizeof(uint32_t) == 4, "Invalid maximum number of bits in uint32_t");
+		static_assert(sizeof(uint64_t) == 8, "Invalid maximum number of bits in uint64_t");
 
 		/** Specifies reserved user IDs. Connected peers will start counting from index 0. */
 		namespace ReservedUserID
@@ -59,53 +66,22 @@ namespace RootForce
 			struct
 			{
 				UserID_t UserID;
-				ActionID_t ActionID;
 				SequenceID_t SequenceID;
+				ActionID_t ActionID;
 			};
 
 			SynchronizedID_t SynchronizedID;
+
+			bool operator<(const NetworkEntityID& p_rhs) const
+			{
+				return SynchronizedID < p_rhs.SynchronizedID;
+			}
 		};
 
 
-		/* 
-			Add this component onto every entity that you want to synchronize over the network.
-
-			The AssociatedInNetworkEntityMap field is read by the NetworkRegistrationSystem and entities
-			are added to a network entity map if the field is false.
+		/*
+			Defines a map between network entity IDs and local entities.
 		*/
-		struct NetworkComponent : public ECS::Component<NetworkComponent>
-		{
-			typedef std::map<UserActionKey_t, SequenceID_t> SequenceIDMap;
-			static SequenceIDMap s_sequenceIDMap;
-			
-			NetworkEntityID ID;
-			bool AssociatedInNetworkEntityMap;
-			
-			NetworkComponent()
-			{
-				ID.UserID = ReservedUserID::NONE;
-				ID.ActionID = ReservedActionID::NONE;
-				ID.SequenceID = ReservedSequenceID::NONE;
-				AssociatedInNetworkEntityMap = false;
-			}
-
-			void SetID(UserID_t p_userID, ActionID_t p_actionID)
-			{
-				ID.UserID = p_userID;
-				ID.ActionID = p_actionID;
-
-				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
-				ID.SequenceID = s_sequenceIDMap[key]++;
-			}
-
-			void SetID(NetworkComponent* p_parent)
-			{
-				ID.UserID = p_parent->ID.UserID;
-				ID.ActionID = p_parent->ID.ActionID;
-				
-				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
-				ID.SequenceID = s_sequenceIDMap[key]++;
-			}
-		};
+		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
 	}
 }

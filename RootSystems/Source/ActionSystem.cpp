@@ -1,26 +1,36 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootSystems
 {
 
+	void ActionSystem::Init()
+	{
+		m_action.Init(m_world->GetEntityManager());
+		m_animation.Init(m_world->GetEntityManager());
+		m_collision.Init(m_world->GetEntityManager());
+		m_transform.Init(m_world->GetEntityManager());
+		m_state.Init(m_world->GetEntityManager());
+		m_physic.Init(m_world->GetEntityManager());
+		m_player.Init(m_world->GetEntityManager());
+		m_health.Init(m_world->GetEntityManager());
+	}
+
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
 		// Get the properties we need.
 		float dt = m_world->GetDelta();
 
-		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-		RootForce::PlayerPhysics* playphys = m_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(p_entity);
-		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
-		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
-		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
-
-		if( !transform || !playphys || !collision || !ability || !action || !health )
-			return;
+		RootForce::Transform* transform = m_transform.Get(p_entity);
+		RootForce::PlayerPhysics* playphys = m_physic.Get(p_entity);
+		RootForce::Collision* collision = m_collision.Get(p_entity);
+		RootForce::Player* player = m_player.Get(p_entity);
+		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
+		RootForce::HealthComponent* health = m_health.Get(p_entity);
+		RootForce::StateComponent* state = m_state.Get(p_entity);
+		RootForce::Animation* animation = m_animation.Get(p_entity);
 
 		if( health->IsDead )
 		{
@@ -46,13 +56,6 @@ namespace RootSystems
 			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
 
-		// Issue a jump if applicable
-		if(action->Jump)
-		{
-			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
-			action->Jump = false;
-		}
-
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
 		action->Angle.x = 0;
@@ -60,29 +63,51 @@ namespace RootSystems
 		m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		
 		// Activate ability! Pew pew!
-		ability->SelectedAbility = ability->Abilities[action->SelectedAbility-1];
+		player->SelectedAbility = action->SelectedAbility - 1;
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-			switch(ability->SelectedAbility)
-			{
-			case RootForce::Ability::ABILITY_TEST:
-				{
-					/*
-					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-					RootForce::Script* script = m_world->GetEntityManager()->CreateComponent<RootForce::Script>(entity);
-					script->m_name = m_engineContext->m_resourceManager->GetScript("AbilityTest");
-					script->m_actions.push_back(RootForce::Action(RootForce::ActionType::ACTION_CREATE));
-					*/
 
-					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript("AbilityTest"), "OnCreate");
-					m_engineContext->m_script->ExecuteScript();
-				}
-				break;
-			default:
-				break;
-			}
+			// TODO: Generate action ID here
+			m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+			m_engineContext->m_script->ExecuteScript();
 		}
+
+		if(state->CurrentState == RootForce::EntityState::ASCENDING)
+			animation->m_animClip = RootForce::AnimationClip::ASCEND;
+		else if(state->CurrentState == RootForce::EntityState::DESCENDING)
+			animation->m_animClip = RootForce::AnimationClip::DESCEND;
+		else if(state->CurrentState == RootForce::EntityState::LANDING)
+		{
+			animation->m_animClip = RootForce::AnimationClip::LANDING;
+			animation->m_locked = 1;
+			state->CurrentState = RootForce::EntityState::GROUNDED;
+		}
+		else
+		{
+			//if(action->StrafePower == 0 && action->MovePower == 0)
+			animation->m_animClip = RootForce::AnimationClip::IDLE;
+			if(action->MovePower == -1)
+				animation->m_animClip = RootForce::AnimationClip::WALKING;
+			else if(action->MovePower == 1)
+				animation->m_animClip = RootForce::AnimationClip::WALKING;
+			if(action->StrafePower == 1)
+				animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+			else if(action->StrafePower == -1)
+				animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+		}
+		// Issue a jump if applicable
+		if(action->Jump)
+		{
+			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+			if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+			{
+				animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+				animation->m_locked = 1;
+			}
+			action->Jump = false;
+		}
+
 	}
 
 }

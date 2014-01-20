@@ -11,10 +11,10 @@ namespace RootForce
 	{
 	}
 
-	void HUD::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher )
+	void HUD::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext )
 	{
 		m_view = p_view;
-		m_chatSystem->Initialize(p_view, p_dispatcher);
+		m_chatSystem->Initialize(p_view, p_dispatcher, p_engineContext);
 
 		SetValue("PlayerScore", "0");
 		SetValue("PlayerDeaths", "0");

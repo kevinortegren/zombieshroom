@@ -31,7 +31,7 @@ namespace RootEngine
 			/* This executes the script that has been set. */
 			virtual void ExecuteScript() = 0;
 
-
+			virtual void AddParameterUserData(void* p_data, size_t p_size, const std::string& p_metaTable) = 0;
 			virtual void AddParameterString(std::string p_string) = 0;
 			virtual void AddParameterNumber(double p_double) = 0;
 			virtual void AddParameterBoolean(bool p_bool) = 0;

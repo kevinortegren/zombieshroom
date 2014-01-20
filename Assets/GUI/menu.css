@@ -105,9 +105,9 @@ a
 {
   margin: auto;
   /*background-color: #FFFFFF;*/
-  background: url('Ram.png') transparent;
+  background: url('SmallWindow2.png') transparent;
   background-size: 100% 100%;
-  padding: 36px;
+  padding: 70px;
   display: none;
 }
 .close

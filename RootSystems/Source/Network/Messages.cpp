@@ -7,6 +7,7 @@ namespace RootForce
 {
 	namespace NetworkMessage
 	{
+		/*
 		GameStateDelta::SerializableComponent::SerializableComponent()
 			: Data(nullptr) {}
 
@@ -307,6 +308,7 @@ namespace RootForce
 				Entities[i].Serialize(p_writeToBitstream, p_bs);
 			}
 		}
+		*/
 
 
 		void Chat::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -319,11 +321,17 @@ namespace RootForce
 		void UserConnected::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Name);
 		}
 
 		void UserDisconnected::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void UserInformation::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, Name);
 		}
 
 		void PlayerCommand::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)

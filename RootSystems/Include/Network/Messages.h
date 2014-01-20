@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <vector>
 #include <Utility/ECS/Include/Entity.h>
-#include <RootSystems/Include/Components.h>
+//#include <RootSystems/Include/Components.h> // DO NOT COMMENT IN, COMPILE ERRORS FROM HELL AWAIT YE (cyclical dependency)
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
 
@@ -24,6 +24,7 @@ namespace RootForce
 				Chat,
 				UserConnected,
 				UserDisconnected,
+				UserInformation,
 				PlayerCommand,
 				DestroyEntities,
 				SpawnUser,
@@ -40,6 +41,7 @@ namespace RootForce
 		/*
 			Sent at regular intervals from the server to the clients.
 		*/
+		/*
 		struct GameStateDelta
 		{
 			struct SerializableComponent
@@ -70,6 +72,7 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+		*/
 
 		/* 
 			Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. 
@@ -93,6 +96,7 @@ namespace RootForce
 		struct UserConnected
 		{
 			Network::UserID_t User;
+			RakNet::RakString Name;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -103,6 +107,16 @@ namespace RootForce
 		struct UserDisconnected
 		{
 			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to the server on connect
+		*/
+		struct UserInformation
+		{
+			RakNet::RakString Name;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

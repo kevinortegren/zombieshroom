@@ -18,25 +18,7 @@ namespace RootForce
 	void IngameState::Initialize()
 	{
 		//Bind c++ functions and members to Lua
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::logging_f, RootForce::LuaAPI::logging_m, "Logging");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::pointLight_f, RootForce::LuaAPI::pointLight_m, "PointLight");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::playerphysics_f, RootForce::LuaAPI::playerphysics_m, "PlayerPhysics");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::health_f, RootForce::LuaAPI::health_m, "Health");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::player_f, RootForce::LuaAPI::player_m, "Player");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::playeraction_f, RootForce::LuaAPI::playeraction_m, "PlayerAction");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::network_f, RootForce::LuaAPI::network_m, "Network");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
+		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
         
@@ -136,6 +118,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -157,8 +143,8 @@ namespace RootForce
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->SetAbility(1, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -179,6 +165,8 @@ namespace RootForce
 		{
 			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
 			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			t->m_position =pos[i];
+
 			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 		
 			Render::ParticleSystemDescription desc;
@@ -186,17 +174,22 @@ namespace RootForce
 			desc.m_initalVel = glm::vec3(0,0,0);
 			desc.m_size = glm::vec2(0.05f, 0.05f);
 
-			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
-			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+			RootForce::ParticleSystemStruct particleSystem;
+			particleSystem.m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			particleSystem.m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			particleSystem.m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			particleSystem.m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+
+			particleSystem.m_params[Render::Semantic::POSITION] = &t->m_position;
+
+			e->m_particleSystems.push_back(particleSystem);
 		}
 
 		/* TEMP END. */
 	}
 
 	void IngameState::Exit()
-		{
+	{
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
@@ -204,19 +197,22 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-		}
+	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
+		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
+		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			return GameStates::Menu;
-	}
+		}
 
 		// Check for disconnection from the server
-		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
-	{
+		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
+		{
 			return GameStates::Menu;
 		}
 		
@@ -226,8 +222,8 @@ namespace RootForce
 		//Update all the data that is displayed in the HUD
 		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
-		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Score) );
-		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Deaths) );
+		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<Player>(player)->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<Player>(player)->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
@@ -301,17 +297,18 @@ namespace RootForce
 
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
-		
-		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
         }
+
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
@@ -328,6 +325,11 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
 
 		if (m_networkContext.m_server != nullptr)
 		{
