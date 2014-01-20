@@ -131,18 +131,25 @@ namespace AbilityEditorNameSpace
 
 		struct Collision : MainComponent
 		{
-			//bool m_externallyControlled;
-			Collision() : MainComponent(ComponentType::COLLISION)
+			bool m_collidesWithWorld;
+			Collision(bool p_colWithWorld = true) : MainComponent(ComponentType::COLLISION)
 			{
-
+				m_collidesWithWorld = p_colWithWorld;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-			
+				QtVariantProperty* collidesWithWorld;
+
+				collidesWithWorld = p_propMan->addProperty(QVariant::Bool, "Collides with world" );
+				p_propMan->setValue(collidesWithWorld, m_collidesWithWorld);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(collidesWithWorld);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_collidesWithWorld = props.at(0)->valueText().compare("True") == 0 ? true : false;
 			}
 		};
 

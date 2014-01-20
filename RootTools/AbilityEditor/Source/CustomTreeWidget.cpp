@@ -29,7 +29,7 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())), event->mimeData()->text()))
 			{
 				QMessageBox msgBox;
-				msgBox.setText("A entity can only contain one of each type of component");
+				msgBox.setText("An entity can only contain one of each type of component");
 				msgBox.exec();
 				delete item;
 				return;
@@ -41,7 +41,7 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())->parent()), event->mimeData()->text()))
 			{
 				QMessageBox msgBox;
-				msgBox.setText("A entity can only contain one of each type of component");
+				msgBox.setText("An entity can only contain one of each type of component");
 				msgBox.exec();
 				return;
 			}

@@ -7,6 +7,7 @@
 #include <QtGui/QMouseEvent>
 #include <Qtgui/QPixmap>
 #include <Qtgui/QPainter>
+#include "ScriptGenerator.h"
 
 #include "GeneratedFiles/ui_AbilityEditor.h"
 
@@ -25,6 +26,7 @@ public:
 private slots:
 		void UpdatePropertyBrowser();
 		void ChangedTab();
+		void GenerateScript();
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;
@@ -34,6 +36,7 @@ private:
 	AbilityEditorNameSpace::OnCreate* m_onCreate;
 	AbilityEditorNameSpace::OnCollide* m_onCollide;
 	AbilityEditorNameSpace::OnDestroy* m_onDestroy;
+	AbilityEditorNameSpace::ScriptGenerator* m_scriptGenerator;
 	unsigned int m_LastSelectedTab;
 	bool event(QEvent* event);
 	QTreeWidgetItem* m_LastSelectedItem;

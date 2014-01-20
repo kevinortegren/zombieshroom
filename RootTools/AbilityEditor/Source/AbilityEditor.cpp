@@ -6,6 +6,7 @@
 #include <QtGui/QDrag>
 #include <QtCore/QMimeData>
 #include <QtGui/QPen>
+#include <QtWidgets/QFileDialog>
 #include "OnCreate.h"
 #include "Exporter.h"
 #include "Importer.h"
@@ -41,8 +42,11 @@ void AbilityEditor::Init()
 {
 	ui.setupUi(this);
 	m_onCreate = new AbilityEditorNameSpace::OnCreate();
-	m_onCollide =new AbilityEditorNameSpace::OnCollide();
-	m_onDestroy= new AbilityEditorNameSpace::OnDestroy();
+	m_onCollide = new AbilityEditorNameSpace::OnCollide();
+	m_onDestroy = new AbilityEditorNameSpace::OnDestroy();
+
+	m_scriptGenerator = new AbilityEditorNameSpace::ScriptGenerator();
+
 	ui.treeOnCreate->SetOnEventClass(m_onCreate);
 	ui.treeOnCollide->SetOnEventClass(m_onCollide);
 	ui.treeOnDestroy->SetOnEventClass(m_onDestroy);
@@ -81,6 +85,8 @@ void AbilityEditor::Init()
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.abilityWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
+	connect(ui.actionGenerate_Script, SIGNAL(triggered()), this, SLOT(GenerateScript()));
+
 	ui.listComponents->addItems(m_compNames);
 	ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
@@ -245,4 +251,15 @@ bool AbilityEditor::event( QEvent* event )
 	if(event->type() == QEvent::Drop)
 		return false;
 	return QWidget::event(event);
+}
+
+void AbilityEditor::GenerateScript()
+{
+	QFileDialog asdf(this);
+	asdf.setFileMode(QFileDialog::AnyFile);
+	asdf.setAcceptMode(QFileDialog::AcceptSave);
+	asdf.setNameFilter("*.lua");
+	QString path = asdf.getSaveFileName();
+	QString name = &(path.toStdString().at(path.lastIndexOf("/")+1));
+	m_scriptGenerator->GenerateScript(path, name, m_onCreate, m_onCollide, m_onDestroy);
 }
