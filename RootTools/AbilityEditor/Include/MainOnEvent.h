@@ -21,7 +21,7 @@ namespace AbilityEditorNameSpace
 		virtual void ViewComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name);
 		virtual void EditEntityData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows);
 		virtual void EditComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name);
-
+		virtual QString GetEntityName(unsigned int p_id) const{return m_entities.at(p_id)->m_name;}
 		virtual std::vector<AbilityEntity::Entity*>* GetEntities() { return &m_entities; }
 	protected:
 		//QtTreePropertyBrowser* m_propBrows;
