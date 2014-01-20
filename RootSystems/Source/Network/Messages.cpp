@@ -321,11 +321,17 @@ namespace RootForce
 		void UserConnected::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Name);
 		}
 
 		void UserDisconnected::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void UserInformation::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, Name);
 		}
 
 		void PlayerCommand::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)

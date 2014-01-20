@@ -1,8 +1,6 @@
 Player = {}
 
-function Player.OnCreate (userId, actionId)
-	local playerEntity = Entity.New();
-
+function Player.OnCreate(playerEntity, userId, actionId)
 	local transform = Transformation.New(playerEntity);
 	local playerPhysics = PlayerPhysics.New(playerEntity);
 	local health = Health.New(playerEntity);

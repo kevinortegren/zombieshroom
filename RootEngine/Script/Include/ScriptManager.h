@@ -19,6 +19,7 @@ namespace RootEngine
 			void SetFunction(std::string p_abilityName, std::string p_functionName);
 			void ExecuteScript();
 			int LoadScript(std::string p_scriptPath);
+			void AddParameterUserData(void* p_data, size_t p_size, const std::string& p_metaTable);
 			void AddParameterString(std::string p_string);
 			void AddParameterNumber(double p_double);
 			void AddParameterBoolean(bool p_bool);

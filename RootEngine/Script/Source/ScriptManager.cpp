@@ -50,8 +50,17 @@ namespace RootEngine
 			m_parameterCount = 0;
 		}
 
+		void ScriptManager::AddParameterUserData(void* p_data, size_t p_size, const std::string& p_metaTable)
+		{
+			void** p = (void**) lua_newuserdata(m_luaState, p_size);
+			*p = p_data;
+			luaL_setmetatable(m_luaState, p_metaTable.c_str());
+			m_parameterCount++;
+		}
+
 		void ScriptManager::AddParameterString(std::string p_string)
 		{
+			
 			lua_pushlstring(m_luaState, p_string.c_str(), p_string.length());
 			m_parameterCount++;
 		}

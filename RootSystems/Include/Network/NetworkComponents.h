@@ -85,6 +85,7 @@ namespace RootForce
 		struct ClientComponent : public ECS::Component<ClientComponent>
 		{
 			ClientState::ClientState State;
+			RakNet::RakString Name;
 		};
 	}
 }

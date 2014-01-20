@@ -98,9 +98,11 @@ TEST(Network, MessageSerializationUserConnected)
 	UserConnected m1;
 	UserConnected m2;
 	m1.User = 4;
+	m1.Name = "Juada";
 
 	SerializeAndDeserialize(m1, m2);
-	ASSERT_EQ(memcmp(&m1, &m2, sizeof(UserConnected)), 0);
+	ASSERT_EQ(m1.User, m2.User);
+	ASSERT_EQ(strcmp(m1.Name.C_String(), m2.Name.C_String()), 0);
 }
 
 TEST(Network, MessageSerializationUserDisconnected)
@@ -111,6 +113,16 @@ TEST(Network, MessageSerializationUserDisconnected)
 
 	SerializeAndDeserialize(m1, m2);
 	ASSERT_EQ(memcmp(&m1, &m2, sizeof(UserDisconnected)), 0);
+}
+
+TEST(Network, MessageSerializationUserInformation)
+{
+	UserInformation m1;
+	UserInformation m2;
+	m1.Name = "Jakljdjanf";
+
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(strcmp(m1.Name.C_String(), m2.Name.C_String()), 0);
 }
 
 TEST(Network, MessageSerializationPlayerCommand)

@@ -24,6 +24,7 @@ namespace RootForce
 				Chat,
 				UserConnected,
 				UserDisconnected,
+				UserInformation,
 				PlayerCommand,
 				DestroyEntities,
 				SpawnUser,
@@ -95,6 +96,7 @@ namespace RootForce
 		struct UserConnected
 		{
 			Network::UserID_t User;
+			RakNet::RakString Name;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -105,6 +107,16 @@ namespace RootForce
 		struct UserDisconnected
 		{
 			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to the server on connect
+		*/
+		struct UserInformation
+		{
+			RakNet::RakString Name;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
