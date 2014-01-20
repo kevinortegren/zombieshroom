@@ -150,14 +150,14 @@ namespace RootForce
 				if (ent->d_type != DT_REG) // Not a regular file
 					continue;
 				std::string fname = ent->d_name;
-				std::string extension = "world";
+				std::string extension = ".world";
 				if(fname.find(extension, (fname.length() - extension.length())) == std::string::npos) // Look for extension
 					continue; // Mismatching extension, skip file
 				if(!first)
 					command += ",";
 				else
 					first = !first;
-				command = command + "'" + fname + "'";
+				command = command + "'" + fname.substr(0,fname.length() - extension.length()) + "'";
 			}
 			closedir (dir);
 		}
