@@ -72,46 +72,51 @@ TEST(Network, SequenceIDs)
 }
 
 template <typename T>
-bool SerializeAndCompare(T& m1)
+void SerializeAndDeserialize(T& m1, T& m2)
 {
 	RakNet::BitStream bs;
 	m1.Serialize(true, &bs);
-
-	T m2;
 	m2.Serialize(false, &bs);
-
-	return memcmp(&m1, &m2, sizeof(T)) == 0;
 }
 
 TEST(Network, MessageSerializationChat)
 {
 	Chat m1;
+	Chat m2;
 	m1.Type = Chat::TYPE_SERVER_MESSAGE;
 	m1.Sender = 4;
 	m1.Message = "Foo bar";
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(m1.Type, m2.Type);
+	ASSERT_EQ(m1.Sender, m2.Sender);
+	ASSERT_EQ(strcmp(m1.Message.C_String(), m2.Message.C_String()), 0);
 }
 
 TEST(Network, MessageSerializationUserConnected)
 {
 	UserConnected m1;
+	UserConnected m2;
 	m1.User = 4;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(UserConnected)), 0);
 }
 
 TEST(Network, MessageSerializationUserDisconnected)
 {
 	UserDisconnected m1;
+	UserDisconnected m2;
 	m1.User = 4;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(UserDisconnected)), 0);
 }
 
 TEST(Network, MessageSerializationPlayerCommand)
 {
 	PlayerCommand m1;
+	PlayerCommand m2;
 	m1.User = 4;
 	m1.Action.MovePower = 1.0f;
 	m1.Action.StrafePower = -1.0f;
@@ -120,84 +125,113 @@ TEST(Network, MessageSerializationPlayerCommand)
 	m1.Action.ActivateAbility = true;
 	m1.Action.SelectedAbility = 2;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(PlayerCommand)), 0);
 }
 
 TEST(Network, MessageSerializationDestroyEntities)
 {
 	DestroyEntities m1;
+	DestroyEntities m2;
 	m1.ID.UserID = 4;
 	m1.ID.ActionID = 2;
 	m1.ID.SequenceID = 18;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(DestroyEntities)), 0);
 }
 
 TEST(Network, MessageSerializationSpawnUser)
 {
 	SpawnUser m1;
+	SpawnUser m2;
 	m1.User = 4;
 	m1.SpawnPointIndex = 43;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(SpawnUser)), 0);
 }
 
 TEST(Network, MessageSerializationLoadMap)
 {
 	LoadMap m1;
+	LoadMap m2;
 	m1.MapName = "GreenhouseBig";
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(strcmp(m1.MapName.C_String(), m2.MapName.C_String()), 0);
 }
 
 TEST(Network, MessageSerializationLoadMapStatus)
 {
 	LoadMapStatus m1;
+	LoadMapStatus m2;
 	m1.Status = LoadMapStatus::STATUS_FAILED_MAP_NOT_FOUND;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(LoadMapStatus)), 0);
 }
 
 TEST(Network, MessageSerializationSetMaxPlayers)
 {
 	SetMaxPlayers m1;
+	SetMaxPlayers m2;
 	m1.MaxPlayers = 14;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(SetMaxPlayers)), 0);
 }
 
 TEST(Network, MessageSerializationSetGameMode)
 {
 	SetGameMode m1;
+	SetGameMode m2;
 	m1.GameMode = 17;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(SetGameMode)), 0);
 }
 
 TEST(Network, MessageSerializationSetMatchTime)
 {
 	SetMatchTime m1;
+	SetMatchTime m2;
 	m1.Seconds = 1870;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(SetMatchTime)), 0);
 }
 
 TEST(Network, MessageSerializationSetKillCount)
 {
 	SetKillCount m1;
+	SetKillCount m2;
 	m1.Count = 445;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(memcmp(&m1, &m2, sizeof(SetKillCount)), 0);
 }
 
 TEST(Network, MessageSerializationServerInformation)
 {
 	ServerInformation m1;
+	ServerInformation m2;
+	m1.ServerName = "KJdfkaj";
 	m1.MapName = "HelloKitBig";
+	m1.CurrentPlayers = 556;
 	m1.MaxPlayers = 775;
+	m1.PasswordProtected = true;
 	m1.GameMode = 7;
 	m1.MatchTimeSeconds = 7769;
 	m1.KillCount = 47;
 
-	ASSERT_TRUE(SerializeAndCompare(m1));
+	SerializeAndDeserialize(m1, m2);
+	ASSERT_EQ(strcmp(m1.ServerName.C_String(), m2.ServerName.C_String()), 0);
+	ASSERT_EQ(strcmp(m1.MapName.C_String(), m2.MapName.C_String()), 0);
+	ASSERT_EQ(m1.CurrentPlayers, m2.CurrentPlayers);
+	ASSERT_EQ(m1.MaxPlayers, m2.MaxPlayers);
+	ASSERT_EQ(m1.PasswordProtected, m2.PasswordProtected);
+	ASSERT_EQ(m1.GameMode, m2.GameMode);
+	ASSERT_EQ(m1.MatchTimeSeconds, m2.MatchTimeSeconds);
+	ASSERT_EQ(m1.KillCount, m2.KillCount);
 }

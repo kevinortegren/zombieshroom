@@ -15,6 +15,11 @@ namespace RootForce
 		typedef uint64_t SynchronizedID_t;
 		typedef uint64_t UserActionKey_t;
 
+		static_assert(sizeof(uint8_t) == 1, "Invalid maximum number of bits in uint8_t");
+		static_assert(sizeof(uint16_t) == 2, "Invalid maximum number of bits in uint16_t");
+		static_assert(sizeof(uint32_t) == 4, "Invalid maximum number of bits in uint32_t");
+		static_assert(sizeof(uint64_t) == 8, "Invalid maximum number of bits in uint64_t");
+
 		/** Specifies reserved user IDs. Connected peers will start counting from index 0. */
 		namespace ReservedUserID
 		{
@@ -61,8 +66,8 @@ namespace RootForce
 			struct
 			{
 				UserID_t UserID;
-				ActionID_t ActionID;
 				SequenceID_t SequenceID;
+				ActionID_t ActionID;
 			};
 
 			SynchronizedID_t SynchronizedID;
