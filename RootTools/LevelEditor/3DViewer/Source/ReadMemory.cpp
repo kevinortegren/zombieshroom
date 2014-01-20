@@ -27,6 +27,7 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(int) * 5;
 	total_memory_size += sizeof(glm::vec2) * 4;
 	total_memory_size += sizeof(int);
+	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	
 
 
@@ -105,13 +106,54 @@ int ReadMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(int));
 
 	export = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	for(int i = 0; i < g_maxMessages; i++)
+	{
+		updateMessages[i] = ((UpdateMessage*)mem) + i ;
+	}
 	
+	mem = (unsigned char*)(mem + sizeof(UpdateMessage) * g_maxMessages);
+
+	NumberOfMessages = (int*)(mem);
 
 	if(first_process)
 	{
 		memset(raw_data,0,total_memory_size);
 	}
 	return 0;
+}
+
+void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape)
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+
+	if(*NumberOfMessages > 0)
+	{
+		out_type = updateMessages[0]->name;
+		out_updateIndex = updateMessages[0]->updateID;
+		out_removeIndex = updateMessages[0]->removeID;
+		out_updateTransform = updateMessages[0]->updateTransform;
+		out_updateShape = updateMessages[0]->updateShape;
+
+		for(int i = 0; i < g_maxMessages-1; i++)
+		{
+			*updateMessages[i] = *updateMessages[i+1];
+		}
+
+		*NumberOfMessages = *NumberOfMessages - 1;
+	}else
+	{
+		out_type = "";
+		out_updateIndex = -1;
+		out_removeIndex = -1;
+		out_updateTransform = false;
+		out_updateShape = false;
+	}
+
+	ReleaseMutex(IdMutexHandle);
 }
 
 int ReadMemory::shutdown()

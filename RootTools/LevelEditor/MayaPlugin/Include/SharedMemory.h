@@ -21,6 +21,7 @@ public:
 	int InitalizeSharedMemory();
 	void UpdateSharedMaterials(int nrOfMaterials, int meshID);
 	void UpdateSharedLocator(int index, int nrOfLocators);
+	void AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove); //Valid types are "Mesh", "Camera", "Light", "Locator"
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];
@@ -36,10 +37,14 @@ public:
 	int* NumberOfMaterials;
 	int* NumberOfLocators;
 
+	int* NumberOfMessages;
+
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
 	glm::vec2* LocatorIdChange;
+
+	UpdateMessage* updateMessages[g_maxMessages];
 
 	int* export;
 	

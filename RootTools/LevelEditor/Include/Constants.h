@@ -22,10 +22,29 @@ const string g_savepath = "C:/Users/BTH/Documents/zombieshroomMain/Assets/";
 
 const string g_levelName = "myTestLevel";
 
+const int g_maxMessages = 30;
+
+struct UpdateMessage
+{
+	char name[g_shortMaxNameLength];
+	int updateID, removeID;
+
+	bool updateTransform;
+	bool updateShape;
+
+	UpdateMessage()
+	{
+		updateID = -1;
+		removeID = -1;
+		updateTransform = false;
+		updateShape = false;
+	}
+};
+
 struct Transform
 {
 	int index;
-	char name[30];
+	char name[g_maxNameLength];
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;

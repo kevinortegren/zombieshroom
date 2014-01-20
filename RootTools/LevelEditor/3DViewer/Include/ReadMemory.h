@@ -29,10 +29,14 @@ public:
 	int* NumberOfMaterials;
 	int* NumberOfLocators;
 
+	int* NumberOfMessages;
+
 	glm::vec2* MeshIdChange;
 	glm::vec2* CameraIdChange;
 	glm::vec2* LightIdChange;
 	glm::vec2* LocatorIdChange;
+
+	UpdateMessage* updateMessages[g_maxMessages];
 
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
@@ -48,13 +52,15 @@ public:
 	HANDLE CameraMutexHandle;
 	HANDLE LocatorMutexHandle;
 	DWORD milliseconds;
+
+	void ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape);
 	
 private:
 	//Functions
 	int shutdown();
-	void ReadMesh(int);
-	void ReadCamera(int);
-	void ReadLight(int);
+	//void ReadMesh(int);
+	//void ReadCamera(int);
+	//void ReadLight(int);
 
 	//Variables
 

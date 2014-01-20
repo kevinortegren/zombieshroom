@@ -57,8 +57,8 @@ void CreateCameraEntity();
 
 void UpdateCamera();
 void LoadLocators();
-void UpdateMesh(int index, bool getIndexFromMaya);
-void UpdateLight(int index, bool getIndexFromMaya);
+void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
+void UpdateLight(int index, bool remove);
 
 void ExportToLevel();
 
@@ -132,13 +132,10 @@ int main(int argc, char* argv[])
 
 			/////////////////////// LOAD MESHES ////////////////////////////////
 
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-
+			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 			numberMeshes = *RM.NumberOfMeshes;
-			*RM.MeshIdChange = glm::vec2(-1, -1);
-
-			ReleaseMutex(RM.IdMutexHandle);
+			ReleaseMutex(RM.MeshMutexHandle);
 
 			for(int i = 0; i < numberMeshes; i++)
 			{				
@@ -149,16 +146,15 @@ int main(int argc, char* argv[])
 				auto buffer = g_engineContext.m_renderer->CreateBuffer();
 				mesh->SetVertexBuffer(buffer);
 
-				UpdateMesh(i, false);
+				UpdateMesh(i, true, true, false);
 			}			
 
 			///////////////////////// Load Lights ////////////////////////////////
 
-			RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-			WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+			RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+			WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
 			numberLights = *RM.NumberOfLights;
-			*RM.LightIdChange = glm::vec2(-1,-1);
-			ReleaseMutex(RM.IdMutexHandle);
+			ReleaseMutex(RM.LightMutexHandle);
 
 			for(int i = 0; i < numberLights; i++)
 			{
@@ -177,13 +173,26 @@ int main(int argc, char* argv[])
 
 				m_world.SetDelta(dt);
 
-				// GET LOCATOR ID CHANGE AND EXPORT STATE
+				string type;
+				int updateID, removeID;
+				bool updateTransform, updateShape;
+
+				//GET A MESSAGE
+				RM.ReadMessage(type, updateID, removeID, updateTransform, updateShape);
+				if(type != "")
+				{
+					cout << type << " ID " << updateID << endl;
+					cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
+				}
+
+				int locatorIdChange = -1;
+				if(type == "Locator")
+					locatorIdChange = updateID;
+
+				// GET EXPORT STATE
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-				int locatorIdChange = RM.LocatorIdChange->x;
-				RM.LocatorIdChange->x = -1;
-				entityExport = *RM.export;
-				
+				entityExport = *RM.export;				
 				ReleaseMutex(RM.IdMutexHandle);
 
 				/////////////  EXPORT   ///////////////////////
@@ -198,9 +207,25 @@ int main(int argc, char* argv[])
 				}
 
 				//UPDATE
-				UpdateMesh(-1, true);
-				UpdateLight(-1, true);								
-				UpdateCamera();
+
+				if(type == "Mesh")
+				{
+					if(removeID == -1)
+						UpdateMesh(updateID, updateTransform, updateShape, false);
+					else
+						UpdateMesh(removeID, updateTransform, updateShape, true);
+				}
+
+				if(type == "Light")
+				{
+					if(removeID == -1)
+						UpdateLight(updateID, false);
+					else
+						UpdateLight(removeID, true);
+				}
+
+				if(type == "Camera")
+					UpdateCamera();
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
@@ -535,21 +560,28 @@ void LoadLocators()
 	ReleaseMutex(RM.LocatorMutexHandle);
 }
 
-void UpdateMesh(int index, bool getIndexFromMaya)
+void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove)
 {
-	int MeshIndex = index;
+	int MeshIndex = -1;
 	int RemoveMeshIndex = -1;
 
-	if(getIndexFromMaya)
+	if(remove)
 	{
-		RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-		WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-		MeshIndex = RM.MeshIdChange->x;
-		RemoveMeshIndex = RM.MeshIdChange->y;
-		numberMeshes = *RM.NumberOfMeshes;
-		*RM.MeshIdChange = glm::vec2(-1, -1);
-		ReleaseMutex(RM.IdMutexHandle);
+		MeshIndex = -1;
+		RemoveMeshIndex = index;
 	}
+	else
+	{
+		MeshIndex = index;
+		RemoveMeshIndex = -1;
+	}
+
+
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	numberMeshes = *RM.NumberOfMeshes;
+	ReleaseMutex(RM.MeshMutexHandle);
+	
 
 	if(MeshIndex != -1)					
 	{
@@ -572,24 +604,49 @@ void UpdateMesh(int index, bool getIndexFromMaya)
 			cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
 		}
 
-		// TRANSFORM AND SCALE
-		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex]);
+		if(updateTransformation)
+		{
+			// TRANSFORM AND SCALE
+			RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(Entities[MeshIndex]);
 
-		transform->m_position = RM.PmeshList[MeshIndex]->transformation.position;
-		transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
+			transform->m_position = RM.PmeshList[MeshIndex]->transformation.position;
+			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
-		////Update material list
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath));
+			////Update material list
+			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath));
 
-		/// ROTATION
-		glm::quat rotation;
-		rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
-		rotation.y = RM.PmeshList[MeshIndex]->transformation.rotation.y;
-		rotation.z = RM.PmeshList[MeshIndex]->transformation.rotation.z;
-		rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;	
+			/// ROTATION
+			glm::quat rotation;
+			rotation.x = RM.PmeshList[MeshIndex]->transformation.rotation.x;
+			rotation.y = RM.PmeshList[MeshIndex]->transformation.rotation.y;
+			rotation.z = RM.PmeshList[MeshIndex]->transformation.rotation.z;
+			rotation.w = RM.PmeshList[MeshIndex]->transformation.rotation.w;	
 
-		transform->m_orientation.SetOrientation(rotation);
+			transform->m_orientation.SetOrientation(rotation);
 
+			//PIVOT
+			glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.rotPivot.x, -RM.PmeshList[MeshIndex]->transformation.rotPivot.y, -RM.PmeshList[MeshIndex]->transformation.rotPivot.z));
+			glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.scalePivot.x, -RM.PmeshList[MeshIndex]->transformation.scalePivot.y, -RM.PmeshList[MeshIndex]->transformation.scalePivot.z));
+
+			glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
+			glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
+
+			glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+			glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
+
+			glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
+
+			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
+			transform->m_position += modifiedPos;
+
+			// Get material connected to mesh and set it from materiallist
+			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+			rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
+		}
+		
+
+		if(updateShape)
+		{
 		// COPY VERTICES
 		Render::Vertex1P1N1UV* m_vertices;
 		m_vertices = new Render::Vertex1P1N1UV[g_maxVerticesPerMesh];
@@ -607,24 +664,7 @@ void UpdateMesh(int index, bool getIndexFromMaya)
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 
-		// Get material connected to mesh and set it from materiallist
-		RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
-		rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
-
-		//PIVOT
-		glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.rotPivot.x, -RM.PmeshList[MeshIndex]->transformation.rotPivot.y, -RM.PmeshList[MeshIndex]->transformation.rotPivot.z));
-		glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmeshList[MeshIndex]->transformation.scalePivot.x, -RM.PmeshList[MeshIndex]->transformation.scalePivot.y, -RM.PmeshList[MeshIndex]->transformation.scalePivot.z));
-
-		glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
-		glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
-
-		glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
-		glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
-
-		glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
-
-		glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
-		transform->m_position += modifiedPos;
+		}
 
 		ReleaseMutex(RM.MeshMutexHandle);
 	}
@@ -639,20 +679,27 @@ void UpdateMesh(int index, bool getIndexFromMaya)
 	}
 }
 
-void UpdateLight(int index, bool getIndexFromMaya)
+void UpdateLight(int index, bool remove)
 {
-	int LightIndex = index;
+	int LightIndex = -1;
 	int RemoveLightIndex = -1;
 
-	if(getIndexFromMaya)
+	if(remove)
 	{
-		RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-		WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-		LightIndex = RM.LightIdChange->x;
-		RemoveLightIndex = RM.LightIdChange->y;
-		*RM.LightIdChange = glm::vec2(-1,-1);
-		ReleaseMutex(RM.IdMutexHandle);
+		LightIndex = -1;
+		RemoveLightIndex = index;
 	}
+	else
+	{
+		LightIndex = index;
+		RemoveLightIndex = -1;
+	}
+
+	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	numberLights = *RM.NumberOfLights;
+	ReleaseMutex(RM.LightMutexHandle);
+	
 
 	int size = LightEntities.size()-1;
 
