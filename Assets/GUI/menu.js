@@ -8,6 +8,7 @@ $(document).ready(function() {
   $("#main-settings").click(function() {
     $("#main-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
+    LoadSettings();
   } );
   $("#main-exit").click(function() {
     Menu.Exit();
@@ -33,8 +34,8 @@ $(document).ready(function() {
   // Player settings
   var LoadSettings = function () {
     var settings = Menu.RequestSettings();
-    for(var skey => var sval in settings)
-      $("settings-"+skey").val(sval);
+    for(var key in settings)
+      $("#settings-"+key).val(settings[key]);
   }
   $("#player-settings-back").click(function() {
     $("#player-settings-menu").css("display", "none");
@@ -42,8 +43,8 @@ $(document).ready(function() {
     LoadSettings();
   } );
   $("#player-settings-save").click(function() {
-    var settings;
-    settings["name"] = $("#settings-name").val();
+    var settings = {};
+    settings["Name"] = $("#settings-Name").val();
     Menu.SaveSettings(settings);
     $("#player-settings-menu").css("display", "none");
     $("#settings-menu").css("display", "table");

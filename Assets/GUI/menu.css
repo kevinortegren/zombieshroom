@@ -170,13 +170,13 @@ a
   background-size: 250px 50px;
   background-position: 50% 50%;
 }
-#options-menu,
-#player-options-menu,
+#settings-menu,
+#player-settings-menu,
 #lan-menu
 {
   display: none;
 }
-#player-options-wrapper
+#player-settings-wrapper
 {
   width: 400px;
   border: 0;

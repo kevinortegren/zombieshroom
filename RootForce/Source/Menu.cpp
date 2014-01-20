@@ -150,12 +150,15 @@ namespace RootForce
 	void Menu::SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
 	{
 		if(!p_array[0].IsObject())
+		{
+			m_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "JavaScript called SaveSettings with a non-object argument.");
 			return;
+		}
 
 		// Parse array, save all values
 		Awesomium::JSObject map = p_array[0].ToObject();
 		Awesomium::JSArray keys = map.GetPropertyNames();
-		for(int i = 0; i < keys.size(); i++)
+		for(unsigned i = 0; i < keys.size(); i++)
 			m_context.m_configManager->SetConfigValue(
 				Awesomium::ToString(keys[i].ToString()),
 				Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString())
