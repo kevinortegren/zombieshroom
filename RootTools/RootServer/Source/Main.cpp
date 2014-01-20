@@ -88,11 +88,15 @@ void Main::Start()
 	// Load the server config file
 	RootSystems::ServerConfig conf = RootServer::ConfigLoader(g_engineContext.m_logger).Load(m_workingDir + "server.conf");
 
+	// Create a server information entity
+	ECS::Entity* serverInfoEntity = m_world.GetEntityManager()->CreateEntity();
+	m_world.GetEntityManager()->CreateComponent<RootForce::Network::ServerInformationComponent>(serverInfoEntity);
+	m_world.GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
+
 	// Initialize the server
-	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, conf));
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf));
 	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), &m_world));
 	m_serverMessageHandler->SetNetworkEntityMap(&m_networkEntityMap);
-	m_serverMessageHandler->SetServerInformation(m_server->GetServerInformation());
 	m_server->SetMessageHandler(m_serverMessageHandler.get());
 
 	// Start the main loop
