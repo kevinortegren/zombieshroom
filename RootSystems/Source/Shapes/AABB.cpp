@@ -31,6 +31,11 @@ namespace RootForce
 		return Rectangle(m_minX, m_minZ, GetLengthX(), GetLengthZ());
 	}
 
+	glm::vec3 AABB::GetCenter( void ) const
+	{
+		return glm::vec3(m_maxX - m_minX, m_maxY - m_minY, m_maxZ - m_minZ);
+	}
+
 	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color) const
 	{
 		glm::vec3 positions[8];

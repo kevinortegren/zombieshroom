@@ -172,6 +172,7 @@ namespace Render
 		
 		// Share depth attachment between gbuffer and forward.
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_geometryPass.m_depthHandle, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Setup fullscreen quad.
 		Render::Vertex1P1UV verts[4];
