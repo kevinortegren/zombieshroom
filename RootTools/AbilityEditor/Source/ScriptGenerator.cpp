@@ -17,9 +17,11 @@ namespace AbilityEditorNameSpace
 
 	void ScriptGenerator::GenerateScript( QString p_filePath, QString p_scriptName, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
+		p_scriptName.chop(4);
 		m_name = p_scriptName.toStdString();
+		
 		//std::ofstream file;
-		m_file.open(p_filePath.toStdString() + ".lua");
+		m_file.open(p_filePath.toStdString());// + ".lua");
 		
 		//Begin writing in the file
 		m_file << "ACTION_CREATE = 0;\n";
@@ -30,7 +32,7 @@ namespace AbilityEditorNameSpace
 		m_file << "\n";
 		m_file << "function " << m_name << ".Process (action, ...)\n";
 		m_file << "\n";
-		m_file << "\t local args = table.pack(...);\n";
+		m_file << "\tlocal args = table.pack(...);\n";
 		m_file << "\n";
 		m_file << "\tif action == ACTION_CREATE then\n";
 		m_file << "\t\t" << m_name << ".OnCreate();\n";
@@ -44,6 +46,11 @@ namespace AbilityEditorNameSpace
 		m_file << "\n";
 
 		WriteOnCreate(p_onCreate);
+		m_file << "\n";
+		WriteOnCollide(p_onCollide);
+		m_file << "\n";
+		WriteOnDestroy(p_onDestroy);
+		m_file << "\n";
 
 		m_file.close();
 	}
@@ -63,14 +70,14 @@ namespace AbilityEditorNameSpace
 			m_file << "\tlocal entity" << i << " = Entity.New();\n";
 			m_file << "\n";
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
-				m_file << "\tlocal renderComp" << i << " = Renderable.New(entity);\n";
+				m_file << "\tlocal renderComp" << i << " = Renderable.New(entity" << i << ");\n";
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
 			{
-				m_file << "\tlocal collisionComp" << i << " = Collision.New(entity);\n";
-				m_file << "\tlocal colRespComp" << i << " = CollisionResponder.New(entity);\n";
+				m_file << "\tlocal collisionComp" << i << " = Collision.New(entity" << i << ");\n";
+				m_file << "\tlocal colRespComp" << i << " = CollisionResponder.New(entity" << i << ");\n";
 				if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISIONSHAPE))
 				{
-					m_file << "\tlocal physicsComp" << i << " = Physics.New(entity);\n";
+					m_file << "\tlocal physicsComp" << i << " = Physics.New(entity" << i << ");\n";
 					if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
 						m_file << "\tcollisionComp" << i << ":CreateHandle(entity" << i << ":GetId(), 1, false);\n";
 					else
@@ -78,10 +85,10 @@ namespace AbilityEditorNameSpace
 				}
 			}
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::TRANSFORM))
-				m_file << "\tlocal transformComp" << i << " = Transformation.New(entity);\n";
+				m_file << "\tlocal transformComp" << i << " = Transformation.New(entity" << i << ");\n";
 			//if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::OFFENSIVEABILITY))
 			//	m_file << "local "
-
+			m_file << "\tlocal scriptComp" << i << " = Script.New(entity" << i << ", \"" << m_name << "\");\n";
 		}
 		// Setting values
 		for (int i = 0; i < m_entityOffset; i++)
@@ -132,26 +139,28 @@ namespace AbilityEditorNameSpace
 				{
 					colWithWorld = ((AbilityComponents::Collision*)entities->at(i)->m_components->at(j))->m_collidesWithWorld;
 				}
-				if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
-				{
-					m_file << "\tphysicsComp"<< i << ":BindShape(collisionComp" << i << ", Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<mass<<", "<<radius<<", "<<(colWithWorld ? "true" : "false")<<");\n";
-					if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
-						m_file << "\tphysicsComp"<< i << ":SetVelocity(collisionComp" << i << ", Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
-					m_file << "\tcolRespComp" << i << ":SetContainer(collisionComp" << i << ");\n";
-				}
+			}
+			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
+			{
+				m_file << "\tphysicsComp"<< i << ":BindShape(collisionComp" << i << ", Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<mass<<", "<<radius<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
+					m_file << "\tphysicsComp"<< i << ":SetVelocity(collisionComp" << i << ", Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
+				m_file << "\tcolRespComp" << i << ":SetContainer(collisionComp" << i << ");\n";
 			}
 		}
 		m_file << "end\n";
 	}
 
-	void ScriptGenerator::WriteOnCollide( OnCreate* p_onCollide )
+	void ScriptGenerator::WriteOnCollide( OnCollide* p_onCollide )
 	{
-
+		m_file << "function " << m_name << ".OnCollide (args)\n";
+		m_file << "end\n";
 	}
 
-	void ScriptGenerator::WriteOnDestroy( OnCreate* p_onDestroy )
+	void ScriptGenerator::WriteOnDestroy( OnDestroy* p_onDestroy )
 	{
-
+		m_file << "function " << m_name << ".OnDestroy (args)\n";
+		m_file << "end\n";
 	}
 
 }

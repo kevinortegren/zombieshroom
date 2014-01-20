@@ -18,8 +18,8 @@ namespace AbilityEditorNameSpace
 
 	private:
 		void WriteOnCreate(OnCreate* p_onCreate);
-		void WriteOnCollide(OnCreate* p_onCollide);
-		void WriteOnDestroy(OnCreate* p_onDestroy);
+		void WriteOnCollide(OnCollide* p_onCollide);
+		void WriteOnDestroy(OnDestroy* p_onDestroy);
 
 	private:
 		std::string m_name;

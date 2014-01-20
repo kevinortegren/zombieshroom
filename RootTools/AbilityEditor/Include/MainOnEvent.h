@@ -17,10 +17,12 @@ namespace AbilityEditorNameSpace
 		virtual void RemoveComponent(unsigned int p_id, QString p_name);
 		virtual bool CheckForExistingComponents(unsigned int p_id,  AbilityComponents::ComponentType::ComponentType p_type);
 		virtual bool CheckForExistingComponents(unsigned int p_id, QString p_name);
-		virtual void ViewEntityData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows);
-		virtual void ViewComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name);
-		virtual void EditEntityData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows);
-		virtual void EditComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name);
+		virtual void ViewEntityData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan);
+		virtual void ViewComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name, QtVariantPropertyManager* p_propMan);
+		virtual void EditEntityData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan);
+		virtual void EditComponentData(unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name, QtVariantPropertyManager* p_propMan);
+		virtual void Clear();
+		//virtual QtVariantPropertyManager* PointMeToPropMan() { return m_propManager; }
 		
 		virtual std::vector<AbilityEntity::Entity*>* GetEntities() { return &m_entities; }
 	protected:

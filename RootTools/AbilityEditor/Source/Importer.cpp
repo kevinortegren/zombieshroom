@@ -126,9 +126,9 @@ namespace AbilityEditorNameSpace
 				if(p_node.FindValue("scale"))
 				{
 					float x,y,z;
-					p_node["Rotation"][0] >> x;
-					p_node["Rotation"][1] >> y;
-					p_node["Rotation"][2] >> z;
+					p_node["scale"][0] >> x;
+					p_node["scale"][1] >> y;
+					p_node["scale"][2] >> z;
 					tempcomp->m_scale = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
