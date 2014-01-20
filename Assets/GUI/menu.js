@@ -5,36 +5,55 @@ $(document).ready(function() {
     $("#lan-menu").css("display", "table");
     $("#lan-refresh").click();
   } );
-  $("#main-options").click(function() {
+  $("#main-settings").click(function() {
     $("#main-menu").css("display", "none");
-    $("#options-menu").css("display", "table");
+    $("#settings-menu").css("display", "table");
   } );
   $("#main-exit").click(function() {
     Menu.Exit();
   } );
-  // Options menu
-  $("#options-player").click(function() {
+  // Settings menu
+  $("#settings-player").click(function() {
+    $("#settings-menu").css("display", "none");
+    $("#player-settings-menu").css("display", "table");
+  } );
+  $("#settings-graphics").click(function() {
     alert("Not yet implemented! D:");
   } );
-  $("#options-graphics").click(function() {
+  $("#settings-sound").click(function() {
     alert("Not yet implemented! D:");
   } );
-  $("#options-sound").click(function() {
+  $("#settings-controls").click(function() {
     alert("Not yet implemented! D:");
   } );
-  $("#options-keybind").click(function() {
-    alert("Not yet implemented! D:");
-  } );
-  $("#options-back").click(function() {
-    $("#options-menu").css("display", "none");
+  $("#settings-back").click(function() {
+    $("#settings-menu").css("display", "none");
     $("#main-menu").css("display", "table");
   } );
+  // Player settings
+  var LoadSettings = function () {
+    var settings = Menu.RequestSettings();
+    for(var skey => var sval in settings)
+      $("settings-"+skey").val(sval);
+  }
+  $("#player-settings-back").click(function() {
+    $("#player-settings-menu").css("display", "none");
+    $("#settings-menu").css("display", "table");
+    LoadSettings();
+  } );
+  $("#player-settings-save").click(function() {
+    var settings;
+    settings["name"] = $("#settings-name").val();
+    Menu.SaveSettings(settings);
+    $("#player-settings-menu").css("display", "none");
+    $("#settings-menu").css("display", "table");
+  } );
   // Lan menu
-  function ClearTable()
+  var ClearTable = function ()
   {
     $("#lan-list tr").not($("#lan-list thead tr")).remove();
-	$("#lan-list").append("<tr style='display:none;'><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-	$("#lan-list").tablesorter();
+    $("#lan-list").append("<tr style='display:none;'><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+    $("#lan-list").tablesorter();
   };
   $("#lan-back").click(function() {
     $("#main-menu").css("display", "table");

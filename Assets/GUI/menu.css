@@ -171,9 +171,19 @@ a
   background-position: 50% 50%;
 }
 #options-menu,
+#player-options-menu,
 #lan-menu
 {
   display: none;
+}
+#player-options-wrapper
+{
+  width: 400px;
+  border: 0;
+  padding: 1px 20px 18px 20px;
+  margin: auto;
+  background: url('Ram.png') transparent;
+  background-size: 100% 100%;
 }
 #lan-wrapper
 {
