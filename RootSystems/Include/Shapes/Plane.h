@@ -30,4 +30,6 @@ namespace RootForce
 
 	void NormalizePlane(PlaneEx& p_plane);
 	float PlaneIntersectLine(PlaneEx& p_plane, Line& p_line);
+	glm::vec3 PlaneIntersectLineA(PlaneEx& p_plane, glm::vec3& p_a, glm::vec3& p_b);
+
 }

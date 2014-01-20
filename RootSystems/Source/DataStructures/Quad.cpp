@@ -287,37 +287,50 @@ namespace RootForce
 
 		for(auto polygon = p_polygons.begin(); polygon != p_polygons.end(); ++polygon)
 		{
-			bool add = true;
-			int a = 0;
-			for(unsigned i = 0; i < (*polygon).m_indices.size(); ++i)
-			{
-				glm::vec3 position = m_vertices[(*polygon).m_indices[i]].m_pos;
-	
-				glm::vec2 point = glm::vec2(position.x, position.z);
+			glm::vec3 center = CalcCenter((*polygon));
 
-				if(!p_rect.IsPointContained(point))
-				{
-					add = false;
-					break;
-				}
-				else
-				{
-					a++;
-				}
-			}
-
-			if(add)
+			if(p_rect.IsPointContained(glm::vec2(center.x, center.z)))
 			{
 				polygons.push_back((*polygon));
-			}
-			else
-			{
-				if(a > 0)
-				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Failed to add polygon %d of %d.", a, (*polygon).m_indices.size());
 			}
 		}
 
 		return polygons;
+	}
+
+	glm::vec3 QuadTree::CalcCenter(Polygon& p_polygon)
+	{
+		float area = 0;
+		float cx = 0;
+		float cy = 0;
+
+		int i;
+		for(i = 0; i < p_polygon.m_indices.size()-1; ++i)
+		{
+			glm::vec3 p0 = m_vertices[p_polygon.m_indices[i+1]].m_pos;
+			glm::vec3 p1 = m_vertices[p_polygon.m_indices[i]].m_pos;
+
+			float tmp = p0.x * p1.z - p1.x * p0.z;
+			area += tmp;
+
+			cx += (p0.x + p1.x) * area;
+			cy += (p0.z + p1.z) * area;
+		}
+
+		glm::vec3 p0 = m_vertices[p_polygon.m_indices[i]].m_pos;
+		glm::vec3 p1 = m_vertices[p_polygon.m_indices[0]].m_pos;
+
+		float tmp = p0.x * p1.z - p1.x * p0.z;
+		area += tmp;
+
+		cx += (p0.x + p1.x) * area;
+		cy += (p0.z + p1.z) * area;
+
+		area *= 0.5f;
+		cx /= (6.0f * area);
+		cy /= (6.0f * area);
+		
+		return glm::vec3(cx, 0, cy);
 	}
 
 	PolygonSplit QuadTree::SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon)
@@ -384,14 +397,19 @@ namespace RootForce
 	{
 		Line l;
 		l.m_origin = p_p0.m_pos;
-		l.m_direction = glm::normalize(p_p1.m_pos - p_p0.m_pos);
+		l.m_direction = p_p1.m_pos - p_p0.m_pos;
 
 		float t = PlaneIntersectLine(p_divider, l);
 
+		Render::Vertex1P1N1UV as;
+		as.m_pos = l.m_origin + l.m_direction * t;
+
+		glm::vec3 i = PlaneIntersectLineA(p_divider, p_p0.m_pos, p_p1.m_pos);
+
 		Render::Vertex1P1N1UV newVertex;
-		newVertex.m_pos = p_p0.m_pos + l.m_direction * t;
+		newVertex.m_pos = i;
 		newVertex.m_normal = p_p0.m_normal;
-		newVertex.m_UV = p_p0.m_UV + (p_p1.m_UV - p_p0.m_UV) * t;
+		newVertex.m_UV = glm::vec2(1,1);
 
 		int index = m_vertices.size();
 		m_vertices.push_back(newVertex);

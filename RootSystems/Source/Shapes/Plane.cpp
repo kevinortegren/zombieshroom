@@ -33,4 +33,14 @@ namespace RootForce
 
 		return f;
 	}
+
+	glm::vec3 PlaneIntersectLineA(PlaneEx& p_plane, glm::vec3& p_a, glm::vec3& p_b)
+	{
+		glm::vec3 ba = p_b-p_a;
+		float nDotA = glm::dot(glm::vec3(p_plane.a, p_plane.b, p_plane.c), p_a);
+		float nDotBA = glm::dot(glm::vec3(p_plane.a, p_plane.b, p_plane.c), ba);
+
+		return p_a + (((p_plane.d - nDotA)/nDotBA) * ba);
+	}
+
 }

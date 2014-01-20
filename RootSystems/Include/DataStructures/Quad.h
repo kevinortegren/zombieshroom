@@ -89,6 +89,8 @@ namespace RootForce
 		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);
 		int SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1);
 
+		glm::vec3 CalcCenter(Polygon& p_polygon);
+
 		RootEngine::GameSharedContext* m_context;
 		ECS::World* m_world;
 		int m_minY, m_maxY;
