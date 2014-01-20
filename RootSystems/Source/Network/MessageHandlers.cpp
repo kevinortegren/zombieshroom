@@ -225,7 +225,7 @@ namespace RootForce
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
 					m.Serialize(true, &bs);
 
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, false);
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 
 					// Set the new client state
 					clientComponent->State = ClientState::AWAITING_USER_CONNECT;
