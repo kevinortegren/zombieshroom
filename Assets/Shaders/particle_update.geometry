@@ -12,6 +12,11 @@ layout(std140) uniform PerFrame
 	float g_time;
 };
 
+layout(std140) uniform PerObject
+{
+	vec3 g_Position;
+};
+
 in vec3 vert_initialVel[];
 in vec2 vert_scale[];
 in float vert_age[];
@@ -37,10 +42,10 @@ void main()
 
 	if(vert_type[0] == 0)
 	{
-		if(age > 0.0000001f)
+		if(age > 0.05f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 = gl_in[0].gl_Position.xyz;
+			vert_initialPos1 = g_Position;
 			vert_initialVel1 = GetRandomDir(g_time);
 			vert_scale1 = vert_scale[0];
 			vert_age1 = 0.0f;
@@ -53,7 +58,7 @@ void main()
 		}
 
 		// Always output the emitter particle with initial values.
-		vert_initialPos1 = gl_in[0].gl_Position.xyz;
+		vert_initialPos1 = g_Position;
 		vert_initialVel1 = vert_initialVel[0];
 		vert_scale1 = vert_scale[0];
 		vert_age1 = age;

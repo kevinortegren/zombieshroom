@@ -8,10 +8,16 @@
 
 namespace RootForce
 {
-	struct ParticleEmitter : public ECS::Component<ParticleEmitter>
+	struct ParticleSystemStruct
 	{
 		Render::ParticleSystemInterface* m_system;
 		Render::Material* m_material;
+		std::map<Render::Semantic::Semantic, void*> m_params;
+	};
+
+	struct ParticleEmitter : public ECS::Component<ParticleEmitter>
+	{
+		std::vector<ParticleSystemStruct> m_particleSystems;
 	};
 
 	class ParticleSystem : public ECS::EntitySystem

@@ -6,6 +6,9 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/PhysicsSystem.h>
+#include <RootSystems/Include/LightSystem.h>
+#include <RootSystems/Include/Components.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;

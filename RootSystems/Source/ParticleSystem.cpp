@@ -27,22 +27,28 @@ namespace RootForce
 	{
 		ParticleEmitter* emitter = m_emitters.Get(p_entity);
 
-		auto updateTechnique = emitter->m_material->m_effect->GetTechniques()[0];
-		updateTechnique->Apply();
-
-		for(unsigned i = 0; i <updateTechnique->GetPrograms().size(); ++i)
+		for(auto itr = emitter->m_particleSystems.begin(); itr != emitter->m_particleSystems.end(); ++itr)
 		{
-			updateTechnique->GetPrograms()[i]->Apply();
+			auto updateTechnique = (*itr).m_material->m_effect->GetTechniques()[0];
+			
+			g_engineContext.m_renderer->SetParticleUniforms(updateTechnique.get(), (*itr).m_params);
 
-			emitter->m_system->Update();
-		}
+			updateTechnique->Apply();
 
-		Render::RenderJob job;
-		job.m_mesh = emitter->m_system->GetMesh();
-		job.m_material = emitter->m_material;
-		job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
+			for(unsigned i = 0; i < updateTechnique->GetPrograms().size(); ++i)
+			{
+				updateTechnique->GetPrograms()[i]->Apply();
+
+				(*itr).m_system->Update();
+			}
+
+			Render::RenderJob job;
+			job.m_mesh = (*itr).m_system->GetMesh();
+			job.m_material = (*itr).m_material;
+			job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
 		
-		g_engineContext.m_renderer->AddRenderJob(job);
+			g_engineContext.m_renderer->AddRenderJob(job);
+		}
 	}
 
 	void ParticleSystem::End()

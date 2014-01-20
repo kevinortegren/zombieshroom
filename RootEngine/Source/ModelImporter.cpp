@@ -73,7 +73,7 @@ namespace RootEngine
 
 	void ModelImporter::Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename )
 	{
-		for(unsigned int i = 0; i < p_node->mNumMeshes; ++i)
+		for(unsigned i = 0; i < p_node->mNumMeshes; ++i)
 		{
 			InitMesh(i, p_scene->mMeshes[i], p_filename);
 
@@ -81,7 +81,7 @@ namespace RootEngine
 			m_model->m_transform = glm::transpose(m_model->m_transform);
 		}
 
-		for(unsigned int i = 0; i < p_node->mNumChildren; ++i)
+		for(unsigned i = 0; i < p_node->mNumChildren; ++i)
 		{
 			Traverse(p_node->mChildren[i], p_scene, p_filename);
 		}

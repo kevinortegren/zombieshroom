@@ -14,6 +14,7 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 }
 
@@ -52,6 +53,7 @@ TEST(RespawnSystem, ProcessEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 
 }

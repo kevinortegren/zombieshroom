@@ -9,7 +9,7 @@ namespace RootForce
 	public:
 		HUD();
 		~HUD();
-		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher);
+		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext);
 		std::shared_ptr<ChatSystem> GetChatSystem() { return m_chatSystem; }
 		Awesomium::WebView* GetView() { return m_view; }
 

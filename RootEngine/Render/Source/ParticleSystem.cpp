@@ -3,6 +3,7 @@
 
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
+#include <RootEngine/Render/Include/Semantics.h>
 
 namespace Render
 {
@@ -60,6 +61,7 @@ namespace Render
 		m_currentVB = 0;
 		m_currentTFB = 1;
 		m_first = true;
+
 	}
 
 	void ParticleSystem::Update()
@@ -108,6 +110,12 @@ namespace Render
 
 		m_perFrameBuffer.Init(GL_UNIFORM_BUFFER);
 		m_perFrameBuffer.BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
+
+		m_perObjectBuffer.Init(GL_UNIFORM_BUFFER);
+		char data[RENDER_PARTICLES_UNIFORM_SIZE];
+		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
+
+		m_perObjectBuffer.BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
 	}
 
 	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc)
@@ -125,6 +133,17 @@ namespace Render
 		return &m_particleSystems[slot++];
 	}
 
+	void ParticleSystemHandler::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
+	{
+		for(auto itr = p_params.begin(); itr != p_params.end(); ++itr)
+		{
+			int offset = p_technique->m_uniformsParams[(*itr).first];
+			unsigned size = Render::GLRenderer::s_sizes[(*itr).first];
+
+			m_perObjectBuffer.BufferSubData(offset, size, (*itr).second);
+		}
+	}
+
 	void ParticleSystemHandler::Free(ParticleSystem* p_system)
 	{
 		m_emptyParticleSlots.push(p_system->m_slot);
@@ -140,6 +159,8 @@ namespace Render
 		m_perFrameBuffer.BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, 5, m_perFrameBuffer.GetBufferId());
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer.GetBufferId());
 	}
 
 	void ParticleSystemHandler::EndTransform()
@@ -160,7 +181,7 @@ namespace Render
 
 		glGenTextures(1, &m_randomTexture);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
-		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, randomVectors.size(), 0.0f, GL_RGB, GL_FLOAT, randomVectors.data());
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, randomVectors.size(), 0, GL_RGB, GL_FLOAT, randomVectors.data());
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);

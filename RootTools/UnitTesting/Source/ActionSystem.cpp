@@ -1,9 +1,6 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
-#include <RootForce/Include/LuaAPI.h>
-
-ECS::World* g_world; // because LUA needs it
 
 TEST(ActionSystem, ProcessEmptyEntity) 
 {
@@ -17,6 +14,7 @@ TEST(ActionSystem, ProcessEmptyEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 }
 
@@ -31,8 +29,6 @@ TEST(ActionSystem, ProcessEntity)
 	pSystem->SetLoggingInterface(g_engineContext.m_logger);
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
-
-	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 
 	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
 	g_engineContext.m_resourceManager->LoadScript("AbilityTest");
@@ -66,7 +62,7 @@ TEST(ActionSystem, ProcessEntity)
 	//Make sure we are not falling when testing the positioning
 	for(int i = 0; i < 1000; i++)
 	{
-		g_engineContext.m_physics->Update(i*0.01f);
+		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
 	}
 
@@ -121,5 +117,6 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();
+	g_engineContext.m_physics->RemoveAll();
 	delete world;
 }

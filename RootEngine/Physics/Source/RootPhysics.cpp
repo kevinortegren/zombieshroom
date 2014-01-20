@@ -1254,6 +1254,19 @@ namespace Physics
 		}
 	}
 
+
+	bool RootPhysics::IsOnGround( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return false;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			return m_playerObjects.at(index)->IsOnGround();
+		} 
+		return false;
+	}
+
 }
 }
 

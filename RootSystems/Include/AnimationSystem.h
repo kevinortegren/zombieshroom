@@ -29,12 +29,13 @@ namespace RootForce
 
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation():m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f){}
+		Animation():m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f), m_locked(0){}
 
 		glm::mat4		m_bones[20];
 		AnimationClip::AnimationClip	m_animClip;
 		AnimationClip::AnimationClip	m_prevAnimClip;
 		float			m_animTime;
+		int				m_locked;
 		bool			m_blending;
 		float			m_blendTime;
 		std::map<std::string, aiVector3D> m_blendPos;

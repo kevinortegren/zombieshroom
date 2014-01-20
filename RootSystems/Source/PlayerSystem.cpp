@@ -28,6 +28,8 @@ namespace RootForce
 
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
+		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
+
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
 
@@ -41,6 +43,9 @@ namespace RootForce
 		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap_Anim");
 
 		transform->m_position = glm::vec3(100, 10, 0);
+
+		state->PrevPosition = transform->m_position;
+		state->CurrentState = RootForce::EntityState::DESCENDING;
 
 		playerControl->m_mouseSensitivity = 0.3f;
 		playphys->MovementSpeed = 10.0f;

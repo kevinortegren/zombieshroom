@@ -6,18 +6,24 @@
 namespace RootForce
 {
 
-	void ChatSystem::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher )
+	void ChatSystem::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext)
 	{
 		m_view = p_view;
 		m_hasFocus = false;
 		m_view->Focus();
 
+		m_engineContext = p_engineContext;
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("ChatSystem"));
 
-		if(result.IsObject() && result.ToObject().type() != Awesomium::kJSObjectType_Local)
+		if(result.IsObject())
 		{
 			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Send"), JSDelegate(this, &ChatSystem::ProcessMessage));
 			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("SetFocus"), JSDelegate(this, &ChatSystem::SetFocus));
+		}
+		else
+		{
+			m_engineContext->m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Could not create ChatSystem object in Javascript");
+			return;
 		}
 		m_view->set_js_method_handler(p_dispatcher);
 		m_view->Focus();

@@ -92,6 +92,7 @@ namespace RootEngine
 
 			//Not final?
 			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
@@ -153,6 +154,7 @@ namespace RootEngine
 			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
+			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);

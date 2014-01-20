@@ -118,6 +118,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
 
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -139,8 +143,8 @@ namespace RootForce
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->SetAbility(1, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -161,6 +165,8 @@ namespace RootForce
 		{
 			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
 			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			t->m_position =pos[i];
+
 			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
 		
 			Render::ParticleSystemDescription desc;
@@ -168,10 +174,15 @@ namespace RootForce
 			desc.m_initalVel = glm::vec3(0,0,0);
 			desc.m_size = glm::vec2(0.05f, 0.05f);
 
-			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
-			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+			RootForce::ParticleSystemStruct particleSystem;
+			particleSystem.m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
+			particleSystem.m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			particleSystem.m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			particleSystem.m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+
+			particleSystem.m_params[Render::Semantic::POSITION] = &t->m_position;
+
+			e->m_particleSystems.push_back(particleSystem);
 		}
 
 		/* TEMP END. */
@@ -286,17 +297,18 @@ namespace RootForce
 
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
-		
-		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		//m_animationSystem->Process();
         {
             PROFILE("Action system", g_engineContext.m_profiler);
             m_actionSystem->Process();
         }
+
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
@@ -313,6 +325,11 @@ namespace RootForce
             PROFILE("Collision system", g_engineContext.m_profiler);
             m_collisionSystem->Process();
         }
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
 
 		if (m_networkContext.m_server != nullptr)
 		{

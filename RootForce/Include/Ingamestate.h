@@ -13,6 +13,7 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/RespawnSystem.h>
+#include <RootSystems/Include/StateSystem.h>
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
@@ -59,6 +60,7 @@ namespace RootForce
 		RootForce::MatchStateSystem* m_gameLogicSystem;
 		RootSystems::ActionSystem* m_actionSystem;
 		RootSystems::RespawnSystem* m_respawnSystem;
+		RootSystems::StateSystem* m_stateSystem;
 
 	};
 }

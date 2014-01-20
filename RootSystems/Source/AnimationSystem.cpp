@@ -10,7 +10,6 @@ namespace RootForce
 
 	void AnimationSystem::Begin()
 	{
-		int a = 0; //??
 	}
 
 	void AnimationSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -22,13 +21,33 @@ namespace RootForce
 
 			if(animation->m_animClip != animation->m_prevAnimClip)
 			{
-				animation->m_animTime = 0.0f;
-				animation->m_prevAnimClip = animation->m_animClip;
-				animation->m_blending = true;
-				animation->m_blendTime = 0.0f;
+				if(animation->m_locked == 2)
+					animation->m_animClip = animation->m_prevAnimClip;
+				else
+				{
+					animation->m_animTime = 0.0f;
+					animation->m_prevAnimClip = animation->m_animClip;
+					animation->m_blending = true;
+					animation->m_blendTime = 0.0f;
+					if(animation->m_locked == 1)
+						animation->m_locked = 2;
+				}
 			}
+
+			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
+			glm::mat4 Identity = glm::mat4(1.0);
+
+			float TicksPerSecond = (float)(tempScene->mAnimations[0]->mTicksPerSecond != 0 ? tempScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+
 			if(!animation->m_blending)
+			{
 				animation->m_animTime += m_world->GetDelta();
+				if(animation->m_locked == 2 && animation->m_animTime*TicksPerSecond >= (float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_duration)
+				{
+					animation->m_locked = 0;
+					return;
+				}
+			}
 			else
 			{
 				animation->m_blendTime += m_world->GetDelta();
@@ -38,13 +57,9 @@ namespace RootForce
 				}
 			}
 			
-			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
-			glm::mat4 Identity = glm::mat4(1.0);
-			
-			float TicksPerSecond	= (float)(tempScene->mAnimations[0]->mTicksPerSecond != 0 ? tempScene->mAnimations[0]->mTicksPerSecond : 25.0f);
 			float TimeInTicks		= animation->m_animTime * TicksPerSecond;
 			float AnimationTime		= ((float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_startTime) + fmod(TimeInTicks, (float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_duration);
-		
+			
 			ReadNodeHeirarchy(AnimationTime, tempScene->mRootNode, Identity, animation, renderable, tempScene);
 		}
 	}
@@ -52,9 +67,6 @@ namespace RootForce
 	void AnimationSystem::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene)
 	{    
 		std::string NodeName(pNode->mName.data);
-		//std::cout << NodeName << "\n";
-		if(NodeName == "Mesh2q" || NodeName == "Character1_Reference")
-			return;
 
 		const aiAnimation* pAnimation = p_aiScene->mAnimations[0];
 

@@ -2,6 +2,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 #endif
+#include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -14,6 +15,7 @@ namespace RootEngine
 	public:
 		virtual void Update(float dt) = 0;
 		virtual void StoreSample(std::string p_name, __int64 p_elapsedTime) = 0;
+		virtual void SetMemoryTracker(MemoryTracker* p_memTracker) = 0;
 #ifndef COMPILE_LEVEL_EDITOR
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
 #endif
@@ -28,6 +30,7 @@ namespace RootEngine
 		
 		void Update(float dt);
 		void StoreSample(std::string p_name, __int64 p_elapsedTime);
+		void SetMemoryTracker(MemoryTracker* p_memTracker);
 #ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 #endif
@@ -38,6 +41,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 		DebugOverlayInterface* m_debugOverlay;
 #endif
+		MemoryTracker* m_memTracker;
 		float m_time;
 		int m_frames;
 	};
