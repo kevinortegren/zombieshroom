@@ -64,12 +64,12 @@ namespace AbilityEditorNameSpace
 
 	void MainOnEvent::ViewEntityData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan )
 	{
-		m_propManager = p_propMan;
+		//m_propManager = p_propMan;
 		QString name = m_entities.at(p_id)->m_name;
 		QtVariantProperty* prop;
-		prop = m_propManager->addProperty(QVariant::String, "Name" );
-		m_propManager->setValue(prop, name);
-		p_propBrows->setFactoryForManager(m_propManager, m_propFactory);
+		prop = p_propMan->addProperty(QVariant::String, "Name" );
+		p_propMan->setValue(prop, name);
+		p_propBrows->setFactoryForManager(p_propMan, m_propFactory);
 		p_propBrows->addProperty(prop);
 
 		
@@ -77,14 +77,14 @@ namespace AbilityEditorNameSpace
 
 	void MainOnEvent::ViewComponentData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name, QtVariantPropertyManager* p_propMan )
 	{
-		m_propManager = p_propMan;
-		m_entities.at(p_id)->ViewComponentData(m_propManager,p_propBrows, m_propFactory , p_name);
+		/*m_propManager = p_propMan;*/
+		m_entities.at(p_id)->ViewComponentData(p_propMan,p_propBrows, m_propFactory , p_name);
 
 	}
 
 	void MainOnEvent::EditEntityData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan )
 	{
-		m_propManager = p_propMan;
+		//m_propManager = p_propMan;
 		QList<QtProperty*> props;
 		props = p_propBrows->properties();
 		m_entities.at(p_id)->m_name = props.at(0)->valueText();
@@ -92,8 +92,8 @@ namespace AbilityEditorNameSpace
 
 	void MainOnEvent::EditComponentData( unsigned int p_id, QtTreePropertyBrowser* p_propBrows, QString p_name, QtVariantPropertyManager* p_propMan )
 	{
-		m_propManager = p_propMan;
-		m_entities.at(p_id)->SaveComponentData(m_propManager,p_propBrows, m_propFactory , p_name);
+		//m_propManager = p_propMan;
+		m_entities.at(p_id)->SaveComponentData(p_propMan,p_propBrows, m_propFactory , p_name);
 	}
 
 	void MainOnEvent::Clear()

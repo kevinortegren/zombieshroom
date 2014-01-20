@@ -61,8 +61,8 @@ void AbilityEditor::Init()
 	connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
-	//connect(ui.abilityWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
-	connect(m_propMan, SIGNAL(valueChanged(QtProperty*, const QVariant&)), this, SLOT(ChangedTab()));
+	connect(ui.abilityWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
+	//connect(m_propMan, SIGNAL(valueChanged(QtProperty*, const QVariant&)), this, SLOT(ChangedTab()));
 	connect(ui.actionGenerate_Script, SIGNAL(triggered()), this, SLOT(GenerateScript()));
 	connect(ui.actionSave_As, SIGNAL(triggered()), this, SLOT(SaveAs()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(Save()));
@@ -73,7 +73,7 @@ void AbilityEditor::Init()
 
 void AbilityEditor::ChangedTab()
 {
-	int test = ui.abilityWidget->currentIndex();
+	//int test = ui.abilityWidget->currentIndex();
 	if(m_LastSelectedItem != nullptr)
 	{
 		
@@ -87,7 +87,7 @@ void AbilityEditor::ChangedTab()
 	m_LastSelectedItem = nullptr;
 	delete m_propBrows;
 	m_propBrows = nullptr;
-	UpdatePropertyBrowser();
+	//UpdatePropertyBrowser();
 }
 
 void AbilityEditor::UpdatePropertyBrowser( )
@@ -240,5 +240,13 @@ void AbilityEditor::Load()
 	dial.setAcceptMode(QFileDialog::AcceptOpen);
 	m_currentSavePath = dial.getOpenFileName();
 	if(m_currentSavePath.compare("") != 0)
+	{
+		ui.treeOnCreate->Clear();
+		ui.treeOnCollide->Clear();
+		ui.treeOnDestroy->Clear();
 		m_importer->Import(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+		ui.treeOnCreate->LoadData();
+		ui.treeOnCollide->LoadData();
+		ui.treeOnDestroy->LoadData();
+	}
 }

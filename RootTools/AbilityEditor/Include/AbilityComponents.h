@@ -337,8 +337,8 @@ namespace AbilityEditorNameSpace
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_speed = atof(props.at(0)->valueText().toStdString().c_str());
-				m_mass =  atof(props.at(1)->valueText().toStdString().c_str());
+				m_mass = atof(props.at(0)->valueText().toStdString().c_str());
+				m_speed = atof(props.at(1)->valueText().toStdString().c_str());
 			}
 		};
 
