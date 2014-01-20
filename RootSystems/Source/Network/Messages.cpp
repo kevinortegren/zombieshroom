@@ -7,6 +7,7 @@ namespace RootForce
 {
 	namespace NetworkMessage
 	{
+		/*
 		GameStateDelta::SerializableComponent::SerializableComponent()
 			: Data(nullptr) {}
 
@@ -307,6 +308,7 @@ namespace RootForce
 				Entities[i].Serialize(p_writeToBitstream, p_bs);
 			}
 		}
+		*/
 
 
 		void Chat::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)

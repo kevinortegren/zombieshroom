@@ -41,7 +41,9 @@ namespace RootForce
 			PLAYERACTION,
 			PLAYERPHYSICS,
 			SHADOWCASTER,
-			DIRECTIONALLIGHT
+			DIRECTIONALLIGHT,
+			SERVERINFORMATION,
+			CLIENT
 		};
 		
 		inline void Initialize()
@@ -67,8 +69,26 @@ namespace RootForce
 			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
 			RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 			RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
-			
+			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
+			RootForce::Network::ClientComponent::SetTypeId(RootForce::ComponentType::CLIENT);
 		};
+
+		inline void InitializeServerComponents()
+		{
+			RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
+			RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
+			RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
+			RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
+			RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
+			RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
+			RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
+			RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
+			RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+			RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
+			RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
+			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
+			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
+		}
 	}
 
 	

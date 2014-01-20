@@ -35,16 +35,16 @@ namespace RootForce
 	{
 		return m_view;
 	}
-	void RootForce::Menu::AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo)
+	void RootForce::Menu::AddServer(const std::pair<uint64_t, RootSystems::ServerInfoInternal>& p_serverInfo)
 	{
 		std::string command = "AddServer(";
 		command = command + "'" + p_serverInfo.second.IP + ":" + std::to_string(p_serverInfo.second.Port) + "',";
-		command = command + "'" + p_serverInfo.second.Name.C_String() + "',";
-		command = command + "'" + p_serverInfo.second.MapFile.C_String() + "',";
-		command = command + std::to_string(p_serverInfo.second.NumPlayers) + ",";
-		command = command + std::to_string(p_serverInfo.second.MaxPlayers) + ",";
+		command = command + "'" + p_serverInfo.second.Information.ServerName.C_String() + "',";
+		command = command + "'" + p_serverInfo.second.Information.MapName.C_String() + "',";
+		command = command + std::to_string(p_serverInfo.second.Information.CurrentPlayers) + ",";
+		command = command + std::to_string(p_serverInfo.second.Information.MaxPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.first/1000) + ",";
-		command = command + "'" + (p_serverInfo.second.PasswordProtected?"Yes":"No") + "');";
+		command = command + "'" + (p_serverInfo.second.Information.PasswordProtected ? "Yes" : "No") + "');";
 
 		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
 	}

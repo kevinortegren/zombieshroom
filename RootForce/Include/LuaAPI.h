@@ -1074,7 +1074,7 @@ namespace RootForce
 			NumberOfArgs(3);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
-			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
+			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int HealthGetHealth(lua_State* p_luaState)
@@ -1107,7 +1107,7 @@ namespace RootForce
 		{
 			NumberOfArgs(3);
 			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
-			(*s)->AbilityScripts[luaL_checknumber(p_luaState, 2)] = std::string(luaL_checkstring(p_luaState, 3));
+			(*s)->AbilityScripts[(size_t)luaL_checknumber(p_luaState, 2)] = std::string(luaL_checkstring(p_luaState, 3));
 			return 0;
 		}
 		static int PlayerSelectAbility(lua_State* p_luaState)
@@ -1115,12 +1115,13 @@ namespace RootForce
 			NumberOfArgs(2);
 			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
 			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
+			return 0;
 		}
 		static int PlayerGetName(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::Player **s = (RootForce::Player**)luaL_checkudata(p_luaState, 1, "Player");
-			lua_pushnumber(p_luaState, (*s)->Name);
+			lua_pushstring(p_luaState, (*s)->Name.c_str());
 			return 1;
 		}
 		static int PlayerGetAbility(lua_State* p_luaState)
@@ -1158,7 +1159,7 @@ namespace RootForce
 			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Network::NetworkComponent>(*e);
-			(*s)->SetID(luaL_checknumber(p_luaState, 2), luaL_checknumber(p_luaState, 3));
+			(*s)->SetID((RootForce::Network::UserID_t) luaL_checknumber(p_luaState, 2), (RootForce::Network::ActionID_t) luaL_checknumber(p_luaState, 3));
 			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
@@ -1478,6 +1479,29 @@ namespace RootForce
 			lua_setglobal(p_luaState, p_typeName.c_str());
 
 			return 1;
+		}
+
+		inline void RegisterLuaTypes(lua_State* p_luaState)
+		{
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::logging_f, RootForce::LuaAPI::logging_m, "Logging");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::pointLight_f, RootForce::LuaAPI::pointLight_m, "PointLight");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playerphysics_f, RootForce::LuaAPI::playerphysics_m, "PlayerPhysics");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::health_f, RootForce::LuaAPI::health_m, "Health");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::player_f, RootForce::LuaAPI::player_m, "Player");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playeraction_f, RootForce::LuaAPI::playeraction_m, "PlayerAction");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::network_f, RootForce::LuaAPI::network_m, "Network");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
+			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
+			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
+			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 		}
 	}
 }

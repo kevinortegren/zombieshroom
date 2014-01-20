@@ -22,10 +22,12 @@ namespace RootSystems
 		uint8_t MaxPlayers;
 		// Port number
 		uint16_t Port;
+		// The name of the server
+		std::string ServerName;
 		// Password to connect to server
 		std::string Password;
 		// Level file name
-		std::string LevelFile;
+		std::string MapName;
 		// Game mode, see enum for details
 		GameMode::GameMode GameMode;
 		// Match length in seconds
@@ -38,7 +40,7 @@ namespace RootSystems
 			MaxPlayers = 12;
 			Port = 5567;
 			Password = "";
-			LevelFile = "level.world"; // ToDo: Set to correct value
+			MapName = "level.world"; // ToDo: Set to correct value
 			GameMode = GameMode::DEATHMATCH;
 			MatchTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory

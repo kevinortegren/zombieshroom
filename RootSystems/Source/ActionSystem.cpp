@@ -1,6 +1,5 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -15,11 +14,11 @@ namespace RootSystems
 		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 		RootForce::PlayerPhysics* playphys = m_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(p_entity);
 		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-		RootForce::UserAbility* ability = m_world->GetEntityManager()->GetComponent<RootForce::UserAbility>(p_entity);
+		RootForce::Player* player = m_world->GetEntityManager()->GetComponent<RootForce::Player>(p_entity);
 		RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(p_entity);
 		RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
 
-		if( !transform || !playphys || !collision || !ability || !action || !health )
+		if( !transform || !playphys || !collision || !player || !action || !health )
 			return;
 
 		if( health->IsDead )
@@ -60,28 +59,14 @@ namespace RootSystems
 		m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 		
 		// Activate ability! Pew pew!
-		ability->SelectedAbility = ability->Abilities[action->SelectedAbility-1];
+		player->SelectedAbility = action->SelectedAbility - 1;
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-			switch(ability->SelectedAbility)
-			{
-			case RootForce::Ability::ABILITY_TEST:
-				{
-					/*
-					ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-					RootForce::Script* script = m_world->GetEntityManager()->CreateComponent<RootForce::Script>(entity);
-					script->m_name = m_engineContext->m_resourceManager->GetScript("AbilityTest");
-					script->m_actions.push_back(RootForce::Action(RootForce::ActionType::ACTION_CREATE));
-					*/
 
-					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript("AbilityTest"), "OnCreate");
-					m_engineContext->m_script->ExecuteScript();
-				}
-				break;
-			default:
-				break;
-			}
+			// TODO: Generate action ID here
+			m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+			m_engineContext->m_script->ExecuteScript();
 		}
 	}
 

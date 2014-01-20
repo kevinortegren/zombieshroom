@@ -2,8 +2,9 @@
 #include <RakNet/BitStream.h>
 #include <Utility/ECS/Include/EntityManager.h>
 #include <RootSystems/Include/Transform.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 using namespace RootForce::Network;
 using namespace RootForce::NetworkMessage;
@@ -54,10 +55,15 @@ TEST(Network, SequenceIDs)
 {
 	RootForce::Network::NetworkComponent::s_sequenceIDMap.clear();
 
-	RootForce::Network::NetworkComponent n1(0, 0);
-	RootForce::Network::NetworkComponent n2(0, 1);
-	RootForce::Network::NetworkComponent n3(0, 1);
-	RootForce::Network::NetworkComponent n4(&n3);
+	RootForce::Network::NetworkComponent n1;
+	RootForce::Network::NetworkComponent n2;
+	RootForce::Network::NetworkComponent n3;
+	RootForce::Network::NetworkComponent n4;
+
+	n1.SetID(0, 0);
+	n2.SetID(0, 1);
+	n3.SetID(0, 1);
+	n4.SetID(&n3);
 
 	ASSERT_EQ(n1.ID.SequenceID, 0);
 	ASSERT_EQ(n2.ID.SequenceID, 0);

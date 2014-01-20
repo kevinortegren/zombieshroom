@@ -18,7 +18,6 @@
 #include <RootSystems/Include/Components.h>
 
 #include <RootForce/Include/GameStates.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
