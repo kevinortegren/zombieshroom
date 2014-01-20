@@ -9,6 +9,11 @@ layout(std140) uniform PerFrame
 	mat4 invViewProj;
 };
 
+layout(std140) uniform PerObject
+{
+	mat4 shadowCasterViewProjectionMatrix;
+};
+
 struct DirectionalLight
 {
 	vec3 LightDirection;
@@ -22,6 +27,7 @@ in DirectionalLight ex_Light;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
+uniform sampler2DShadow g_ShadowDepth;
 
 out vec4 out_Color;
 
@@ -45,6 +51,10 @@ void main() {
 	vec3 normal = normalize(vert_normal.xyz*2-1); 
 	vec3 position = GetVSPositionFromDepth();
 
+	mat4 viewToLightViewProjection = shadowCasterViewProjectionMatrix * invView;
+	vec4 shadowCoord = viewToLightViewProjection * vec4(position, 1.0f);
+	shadowCoord /= shadowCoord.w;
+
 	vec3 vert_lightVec = normalize( -ex_Light.LightDirection );
 
 	vec3 viewDir = -normalize(position);
@@ -54,4 +64,7 @@ void main() {
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
 	out_Color = vec4(diffuse_color + spec_color, 1.0f);
+
+	float visibility = texture(g_ShadowDepth, vec3(shadowCoord.xy, shadowCoord.z));
+	out_Color *= visibility;
 }

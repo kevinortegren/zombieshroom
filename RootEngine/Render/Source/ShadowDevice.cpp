@@ -22,14 +22,15 @@ namespace Render
 
 	void ShadowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
+		
 		m_depthTexture = new Texture();
 		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		//m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
 		glGenFramebuffers(1, &m_framebuffer);
@@ -50,9 +51,9 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_BACK);
 		glReadBuffer(GL_BACK);
-
-		//auto effect = g_context.m_resourceManager->LoadEffect("Shadow");
-		//m_technique = effect->GetTechniques()[0];
+		
+		auto effect = g_context.m_resourceManager->LoadEffect("Renderer/Shadow");
+		m_technique = effect->GetTechniques()[0];
 	}
 
 	void ShadowDevice::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster, int p_index)
@@ -67,6 +68,7 @@ namespace Render
 	void ShadowDevice::Process()
 	{
 
+		m_numberOfShadowcasters = 0;
 	}
 
 }

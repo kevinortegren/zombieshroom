@@ -95,12 +95,15 @@ namespace RootForce
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
-		// Initialize render and point light system.
+		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+
+		m_shadowSystem = new RootForce::ShadowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
@@ -352,6 +355,11 @@ namespace RootForce
 			m_cameraSystem->Process();
 		}
 		
+		{
+			PROFILE("Shadow system", g_engineContext.m_profiler);
+			m_shadowSystem->Process();
+		}
+
 		{ 
 			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();

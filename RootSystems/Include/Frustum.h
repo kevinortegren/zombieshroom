@@ -18,10 +18,10 @@ namespace RootForce
 			RecalculatePlanes();
 		}
 		Frustum(){
-			m_fov = 0;
-			m_near = 0;
-			m_far = 0;
-			m_aspectRatio = 1;
+			m_fov = 50.0f;
+			m_near = 0.1f;
+			m_far = 10.0f;
+			m_aspectRatio = 1.0f;
 			//RecalculatePlanes();
 		}
 		~Frustum(){}

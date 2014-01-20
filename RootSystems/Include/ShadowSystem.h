@@ -9,6 +9,7 @@ namespace RootForce
 {
 	class ShadowSystem : public ECS::EntitySystem
 	{
+	public:
 		ShadowSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
 		{
@@ -24,5 +25,7 @@ namespace RootForce
 		ECS::ComponentMapper<Shadowcaster> m_shadowcasters;
 		ECS::ComponentMapper<Transform> m_transforms;
 
+	private:
+		int m_shadowcasterCount;
 	};
 }

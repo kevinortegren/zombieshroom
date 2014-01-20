@@ -16,8 +16,8 @@ namespace RootForce
 		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
 		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
 		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
-		sunTransform->m_position = glm::vec3(0.0f, 0.0f, 100.0f);
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
+		sunTransform->m_position = -150.0f * sunTransform->m_orientation.GetFront();
 		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
 		sunShadowcaster->m_resolution = 512;
 		sunShadowcaster->m_levels = 1;
@@ -77,7 +77,7 @@ namespace RootForce
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
 		camera->m_near = 0.5f;
-		camera->m_far = 10000000.0f;
+		camera->m_far = 100000.0f;
 		camera->m_fov = 45.0f;
 
 		cameraLookAt->m_targetTag = "AimingDevice";

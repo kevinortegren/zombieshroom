@@ -25,11 +25,12 @@ namespace Render
 
 		GLuint GetFramebuffer(){ return m_framebuffer; }
 
-		std::shared_ptr<TechniqueInterface> m_technique;
+		std::shared_ptr<Technique> m_technique;
 		Shadowcaster m_shadowcasters[RENDER_MAX_SHADOWCASTERS];
+		Texture* m_depthTexture;
 	private:
 		size_t m_numberOfShadowcasters;
-		Texture* m_depthTexture;
+		
 		GLuint m_framebuffer;
 	};
 }
