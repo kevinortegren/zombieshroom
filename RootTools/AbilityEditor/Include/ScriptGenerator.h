@@ -17,9 +17,10 @@ namespace AbilityEditorNameSpace
 		void GenerateScript(QString p_filePath, QString p_scriptName, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
 
 	private:
-		void WriteOnCreate(OnCreate* p_onCreate);
-		void WriteOnCollide(OnCollide* p_onCollide);
-		void WriteOnDestroy(OnDestroy* p_onDestroy);
+		void WriteOnCreate(OnCreate* p_onCreate, int i);
+		void WriteOnCollide(OnCollide* p_onCollide, int i);
+		void WriteOnDestroy(OnDestroy* p_onDestroy, int i);
+		void WriteAddClientComponents(OnCreate* p_onCreate, int i);
 
 	private:
 		std::string m_name;
