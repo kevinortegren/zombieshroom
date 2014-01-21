@@ -1,6 +1,7 @@
 #include "CustomTreeWidget.h"
 #include <Qt/QtCore/QMimeData>
 #include <Qt/QtWidgets/QMessageBox>
+#include <QtGui/QDrag>
 CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(parent)
 {
 	setAcceptDrops(true);
@@ -8,48 +9,58 @@ CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(pare
 
 void CustomTreeWidget::dropEvent( QDropEvent* event )
 {
-	if(event->mimeData()->objectName().compare("Abilities") == 0)
+	if(event->source() != this)
 	{
-		QTreeWidgetItem* item = new QTreeWidgetItem;
-		item->setText(0,event->mimeData()->text());
-		item->setWhatsThis(0,"Entity");
+
+		if(event->mimeData()->objectName().compare("Abilities") == 0)
+		{
+			QTreeWidgetItem* item = new QTreeWidgetItem;
+			item->setText(0,event->mimeData()->text());
+			item->setWhatsThis(0,"Entity");
 		
-		this->addTopLevelItem(item);
-		m_onEvent->AddEntity(item->text(0));
+			this->addTopLevelItem(item);
+			m_onEvent->AddEntity(item->text(0));
 	
-	}
-	else if(this->itemAt(event->pos()) != nullptr )
-	{
-		
-		QTreeWidgetItem* item = new QTreeWidgetItem;
-		item->setText(0,event->mimeData()->text());
-		item->setWhatsThis(0,event->mimeData()->objectName());
-		if((this->itemAt(event->pos())->whatsThis(0).compare("Entity") ==0))
-		{
-			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())), event->mimeData()->text()))
-			{
-				QMessageBox msgBox;
-				msgBox.setText("An entity can only contain one of each type of component");
-				msgBox.exec();
-				delete item;
-				return;
-			}
-			this->itemAt(event->pos())->addChild(item);
 		}
-		else
+		else if(this->itemAt(event->pos()) != nullptr )
 		{
-			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())->parent()), event->mimeData()->text()))
+			unsigned int index = -1;
+			QTreeWidgetItem* item = new QTreeWidgetItem;
+			item->setText(0,event->mimeData()->text());
+			item->setWhatsThis(0,event->mimeData()->objectName());
+			if((this->itemAt(event->pos())->whatsThis(0).compare("Entity") ==0))
 			{
-				QMessageBox msgBox;
-				msgBox.setText("An entity can only contain one of each type of component");
-				msgBox.exec();
-				return;
+				if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())), event->mimeData()->text()))
+				{
+					QMessageBox msgBox;
+					msgBox.setText("An entity can only contain one of each type of component");
+					msgBox.exec();
+					delete item;
+					return;
+				}
+
+				this->itemAt(event->pos())->addChild(item);
+				index =  this->indexOfTopLevelItem(item->parent());
 			}
-			this->itemAt(event->pos())->parent()->addChild(item);
+			else
+			{
+				if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())->parent()), event->mimeData()->text()))
+				{
+					QMessageBox msgBox;
+					msgBox.setText("An entity can only contain one of each type of component");
+					msgBox.exec();
+					return;
+				}
+				//this->itemAt(event->pos())->parent()->addChild(item);
+			
+			
+				index = this->indexOfTopLevelItem(item->parent()->parent());
+			}
+	
+			m_onEvent->AddComponent(index, item->text(0));
 		}
-		unsigned int index = this->indexOfTopLevelItem(item->parent());
-		m_onEvent->AddComponent(index, item->text(0));
 	}
+	
 }
 
 void CustomTreeWidget::dragEnterEvent( QDragEnterEvent* event )
@@ -62,6 +73,8 @@ void CustomTreeWidget::dragMoveEvent( QDragMoveEvent *event )
 
 	event->acceptProposedAction();
 }
+
+
 
 void CustomTreeWidget::SetOnEventClass(AbilityEditorNameSpace::MainOnEvent* p_onEvent )
 {

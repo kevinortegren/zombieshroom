@@ -7,7 +7,7 @@ function AbilityTest.OnCreate (self, userId, actionId)
 
 	local entity0 = Entity.New();
 
-	local collisionComp0 = Collision.New(entity0);
+	local collisionComp 0= Collision.New(entity0);
 	local colRespComp0 = CollisionResponder.New(entity0);
 	local physicsComp0 = Physics.New(entity0);
 	collisionComp0:CreateHandle(entity0:GetId(), 1, false);
