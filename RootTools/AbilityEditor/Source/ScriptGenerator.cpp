@@ -27,10 +27,8 @@ namespace AbilityEditorNameSpace
 			streamustotalus << i;
 
 			QString test = streamustotalus.str().c_str();
-			/*std::string test2 = streamustotalus.str().c_str();
-			test = test2.c_str();*/
-			test.append(".lua");
 			m_name.append(test.toStdString());
+			test.append(".lua");
 
 			if(i == 0)
 			{
@@ -57,7 +55,7 @@ namespace AbilityEditorNameSpace
 			m_file << "\n";
 			WriteAddClientComponents(p_onCreate, i);
 			m_file << "\n";
-			WriteOnCollide(p_onCollide, i);
+			WriteOnCollide(p_onCreate, p_onCollide, i);
 			m_file << "\n";
 			WriteOnDestroy(p_onDestroy, i);
 
@@ -125,10 +123,6 @@ namespace AbilityEditorNameSpace
 			{
 				rotation = ((AbilityComponents::Transform*)entities->at(i)->m_components->at(j))->m_rotation;
 			}
-			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::ABILITYPARTICLE)
-			{
-				// TODO : Add stuff later
-			}
 			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::COLLISION)
 			{
 				colWithWorld = ((AbilityComponents::Collision*)entities->at(i)->m_components->at(j))->m_collidesWithWorld;
@@ -174,23 +168,27 @@ namespace AbilityEditorNameSpace
 		m_file << "end\n";
 	}
 
-	void ScriptGenerator::WriteOnCollide( OnCollide* p_onCollide, int i )
+	void ScriptGenerator::WriteOnCollide( OnCreate* p_onCreate, OnCollide* p_onCollide, int i )
 	{
-		std::vector<AbilityEntity::Entity*>* entities = p_onCollide->GetEntities();
+		std::vector<AbilityEntity::Entity*>* OCEntities = p_onCreate->GetEntities();
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
-		for (unsigned int j = 0; j < entities->at(i)->m_components->size(); j++)
+		for (unsigned int j = 0; j < OCEntities->at(i)->m_components->size(); j++)
 		{
-			if(entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
+			if(OCEntities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
 			{
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
+				m_file << "\tlocal hitPos = entity:GetTransform():GetPos;\n";
+				m_file << "\tlocal selfPos = self:GetTransform():GetPos;\n";
 				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
-
+				m_file << "\tif type == 3 then\n";
+				m_file << "\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,hitPos.y-selfPos.y,hitPos.z-selfPos.z), " << ((AbilityComponents::OffensiveAbility*)OCEntities->at(i)->m_components->at(j))->m_knockbackPower << ");\n";
+				m_file << "\tend\n";
 			}
-			if(entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::EXPLOSIVE)
+			if(OCEntities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::EXPLOSIVE)
 			{
-
+				//Place in OnCreate maybe?
 			}
 		}
 		m_file << "end\n";

@@ -327,15 +327,18 @@ namespace AbilityEditorNameSpace
 		{
 			float m_speed;
 			float m_mass;
-			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f) : MainComponent(ComponentType::PHYSICSCONTROLLED)
+			QVector3D m_gravity;
+			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f)) : MainComponent(ComponentType::PHYSICSCONTROLLED)
 			{
 				m_speed = p_speed;
 				m_mass = p_mass;
+				m_gravity =	p_gravity;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *mass;
-
+				QtVariantProperty* speed, *mass, *gravity, *x, *y, *z;
+				QList<QtProperty*> list;
+				QString combinedValue;
 				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
 				p_propMan->setValue(speed, m_speed);
 				mass = p_propMan->addProperty(QVariant::Double, "Mass");
@@ -343,6 +346,22 @@ namespace AbilityEditorNameSpace
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(mass);
 				p_propBrows->addProperty(speed);
+
+				//Show gravity vector
+				gravity = p_propMan->addProperty(QVariant::String, "Gravity");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_gravity.x());
+				p_propMan->setValue(y, m_gravity.y());
+				p_propMan->setValue(z, m_gravity.z());
+				gravity->addSubProperty(x);
+				gravity->addSubProperty(y);
+				gravity->addSubProperty(z);
+				list = gravity->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(gravity,combinedValue);
+				p_propBrows->addProperty(gravity);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -350,6 +369,12 @@ namespace AbilityEditorNameSpace
 				props = p_propBrows->properties();
 				m_mass = atof(props.at(0)->valueText().toStdString().c_str());
 				m_speed = atof(props.at(1)->valueText().toStdString().c_str());
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
+				subprops = props.at(0)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_gravity[i] = atof(subprops.at(i)->valueText().toStdString().c_str());
+				}
 			}
 		};
 

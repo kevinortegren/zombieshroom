@@ -21,7 +21,6 @@ function AbilityTest.OnCreate (self, userId, actionId)
 
 --function AbilityTest.AddClientComponents (self)
 
-
 	local renderComp0 = Renderable.New(entity0);
 	transformComp0:SetPos(posVec);
 	renderComp0:SetModel("Primitives/sphereTangents");
