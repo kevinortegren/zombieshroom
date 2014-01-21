@@ -1,16 +1,16 @@
 Player = {}
 
 function Player.OnCreate(self, userId, actionId)
-	local transform = Transformation.New(playerEntity);
-	local playerPhysics = PlayerPhysics.New(playerEntity);
-	local health = Health.New(playerEntity);
-	local player = PlayerComponent.New(playerEntity);
-	local physics = Physics.New(playerEntity);
-	local collision = Collision.New(playerEntity);
-	local collisionResponder = CollisionResponder.New(playerEntity);
-	local script = Script.New(playerEntity, "Player");
-	local playerAction = PlayerAction.New(playerEntity);
-	local network = Network.New(playerEntity, userId, actionId);
+	local transform = Transformation.New(self);
+	local playerPhysics = PlayerPhysics.New(self);
+	local health = Health.New(self);
+	local player = PlayerComponent.New(self);
+	local physics = Physics.New(self);
+	local collision = Collision.New(self);
+	local collisionResponder = CollisionResponder.New(self);
+	local script = Script.New(self, "Player");
+	local playerAction = PlayerAction.New(self);
+	local network = Network.New(self, userId, actionId);
 
 	-- TODO: Decide where to put spawn logic
 	player:SetAbility(0, "AbilityTest");
@@ -28,8 +28,8 @@ function Player.OnCreate(self, userId, actionId)
 end
 
 function Player.AddClientComponents(self)
-	local renderable = Renderable.New(playerEntity);
-	local animation = Animation.New(playerEntity);
+	local renderable = Renderable.New(self);
+	local animation = Animation.New(self);
 
 	renderable:SetModel("testchar");
 	renderable:SetMaterial("testchar");

@@ -42,8 +42,12 @@ namespace RootForce
 		{
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->m_position[i]);
+			
+			glm::quat q = p_c->m_orientation.GetQuaternion();
 			for (int i = 0; i < 4; ++i)
-				p_bs->Serialize(p_writeToBitstream, p_c->m_orientation.GetQuaternion()[i]);
+				p_bs->Serialize(p_writeToBitstream, q[i]);
+			p_c->m_orientation.SetOrientation(q);
+
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->m_scale[i]);
 		}
@@ -228,10 +232,13 @@ namespace RootForce
 				} break;
 			}
 
-			DataSize = bs.GetNumberOfBytesUsed();
-			RakNet::BitSize_t bitsize = bs.CopyData((unsigned char**)&Data);
+			if (success)
+			{
+				DataSize = bs.GetNumberOfBytesUsed();
+				RakNet::BitSize_t bitsize = bs.CopyData((unsigned char**)&Data);
 
-			assert( (int)std::ceil(bitsize / 8.0f) == DataSize);
+				assert( (int)std::ceil(bitsize / 8.0f) == DataSize);
+			}
 
 			return success;
 		}
@@ -241,7 +248,7 @@ namespace RootForce
 		{
 			T* c = p_entityManager->GetComponent<T>(p_entity);
 			if (c == nullptr)
-				p_entityManager->CreateComponent<T>(p_entity);
+				c = p_entityManager->CreateComponent<T>(p_entity);
 
 			RootForce::NetworkMessage::Serialize(false, &p_bs, c);
 
@@ -350,11 +357,9 @@ namespace RootForce
 			std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components = p_world->GetEntityManager()->GetAllComponents(p_entity);
 			for (size_t i = 0; i < components.size(); ++i)
 			{
-				SerializableComponent c;
-				if (c.SerializeComponent(components[i].second, (ComponentType::ComponentType)components[i].first))
-				{
-					Components.push_back(c);
-				}
+				Components.push_back(SerializableComponent());
+				if (!Components.back().SerializeComponent(components[i].second, (ComponentType::ComponentType)components[i].first))
+					Components.pop_back();
 			}
 
 			return true;

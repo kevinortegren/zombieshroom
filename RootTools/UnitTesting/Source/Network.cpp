@@ -10,6 +10,43 @@
 using namespace RootForce::Network;
 using namespace RootForce::NetworkMessage;
 
+TEST(Network, SerializeComponent)
+{
+	ECS::World* worldA = CreateWorld();
+	ECS::World* worldB = CreateWorld();
+
+	GameStateDelta::SerializableComponent mA;
+	GameStateDelta::SerializableComponent mB;
+
+	ECS::Entity* A;
+	ECS::Entity* B;
+
+	RootForce::Transform* transformA;
+	RootForce::Transform* transformB;
+
+	A = worldA->GetEntityManager()->CreateEntity();
+	B = worldB->GetEntityManager()->CreateEntity();
+
+	transformA = worldA->GetEntityManager()->CreateComponent<RootForce::Transform>(A);
+	transformA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	transformA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	transformA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
+
+	mA.SerializeComponent(transformA, RootForce::ComponentType::TRANSFORM);
+	
+	RakNet::BitStream bs;
+	mA.Serialize(true, &bs);
+	mB.Serialize(false, &bs);
+
+	mB.DeserializeComponent(B, worldB->GetEntityManager());
+	transformB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+
+	ASSERT_NE(transformB, nullptr);
+	ASSERT_EQ(transformA->m_position, transformB->m_position);
+	ASSERT_EQ(transformA->m_orientation.GetQuaternion(), transformB->m_orientation.GetQuaternion());
+	ASSERT_EQ(transformA->m_scale, transformB->m_scale);
+}
+
 TEST(Network, SerializeEntity)
 {
 	ECS::World* worldA = CreateWorld();
@@ -21,11 +58,23 @@ TEST(Network, SerializeEntity)
 	ECS::Entity* A;
 	ECS::Entity* B;
 
+	GameStateDelta::SerializableEntity mA;
+	GameStateDelta::SerializableEntity mB;
+
 	A = worldA->GetEntityManager()->CreateEntity();
 	
+	g_world = worldA;
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
 	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
 
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+
+	RootForce::Transform* transformA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
 	transformA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
 	transformA->m_orientation.SetOrientation(glm::quat(5.0f, 7.0f, 9.0f, 11.0f));
 	transformA->m_scale = glm::vec3(14.0f, 17.0f, 20.0f);
@@ -36,10 +85,18 @@ TEST(Network, SerializeEntity)
 	idA.SequenceID = 0;
 	mapA[idA] = A;
 
-	GameStateDelta::SerializableEntity mA;
+	// Serialize the entity to the game state delta struct
 	mA.SerializeEntity(A, worldA, mapA);
 
-	GameStateDelta::SerializableEntity mB;
+
+	// Serialize and deserialize to the bitstream
+	RakNet::BitStream bs;
+	mA.Serialize(true, &bs);
+	mB.Serialize(false, &bs);
+
+
+	// Deserialize the entity from the game state delta struct
+	g_world = worldB;
 	B = mB.DeserializeEntity(worldB, mapB);
 
 	RootForce::Transform* transformB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
