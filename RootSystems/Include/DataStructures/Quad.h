@@ -8,7 +8,7 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-#define QUADTREE_POLYGONS_PER_NODE 1000
+#define QUADTREE_POLYGONS_PER_NODE 10000
 #define QUAD_MAX_CHILDS 4
 
 namespace RootForce
@@ -19,7 +19,7 @@ namespace RootForce
 
 		friend class QuadTree;
 
-		QuadNode(AABB& p_bounds, unsigned p_numTriangles);
+		QuadNode(AABB& p_bounds);
 
 		void AddChild(QuadNode* p_child);
 		const std::vector<QuadNode*>& GetChilds();
@@ -88,13 +88,17 @@ namespace RootForce
 
 		std::vector<Triangle> Trianglulate(std::vector<Polygon> p_polygons);
 
-		void CreateEntities(std::vector<Triangle> p_triangles, std::string p_key); 
+		void CreateEntities(std::vector<Triangle> p_triangles, std::string p_key);
+		void CreateEntitiesEx(std::vector<Triangle> p_triangles, std::string p_key); 
+
 
 		PolygonSplit SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon);
 		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);
 		int SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1);
 
 		glm::vec3 CalcCenter(Polygon& p_polygon);
+		glm::vec3 CalcCenterEx(Polygon& p_polygon);
+
 
 		RootEngine::GameSharedContext* m_context;
 		ECS::World* m_world;

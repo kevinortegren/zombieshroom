@@ -270,8 +270,8 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+#endif
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
 			{
@@ -284,7 +284,7 @@ namespace RootForce
 				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
 			}
 		}
-#endif
+
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
