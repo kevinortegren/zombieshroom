@@ -16,11 +16,11 @@ function AbilityTest.OnCreate (self, userId, actionId)
 	physicsComp0:BindShape(collisionComp0, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp0:SetVelocity(collisionComp0, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
 	colRespComp0:SetContainer(collisionComp0);
-end
+	physicsComp0:SetGravity(collisionComp0, Vec3.New(10,0,0));
+--end
 
-function AbilityTest.AddClientComponents (self)
+--function AbilityTest.AddClientComponents (self)
 
-	local entity0 = Entity.New();
 
 	local renderComp0 = Renderable.New(entity0);
 	transformComp0:SetPos(posVec);
@@ -33,6 +33,15 @@ function AbilityTest.AddClientComponents (self)
 end
 
 function AbilityTest.OnCollide (self, entity)
+	--local hitCol = entity:GetCollision();
+	--local hitPhys = entity:GetPhysics();
+	--local type = hitPhys:GetType(hitCol);
+	--if type == 3 then
+	--	hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(0,1,0), 25);
+	--end
+
+
+
 end
 
 function AbilityTest.OnDestroy (args)

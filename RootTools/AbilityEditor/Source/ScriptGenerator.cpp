@@ -30,7 +30,8 @@ namespace AbilityEditorNameSpace
 			/*std::string test2 = streamustotalus.str().c_str();
 			test = test2.c_str();*/
 			test.append(".lua");
-			
+			m_name.append(test.toStdString());
+
 			if(i == 0)
 			{
 				p_filePath.chop(4);
@@ -150,8 +151,8 @@ namespace AbilityEditorNameSpace
 		m_file << "\n";
 		std::vector<AbilityEntity::Entity*>* entities = p_onCreate->GetEntities();
 		
-			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
-				m_file << "\tlocal renderComp = Renderable.New(self);\n";
+		if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
+			m_file << "\tlocal renderComp = Renderable.New(self);\n";
 		for (unsigned int j = 0; j < entities->at(i)->m_components->size(); j++)
 		{
 			// Setting values
@@ -175,8 +176,23 @@ namespace AbilityEditorNameSpace
 
 	void ScriptGenerator::WriteOnCollide( OnCollide* p_onCollide, int i )
 	{
-		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
+		std::vector<AbilityEntity::Entity*>* entities = p_onCollide->GetEntities();
 
+		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
+		for (unsigned int j = 0; j < entities->at(i)->m_components->size(); j++)
+		{
+			if(entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
+			{
+				m_file << "\tlocal hitCol = entity:GetCollision();\n";
+				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
+				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
+
+			}
+			if(entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::EXPLOSIVE)
+			{
+
+			}
+		}
 		m_file << "end\n";
 	}
 
