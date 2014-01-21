@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <vector>
 #include <Utility/ECS/Include/Entity.h>
-#include <RootSystems/Include/Components.h>
+#include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
 

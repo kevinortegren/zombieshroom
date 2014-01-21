@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Components.h>
 
 using namespace RootForce::Network;
 using namespace RootForce::NetworkMessage;
@@ -14,8 +15,39 @@ TEST(Network, SerializeEntity)
 	ECS::World* worldA = CreateWorld();
 	ECS::World* worldB = CreateWorld();
 
+	NetworkEntityMap mapA;
+	NetworkEntityMap mapB;
+
 	ECS::Entity* A;
 	ECS::Entity* B;
+
+	A = worldA->GetEntityManager()->CreateEntity();
+	
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
+
+	transformA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	transformA->m_orientation.SetOrientation(glm::quat(5.0f, 7.0f, 9.0f, 11.0f));
+	transformA->m_scale = glm::vec3(14.0f, 17.0f, 20.0f);
+	
+	NetworkEntityID idA;
+	idA.UserID = 0;
+	idA.ActionID = 0;
+	idA.SequenceID = 0;
+	mapA[idA] = A;
+
+	GameStateDelta::SerializableEntity mA;
+	mA.SerializeEntity(A, worldA, mapA);
+
+	GameStateDelta::SerializableEntity mB;
+	B = mB.DeserializeEntity(worldB, mapB);
+
+	RootForce::Transform* transformB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+
+	ASSERT_NE(transformB, nullptr);
+	ASSERT_EQ(transformA->m_position, transformB->m_position);
+	ASSERT_EQ(transformA->m_orientation.GetQuaternion(), transformB->m_orientation.GetQuaternion());
+	ASSERT_EQ(transformA->m_scale, transformB->m_scale);
 }
 
 /*

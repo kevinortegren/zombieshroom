@@ -76,6 +76,11 @@ namespace RootForce
 			{
 				return SynchronizedID < p_rhs.SynchronizedID;
 			}
+
+			bool operator==(const NetworkEntityID& p_rhs) const
+			{
+				return SynchronizedID == p_rhs.SynchronizedID;
+			}
 		};
 
 

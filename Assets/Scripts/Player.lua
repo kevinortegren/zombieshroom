@@ -1,7 +1,6 @@
 Player = {}
 
 function Player.OnCreate(self, userId, actionId)
-	Logging.Log("Hello", 0);
 	local transform = Transformation.New(playerEntity);
 	local playerPhysics = PlayerPhysics.New(playerEntity);
 	local health = Health.New(playerEntity);

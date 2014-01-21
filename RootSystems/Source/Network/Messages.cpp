@@ -237,66 +237,71 @@ namespace RootForce
 		}
 
 		template <typename T>
-		T* CreateOrGetAndDeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		T* CreateOrGetAndDeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, RakNet::BitStream& p_bs)
 		{
 			T* c = p_entityManager->GetComponent<T>(p_entity);
 			if (c == nullptr)
 				p_entityManager->CreateComponent<T>(p_entity);
 
-			RootForce::NetworkMessage::Serialize(false, &bs, c);
+			RootForce::NetworkMessage::Serialize(false, &p_bs, c);
+
+			return c;
 		}
 
 		ECS::ComponentInterface* GameStateDelta::SerializableComponent::DeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
 		{
 			RakNet::BitStream bs((unsigned char*)Data, DataSize, false);
 
+			ECS::ComponentInterface* component = nullptr;
 			switch (Type)
 			{
 				case ComponentType::TRANSFORM:
 				{
-					CreateOrGetAndDeserializeComponent<Transform>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Transform>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::HEALTH:
 				{
-					CreateOrGetAndDeserializeComponent<HealthComponent>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<HealthComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PHYSICS:
 				{
-					CreateOrGetAndDeserializeComponent<Physics>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Physics>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::NETWORK:
 				{
-					CreateOrGetAndDeserializeComponent<Network::NetworkComponent>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Network::NetworkComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::LOOKATBEHAVIOR:
 				{
-					CreateOrGetAndDeserializeComponent<LookAtBehavior>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<LookAtBehavior>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::SCRIPT:
 				{
-					CreateOrGetAndDeserializeComponent<Script>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Script>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PLAYER:
 				{
-					CreateOrGetAndDeserializeComponent<PlayerComponent>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<PlayerComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::TDMRULES:
 				{
-					CreateOrGetAndDeserializeComponent<TDMRuleSet>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<TDMRuleSet>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PLAYERPHYSICS:
 				{
-					CreateOrGetAndDeserializeComponent<PlayerPhysics>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<PlayerPhysics>(p_entity, p_entityManager, bs);
 				} break;
 			}
+
+			return component;
 		}
 
 
@@ -311,7 +316,7 @@ namespace RootForce
 			if (!p_writeToBitstream)
 				Components.resize(size);
 
-			for (int i = 0; i < Components.size(); ++i)
+			for (size_t i = 0; i < Components.size(); ++i)
 			{
 				Components[i].Serialize(p_writeToBitstream, p_bs);
 			}
@@ -319,7 +324,13 @@ namespace RootForce
 
 		bool GameStateDelta::SerializableEntity::SerializeEntity(ECS::Entity* p_entity, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
 		{
-			Network::NetworkEntityMap::const_iterator it = std::find(p_map.begin(), p_map.end(), p_entity);
+			Network::NetworkEntityMap::const_iterator it;
+			for (it = p_map.begin(); it != p_map.end(); it++)
+			{
+				if (it->second == p_entity)
+					break;
+			}
+
 			if (it == p_map.end())
 			{
 				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No associated network entity ID", p_entity->GetId());
@@ -359,13 +370,13 @@ namespace RootForce
 				// Entity doesn't exist, so create it.
 				entity = p_world->GetEntityManager()->CreateEntity();
 
-				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript(ScriptName.C_String()), "OnCreate");
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(ScriptName.C_String()), "OnCreate");
 				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
 				g_engineContext.m_script->AddParameterNumber(ID.UserID);
 				g_engineContext.m_script->AddParameterNumber(ID.ActionID);
 				g_engineContext.m_script->ExecuteScript();
 
-				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript(ScriptName.C_String()), "AddClientComponents");
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(ScriptName.C_String()), "AddClientComponents");
 				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
 				g_engineContext.m_script->ExecuteScript();
 			}
@@ -377,7 +388,7 @@ namespace RootForce
 			// Deserialize components
 			for (size_t i = 0; i < Components.size(); ++i)
 			{
-
+				Components[i].DeserializeComponent(entity, p_world->GetEntityManager());
 			}
 
 			return entity;
@@ -391,7 +402,7 @@ namespace RootForce
 			if (!p_writeToBitstream)
 				Entities.resize(size);
 
-			for (int i = 0; i < Entities.size(); ++i)
+			for (size_t i = 0; i < Entities.size(); ++i)
 			{
 				Entities[i].Serialize(p_writeToBitstream, p_bs);
 			}
