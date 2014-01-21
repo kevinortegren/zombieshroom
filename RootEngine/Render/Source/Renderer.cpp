@@ -455,7 +455,7 @@ namespace Render
 		matrices.m_invViewProj = glm::inverse(viewProjection);
 		m_cameraBuffer.BufferSubData(0, sizeof(matrices), &matrices);
 
-		glCullFace(GL_BACK);
+		glCullFace(GL_FRONT);
 		glViewport(0, 0, 512, 512);
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
@@ -497,7 +497,14 @@ namespace Render
 		//TODO: Bind shadow depth texture.
 		m_shadowDevice.m_depthTexture->Enable(3);
 
-		glm::mat4 lvp = m_shadowDevice.m_shadowcasters[0].m_projectionMatrix *  m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0, 
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+			);
+
+		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
 
 		m_uniforms.BufferSubData(0, sizeof(glm::mat4), &lvp);
 

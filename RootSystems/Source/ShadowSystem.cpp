@@ -25,7 +25,7 @@ namespace RootForce
 		Shadowcaster* shadowcaster = m_shadowcasters.Get(p_entity);
 
 		Render::Shadowcaster sc;
-		sc.m_projectionMatrix = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, 0.5f, 400.0f);
+		sc.m_projectionMatrix = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, 0.5f, 600.0f);
 		Orientation tOr = transform->m_orientation;
 		tOr.Yaw(180.0f);
 		glm::mat4 tempWorldMatrix;

@@ -17,7 +17,7 @@ namespace RootForce
 		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
 		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
-		sunTransform->m_position = -150.0f * sunTransform->m_orientation.GetFront();
+		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
 		sunShadowcaster->m_resolution = 512;
 		sunShadowcaster->m_levels = 1;

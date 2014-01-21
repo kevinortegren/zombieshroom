@@ -29,7 +29,7 @@ namespace Render
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		//m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
