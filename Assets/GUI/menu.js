@@ -1,4 +1,9 @@
 $(document).ready(function() {
+  // Splash skip
+  $("#splash").click(function() {
+    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none");});
+  } );
+  setTimeout(function(){$("#splash").click();}, 2000);
   // Main menu
   $("#main-play").click(function() {
     $("#main-menu").css("display", "none");
