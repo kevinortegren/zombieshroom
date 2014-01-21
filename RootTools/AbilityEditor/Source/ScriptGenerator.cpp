@@ -142,7 +142,7 @@ namespace AbilityEditorNameSpace
 			}
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
 			{
-				m_file << "\tphysicsComp"<< i << ":BindShape(collisionComp" << i << ", Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<mass<<", "<<radius<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				m_file << "\tphysicsComp"<< i << ":BindShape(collisionComp" << i << ", Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
 					m_file << "\tphysicsComp"<< i << ":SetVelocity(collisionComp" << i << ", Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
 				m_file << "\tcolRespComp" << i << ":SetContainer(collisionComp" << i << ");\n";

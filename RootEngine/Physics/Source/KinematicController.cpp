@@ -187,3 +187,8 @@ void KinematicController::SetJumpForce( float p_jumpForce )
 {
 	m_kinController->setJumpSpeed(p_jumpForce);
 }
+
+bool KinematicController::IsOnGround()
+{
+	return m_kinController->onGround();
+}

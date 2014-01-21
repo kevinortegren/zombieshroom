@@ -6,11 +6,13 @@
 #include <RootEngine/Render/Include/RenderJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/GeometryBuffer.h>
-#include <RootEngine/Render/Include/Line.h>
+#include <RootEngine/Render/Include/LineRenderer.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Light.h>
 #include <RootEngine/Render/Include/ParticleSystem.h>
 #include <RootEngine/Render/Include/LightingDevice.h>
+#include <RootEngine/Render/Include/Shadowcaster.h>
+#include <RootEngine/Render/Include/ShadowDevice.h>
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
@@ -44,15 +46,16 @@ namespace Render
 	public:
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void SetResolution(int p_width, int p_height) = 0;
-		
+
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
+
+		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster) = 0;
 		
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
-		virtual void RenderLines() = 0;
 		virtual void Swap() = 0;
 		virtual void DisplayNormals(bool p_display) = 0;
 
@@ -68,7 +71,8 @@ namespace Render
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 
 		// Particle systems.
-		virtual ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc) = 0;
+		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
 
@@ -91,12 +95,12 @@ namespace Render
 
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
+		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster);
 
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
-		void RenderLines();
 		void Swap();
 		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		bool CheckExtension(const char* p_extension);
@@ -111,7 +115,8 @@ namespace Render
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 		std::shared_ptr<Material> CreateMaterial();
 
-		ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc);
+		ParticleSystem* CreateParticleSystem();
+		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
 
@@ -119,31 +124,41 @@ namespace Render
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
 
+		static std::map<Semantic::Semantic, unsigned> s_sizes;
+
 	private:
+
+		void InitializeSemanticSizes();
+		void RenderGeometry();
 
 		void GeometryPass();
 		void LightingPass();
 		void ForwardPass();
+		void Output();
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
 
-		static GLRenderer* s_rendererInstance;
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
 		int m_width;
 		int m_height;
 
-		std::vector<RenderJob> m_jobs;
+		GLuint m_fbo;
+		GLuint m_color;
 
-		GeometryBuffer m_gbuffer;
-		ParticleSystemHandler m_particles;
+		std::vector<RenderJob> m_jobs;
+		unsigned m_renderFlags;
+		
+		GeometryBuffer m_geometryPass;
 		LightingDevice m_lighting;
+		LineRenderer m_lineRenderer;
+
+		Mesh m_fullscreenQuad;
+	
+		ParticleSystemHandler m_particles;
+		//ShadowDevice m_shadowDevice;
 		
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
-		
-		// TODO: Create line drawer.
-		Mesh m_lineMesh;
-		std::vector<Line> m_lines;
 
 		struct
 		{
@@ -158,12 +173,10 @@ namespace Render
 		Buffer m_cameraBuffer;
 		Buffer m_uniforms;
 
-		std::shared_ptr<TechniqueInterface> m_debugTech;
+		std::shared_ptr<TechniqueInterface> m_renderTech;
 		std::shared_ptr<TechniqueInterface> m_normalTech;
 
 		bool m_displayNormals;
-
-
 	};
 }
 

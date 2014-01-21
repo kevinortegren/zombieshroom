@@ -8,8 +8,12 @@
 #include <QtPropertyBrowser/QtVariantPropertyManager>
 #include <QtPropertyBrowser/QtTreePropertyBrowser>
 #include <QtPropertyBrowser/QtVariantEditorFactory>
+#include <QtPropertyBrowser/QtEnumPropertyManager>
+#include <QtPropertyBrowser/QtEnumEditorFactory>
 #include <Qt/QtGui/QVector3D>
 #include <Qt/QtWidgets/QMessageBox>
+#include <Qt/QtWidgets/QSpinBox>
+
 namespace AbilityEditorNameSpace
 {
 
@@ -240,9 +244,20 @@ namespace AbilityEditorNameSpace
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* collisionShape, *radius, *height, *collisionModelname;				
-				collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
-				p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
+				QtVariantProperty* radius, *height, *collisionModelname;	
+				QtProperty* collisionShape;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(shape)i];
+				}
+				collisionShape = enumMan->addProperty("Collision shape");
+				enumMan->setEnumNames(collisionShape,enumTypes);
+				enumMan->setValue(collisionShape, 1);
+				//collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
+				//p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
 				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere or Mesh");
 				radius = p_propMan->addProperty(QVariant::Double, "Radius");
 				p_propMan->setValue(radius, m_radius);
@@ -251,6 +266,7 @@ namespace AbilityEditorNameSpace
 				collisionModelname = p_propMan->addProperty(QVariant::String, "CollisionModel name");
 				p_propMan->setValue(collisionModelname, m_collisionModelShapeName.c_str());
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->addProperty(collisionShape);
 				p_propBrows->addProperty(radius);
 				p_propBrows->addProperty(height);

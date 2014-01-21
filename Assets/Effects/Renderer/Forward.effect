@@ -1,0 +1,17 @@
+- name: Forward
+  techniques:
+    - name: Forward
+      textures:
+        - name: g_Background
+          slot: 3
+      programs:
+        - name: output
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 0

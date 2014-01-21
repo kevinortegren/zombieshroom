@@ -71,10 +71,19 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
 			}
 			break;
+		case RootForce::ComponentType::DIRECTIONALLIGHT:
+			{
+				p_emitter << YAML::Comment("Directional Light");
+				RootForce::DirectionalLight* directionalLight = static_cast<RootForce::DirectionalLight*>(p_component);
+				glm::vec4 color = directionalLight->m_color;
+
+				p_emitter << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << color.x << color.y << color.z << YAML::EndSeq;
+			}
+			break;
 		case RootForce::ComponentType::PLAYERCONTROL:
 			{
-				RootForce::PlayerControl* input = static_cast<RootForce::PlayerControl*>(p_component);
-				p_emitter << YAML::Key << "Speed" << YAML::Value << input->m_speed;
+				RootForce::PlayerPhysics* playphys = static_cast<RootForce::PlayerPhysics*>(p_component);
+				p_emitter << YAML::Key << "Speed" << YAML::Value << playphys->MovementSpeed;
 			}
 			break;
 		case RootForce::ComponentType::PHYSICS:
