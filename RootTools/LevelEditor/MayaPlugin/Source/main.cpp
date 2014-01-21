@@ -123,6 +123,8 @@ void GivePaintId(int index, string filePath)
 
 void PaintModel(int index, MImage& texture)
 {
+	HANDLE TextureMutexHandle;
+	DWORD milliseconds;
 	//Print(paintCount);
 	//SM.materialList[SM.meshList[index].MaterialID]
 	//Hämtar ut vilken texturnod som gäller och kopplar
@@ -137,7 +139,18 @@ void PaintModel(int index, MImage& texture)
 			myTexture.Pixels[i] = texture.pixels()[i];
 		}
 
-		Print("Done");
+		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		WaitForSingleObject(TextureMutexHandle, SM.milliseconds);
+		//Print("Done");
+
+		SM.PpaintList[SM.meshList[index].paintIndex]->heigth = y;
+		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
+		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTexture.Pixels, x*y*4);
+
+		*SM.NumberOfPaintTextures = paintCount;
+		ReleaseMutex(TextureMutexHandle);
+
+		SM.AddUpdateMessage("Texture", SM.meshList[index].paintIndex, false, false, false);
 		/*När man skapar en textur så ska man titta på om nament på materialet är paint (som avgör om vi ska måla den eller inte),
 		och i så fall ska vi lägga den som painttexture, sen tar vi en dirty node cb på den. och när det händer får vi skicka över pixel datan till
 		andra sidan*/

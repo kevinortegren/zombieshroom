@@ -22,6 +22,7 @@ public:
 	void UpdateSharedMaterials(int nrOfMaterials, int meshID);
 	void UpdateSharedLocator(int index, int nrOfLocators);
 	void AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove); //Valid types are "Mesh", "Camera", "Light", "Locator"
+
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];

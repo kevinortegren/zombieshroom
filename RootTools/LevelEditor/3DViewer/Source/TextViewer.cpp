@@ -227,6 +227,18 @@ int main(int argc, char* argv[])
 				if(type == "Camera")
 					UpdateCamera();
 
+				if(type == "Texture")
+				{
+					if(updateID != -1)
+					{
+						RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+						WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+						cout << RM.PpaintList[updateID]->heigth << endl;
+						cout << RM.PpaintList[updateID]->width << endl;
+						ReleaseMutex(RM.TextureMutexHandle);
+					}
+				}
+
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
 				cameraSystem->Process();
@@ -362,7 +374,8 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 
 void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap)
 {
-	if(textureName == "" || textureName == "NONE")
+	
+	if(textureName == "" || textureName == "NONE" || textureName == "PaintTexture")
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
