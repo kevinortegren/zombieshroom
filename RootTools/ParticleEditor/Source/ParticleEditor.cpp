@@ -211,14 +211,14 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax = 2.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin = 0.1f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMax = 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin = glm::vec2(0.05f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax = glm::vec2(0.05f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd = glm::vec2(1.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd = glm::vec4(1.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity = glm::vec3(0.0f, 0.0f, 0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin	= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax	= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd	= glm::vec2(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_color		= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd	= glm::vec4(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity	= glm::vec3(0.0f, 0.0f, 0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_direction = glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_spread = 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_spread	= 1.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.05f;
 
 	//Map data to params list for buffering

@@ -57,7 +57,7 @@ namespace Render
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 10 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 14 * sizeof(float));
-
+		
 			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
 			m_meshes[i]->SetVertexAttribute(attributes[i]);
 		} 

@@ -37,6 +37,7 @@ in float vert_type[];
 in vec4 vert_color[];
 in vec3 vert_accel[];
 
+
 // Transform feedback values.
 out vec3 vert_initialPos1;
 out vec3 vert_initialVel1;
@@ -45,6 +46,8 @@ out float vert_age1;
 out float vert_type1;
 out vec4 vert_color1;
 out vec3 vert_accel1;
+
+
 
 vec3 GetRandomDir(float TexCoord)
 {
@@ -83,13 +86,13 @@ void main()
 		}
 
 		// Always output the emitter particle with initial values.
-		vert_initialPos1 = g_Position;
-		vert_initialVel1 = vert_initialVel[0];
-		vert_scale1 = vec2(0.0f, 0.0f);
-		vert_age1 = lifeTime;
-		vert_type1 = 0.0f;
-		vert_color1 = vert_color[0];  
-		vert_accel1 = vert_accel[0];
+		vert_initialPos1	= g_Position;
+		vert_initialVel1	= vert_initialVel[0];
+		vert_scale1			= vec2(0.0f, 0.0f);
+		vert_age1			= lifeTime;
+		vert_type1			= 0.0f;
+		vert_color1			= vert_color[0];  
+		vert_accel1			= vert_accel[0];
 		EmitVertex();
 		EndPrimitive();
 	}
@@ -100,16 +103,18 @@ void main()
 		vec3 DeltaV = g_dt * vert_accel[0]; 
 		//Pos
 		vec3 DeltaP = g_dt * vert_initialVel[0];
-		
+
 		if(lifeTime > 0.0f)
-		{
-			vert_initialPos1 = gl_in[0].gl_Position.xyz + DeltaP;		
-			vert_initialVel1 = vert_initialVel[0] + DeltaV;
-			vert_scale1 = vert_scale[0];
-			vert_age1 = lifeTime;		
-			vert_type1 = 1.0f;
-			vert_color1 = vert_color[0];  
-			vert_accel1 = vert_accel[0];
+		{	
+			//float linearFac = 1.0f - lifeTime / vert_age[0];
+			vert_initialPos1	= gl_in[0].gl_Position.xyz + DeltaP;		
+			vert_initialVel1	= vert_initialVel[0] + DeltaV;
+			vert_scale1			= vert_scale[0];//mix(vert_scale[0], vert_endScale[0], linearFac);
+			vert_age1			= lifeTime;		
+			vert_type1			= 1.0f;
+			vert_color1			= vert_color[0];//mix(vert_color[0], vert_endColor[0], linearFac);  
+			vert_accel1			= vert_accel[0];
+
 			EmitVertex();
 			EndPrimitive();
 		}
