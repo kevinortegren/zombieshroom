@@ -9,12 +9,12 @@ namespace RootForce
 {
 	ConnectingState::ConnectingState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
-		, m_sharedSystems(p_sharedSystems)
+		, m_sharedSystems(p_sharedSystems),
+		m_loadingScreen(nullptr)
 	{}
 
 	ConnectingState::~ConnectingState()
 	{
-		g_engineContext.m_gui->DestroyView(m_loadingScreen);
 	}
 
 	void ConnectingState::Initialize()

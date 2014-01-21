@@ -19,7 +19,8 @@ namespace RootForce
 	{
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
-
+		
+		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 		g_engineContext.m_resourceManager->LoadScript("Player");
         
