@@ -175,15 +175,18 @@ namespace RootForce
 
 		for(int i = 0; i < 5; i++)
 		{
+			//Create particle entity
 			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
+			//Add transform
 			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
 			t->m_position = pos[i];
-
+			//Add Particle Emitter
 			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
-
+			//Add particle system to emitter
 			RootForce::ParticleSystemStruct particleSystem;
 			e->m_particleSystems.push_back(particleSystem);
 
+			//Set Particle system values
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_system = g_engineContext.m_renderer->CreateParticleSystem();	
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
@@ -200,8 +203,9 @@ namespace RootForce
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity = glm::vec3(0.0f, -9.0f, 0.0f);
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_direction = glm::vec3(0.0f);
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_spread = 1.0f;
-			e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.05f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.03f;
 
+			//Point system values to params
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &t->m_position;
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin;
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax;
