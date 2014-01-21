@@ -10,6 +10,8 @@
 #include <RootSystems/Include/ParticleSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/Components.h>
+#include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
+#include <RootEngine/Render/Include/Texture.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -22,6 +24,7 @@ public:
 	void HandleEvents();
 	void Update(float p_delta);
 private:
+	void UpdateAimingDevice();
 	bool m_running;
 	std::string m_workingDirectory;
 	void* m_engineModule;
@@ -29,11 +32,14 @@ private:
 
 	ECS::World m_world;
 
-	RootForce::RenderingSystem* m_renderingSystem;
-	RootForce::PointLightSystem* m_pointLightSystem;
-	RootForce::ParticleSystem* m_particleSystem;
-	RootForce::CameraSystem* m_cameraSystem;
-	RootForce::LookAtSystem* m_lookAtSystem;
+	RootForce::RenderingSystem*				m_renderingSystem;
+	RootForce::PointLightSystem*			m_pointLightSystem;
+	RootForce::ParticleSystem*				m_particleSystem;
+	RootForce::CameraSystem*				m_cameraSystem;
+	RootForce::LookAtSystem*				m_lookAtSystem;
+	RootForce::ThirdPersonBehaviorSystem*	m_thirdPersonBehaviorSystem;
+
+	ECS::Entity* m_aimingDevice;
 };
 
 

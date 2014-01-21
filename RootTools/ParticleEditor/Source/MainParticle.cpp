@@ -123,7 +123,6 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 
-
 	// Initialize render and point light system.
 	m_renderingSystem = new RootForce::RenderingSystem(g_world);
 	g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
@@ -142,29 +141,51 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
+	m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 	// Setup the importer and exporter
 	//m_world.GetEntityImporter()->SetImporter(Importer);
 	//m_world.GetEntityExporter()->SetExporter(Exporter);
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
+	
+	//Create player aiming device
+	m_aimingDevice = m_world.GetEntityManager()->CreateEntity();
+	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
+	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
+	aimingDeviceTransform->m_scale = glm::vec3(0.05f);
+	RootForce::Renderable* aimingRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_aimingDevice);
+	aimingRenderable->m_material = g_engineContext.m_resourceManager->GetMaterial("AimingDeviceRenderable");
+	aimingRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
+	aimingRenderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
+	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0,1,0,1));
 
 	// Add camera entity.	
 	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
-
 	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+	cameraTransform->m_position = glm::vec3(0);
 	camera->m_near = 0.1f;
 	camera->m_far = 1000.0f;
 	camera->m_fov = 45.0f;
 
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-	cameraTransform->m_position = glm::vec3(0.0f, 20.0f, 0.0f);
+	cameraLookAt->m_targetTag = "AimingDevice";
+	cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	RootForce::LookAtBehavior* lookAtComponent = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-	
-	
+	cameraThirdPerson->m_targetTag = "AimingDevice";
+	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+
 	m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
 	p_particleEditorQt->SetContext(&g_engineContext);
 	p_particleEditorQt->SetWorld(&m_world);
+	p_particleEditorQt->SetWorkingDirectory(m_workingDirectory);
+	p_particleEditorQt->Init();
+	p_particleEditorQt->ConnectSignalsAndSlots();
 }
 
 MainParticle::~MainParticle()
@@ -191,15 +212,47 @@ void MainParticle::Update( float p_delta )
 	g_world->SetDelta(p_delta);
 	g_engineContext.m_renderer->Clear();
 	HandleEvents();
-	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
-	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
-	trans->m_position.y -= (g_engineContext.m_inputSys->GetScroll()*4);
-
+	UpdateAimingDevice();
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
+	m_thirdPersonBehaviorSystem->Process();
 	m_particleSystem->Process();
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
+	
+}
+
+void MainParticle::UpdateAimingDevice()
+{
+	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
+	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->GetComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+	float speedZoomFac = cameraThirdPerson->m_distance/50.0f;
+	cameraThirdPerson->m_distance -= (g_engineContext.m_inputSys->GetScroll() * 4 * speedZoomFac);
+
+	if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT) == RootEngine::InputManager::KeyState::DOWN)
+	{
+		glm::ivec2 m_deltaMouseMovement = g_engineContext.m_inputSys->GetDeltaMousePos();
+		RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_aimingDevice);
+		RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
+		if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN)
+		{
+			trans->m_orientation.YawGlobal(m_deltaMouseMovement.x * 0.3f);
+			trans->m_orientation.Pitch(-m_deltaMouseMovement.y * 0.3f);
+		}
+		else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::MIDDLE) == RootEngine::InputManager::KeyState::DOWN)
+		{
+			trans->m_position += cameraTrans->m_orientation.GetUp() * -(float)m_deltaMouseMovement.y * 0.02f;
+			trans->m_position += cameraTrans->m_orientation.GetRight() * (float)m_deltaMouseMovement.x * 0.02f;
+		}
+		else if (g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::RIGHT) == RootEngine::InputManager::KeyState::DOWN)
+		{
+			
+			if(glm::abs(m_deltaMouseMovement.y) > glm::abs(m_deltaMouseMovement.x))
+				cameraThirdPerson->m_distance += m_deltaMouseMovement.y * 0.3f * speedZoomFac;
+			else
+				cameraThirdPerson->m_distance += m_deltaMouseMovement.x * 0.3f * speedZoomFac;
+		}
+	}
 }

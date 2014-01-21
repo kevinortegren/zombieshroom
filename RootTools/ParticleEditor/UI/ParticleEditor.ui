@@ -350,207 +350,17 @@
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
-        <item row="2" column="4">
-         <widget class="QDoubleSpinBox" name="sizeMinSpinBoxX">
-          <property name="minimum">
-           <double>0.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="4">
-         <widget class="QDoubleSpinBox" name="spreadSpinBox">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>10.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="4">
-         <widget class="QDoubleSpinBox" name="lifeTimeMinSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="6">
-         <widget class="QDoubleSpinBox" name="lifeTimeMaxSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="6">
-         <widget class="QDoubleSpinBox" name="speedMaxSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="5">
-         <widget class="QDoubleSpinBox" name="gravitySpinBoxY">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Gravity:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="4">
-         <widget class="QDoubleSpinBox" name="gravitySpinBoxX">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="4">
-         <widget class="QPushButton" name="colorButton">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="4">
-         <widget class="QDoubleSpinBox" name="speedMinSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="4">
-         <widget class="QDoubleSpinBox" name="directionSpinBoxX">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="1">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Direction:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="6">
-         <widget class="QDoubleSpinBox" name="gravitySpinBoxZ">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
+        <item row="9" column="1">
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>SpeedMin:</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="6">
-         <widget class="QDoubleSpinBox" name="directionSpinBoxZ">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
+        <item row="13" column="1">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>LifeMin:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QDoubleSpinBox" name="posSpinBoxX">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="5">
-         <widget class="QDoubleSpinBox" name="directionSpinBoxY">
-          <property name="minimum">
-           <double>-1024.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1024.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -567,6 +377,59 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="4">
+         <widget class="QDoubleSpinBox" name="posSpinBoxX">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="4">
+         <widget class="QDoubleSpinBox" name="speedMinSpinBox">
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>SizeMin:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="8">
+         <widget class="QDoubleSpinBox" name="speedEndSpinBox">
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Pos:</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="6">
          <widget class="QDoubleSpinBox" name="posSpinBoxZ">
           <property name="minimum">
@@ -580,91 +443,8 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>SizeMin:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Color:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Pos:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Spread:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="7">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>SpeedEnd:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="8">
-         <widget class="QDoubleSpinBox" name="speedEndSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="7">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>ColorEnd:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="8">
-         <widget class="QPushButton" name="colorButtonEnd">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="5">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>SpeedMax:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="5">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>LifeMax:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>SizeEnd:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4">
-         <widget class="QDoubleSpinBox" name="sizeEndSpinBoxX">
+        <item row="13" column="8">
+         <widget class="QDoubleSpinBox" name="spawnTimeSpinBox">
           <property name="maximum">
            <double>1024.000000000000000</double>
           </property>
@@ -672,11 +452,125 @@
            <double>0.010000000000000</double>
           </property>
           <property name="value">
-           <double>1.000000000000000</double>
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>
-        <item row="2" column="7">
+        <item row="9" column="7">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>SpeedEnd:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="5">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>LifeMax:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="7">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>SpawnTime:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="5">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>SpeedMax:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QDoubleSpinBox" name="gravitySpinBoxY">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Direction:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6">
+         <widget class="QDoubleSpinBox" name="gravitySpinBoxZ">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QDoubleSpinBox" name="gravitySpinBoxX">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QDoubleSpinBox" name="directionSpinBoxX">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QDoubleSpinBox" name="directionSpinBoxY">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QDoubleSpinBox" name="directionSpinBoxZ">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="5">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>SizeMax:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="6">
          <widget class="QDoubleSpinBox" name="sizeMaxSpinBoxX">
           <property name="maximum">
            <double>1024.000000000000000</double>
@@ -689,15 +583,58 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="6">
-         <widget class="QLabel" name="label_12">
+        <item row="5" column="7">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>SizeMax:</string>
+           <string>SizeEnd:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="5">
-         <widget class="QDoubleSpinBox" name="sizeMinSpinBoxY">
+        <item row="5" column="8">
+         <widget class="QDoubleSpinBox" name="sizeEndSpinBoxX">
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Gravity:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Spread:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QDoubleSpinBox" name="spreadSpinBox">
+          <property name="minimum">
+           <double>-1024.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="4">
+         <widget class="QDoubleSpinBox" name="sizeMinSpinBoxX">
           <property name="minimum">
            <double>0.000000000000000</double>
           </property>
@@ -712,46 +649,33 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="8">
-         <widget class="QDoubleSpinBox" name="sizeMaxSpinBoxY">
+        <item row="13" column="4">
+         <widget class="QDoubleSpinBox" name="lifeTimeMinSpinBox">
+          <property name="maximum">
+           <double>1024.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="6">
+         <widget class="QDoubleSpinBox" name="speedMaxSpinBox">
           <property name="maximum">
            <double>1024.000000000000000</double>
           </property>
           <property name="singleStep">
-           <double>0.010000000000000</double>
+           <double>0.100000000000000</double>
           </property>
           <property name="value">
            <double>1.000000000000000</double>
           </property>
          </widget>
         </item>
-        <item row="3" column="5">
-         <widget class="QDoubleSpinBox" name="sizeEndSpinBoxY">
+        <item row="13" column="6">
+         <widget class="QDoubleSpinBox" name="lifeTimeMaxSpinBox">
           <property name="maximum">
            <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="7">
-         <widget class="QLabel" name="label_17">
-          <property name="text">
-           <string>SpawnTime:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="8">
-         <widget class="QDoubleSpinBox" name="spawnTimeSpinBox">
-          <property name="maximum">
-           <double>1024.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
           </property>
           <property name="value">
            <double>0.100000000000000</double>
@@ -776,18 +700,6 @@
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="2">
-        <widget class="QLineEdit" name="textureEmitterLineEdit">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_16">
          <property name="font">
@@ -800,19 +712,29 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QPushButton" name="browseEmitterTextureButton">
+       <item row="0" column="2">
+        <widget class="QLineEdit" name="textureEmitterLineEdit">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
-         <property name="text">
-          <string>Browse...</string>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QTreeView" name="textureTreeView">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>52</y>
+        <width>497</width>
+        <height>597</height>
+       </rect>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -1087,6 +1009,8 @@
     </property>
     <addaction name="actionStats"/>
     <addaction name="actionGrid_2"/>
+    <addaction name="actionColor_Triangle"/>
+    <addaction name="actionEndColor_Triangle"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -1184,6 +1108,16 @@
   <action name="actionGrid_2">
    <property name="text">
     <string>Grid</string>
+   </property>
+  </action>
+  <action name="actionColor_Triangle">
+   <property name="text">
+    <string>Color Triangle</string>
+   </property>
+  </action>
+  <action name="actionEndColor_Triangle">
+   <property name="text">
+    <string>EndColor Triangle</string>
    </property>
   </action>
  </widget>

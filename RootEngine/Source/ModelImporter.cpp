@@ -216,12 +216,15 @@ namespace RootEngine
 			mesh->CreateIndexBuffer(&indices[0], indices.size());
 
 			// Create physics mesh.
-			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+			if(m_context->m_physics)
+			{
+				std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
 
-			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+				pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
 
-			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
-			m_model->m_physicsMeshes.push_back(pmesh.get());
+				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+				m_model->m_physicsMeshes.push_back(pmesh.get());
+			}
 		}
 
 		mesh->SetPrimitiveType(GL_TRIANGLES);

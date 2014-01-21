@@ -30,6 +30,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -50,6 +51,8 @@ public:
     QAction *actionYellow;
     QAction *actionWhite;
     QAction *actionGrid_2;
+    QAction *actionColor_Triangle;
+    QAction *actionEndColor_Triangle;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *tabProperties;
@@ -66,51 +69,44 @@ public:
     QComboBox *templateComboBox;
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
-    QDoubleSpinBox *sizeMinSpinBoxX;
-    QDoubleSpinBox *spreadSpinBox;
-    QDoubleSpinBox *lifeTimeMinSpinBox;
-    QDoubleSpinBox *lifeTimeMaxSpinBox;
-    QDoubleSpinBox *speedMaxSpinBox;
-    QDoubleSpinBox *gravitySpinBoxY;
-    QLabel *label_6;
-    QDoubleSpinBox *gravitySpinBoxX;
-    QPushButton *colorButton;
+    QLabel *label_7;
+    QLabel *label_9;
+    QDoubleSpinBox *posSpinBoxY;
+    QDoubleSpinBox *posSpinBoxX;
     QDoubleSpinBox *speedMinSpinBox;
-    QDoubleSpinBox *directionSpinBoxX;
+    QLabel *label_2;
+    QDoubleSpinBox *speedEndSpinBox;
+    QLabel *label;
+    QDoubleSpinBox *posSpinBoxZ;
+    QDoubleSpinBox *spawnTimeSpinBox;
+    QLabel *label_14;
+    QLabel *label_10;
+    QLabel *label_17;
+    QLabel *label_11;
+    QDoubleSpinBox *gravitySpinBoxY;
     QLabel *label_8;
     QDoubleSpinBox *gravitySpinBoxZ;
-    QLabel *label_7;
-    QDoubleSpinBox *directionSpinBoxZ;
-    QLabel *label_9;
-    QDoubleSpinBox *posSpinBoxX;
+    QDoubleSpinBox *gravitySpinBoxX;
+    QDoubleSpinBox *directionSpinBoxX;
     QDoubleSpinBox *directionSpinBoxY;
-    QDoubleSpinBox *posSpinBoxY;
-    QDoubleSpinBox *posSpinBoxZ;
-    QLabel *label_2;
-    QLabel *label_4;
-    QLabel *label;
-    QLabel *label_13;
-    QLabel *label_14;
-    QDoubleSpinBox *speedEndSpinBox;
-    QLabel *label_5;
-    QPushButton *colorButtonEnd;
-    QLabel *label_11;
-    QLabel *label_10;
+    QDoubleSpinBox *directionSpinBoxZ;
+    QLabel *label_12;
+    QDoubleSpinBox *sizeMaxSpinBoxX;
     QLabel *label_3;
     QDoubleSpinBox *sizeEndSpinBoxX;
-    QDoubleSpinBox *sizeMaxSpinBoxX;
-    QLabel *label_12;
-    QDoubleSpinBox *sizeMinSpinBoxY;
-    QDoubleSpinBox *sizeMaxSpinBoxY;
-    QDoubleSpinBox *sizeEndSpinBoxY;
-    QLabel *label_17;
-    QDoubleSpinBox *spawnTimeSpinBox;
+    QLabel *label_6;
+    QLabel *label_13;
+    QDoubleSpinBox *spreadSpinBox;
+    QDoubleSpinBox *sizeMinSpinBoxX;
+    QDoubleSpinBox *lifeTimeMinSpinBox;
+    QDoubleSpinBox *speedMaxSpinBox;
+    QDoubleSpinBox *lifeTimeMaxSpinBox;
     QWidget *tab_2;
     QWidget *gridLayoutWidget_2;
     QGridLayout *gridLayout_2;
-    QLineEdit *textureEmitterLineEdit;
     QLabel *label_16;
-    QPushButton *browseEmitterTextureButton;
+    QLineEdit *textureEmitterLineEdit;
+    QTreeView *textureTreeView;
     QGroupBox *groupBox;
     QListWidget *listWidget;
     QFrame *frame;
@@ -190,6 +186,10 @@ public:
         actionWhite->setObjectName(QStringLiteral("actionWhite"));
         actionGrid_2 = new QAction(ParticleEditorClass);
         actionGrid_2->setObjectName(QStringLiteral("actionGrid_2"));
+        actionColor_Triangle = new QAction(ParticleEditorClass);
+        actionColor_Triangle->setObjectName(QStringLiteral("actionColor_Triangle"));
+        actionEndColor_Triangle = new QAction(ParticleEditorClass);
+        actionEndColor_Triangle->setObjectName(QStringLiteral("actionEndColor_Triangle"));
         centralWidget = new QWidget(ParticleEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
@@ -251,134 +251,15 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        sizeMinSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
-        sizeMinSpinBoxX->setObjectName(QStringLiteral("sizeMinSpinBoxX"));
-        sizeMinSpinBoxX->setMinimum(0);
-        sizeMinSpinBoxX->setMaximum(1024);
-        sizeMinSpinBoxX->setSingleStep(0.01);
-        sizeMinSpinBoxX->setValue(1);
-
-        gridLayout->addWidget(sizeMinSpinBoxX, 2, 4, 1, 1);
-
-        spreadSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        spreadSpinBox->setObjectName(QStringLiteral("spreadSpinBox"));
-        spreadSpinBox->setMinimum(-1024);
-        spreadSpinBox->setMaximum(1024);
-        spreadSpinBox->setSingleStep(0.1);
-        spreadSpinBox->setValue(10);
-
-        gridLayout->addWidget(spreadSpinBox, 9, 4, 1, 1);
-
-        lifeTimeMinSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        lifeTimeMinSpinBox->setObjectName(QStringLiteral("lifeTimeMinSpinBox"));
-        lifeTimeMinSpinBox->setMaximum(1024);
-        lifeTimeMinSpinBox->setValue(0.1);
-
-        gridLayout->addWidget(lifeTimeMinSpinBox, 10, 4, 1, 1);
-
-        lifeTimeMaxSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        lifeTimeMaxSpinBox->setObjectName(QStringLiteral("lifeTimeMaxSpinBox"));
-        lifeTimeMaxSpinBox->setMaximum(1024);
-        lifeTimeMaxSpinBox->setValue(0.1);
-
-        gridLayout->addWidget(lifeTimeMaxSpinBox, 10, 6, 1, 1);
-
-        speedMaxSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        speedMaxSpinBox->setObjectName(QStringLiteral("speedMaxSpinBox"));
-        speedMaxSpinBox->setMaximum(1024);
-        speedMaxSpinBox->setSingleStep(0.1);
-        speedMaxSpinBox->setValue(1);
-
-        gridLayout->addWidget(speedMaxSpinBox, 6, 6, 1, 1);
-
-        gravitySpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
-        gravitySpinBoxY->setObjectName(QStringLiteral("gravitySpinBoxY"));
-        gravitySpinBoxY->setMinimum(-1024);
-        gravitySpinBoxY->setMaximum(1024);
-        gravitySpinBoxY->setSingleStep(0.1);
-
-        gridLayout->addWidget(gravitySpinBoxY, 5, 5, 1, 1);
-
-        label_6 = new QLabel(gridLayoutWidget);
-        label_6->setObjectName(QStringLiteral("label_6"));
-
-        gridLayout->addWidget(label_6, 5, 1, 1, 1);
-
-        gravitySpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
-        gravitySpinBoxX->setObjectName(QStringLiteral("gravitySpinBoxX"));
-        gravitySpinBoxX->setMinimum(-1024);
-        gravitySpinBoxX->setMaximum(1024);
-        gravitySpinBoxX->setSingleStep(0.1);
-
-        gridLayout->addWidget(gravitySpinBoxX, 5, 4, 1, 1);
-
-        colorButton = new QPushButton(gridLayoutWidget);
-        colorButton->setObjectName(QStringLiteral("colorButton"));
-        colorButton->setDefault(false);
-        colorButton->setFlat(false);
-
-        gridLayout->addWidget(colorButton, 4, 4, 1, 1);
-
-        speedMinSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        speedMinSpinBox->setObjectName(QStringLiteral("speedMinSpinBox"));
-        speedMinSpinBox->setMaximum(1024);
-        speedMinSpinBox->setSingleStep(0.1);
-        speedMinSpinBox->setValue(1);
-
-        gridLayout->addWidget(speedMinSpinBox, 6, 4, 1, 1);
-
-        directionSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
-        directionSpinBoxX->setObjectName(QStringLiteral("directionSpinBoxX"));
-        directionSpinBoxX->setMinimum(-1024);
-        directionSpinBoxX->setMaximum(1024);
-        directionSpinBoxX->setValue(0);
-
-        gridLayout->addWidget(directionSpinBoxX, 8, 4, 1, 1);
-
-        label_8 = new QLabel(gridLayoutWidget);
-        label_8->setObjectName(QStringLiteral("label_8"));
-
-        gridLayout->addWidget(label_8, 8, 1, 1, 1);
-
-        gravitySpinBoxZ = new QDoubleSpinBox(gridLayoutWidget);
-        gravitySpinBoxZ->setObjectName(QStringLiteral("gravitySpinBoxZ"));
-        gravitySpinBoxZ->setMinimum(-1024);
-        gravitySpinBoxZ->setMaximum(1024);
-        gravitySpinBoxZ->setSingleStep(0.1);
-
-        gridLayout->addWidget(gravitySpinBoxZ, 5, 6, 1, 1);
-
         label_7 = new QLabel(gridLayoutWidget);
         label_7->setObjectName(QStringLiteral("label_7"));
 
-        gridLayout->addWidget(label_7, 6, 1, 1, 1);
-
-        directionSpinBoxZ = new QDoubleSpinBox(gridLayoutWidget);
-        directionSpinBoxZ->setObjectName(QStringLiteral("directionSpinBoxZ"));
-        directionSpinBoxZ->setMinimum(-1024);
-        directionSpinBoxZ->setMaximum(1024);
-
-        gridLayout->addWidget(directionSpinBoxZ, 8, 6, 1, 1);
+        gridLayout->addWidget(label_7, 9, 1, 1, 1);
 
         label_9 = new QLabel(gridLayoutWidget);
         label_9->setObjectName(QStringLiteral("label_9"));
 
-        gridLayout->addWidget(label_9, 10, 1, 1, 1);
-
-        posSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
-        posSpinBoxX->setObjectName(QStringLiteral("posSpinBoxX"));
-        posSpinBoxX->setMinimum(-1024);
-        posSpinBoxX->setMaximum(1024);
-        posSpinBoxX->setSingleStep(0.1);
-
-        gridLayout->addWidget(posSpinBoxX, 0, 4, 1, 1);
-
-        directionSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
-        directionSpinBoxY->setObjectName(QStringLiteral("directionSpinBoxY"));
-        directionSpinBoxY->setMinimum(-1024);
-        directionSpinBoxY->setMaximum(1024);
-
-        gridLayout->addWidget(directionSpinBoxY, 8, 5, 1, 1);
+        gridLayout->addWidget(label_9, 13, 1, 1, 1);
 
         posSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
         posSpinBoxY->setObjectName(QStringLiteral("posSpinBoxY"));
@@ -388,6 +269,40 @@ public:
 
         gridLayout->addWidget(posSpinBoxY, 0, 5, 1, 1);
 
+        posSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
+        posSpinBoxX->setObjectName(QStringLiteral("posSpinBoxX"));
+        posSpinBoxX->setMinimum(-1024);
+        posSpinBoxX->setMaximum(1024);
+        posSpinBoxX->setSingleStep(0.1);
+
+        gridLayout->addWidget(posSpinBoxX, 0, 4, 1, 1);
+
+        speedMinSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        speedMinSpinBox->setObjectName(QStringLiteral("speedMinSpinBox"));
+        speedMinSpinBox->setMaximum(1024);
+        speedMinSpinBox->setSingleStep(0.1);
+        speedMinSpinBox->setValue(1);
+
+        gridLayout->addWidget(speedMinSpinBox, 9, 4, 1, 1);
+
+        label_2 = new QLabel(gridLayoutWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout->addWidget(label_2, 5, 1, 1, 1);
+
+        speedEndSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        speedEndSpinBox->setObjectName(QStringLiteral("speedEndSpinBox"));
+        speedEndSpinBox->setMaximum(1024);
+        speedEndSpinBox->setSingleStep(0.1);
+        speedEndSpinBox->setValue(1);
+
+        gridLayout->addWidget(speedEndSpinBox, 9, 8, 1, 1);
+
+        label = new QLabel(gridLayoutWidget);
+        label->setObjectName(QStringLiteral("label"));
+
+        gridLayout->addWidget(label, 0, 1, 1, 1);
+
         posSpinBoxZ = new QDoubleSpinBox(gridLayoutWidget);
         posSpinBoxZ->setObjectName(QStringLiteral("posSpinBoxZ"));
         posSpinBoxZ->setMinimum(-1024);
@@ -396,71 +311,89 @@ public:
 
         gridLayout->addWidget(posSpinBoxZ, 0, 6, 1, 1);
 
-        label_2 = new QLabel(gridLayoutWidget);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        spawnTimeSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        spawnTimeSpinBox->setObjectName(QStringLiteral("spawnTimeSpinBox"));
+        spawnTimeSpinBox->setMaximum(1024);
+        spawnTimeSpinBox->setSingleStep(0.01);
+        spawnTimeSpinBox->setValue(0.1);
 
-        gridLayout->addWidget(label_2, 2, 1, 1, 1);
-
-        label_4 = new QLabel(gridLayoutWidget);
-        label_4->setObjectName(QStringLiteral("label_4"));
-
-        gridLayout->addWidget(label_4, 4, 1, 1, 1);
-
-        label = new QLabel(gridLayoutWidget);
-        label->setObjectName(QStringLiteral("label"));
-
-        gridLayout->addWidget(label, 0, 1, 1, 1);
-
-        label_13 = new QLabel(gridLayoutWidget);
-        label_13->setObjectName(QStringLiteral("label_13"));
-
-        gridLayout->addWidget(label_13, 9, 1, 1, 1);
+        gridLayout->addWidget(spawnTimeSpinBox, 13, 8, 1, 1);
 
         label_14 = new QLabel(gridLayoutWidget);
         label_14->setObjectName(QStringLiteral("label_14"));
 
-        gridLayout->addWidget(label_14, 6, 7, 1, 1);
-
-        speedEndSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        speedEndSpinBox->setObjectName(QStringLiteral("speedEndSpinBox"));
-        speedEndSpinBox->setMaximum(1024);
-        speedEndSpinBox->setSingleStep(0.1);
-        speedEndSpinBox->setValue(1);
-
-        gridLayout->addWidget(speedEndSpinBox, 6, 8, 1, 1);
-
-        label_5 = new QLabel(gridLayoutWidget);
-        label_5->setObjectName(QStringLiteral("label_5"));
-
-        gridLayout->addWidget(label_5, 4, 7, 1, 1);
-
-        colorButtonEnd = new QPushButton(gridLayoutWidget);
-        colorButtonEnd->setObjectName(QStringLiteral("colorButtonEnd"));
-
-        gridLayout->addWidget(colorButtonEnd, 4, 8, 1, 1);
-
-        label_11 = new QLabel(gridLayoutWidget);
-        label_11->setObjectName(QStringLiteral("label_11"));
-
-        gridLayout->addWidget(label_11, 6, 5, 1, 1);
+        gridLayout->addWidget(label_14, 9, 7, 1, 1);
 
         label_10 = new QLabel(gridLayoutWidget);
         label_10->setObjectName(QStringLiteral("label_10"));
 
-        gridLayout->addWidget(label_10, 10, 5, 1, 1);
+        gridLayout->addWidget(label_10, 13, 5, 1, 1);
 
-        label_3 = new QLabel(gridLayoutWidget);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_17 = new QLabel(gridLayoutWidget);
+        label_17->setObjectName(QStringLiteral("label_17"));
 
-        gridLayout->addWidget(label_3, 3, 1, 1, 1);
+        gridLayout->addWidget(label_17, 13, 7, 1, 1);
 
-        sizeEndSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
-        sizeEndSpinBoxX->setObjectName(QStringLiteral("sizeEndSpinBoxX"));
-        sizeEndSpinBoxX->setMaximum(1024);
-        sizeEndSpinBoxX->setSingleStep(0.01);
-        sizeEndSpinBoxX->setValue(1);
+        label_11 = new QLabel(gridLayoutWidget);
+        label_11->setObjectName(QStringLiteral("label_11"));
 
-        gridLayout->addWidget(sizeEndSpinBoxX, 3, 4, 1, 1);
+        gridLayout->addWidget(label_11, 9, 5, 1, 1);
+
+        gravitySpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
+        gravitySpinBoxY->setObjectName(QStringLiteral("gravitySpinBoxY"));
+        gravitySpinBoxY->setMinimum(-1024);
+        gravitySpinBoxY->setMaximum(1024);
+        gravitySpinBoxY->setSingleStep(0.1);
+
+        gridLayout->addWidget(gravitySpinBoxY, 1, 5, 1, 1);
+
+        label_8 = new QLabel(gridLayoutWidget);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        gridLayout->addWidget(label_8, 2, 1, 1, 1);
+
+        gravitySpinBoxZ = new QDoubleSpinBox(gridLayoutWidget);
+        gravitySpinBoxZ->setObjectName(QStringLiteral("gravitySpinBoxZ"));
+        gravitySpinBoxZ->setMinimum(-1024);
+        gravitySpinBoxZ->setMaximum(1024);
+        gravitySpinBoxZ->setSingleStep(0.1);
+
+        gridLayout->addWidget(gravitySpinBoxZ, 1, 6, 1, 1);
+
+        gravitySpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
+        gravitySpinBoxX->setObjectName(QStringLiteral("gravitySpinBoxX"));
+        gravitySpinBoxX->setMinimum(-1024);
+        gravitySpinBoxX->setMaximum(1024);
+        gravitySpinBoxX->setSingleStep(0.1);
+
+        gridLayout->addWidget(gravitySpinBoxX, 1, 4, 1, 1);
+
+        directionSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
+        directionSpinBoxX->setObjectName(QStringLiteral("directionSpinBoxX"));
+        directionSpinBoxX->setMinimum(-1024);
+        directionSpinBoxX->setMaximum(1024);
+        directionSpinBoxX->setValue(0);
+
+        gridLayout->addWidget(directionSpinBoxX, 2, 4, 1, 1);
+
+        directionSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
+        directionSpinBoxY->setObjectName(QStringLiteral("directionSpinBoxY"));
+        directionSpinBoxY->setMinimum(-1024);
+        directionSpinBoxY->setMaximum(1024);
+
+        gridLayout->addWidget(directionSpinBoxY, 2, 5, 1, 1);
+
+        directionSpinBoxZ = new QDoubleSpinBox(gridLayoutWidget);
+        directionSpinBoxZ->setObjectName(QStringLiteral("directionSpinBoxZ"));
+        directionSpinBoxZ->setMinimum(-1024);
+        directionSpinBoxZ->setMaximum(1024);
+
+        gridLayout->addWidget(directionSpinBoxZ, 2, 6, 1, 1);
+
+        label_12 = new QLabel(gridLayoutWidget);
+        label_12->setObjectName(QStringLiteral("label_12"));
+
+        gridLayout->addWidget(label_12, 5, 5, 1, 1);
 
         sizeMaxSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
         sizeMaxSpinBoxX->setObjectName(QStringLiteral("sizeMaxSpinBoxX"));
@@ -468,50 +401,70 @@ public:
         sizeMaxSpinBoxX->setSingleStep(0.01);
         sizeMaxSpinBoxX->setValue(1);
 
-        gridLayout->addWidget(sizeMaxSpinBoxX, 2, 7, 1, 1);
+        gridLayout->addWidget(sizeMaxSpinBoxX, 5, 6, 1, 1);
 
-        label_12 = new QLabel(gridLayoutWidget);
-        label_12->setObjectName(QStringLiteral("label_12"));
+        label_3 = new QLabel(gridLayoutWidget);
+        label_3->setObjectName(QStringLiteral("label_3"));
 
-        gridLayout->addWidget(label_12, 2, 6, 1, 1);
+        gridLayout->addWidget(label_3, 5, 7, 1, 1);
 
-        sizeMinSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
-        sizeMinSpinBoxY->setObjectName(QStringLiteral("sizeMinSpinBoxY"));
-        sizeMinSpinBoxY->setMinimum(0);
-        sizeMinSpinBoxY->setMaximum(1024);
-        sizeMinSpinBoxY->setSingleStep(0.01);
-        sizeMinSpinBoxY->setValue(1);
+        sizeEndSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
+        sizeEndSpinBoxX->setObjectName(QStringLiteral("sizeEndSpinBoxX"));
+        sizeEndSpinBoxX->setMaximum(1024);
+        sizeEndSpinBoxX->setSingleStep(0.01);
+        sizeEndSpinBoxX->setValue(1);
 
-        gridLayout->addWidget(sizeMinSpinBoxY, 2, 5, 1, 1);
+        gridLayout->addWidget(sizeEndSpinBoxX, 5, 8, 1, 1);
 
-        sizeMaxSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
-        sizeMaxSpinBoxY->setObjectName(QStringLiteral("sizeMaxSpinBoxY"));
-        sizeMaxSpinBoxY->setMaximum(1024);
-        sizeMaxSpinBoxY->setSingleStep(0.01);
-        sizeMaxSpinBoxY->setValue(1);
+        label_6 = new QLabel(gridLayoutWidget);
+        label_6->setObjectName(QStringLiteral("label_6"));
 
-        gridLayout->addWidget(sizeMaxSpinBoxY, 2, 8, 1, 1);
+        gridLayout->addWidget(label_6, 1, 1, 1, 1);
 
-        sizeEndSpinBoxY = new QDoubleSpinBox(gridLayoutWidget);
-        sizeEndSpinBoxY->setObjectName(QStringLiteral("sizeEndSpinBoxY"));
-        sizeEndSpinBoxY->setMaximum(1024);
-        sizeEndSpinBoxY->setSingleStep(0.01);
-        sizeEndSpinBoxY->setValue(1);
+        label_13 = new QLabel(gridLayoutWidget);
+        label_13->setObjectName(QStringLiteral("label_13"));
 
-        gridLayout->addWidget(sizeEndSpinBoxY, 3, 5, 1, 1);
+        gridLayout->addWidget(label_13, 3, 1, 1, 1);
 
-        label_17 = new QLabel(gridLayoutWidget);
-        label_17->setObjectName(QStringLiteral("label_17"));
+        spreadSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        spreadSpinBox->setObjectName(QStringLiteral("spreadSpinBox"));
+        spreadSpinBox->setMinimum(-1024);
+        spreadSpinBox->setMaximum(1024);
+        spreadSpinBox->setSingleStep(0.1);
+        spreadSpinBox->setValue(10);
 
-        gridLayout->addWidget(label_17, 10, 7, 1, 1);
+        gridLayout->addWidget(spreadSpinBox, 3, 4, 1, 1);
 
-        spawnTimeSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        spawnTimeSpinBox->setObjectName(QStringLiteral("spawnTimeSpinBox"));
-        spawnTimeSpinBox->setMaximum(1024);
-        spawnTimeSpinBox->setSingleStep(0.01);
-        spawnTimeSpinBox->setValue(0.1);
+        sizeMinSpinBoxX = new QDoubleSpinBox(gridLayoutWidget);
+        sizeMinSpinBoxX->setObjectName(QStringLiteral("sizeMinSpinBoxX"));
+        sizeMinSpinBoxX->setMinimum(0);
+        sizeMinSpinBoxX->setMaximum(1024);
+        sizeMinSpinBoxX->setSingleStep(0.01);
+        sizeMinSpinBoxX->setValue(1);
 
-        gridLayout->addWidget(spawnTimeSpinBox, 10, 8, 1, 1);
+        gridLayout->addWidget(sizeMinSpinBoxX, 5, 4, 1, 1);
+
+        lifeTimeMinSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        lifeTimeMinSpinBox->setObjectName(QStringLiteral("lifeTimeMinSpinBox"));
+        lifeTimeMinSpinBox->setMaximum(1024);
+        lifeTimeMinSpinBox->setValue(0.1);
+
+        gridLayout->addWidget(lifeTimeMinSpinBox, 13, 4, 1, 1);
+
+        speedMaxSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        speedMaxSpinBox->setObjectName(QStringLiteral("speedMaxSpinBox"));
+        speedMaxSpinBox->setMaximum(1024);
+        speedMaxSpinBox->setSingleStep(0.1);
+        speedMaxSpinBox->setValue(1);
+
+        gridLayout->addWidget(speedMaxSpinBox, 9, 6, 1, 1);
+
+        lifeTimeMaxSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        lifeTimeMaxSpinBox->setObjectName(QStringLiteral("lifeTimeMaxSpinBox"));
+        lifeTimeMaxSpinBox->setMaximum(1024);
+        lifeTimeMaxSpinBox->setValue(0.1);
+
+        gridLayout->addWidget(lifeTimeMaxSpinBox, 13, 6, 1, 1);
 
         tabWidget->addTab(tabProperties, QString());
         tab_2 = new QWidget();
@@ -524,6 +477,12 @@ public:
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         gridLayout_2->setContentsMargins(0, 0, 0, 0);
+        label_16 = new QLabel(gridLayoutWidget_2);
+        label_16->setObjectName(QStringLiteral("label_16"));
+        label_16->setFont(font1);
+
+        gridLayout_2->addWidget(label_16, 0, 0, 1, 1);
+
         textureEmitterLineEdit = new QLineEdit(gridLayoutWidget_2);
         textureEmitterLineEdit->setObjectName(QStringLiteral("textureEmitterLineEdit"));
         textureEmitterLineEdit->setFont(font1);
@@ -531,18 +490,9 @@ public:
 
         gridLayout_2->addWidget(textureEmitterLineEdit, 0, 2, 1, 1);
 
-        label_16 = new QLabel(gridLayoutWidget_2);
-        label_16->setObjectName(QStringLiteral("label_16"));
-        label_16->setFont(font1);
-
-        gridLayout_2->addWidget(label_16, 0, 0, 1, 1);
-
-        browseEmitterTextureButton = new QPushButton(gridLayoutWidget_2);
-        browseEmitterTextureButton->setObjectName(QStringLiteral("browseEmitterTextureButton"));
-        browseEmitterTextureButton->setFont(font1);
-
-        gridLayout_2->addWidget(browseEmitterTextureButton, 0, 3, 1, 1);
-
+        textureTreeView = new QTreeView(tab_2);
+        textureTreeView->setObjectName(QStringLiteral("textureTreeView"));
+        textureTreeView->setGeometry(QRect(8, 52, 497, 597));
         tabWidget->addTab(tab_2, QString());
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -641,6 +591,8 @@ public:
         menuHelp->addAction(actionAbout);
         menuView->addAction(actionStats);
         menuView->addAction(actionGrid_2);
+        menuView->addAction(actionColor_Triangle);
+        menuView->addAction(actionEndColor_Triangle);
 
         retranslateUi(ParticleEditorClass);
         QObject::connect(templateComboBox, SIGNAL(currentIndexChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
@@ -672,6 +624,8 @@ public:
         actionYellow->setText(QApplication::translate("ParticleEditorClass", "Yellow", 0));
         actionWhite->setText(QApplication::translate("ParticleEditorClass", "White", 0));
         actionGrid_2->setText(QApplication::translate("ParticleEditorClass", "Grid", 0));
+        actionColor_Triangle->setText(QApplication::translate("ParticleEditorClass", "Color Triangle", 0));
+        actionEndColor_Triangle->setText(QApplication::translate("ParticleEditorClass", "EndColor Triangle", 0));
         groupBox_3->setTitle(QApplication::translate("ParticleEditorClass", "Properties", 0));
         groupBox_5->setTitle(QApplication::translate("ParticleEditorClass", "Template properties", 0));
         label_15->setText(QApplication::translate("ParticleEditorClass", "Hej", 0));
@@ -684,26 +638,21 @@ public:
          << QApplication::translate("ParticleEditorClass", "Pulsing", 0)
          << QApplication::translate("ParticleEditorClass", "Explosion", 0)
         );
-        label_6->setText(QApplication::translate("ParticleEditorClass", "Gravity:", 0));
-        colorButton->setText(QString());
-        label_8->setText(QApplication::translate("ParticleEditorClass", "Direction:", 0));
         label_7->setText(QApplication::translate("ParticleEditorClass", "SpeedMin:", 0));
         label_9->setText(QApplication::translate("ParticleEditorClass", "LifeMin:", 0));
         label_2->setText(QApplication::translate("ParticleEditorClass", "SizeMin:", 0));
-        label_4->setText(QApplication::translate("ParticleEditorClass", "Color:", 0));
         label->setText(QApplication::translate("ParticleEditorClass", "Pos:", 0));
-        label_13->setText(QApplication::translate("ParticleEditorClass", "Spread:", 0));
         label_14->setText(QApplication::translate("ParticleEditorClass", "SpeedEnd:", 0));
-        label_5->setText(QApplication::translate("ParticleEditorClass", "ColorEnd:", 0));
-        colorButtonEnd->setText(QString());
-        label_11->setText(QApplication::translate("ParticleEditorClass", "SpeedMax:", 0));
         label_10->setText(QApplication::translate("ParticleEditorClass", "LifeMax:", 0));
-        label_3->setText(QApplication::translate("ParticleEditorClass", "SizeEnd:", 0));
-        label_12->setText(QApplication::translate("ParticleEditorClass", "SizeMax:", 0));
         label_17->setText(QApplication::translate("ParticleEditorClass", "SpawnTime:", 0));
+        label_11->setText(QApplication::translate("ParticleEditorClass", "SpeedMax:", 0));
+        label_8->setText(QApplication::translate("ParticleEditorClass", "Direction:", 0));
+        label_12->setText(QApplication::translate("ParticleEditorClass", "SizeMax:", 0));
+        label_3->setText(QApplication::translate("ParticleEditorClass", "SizeEnd:", 0));
+        label_6->setText(QApplication::translate("ParticleEditorClass", "Gravity:", 0));
+        label_13->setText(QApplication::translate("ParticleEditorClass", "Spread:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
-        browseEmitterTextureButton->setText(QApplication::translate("ParticleEditorClass", "Browse...", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Resources", 0));
         groupBox->setTitle(QApplication::translate("ParticleEditorClass", "Emitters", 0));
         groupBox_6->setTitle(QApplication::translate("ParticleEditorClass", "Manage emitters", 0));
