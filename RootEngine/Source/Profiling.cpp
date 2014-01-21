@@ -5,7 +5,7 @@ namespace RootEngine
 	Profiling::Profiling()
 		: m_time(0.0f), m_frames(0)
 	{
-
+		
 	}
 
 	Profiling::~Profiling()
@@ -20,6 +20,8 @@ namespace RootEngine
 		std::vector<unsigned int> samples;
 		std::vector<std::string> names;
 
+		MemInfo* memInfo = m_memTracker->GetProcessMemInfo();
+
 		//Clear output list
 		m_ouputList.clear();
 		m_ouputList.shrink_to_fit();
@@ -28,7 +30,10 @@ namespace RootEngine
 
 		std::string output	= "FPS: " + std::to_string(m_frames);
 		m_ouputList.push_back(output);
-
+		output = "Working set memory: " + std::to_string(memInfo->m_workingSetMiB) + "MB  " + std::to_string(memInfo->m_workingSetKiB) + "KB  " + std::to_string(memInfo->m_workingSetB) + "B";
+		m_ouputList.push_back(output);
+		output = "Peak set memory: " + std::to_string(memInfo->m_peakSetMiB) + "MB  " + std::to_string(memInfo->m_peakSetKiB) + "KB  " + std::to_string(memInfo->m_peakSetB) + "B";
+		m_ouputList.push_back(output);
 		//Calculate average time
 		__int64 qfreq;
 		QueryPerformanceFrequency((LARGE_INTEGER*)&qfreq);
@@ -102,10 +107,15 @@ namespace RootEngine
 	{
 		m_sampleMap[p_name].push_back(p_elapsedTime);
 	}
+	void Profiling::SetMemoryTracker( MemoryTracker* p_memTracker )
+	{
+		m_memTracker = p_memTracker;
+	}
 #ifndef COMPILE_LEVEL_EDITOR
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
 	{
 		m_debugOverlay = p_debugOverlay;
 	}
+
 #endif
 }

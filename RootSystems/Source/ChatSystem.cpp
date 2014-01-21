@@ -6,18 +6,24 @@
 namespace RootForce
 {
 
-	void ChatSystem::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher )
+	void ChatSystem::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext)
 	{
 		m_view = p_view;
 		m_hasFocus = false;
 		m_view->Focus();
 
+		m_engineContext = p_engineContext;
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("ChatSystem"));
 
-		if(result.IsObject() && result.ToObject().type() != Awesomium::kJSObjectType_Local)
+		if(result.IsObject())
 		{
 			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Send"), JSDelegate(this, &ChatSystem::ProcessMessage));
 			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("SetFocus"), JSDelegate(this, &ChatSystem::SetFocus));
+		}
+		else
+		{
+			m_engineContext->m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Could not create ChatSystem object in Javascript");
+			return;
 		}
 		m_view->set_js_method_handler(p_dispatcher);
 		m_view->Focus();
@@ -46,7 +52,15 @@ namespace RootForce
 	{
 		//JSAddMessage(Awesomium::ToString(p_array[0].ToString()).c_str()); //This line of code sounds retardeded :/
 
-		m_messageBuffer.push_back(Awesomium::ToString(p_array[0].ToString()));
+		//TODO: check the first char for a / sign, if found it is a server event and should be treated differently
+		std::string temp = Awesomium::ToString(p_array[0].ToString());
+		if(temp[0] == '/')
+		{
+			RootServer::EventData ev = RootServer::EventFromString(temp.substr(1));
+			m_eventBuffer.push_back(ev);
+		}
+		else
+			m_messageBuffer.push_back(Awesomium::ToString(p_array[0].ToString()));
 	}
 
 	std::string ChatSystem::PollMessage()
@@ -57,6 +71,16 @@ namespace RootForce
 		m_messageBuffer.erase(m_messageBuffer.begin());
 		return temp;
 	}
-	
+
+	RootServer::EventData ChatSystem::PollEvent()
+	{
+		if(m_eventBuffer.size() < 1)
+			return RootServer::EventData();
+		RootServer::EventData temp = m_eventBuffer.at(0); 
+		m_eventBuffer.erase(m_eventBuffer.begin());
+		return temp;
+	}
+
+
 
 }

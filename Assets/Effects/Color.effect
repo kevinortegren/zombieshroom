@@ -13,3 +13,7 @@
             type: vertex
           - name: Color
             type: fragment
+        depth:
+          test: 1
+          write: 0
+        blend: 0

@@ -92,6 +92,7 @@ namespace RootEngine
 
 			//Not final?
 			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
@@ -128,8 +129,10 @@ namespace RootEngine
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
 			virtual void SetMass(int p_objectHandle, float p_mass) = 0;
 			virtual void SetGravity(int p_objectHandle, glm::vec3 p_gravity) = 0;
-			virtual void SetPosition(int p_objectHandle , glm::vec3 p_position) = 0;
+			virtual void SetPosition(int p_objectHandle, glm::vec3 p_position) = 0;
+			virtual void Move(int p_objectHandle , glm::vec3 p_position) = 0;
 			virtual void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId) = 0;
+
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
@@ -151,6 +154,7 @@ namespace RootEngine
 			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
+			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
@@ -188,7 +192,8 @@ namespace RootEngine
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
 			void SetMass(int p_objectHandle, float p_mass);
 			void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation);
-			void SetPosition(int p_objectHandle , glm::vec3 p_position);
+			void SetPosition(int p_objectHandle, glm::vec3 p_position);
+			void Move(int p_objectHandle , glm::vec3 p_position);
 			void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId);
 			void RemoveObject(int p_objectHandle);
 			void RemoveAll();
