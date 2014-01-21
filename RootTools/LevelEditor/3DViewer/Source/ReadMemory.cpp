@@ -17,18 +17,15 @@ ReadMemory::~ReadMemory()
 int ReadMemory::InitalizeSharedMemory()
 {
 	int total_memory_size = 0;
-	
+
 	total_memory_size += sizeof(Mesh) * g_maxMeshes;
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Material) * g_maxMeshes;
 	total_memory_size += sizeof(Locator) * g_maxLocators;
-
-	total_memory_size += sizeof(int) * 5;
-	total_memory_size += sizeof(glm::vec2) * 4;
-	total_memory_size += sizeof(int);
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
-	
+	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
+	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -55,9 +52,6 @@ int ReadMemory::InitalizeSharedMemory()
 	NumberOfMeshes = (int*)(mem);
 	mem = (unsigned char*)(NumberOfMeshes + sizeof(int));
 
-	MeshIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(MeshIdChange + sizeof(glm::vec2));
-
 	for(int i = 0; i < g_maxLights; i++)
 	{
 		PlightList[i] = ((Light*)mem) + i ;
@@ -67,17 +61,11 @@ int ReadMemory::InitalizeSharedMemory()
 	NumberOfLights = (int*)(mem);
 	mem = (unsigned char*)(mem + sizeof(int));
 
-	LightIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(mem + sizeof(glm::vec2));
-
 	for(int i = 0; i < g_maxCameras; i++)
 	{
 		PcameraList[i] = ((Camera*)mem) + i ;
 	}
 	mem = (unsigned char*)(mem + sizeof(Camera) * g_maxCameras);
-
-	CameraIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(mem + sizeof(glm::vec2));
 
 	NumberOfCameras = (int*)(mem);
 	mem = (unsigned char*)(mem + sizeof(int));
@@ -98,9 +86,6 @@ int ReadMemory::InitalizeSharedMemory()
 	}
 	mem = (unsigned char*)(mem + sizeof(Locator) * g_maxLocators);
 
-	LocatorIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(mem + sizeof(glm::vec2));
-
 	NumberOfLocators = (int*)(mem);
 
 	mem = (unsigned char*)(mem + sizeof(int));
@@ -117,6 +102,17 @@ int ReadMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(UpdateMessage) * g_maxMessages);
 
 	NumberOfMessages = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	for(int i = 0; i < g_maxPaintTextures; i++)
+	{
+		PpaintList[i] = ((PaintTexture*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(PaintTexture) * g_maxPaintTextures);
+
+	NumberOfPaintTextures = (int*)(mem);
 
 	if(first_process)
 	{

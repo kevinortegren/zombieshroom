@@ -492,12 +492,6 @@ void UpdateCamera()
 	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
 	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
 
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
-	int cameraIDchange = RM.CameraIdChange->x;
-	RM.CameraIdChange->x = -1;
-	ReleaseMutex(RM.IdMutexHandle);
-
 	//if(cameraIDchange != -1)
 	//{
 	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
@@ -726,7 +720,7 @@ void UpdateLight(int index, bool remove)
 		ReleaseMutex(RM.LightMutexHandle);
 	}
 
-	if(RemoveLightIndex >0 && RemoveLightIndex < size)	
+	if(RemoveLightIndex != -1 && RemoveLightIndex < size)	
 	{					
 		m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);
 		m_world.GetEntityManager()->RemoveEntity(LightEntities[RemoveLightIndex]);

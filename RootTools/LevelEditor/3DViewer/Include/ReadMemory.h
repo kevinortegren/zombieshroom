@@ -30,11 +30,7 @@ public:
 	int* NumberOfLocators;
 
 	int* NumberOfMessages;
-
-	glm::vec2* MeshIdChange;
-	glm::vec2* CameraIdChange;
-	glm::vec2* LightIdChange;
-	glm::vec2* LocatorIdChange;
+	int* NumberOfPaintTextures;
 
 	UpdateMessage* updateMessages[g_maxMessages];
 
@@ -43,6 +39,7 @@ public:
 	Camera* PcameraList[g_maxCameras];
 	Material* PmaterialList[g_maxMeshes];
 	Locator* PlocatorList[g_maxLocators];
+	PaintTexture* PpaintList[g_maxPaintTextures];
 
 	int* export;
 

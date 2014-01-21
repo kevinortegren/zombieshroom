@@ -44,17 +44,15 @@ void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
 void DuplicationCb(void *clientData);
 void checkForDuplicatedMeshes(MObject node);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode, MString &out_specular_path);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
 
-void PaintModel(int index);
+void PaintModel(int index, MImage& texture);
 int paintCount = 0;
 
-////////////////MIMAGE TEST///////////////
-MImage paintTexture;
-
+PaintTexture myTexture;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -104,43 +102,47 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 	return status;
 }
-void GivePaintId(int index)
+void GivePaintId(int index, string filePath)
 {
-	string herp = "Paint";
-	
-		for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)				//VARNING FUL LÖSNING!!!!!
+	if (filePath == "PaintTexture")
+	{
+		Print(SM.meshList[index].modelName, " given paintID! _______________________________________________________________________________________");
+
+		if(SM.meshList[index].paintIndex == -1)
 		{
-			if(herp.compare(SM.meshList[index].transformation.flags[i]) == 0)
-			{
-				PaintModel(index);
-				if(SM.meshList[index].paintIndex = 0)
-				{
-				SM.meshList[index].paintIndex = paintCount;
+			SM.meshList[index].paintIndex = paintCount;
 
-				paintCount++;
-
-				}
-			}
-			else
-			{
-				SM.meshList[index].paintIndex =-1;
-			}
+			paintCount++;
 		}
+		else
+		{
+			Print("Already has paintID!");
+		}
+	}
 }
 
-void PaintModel(int index)
+void PaintModel(int index, MImage& texture)
 {
 	//Print(paintCount);
 	//SM.materialList[SM.meshList[index].MaterialID]
 	//Hämtar ut vilken texturnod som gäller och kopplar
 		//paintTexture.readFromTextureNode(
 		unsigned int x,y;
-		paintTexture.getSize(x,y);
+		texture.getSize(x,y);
 		Print("Painting");
+		Print("SIZE X Y ", x, " ", y);
 
+		for(int i = 0; i < x*y*4; i++)
+		{
+			myTexture.Pixels[i] = texture.pixels()[i];
+		}
+
+		Print("Done");
 		/*När man skapar en textur så ska man titta på om nament på materialet är paint (som avgör om vi ska måla den eller inte),
 		och i så fall ska vi lägga den som painttexture, sen tar vi en dirty node cb på den. och när det händer får vi skicka över pixel datan till
 		andra sidan*/
+
+		//texture.release();
 }
 
 void Export()
@@ -1050,7 +1052,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MString specularName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
-		MObject material_objectNode;
+		MFnDependencyNode texture_node;
 
 		//Get the name of the transformation and the model name for the exporter.
 		MString transName = cleanFullPathName(mesh.fullPathName().asChar());
@@ -1059,13 +1061,37 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 		MString name = cleanFullPathName(mesh.name().asChar());
 		memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
-		GivePaintId(meshIndex);
 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, material_objectNode, specularName);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node);
 		materialName = material_node.name();
+		string texPath = texturepath.asChar();
+
+		MImage texture;
+
+		//PAINT STUFF
+		GivePaintId(meshIndex, texPath);
+		if(SM.meshList[meshIndex].paintIndex != -1)
+		{
+			Print("BEFORE ", texture_node.name());
+
+			MObject temp = texture_node.object();
+
+			Print("AFTER: TYPE ", temp.apiTypeStr(), " NAME ", texture_node.name());
+			
+			MStatus hej = texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+			if(hej)
+			{
+				Print("Success");
+				PaintModel(meshIndex, texture);
+			}
+			else
+			{
+				Print("FAIL!");
+			}			
+		}
 
 		//Check if the material already exists.
 		int materialID = -1;
@@ -1390,7 +1416,7 @@ void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_no
 	}
 }
 
-void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MObject &out_materialObject)
+void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFnDependencyNode &out_textureNode)
 {
 	MStatus status = MS::kSuccess;;
 	//Get the texture paths.
@@ -1409,12 +1435,17 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MOb
 			found_color = true;
 			MFnDependencyNode texture_node(connections[n].node(&status));
 
-			//MObject FileNode;
-			//texture_node.setObject(FileNode);
-			
+			out_textureNode.setObject(connections[n].node(&status));
+
+			Print("DEEP NAME ", out_textureNode.name());
 
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
+
+			if(out_color_path == "")
+			{
+				out_color_path = "PaintTexture";
+			}
 			//out_materialObject = FileNode;
 
 			break;
@@ -1514,7 +1545,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	}
 
 }
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialNode, MString &out_specular_path)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode)
 {
 	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
@@ -1531,7 +1562,8 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		for(int j = 0; j < shaders.length(); j++)
 		{
 			GetMaterialNode(shaders[j], material_node);
-			ExtractColor(material_node, out_color_path, out_materialNode);
+			ExtractColor(material_node, out_color_path, out_textureNode);
+			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
 		}

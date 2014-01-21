@@ -8,9 +8,6 @@ const int g_maxSceneObjects = 1000;
 const int g_maxMeshes = 300;
 const int g_maxCameras = 15;
 const int g_maxLights = 10;
-//textureBawlsheit
-const int g_MaxResolution = 512;
-const int g_maxPaint = 2;
 
 const int g_maxVerticesPerMesh = 30000;
 const int g_maxNameLength = 30;
@@ -22,7 +19,15 @@ const string g_savepath = "C:/Users/BTH/Documents/zombieshroomMain/Assets/";
 
 const string g_levelName = "myTestLevel";
 
+const string textureR = "grass.dds";
+const string textureG = "smoke.dds";
+const string textureB = "sphere_diffuse.dds";
+
 const int g_maxMessages = 30;
+//textureBawlsheit
+const int g_MaxResolution = 512 * 512 *4;
+const int g_tileFactor = 16;
+const int g_maxPaintTextures = 1;
 
 struct UpdateMessage
 {
@@ -69,6 +74,11 @@ struct Mesh
 	char materialName[g_maxNameLength];
 	char modelName[g_maxNameLength];
 	int paintIndex;	//ska sätta om -1 så har den ingen.
+
+	Mesh()
+	{
+		paintIndex = -1;
+	}
 };
 
 struct Material
@@ -110,7 +120,14 @@ struct Locator
 	Transform transformation;
 };
 
-struct Paint
+struct PaintTexture
 {
-	glm::vec4 Pixels[g_MaxResolution];
+	unsigned char Pixels[g_MaxResolution];
+	int heigth, width;
+	int tileFactor;
+
+	PaintTexture()
+	{
+		tileFactor = g_tileFactor;
+	}
 };

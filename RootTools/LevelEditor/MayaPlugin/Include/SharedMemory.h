@@ -29,20 +29,16 @@ public:
 	Camera cameraList[g_maxCameras];
 	Material materialList[g_maxMeshes];
 	Locator locatorList[g_maxLocators];
-	Paint PaintList[g_maxPaint];
+
+	PaintTexture* PpaintList[g_maxPaintTextures];
 
 	int* NumberOfMeshes;
 	int* NumberOfLights;
 	int* NumberOfCameras;
 	int* NumberOfMaterials;
 	int* NumberOfLocators;
-
 	int* NumberOfMessages;
-
-	glm::vec2* MeshIdChange;
-	glm::vec2* CameraIdChange;
-	glm::vec2* LightIdChange;
-	glm::vec2* LocatorIdChange;
+	int* NumberOfPaintTextures;
 
 	UpdateMessage* updateMessages[g_maxMessages];
 
