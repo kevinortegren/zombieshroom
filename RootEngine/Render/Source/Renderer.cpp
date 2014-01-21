@@ -120,7 +120,7 @@ namespace Render
 		glEnable(GL_DEPTH_TEST);
 		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	
+
 		GLint test;
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &test);
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Max Vertex Uniforms %d.", test);
@@ -285,10 +285,14 @@ namespace Render
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 		{
 			PROFILE("Geometry Pass", g_context.m_profiler);
 			GeometryPass();
 		}
+
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 		{
 			PROFILE("Lighting Pass", g_context.m_profiler);

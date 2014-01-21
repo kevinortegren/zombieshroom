@@ -161,13 +161,14 @@ namespace RootForce
 
 		Subdivide(m_root, m_globalPolygonList);
 
-		std::vector<Triangle> tris = Trianglulate(m_globalPolygonList);
-
 		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
-		for(auto i = a.first; i != a.second; ++i)
+		for(auto b = a.first; b != a.second; ++b)
 		{
-			m_world->GetEntityManager()->RemoveEntity(i->second);
+			m_world->GetEntityManager()->RemoveAllComponents(b->second);
+			m_world->GetEntityManager()->RemoveEntity(b->second);
 		}
+
+		std::vector<Triangle> tris = Trianglulate(m_globalPolygonList);
 
 		CreateEntities(tris);
 	}
@@ -255,10 +256,10 @@ namespace RootForce
 			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_minY, m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
 			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_minY, m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
-			std::vector<Polygon> bl = DividePolygons(bottomLeft, polygonsAfterZSplit);
-			std::vector<Polygon> br = DividePolygons(bottomRight, polygonsAfterZSplit);
-			std::vector<Polygon> tl = DividePolygons(topLeft, polygonsAfterZSplit);
-			std::vector<Polygon> tr = DividePolygons(topRight, polygonsAfterZSplit);
+			std::vector<Polygon> bl = DividePolygons(bottomLeft, polygonsAfterXSplit);
+			std::vector<Polygon> br = DividePolygons(bottomRight, polygonsAfterXSplit);
+			std::vector<Polygon> tl = DividePolygons(topLeft, polygonsAfterXSplit);
+			std::vector<Polygon> tr = DividePolygons(topRight, polygonsAfterXSplit);
 
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Left Polygons: %d", bl.size());
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Right Polygons: %d", br.size());
@@ -282,7 +283,7 @@ namespace RootForce
 			//Subdivide( topLeftChild, tl );
 			//Subdivide( topRightChild, tr );
 
-			m_globalPolygonList = polygonsAfterZSplit;
+			m_globalPolygonList = polygonsAfterXSplit;
 		}
 		else
 		{
@@ -555,6 +556,10 @@ namespace RootForce
 				t.m_indices[0] = p.m_indices[0];
 				t.m_indices[1] = p.m_indices[j-1];
 				t.m_indices[2] = p.m_indices[j];
+				t.m_scale = p.m_scale;
+				t.m_translation = p.m_translation;
+				t.m_material = p.m_material;
+
 
 				triangles.push_back(t);
 			}
@@ -594,6 +599,20 @@ namespace RootForce
 			indices.push_back(p_triangles[i].m_indices[1]);
 			indices.push_back(p_triangles[i].m_indices[2]);
 		}
+
+		ECS::Entity* newE = m_world->GetEntityManager()->CreateEntity();
+		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(newE);
+		r->m_model = m_context->m_resourceManager->CreateModel("asda");
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
+		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
+		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+		r->m_material = wp;
+				
+		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(newE);
+		t->m_position = p_triangles[0].m_translation;
+		t->m_scale = p_triangles[0].m_scale;
 	}
 
 	void CreateEntity();
