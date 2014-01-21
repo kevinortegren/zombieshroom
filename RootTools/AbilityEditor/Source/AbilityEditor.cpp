@@ -173,26 +173,27 @@ bool AbilityEditor::event( QEvent* event )
 			{
 				if(ui.treeOnCreate->currentItem() != 0)
 				{
-									
+					ui.treeOnCreate->RemoveSelected(ui.treeOnCreate->currentItem());		
 					delete ui.treeOnCreate->currentItem();	
-					ui.treeOnCreate->RemoveSelected(m_LastSelectedItem);
+					
 				}
 			}
 			else if(ui.abilityWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
 			{
 				if(ui.treeOnCollide->currentItem() != 0)
 				{
-					
+					ui.treeOnCollide->RemoveSelected(ui.treeOnCollide->currentItem());	
 					delete ui.treeOnCollide->currentItem();
-					ui.treeOnCollide->RemoveSelected(m_LastSelectedItem);	
+					
 				}
 			}
 			else if(ui.abilityWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
 			{
 				if(ui.treeOnDestroy->currentItem() != 0)
 				{
+					ui.treeOnDestroy->RemoveSelected(ui.treeOnDestroy->currentItem());
 					delete ui.treeOnDestroy->currentItem();
-					ui.treeOnDestroy->RemoveSelected(m_LastSelectedItem);	
+						
 				}
 			}
 			m_LastSelectedItem = nullptr;

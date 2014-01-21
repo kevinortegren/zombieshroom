@@ -70,6 +70,7 @@ void CustomTreeWidget::SetOnEventClass(AbilityEditorNameSpace::MainOnEvent* p_on
 
 void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 {
+	
 	if(p_item == nullptr)
 	{
 		m_onEvent->RemoveEntity(0);
@@ -78,10 +79,14 @@ void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 	if(p_item->whatsThis(0).compare("Entity") == 0)
 	{
 		m_onEvent->RemoveEntity(this->indexOfTopLevelItem(p_item));
+		delete this->takeTopLevelItem(this->indexOfTopLevelItem(p_item));
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
+
 		m_onEvent->RemoveComponent(this->indexOfTopLevelItem(p_item->parent()),p_item->text(0));
+		this->removeItemWidget(p_item,0);
+		
 	}
 }
 

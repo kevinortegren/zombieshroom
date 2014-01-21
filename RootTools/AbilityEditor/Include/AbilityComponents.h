@@ -255,7 +255,7 @@ namespace AbilityEditorNameSpace
 				}
 				collisionShape = enumMan->addProperty("Collision shape");
 				enumMan->setEnumNames(collisionShape,enumTypes);
-				enumMan->setValue(collisionShape, 1);
+				enumMan->setValue(collisionShape, m_CollisionShape);
 				//collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
 				//p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
 				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere or Mesh");
@@ -277,23 +277,18 @@ namespace AbilityEditorNameSpace
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
 				bool foundShape = false;
-				for(int i = 0; i < shape::END_OF_ENUM; i++)
+				std::map<shape, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
 				{
-					if(props.at(0)->valueText().compare(m_enumToText[(shape)i]) == 0)
+					if(it->second == props.at(0)->valueText())
 					{
-						m_CollisionShape = (shape)i;
-						foundShape = true;
+						 m_CollisionShape = it->first;
 					}
-				}
-				if(!foundShape)
-				{
-					QMessageBox msgbox;
-					msgbox.setText("Invalid collision shape : " + props.at(0)->valueText() + ". Valid collision shapes are : 'Cone', 'Cylinder', 'Sphere' and 'Mesh' ");
-					msgbox.exec();
 				}
 				m_radius = atof(props.at(1)->valueText().toStdString().c_str());
 				m_height = atof(props.at(2)->valueText().toStdString().c_str());;
 				m_collisionModelShapeName = props.at(3)->valueText().toStdString();
+				
 			}
 
 		};
