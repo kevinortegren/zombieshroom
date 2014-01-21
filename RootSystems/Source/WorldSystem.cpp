@@ -130,8 +130,6 @@ namespace RootForce
 			if(p_node->GetChilds().size() == 0)
 			{
 				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
-				m_culledNodes += p_node->GetEntities().size();
-
 			}
 			else
 			{

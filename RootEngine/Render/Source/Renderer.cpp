@@ -285,6 +285,7 @@ namespace Render
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
+		if(m_displayNormals)
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		{

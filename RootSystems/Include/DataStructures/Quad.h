@@ -8,12 +8,11 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-#define QUADTREE_POLYGONS_PER_NODE 500
+#define QUADTREE_POLYGONS_PER_NODE 1000
 #define QUAD_MAX_CHILDS 4
 
 namespace RootForce
 {
-
 	class QuadNode
 	{
 	public:
@@ -21,35 +20,28 @@ namespace RootForce
 		friend class QuadTree;
 
 		QuadNode(AABB& p_bounds, unsigned p_numTriangles);
-		~QuadNode();
 
 		void AddChild(QuadNode* p_child);
 		const std::vector<QuadNode*>& GetChilds();
-		const std::vector<ECS::Entity*>& GetEntities();
 		const AABB& GetBounds() const;
+		
+		std::string m_key;
 
 	private:
-
 		AABB m_bounds;
-		unsigned m_numTriangles;
 		std::vector<QuadNode*> m_childs;
-		std::vector<ECS::Entity*> m_entities;
 	};
 
 	struct Triangle
 	{
 		int m_indices[3];
-		Render::Material* m_material;
-		glm::vec3 m_translation;
-		glm::vec3 m_scale;
+		unsigned int m_materialIndex;
 	};
 
 	struct Polygon
 	{
 		std::vector<int> m_indices;
-		Render::Material* m_material;
-		glm::vec3 m_translation;
-		glm::vec3 m_scale;
+		unsigned int m_materialIndex;
 	};
 
 	namespace Side
@@ -78,7 +70,6 @@ namespace RootForce
 	class QuadTree
 	{
 	public:
-		QuadTree();
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
 
 		QuadNode* PickRoot(glm::vec2 p_position);
@@ -97,8 +88,7 @@ namespace RootForce
 
 		std::vector<Triangle> Trianglulate(std::vector<Polygon> p_polygons);
 
-		void CreateEntities(std::vector<Triangle> p_triangles); 
-		void CreateEntity();
+		void CreateEntities(std::vector<Triangle> p_triangles, std::string p_key); 
 
 		PolygonSplit SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon);
 		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);
@@ -113,8 +103,8 @@ namespace RootForce
 		QuadNode* m_root;
 
 		std::vector<Polygon> m_globalPolygonList;
-		std::vector<Render::Vertex1P1N1UV> m_vertices;
 
-		int m_split;
+		std::vector<Render::Vertex1P1N1UV> m_vertices;
+		std::vector<Render::Material*> m_materials;
 	};
 }
