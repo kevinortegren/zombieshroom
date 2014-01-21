@@ -140,17 +140,13 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 	//Check if last message is of same type and don't add new if true
 	if(nrOfMessages > 0)
 	{
-		for(int i = 0; i < nrOfMessages; i++)
+		if(type == updateMessages[nrOfMessages-1]->name && (index == updateMessages[nrOfMessages-1]->updateID || index == updateMessages[nrOfMessages-1]->removeID))
 		{
-			if(type == updateMessages[i]->name && (index == updateMessages[i]->updateID || index == updateMessages[i]->removeID))
-			{
-				stop = true;
-				break;
-			}
+			stop = true;
 		}
 	}
 
-	if(!stop && index != -1)
+	if(!stop)
 	{
 		//Maybe check last message for duplicate aswell
 		if(*NumberOfMessages < g_maxMessages)

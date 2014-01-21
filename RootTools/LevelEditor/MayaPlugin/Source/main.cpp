@@ -13,7 +13,7 @@ SharedMemory SM;
 // Globala variabler.
 MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
-MSelectionList derp();
+MSelectionList selected;
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators];
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
@@ -43,6 +43,7 @@ void MayaLightToList(MObject node, int id);
 void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
 void DuplicationCb(void *clientData);
+void checkForDuplicatedMeshes(MObject node);
 void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MObject &out_materialObjectNode, MString &out_specular_path);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
@@ -95,8 +96,8 @@ EXPORT MStatus initializePlugin(MObject obj)
 		id = MDGMessage::addNodeRemovedCallback(NodeRemovedCB, "dependNode", nullptr, &status);
 		AddCallbackID(status, id);
 
-		//id = MModelMessage::addAfterDuplicateCallback(DuplicationCb, nullptr, &status);
-		//AddCallbackID(status, id);	//Unresolved external symbol
+		id = MModelMessage::addAfterDuplicateCallback(DuplicationCb, nullptr, &status);
+		AddCallbackID(status, id);	//Unresolved external symbol
 
 
 	}
@@ -412,10 +413,27 @@ void viewCB(const MString &str, void *clientData)
 	}	
 }
 
-//void duplicationCb(void* clientdata)
-//{
-//	Print("herrow");
-//}
+void DuplicationCb(void* clientdata)
+{
+	MGlobal::getActiveSelectionList(selected);
+
+	MObject temp;
+
+	for(int i = 0; i < selected.length()+1; i++)
+	{
+		selected.getDependNode(i,temp);
+
+		if(temp.hasFn(MFn::kTransform))
+		{
+		MFnTransform tempTrans = temp; 
+		Print (tempTrans.name());
+		checkForDuplicatedMeshes(tempTrans.child(0));
+		checkForNewCameras(tempTrans.child(0), nullptr);
+		//checkForNewLights(tempTrans.child(0), nullptr);		// NO NEEEAAAAAAD FOOOUUUUL
+		}
+
+	}
+}
 
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
@@ -757,6 +775,33 @@ void checkForNewMeshes(bool made, MObject source, MObject destination)
 			MayaMeshToList(destination, currNrMeshes, true, true, true);
 			currNrMeshes++;		
 
+		}
+	}
+}
+
+void checkForDuplicatedMeshes(MObject node)
+{
+	MCallbackId id;
+	MStatus status;
+
+	if (node.hasFn(MFn::kMesh))
+	{
+		MFnMesh mesh = node;
+		g_mayaMeshList[currNrMeshes] = node;
+
+		id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaMeshList[currNrMeshes], dirtyMeshNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+
+
+		if(mesh.parent(0, &status).hasFn(MFn::kTransform))
+		{
+			MObject transform = mesh.parent(0, &status);
+
+			id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+
+			MayaMeshToList(node, currNrMeshes, true, true, true);
+			currNrMeshes++;		
 		}
 	}
 }

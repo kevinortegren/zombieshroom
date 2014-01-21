@@ -726,7 +726,7 @@ void UpdateLight(int index, bool remove)
 		ReleaseMutex(RM.LightMutexHandle);
 	}
 
-	if(RemoveLightIndex != -1 && RemoveLightIndex < size)	
+	if(RemoveLightIndex >0 && RemoveLightIndex < size)	
 	{					
 		m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);
 		m_world.GetEntityManager()->RemoveEntity(LightEntities[RemoveLightIndex]);

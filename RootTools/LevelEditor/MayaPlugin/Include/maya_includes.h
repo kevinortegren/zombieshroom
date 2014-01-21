@@ -15,6 +15,7 @@
 // Wrappers
 #include <maya/MGlobal.h>
 #include <maya/MCallbackIdArray.h>
+#include <maya/MSelectionList.h>
 
 // Messages
 #include <maya/MMessage.h>
