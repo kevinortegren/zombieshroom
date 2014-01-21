@@ -62,7 +62,7 @@ namespace RootForce
 			RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 			RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 			RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-			RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+			RootForce::PlayerComponent::SetTypeId(RootForce::ComponentType::PLAYER);
 			RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
 			RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 			RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
@@ -85,7 +85,7 @@ namespace RootForce
 			RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
 			RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 			RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-			RootForce::Player::SetTypeId(RootForce::ComponentType::PLAYER);
+			RootForce::PlayerComponent::SetTypeId(RootForce::ComponentType::PLAYER);
 			RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
 			RootForce::PlayerActionComponent::SetTypeId(RootForce::ComponentType::PLAYERACTION);
 			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);

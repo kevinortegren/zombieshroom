@@ -12,7 +12,7 @@ namespace RootForce
 		
 		RootForce::Renderable* renderable = entityManager->CreateComponent<RootForce::Renderable>(entity);
 		RootForce::Transform* transform = entityManager->CreateComponent<RootForce::Transform>(entity);
-		RootForce::Player* player = entityManager->CreateComponent<RootForce::Player>(entity);
+		RootForce::PlayerComponent* player = entityManager->CreateComponent<RootForce::PlayerComponent>(entity);
 		RootForce::PlayerControl* playerControl = entityManager->CreateComponent<RootForce::PlayerControl>(entity);
 		RootForce::PlayerPhysics* playphys = entityManager->CreateComponent<RootForce::PlayerPhysics>(entity);
 		RootForce::HealthComponent* health = entityManager->CreateComponent<RootForce::HealthComponent>(entity);
@@ -65,8 +65,8 @@ namespace RootForce
 
 		physics->m_mass = 5.0f;
 		collision->m_meshHandle = "testchar0";
-		collision->m_handle = m_engineContext->m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity->GetId(),
-			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionResponder->m_collidedEntityId);
+		collision->m_handle = m_engineContext->m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity,
+			transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, 10.0f, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
 
 		script->Name = m_engineContext->m_resourceManager->LoadScript("Player");
 	

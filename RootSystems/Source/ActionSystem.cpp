@@ -26,7 +26,7 @@ namespace RootSystems
 		RootForce::Transform* transform = m_transform.Get(p_entity);
 		RootForce::PlayerPhysics* playphys = m_physic.Get(p_entity);
 		RootForce::Collision* collision = m_collision.Get(p_entity);
-		RootForce::Player* player = m_player.Get(p_entity);
+		RootForce::PlayerComponent* player = m_player.Get(p_entity);
 		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);

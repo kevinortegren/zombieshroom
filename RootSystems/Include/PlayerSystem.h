@@ -58,7 +58,8 @@ namespace RootForce
 		float RespawnDelay;
 	};
 
-	struct Player : public ECS::Component<Player>
+
+	struct PlayerComponent : public ECS::Component<PlayerComponent>
 	{
 		std::string Name;
 		int TeamID;

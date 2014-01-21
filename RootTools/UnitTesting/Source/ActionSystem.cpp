@@ -36,7 +36,7 @@ TEST(ActionSystem, ProcessEntity)
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);
-	RootForce::Player* player = world->GetEntityManager()->GetComponent<RootForce::Player>(testity);
+	RootForce::PlayerComponent* player = world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(testity);
 	RootForce::Transform* transform = world->GetEntityManager()->GetComponent<RootForce::Transform>(testity);
 	g_engineContext.m_physics->CreatePlane(glm::vec3(0,1,0),glm::vec3(0,-50,0)); 
 	

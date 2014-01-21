@@ -98,10 +98,12 @@ TEST(Network, MessageSerializationUserConnected)
 	UserConnected m1;
 	UserConnected m2;
 	m1.User = 4;
+	m1.IsYou = true;
 	m1.Name = "Juada";
 
 	SerializeAndDeserialize(m1, m2);
 	ASSERT_EQ(m1.User, m2.User);
+	ASSERT_EQ(m1.IsYou, m2.IsYou);
 	ASSERT_EQ(strcmp(m1.Name.C_String(), m2.Name.C_String()), 0);
 }
 
@@ -233,6 +235,7 @@ TEST(Network, MessageSerializationServerInformation)
 	m1.CurrentPlayers = 556;
 	m1.MaxPlayers = 775;
 	m1.PasswordProtected = true;
+	m1.IsDedicated = true;
 	m1.GameMode = 7;
 	m1.MatchTimeSeconds = 7769;
 	m1.KillCount = 47;
@@ -243,6 +246,7 @@ TEST(Network, MessageSerializationServerInformation)
 	ASSERT_EQ(m1.CurrentPlayers, m2.CurrentPlayers);
 	ASSERT_EQ(m1.MaxPlayers, m2.MaxPlayers);
 	ASSERT_EQ(m1.PasswordProtected, m2.PasswordProtected);
+	ASSERT_EQ(m1.IsDedicated, m2.IsDedicated);
 	ASSERT_EQ(m1.GameMode, m2.GameMode);
 	ASSERT_EQ(m1.MatchTimeSeconds, m2.MatchTimeSeconds);
 	ASSERT_EQ(m1.KillCount, m2.KillCount);

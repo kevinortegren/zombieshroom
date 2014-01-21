@@ -90,7 +90,7 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
-		Player* player = m_world->GetEntityManager()->GetComponent<Player>(entity);
+		PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);

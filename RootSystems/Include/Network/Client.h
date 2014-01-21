@@ -22,7 +22,7 @@ namespace RootForce
 			Client(Logging* p_logger, ECS::World* p_world);
 			~Client();
 
-			bool Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port);
+			bool Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port, bool p_isRemote);
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);

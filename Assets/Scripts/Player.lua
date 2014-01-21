@@ -1,10 +1,11 @@
 Player = {}
 
-function Player.OnCreate(playerEntity, userId, actionId)
+function Player.OnCreate(self, userId, actionId)
+	Logging.Log("Hello", 0);
 	local transform = Transformation.New(playerEntity);
 	local playerPhysics = PlayerPhysics.New(playerEntity);
 	local health = Health.New(playerEntity);
-	local player = Player.New(playerEntity);
+	local player = PlayerComponent.New(playerEntity);
 	local physics = Physics.New(playerEntity);
 	local collision = Collision.New(playerEntity);
 	local collisionResponder = CollisionResponder.New(playerEntity);
@@ -27,7 +28,7 @@ function Player.OnCreate(playerEntity, userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 end
 
-function Player.AddClientComponents(playerEntity)
+function Player.AddClientComponents(self)
 	local renderable = Renderable.New(playerEntity);
 	local animation = Animation.New(playerEntity);
 
@@ -40,9 +41,12 @@ function Player.AddClientComponents(playerEntity)
 	renderable:SetAnimation(animation);
 end
 
-
-function Player.OnCollide (entityId)
+function Player.AddLocalClientComponents(self)
 	
+end
+
+function Player.OnCollide (self, entity)
+	Logging.Log("Entity collided");
 end
 
 function Player.OnDestroy ()

@@ -7,7 +7,7 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Server::Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config)
+		Server::Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config, bool p_isDedicated)
 			: m_logger(p_logger)
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
@@ -23,19 +23,22 @@ namespace RootForce
 			m_peer->SetOccasionalPing(true);
 			m_peer->SetIncomingPassword(p_config.Password.c_str(), p_config.Password.size() + 1);
 
-			// Setup the ping response (for network discovery)
-			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
-			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
+			// Create a server info entity
+			ECS::Entity* serverInfoEntity = m_world->GetEntityManager()->CreateEntity();
+			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
+			m_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
 
 			serverInfo->Information.ServerName = p_config.ServerName.c_str();
 			serverInfo->Information.MapName = p_config.MapName.c_str();
 			serverInfo->Information.CurrentPlayers = 0;
 			serverInfo->Information.MaxPlayers = p_config.MaxPlayers;
 			serverInfo->Information.PasswordProtected = p_config.Password != "";
+			serverInfo->Information.IsDedicated = p_isDedicated;
 			serverInfo->Information.GameMode = p_config.GameMode;
 			serverInfo->Information.MatchTimeSeconds = p_config.MatchTime;
 			serverInfo->Information.KillCount = p_config.KillCount;
 
+			// Setup the ping response (for network discovery)
 			UpdatePingResponse();
 
 			// Notify the user of the firepower of this fully armed and operational server!

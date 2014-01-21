@@ -35,7 +35,6 @@ namespace RootForce
 		public:
 			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
-			void SetIsRemote(bool p_isRemote);
 			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetLanList(RootSystems::LanList* p_list);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
@@ -43,8 +42,6 @@ namespace RootForce
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
-			bool m_isRemote;
-
 			ECS::World* m_world;
 			NetworkEntityMap* m_networkEntityMap;
 			RootSystems::LanList* m_list;

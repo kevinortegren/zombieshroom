@@ -10,6 +10,8 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include "ConfigLoader.h"
 #include "ConsoleInput.h"
+#include <ComponentExporter.h>
+#include <ComponentImporter.h>
 
 #undef main
 
@@ -82,6 +84,11 @@ void Main::Start()
 	// Register the components the server uses
 	RootForce::ComponentType::InitializeServerComponents();
 
+	// Setup the importer/exporter
+	m_world.GetEntityExporter()->SetExporter(Exporter);
+	m_world.GetEntityImporter()->SetImporter(Importer);
+
+	// Startup the console
 	RootServer::ConsoleInput m_console;
 	m_console.Startup( );
 		
@@ -94,7 +101,7 @@ void Main::Start()
 	m_world.GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
 
 	// Initialize the server
-	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf));
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf, true));
 	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), &m_world));
 	m_serverMessageHandler->SetNetworkEntityMap(&m_networkEntityMap);
 	m_server->SetMessageHandler(m_serverMessageHandler.get());

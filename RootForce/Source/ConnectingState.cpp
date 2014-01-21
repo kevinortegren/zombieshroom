@@ -19,25 +19,15 @@ namespace RootForce
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
-		// Create a server information entity and a client entity
-		ECS::Entity* serverInfoEntity = g_world->GetEntityManager()->CreateEntity();
-		g_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
-		g_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
-
-		ECS::Entity* clientEntity = g_world->GetEntityManager()->CreateEntity();
-		g_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
-		g_world->GetTagManager()->RegisterEntity("Client", clientEntity);
-
 		// Host
 		if (p_playData.Host)
 		{
 			// Setup the server and connect a local client
-			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
+			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo, false));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(&m_networkContext.m_networkEntityMap);
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
-			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port);
-			m_networkContext.m_clientMessageHandler->SetIsRemote(false);
+			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 
 			// Setup the rules
 			ECS::Entity* entity = g_world->GetEntityManager()->CreateEntity();
@@ -51,8 +41,7 @@ namespace RootForce
 		else
 		{
 			// Connect the client
-			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port);
-			m_networkContext.m_clientMessageHandler->SetIsRemote(true);
+			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port, true);
 
 			// Setup the rules
 			ECS::Entity* ruleEntity = g_world->GetEntityManager()->CreateEntity();

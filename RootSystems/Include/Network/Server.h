@@ -14,7 +14,7 @@ namespace RootForce
 		class Server
 		{
 		public:
-			Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config);
+			Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config, bool p_isDedicated);
 			~Server();
 
 			const NetworkMessage::ServerInformation& GetServerInformation() const;

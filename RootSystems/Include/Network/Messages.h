@@ -96,6 +96,7 @@ namespace RootForce
 		struct UserConnected
 		{
 			Network::UserID_t User;
+			bool IsYou;
 			RakNet::RakString Name;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
@@ -229,6 +230,7 @@ namespace RootForce
 			Network::UserID_t CurrentPlayers;
 			Network::UserID_t MaxPlayers;
 			bool PasswordProtected;
+			bool IsDedicated;
 			uint8_t GameMode;
 			uint32_t MatchTimeSeconds;
 			uint32_t KillCount;

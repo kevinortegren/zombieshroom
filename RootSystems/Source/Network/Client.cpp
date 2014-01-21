@@ -22,6 +22,11 @@ namespace RootForce
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)
 				throw std::runtime_error("Failed to create RakNet client");
 
+			// Create a client entity
+			ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
+			m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
+			m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
+
 			m_logger->LogText(LogTag::CLIENT, LogLevel::INIT_PRINT, "Client initialized successfully");
 		}
 
@@ -37,8 +42,13 @@ namespace RootForce
 			p_list->Start();
 		}
 
-		bool Client::Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port)
+		bool Client::Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port, bool p_isRemote)
 		{
+			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
+			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
+			clientComponent->IsRemote = p_isRemote;
+			clientComponent->State = ClientState::UNCONNECTED;
+
 			if (m_peer->Connect(p_address.c_str(), p_port, p_password.c_str(), p_password.size() + 1) != RakNet::CONNECTION_ATTEMPT_STARTED)
 				return false;
 

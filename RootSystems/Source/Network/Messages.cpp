@@ -321,6 +321,7 @@ namespace RootForce
 		void UserConnected::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, IsYou);
 			p_bs->Serialize(p_writeToBitstream, Name);
 		}
 
@@ -394,6 +395,7 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, CurrentPlayers);
 			p_bs->Serialize(p_writeToBitstream, MaxPlayers);
 			p_bs->Serialize(p_writeToBitstream, PasswordProtected);
+			p_bs->Serialize(p_writeToBitstream, IsDedicated);
 			p_bs->Serialize(p_writeToBitstream, GameMode);
 			p_bs->Serialize(p_writeToBitstream, MatchTimeSeconds);
 			p_bs->Serialize(p_writeToBitstream, KillCount);

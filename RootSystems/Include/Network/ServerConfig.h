@@ -39,8 +39,9 @@ namespace RootSystems
 		{
 			MaxPlayers = 12;
 			Port = 5567;
+			ServerName = "Server";
 			Password = "";
-			MapName = "level.world"; // ToDo: Set to correct value
+			MapName = "test.world";
 			GameMode = GameMode::DEATHMATCH;
 			MatchTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory

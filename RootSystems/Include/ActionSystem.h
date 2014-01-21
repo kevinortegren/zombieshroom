@@ -37,7 +37,7 @@ namespace RootSystems
 			SetUsage<RootForce::Transform>();
 			SetUsage<RootForce::StateComponent>();
 			SetUsage<RootForce::PlayerPhysics>();
-			SetUsage<RootForce::Player>();
+			SetUsage<RootForce::PlayerComponent>();
 			SetUsage<RootForce::HealthComponent>();
 
 		}
@@ -53,7 +53,7 @@ namespace RootSystems
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::StateComponent> m_state;
 		ECS::ComponentMapper<RootForce::PlayerPhysics> m_physic;
-		ECS::ComponentMapper<RootForce::Player> m_player;
+		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 	};
 
