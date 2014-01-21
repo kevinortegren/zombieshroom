@@ -36,6 +36,14 @@ namespace RootForce
 		std::vector<ECS::Entity*> m_entities;
 	};
 
+	struct Triangle
+	{
+		int m_indices[3];
+		Render::Material* m_material;
+		glm::vec3 m_translation;
+		glm::vec3 m_scale;
+	};
+
 	struct Polygon
 	{
 		std::vector<int> m_indices;
@@ -83,7 +91,14 @@ namespace RootForce
 		void RenderNode(QuadNode* p_node);	
 		int RoundToPow2(int p_value);
 		void Subdivide( QuadNode* p_node, std::vector<Polygon> p_polygons );
+
 		std::vector<Polygon> DividePolygons( Rectangle p_rect, std::vector<Polygon> p_polygons );
+		std::vector<Polygon> DividePolygonsEx( Rectangle p_rect, std::vector<Polygon> p_polygons );
+
+		std::vector<Triangle> Trianglulate(std::vector<Polygon> p_polygons);
+
+		void CreateEntities(std::vector<Triangle> p_triangles); 
+		void CreateEntity();
 
 		PolygonSplit SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon);
 		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position);

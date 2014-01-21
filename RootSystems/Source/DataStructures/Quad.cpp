@@ -160,6 +160,16 @@ namespace RootForce
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", numTriangles);
 
 		Subdivide(m_root, m_globalPolygonList);
+
+		std::vector<Triangle> tris = Trianglulate(m_globalPolygonList);
+
+		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		for(auto i = a.first; i != a.second; ++i)
+		{
+			m_world->GetEntityManager()->RemoveEntity(i->second);
+		}
+
+		CreateEntities(tris);
 	}
 
 	int QuadTree::RoundToPow2(int p_value)
@@ -183,7 +193,7 @@ namespace RootForce
 			glm::vec3 center = aabb->GetCenter();
 
 			// Define splitting planes.
-			static glm::vec3 splittingNormals[2] = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 0) };
+			static glm::vec3 splittingNormals[2] = { glm::vec3(0, 0, -1), glm::vec3(-1, 0, 0) };
 
 			PlaneEx zp;
 			zp.a = splittingNormals[0].x;
@@ -217,7 +227,7 @@ namespace RootForce
 
 			std::vector<Polygon> polygonsAfterXSplit;
 
-			// Split all polygons with the x-plane.
+			// Split all polygons with the z-plane.
 			for(int i = 0; i < polygonsAfterZSplit.size(); ++i)
 			{
 				PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
@@ -245,10 +255,10 @@ namespace RootForce
 			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_minY, m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
 			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_minY, m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
-			std::vector<Polygon> bl = DividePolygons(bottomLeft, polygonsAfterXSplit);
-			std::vector<Polygon> br = DividePolygons(bottomRight, polygonsAfterXSplit);
-			std::vector<Polygon> tl = DividePolygons(topLeft, polygonsAfterXSplit);
-			std::vector<Polygon> tr = DividePolygons(topRight, polygonsAfterXSplit);
+			std::vector<Polygon> bl = DividePolygons(bottomLeft, polygonsAfterZSplit);
+			std::vector<Polygon> br = DividePolygons(bottomRight, polygonsAfterZSplit);
+			std::vector<Polygon> tl = DividePolygons(topLeft, polygonsAfterZSplit);
+			std::vector<Polygon> tr = DividePolygons(topRight, polygonsAfterZSplit);
 
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Left Polygons: %d", bl.size());
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Bottom Right Polygons: %d", br.size());
@@ -267,10 +277,12 @@ namespace RootForce
 			p_node->AddChild(topLeftChild);
 			p_node->AddChild(topRightChild);
 
-			Subdivide( bottomLeftChild, bl);
-			Subdivide( bottomRightChild, br );
-			Subdivide( topLeftChild, tl );
-			Subdivide( topRightChild, tr );
+			//Subdivide( bottomLeftChild, bl);
+			//Subdivide( bottomRightChild, br );
+			//Subdivide( topLeftChild, tl );
+			//Subdivide( topRightChild, tr );
+
+			m_globalPolygonList = polygonsAfterZSplit;
 		}
 		else
 		{
@@ -298,33 +310,76 @@ namespace RootForce
 		return polygons;
 	}
 
+	std::vector<Polygon> QuadTree::DividePolygonsEx( Rectangle p_rect, std::vector<Polygon> p_polygons )
+	{
+		std::vector<Polygon> polygons;
+
+		float bias = 0.1f;
+		for(int i = 0; i < p_polygons.size(); ++i)
+		{
+			bool add = true;
+			for(int j = 0; j < p_polygons[i].m_indices.size(); ++j)
+			{
+				glm::vec3 p = m_vertices[p_polygons[i].m_indices[j]].m_pos;
+
+				if((p.x-bias >= p_rect.m_x && p.x <= p_rect.m_x + p_rect.m_width+bias) &&
+					( p.z-bias >= p_rect.m_y && p.z <= p_rect.m_y + p_rect.m_height+bias ))
+				{
+
+				}
+				else
+				{
+					add = false;
+					break;
+				}
+
+			}
+
+			if(add)
+			{
+				polygons.push_back(p_polygons[i]);
+			}	
+		}
+
+		return polygons;
+	}
+
 	glm::vec3 QuadTree::CalcCenter(Polygon& p_polygon)
 	{
 		float area = 0;
 		float cx = 0;
 		float cy = 0;
+		float x0 = 0;
+		float y0 = 0;
+		float x1 = 0;
+		float y1 = 0;
+		float a = 0;
 
 		int i;
 		for(i = 0; i < p_polygon.m_indices.size()-1; ++i)
 		{
-			glm::vec3 p0 = m_vertices[p_polygon.m_indices[i+1]].m_pos;
-			glm::vec3 p1 = m_vertices[p_polygon.m_indices[i]].m_pos;
+			x0 = m_vertices[p_polygon.m_indices[i]].m_pos.x;
+			y0 = m_vertices[p_polygon.m_indices[i]].m_pos.z;
+			x1 = m_vertices[p_polygon.m_indices[i+1]].m_pos.x;
+			y1 = m_vertices[p_polygon.m_indices[i+1]].m_pos.z;
 
-			float tmp = p0.x * p1.z - p1.x * p0.z;
-			area += tmp;
+			a = x0 * y1 - x1 * y0;
+			area += a;
 
-			cx += (p0.x + p1.x) * area;
-			cy += (p0.z + p1.z) * area;
+			cx += (x0 + x1) * a;
+			cy += (y0 + y1) * a;
 		}
 
-		glm::vec3 p0 = m_vertices[p_polygon.m_indices[i]].m_pos;
-		glm::vec3 p1 = m_vertices[p_polygon.m_indices[0]].m_pos;
+		x0 = m_vertices[p_polygon.m_indices[i]].m_pos.x;
+		y0 = m_vertices[p_polygon.m_indices[i]].m_pos.z;
+		x1 = m_vertices[p_polygon.m_indices[0]].m_pos.x;
+		y1 = m_vertices[p_polygon.m_indices[0]].m_pos.z;
 
-		float tmp = p0.x * p1.z - p1.x * p0.z;
-		area += tmp;
+		a = x0 * y1 - x1 * y0;
+		area += a;
 
-		cx += (p0.x + p1.x) * area;
-		cy += (p0.z + p1.z) * area;
+		cx += (x0 + x1) * a;
+		cy += (y0 + y1) * a;
 
 		area *= 0.5f;
 		cx /= (6.0f * area);
@@ -361,8 +416,8 @@ namespace RootForce
 				{
 					int index = SplitVertex(p_divider, pa, pb);
 
-					split.m_back.m_indices.push_back(index);
 					split.m_front.m_indices.push_back(index);
+					split.m_back.m_indices.push_back(index);			
 				}
 
 				split.m_back.m_indices.push_back(p_polygon.m_indices[i]);
@@ -395,14 +450,15 @@ namespace RootForce
 
 	int QuadTree::SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1)
 	{
-		Line l;
+
+		/*Line l;
 		l.m_origin = p_p0.m_pos;
 		l.m_direction = p_p1.m_pos - p_p0.m_pos;
 
 		float t = PlaneIntersectLine(p_divider, l);
 
 		Render::Vertex1P1N1UV as;
-		as.m_pos = l.m_origin + l.m_direction * t;
+		as.m_pos = l.m_origin + l.m_direction * t;*/
 
 		glm::vec3 i = PlaneIntersectLineA(p_divider, p_p0.m_pos, p_p1.m_pos);
 
@@ -484,4 +540,62 @@ namespace RootForce
 	{
 		return m_root;
 	}
+
+	std::vector<Triangle> QuadTree::Trianglulate(std::vector<Polygon> p_polygons)
+	{
+		std::vector<Triangle> triangles;
+
+		for(int i = 0; i < p_polygons.size(); ++i)
+		{
+			Polygon p = p_polygons[i];
+
+			for(int j = 2; j < p.m_indices.size(); j++)
+			{
+				Triangle t;
+				t.m_indices[0] = p.m_indices[0];
+				t.m_indices[1] = p.m_indices[j-1];
+				t.m_indices[2] = p.m_indices[j];
+
+				triangles.push_back(t);
+			}
+		}
+
+		return triangles;
+	}
+
+	void QuadTree::CreateEntities(std::vector<Triangle> p_triangles)
+	{
+		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_material > b.m_material; });
+
+		std::vector<unsigned int> indices;
+		std::vector<Render::Vertex1P1N1UV> vertices;
+
+		Render::Material* wp = p_triangles[0].m_material;
+		for(int i = 0; i < p_triangles.size(); i++)
+		{
+			if(p_triangles[i].m_material != wp)
+			{
+				wp = p_triangles[i].m_material;
+				
+				ECS::Entity* newE = m_world->GetEntityManager()->CreateEntity();
+				RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(newE);
+				r->m_model = m_context->m_resourceManager->CreateModel("asda");
+				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
+				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+				r->m_material = wp;
+				
+				RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(newE);
+				t->m_position = p_triangles[0].m_translation;
+				t->m_scale = p_triangles[0].m_scale;
+			}
+
+			// Push triangle face.
+			indices.push_back(p_triangles[i].m_indices[0]);
+			indices.push_back(p_triangles[i].m_indices[1]);
+			indices.push_back(p_triangles[i].m_indices[2]);
+		}
+	}
+
+	void CreateEntity();
+
 }

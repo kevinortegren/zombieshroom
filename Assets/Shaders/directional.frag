@@ -27,9 +27,15 @@ out vec4 out_Color;
 
 vec3 GetVSPositionFromDepth()
 {
-	float z = texture(g_Depth, ex_TexCoord).x;
-	float x = (ex_TexCoord.x) * 2 - 1;
-	float y = (ex_TexCoord.y) * 2 - 1;
+	float z = texture(g_Depth, ex_TexCoord).r;
+
+	if(z == 1)
+		discard;
+		
+	z = z * 2 - 1;
+
+	float x = ex_TexCoord.x * 2 - 1;
+	float y = ex_TexCoord.y * 2 - 1;
 
 	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
 	vec4 sPos = invProj * vProjectedPos;
