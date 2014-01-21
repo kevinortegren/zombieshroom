@@ -89,11 +89,7 @@ void CustomTreeWidget::ViewSelectedData( QTreeWidgetItem* p_item, QtTreeProperty
 {
 	if(p_item->whatsThis(0).compare("Entity") == 0)
 	{
-
 		m_onEvent->ViewEntityData(this->indexOfTopLevelItem(p_item),p_propBrows, p_propMan );
-		p_item->setText(0, m_onEvent->GetEntityName(this->indexOfTopLevelItem(p_item)));
-		
-
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
