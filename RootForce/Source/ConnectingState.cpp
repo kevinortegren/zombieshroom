@@ -12,13 +12,26 @@ namespace RootForce
 		, m_sharedSystems(p_sharedSystems)
 	{}
 
+	ConnectingState::~ConnectingState()
+	{
+		g_engineContext.m_gui->DestroyView(m_loadingScreen);
+	}
+
 	void ConnectingState::Initialize()
 	{
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
+		m_loadingScreen = g_engineContext.m_gui->LoadURL("loading.html");
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
+		// Render a frame of loading screen to indicate the loading state
+		while(m_loadingScreen->IsLoading())
+			g_engineContext.m_gui->Update();
+		g_engineContext.m_renderer->Clear();
+		g_engineContext.m_gui->Render(m_loadingScreen);
+		g_engineContext.m_renderer->Swap();
+        
 		// Host
 		if (p_playData.Host)
 		{
@@ -62,7 +75,8 @@ namespace RootForce
 	}
 
 	void ConnectingState::Exit()
-	{}
+	{
+	}
 
 	GameStates::GameStates ConnectingState::Update()
 	{

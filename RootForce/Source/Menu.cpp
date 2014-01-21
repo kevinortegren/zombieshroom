@@ -9,10 +9,10 @@ namespace RootForce
 	{
 		m_view = p_view;
 		m_context = p_context;
-		/*while(m_view->IsLoading())
+		while(m_view->IsLoading())
 		{
-
-		}*/
+			m_context.m_gui->Update();
+		}
 
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("Menu"));
 

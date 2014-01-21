@@ -15,6 +15,7 @@ namespace RootForce
 	{
 	public:
 		ConnectingState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems);
+		~ConnectingState();
 
 		void Initialize();
 		void Enter(const GameStates::PlayData& p_playData);
@@ -23,5 +24,6 @@ namespace RootForce
 	private:
 		NetworkContext& m_networkContext;
 		SharedSystems& m_sharedSystems;
+		Awesomium::WebView* m_loadingScreen;
 	};
 }
