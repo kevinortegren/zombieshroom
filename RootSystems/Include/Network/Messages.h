@@ -5,11 +5,9 @@
 #include <stdint.h>
 #include <vector>
 #include <Utility/ECS/Include/Entity.h>
-//#include <RootSystems/Include/Components.h> // DO NOT COMMENT IN, COMPILE ERRORS FROM HELL AWAIT YE (cyclical dependency)
+#include <RootSystems/Include/Components.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
-
-
 
 namespace RootForce
 {
@@ -41,7 +39,6 @@ namespace RootForce
 		/*
 			Sent at regular intervals from the server to the clients.
 		*/
-		/*
 		struct GameStateDelta
 		{
 			struct SerializableComponent
@@ -53,7 +50,7 @@ namespace RootForce
 				SerializableComponent();
 				~SerializableComponent();
 				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-				void SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
+				bool SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
 				ECS::ComponentInterface* DeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
 			};
 
@@ -64,15 +61,15 @@ namespace RootForce
 				std::vector<SerializableComponent> Components;
 
 				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-				void SerializeEntity(ECS::Entity* p_entity);
-				ECS::Entity* DeserializeEntity(const Network::NetworkEntityMap& p_map);
+				bool SerializeEntity(ECS::Entity* p_entity, ECS::World* p_world, const Network::NetworkEntityMap& p_map);
+				ECS::Entity* DeserializeEntity(ECS::World* p_world, Network::NetworkEntityMap& p_map);
 			};
 
 			std::vector<SerializableEntity> Entities;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
-		*/
+		
 
 		/* 
 			Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. 

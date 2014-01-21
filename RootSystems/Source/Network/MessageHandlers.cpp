@@ -113,7 +113,11 @@ namespace RootForce
 
 				case NetworkMessage::MessageType::GameStateDelta:
 				{
+					// Local clients share world with server - does not need to do anything.
+					if (clientComponent->IsRemote)
+					{
 
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::Chat:

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <RootEngine/Include/GameSharedContext.h>
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\EntitySystem.h>
+#include <Utility/ECS/Include/Component.h>
+#include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
