@@ -38,8 +38,8 @@ function AbilityTest.OnCreate ()
 	renderComp0:SetMaterialSpecular("fireballSpecular");
 	renderComp0:SetMaterialNormal("fireballNormal");
 	renderComp0:SetMaterialEffect("Mesh_NormalMap");
-	physicsComp0:BindShape(collisionComp0, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 19, 1, true);
-	physicsComp0:SetVelocity(collisionComp0, Vec3.New(frontVec.x * 5, frontVec.y * 5, frontVec.z * 5));
+	physicsComp0:BindShape(collisionComp0, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
+	physicsComp0:SetVelocity(collisionComp0, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
 	colRespComp0:SetContainer(collisionComp0);
 end
 
