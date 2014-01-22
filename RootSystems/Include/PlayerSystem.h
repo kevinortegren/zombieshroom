@@ -1,8 +1,7 @@
 #pragma once
 
-#include <RootEngine/Include/GameSharedContext.h>
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\EntitySystem.h>
+#include <Utility/ECS/Include/Component.h>
+#include <glm/glm.hpp>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
@@ -69,17 +68,5 @@ namespace RootForce
 
 		int Score;
 		int Deaths;
-	};
-
-	class PlayerSystem : public ECS::VoidSystem
-	{
-	public:
-		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world)
-			, m_engineContext(p_engineContext) {}
-		void CreatePlayer(int p_teamID);
-		void Process();
-	private:
-		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

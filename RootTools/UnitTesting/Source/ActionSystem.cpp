@@ -5,6 +5,7 @@
 TEST(ActionSystem, ProcessEmptyEntity) 
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
@@ -30,9 +31,24 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
-	g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
+	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
+
+	// Call the OnCreate script
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+	
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);

@@ -5,6 +5,7 @@
 TEST(RespawnSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
@@ -21,6 +22,7 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 TEST(RespawnSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* mockSpawn = world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* mockSpawnTransform = world->GetEntityManager()->CreateComponent<RootForce::Transform>(mockSpawn);
@@ -30,8 +32,24 @@ TEST(RespawnSystem, ProcessEntity)
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
-	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
+	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
+
+	// Call the OnCreate script
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+	
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
 
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);
 

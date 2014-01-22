@@ -38,9 +38,9 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int Log(lua_State* p_luaState)
 		{
-			NumberOfArgs(2);
-			const char* s = luaL_checkstring(p_luaState, 1);
-			int l = (int) luaL_checkint(p_luaState, 2);
+			NumberOfArgs(2); // LogLevel, LogMessage
+			int l = (int) luaL_checkint(p_luaState, 1);
+			const char* s = luaL_checkstring(p_luaState, 2);
 			
 			lua_Debug ar;
 			lua_getstack(p_luaState, 1, &ar);

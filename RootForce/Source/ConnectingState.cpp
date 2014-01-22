@@ -31,12 +31,15 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();
+
+		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
+		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
         
 		// Host
 		if (p_playData.Host)
 		{
 			// Setup the server and connect a local client
-			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo, false));
+			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(&m_networkContext.m_networkEntityMap);
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());

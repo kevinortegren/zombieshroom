@@ -5,6 +5,8 @@
 #include <RakNet/BitStream.h>
 #include <stdexcept>
 
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	namespace Network
@@ -45,9 +47,10 @@ namespace RootForce
 		bool Client::Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port, bool p_isRemote)
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
-			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
+			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 			clientComponent->IsRemote = p_isRemote;
 			clientComponent->State = ClientState::UNCONNECTED;
+			clientComponent->Name = g_engineContext.m_configManager->GetConfigValueAsString("Name").c_str();
 
 			if (m_peer->Connect(p_address.c_str(), p_port, p_password.c_str(), p_password.size() + 1) != RakNet::CONNECTION_ATTEMPT_STARTED)
 				return false;

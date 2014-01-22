@@ -10,8 +10,10 @@
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/WorldSystem.h>
 
 RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
 
 class Main {
 public:
@@ -32,5 +34,7 @@ private:
 	std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 
 	std::string m_workingDir;
-
+	
+	// System responsible for creating the world.
+	std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 };

@@ -41,7 +41,7 @@ namespace RootSystems
 			Port = 5567;
 			ServerName = "Server";
 			Password = "";
-			MapName = "test.world";
+			MapName = "Nyaste";
 			GameMode = GameMode::DEATHMATCH;
 			MatchTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory

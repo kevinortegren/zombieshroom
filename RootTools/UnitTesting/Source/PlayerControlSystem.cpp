@@ -5,6 +5,7 @@
 TEST(PlayerControlSystem, Process)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	// Initialize the keybindings we need for the test(not the complete list that is normally used)
 	std::vector<RootForce::Keybinding> keybindings(6);
@@ -46,10 +47,27 @@ TEST(PlayerControlSystem, Process)
 	system->SetLoggingInterface(g_engineContext.m_logger);
 	system->SetPhysicsInterface(g_engineContext.m_physics);
 	system->SetKeybindings(keybindings);
+	
+	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
-	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
-		RootEngine::InputManager::InputInterface* ii = g_engineContext.m_inputSys;
+	// Call the OnCreate script
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+	
+	// Add client components onto the entity
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
+	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+
+	RootEngine::InputManager::InputInterface* ii = g_engineContext.m_inputSys;
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 

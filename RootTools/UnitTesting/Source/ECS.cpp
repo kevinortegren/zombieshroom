@@ -8,6 +8,7 @@ TEST(ECS, GettingAllComponents)
 {
 	// Initialize a world and some components
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	TestComponent1::SetTypeId(0);
 	TestComponent2::SetTypeId(1);
