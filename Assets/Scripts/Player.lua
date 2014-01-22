@@ -3,18 +3,19 @@ Player = {}
 function Player.OnCreate(userId, actionId)
 	
 	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
+  local player = Entity.New();
 
-	local transform = Transformation.New(self);
-	local playerPhysics = PlayerPhysics.New(self);
-	local health = Health.New(self);
-	local player = PlayerComponent.New(self);
-	local physics = Physics.New(self);
-	local collision = Collision.New(self);
-	local collisionResponder = CollisionResponder.New(self);
-	local script = Script.New(self, "Player");
-	local playerAction = PlayerAction.New(self);
-	local stateComponent = StateComponent.New(self);
-	local network = Network.New(self, userId, actionId);
+	local transform = Transformation.New(player);
+	local playerPhysics = PlayerPhysics.New(player);
+	local health = Health.New(player);
+	local playerComponent = PlayerComponent.New(player);
+	local physics = Physics.New(player);
+	local collision = Collision.New(player);
+	local collisionResponder = CollisionResponder.New(player);
+	local script = Script.New(player, "Player");
+	local playerAction = PlayerAction.New(player);
+	local stateComponent = StateComponent.New(player);
+	local network = Network.New(player, userId, actionId);
 
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
@@ -29,8 +30,8 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetActivateAbility(false);
 	playerAction:SelectAbility(1);
 
-	player:SetAbility(0, "AbilityTest");
-	player:SelectAbility(0);
+	playerComponent:SetAbility(0, "AbilityTest");
+	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(10);
 	playerPhysics:SetJumpForce(20);
@@ -38,17 +39,17 @@ function Player.OnCreate(userId, actionId)
 	physics:SetMass(5);
 
 	collision:SetMeshHandle("testchar0");
-	Collision.AddPlayerObjectToWorld(self, collision, transform, physics, playerPhysics, collisionResponder);
+	Collision.AddPlayerObjectToWorld(player, collision, transform, physics, playerPhysics, collisionResponder);
 
 	health:SetHealth(100);
 	health:SetIsDead(false);
 	health:SetWantsRespawn(false);
-	player:SetDeaths(0);
-	player:SetScore(0);
+	playerComponent:SetDeaths(0);
+	playerComponent:SetScore(0);
 	-- ToDo: Get and set a correct team id
-	player:SetTeamId(0);
+	playerComponent:SetTeamId(0);
 
-	Entity.RegisterGroup("NonExport", self);
+	Entity.RegisterGroup("NonExport", player);
 
 	-- Create an aiming device
 	local aimingEntity = Entity.New();
@@ -57,28 +58,28 @@ function Player.OnCreate(userId, actionId)
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
     
-    if Global.IsServer then
-        local renderable = Renderable.New(self);
-        local animation = Animation.New(self);
+  if Global.IsClient then
+    local renderable = Renderable.New(player);
+    local animation = Animation.New(player);
 
-        renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
-        renderable:SetModel("testchar");
-        renderable:SetMaterial("testchar");
-        renderable:SetMaterialDiffuse("WStexture");
-        renderable:SetMaterialSpecular("WSSpecular");
-        renderable:SetMaterialNormal("WSNormal");
-        renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
-        renderable:SetAnimation(animation);
-    end
-    
-    if Global.UserID == userId then
-        local playerControl = PlayerControl.New(self);
+    renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
+    renderable:SetModel("testchar");
+    renderable:SetMaterial("testchar");
+    renderable:SetMaterialDiffuse("WStexture");
+    renderable:SetMaterialSpecular("WSSpecular");
+    renderable:SetMaterialNormal("WSNormal");
+    renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
+    renderable:SetAnimation(animation);
+  end
+  
+  if Global.UserID == userId then
+      local playerControl = PlayerControl.New(player);
 
-        playerControl:SetMouseSensitivity(0.3);
+      playerControl:SetMouseSensitivity(0.3);
 
-        Entity.RegisterTag("Player", self);
-        Entity.RegisterTag("AimingDevice", aimingEntity);
-    end
+      Entity.RegisterTag("Player", player);
+      Entity.RegisterTag("AimingDevice", aimingEntity);
+  end
 end
 
 function Player.OnCollide (self, entity)

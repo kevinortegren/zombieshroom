@@ -32,24 +32,15 @@ TEST(RespawnSystem, ProcessEntity)
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
 
-	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
-
 	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->AddParameterNumber(0);
 	g_engineContext.m_script->AddParameterNumber(0);
-	g_engineContext.m_script->ExecuteScript();
-
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->ExecuteScript();
 	
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);
 

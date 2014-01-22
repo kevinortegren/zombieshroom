@@ -79,20 +79,26 @@ namespace RootEngine
 
 		void ScriptManager::SetGlobalString(const std::string& p_variableName, const std::string& p_string)
 		{
+			lua_getglobal(m_luaState, "Global");
 			lua_pushstring(m_luaState, p_string.c_str());
-			lua_setglobal(m_luaState, p_variableName.c_str());
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
 		}
 
 		void ScriptManager::SetGlobalNumber(const std::string& p_variableName, double p_double)
-		{
+		{	
+			lua_getglobal(m_luaState, "Global");
 			lua_pushnumber(m_luaState, p_double);
-			lua_setglobal(m_luaState, p_variableName.c_str());
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
 		}
 
 		void ScriptManager::SetGlobalBoolean(const std::string& p_variableName, bool p_bool)
 		{
+			lua_getglobal(m_luaState, "Global");
 			lua_pushboolean(m_luaState, p_bool);
-			lua_setglobal(m_luaState, p_variableName.c_str());
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
 		}
 
 

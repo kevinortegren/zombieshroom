@@ -146,6 +146,8 @@ namespace RootForce
 					id.ActionID = ReservedActionID::CONNECT;
 					id.SequenceID = 1;
 
+					g_engineContext.m_script->SetGlobalNumber("UserID", id.UserID);
+
 					if (clientComponent->IsRemote)
 					{
 						// If we are a remote client, we need to create our own entities.
@@ -156,7 +158,7 @@ namespace RootForce
 						// Call the OnCreate script
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from Message::UserConnected");
 						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
-						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+						//g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
 						g_engineContext.m_script->AddParameterNumber(id.UserID);
 						g_engineContext.m_script->AddParameterNumber(id.ActionID);
 						g_engineContext.m_script->ExecuteScript();
@@ -518,18 +520,17 @@ namespace RootForce
 							if (clientComponent->State == ClientState::AWAITING_USER_CONNECT)
 							{
 								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client (%s) successfully loaded map", p_packet->systemAddress.ToString());
-							
-								// Create the player, given a player entity.
-								ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
-								id.SequenceID = 1;
-								networkEntityMap[id] = playerEntity;
 								
 								g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from LoadMapStatus::Status_Completed");
 								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-								g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
+								//g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
 								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
 								g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
-								g_engineContext.m_script->ExecuteScript();
+								
+								// Get the newly created player entity
+								ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
+								id.SequenceID = 1;
+								networkEntityMap[id] = playerEntity;
 
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								playerComponent->Name = clientComponent->Name;

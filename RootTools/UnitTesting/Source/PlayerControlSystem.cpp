@@ -47,25 +47,17 @@ TEST(PlayerControlSystem, Process)
 	system->SetLoggingInterface(g_engineContext.m_logger);
 	system->SetPhysicsInterface(g_engineContext.m_physics);
 	system->SetKeybindings(keybindings);
-	
-	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 
 	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetGlobalNumber("IsClient", true);
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->AddParameterNumber(0);
 	g_engineContext.m_script->AddParameterNumber(0);
 	g_engineContext.m_script->ExecuteScript();
 
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
-	
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootEngine::InputManager::InputInterface* ii = g_engineContext.m_inputSys;
 

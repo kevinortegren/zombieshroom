@@ -31,24 +31,16 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
-	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
-
 	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetGlobalNumber("IsClient", true);
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->AddParameterNumber(0);
 	g_engineContext.m_script->AddParameterNumber(0);
 	g_engineContext.m_script->ExecuteScript();
 
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
-	
-	// Add client components onto the entity
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "AddLocalClientComponents");
-	g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);
