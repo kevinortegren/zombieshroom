@@ -86,6 +86,7 @@ void AbilityEditor::Init()
 	connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(Load()));
 	connect(ui.treeView, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
 	connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
+	connect(ui.pushButton, SIGNAL(pressed()), this, SLOT(BrowseName()));
 	
 }
 
@@ -318,4 +319,15 @@ void AbilityEditor::AddNewEntity()
 		ui.treeOnDestroy->addTopLevelItem(item);
 		m_onDestroy->AddEntity(item->text(0));
 	}
+}
+
+void AbilityEditor::BrowseName()
+{
+	QFileDialog dial(this);
+	dial.setFileMode(QFileDialog::AnyFile);
+	dial.setAcceptMode(QFileDialog::AcceptOpen);
+	QString asdf = dial.getOpenFileName();
+	QString name = &(asdf.toStdString().at(asdf.lastIndexOf("/")+1));
+	//PLEASE REMOVE FILE ENDING THINGYSTUFF
+	m_propMan->setValue(m_propBrows->currentItem()->property(), name);
 }

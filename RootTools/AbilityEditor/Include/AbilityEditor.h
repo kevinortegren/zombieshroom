@@ -35,6 +35,7 @@ private slots:
 		void Load();
 		void FileViewDrag(const QModelIndex& p_modelIndex);
 		void AddNewEntity();
+		void BrowseName();
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;

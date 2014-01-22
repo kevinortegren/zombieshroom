@@ -17,25 +17,33 @@ namespace AbilityEditorNameSpace
 
 	}
 
-	void ScriptGenerator::GenerateScript( QString p_filePath, QString p_folderName, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
+	void ScriptGenerator::GenerateScript( QString p_filePath, QString p_name, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
 		//p_scriptName.chop(4);
 		//m_name = p_folderName.toStdString();
-		
+
+		/* THIS IS IF WE WANT TO PUT SCRIPTS IN A FOLDER
 		p_filePath.chop(p_filePath.size() - p_filePath.lastIndexOf("/") - 1);
 		QDir thedir;
 		thedir.setCurrent(p_filePath);
 		//QDir().setCurrent(p_filePath);
-		if(!thedir.exists(p_folderName))
+		if(!thedir.exists(p_name))
 		{
-			thedir.mkdir(p_folderName);
-		}
+			thedir.mkdir(p_name);
+		}*/
+
+		p_filePath.chop(p_filePath.size() - p_filePath.lastIndexOf("/") - 1);
 
 		for (int i = 0; (unsigned int)i < p_onCreate->GetEntities()->size(); i++)
 		{
-			m_name = p_onCreate->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + p_folderName.toStdString() + "/" + m_name + ".lua");
+			//Folder only
+			//m_name = p_onCreate->GetEntities()->at(i)->m_name.toStdString();
+			//m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
 			
+			//No folder
+			m_name = p_onCreate->GetEntities()->at(i)->m_name.toStdString();
+			m_file.open(p_filePath.toStdString() + m_name + ".lua");
+
 			//Begin writing in the file
 			m_file << m_name << " = {};\n";
 			m_file << "\n";
@@ -54,7 +62,7 @@ namespace AbilityEditorNameSpace
 		for (int i = 0; (unsigned int)i < p_onCollide->GetEntities()->size(); i++)
 		{
 			m_name = p_onCollide->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + p_folderName.toStdString() + "/" + m_name + ".lua");
+			m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
 
 			//Begin writing in the file
 			m_file << m_name << " = {};\n";
@@ -74,7 +82,7 @@ namespace AbilityEditorNameSpace
 		for (int i = 0; (unsigned int)i < p_onDestroy->GetEntities()->size(); i++)
 		{
 			m_name = p_onDestroy->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + p_folderName.toStdString() + "/" + m_name + ".lua");
+			m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
 
 			//Begin writing in the file
 			m_file << m_name << " = {};\n";
