@@ -4,6 +4,7 @@
 #include "SharedMemory.h"
 #include <algorithm>
 #include "Constants.h"
+#include <sstream>;
 
 // Threshold for determining if two vertices are identical
 #define THRESHOLD 0.01f
@@ -364,7 +365,8 @@ void loadScene()
 		}
 
 		MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
-		SM.UpdateSharedMesh(i, true, true, currNrMeshes);
+		//SM.UpdateSharedMesh(i, true, true, currNrMeshes);
+		//DONE correct in ^^
 	}
 	//Light transformation CB
 	for(int i = 0; i < currNrLights; i++)
@@ -384,21 +386,26 @@ void loadScene()
 		}
 
 		MayaLightToList(g_mayaLightList[i], i);
-		SM.UpdateSharedLight(i, currNrLights);
+		//SM.UpdateSharedLight(i, currNrLights);
+		//Done correct in ^^
 	}
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
 	{
 		MFnCamera camera = g_mayaCameraList[i];
-
-		const MString temp = "modelPanel4";
-
-		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);
 		
+		//int nr = i + 1;
+		std::ostringstream oss;
+		oss << "modelPanel" << i+1;
+		
+		const MString temp = oss.str().c_str();
+			
+		MCallbackId id = MUiMessage::add3dViewPostRenderMsgCallback(temp, viewCB, nullptr, &status);		
 		AddCallbackID(status, id);
 
 		MayaCameraToList(g_mayaCameraList[i], i);
-		SM.UpdateSharedCamera(i);
+		//SM.UpdateSharedCamera(i);
+		//Done correct in ^^
 	}
 
 }
@@ -1293,19 +1300,31 @@ void MayaLightToList(MObject node, int lightIndex)
 	MSpace::Space space_local = MSpace::kObject;
 	const MString PL = "PointLight";
 	const MString DL = "DirectionalLight";
+	const MString AL = "AmbientLight";
 
 	///////////////////////	LIGHT
 	if(node.hasFn(MFn::kLight))
 	{
+		MFnLight light = node;
+
 		if(node.hasFn(MFn::kPointLight))
 		{
-		memcpy(SM.lightList[lightIndex].LightType, PL.asChar(), PL.numChars());
+			memcpy(SM.lightList[lightIndex].LightType, PL.asChar(), PL.numChars());
 		}
+
 		if(node.hasFn(MFn::kDirectionalLight))
 		{
-		memcpy(SM.lightList[lightIndex].LightType, DL.asChar(), DL.numChars());
+			memcpy(SM.lightList[lightIndex].LightType, DL.asChar(), DL.numChars());
+			SM.lightList[lightIndex].direction.x = light.lightDirection().x;
+			SM.lightList[lightIndex].direction.y = light.lightDirection().y;
+			SM.lightList[lightIndex].direction.z = light.lightDirection().z;
 		}
-		MFnLight light = node;
+
+		if(node.hasFn(MFn::kAmbientLight))
+		{
+			memcpy(SM.lightList[lightIndex].LightType, AL.asChar(), AL.numChars());
+		}
+
 		SM.lightList[lightIndex].color.r = light.color(&status).r;
 		SM.lightList[lightIndex].color.g = light.color(&status).g;
 		SM.lightList[lightIndex].color.b = light.color(&status).b;
@@ -1336,6 +1355,8 @@ void MayaLightToList(MObject node, int lightIndex)
 			SM.lightList[lightIndex].transformation.rotation.z = rotZ;
 			SM.lightList[lightIndex].transformation.rotation.w = rotW;
 		}
+
+		SM.UpdateSharedLight(lightIndex, currNrLights);
 	}
 }
 
@@ -1399,6 +1420,7 @@ void MayaCameraToList(MObject node, int cameraIndex)
 			SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
 			SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
 		}
+		SM.UpdateSharedCamera(cameraIndex);
 	}
 }
 

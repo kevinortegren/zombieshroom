@@ -31,6 +31,7 @@ int entityExport;
 ReadMemory RM;
 int numberMeshes;
 int numberLights;
+int numberCameras;
 // Setup world.
 ECS::World m_world;
 RootForce::RenderingSystem* renderingSystem;
@@ -53,12 +54,13 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world);
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
 ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int index);
-void CreateCameraEntity();
+void CreateCameraEntity(int index);
 
-void UpdateCamera();
+void UpdateCamera(int index);
 void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
-void UpdateLight(int index, bool remove);
+void UpdateLight(int index, bool remove, bool firstTimeLoad);
+bool ambientInfoExists = false;
 
 void ExportToLevel();
 
@@ -111,11 +113,18 @@ int main(int argc, char* argv[])
 
 			Initialize(g_engineContext);
 
-			//LOAD
-			CreateCameraEntity();			
+			//LOAD						
 			LoadLocators();
 
+			//LOAD CAMERAS
+			RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+			WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+			numberCameras = *RM.NumberOfCameras;
+			ReleaseMutex(RM.CameraMutexHandle);
 
+			CreateCameraEntity(0);
+
+			//LOAD MATERIALS
 			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 			int renderNrOfMaterials = *RM.NumberOfMaterials;
@@ -127,9 +136,6 @@ int main(int argc, char* argv[])
 
 			ReleaseMutex(RM.MeshMutexHandle);
 
-			// Set to update all materials
-			//renderNrOfMaterials = -1;
-
 			/////////////////////// LOAD MESHES ////////////////////////////////
 
 			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
@@ -139,6 +145,7 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberMeshes; i++)
 			{				
+				//OPEN MUTEX?
 				string name = RM.PmeshList[i]->modelName;
 				Entities.push_back(CreateMeshEntity(&m_world, name, i));
 				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
@@ -158,7 +165,7 @@ int main(int argc, char* argv[])
 
 			for(int i = 0; i < numberLights; i++)
 			{
-				UpdateLight(i, false);
+				UpdateLight(i, false, true);
 			}
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
@@ -219,13 +226,15 @@ int main(int argc, char* argv[])
 				if(type == "Light")
 				{
 					if(removeID == -1)
-						UpdateLight(updateID, false);
+						UpdateLight(updateID, false, false);
 					else
-						UpdateLight(removeID, true);
+						UpdateLight(removeID, true, false);
 				}
 
 				if(type == "Camera")
-					UpdateCamera();
+				{
+					UpdateCamera(updateID);
+				}
 
 				if(type == "Texture")
 				{
@@ -328,14 +337,6 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
-
-	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	Render::DirectionalLight dl;
-	dl.m_direction = glm::vec3(0,-1,0);
-	dl.m_color = glm::vec4(0,0,1,1);
-
-	//g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
 
 	// Initialize systems.
 	renderingSystem = new RootForce::RenderingSystem(&m_world);
@@ -470,16 +471,16 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	return entity;
 }
 
-void CreateCameraEntity()
+void CreateCameraEntity(int index)
 {
 	//Create camera entity
 	cameras.push_back(m_world.GetEntityManager()->CreateEntity());
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
-	m_world.GetTagManager()->RegisterEntity("Camera", cameras[0]);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[0]);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[index]);
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[index]);
+	m_world.GetTagManager()->RegisterEntity("Camera", cameras[index]);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", cameras[index]);
 
-	UpdateCamera();
+	UpdateCamera(index);
 }
 
 std::string GetNameFromPath( std::string p_path )
@@ -500,35 +501,36 @@ std::string GetNameFromPath( std::string p_path )
 
 
 
-void UpdateCamera()
+void UpdateCamera(int index)
 {
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
+	if(index != -1)
+	{
 
-	//if(cameraIDchange != -1)
-	//{
-	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-	WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
+		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
 
-	glm::quat rotation;
-	rotation.x = RM.PcameraList[0]->transformation.rotation.x;
-	rotation.y = RM.PcameraList[0]->transformation.rotation.y;
-	rotation.z = RM.PcameraList[0]->transformation.rotation.z;
-	rotation.w = RM.PcameraList[0]->transformation.rotation.w;
+		RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+		WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
 
-	cameraTransform->m_position.x = RM.PcameraList[0]->transformation.position.x;
-	cameraTransform->m_position.y = RM.PcameraList[0]->transformation.position.y;
-	cameraTransform->m_position.z = RM.PcameraList[0]->transformation.position.z;
-	cameraTransform->m_orientation.SetOrientation(rotation);
-	//Rotate 180 to fix camera
-	cameraTransform->m_orientation.Yaw(180);
+		glm::quat rotation;
+		rotation.x = RM.PcameraList[index]->transformation.rotation.x;
+		rotation.y = RM.PcameraList[index]->transformation.rotation.y;
+		rotation.z = RM.PcameraList[index]->transformation.rotation.z;
+		rotation.w = RM.PcameraList[index]->transformation.rotation.w;
 
-	camera->m_far = RM.PcameraList[0]->farClippingPlane;					
-	camera->m_near = RM.PcameraList[0]->nearClippingPlane;
-	camera->m_fov = glm::degrees(RM.PcameraList[0]->verticalFieldOfView);
+		cameraTransform->m_position.x = RM.PcameraList[index]->transformation.position.x;
+		cameraTransform->m_position.y = RM.PcameraList[index]->transformation.position.y;
+		cameraTransform->m_position.z = RM.PcameraList[index]->transformation.position.z;
+		cameraTransform->m_orientation.SetOrientation(rotation);
+		//Rotate 180 to fix camera
+		cameraTransform->m_orientation.Yaw(180);
 
-	ReleaseMutex(RM.CameraMutexHandle);
-	//}
+		camera->m_far = RM.PcameraList[index]->farClippingPlane;					
+		camera->m_near = RM.PcameraList[index]->nearClippingPlane;
+		camera->m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
+
+		ReleaseMutex(RM.CameraMutexHandle);
+	}
 }
 
 void LoadLocators()
@@ -686,7 +688,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 	}
 }
 
-void UpdateLight(int index, bool remove)
+void UpdateLight(int index, bool remove, bool firstTimeLoad)
 {
 	int LightIndex = -1;
 	int RemoveLightIndex = -1;
@@ -706,29 +708,50 @@ void UpdateLight(int index, bool remove)
 	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
 	numberLights = *RM.NumberOfLights;
 	ReleaseMutex(RM.LightMutexHandle);
-	
 
 	int size = LightEntities.size()-1;
+	string type = RM.PlightList[LightIndex]->LightType;
 
 	if(LightIndex != -1)					
 	{		
-		if(LightIndex > size)
-		{
-			LightEntities.push_back(CreateLightEntity(&m_world));
-		}
-
 		RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
-		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
-		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.r = RM.PlightList[LightIndex]->color.r;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.g = RM.PlightList[LightIndex]->color.g;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.b = RM.PlightList[LightIndex]->color.b;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.a = RM.PlightList[LightIndex]->color.a;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
-		m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
+		if(type == "PointLight")
+		{
+			if(LightIndex > size)
+			{
+				LightEntities.push_back(CreateLightEntity(&m_world));
+			}
+
+			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
+			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.r = RM.PlightList[LightIndex]->color.r;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.g = RM.PlightList[LightIndex]->color.g;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.b = RM.PlightList[LightIndex]->color.b;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.a = RM.PlightList[LightIndex]->color.a;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
+		}
+
+		if(type == "DirectionalLight" && firstTimeLoad)
+		{
+			Render::DirectionalLight dl;
+			dl.m_direction = RM.PlightList[LightIndex]->direction;
+			dl.m_color = RM.PlightList[LightIndex]->color;
+
+			g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
+		}
+
+		if(type == "AmbientLight")
+		{
+			g_engineContext.m_renderer->SetAmbientLight(RM.PlightList[LightIndex]->color);
+			ambientInfoExists = true;
+		}
+
+		if(!ambientInfoExists)
+			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 		ReleaseMutex(RM.LightMutexHandle);
 	}

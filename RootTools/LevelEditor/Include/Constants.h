@@ -19,9 +19,9 @@ const string g_savepath = "C:/Users/BTH/Documents/zombieshroomMain/Assets/";
 
 const string g_levelName = "myTestLevel";
 
-const string textureR = "grass.dds";
-const string textureG = "smoke.dds";
-const string textureB = "sphere_diffuse.dds";
+const string textureR = "sphere_diffuse.dds";
+const string textureG = "grass.dds";
+const string textureB = "smoke.dds";
 
 const int g_maxMessages = 30;
 //textureBawlsheit
@@ -112,6 +112,7 @@ struct Light
 	char LightType[g_maxNameLength];
 	Transform transformation;
 	glm::vec4 color;
+	glm::vec3 direction;
 	float Intensity;
 };
 
@@ -126,8 +127,13 @@ struct PaintTexture
 	int heigth, width;
 	int tileFactor;
 
+	char textureRed[g_maxNameLength];
+	char textureGreen[g_maxNameLength];
+	char textureBlue[g_maxNameLength];
+
 	PaintTexture()
 	{
 		tileFactor = g_tileFactor;
+		//memcpy(textureRed)
 	}
 };
