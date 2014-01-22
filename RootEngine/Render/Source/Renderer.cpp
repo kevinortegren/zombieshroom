@@ -151,7 +151,7 @@ namespace Render
 		m_geometryPass.Init(width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 512, 512);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(width, height);
@@ -281,7 +281,10 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		ShadowPass();
+		{
+			PROFILE("Shadow pass", g_context.m_profiler);
+			ShadowPass();
+		}
 
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
@@ -291,8 +294,6 @@ namespace Render
 			PROFILE("Geometry Pass", g_context.m_profiler);
 			GeometryPass();
 		}
-
-		
 
 		{
 			PROFILE("Lighting Pass", g_context.m_profiler);
@@ -456,7 +457,7 @@ namespace Render
 		m_cameraBuffer.BufferSubData(0, sizeof(matrices), &matrices);
 
 		glCullFace(GL_FRONT);
-		glViewport(0, 0, 512, 512);
+		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
