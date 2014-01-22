@@ -181,6 +181,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 
 bool AbilityEditor::event( QEvent* event )
 {
+	
 	if (event->type() == QEvent::KeyPress)
 	{
 		QKeyEvent* ke = static_cast<QKeyEvent*>(event);
@@ -192,7 +193,7 @@ bool AbilityEditor::event( QEvent* event )
 				if(ui.treeOnCreate->currentItem() != 0)
 				{
 					ui.treeOnCreate->RemoveSelected(ui.treeOnCreate->currentItem());		
-					delete ui.treeOnCreate->currentItem();	
+					//delete ui.treeOnCreate->currentItem();	
 					
 				}
 			}
@@ -201,7 +202,7 @@ bool AbilityEditor::event( QEvent* event )
 				if(ui.treeOnCollide->currentItem() != 0)
 				{
 					ui.treeOnCollide->RemoveSelected(ui.treeOnCollide->currentItem());	
-					delete ui.treeOnCollide->currentItem();
+					//delete ui.treeOnCollide->currentItem();
 					
 				}
 			}
@@ -210,16 +211,21 @@ bool AbilityEditor::event( QEvent* event )
 				if(ui.treeOnDestroy->currentItem() != 0)
 				{
 					ui.treeOnDestroy->RemoveSelected(ui.treeOnDestroy->currentItem());
-					delete ui.treeOnDestroy->currentItem();
+					//delete ui.treeOnDestroy->currentItem();
 						
 				}
 			}
 			m_LastSelectedItem = nullptr;
+			//return false;
 		}
 	}
 	if(event->type() == QEvent::Drop)
 		return false;
 	return QWidget::event(event);
+	//if(event->type() == QEvent::Drop)
+	//	return QWidget::event(event);
+	//return QWidget::event(event);
+//	return QWidget::event(event);
 }
 
 void AbilityEditor::GenerateScript()

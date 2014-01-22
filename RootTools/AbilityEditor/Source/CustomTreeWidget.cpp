@@ -1,6 +1,7 @@
 #include "CustomTreeWidget.h"
 #include <Qt/QtCore/QMimeData>
 #include <Qt/QtWidgets/QMessageBox>
+#include <QtGui/QDrag>
 CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(parent)
 {
 	setAcceptDrops(true);
@@ -24,7 +25,6 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
 		item->setWhatsThis(0,"Entity");
-		
 
 		this->addTopLevelItem(item);
 		m_onEvent->AddEntity(item->text(0));
@@ -32,7 +32,7 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 	}
 	else if(this->itemAt(event->pos()) != nullptr )
 	{
-		
+
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
 		item->setWhatsThis(0,event->mimeData()->objectName());
@@ -62,6 +62,7 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 		unsigned int index = this->indexOfTopLevelItem(item->parent());
 		m_onEvent->AddComponent(index, item->text(0));
 	}
+	
 }
 
 void CustomTreeWidget::dragEnterEvent( QDragEnterEvent* event )
@@ -74,6 +75,8 @@ void CustomTreeWidget::dragMoveEvent( QDragMoveEvent *event )
 
 	event->acceptProposedAction();
 }
+
+
 
 void CustomTreeWidget::SetOnEventClass(AbilityEditorNameSpace::MainOnEvent* p_onEvent )
 {
@@ -90,14 +93,18 @@ void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 	}
 	if(p_item->whatsThis(0).compare("Entity") == 0)
 	{
-		m_onEvent->RemoveEntity(this->indexOfTopLevelItem(p_item));
-		delete this->takeTopLevelItem(this->indexOfTopLevelItem(p_item));
+		int test = this->indexOfTopLevelItem(p_item);
+		delete p_item;
+		//m_onEvent->RemoveEntity(this->indexOfTopLevelItem(p_item));
+		m_onEvent->RemoveEntity(test);
+		//delete this->takeTopLevelItem(this->indexOfTopLevelItem(p_item));
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
 
 		m_onEvent->RemoveComponent(this->indexOfTopLevelItem(p_item->parent()),p_item->text(0));
 		this->removeItemWidget(p_item,0);
+		delete p_item;
 		
 	}
 }
