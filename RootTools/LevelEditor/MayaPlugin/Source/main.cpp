@@ -147,6 +147,11 @@ void PaintModel(int index, MImage& texture)
 		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
 		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTexture.Pixels, x*y*4);
 
+		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, g_textureR.c_str(), g_maxNameLength);
+		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, g_textureG.c_str(), g_maxNameLength);
+		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, g_textureB.c_str(), g_maxNameLength);
+		SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = g_tileFactor;
+
 		*SM.NumberOfPaintTextures = paintCount;
 		ReleaseMutex(TextureMutexHandle);
 

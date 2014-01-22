@@ -19,14 +19,14 @@ const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
 
 const string g_levelName = "myTestLevel";
 
-const string textureR = "sphere_diffuse.dds";
-const string textureG = "grass.dds";
-const string textureB = "smoke.dds";
+const string g_textureR = "terrain_light_grass";
+const string g_textureG = "terrain_dark_grass";
+const string g_textureB = "terrain_stone";
 
 const int g_maxMessages = 30;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
-const int g_tileFactor = 16;
+const int g_tileFactor = 4;
 const int g_maxPaintTextures = 1;
 
 struct UpdateMessage
@@ -134,6 +134,8 @@ struct PaintTexture
 	PaintTexture()
 	{
 		tileFactor = g_tileFactor;
-		//memcpy(textureRed)
+		memcpy(textureRed, g_textureR.c_str(), g_maxNameLength);
+		memcpy(textureGreen, g_textureG.c_str(), g_maxNameLength);
+		memcpy(textureBlue, g_textureB.c_str(), g_maxNameLength);
 	}
 };

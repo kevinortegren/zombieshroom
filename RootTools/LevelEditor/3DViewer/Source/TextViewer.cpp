@@ -114,12 +114,14 @@ int main(int argc, char* argv[])
 			g_engineContext.m_renderer->SetupSDLContext(g_window.get());
 			g_running = true;
 
+			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
+			painter->CreateEmptyTexture(256, 256, Render::TextureFormat::TEXTURE_RGBA);
+
 			Initialize(g_engineContext);
 
 			LoadSceneFromMaya();
 
-			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
-			painter->CreateEmptyTexture(256, 256, Render::TextureFormat::TEXTURE_RGBA);
+
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -388,26 +390,42 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	if(textureName == "" || textureName == "NONE")
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
-		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
 	else if(textureName == "PaintTexture")
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
-		mat->m_diffuseMap = painter;
-		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+		mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+
+		//OPEN MUTEX!!!!
+		painter->BufferData(RM.PpaintList[0]->Pixels);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureRed, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		mat->m_textures[Render::TextureSemantic::TEXTURE_G] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureGreen, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureBlue, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		mat->m_tileFactor = RM.PpaintList[0]->tileFactor;
+		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 	}
 	else
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
-		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 		if(normalMap != "" && normalMap != "NONE")
 		{
-		mat->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 		}
 		if(specularMap != "" && specularMap != "NONE")
 		{
-		mat->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
 		}
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh"); //Måste ha tangenter (använd Mesh_NormalMap)
 	}
@@ -544,9 +562,9 @@ void UpdateCamera(int index)
 		//Rotate 180 to fix camera
 		cameraTransform->m_orientation.Yaw(180);
 
-		camera->m_frustrum.m_far = RM.PcameraList[index]->farClippingPlane;					
-		camera->m_frustrum.m_near = RM.PcameraList[index]->nearClippingPlane;
-		camera->m_frustrum.m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
+		camera->m_frustum.m_far = RM.PcameraList[index]->farClippingPlane;					
+		camera->m_frustum.m_near = RM.PcameraList[index]->nearClippingPlane;
+		camera->m_frustum.m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
 
 		ReleaseMutex(RM.CameraMutexHandle);
 	}
@@ -637,6 +655,15 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 			////Update material list
 			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath));
+			
+			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+
+			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
+			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend"))
+			{
+				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			}
+
 
 			/// ROTATION
 			glm::quat rotation;
@@ -663,8 +690,10 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_position += modifiedPos;
 
 			// Get material connected to mesh and set it from materiallist
-			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+			
 			rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
+
+			
 		}
 		
 
