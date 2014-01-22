@@ -402,6 +402,14 @@ namespace RootForce
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
 					
+					// Remove all entities associated with that player
+					NetworkEntityID id;
+					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					id.ActionID = ReservedActionID::ALL;
+					id.SequenceID = ReservedSequenceID::ALL;
+					Network::DeleteEntities(networkEntityMap, id, m_world->GetEntityManager());
+
+					// Notify clients of disconnected client
 					NetworkMessage::UserDisconnected m;
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					
