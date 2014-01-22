@@ -27,6 +27,18 @@ namespace Render
 		};
 	}
 
-	static std::map<Semantic::Semantic, unsigned> s_sizes;
-
+	namespace TextureSemantic
+	{
+		enum TextureSemantic
+		{
+			DIFFUSE,
+			SPECULAR,
+			NORMAL,
+			DEPTH,
+			TEXTUREMAP,
+			TEXTURE_R,
+			TEXTURE_G,
+			TEXTURE_B
+		};
+	}
 }

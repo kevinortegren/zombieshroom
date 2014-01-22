@@ -189,7 +189,7 @@ namespace RootForce
 			//Set Particle system values
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_system = g_engineContext.m_renderer->CreateParticleSystem();	
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin = 15.0f;
 			e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax = 15.0f;

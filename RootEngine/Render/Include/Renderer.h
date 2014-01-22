@@ -32,13 +32,6 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3 
 
-#define RENDER_TEXTURE_DIFFUSE 0
-#define RENDER_TEXTURE_SPECULAR 1
-#define RENDER_TEXTURE_NORMAL 2
-
-#define RENDER_TEXTURE_RANDOM 4
-#define RENDER_TEXTURE_DEPTH 5
-
 namespace Render
 {
 	class RendererInterface : public RootEngine::SubsystemInterface
@@ -175,8 +168,6 @@ namespace Render
 		Buffer m_uniforms;
 
 		std::shared_ptr<TechniqueInterface> m_renderTech;
-		std::shared_ptr<TechniqueInterface> m_normalTech;
-
 		bool m_displayNormals;
 	};
 }

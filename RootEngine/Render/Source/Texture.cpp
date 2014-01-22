@@ -112,10 +112,16 @@ namespace Render
 		return true;
 	}
 
-	void Texture::Enable(unsigned int p_slot)
+	void Texture::Bind(unsigned int p_slot)
 	{
 		glActiveTexture(GL_TEXTURE0 + p_slot);
 		glBindTexture(m_target, m_textureHandle);
+	}
+
+	void Texture::Unbind(unsigned int p_slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + p_slot);
+		glBindTexture(m_target, 0);
 	}
 
 	void Texture::SetParameter(int p_name, int p_parameter)
