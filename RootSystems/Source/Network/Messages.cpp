@@ -769,6 +769,30 @@ namespace RootForce
 			return component;
 		}
 
+
+		bool CanSerializeEntity(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, const Network::NetworkEntityMap& p_map)
+		{
+			// Find the entity in the network entity map.
+			Network::NetworkEntityMap::const_iterator it;
+			for (it = p_map.begin(); it != p_map.end(); it++)
+			{
+				if (it->second == p_entity)
+					break;
+			}
+
+			if (it == p_map.end())
+				return false;
+
+			// Make sure the entity has a script component.
+			Script* script = p_entityManager->GetComponent<Script>(p_entity);
+			if (script == nullptr)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
 		bool SerializeEntity(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, const Network::NetworkEntityMap& p_map)
 		{
 			// Find the entity in the network entity map.
@@ -782,7 +806,7 @@ namespace RootForce
 			// If it doesn't exist, return false.
 			if (it == p_map.end())
 			{
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No associated network entity ID", p_entity->GetId());
+				//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No associated network entity ID", p_entity->GetId());
 				return false;
 			}
 
@@ -790,7 +814,7 @@ namespace RootForce
 			Script* script = p_entityManager->GetComponent<Script>(p_entity);
 			if (script == nullptr)
 			{
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No script component", p_entity->GetId());
+				//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No script component", p_entity->GetId());
 				return false;
 			}
 
@@ -870,6 +894,44 @@ namespace RootForce
 			}
 
 			return entity;
+		}
+
+
+
+
+		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
+		{
+			std::vector<ECS::Entity*> entities = p_world->GetEntityManager()->GetAllEntities();
+			
+			// Write the number of serializable entities.
+			int count = 0;
+			for (size_t i = 0; i < entities.size(); ++i)
+			{
+				if (CanSerializeEntity(entities[i], p_world->GetEntityManager(), p_map))
+					++count;
+			}
+
+			p_bs->Serialize(true, count);
+
+			// Serialize all serializable entities.
+			for (int i = 0; i < entities.size(); ++i)
+			{
+				SerializeEntity(p_bs, entities[i], p_world->GetEntityManager(), p_map);
+			}
+		}
+
+
+		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map)
+		{
+			// Read the number of entities
+			int count;
+			p_bs->Serialize(false, count);
+
+			// Deserialize all entities
+			for (int i = 0; i < count; ++i)
+			{
+				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map);
+			}
 		}
 	}
 }

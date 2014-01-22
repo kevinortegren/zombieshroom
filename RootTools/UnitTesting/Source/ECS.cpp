@@ -50,3 +50,26 @@ TEST(ECS, NullComponent)
 
 	ASSERT_NE(world->GetEntityManager()->GetComponent<RootForce::Transform>(e), nullptr);
 }
+
+TEST(ECS, GetAllEntities)
+{
+	// Initialize a world and some entities
+	ECS::World* world = CreateWorld();
+
+	// Create a few entities
+	const int NUM_ENTITIES = 5;
+	ECS::Entity* e[NUM_ENTITIES];
+	for (int i = 0; i < NUM_ENTITIES; ++i)
+	{
+		e[i] = world->GetEntityManager()->CreateEntity();
+	}
+
+	// Assert that we get the right entities
+	std::vector<ECS::Entity*> entities = world->GetEntityManager()->GetAllEntities();
+
+	ASSERT_EQ(entities.size(), NUM_ENTITIES);
+	for (int i = 0; i < NUM_ENTITIES; ++i)
+	{
+		ASSERT_EQ(entities[i], e[i]);
+	}
+}

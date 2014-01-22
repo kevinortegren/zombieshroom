@@ -113,6 +113,7 @@ namespace ECS
 		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
 		int GetNumEntities() const { return m_entities.size(); }
 
+		std::vector<ECS::Entity*> GetAllEntities();
 	private:
 
 		EntitySystemManager* m_systemManager;

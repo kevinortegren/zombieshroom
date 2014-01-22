@@ -259,6 +259,11 @@ namespace RootForce
 		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
 
 		/*
+			Check whether an entity can be serialized. This will check whether it exists in the network entity map and whether it has a script component.
+		*/
+		bool CanSerializeEntity(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, const Network::NetworkEntityMap& p_map);
+		
+		/*
 			Serialize an entity and all of its serializable components. The entity needs to have a script component registered in the given entity manager.
 			The entity does also need to be registered in the given network entity map. Returns false if these requirements are not met.
 
@@ -283,5 +288,25 @@ namespace RootForce
 			Where components are deserialized differently depending on their type. See DeserializeComponent for more information.
 		*/
 		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map);
+
+		/*
+			Serialize all entities in the world along with all their components that can be serialized.
+
+			The world is serialized in the following way:
+				- NumberOfEntities
+				- Entities
+			See SerializeEntity for how entities are serialized.
+		*/
+		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map);
+
+		/*
+			Deserialize a world, creating any entities that are not existing, and updating all serializable components.
+
+			The serialized data in the bitstream is assumed to be in the following order:
+				- NumberOfEntities
+				- Entities
+			See DeserializeEntity for how entities are serialized.
+		*/
+		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map);
 	}
 }
