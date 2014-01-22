@@ -246,6 +246,7 @@ namespace Render
 		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
 		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
 		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::SHADOW]		= sizeof(glm::mat4);
 		s_sizes[Semantic::POSITION]		= sizeof(glm::vec3);
 		s_sizes[Semantic::LIFETIMEMIN]	= sizeof(float);
 		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);

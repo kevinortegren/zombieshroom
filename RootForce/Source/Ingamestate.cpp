@@ -137,7 +137,6 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
 
-
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -151,8 +150,6 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
-
-		// Load the level and create a world
 
 		//Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
@@ -308,8 +305,8 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+#endif
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
 			{
@@ -322,16 +319,11 @@ namespace RootForce
 				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
 			}
 		}
-#endif
+
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-		{
-			PROFILE("World System", g_engineContext.m_profiler);
-			m_sharedSystems.m_worldSystem->Process();
-		}
-
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
@@ -393,9 +385,15 @@ namespace RootForce
 		}
 
 		{ 
-			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			PROFILE("ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
+
+		{
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
 			m_pointLightSystem->Process();
