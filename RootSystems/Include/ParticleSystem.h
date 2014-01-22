@@ -13,6 +13,7 @@ namespace RootForce
 		Render::ParticleSystemInterface* m_system;
 		Render::Material* m_material;
 		std::map<Render::Semantic::Semantic, void*> m_params;
+		glm::vec3	m_position;
 		float 		m_lifeTimeMin;
 		float 		m_lifeTimeMax;
 		float 		m_speedMin;

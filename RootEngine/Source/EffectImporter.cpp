@@ -208,6 +208,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::SPAWNTIME, offset);
 						}
+						else if(sem == "TRANSPOSITION")
+						{
+							technique->AddUniformParam(Render::Semantic::TRANSPOSITION, offset);
+						}
 					}
 				}
 

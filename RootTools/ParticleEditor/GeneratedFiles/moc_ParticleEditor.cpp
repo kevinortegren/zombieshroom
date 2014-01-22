@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ParticleEditor_t {
-    QByteArrayData data[43];
-    char stringdata[600];
+    QByteArrayData data[47];
+    char stringdata[686];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -71,7 +71,11 @@ QT_MOC_LITERAL(38, 529, 12),
 QT_MOC_LITERAL(39, 542, 15),
 QT_MOC_LITERAL(40, 558, 20),
 QT_MOC_LITERAL(41, 579, 7),
-QT_MOC_LITERAL(42, 587, 11)
+QT_MOC_LITERAL(42, 587, 11),
+QT_MOC_LITERAL(43, 599, 15),
+QT_MOC_LITERAL(44, 615, 18),
+QT_MOC_LITERAL(45, 634, 23),
+QT_MOC_LITERAL(46, 658, 26)
     },
     "ParticleEditor\0MenuNew\0\0MenuOpen\0"
     "MenuSave\0ManuSaveAs\0MenuExit\0MenuViewStats\0"
@@ -89,7 +93,9 @@ QT_MOC_LITERAL(42, 587, 11)
     "SpeedMaxChanged\0SpreadChanged\0"
     "SpawnTimeChanged\0ColorChanged\0"
     "ColorEndChanged\0TextureDoubleClicked\0"
-    "p_index\0GridToggled\0"
+    "p_index\0GridToggled\0GridSizeChanged\0"
+    "FocusButtonClicked\0colorAlphaSliderChanged\0"
+    "endColorAlphaSliderChanged\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -99,7 +105,7 @@ static const uint qt_meta_data_ParticleEditor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      35,   14, // methods
+      39,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -107,41 +113,45 @@ static const uint qt_meta_data_ParticleEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  189,    2, 0x08,
-       3,    0,  190,    2, 0x08,
-       4,    0,  191,    2, 0x08,
-       5,    0,  192,    2, 0x08,
-       6,    0,  193,    2, 0x08,
-       7,    0,  194,    2, 0x08,
-       8,    0,  195,    2, 0x08,
-       9,    0,  196,    2, 0x08,
-      10,    0,  197,    2, 0x08,
-      11,    0,  198,    2, 0x08,
-      12,    0,  199,    2, 0x08,
-      13,    0,  200,    2, 0x08,
-      14,    1,  201,    2, 0x08,
-      16,    1,  204,    2, 0x08,
-      18,    1,  207,    2, 0x08,
-      20,    1,  210,    2, 0x08,
-      22,    1,  213,    2, 0x08,
-      24,    1,  216,    2, 0x08,
-      25,    1,  219,    2, 0x08,
-      26,    1,  222,    2, 0x08,
-      27,    1,  225,    2, 0x08,
-      28,    1,  228,    2, 0x08,
-      29,    1,  231,    2, 0x08,
-      30,    1,  234,    2, 0x08,
-      31,    1,  237,    2, 0x08,
-      32,    1,  240,    2, 0x08,
-      33,    1,  243,    2, 0x08,
-      34,    1,  246,    2, 0x08,
-      35,    1,  249,    2, 0x08,
-      36,    1,  252,    2, 0x08,
-      37,    1,  255,    2, 0x08,
-      38,    1,  258,    2, 0x08,
-      39,    1,  261,    2, 0x08,
-      40,    1,  264,    2, 0x08,
-      42,    0,  267,    2, 0x08,
+       1,    0,  209,    2, 0x08,
+       3,    0,  210,    2, 0x08,
+       4,    0,  211,    2, 0x08,
+       5,    0,  212,    2, 0x08,
+       6,    0,  213,    2, 0x08,
+       7,    0,  214,    2, 0x08,
+       8,    0,  215,    2, 0x08,
+       9,    0,  216,    2, 0x08,
+      10,    0,  217,    2, 0x08,
+      11,    0,  218,    2, 0x08,
+      12,    0,  219,    2, 0x08,
+      13,    0,  220,    2, 0x08,
+      14,    1,  221,    2, 0x08,
+      16,    1,  224,    2, 0x08,
+      18,    1,  227,    2, 0x08,
+      20,    1,  230,    2, 0x08,
+      22,    1,  233,    2, 0x08,
+      24,    1,  236,    2, 0x08,
+      25,    1,  239,    2, 0x08,
+      26,    1,  242,    2, 0x08,
+      27,    1,  245,    2, 0x08,
+      28,    1,  248,    2, 0x08,
+      29,    1,  251,    2, 0x08,
+      30,    1,  254,    2, 0x08,
+      31,    1,  257,    2, 0x08,
+      32,    1,  260,    2, 0x08,
+      33,    1,  263,    2, 0x08,
+      34,    1,  266,    2, 0x08,
+      35,    1,  269,    2, 0x08,
+      36,    1,  272,    2, 0x08,
+      37,    1,  275,    2, 0x08,
+      38,    1,  278,    2, 0x08,
+      39,    1,  281,    2, 0x08,
+      40,    1,  284,    2, 0x08,
+      42,    0,  287,    2, 0x08,
+      43,    1,  288,    2, 0x08,
+      44,    0,  291,    2, 0x08,
+      45,    1,  292,    2, 0x08,
+      46,    1,  295,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -179,6 +189,10 @@ static const uint qt_meta_data_ParticleEditor[] = {
     QMetaType::Void, QMetaType::QColor,   23,
     QMetaType::Void, QMetaType::QModelIndex,   41,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,   23,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   23,
+    QMetaType::Void, QMetaType::Int,   23,
 
        0        // eod
 };
@@ -223,6 +237,10 @@ void ParticleEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 32: _t->ColorEndChanged((*reinterpret_cast< const QColor(*)>(_a[1]))); break;
         case 33: _t->TextureDoubleClicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
         case 34: _t->GridToggled(); break;
+        case 35: _t->GridSizeChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 36: _t->FocusButtonClicked(); break;
+        case 37: _t->colorAlphaSliderChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 38: _t->endColorAlphaSliderChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -253,13 +271,13 @@ int ParticleEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 35)
+        if (_id < 39)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 35;
+        _id -= 39;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 35)
+        if (_id < 39)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 35;
+        _id -= 39;
     }
     return _id;
 }

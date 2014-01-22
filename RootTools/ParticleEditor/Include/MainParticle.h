@@ -38,7 +38,7 @@ private:
 	RootForce::CameraSystem*				m_cameraSystem;
 	RootForce::LookAtSystem*				m_lookAtSystem;
 	RootForce::ThirdPersonBehaviorSystem*	m_thirdPersonBehaviorSystem;
-
+	ParticleEditor*							m_particleEditorQt;
 	ECS::Entity* m_aimingDevice;
 };
 

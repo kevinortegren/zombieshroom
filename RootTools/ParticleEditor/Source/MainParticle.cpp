@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 
 MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt )
 {
+	m_particleEditorQt = p_particleEditorQt;
 	m_workingDirectory = p_workingDirectory;
 	g_world = &m_world;
 
@@ -153,13 +154,13 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
 	m_world.GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
 	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
-	aimingDeviceTransform->m_scale = glm::vec3(0.05f);
+	aimingDeviceTransform->m_scale = glm::vec3(0.01f);
 	RootForce::Renderable* aimingRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_aimingDevice);
 	aimingRenderable->m_material = g_engineContext.m_resourceManager->GetMaterial("AimingDeviceRenderable");
 	aimingRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
 	aimingRenderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
-	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0,1,0,1));
+	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Add camera entity.	
 	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
@@ -184,6 +185,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	p_particleEditorQt->SetContext(&g_engineContext);
 	p_particleEditorQt->SetWorld(&m_world);
 	p_particleEditorQt->SetWorkingDirectory(m_workingDirectory);
+	p_particleEditorQt->SetAimingDevice(m_aimingDevice);
 	p_particleEditorQt->Init();
 	p_particleEditorQt->ConnectSignalsAndSlots();
 }
@@ -243,8 +245,9 @@ void MainParticle::UpdateAimingDevice()
 		}
 		else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::MIDDLE) == RootEngine::InputManager::KeyState::DOWN)
 		{
-			trans->m_position += cameraTrans->m_orientation.GetUp() * -(float)m_deltaMouseMovement.y * 0.02f;
-			trans->m_position += cameraTrans->m_orientation.GetRight() * (float)m_deltaMouseMovement.x * 0.02f;
+			trans->m_position += cameraTrans->m_orientation.GetUp() * -(float)m_deltaMouseMovement.y * 0.005f;
+			trans->m_position += cameraTrans->m_orientation.GetRight() * (float)m_deltaMouseMovement.x * 0.005f;
+			m_particleEditorQt->SetLookAtSpinBox(trans->m_position);
 		}
 		else if (g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::RIGHT) == RootEngine::InputManager::KeyState::DOWN)
 		{

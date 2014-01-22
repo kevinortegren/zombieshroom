@@ -14,12 +14,14 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
@@ -27,6 +29,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -101,6 +104,7 @@ public:
     QDoubleSpinBox *lifeTimeMinSpinBox;
     QDoubleSpinBox *speedMaxSpinBox;
     QDoubleSpinBox *lifeTimeMaxSpinBox;
+    QPushButton *focusButton;
     QWidget *tab_2;
     QWidget *gridLayoutWidget_2;
     QGridLayout *gridLayout_2;
@@ -122,6 +126,32 @@ public:
     QMenu *menuHelp;
     QMenu *menuView;
     QStatusBar *statusBar;
+    QDockWidget *dockWidget;
+    QWidget *dockWidgetContents;
+    QLCDNumber *FPSlcdNumber;
+    QLabel *label_4;
+    QDoubleSpinBox *lookAtSpinBoxY;
+    QDoubleSpinBox *lookAtSpinBoxX;
+    QDoubleSpinBox *lookAtSpinBoxZ;
+    QLabel *label_18;
+    QDockWidget *colorDockWidget;
+    QWidget *dockWidgetContents_3;
+    QSlider *colorAlphaSlider;
+    QDoubleSpinBox *colorSpinBoxR;
+    QDoubleSpinBox *colorSpinBoxG;
+    QDoubleSpinBox *colorSpinBoxB;
+    QDoubleSpinBox *colorSpinBoxA;
+    QDockWidget *endcolorDockWidget;
+    QWidget *dockWidgetContents_4;
+    QSlider *endcolorAlphaSlider;
+    QDoubleSpinBox *endcolorSpinBoxG;
+    QDoubleSpinBox *endcolorSpinBoxB;
+    QDoubleSpinBox *endcolorSpinBoxR;
+    QDoubleSpinBox *endcolorSpinBoxA;
+    QDockWidget *gridDockWidget;
+    QWidget *dockWidgetContents_5;
+    QDoubleSpinBox *gridSpaceSpinBox;
+    QLabel *label_5;
 
     void setupUi(QMainWindow *ParticleEditorClass)
     {
@@ -194,7 +224,7 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(1218, 126, 517, 803));
+        tabWidget->setGeometry(QRect(1008, 124, 517, 803));
         QFont font;
         font.setPointSize(16);
         tabWidget->setFont(font);
@@ -207,7 +237,7 @@ public:
         tabProperties->setObjectName(QStringLiteral("tabProperties"));
         groupBox_3 = new QGroupBox(tabProperties);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(2, 0, 507, 687));
+        groupBox_3->setGeometry(QRect(2, 0, 507, 761));
         QFont font1;
         font1.setPointSize(10);
         groupBox_3->setFont(font1);
@@ -216,7 +246,7 @@ public:
         groupBox_5->setGeometry(QRect(5, 328, 497, 353));
         stackedWidget = new QStackedWidget(groupBox_5);
         stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
-        stackedWidget->setGeometry(QRect(2, 74, 489, 275));
+        stackedWidget->setGeometry(QRect(2, 74, 489, 355));
         page = new QWidget();
         page->setObjectName(QStringLiteral("page"));
         label_15 = new QLabel(page);
@@ -466,6 +496,11 @@ public:
 
         gridLayout->addWidget(lifeTimeMaxSpinBox, 13, 6, 1, 1);
 
+        focusButton = new QPushButton(gridLayoutWidget);
+        focusButton->setObjectName(QStringLiteral("focusButton"));
+
+        gridLayout->addWidget(focusButton, 0, 7, 1, 1);
+
         tabWidget->addTab(tabProperties, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
@@ -496,19 +531,19 @@ public:
         tabWidget->addTab(tab_2, QString());
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(1458, -2, 277, 157));
+        groupBox->setGeometry(QRect(1248, 0, 277, 119));
         groupBox->setFont(font1);
         listWidget = new QListWidget(groupBox);
         listWidget->setObjectName(QStringLiteral("listWidget"));
-        listWidget->setGeometry(QRect(12, 16, 253, 135));
+        listWidget->setGeometry(QRect(12, 16, 253, 97));
         frame = new QFrame(centralWidget);
         frame->setObjectName(QStringLiteral("frame"));
-        frame->setGeometry(QRect(2, 28, 1209, 899));
+        frame->setGeometry(QRect(2, 28, 999, 899));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         groupBox_6 = new QGroupBox(centralWidget);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(1214, 4, 239, 117));
+        groupBox_6->setGeometry(QRect(1004, 2, 239, 117));
         formLayoutWidget = new QWidget(groupBox_6);
         formLayoutWidget->setObjectName(QStringLiteral("formLayoutWidget"));
         formLayoutWidget->setGeometry(QRect(6, 14, 227, 99));
@@ -577,6 +612,186 @@ public:
         statusBar->setObjectName(QStringLiteral("statusBar"));
         statusBar->setSizeGripEnabled(false);
         ParticleEditorClass->setStatusBar(statusBar);
+        dockWidget = new QDockWidget(ParticleEditorClass);
+        dockWidget->setObjectName(QStringLiteral("dockWidget"));
+        dockWidget->setMinimumSize(QSize(200, 150));
+        dockWidget->setMaximumSize(QSize(200, 150));
+        dockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        dockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
+        FPSlcdNumber = new QLCDNumber(dockWidgetContents);
+        FPSlcdNumber->setObjectName(QStringLiteral("FPSlcdNumber"));
+        FPSlcdNumber->setGeometry(QRect(56, 2, 139, 37));
+        label_4 = new QLabel(dockWidgetContents);
+        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setGeometry(QRect(10, 0, 59, 39));
+        QFont font2;
+        font2.setPointSize(15);
+        label_4->setFont(font2);
+        lookAtSpinBoxY = new QDoubleSpinBox(dockWidgetContents);
+        lookAtSpinBoxY->setObjectName(QStringLiteral("lookAtSpinBoxY"));
+        lookAtSpinBoxY->setGeometry(QRect(102, 58, 47, 22));
+        lookAtSpinBoxY->setReadOnly(true);
+        lookAtSpinBoxY->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        lookAtSpinBoxY->setDecimals(3);
+        lookAtSpinBoxY->setMinimum(-1024);
+        lookAtSpinBoxY->setMaximum(1024);
+        lookAtSpinBoxX = new QDoubleSpinBox(dockWidgetContents);
+        lookAtSpinBoxX->setObjectName(QStringLiteral("lookAtSpinBoxX"));
+        lookAtSpinBoxX->setGeometry(QRect(56, 58, 47, 22));
+        lookAtSpinBoxX->setWrapping(false);
+        lookAtSpinBoxX->setFrame(true);
+        lookAtSpinBoxX->setReadOnly(true);
+        lookAtSpinBoxX->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        lookAtSpinBoxX->setKeyboardTracking(true);
+        lookAtSpinBoxX->setDecimals(3);
+        lookAtSpinBoxX->setMinimum(-1024);
+        lookAtSpinBoxX->setValue(0);
+        lookAtSpinBoxZ = new QDoubleSpinBox(dockWidgetContents);
+        lookAtSpinBoxZ->setObjectName(QStringLiteral("lookAtSpinBoxZ"));
+        lookAtSpinBoxZ->setGeometry(QRect(148, 58, 47, 22));
+        lookAtSpinBoxZ->setReadOnly(true);
+        lookAtSpinBoxZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        lookAtSpinBoxZ->setDecimals(3);
+        lookAtSpinBoxZ->setMinimum(-1024);
+        lookAtSpinBoxZ->setMaximum(1024);
+        label_18 = new QLabel(dockWidgetContents);
+        label_18->setObjectName(QStringLiteral("label_18"));
+        label_18->setGeometry(QRect(4, 52, 63, 31));
+        QFont font3;
+        font3.setPointSize(11);
+        label_18->setFont(font3);
+        dockWidget->setWidget(dockWidgetContents);
+        ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
+        colorDockWidget = new QDockWidget(ParticleEditorClass);
+        colorDockWidget->setObjectName(QStringLiteral("colorDockWidget"));
+        colorDockWidget->setMinimumSize(QSize(200, 280));
+        colorDockWidget->setMaximumSize(QSize(200, 280));
+        colorDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        colorDockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
+        dockWidgetContents_3 = new QWidget();
+        dockWidgetContents_3->setObjectName(QStringLiteral("dockWidgetContents_3"));
+        colorAlphaSlider = new QSlider(dockWidgetContents_3);
+        colorAlphaSlider->setObjectName(QStringLiteral("colorAlphaSlider"));
+        colorAlphaSlider->setGeometry(QRect(8, 232, 185, 22));
+        colorAlphaSlider->setMaximum(255);
+        colorAlphaSlider->setTracking(true);
+        colorAlphaSlider->setOrientation(Qt::Horizontal);
+        colorAlphaSlider->setInvertedAppearance(false);
+        colorAlphaSlider->setInvertedControls(false);
+        colorAlphaSlider->setTickPosition(QSlider::NoTicks);
+        colorSpinBoxR = new QDoubleSpinBox(dockWidgetContents_3);
+        colorSpinBoxR->setObjectName(QStringLiteral("colorSpinBoxR"));
+        colorSpinBoxR->setGeometry(QRect(8, 208, 47, 22));
+        colorSpinBoxR->setWrapping(false);
+        colorSpinBoxR->setFrame(true);
+        colorSpinBoxR->setReadOnly(true);
+        colorSpinBoxR->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        colorSpinBoxR->setKeyboardTracking(true);
+        colorSpinBoxR->setDecimals(3);
+        colorSpinBoxR->setMinimum(0);
+        colorSpinBoxR->setMaximum(1);
+        colorSpinBoxR->setValue(0);
+        colorSpinBoxG = new QDoubleSpinBox(dockWidgetContents_3);
+        colorSpinBoxG->setObjectName(QStringLiteral("colorSpinBoxG"));
+        colorSpinBoxG->setGeometry(QRect(54, 208, 47, 22));
+        colorSpinBoxG->setReadOnly(true);
+        colorSpinBoxG->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        colorSpinBoxG->setDecimals(3);
+        colorSpinBoxG->setMinimum(0);
+        colorSpinBoxG->setMaximum(1);
+        colorSpinBoxB = new QDoubleSpinBox(dockWidgetContents_3);
+        colorSpinBoxB->setObjectName(QStringLiteral("colorSpinBoxB"));
+        colorSpinBoxB->setGeometry(QRect(100, 208, 47, 22));
+        colorSpinBoxB->setReadOnly(true);
+        colorSpinBoxB->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        colorSpinBoxB->setDecimals(3);
+        colorSpinBoxB->setMinimum(0);
+        colorSpinBoxB->setMaximum(1);
+        colorSpinBoxA = new QDoubleSpinBox(dockWidgetContents_3);
+        colorSpinBoxA->setObjectName(QStringLiteral("colorSpinBoxA"));
+        colorSpinBoxA->setGeometry(QRect(146, 208, 47, 22));
+        colorSpinBoxA->setReadOnly(true);
+        colorSpinBoxA->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        colorSpinBoxA->setDecimals(3);
+        colorSpinBoxA->setMinimum(0);
+        colorSpinBoxA->setMaximum(1);
+        colorDockWidget->setWidget(dockWidgetContents_3);
+        ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), colorDockWidget);
+        endcolorDockWidget = new QDockWidget(ParticleEditorClass);
+        endcolorDockWidget->setObjectName(QStringLiteral("endcolorDockWidget"));
+        endcolorDockWidget->setMinimumSize(QSize(200, 280));
+        endcolorDockWidget->setMaximumSize(QSize(200, 280));
+        endcolorDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        endcolorDockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
+        dockWidgetContents_4 = new QWidget();
+        dockWidgetContents_4->setObjectName(QStringLiteral("dockWidgetContents_4"));
+        endcolorAlphaSlider = new QSlider(dockWidgetContents_4);
+        endcolorAlphaSlider->setObjectName(QStringLiteral("endcolorAlphaSlider"));
+        endcolorAlphaSlider->setGeometry(QRect(6, 232, 185, 22));
+        endcolorAlphaSlider->setMaximum(255);
+        endcolorAlphaSlider->setTracking(true);
+        endcolorAlphaSlider->setOrientation(Qt::Horizontal);
+        endcolorAlphaSlider->setInvertedAppearance(false);
+        endcolorAlphaSlider->setInvertedControls(false);
+        endcolorAlphaSlider->setTickPosition(QSlider::NoTicks);
+        endcolorSpinBoxG = new QDoubleSpinBox(dockWidgetContents_4);
+        endcolorSpinBoxG->setObjectName(QStringLiteral("endcolorSpinBoxG"));
+        endcolorSpinBoxG->setGeometry(QRect(54, 208, 47, 22));
+        endcolorSpinBoxG->setReadOnly(true);
+        endcolorSpinBoxG->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        endcolorSpinBoxG->setDecimals(3);
+        endcolorSpinBoxG->setMinimum(0);
+        endcolorSpinBoxG->setMaximum(1);
+        endcolorSpinBoxB = new QDoubleSpinBox(dockWidgetContents_4);
+        endcolorSpinBoxB->setObjectName(QStringLiteral("endcolorSpinBoxB"));
+        endcolorSpinBoxB->setGeometry(QRect(100, 208, 47, 22));
+        endcolorSpinBoxB->setReadOnly(true);
+        endcolorSpinBoxB->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        endcolorSpinBoxB->setDecimals(3);
+        endcolorSpinBoxB->setMinimum(0);
+        endcolorSpinBoxB->setMaximum(1);
+        endcolorSpinBoxR = new QDoubleSpinBox(dockWidgetContents_4);
+        endcolorSpinBoxR->setObjectName(QStringLiteral("endcolorSpinBoxR"));
+        endcolorSpinBoxR->setGeometry(QRect(8, 208, 47, 22));
+        endcolorSpinBoxR->setWrapping(false);
+        endcolorSpinBoxR->setFrame(true);
+        endcolorSpinBoxR->setReadOnly(true);
+        endcolorSpinBoxR->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        endcolorSpinBoxR->setKeyboardTracking(true);
+        endcolorSpinBoxR->setDecimals(3);
+        endcolorSpinBoxR->setMinimum(0);
+        endcolorSpinBoxR->setMaximum(1);
+        endcolorSpinBoxR->setValue(0);
+        endcolorSpinBoxA = new QDoubleSpinBox(dockWidgetContents_4);
+        endcolorSpinBoxA->setObjectName(QStringLiteral("endcolorSpinBoxA"));
+        endcolorSpinBoxA->setGeometry(QRect(146, 208, 47, 22));
+        endcolorSpinBoxA->setReadOnly(true);
+        endcolorSpinBoxA->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        endcolorSpinBoxA->setDecimals(3);
+        endcolorSpinBoxA->setMinimum(0);
+        endcolorSpinBoxA->setMaximum(1);
+        endcolorDockWidget->setWidget(dockWidgetContents_4);
+        ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), endcolorDockWidget);
+        gridDockWidget = new QDockWidget(ParticleEditorClass);
+        gridDockWidget->setObjectName(QStringLiteral("gridDockWidget"));
+        gridDockWidget->setMinimumSize(QSize(200, 38));
+        gridDockWidget->setMaximumSize(QSize(200, 100));
+        gridDockWidget->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+        gridDockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
+        dockWidgetContents_5 = new QWidget();
+        dockWidgetContents_5->setObjectName(QStringLiteral("dockWidgetContents_5"));
+        gridSpaceSpinBox = new QDoubleSpinBox(dockWidgetContents_5);
+        gridSpaceSpinBox->setObjectName(QStringLiteral("gridSpaceSpinBox"));
+        gridSpaceSpinBox->setGeometry(QRect(93, 24, 77, 22));
+        gridSpaceSpinBox->setSingleStep(0.25);
+        gridSpaceSpinBox->setValue(0.5);
+        label_5 = new QLabel(dockWidgetContents_5);
+        label_5->setObjectName(QStringLiteral("label_5"));
+        label_5->setGeometry(QRect(18, 26, 59, 16));
+        gridDockWidget->setWidget(dockWidgetContents_5);
+        ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), gridDockWidget);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuView->menuAction());
@@ -651,6 +866,7 @@ public:
         label_3->setText(QApplication::translate("ParticleEditorClass", "SizeEnd:", 0));
         label_6->setText(QApplication::translate("ParticleEditorClass", "Gravity:", 0));
         label_13->setText(QApplication::translate("ParticleEditorClass", "Spread:", 0));
+        focusButton->setText(QApplication::translate("ParticleEditorClass", "Look At", 0));
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Resources", 0));
@@ -664,6 +880,16 @@ public:
         menuFile->setTitle(QApplication::translate("ParticleEditorClass", "File", 0));
         menuHelp->setTitle(QApplication::translate("ParticleEditorClass", "Help", 0));
         menuView->setTitle(QApplication::translate("ParticleEditorClass", "View", 0));
+        dockWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Status", 0));
+        label_4->setText(QApplication::translate("ParticleEditorClass", "FPS:", 0));
+        label_18->setText(QApplication::translate("ParticleEditorClass", "LookAt:", 0));
+        colorDockWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Start Color", 0));
+        endcolorDockWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "End Color", 0));
+#ifndef QT_NO_ACCESSIBILITY
+        gridDockWidget->setAccessibleName(QString());
+#endif // QT_NO_ACCESSIBILITY
+        gridDockWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Grid Settings", 0));
+        label_5->setText(QApplication::translate("ParticleEditorClass", "Grid space:", 0));
     } // retranslateUi
 
 };

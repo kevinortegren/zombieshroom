@@ -8,10 +8,10 @@ ParticleEditor::ParticleEditor(QWidget *parent)
 
 ParticleEditor::~ParticleEditor()
 {
-	delete m_statWidget;
 	delete m_particleTab;
 	delete m_colorTriangle;
 	delete m_colorEndTriangle;
+	delete m_particleImporter;
 }
 
 void ParticleEditor::ConnectSignalsAndSlots()
@@ -51,17 +51,17 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(m_colorEndTriangle,		SIGNAL(colorChanged(const QColor&)),		this, SLOT(ColorEndChanged(const QColor&)));
 	connect(ui.actionColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorTriangle()));
 	connect(ui.actionEndColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorEndTriangle()));
+	connect(ui.gridSpaceSpinBox,	SIGNAL(valueChanged(double)),				this, SLOT(GridSizeChanged(double)));
+	connect(ui.focusButton,			SIGNAL(clicked()),							this, SLOT(FocusButtonClicked()));
+	connect(ui.colorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(colorAlphaSliderChanged(int)));
+	connect(ui.endcolorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(endColorAlphaSliderChanged(int)));
 }
 
 void ParticleEditor::Init()
 {
-	//Create a status widget window for displaying FPS and other things
-	m_statWidget = new StatWidget();
-	m_statWidget->hide();
-
 	//Create the tab bar on top of the 3D view, each tab is a Entity with a transform and a particle emitter component
 	m_particleTab = new ParticleTab(this);
-	m_particleTab->setGeometry(QRect(0, ui.menuBar->height(), 1209, 27));
+	m_particleTab->setGeometry(QRect(0, ui.menuBar->height(), 999, 27));
 	m_particleTab->show();
 
 	ui.menuView->setEnabled(true);
@@ -72,6 +72,9 @@ void ParticleEditor::Init()
 	m_selectedEmitterIndex	= -1;
 	m_selectedEntityIndex	= -1;
 	m_materialIndex			= 0;
+	m_gridSpace				= 0.5f;
+	m_samples				= 0;
+	m_collectedTime			= 0.0f;
 
 	m_fileSystemModel = new QFileSystemModel;
 	m_fileSystemModel->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Textures/"));
@@ -85,13 +88,19 @@ void ParticleEditor::Init()
 	ui.textureTreeView->hideColumn(2);
 	ui.textureTreeView->setRootIndex(m_fileSystemModel->index(QString::fromStdString(m_workingDirectory + "Assets/Textures/")));
 	
-	m_colorTriangle = new QtColorTriangle();
+	m_colorTriangle = new QtColorTriangle(ui.colorDockWidget);
 	m_colorTriangle->show();
-	m_colorTriangle->setGeometry(100.0f, 100.0f, 200.0f, 200.0f);
+	m_colorTriangle->setGeometry(0, 20, 200.0f, 180.0f);
 
-	m_colorEndTriangle = new QtColorTriangle();
+	m_colorEndTriangle = new QtColorTriangle(ui.endcolorDockWidget);
 	m_colorEndTriangle->show();
-	m_colorEndTriangle->setGeometry(400.0f, 400, 200.0f, 200.0f);
+	m_colorEndTriangle->setGeometry(0, 20, 200.0f, 180.0f);
+
+	ui.endcolorDockWidget->hide();
+	ui.colorDockWidget->hide();
+
+	m_particleImporter = new ParticleImporter();
+	m_particleImporter->SetGameSharedContext(m_context);
 }
 
 bool ParticleEditor::CheckExit()
@@ -120,9 +129,18 @@ void ParticleEditor::closeEvent( QCloseEvent *event )
 
 void ParticleEditor::Update( float p_dt )
 {
-	m_statWidget->Update(p_dt);
+	m_samples++;
+	m_collectedTime += p_dt;
+	if(m_collectedTime >= 0.5f)
+	{
+		int fps = (int)(1.0f/(m_collectedTime/(float)m_samples));
+		ui.FPSlcdNumber->display(fps);
+		m_samples = 0;
+		m_collectedTime = 0;
+	}
+
 	if(m_showGrid)
-		DrawGridX(2);
+		DrawGridX(m_gridSpace, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 }
 
 void ParticleEditor::MenuExit()
@@ -153,15 +171,55 @@ void ParticleEditor::MenuNew()
 	//Show property pages if the first is created
 	if(m_selectedEntityIndex == -1)
 	{
-		ui.tabWidget->setEnabled(true);
-		ui.tabWidget->show();
 		m_selectedEntityIndex = 0; 
 	}
 }
 
 void ParticleEditor::MenuOpen()
 {
+	//Enable the New Emitter button 
+	ui.newEmitterButton->setEnabled(true);
 
+	//Create the Entity with transform and particle components
+	ECS::Entity* p = m_world->GetEntityManager()->CreateEntity();
+	RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+	t->m_position = glm::vec3(0,0,0);
+	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);
+
+	//Push back this Entity in the local entity vector
+	m_emitterEntities.push_back(p);
+
+	//Show property pages if the first is created
+	if(m_selectedEntityIndex == -1)
+	{
+		m_selectedEntityIndex = 0; 
+	}
+
+	QString fullFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("PARTICLE-file (*.particle)"));
+
+	m_particleImporter->LoadParticleEmitter(fullFileName.toStdString(), e, t);
+
+	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
+	{
+		//Add an item representing the emitter to the emitter list with the specified name
+		QListWidgetItem* tempItem = new QListWidgetItem("System" + QString::number(i));
+		ui.listWidget->addItem(tempItem);
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter created: %s", ui.nameEmitterLineEdit->text().toStdString().c_str());
+
+		//Enable Delete and rename buttons
+		if(m_selectedEmitterIndex == -1)
+		{
+			ui.deleteEmitterButton->setEnabled(true);
+			ui.renameEmitterButton->setEnabled(true);
+			ui.tabWidget->setEnabled(true);
+			ui.tabWidget->show();
+			ui.colorDockWidget->show();
+			ui.endcolorDockWidget->show();
+			EmitterSelected(tempItem);
+			ui.listWidget->setCurrentItem(tempItem);
+		}
+	}
+	
 }
 
 void ParticleEditor::MenuSave()
@@ -171,12 +229,52 @@ void ParticleEditor::MenuSave()
 
 void ParticleEditor::ManuSaveAs()
 {
+	ECS::Entity* entity = m_emitterEntities.at(0);
+	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 
+	QString fullFileName = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("PARTICLE-file (*.particle)"));
+	QFile file(fullFileName);
+	YAML::Emitter emitter;
+
+	emitter << YAML::BeginSeq;
+
+	for(auto itr = e->m_particleSystems.begin(); itr != e->m_particleSystems.end(); ++itr)
+	{
+		// Export Particle systems
+		emitter << YAML::BeginMap;
+		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_position.x << (*itr).m_position.y << (*itr).m_position.z << YAML::EndSeq; 
+		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr).m_lifeTimeMin;
+		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr).m_lifeTimeMax;
+		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr).m_speedMin;
+		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr).m_speedMax;
+		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMin.x << (*itr).m_sizeMin.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMax.x << (*itr).m_sizeMax.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeEnd.x << (*itr).m_sizeEnd.y << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_color.r << (*itr).m_color.g << (*itr).m_color.b << (*itr).m_color.a << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_colorEnd.r << (*itr).m_colorEnd.g << (*itr).m_colorEnd.b << (*itr).m_colorEnd.a << YAML::EndSeq; 
+		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_gravity.x << (*itr).m_gravity.y << (*itr).m_gravity.z << YAML::EndSeq; 
+		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_direction.x << (*itr).m_direction.y << (*itr).m_direction.z << YAML::EndSeq; 
+		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr).m_spread;
+		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr).m_spawnTime;
+		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_diffuseMap);
+		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr).m_material->m_effect);
+		emitter << YAML::EndMap;
+	}
+	
+	emitter << YAML::EndSeq;
+
+	//Write exported yaml to file
+	if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream out(&file);
+		out << emitter.c_str();
+		file.close();
+	}
 }
 
 void ParticleEditor::MenuViewStats()
 {
-	m_statWidget->show();
+	ui.dockWidget->show();
 }
 
 void ParticleEditor::MenuHelpAbout()
@@ -195,8 +293,8 @@ void ParticleEditor::NewEmitter()
 
 	//Get current particle entity and get its components
 	ECS::Entity* entity = m_emitterEntities.at(0);
-	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
-	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
+	RootForce::Transform* t			= m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+	RootForce::ParticleEmitter* e	= m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 
 	//Create a new particle emitter and push it to the component
 	RootForce::ParticleSystemStruct particleSystem;
@@ -207,6 +305,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_material = m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_position = glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin = 2.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax = 2.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin = 0.1f;
@@ -222,7 +321,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.05f;
 
 	//Map data to params list for buffering
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &t->m_position;
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_position;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPEEDMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin;
@@ -236,6 +335,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::DIRECTION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_direction;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPREAD]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spread;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPAWNTIME]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime;
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::TRANSPOSITION]	= &t->m_position;
 
 	//Add an item representing the emitter to the emitter list with the specified name
 	QListWidgetItem* tempItem = new QListWidgetItem(ui.nameEmitterLineEdit->text());
@@ -247,7 +347,12 @@ void ParticleEditor::NewEmitter()
 	{
 		ui.deleteEmitterButton->setEnabled(true);
 		ui.renameEmitterButton->setEnabled(true);
+		ui.tabWidget->setEnabled(true);
+		ui.tabWidget->show();
+		ui.colorDockWidget->show();
+		ui.endcolorDockWidget->show();
 		EmitterSelected(tempItem);
+		ui.listWidget->setCurrentItem(tempItem);
 	}
 
 	//Empty the name field
@@ -280,6 +385,10 @@ void ParticleEditor::DeleteEmitter()
 	{
 		ui.deleteEmitterButton->setEnabled(false);
 		ui.renameEmitterButton->setEnabled(false);
+		ui.tabWidget->setEnabled(false);
+		ui.tabWidget->hide();
+		ui.colorDockWidget->hide();
+		ui.endcolorDockWidget->hide();
 		m_selectedEmitterIndex = -1;
 	}
 	else
@@ -313,13 +422,12 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter selected: %d", m_selectedEmitterIndex);
 
 	ECS::Entity* entity = m_emitterEntities.at(m_selectedEntityIndex);
-	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 	
 	//Position
-	ui.posSpinBoxX->setValue(t->m_position.x);
-	ui.posSpinBoxY->setValue(t->m_position.y);
-	ui.posSpinBoxZ->setValue(t->m_position.z);
+	ui.posSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.x);
+	ui.posSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.y);
+	ui.posSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.z);
 	//Lifetime
 	ui.lifeTimeMinSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMin);
 	ui.lifeTimeMaxSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMax);
@@ -331,13 +439,25 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	ui.sizeMaxSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.x);
 	ui.sizeEndSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.x);
 	
-	//Color
-	QColor col(pe->m_particleSystems[m_selectedEmitterIndex].m_color.r*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_color.g*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_color.b*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_color.a*255.0f);
-	m_colorTriangle->setColor(col);
-	
-	QColor colEnd(pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b*255.0f, pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a*255.0f);
-	m_colorEndTriangle->setColor(colEnd);
+	//Start color
+	float red	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.r*255.0f;
+	float green = pe->m_particleSystems[m_selectedEmitterIndex].m_color.g*255.0f;
+	float blue	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.b*255.0f;
+	float alpha	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.a*255.0f;
 
+	QColor col(red, green, blue, alpha);
+	m_colorTriangle->setColor(col);
+	ui.colorAlphaSlider->setValue(alpha);
+
+	//End color
+	red		= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r*255.0f;
+	green	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g*255.0f;
+	blue	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b*255.0f;
+	alpha	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a*255.0f;
+
+	QColor colEnd(red, green, blue, alpha);
+	m_colorEndTriangle->setColor(colEnd);
+	ui.endcolorAlphaSlider->setValue(alpha);
 	//Gravity
 	ui.gravitySpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.x);
 	ui.gravitySpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.y);
@@ -354,20 +474,20 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 
 void ParticleEditor::PositionXChanged( double p_x )
 {
-	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEntityIndex));
-	t->m_position.x = (float)p_x;
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex].m_position.x = (float)p_x;
 }
 
 void ParticleEditor::PositionYChanged( double p_y )
 {
-	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEntityIndex));
-	t->m_position.y = (float)p_y;
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex].m_position.y = (float)p_y;
 }
 
 void ParticleEditor::PositionZChanged( double p_z )
 {
-	RootForce::Transform* t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_emitterEntities.at(m_selectedEntityIndex));
-	t->m_position.z = (float)p_z;
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex].m_position.z = (float)p_z;
 }
 
 void ParticleEditor::SizeMinXChanged( double p_val )
@@ -467,60 +587,77 @@ void ParticleEditor::SpawnTimeChanged( double p_val )
 void ParticleEditor::ColorChanged( const QColor& p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.r = (float)p_val.red()/255.0f;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.g = (float)p_val.green()/255.0f;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.b = (float)p_val.blue()/255.0f;
+
+	float red	= (float)p_val.red()/255.0f;
+	float green = (float)p_val.green()/255.0f;
+	float blue	= (float)p_val.blue()/255.0f;
+	//Set particle data
+	pe->m_particleSystems[m_selectedEmitterIndex].m_color.r = red;
+	pe->m_particleSystems[m_selectedEmitterIndex].m_color.g = green;
+	pe->m_particleSystems[m_selectedEmitterIndex].m_color.b = blue;
+	//Set UI
+	ui.colorSpinBoxR->setValue(red);
+	ui.colorSpinBoxG->setValue(green);
+	ui.colorSpinBoxB->setValue(blue);
 }
 
 void ParticleEditor::ColorEndChanged( const QColor& p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r = (float)p_val.red()/255.0f;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g = (float)p_val.green()/255.0f;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b = (float)p_val.blue()/255.0f;
+
+	float red	= (float)p_val.red()/255.0f;
+	float green = (float)p_val.green()/255.0f;
+	float blue	= (float)p_val.blue()/255.0f;
+	//Set particle data
+	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r = red;
+	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g = green;
+	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b = blue;
+	//Set UI
+	ui.endcolorSpinBoxR->setValue(red);
+	ui.endcolorSpinBoxG->setValue(green);
+	ui.endcolorSpinBoxB->setValue(blue);
 }
 
 void ParticleEditor::MenuViewColorTriangle()
 {
-	m_colorTriangle->show();
+	if(m_selectedEmitterIndex != -1)
+		ui.colorDockWidget->show();
 }
 
 void ParticleEditor::MenuViewColorEndTriangle()
 {
-	m_colorEndTriangle->show();
+	if(m_selectedEmitterIndex != -1)
+		ui.endcolorDockWidget->show();
 }
 
-void ParticleEditor::DrawGridX(int p_spacing)
-{//TODO: IMPLEMENT ORIGO LINES IN ANOTHER COLOR
+void ParticleEditor::DrawGridX(float p_spacing, glm::vec4 p_color)
+{
 	for (int i = -5; i < 6; i++)
 	{
-		m_context->m_renderer->AddLine(glm::vec3((float)(-5*p_spacing), 0, (float)(i*p_spacing)), glm::vec3((float)(5*p_spacing), 0, (float)(i*p_spacing)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-		m_context->m_renderer->AddLine(glm::vec3((float)(i*p_spacing), 0, (float)(-5*p_spacing)), glm::vec3((float)(i*p_spacing), 0, (float)(5*p_spacing)), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+		if(i == 0)
+		{
+			m_context->m_renderer->AddLine(glm::vec3((float)(-5*p_spacing), 0, 0), glm::vec3((float)(5*p_spacing), 0, 0), glm::vec4(1.0f));
+			m_context->m_renderer->AddLine(glm::vec3(0, 0, (float)(-5*p_spacing)), glm::vec3(0, 0, (float)(5*p_spacing)), glm::vec4(1.0f));
+		}
+		else
+		{
+			m_context->m_renderer->AddLine(glm::vec3((float)(-5*p_spacing), 0, (float)(i*p_spacing)), glm::vec3((float)(5*p_spacing), 0, (float)(i*p_spacing)), p_color);
+			m_context->m_renderer->AddLine(glm::vec3((float)(i*p_spacing), 0, (float)(-5*p_spacing)), glm::vec3((float)(i*p_spacing), 0, (float)(5*p_spacing)), p_color);
+		}
 	}
-}
-
-void ParticleEditor::DrawGridY( int p_spacing )
-{
-	//TODO: IMPLEMENT 
-}
-
-void ParticleEditor::DrawGridZ( int p_spacing )
-{
-	//TODO: IMPLEMENT 
 }
 
 void ParticleEditor::GridToggled()
 {
-	if(m_showGrid)
-	{
-		m_showGrid = false;
-		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Grid toggled off");
-	}
-	else
-	{
-		m_showGrid = true;
-		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Grid toggled on");
-	}
+	m_showGrid = true;
+	ui.gridDockWidget->show();
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Grid showing");
+}
+
+void ParticleEditor::GridSizeChanged( double p_val )
+{
+	//Change grid spacing
+	m_gridSpace = (float)p_val;
 }
 
 void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
@@ -540,6 +677,32 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+}
+
+void ParticleEditor::FocusButtonClicked()
+{
+	m_aimingDeviceTransform->m_position.x = (float)ui.posSpinBoxX->value();
+	m_aimingDeviceTransform->m_position.y = (float)ui.posSpinBoxY->value();
+	m_aimingDeviceTransform->m_position.z = (float)ui.posSpinBoxZ->value();
+	ui.lookAtSpinBoxX->setValue((float)ui.posSpinBoxX->value());
+	ui.lookAtSpinBoxY->setValue((float)ui.posSpinBoxY->value());
+	ui.lookAtSpinBoxZ->setValue((float)ui.posSpinBoxZ->value());
+}
+
+void ParticleEditor::colorAlphaSliderChanged( int p_val )
+{
+	float alpha = (float)p_val/255.0f;
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	ui.colorSpinBoxA->setValue(alpha);
+	pe->m_particleSystems[m_selectedEmitterIndex].m_color.a = alpha;
+}
+
+void ParticleEditor::endColorAlphaSliderChanged( int p_val )
+{
+	float alpha = (float)p_val/255.0f;
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	ui.endcolorSpinBoxA->setValue(alpha);
+	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a = alpha;
 }
 
 void ParticleEditor::ShowMessageBox( QString p_msg )
@@ -571,5 +734,20 @@ void ParticleEditor::SetWorkingDirectory( std::string p_dir )
 {
 	m_workingDirectory = p_dir;
 }
+
+void ParticleEditor::SetAimingDevice( ECS::Entity* p_aimingDevice )
+{
+	m_aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_aimingDevice);
+}
+
+void ParticleEditor::SetLookAtSpinBox( glm::vec3 p_pos )
+{
+	//update lookat info
+	ui.lookAtSpinBoxX->setValue(p_pos.x);
+	ui.lookAtSpinBoxY->setValue(p_pos.y);
+	ui.lookAtSpinBoxZ->setValue(p_pos.z);
+}
+
+
 
 

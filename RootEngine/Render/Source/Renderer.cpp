@@ -255,6 +255,7 @@ namespace Render
 		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
 		s_sizes[Semantic::SPREAD]		= sizeof(float);
 		s_sizes[Semantic::SPAWNTIME]	= sizeof(float);
+		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)

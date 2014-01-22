@@ -42,8 +42,10 @@
           offset: 80
         - sem: COLOREND
           offset: 96
-        - sem: SPAWNTIME
+        - sem: TRANSPOSITION
           offset: 112
+        - sem: SPAWNTIME
+          offset: 124
       # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
