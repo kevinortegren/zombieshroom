@@ -22,6 +22,5 @@ namespace Render
 		GLuint m_depthHandle;	// 32bit Depth.
 		GLuint m_diffuseHandle; // 24bit Diffuse 8bit Specular;
 		GLuint m_normalsHandle;// 24bit ViewSpaceNormals 8bit Empty.
-		GLuint m_backgroundHandle;
 	};
 }

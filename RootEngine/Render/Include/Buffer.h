@@ -15,7 +15,6 @@ namespace Render
 		virtual size_t GetNumElements() const = 0;
 		virtual size_t GetBufferSize() const = 0;
 		virtual size_t GetElementSize() const  = 0;
-
 	};
 
 	class Buffer : public BufferInterface
