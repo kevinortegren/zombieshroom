@@ -33,7 +33,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        
+		
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -95,12 +95,15 @@ namespace RootForce
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
-		// Initialize render and point light system.
+		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+
+		m_shadowSystem = new RootForce::ShadowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
@@ -299,26 +302,26 @@ namespace RootForce
 		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		//m_animationSystem->Process();
-        {
-            PROFILE("Action system", g_engineContext.m_profiler);
-            m_actionSystem->Process();
-        }
+		{
+			PROFILE("Action system", g_engineContext.m_profiler);
+			m_actionSystem->Process();
+		}
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_respawnSystem->Process();
 		}
 
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
+			g_engineContext.m_physics->Update(p_deltaTime);
+			m_physicsSystem->Process();
+		}
 
-        {
-            PROFILE("Collision system", g_engineContext.m_profiler);
-            m_collisionSystem->Process();
-        }
+		{
+			PROFILE("Collision system", g_engineContext.m_profiler);
+			m_collisionSystem->Process();
+		}
 
 		{
 			PROFILE("StateSystem", g_engineContext.m_profiler);
@@ -335,15 +338,20 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-        
-		{
-            PROFILE("Camera systems", g_engineContext.m_profiler);
-            m_playerControlSystem->UpdateAimingDevice();
-            m_thirdPersonBehaviorSystem->Process();
-            m_lookAtSystem->Process();
-            m_cameraSystem->Process();
-        }
 		
+		{
+			PROFILE("Camera systems", g_engineContext.m_profiler);
+			m_playerControlSystem->UpdateAimingDevice();
+			m_thirdPersonBehaviorSystem->Process();
+			m_lookAtSystem->Process();
+			m_cameraSystem->Process();
+		}
+		
+		{
+			PROFILE("Shadow system", g_engineContext.m_profiler);
+			m_shadowSystem->Process();
+		}
+
 		{ 
 			PROFILE("ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
@@ -356,7 +364,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
-            m_pointLightSystem->Process();
+			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 
 		}
@@ -368,8 +376,8 @@ namespace RootForce
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();
-        
-        g_engineContext.m_profiler->Update(p_deltaTime);
+		
+		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
@@ -378,7 +386,7 @@ namespace RootForce
 			g_engineContext.m_gui->Render(m_hud->GetView());
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
-        
+		
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();

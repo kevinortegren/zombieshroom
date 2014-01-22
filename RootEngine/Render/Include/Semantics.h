@@ -8,7 +8,8 @@ namespace Render
 		{
 			NORMAL,
 			MODEL,
-			BONES
+			BONES,
+			SHADOW
 		};
 	}
 
@@ -18,6 +19,7 @@ namespace Render
 	{
 		s_sizes[Semantic::MODEL] = 64;
 		s_sizes[Semantic::NORMAL] = 64;
-		s_sizes[Semantic::BONES] = 20 * 64;
+		s_sizes[Semantic::BONES] = 1280;
+		s_sizes[Semantic::SHADOW] = 64;
 	}
 }
