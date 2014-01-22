@@ -2,8 +2,12 @@
 
 #include <cstdint>
 #include <map>
-#include <Utility/ECS/Include/Entity.h>
 
+namespace ECS
+{
+	class Entity;
+	class EntityManager;
+}
 
 namespace RootForce
 {
@@ -88,5 +92,10 @@ namespace RootForce
 			Defines a map between network entity IDs and local entities.
 		*/
 		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
+
+		/*
+			Remove a set of entities from the network entity map and delete them.
+		*/
+		void DeleteEntities(NetworkEntityMap& p_map, NetworkEntityID p_id, ECS::EntityManager* p_entityManager);
 	}
 }

@@ -50,6 +50,9 @@ namespace RootForce
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
+			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
+
 			NetworkEntityMap& networkEntityMap = *m_networkEntityMap;
 
 			switch (p_id)
@@ -116,7 +119,12 @@ namespace RootForce
 					// Local clients share world with server - does not need to do anything.
 					if (clientComponent->IsRemote)
 					{
+						NetworkMessage::DeserializeWorld(p_bs, m_world, networkEntityMap);
 
+						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
+						{
+							clientComponent->State = ClientState::CONNECTED;
+						}
 					}
 				} return true;
 
@@ -165,7 +173,14 @@ namespace RootForce
 						g_engineContext.m_script->AddParameterUserData(networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
 						g_engineContext.m_script->ExecuteScript();
 
-						clientComponent->State = ClientState::CONNECTED;
+						if (clientComponent->IsRemote)
+						{
+							clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
+						}
+						else
+						{
+							clientComponent->State = ClientState::CONNECTED;
+						}
 					}
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%s): %s", p_packet->systemAddress.ToString(), m.Name.C_String());
@@ -173,47 +188,134 @@ namespace RootForce
 
 				case NetworkMessage::MessageType::UserDisconnected:
 				{
+					NetworkMessage::UserDisconnected m;
+					m.Serialize(false, p_bs);
+
+					// Log the disconnect.
+					NetworkEntityID id;
+					id.UserID = m.User;
+					id.ActionID = ReservedActionID::CONNECT;
+					id.SequenceID = 0;
+					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
 					
+					// Remove all entities associated with that player.
+					if (clientComponent->IsRemote)
+					{
+						id.UserID = m.User;
+						id.ActionID = ReservedActionID::ALL;
+						id.SequenceID = ReservedSequenceID::ALL;
+						Network::DeleteEntities(networkEntityMap, id, m_world->GetEntityManager());
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::PlayerCommand:
 				{
-					
+					NetworkMessage::PlayerCommand m;
+					m.Serialize(false, p_bs);
+
+					// A local server would already have updated the entities.
+					if (clientComponent->IsRemote)
+					{
+						// TODO: Send action to action system
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::DestroyEntities:
 				{
-					
+					NetworkMessage::DestroyEntities m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->IsRemote)
+					{
+						Network::DeleteEntities(networkEntityMap, m.ID, m_world->GetEntityManager());
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::SpawnUser:
 				{
+					NetworkMessage::SpawnUser m;
+					m.Serialize(false, p_bs);
 
+					if (clientComponent->IsRemote)
+					{
+						// TODO: Send spawn point index to respawn system.
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::LoadMap:
 				{
+					NetworkMessage::LoadMap m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->IsRemote)
+					{
+						// Update server information
+						serverInfo->Information.MapName = m.MapName;
+
+						// Load the map
+						m_worldSystem->CreateWorld(serverInfo->Information.MapName.C_String());
+					}
+
+					// Send load map status
+					NetworkMessage::LoadMapStatus n;
+					n.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
+					
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
+					n.Serialize(true, &bs);
+
+					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
 
 				} return true;
 
 				case NetworkMessage::MessageType::SetMaxPlayers:
 				{
+					NetworkMessage::SetMaxPlayers m;
+					m.Serialize(false, p_bs);
 
+					if (clientComponent->IsRemote)
+					{
+						// Update server information
+						serverInfo->Information.MaxPlayers = m.MaxPlayers;
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::SetGameMode:
 				{
+					NetworkMessage::SetGameMode m;
+					m.Serialize(false, p_bs);
 
+					if (clientComponent->IsRemote)
+					{
+						// Update server information
+						serverInfo->Information.GameMode = m.GameMode;
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::SetMatchTime:
 				{
+					NetworkMessage::SetMatchTime m;
+					m.Serialize(false, p_bs);
 
+					if (clientComponent->IsRemote)
+					{
+						// Update server information
+						serverInfo->Information.MatchTimeSeconds = m.Seconds;
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::SetKillCount:
 				{
+					NetworkMessage::SetKillCount m;
+					m.Serialize(false, p_bs);
 
+					if (clientComponent->IsRemote)
+					{
+						// Update server information
+						serverInfo->Information.KillCount = m.Count;
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::ServerInformation:
@@ -374,7 +476,10 @@ namespace RootForce
 
 				case NetworkMessage::MessageType::PlayerCommand:
 				{
-					// TODO: Fix this after connections work.
+					NetworkMessage::PlayerCommand m;
+					m.Serialize(false, p_bs);
+
+					// TODO: Send action to action system.
 				} return true;
 
 				case NetworkMessage::MessageType::LoadMapStatus:
@@ -393,6 +498,8 @@ namespace RootForce
 						{
 							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client (%s) successfully loaded map", p_packet->systemAddress.ToString());
 							
+							// TODO: IMPORTANT - LEVEL FINISHING TO LOAD DOESN'T NECESSARILY MEAN A CLIENT HAS FINISHED CONNECTING. MUST CHECK CLIENT STATE.
+
 							// Get the player information
 							NetworkEntityID id;
 							id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
@@ -454,6 +561,15 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 								n.Serialize(true, &bs);
+
+								m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+							}
+
+							// Send a game state snapshot to the connectee
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
+								NetworkMessage::SerializeWorld(&bs, m_world, networkEntityMap);
 
 								m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 							}
