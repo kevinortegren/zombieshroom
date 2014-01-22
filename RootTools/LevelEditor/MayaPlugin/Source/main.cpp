@@ -394,7 +394,6 @@ void loadScene()
 	{
 		MFnCamera camera = g_mayaCameraList[i];
 		
-		//int nr = i + 1;
 		std::ostringstream oss;
 		oss << "modelPanel" << i+1;
 		

@@ -63,6 +63,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad);
 bool ambientInfoExists = false;
 
 void ExportToLevel();
+void LoadSceneFromMaya();
 
 string PL = "PointLight";
 
@@ -113,60 +114,7 @@ int main(int argc, char* argv[])
 
 			Initialize(g_engineContext);
 
-			//LOAD						
-			LoadLocators();
-
-			//LOAD CAMERAS
-			RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-			WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
-			numberCameras = *RM.NumberOfCameras;
-			ReleaseMutex(RM.CameraMutexHandle);
-
-			CreateCameraEntity(0);
-
-			//LOAD MATERIALS
-			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-			int renderNrOfMaterials = *RM.NumberOfMaterials;
-
-			for(int i = 0; i < renderNrOfMaterials; i++)
-			{
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath));
-			}
-
-			ReleaseMutex(RM.MeshMutexHandle);
-
-			/////////////////////// LOAD MESHES ////////////////////////////////
-
-			RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-			WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-			numberMeshes = *RM.NumberOfMeshes;
-			ReleaseMutex(RM.MeshMutexHandle);
-
-			for(int i = 0; i < numberMeshes; i++)
-			{				
-				//OPEN MUTEX?
-				string name = RM.PmeshList[i]->modelName;
-				Entities.push_back(CreateMeshEntity(&m_world, name, i));
-				auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
-				auto mesh = model->m_meshes[0];
-				auto buffer = g_engineContext.m_renderer->CreateBuffer();
-				mesh->SetVertexBuffer(buffer);
-
-				UpdateMesh(i, true, true, false);
-			}			
-
-			///////////////////////// Load Lights ////////////////////////////////
-
-			RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-			WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
-			numberLights = *RM.NumberOfLights;
-			ReleaseMutex(RM.LightMutexHandle);
-
-			for(int i = 0; i < numberLights; i++)
-			{
-				UpdateLight(i, false, true);
-			}
+			LoadSceneFromMaya();
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,10 +140,6 @@ int main(int argc, char* argv[])
 					cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
 				}
 
-				int locatorIdChange = -1;
-				if(type == "Locator")
-					locatorIdChange = updateID;
-
 				// GET EXPORT STATE
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
@@ -208,9 +152,10 @@ int main(int argc, char* argv[])
 					ExportToLevel();
 				}
 				/////////////////////// UPDATE LOCATORS //////////////////////////////
-				if(locatorIdChange != -1)
+
+				if(type == "Locator")
 				{
-					cout << RM.PlocatorList[locatorIdChange]->transformation.name << " updated!" << endl;
+					cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
 				}
 
 				//UPDATE
@@ -352,6 +297,63 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 
 	particleSystem = new RootForce::ParticleSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem, "ParticleSystem");
+}
+
+void LoadSceneFromMaya()
+{
+	//LOAD						
+	LoadLocators();
+
+	//LOAD CAMERAS
+	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+	WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+	numberCameras = *RM.NumberOfCameras;
+	ReleaseMutex(RM.CameraMutexHandle);
+	CreateCameraEntity(0);
+
+	//LOAD MATERIALS
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	int renderNrOfMaterials = *RM.NumberOfMaterials;
+
+	for(int i = 0; i < renderNrOfMaterials; i++)
+	{
+		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath));
+	}
+
+	ReleaseMutex(RM.MeshMutexHandle);
+
+	/////////////////////// LOAD MESHES ////////////////////////////////
+
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	numberMeshes = *RM.NumberOfMeshes;
+	ReleaseMutex(RM.MeshMutexHandle);
+
+	for(int i = 0; i < numberMeshes; i++)
+	{				
+		//OPEN MUTEX?
+		string name = RM.PmeshList[i]->modelName;
+		Entities.push_back(CreateMeshEntity(&m_world, name, i));
+		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
+		auto mesh = model->m_meshes[0];
+		auto buffer = g_engineContext.m_renderer->CreateBuffer();
+		mesh->SetVertexBuffer(buffer);
+
+		UpdateMesh(i, true, true, false);
+	}			
+
+	///////////////////////// Load Lights ////////////////////////////////
+
+	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	numberLights = *RM.NumberOfLights;
+	ReleaseMutex(RM.LightMutexHandle);
+
+	for(int i = 0; i < numberLights; i++)
+	{
+		UpdateLight(i, false, true);
+	}
 }
 
 ECS::Entity* CreateLightEntity(ECS::World* p_world)	
