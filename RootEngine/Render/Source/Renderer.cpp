@@ -83,10 +83,10 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
@@ -150,6 +150,12 @@ namespace Render
 		// Setup GBuffer.
 		m_geometryPass.Init(width, height);
 
+		// Setup shadow device.
+		m_shadowDevice.Init(this, 512, 512);
+
+		// Setup lighting device.
+		m_lighting.Init(width, height);
+	
 		// Setup render target for forward renderer to use.
 		glGenFramebuffers(1, &m_fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
@@ -163,10 +169,13 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color, 0);
 		
 		// Share depth attachment between gbuffer and forward.
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_geometryPass.m_depthHandle, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Setup fullscreen quad.
 		Render::Vertex1P1UV verts[4];
@@ -194,9 +203,6 @@ namespace Render
 
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
-
-		// Setup lighting device.
-		m_lighting.Init(width, height);
 
 		// Load default rendering effects.
 		auto renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Forward");
@@ -275,6 +281,11 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		{
+			PROFILE("Shadow Pass", g_context.m_profiler)
+			ShadowPass();
+		}
+
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer.BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
@@ -359,7 +370,7 @@ namespace Render
 					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_SPECULAR);
 					if((*job).m_material->m_specularMap != nullptr)
 					{
-						// Bind diffuse texture.
+						// Bind specular texture.
 						(*job).m_material->m_specularMap->Enable(RENDER_TEXTURE_SPECULAR);
 					}
 					else
@@ -370,7 +381,7 @@ namespace Render
 					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_NORMAL);
 					if((*job).m_material->m_normalMap != nullptr)
 					{
-						// Bind diffuse texture.
+						// Bind normal texture.
 						(*job).m_material->m_normalMap->Enable(RENDER_TEXTURE_NORMAL);
 					}
 					else
@@ -403,8 +414,101 @@ namespace Render
 		}
 	}
 
+	void GLRenderer::ShadowPass()
+	{
+		m_shadowDevice.Process();
+		//Set up framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.GetFramebuffer());
+		glDrawBuffers(0, NULL);
+		//glReadBuffer(GL_NONE);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+
+		// Buffer Per Frame data.
+		struct
+		{
+			glm::mat4 m_projection;
+			glm::mat4 m_view;
+			glm::mat4 m_invView;
+			glm::mat4 m_invProj;
+			glm::mat4 m_invViewProj;
+
+		} matrices;
+
+
+		//matrices.m_view = glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		//matrices.m_view = glm::translate(matrices.m_view, glm::vec3(0.0f, 0.0f, -100.0f));
+		//matrices.m_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.5f, 1000.0f);
+		////matrices.m_projection = glm::perspectiveFov(90.0f, 512.0f, 512.0f, 0.5f, 1000.0f);
+		//matrices.m_invView = glm::inverse(matrices.m_view);
+		//matrices.m_invProj = glm::inverse(matrices.m_projection);
+		//matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
+
+		matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+		matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrix;
+		matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrix);
+		matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrix);
+		matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
+
+		glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+
+		matrices.m_invViewProj = glm::inverse(viewProjection);
+		m_cameraBuffer.BufferSubData(0, sizeof(matrices), &matrices);
+
+		glCullFace(GL_FRONT);
+		glViewport(0, 0, 512, 512);
+
+		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+		{
+			(*job).m_mesh->Bind();
+			m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
+
+			for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+			{	
+				m_uniforms.BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+			}
+
+			if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+			{
+				(*job).m_mesh->DrawTransformFeedback();
+			}
+			else
+			{
+				(*job).m_mesh->Draw();		
+			}
+
+			(*job).m_mesh->Unbind();
+		}
+
+		glCullFace(GL_BACK);
+		//glReadBuffer(GL_BACK);
+		glViewport(0, 0, m_width, m_height);
+		//For each shadow caster
+		//m_renderFlags = 
+		//RenderGeometry();
+
+		//Apply to back buffer
+		
+	}
+
 	void GLRenderer::LightingPass()
 	{
+		
+		//TODO: Bind shadow depth texture.
+		m_shadowDevice.m_depthTexture->Enable(3);
+
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0, 
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+			);
+
+		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+
+		m_uniforms.BufferSubData(0, sizeof(glm::mat4), &lvp);
+
 		m_lighting.Process(m_fullscreenQuad);
 
 		// Bind forward target.
@@ -519,9 +623,9 @@ namespace Render
 		m_particles.EndTransform();
 	}
 
-	void GLRenderer::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster )
+	void GLRenderer::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster, int p_index)
 	{
-
+		m_shadowDevice.AddShadowcaster(p_shadowcaster, p_index);
 	}
 }
 

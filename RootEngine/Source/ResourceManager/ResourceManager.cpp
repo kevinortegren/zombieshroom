@@ -179,6 +179,25 @@ namespace RootEngine
 		return m_models[p_path];
 	}
 
+	Render::TextureInterface* ResourceManager::CreateTexture(const std::string& p_path)
+	{
+		if(m_textures.find(p_path) == m_textures.end())
+		{
+			std::shared_ptr<Render::TextureInterface> texture = m_context->m_renderer->CreateTexture();
+	
+			if(texture)
+			{
+				m_textures[p_path] = texture;
+				return m_textures[p_path].get();
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		return m_textures[p_path].get();
+	}
+
 	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
 	{
 		// Look if new name dosent exist.

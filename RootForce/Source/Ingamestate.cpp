@@ -33,7 +33,7 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        
+		
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -95,12 +95,15 @@ namespace RootForce
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
-		// Initialize render and point light system.
+		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+
+		m_shadowSystem = new RootForce::ShadowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
@@ -134,7 +137,6 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
 
-
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -148,8 +150,6 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
-
-		// Load the level and create a world
 
 		//Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
@@ -273,8 +273,8 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+#endif
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
 			{
@@ -287,16 +287,11 @@ namespace RootForce
 				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
 			}
 		}
-#endif
+
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-		{
-			PROFILE("World System", g_engineContext.m_profiler);
-			m_sharedSystems.m_worldSystem->Process();
-		}
-
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
@@ -307,26 +302,26 @@ namespace RootForce
 		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
 
 		//m_animationSystem->Process();
-        {
-            PROFILE("Action system", g_engineContext.m_profiler);
-            m_actionSystem->Process();
-        }
+		{
+			PROFILE("Action system", g_engineContext.m_profiler);
+			m_actionSystem->Process();
+		}
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_respawnSystem->Process();
 		}
 
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
+			g_engineContext.m_physics->Update(p_deltaTime);
+			m_physicsSystem->Process();
+		}
 
-        {
-            PROFILE("Collision system", g_engineContext.m_profiler);
-            m_collisionSystem->Process();
-        }
+		{
+			PROFILE("Collision system", g_engineContext.m_profiler);
+			m_collisionSystem->Process();
+		}
 
 		{
 			PROFILE("StateSystem", g_engineContext.m_profiler);
@@ -343,22 +338,33 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-        
-		{
-            PROFILE("Camera systems", g_engineContext.m_profiler);
-            m_playerControlSystem->UpdateAimingDevice();
-            m_thirdPersonBehaviorSystem->Process();
-            m_lookAtSystem->Process();
-            m_cameraSystem->Process();
-        }
 		
+		{
+			PROFILE("Camera systems", g_engineContext.m_profiler);
+			m_playerControlSystem->UpdateAimingDevice();
+			m_thirdPersonBehaviorSystem->Process();
+			m_lookAtSystem->Process();
+			m_cameraSystem->Process();
+		}
+		
+		{
+			PROFILE("Shadow system", g_engineContext.m_profiler);
+			m_shadowSystem->Process();
+		}
+
 		{ 
-			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			PROFILE("ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
+
+		{
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
+		}
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
-            m_pointLightSystem->Process();
+			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 
 		}
@@ -370,8 +376,8 @@ namespace RootForce
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();
-        
-        g_engineContext.m_profiler->Update(p_deltaTime);
+		
+		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
@@ -380,7 +386,7 @@ namespace RootForce
 			g_engineContext.m_gui->Render(m_hud->GetView());
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
-        
+		
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();

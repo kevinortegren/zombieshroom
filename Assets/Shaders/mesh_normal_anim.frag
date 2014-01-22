@@ -25,6 +25,6 @@ void main()
 
 	vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
-	diffuse = vec4(frag_color, specTerm);
+	diffuse = vec4(frag_color.xyz, specTerm);
 	normals = vec3(bumpNormal * 0.5 + 0.5);
 }

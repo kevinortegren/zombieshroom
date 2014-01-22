@@ -51,6 +51,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		RootForce::PhysicsSystem* m_physicsSystem;
 		RootForce::CollisionSystem* m_collisionSystem;
+		RootForce::ShadowSystem* m_shadowSystem;
 		RootForce::RenderingSystem* m_renderingSystem;
 		RootForce::PointLightSystem* m_pointLightSystem;
 		RootForce::ParticleSystem* m_particleSystem;
