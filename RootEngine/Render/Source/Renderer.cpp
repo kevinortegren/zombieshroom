@@ -246,14 +246,15 @@ namespace Render
 		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);
 		s_sizes[Semantic::SPEEDMIN]		= sizeof(float);
 		s_sizes[Semantic::SPEEDMAX]		= sizeof(float);
-		s_sizes[Semantic::SIZEMIN]		= sizeof(float);
-		s_sizes[Semantic::SIZEMAX]		= sizeof(float);
-		s_sizes[Semantic::SIZEEND]		= sizeof(float);
+		s_sizes[Semantic::SIZEMIN]		= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEMAX]		= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEEND]		= sizeof(glm::vec2);
 		s_sizes[Semantic::COLOR]		= sizeof(glm::vec4);
 		s_sizes[Semantic::COLOREND]		= sizeof(glm::vec4);
 		s_sizes[Semantic::GRAVITY]		= sizeof(glm::vec3);
 		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
 		s_sizes[Semantic::SPREAD]		= sizeof(float);
+		s_sizes[Semantic::SPAWNTIME]	= sizeof(float);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -528,9 +529,9 @@ namespace Render
 		return std::shared_ptr<Material>(mat); 
 	}
 
-	ParticleSystem* GLRenderer::CreateParticleSystem(const ParticleSystemDescription& p_desc)
+	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
-		return m_particles.Create(this, p_desc);
+		return m_particles.Create(this);
 	}
 
 	void GLRenderer::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)

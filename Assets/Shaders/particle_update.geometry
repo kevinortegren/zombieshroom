@@ -14,13 +14,28 @@ layout(std140) uniform PerFrame
 
 layout(std140) uniform PerObject
 {
-	vec3 g_Position;
+	vec3	g_Position;
+	float 	g_lifeTimeMin;
+	vec3 	g_gravity;
+	float 	g_lifeTimeMax;
+	vec3 	g_direction;
+	float 	g_speedMin;
+	vec2 	g_sizeMin;
+	float 	g_speedMax;
+	float 	g_spread;
+	vec2 	g_sizeMax;
+	vec2 	g_sizeEnd;
+	vec4 	g_color;
+	vec4 	g_colorEnd;
+	float	g_spawnTime;
 };
 
 in vec3 vert_initialVel[];
 in vec2 vert_scale[];
 in float vert_age[];
 in float vert_type[];
+in vec4 vert_color[];
+in vec3 vert_accel[];
 
 // Transform feedback values.
 out vec3 vert_initialPos1;
@@ -28,6 +43,8 @@ out vec3 vert_initialVel1;
 out vec2 vert_scale1;
 out float vert_age1;
 out float vert_type1;
+out vec4 vert_color1;
+out vec3 vert_accel1;
 
 vec3 GetRandomDir(float TexCoord)
 {
@@ -36,51 +53,63 @@ vec3 GetRandomDir(float TexCoord)
     return direction;
 } 
 
+float GetRandomNumber(float TexCoord, float min, float max)
+{
+	vec3 direction = texture(g_Random, TexCoord + 10.0f).xyz;
+	float magnitud = max - min;
+	float rand = (direction.x + direction.y + direction.z)/3.0f;
+	float number =  rand * magnitud + min;
+    return number;
+}
 void main() 
 {	
-	float age = vert_age[0] + g_dt;
+	float lifeTime = vert_age[0] - g_dt;
 
 	if(vert_type[0] == 0)
 	{
-		if(age > 0.05f)
+		if(lifeTime <= 0.0f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 = g_Position;
-			vert_initialVel1 = GetRandomDir(g_time);
-			vert_scale1 = vert_scale[0];
-			vert_age1 = 0.0f;
-			vert_type1 = 1.0f;
-		 
+			vert_initialPos1 	= g_Position;
+			vert_initialVel1 	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+			vert_scale1 		= vec2(GetRandomNumber(g_time, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time, g_sizeMin.y, g_sizeMax.y));
+			vert_age1 			= GetRandomNumber(g_time, g_lifeTimeMin, g_lifeTimeMax);
+			vert_type1 			= 1.0f;
+		 	vert_color1 		= g_color;
+		 	vert_accel1			= g_gravity;
+			lifeTime			= g_spawnTime;
 			EmitVertex();
 			EndPrimitive();
-
-			age = 0.0f;
 		}
 
 		// Always output the emitter particle with initial values.
 		vert_initialPos1 = g_Position;
 		vert_initialVel1 = vert_initialVel[0];
-		vert_scale1 = vert_scale[0];
-		vert_age1 = age;
+		vert_scale1 = vec2(0.0f, 0.0f);
+		vert_age1 = lifeTime;
 		vert_type1 = 0.0f;
-		 
+		vert_color1 = vert_color[0];  
+		vert_accel1 = vert_accel[0];
 		EmitVertex();
 		EndPrimitive();
 	}
 	else
 	{
 		// Update.
-		vec3 DeltaV = g_dt * vec3(0.0, 0.0f, 0.0); 
+		//Accel
+		vec3 DeltaV = g_dt * vert_accel[0]; 
+		//Pos
 		vec3 DeltaP = g_dt * vert_initialVel[0];
 		
-		if(age <= 20.0f)
+		if(lifeTime > 0.0f)
 		{
 			vert_initialPos1 = gl_in[0].gl_Position.xyz + DeltaP;		
 			vert_initialVel1 = vert_initialVel[0] + DeltaV;
 			vert_scale1 = vert_scale[0];
-			vert_age1 = age;		
+			vert_age1 = lifeTime;		
 			vert_type1 = 1.0f;
-		 
+			vert_color1 = vert_color[0];  
+			vert_accel1 = vert_accel[0];
 			EmitVertex();
 			EndPrimitive();
 		}
