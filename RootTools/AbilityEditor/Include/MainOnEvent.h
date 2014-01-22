@@ -8,10 +8,12 @@ namespace AbilityEditorNameSpace
 	public:
 		MainOnEvent();
 		~MainOnEvent();
+		virtual void AddScript(QString p_name);
 		virtual void AddEntity(QString p_name);
 		virtual void AddEntity(AbilityEntity::Entity* p_entity);
 		virtual void AddComponent(unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type);
 		virtual void AddComponent(unsigned int p_id, QString p_name);
+		// virtual void RemoveScript();
 		virtual void RemoveEntity(unsigned int p_id);
 		virtual void RemoveComponent(unsigned int p_id, AbilityComponents::ComponentType::ComponentType p_type);
 		virtual void RemoveComponent(unsigned int p_id, QString p_name);
@@ -27,12 +29,13 @@ namespace AbilityEditorNameSpace
 		virtual void Clear();
 		//virtual QtVariantPropertyManager* PointMeToPropMan() { return m_propManager; }
 		
-
+		virtual std::vector<QString> GetScriptNames() { return m_scripts; }
 		virtual std::vector<AbilityEntity::Entity*>* GetEntities() { return &m_entities; }
 	protected:
 		//QtTreePropertyBrowser* m_propBrows;
 		std::vector<AbilityEntity::Entity*> m_entities;
 		QtVariantPropertyManager* m_propManager;
 		QtVariantEditorFactory* m_propFactory;
+		std::vector<QString> m_scripts;
 	};
 }

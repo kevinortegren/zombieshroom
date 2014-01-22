@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QFileSystemModel>
 #include <QtPropertyBrowser/QtTreePropertyBrowser>
 #include <QtCore/QStringList>
 #include <QtGui/QMouseEvent>
@@ -32,6 +33,8 @@ private slots:
 		void SaveAs();
 		void Save();
 		void Load();
+		void FileViewDrag(const QModelIndex& p_modelIndex);
+		void AddNewEntity();
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;
@@ -49,6 +52,7 @@ private:
 	QString m_currentSavePath;
 	bool event(QEvent* event);
 	QTreeWidgetItem* m_LastSelectedItem;
+	QFileSystemModel* m_fileViewModel;
 	//void mousePressEvent(QMouseEvent* event);
 
 };

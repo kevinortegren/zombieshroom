@@ -8,15 +8,27 @@ CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(pare
 
 void CustomTreeWidget::dropEvent( QDropEvent* event )
 {
-	if(event->mimeData()->objectName().compare("Abilities") == 0)
+	if(event->mimeData()->objectName().compare("Script") == 0)
+	{
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,event->mimeData()->text());
+		item->setWhatsThis(0,"Script");
+		item->setTextColor(0,QColor(0,255,0));
+		
+		this->addTopLevelItem(item);
+		m_onEvent->AddScript(item->text(0));
+	
+	}
+	else if(event->mimeData()->objectName().compare("Entity") == 0)
 	{
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
 		item->setWhatsThis(0,"Entity");
 		
+
 		this->addTopLevelItem(item);
 		m_onEvent->AddEntity(item->text(0));
-	
+
 	}
 	else if(this->itemAt(event->pos()) != nullptr )
 	{

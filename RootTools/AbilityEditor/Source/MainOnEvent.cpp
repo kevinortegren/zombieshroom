@@ -104,7 +104,12 @@ namespace AbilityEditorNameSpace
 			delete m_entities.at(i);
 		}	
 		m_entities.clear();
-	
+		//m_scripts->clear(); //Scriptlist
+	}
+
+	void MainOnEvent::AddScript( QString p_name )
+	{
+		m_scripts.push_back(p_name); //Scriptlist
 	}
 
 }

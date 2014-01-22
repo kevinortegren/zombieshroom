@@ -19,6 +19,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 #include "CustomListWidget.h"
 #include "CustomTreeWidget.h"
@@ -33,6 +34,7 @@ public:
     QAction *actionLoad;
     QAction *actionQuit;
     QAction *actionGenerate_Script;
+    QAction *actionEntity;
     QWidget *centralWidget;
     QTabWidget *abilityWidget;
     QWidget *tabOnCreate;
@@ -43,7 +45,7 @@ public:
     CustomTreeWidget *treeOnDestroy;
     QTabWidget *toolBoxWidget;
     QWidget *tabAbilities;
-    CustomListWidget *listAbilities;
+    QTreeView *treeView;
     QWidget *tabComponents;
     CustomListWidget *listComponents;
     QWidget *tabConditions;
@@ -51,6 +53,7 @@ public:
     QWidget *propertyWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
+    QMenu *menuNew;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *AbilityEditorClass)
@@ -73,6 +76,8 @@ public:
         actionQuit->setObjectName(QStringLiteral("actionQuit"));
         actionGenerate_Script = new QAction(AbilityEditorClass);
         actionGenerate_Script->setObjectName(QStringLiteral("actionGenerate_Script"));
+        actionEntity = new QAction(AbilityEditorClass);
+        actionEntity->setObjectName(QStringLiteral("actionEntity"));
         centralWidget = new QWidget(AbilityEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         abilityWidget = new QTabWidget(centralWidget);
@@ -112,11 +117,9 @@ public:
         toolBoxWidget->setGeometry(QRect(320, 10, 261, 381));
         tabAbilities = new QWidget();
         tabAbilities->setObjectName(QStringLiteral("tabAbilities"));
-        listAbilities = new CustomListWidget(tabAbilities);
-        listAbilities->setObjectName(QStringLiteral("listAbilities"));
-        listAbilities->setGeometry(QRect(0, 0, 251, 351));
-        listAbilities->setDragEnabled(true);
-        listAbilities->setDragDropMode(QAbstractItemView::NoDragDrop);
+        treeView = new QTreeView(tabAbilities);
+        treeView->setObjectName(QStringLiteral("treeView"));
+        treeView->setGeometry(QRect(0, 0, 251, 351));
         toolBoxWidget->addTab(tabAbilities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
@@ -141,17 +144,21 @@ public:
         menuBar->setGeometry(QRect(0, 0, 592, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
+        menuNew = new QMenu(menuBar);
+        menuNew->setObjectName(QStringLiteral("menuNew"));
         AbilityEditorClass->setMenuBar(menuBar);
         statusBar = new QStatusBar(AbilityEditorClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         AbilityEditorClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
+        menuBar->addAction(menuNew->menuAction());
         menuFile->addAction(actionSave_As);
         menuFile->addAction(actionSave);
         menuFile->addAction(actionLoad);
         menuFile->addAction(actionGenerate_Script);
         menuFile->addAction(actionQuit);
+        menuNew->addAction(actionEntity);
 
         retranslateUi(AbilityEditorClass);
 
@@ -169,7 +176,8 @@ public:
         actionSave->setText(QApplication::translate("AbilityEditorClass", "Save", 0));
         actionLoad->setText(QApplication::translate("AbilityEditorClass", "Open...", 0));
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
-        actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
+        actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script Folder...", 0));
+        actionEntity->setText(QApplication::translate("AbilityEditorClass", "Entity", 0));
         QTreeWidgetItem *___qtreewidgetitem = treeOnCreate->headerItem();
         ___qtreewidgetitem->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
         abilityWidget->setTabText(abilityWidget->indexOf(tabOnCreate), QApplication::translate("AbilityEditorClass", "On Create", 0));
@@ -183,6 +191,7 @@ public:
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
         menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
+        menuNew->setTitle(QApplication::translate("AbilityEditorClass", "New", 0));
     } // retranslateUi
 
 };

@@ -142,7 +142,7 @@
      <attribute name="title">
       <string>Existing Abilities</string>
      </attribute>
-     <widget class="CustomListWidget" name="listAbilities">
+     <widget class="QTreeView" name="treeView">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -150,12 +150,6 @@
         <width>251</width>
         <height>351</height>
        </rect>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::NoDragDrop</enum>
       </property>
      </widget>
     </widget>
@@ -226,7 +220,14 @@
     <addaction name="actionGenerate_Script"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuNew">
+    <property name="title">
+     <string>New</string>
+    </property>
+    <addaction name="actionEntity"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuNew"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionSave_As">
@@ -251,7 +252,12 @@
   </action>
   <action name="actionGenerate_Script">
    <property name="text">
-    <string>Generate Script...</string>
+    <string>Generate Script Folder...</string>
+   </property>
+  </action>
+  <action name="actionEntity">
+   <property name="text">
+    <string>Entity</string>
    </property>
   </action>
  </widget>

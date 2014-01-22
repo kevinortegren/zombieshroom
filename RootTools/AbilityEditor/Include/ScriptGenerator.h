@@ -14,7 +14,7 @@ namespace AbilityEditorNameSpace
 		ScriptGenerator();
 		~ScriptGenerator();
 
-		void GenerateScript(QString p_filePath, QString p_scriptName, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
+		void GenerateScript(QString p_filePath, QString p_folderName, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
 
 	private:
 		void WriteOnCreate(OnCreate* p_onCreate, int i);

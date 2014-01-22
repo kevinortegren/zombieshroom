@@ -44,12 +44,29 @@ void AbilityEditor::Init()
 	m_exporter = new AbilityEditorNameSpace::Exporter();
 	m_importer = new AbilityEditorNameSpace::Importer();
 
+
 	ui.listComponents->addItems(m_compNames);
-	ui.listAbilities->addItem("Empty Entity");
+	//ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
 	m_propMan = new QtVariantPropertyManager;
 	m_mainLayout = new QGridLayout();
 	m_LastSelectedItem = nullptr;
+
+
+	// File View Tree Test
+	QStringList filters;
+	filters << "*.lua";
+	QString path = QDir::currentPath()+"/../../Debug/Assets/Scripts";
+	m_fileViewModel = new QFileSystemModel;
+	m_fileViewModel->setRootPath(path);
+	m_fileViewModel->setNameFilters(filters);
+	ui.treeView->setModel(m_fileViewModel);
+	ui.treeView->setRootIndex(m_fileViewModel->index(path));
+	ui.treeView->setColumnHidden(1, true);
+	ui.treeView->setColumnHidden(2, true);
+	ui.treeView->setColumnHidden(3, true);
+	
+	//End Test
 
 	ui.treeOnCreate->SetOnEventClass(m_onCreate);
 	ui.treeOnCollide->SetOnEventClass(m_onCollide);
@@ -67,7 +84,8 @@ void AbilityEditor::Init()
 	connect(ui.actionSave_As, SIGNAL(triggered()), this, SLOT(SaveAs()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(Save()));
 	connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(Load()));
-
+	connect(ui.treeView, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
+	connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
 	
 }
 
@@ -249,5 +267,49 @@ void AbilityEditor::Load()
 		ui.treeOnCreate->LoadData();
 		ui.treeOnCollide->LoadData();
 		ui.treeOnDestroy->LoadData();
+	}
+}
+
+void AbilityEditor::FileViewDrag( const QModelIndex& p_modelIndex )
+{
+	QString type = "Script";
+	QPixmap pixeimap(QSize(100,20));
+	QDrag* drag = new QDrag(this);
+	QMimeData* data = new QMimeData;
+	data->setText(m_fileViewModel->fileInfo(p_modelIndex).fileName());
+	data->setObjectName(type);
+	drag->setMimeData(data);
+	drag->setPixmap(pixeimap);
+	Qt::DropAction dropAction = drag->exec();
+}
+
+void AbilityEditor::AddNewEntity()
+{
+	if (ui.abilityWidget->currentIndex() == 0)
+	{
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,"New Entity");
+		item->setWhatsThis(0,"Entity");
+
+		ui.treeOnCreate->addTopLevelItem(item);
+		m_onCreate->AddEntity(item->text(0));
+	}
+	else if (ui.abilityWidget->currentIndex() == 1)
+	{
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,"New Entity");
+		item->setWhatsThis(0,"Entity");
+
+		ui.treeOnCollide->addTopLevelItem(item);
+		m_onCollide->AddEntity(item->text(0));
+	}
+	else if (ui.abilityWidget->currentIndex() == 2)
+	{
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,"New Entity");
+		item->setWhatsThis(0,"Entity");
+
+		ui.treeOnDestroy->addTopLevelItem(item);
+		m_onDestroy->AddEntity(item->text(0));
 	}
 }
