@@ -91,7 +91,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 		p_particleEditorQt->ui.frame->height(),
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS),
 		SDL_DestroyWindow);
-
+	
 	//////////////////////////////////////////////////////////////////////////
 	//Get HWND from SDL window and change its position
 	//////////////////////////////////////////////////////////////////////////
@@ -144,9 +144,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
 	m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
-	// Setup the importer and exporter
-	//m_world.GetEntityImporter()->SetImporter(Importer);
-	//m_world.GetEntityExporter()->SetExporter(Exporter);
+	
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	
 	//Create player aiming device
@@ -158,7 +156,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::Renderable* aimingRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_aimingDevice);
 	aimingRenderable->m_material = g_engineContext.m_resourceManager->GetMaterial("AimingDeviceRenderable");
 	aimingRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
-	aimingRenderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
+	aimingRenderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 

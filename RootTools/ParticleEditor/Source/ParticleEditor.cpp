@@ -256,7 +256,7 @@ void ParticleEditor::ManuSaveAs()
 		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_direction.x << (*itr).m_direction.y << (*itr).m_direction.z << YAML::EndSeq; 
 		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr).m_spread;
 		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr).m_spawnTime;
-		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_diffuseMap);
+		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
 		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr).m_material->m_effect);
 		emitter << YAML::EndMap;
 	}
@@ -303,7 +303,7 @@ void ParticleEditor::NewEmitter()
 	//Set default data 
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_system = m_context->m_renderer->CreateParticleSystem();	
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_material = m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_position = glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin = 2.0f;
@@ -676,7 +676,7 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	}
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_diffuseMap = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+	pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
 }
 
 void ParticleEditor::FocusButtonClicked()

@@ -39,7 +39,7 @@ void ParticleImporter::LoadParticleEmitter(const std::string& p_filename, RootFo
 
 		p_particleEmitter->m_particleSystems[i].m_system					= m_context->m_renderer->CreateParticleSystem();	
 		p_particleEmitter->m_particleSystems[i].m_material					= m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
-		p_particleEmitter->m_particleSystems[i].m_material->m_diffuseMap	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+		p_particleEmitter->m_particleSystems[i].m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 		p_particleEmitter->m_particleSystems[i].m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
 
 		//Position
