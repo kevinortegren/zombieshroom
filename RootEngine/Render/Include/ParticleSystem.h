@@ -13,6 +13,7 @@
 #define RENDER_NUM_PARTCILES 10000
 #define RENDER_NUM_PARTICLESYSTEMS 100
 #define RENDER_NUM_RANDOMVECTORS 1000
+#define RENDER_PARTICLES_UNIFORM_SIZE 1024
 
 namespace Render
 {
@@ -24,20 +25,15 @@ namespace Render
 		glm::vec3 m_initialVel;
 		glm::vec2 m_size;
 		float m_age;
-		float m_type; // 0 = emitter;
-	};
-
-	struct ParticleSystemDescription
-	{
-		glm::vec3 m_initalPos;
-		glm::vec3 m_initalVel;
-		glm::vec2 m_size;
+		float m_type; // 0 = emitter
+		glm::vec4 m_color;
+		glm::vec3 m_accel;
 	};
 
 	class ParticleSystemInterface
 	{
 	public:
-		virtual void Init(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc, unsigned p_slot) = 0;
+		virtual void Init(GLRenderer* p_renderer, unsigned p_slot) = 0;
 		virtual void Update() = 0;
 		virtual Render::MeshInterface* GetMesh() = 0;
 	};
@@ -47,7 +43,7 @@ namespace Render
 	public:
 		friend class ParticleSystemHandler;
 
-		void Init(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc, unsigned p_slot);
+		void Init(GLRenderer* p_renderer, unsigned p_slot);
 		void Update();
 		Render::MeshInterface* GetMesh();
 
@@ -65,7 +61,8 @@ namespace Render
 
 		ParticleSystemHandler();
 		void Init();
-		ParticleSystem* Create(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc);
+		ParticleSystem* Create(GLRenderer* p_renderer);
+		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void Free(ParticleSystem* p_system);
 		void BeginTransform(float dt);
 		void EndTransform();
@@ -92,5 +89,6 @@ namespace Render
 		} m_perFrameVars;
 
 		Buffer m_perFrameBuffer;
+		Buffer m_perObjectBuffer;
 	};
 }

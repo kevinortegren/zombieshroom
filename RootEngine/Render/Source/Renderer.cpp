@@ -53,6 +53,8 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 
 namespace Render
 {
+	std::map<Semantic::Semantic, unsigned> GLRenderer::s_sizes;
+
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
@@ -83,7 +85,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
@@ -240,6 +242,28 @@ namespace Render
 		m_lineRenderer.Init(this);
 	}
 
+	void GLRenderer::InitializeSemanticSizes()
+	{
+		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
+		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
+		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::SHADOW]		= sizeof(glm::mat4);
+		s_sizes[Semantic::POSITION]		= sizeof(glm::vec3);
+		s_sizes[Semantic::LIFETIMEMIN]	= sizeof(float);
+		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);
+		s_sizes[Semantic::SPEEDMIN]		= sizeof(float);
+		s_sizes[Semantic::SPEEDMAX]		= sizeof(float);
+		s_sizes[Semantic::SIZEMIN]		= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEMAX]		= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEEND]		= sizeof(glm::vec2);
+		s_sizes[Semantic::COLOR]		= sizeof(glm::vec4);
+		s_sizes[Semantic::COLOREND]		= sizeof(glm::vec4);
+		s_sizes[Semantic::GRAVITY]		= sizeof(glm::vec3);
+		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
+		s_sizes[Semantic::SPREAD]		= sizeof(float);
+		s_sizes[Semantic::SPAWNTIME]	= sizeof(float);
+	}
+
 	void GLRenderer::SetResolution(int p_width, int p_height)
 	{
 		/*SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -285,6 +309,8 @@ namespace Render
 			PROFILE("Shadow Pass", g_context.m_profiler)
 			ShadowPass();
 		}
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms.GetBufferId());
 
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
@@ -608,9 +634,14 @@ namespace Render
 		return std::shared_ptr<Material>(mat); 
 	}
 
-	ParticleSystem* GLRenderer::CreateParticleSystem(const ParticleSystemDescription& p_desc)
+	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
-		return m_particles.Create(this, p_desc);
+		return m_particles.Create(this);
+	}
+
+	void GLRenderer::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
+	{
+		m_particles.SetParticleUniforms(p_technique, p_params);
 	}
 
 	void GLRenderer::BeginTransform(float dt)

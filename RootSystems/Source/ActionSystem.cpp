@@ -57,14 +57,6 @@ namespace RootSystems
 			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
 
-		// Issue a jump if applicable
-		if(action->Jump)
-		{
-			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
-			animation->m_animClip = RootForce::AnimationClip::JUMP_START;
-			action->Jump = false;
-		}
-
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
 		action->Angle.x = 0;
@@ -103,6 +95,7 @@ namespace RootSystems
 		else if(state->CurrentState == RootForce::EntityState::LANDING)
 		{
 			animation->m_animClip = RootForce::AnimationClip::LANDING;
+			animation->m_locked = 1;
 			state->CurrentState = RootForce::EntityState::GROUNDED;
 		}
 		else
@@ -117,6 +110,17 @@ namespace RootSystems
 				animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
 			else if(action->StrafePower == -1)
 				animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+		}
+		// Issue a jump if applicable
+		if(action->Jump)
+		{
+			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+			if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+			{
+				animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+				animation->m_locked = 1;
+			}
+			action->Jump = false;
 		}
 
 	}

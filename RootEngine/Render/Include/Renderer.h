@@ -71,7 +71,8 @@ namespace Render
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 
 		// Particle systems.
-		virtual ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc) = 0;
+		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
 
@@ -114,7 +115,8 @@ namespace Render
 		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
 		std::shared_ptr<Material> CreateMaterial();
 
-		ParticleSystem* CreateParticleSystem(const ParticleSystemDescription& p_desc);
+		ParticleSystem* CreateParticleSystem();
+		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
 
@@ -122,8 +124,11 @@ namespace Render
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
 
+		static std::map<Semantic::Semantic, unsigned> s_sizes;
+
 	private:
 
+		void InitializeSemanticSizes();
 		void RenderGeometry();
 
 		void GeometryPass();

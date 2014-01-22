@@ -40,7 +40,7 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 {
 	std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components;
 
-	for (int type = 0; type < m_components.size(); ++type)
+	for (unsigned int type = 0; type < m_components.size(); ++type)
 	{
 		if (p_entity->m_id < m_components[type].size() && m_components[type][p_entity->m_id] != nullptr)
 		{

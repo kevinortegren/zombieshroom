@@ -170,7 +170,7 @@ namespace RootForce
 
 	int QuadTree::RoundToPow2(int p_value)
 	{
-		return pow(2, ceil(log(p_value)/log(2)));
+		return (int)pow(2, ceil(log(p_value)/log(2)));
 	}
 
 	void QuadTree::Subdivide( QuadNode* p_node,  std::vector<Polygon> p_polygons  )

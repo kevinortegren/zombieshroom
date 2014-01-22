@@ -31,6 +31,9 @@ namespace RootEngine
 				return;
 			switch(p_event.type)
 			{
+			case SDL_MOUSEWHEEL:
+				m_scroll += p_event.wheel.y;
+				break;
 			case SDL_KEYDOWN:
 				if(!p_event.key.repeat)
 					m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN_EDGE;
@@ -107,6 +110,7 @@ namespace RootEngine
 		void InputManager::Reset()
 		{
 			m_deltaMousePos = glm::vec2(0, 0);
+			m_scroll = 0;
 		}
 
 		
@@ -114,6 +118,11 @@ namespace RootEngine
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{
 			m_lockMouseEnabled = p_enable;
+		}
+		//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)
+		int InputManager::GetScroll()
+		{
+			return m_scroll;
 		}
 
 	}

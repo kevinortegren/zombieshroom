@@ -152,6 +152,62 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::BONES, offset);
 						}
+						else if(sem == "POSITION")
+						{
+							technique->AddUniformParam(Render::Semantic::POSITION, offset);
+						}
+						else if(sem == "LIFETIMEMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::LIFETIMEMIN, offset);
+						}
+						else if(sem == "LIFETIMEMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::LIFETIMEMAX, offset);
+						}
+						else if(sem == "SPEEDMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::SPEEDMIN, offset);
+						}
+						else if(sem == "SPEEDMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::SPEEDMAX, offset);
+						}
+						else if(sem == "SIZEMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEMIN, offset);
+						}
+						else if(sem == "SIZEMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEMAX, offset);
+						}
+						else if(sem == "SIZEEND")
+						{
+							technique->AddUniformParam(Render::Semantic::SIZEEND, offset);
+						}
+						else if(sem == "COLOR")
+						{
+							technique->AddUniformParam(Render::Semantic::COLOR, offset);
+						}
+						else if(sem == "COLOREND")
+						{
+							technique->AddUniformParam(Render::Semantic::COLOREND, offset);
+						}
+						else if(sem == "GRAVITY")
+						{
+							technique->AddUniformParam(Render::Semantic::GRAVITY, offset);
+						}
+						else if(sem == "DIRECTION")
+						{
+							technique->AddUniformParam(Render::Semantic::DIRECTION, offset);
+						}
+						else if(sem == "SPREAD")
+						{
+							technique->AddUniformParam(Render::Semantic::SPREAD, offset);
+						}
+						else if(sem == "SPAWNTIME")
+						{
+							technique->AddUniformParam(Render::Semantic::SPAWNTIME, offset);
+						}
 					}
 				}
 

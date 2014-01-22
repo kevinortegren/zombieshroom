@@ -111,6 +111,10 @@ namespace RootForce
 					}
 				}
 			}
+			else
+			{
+				transform->m_orientation.LookAt(glm::vec3(0.0f) - transform->m_position, transform->m_orientation.GetUp());
+			}
 		}
 
 	private:

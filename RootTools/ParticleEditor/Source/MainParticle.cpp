@@ -7,6 +7,7 @@
 #include <RootEngine/Include/RootEngine.h>
 #include <SDL2/SDL_main.h>
 #include <SDL2/SDL_syswm.h> 
+
 #undef main
 int main(int argc, char *argv[])
 {
@@ -18,23 +19,25 @@ int main(int argc, char *argv[])
 	{
 		QApplication a(argc, argv);
 		ParticleEditor w;
-		w.show();
+		
 		MainParticle m(path, &w);
-
+		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
 		bool notExit = true;
 		while(notExit)
 		{
 			notExit = w.CheckExit();
 			
-			a.processEvents(QEventLoop::AllEvents);
+			
 
 			uint64_t now = SDL_GetPerformanceCounter();
 			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 			old = now;
+			w.Update(dt);
+			a.processEvents(QEventLoop::AllEvents);
 			m.Update(dt);
-			m.HandleEvents();
 		}
+		
 	} 
 	catch (std::exception& e) 
 	{
@@ -143,6 +146,25 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	//m_world.GetEntityImporter()->SetImporter(Importer);
 	//m_world.GetEntityExporter()->SetExporter(Exporter);
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
+
+	// Add camera entity.	
+	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
+	camera->m_near = 0.1f;
+	camera->m_far = 1000.0f;
+	camera->m_fov = 45.0f;
+
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+	cameraTransform->m_position = glm::vec3(0.0f, 20.0f, 0.0f);
+
+	RootForce::LookAtBehavior* lookAtComponent = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+	
+	
+	m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
+
+	p_particleEditorQt->SetContext(&g_engineContext);
+	p_particleEditorQt->SetWorld(&m_world);
 }
 
 MainParticle::~MainParticle()
@@ -168,6 +190,10 @@ void MainParticle::Update( float p_delta )
 {
 	g_world->SetDelta(p_delta);
 	g_engineContext.m_renderer->Clear();
+	HandleEvents();
+	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
+	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
+	trans->m_position.y -= (g_engineContext.m_inputSys->GetScroll()*4);
 
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();

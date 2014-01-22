@@ -9,17 +9,21 @@ namespace Render
 			NORMAL,
 			MODEL,
 			BONES,
-			SHADOW
+			SHADOW,
+			POSITION,
+			LIFETIMEMIN,
+			LIFETIMEMAX,
+			SPEEDMIN,
+			SPEEDMAX,
+			SIZEMIN,
+			SIZEMAX,
+			SIZEEND,
+			COLOR,
+			COLOREND,
+			GRAVITY,
+			DIRECTION,
+			SPREAD,
+			SPAWNTIME,
 		};
-	}
-
-	static std::map<Semantic::Semantic, unsigned> s_sizes;
-
-	inline void InitializeSemanticSizes()
-	{
-		s_sizes[Semantic::MODEL] = 64;
-		s_sizes[Semantic::NORMAL] = 64;
-		s_sizes[Semantic::BONES] = 1280;
-		s_sizes[Semantic::SHADOW] = 64;
 	}
 }
