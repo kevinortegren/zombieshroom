@@ -31,9 +31,10 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();
-
-		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
-		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+		
+		ECS::Entity* serverInfoEntity = g_world->GetEntityManager()->CreateEntity();
+		g_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
+		g_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
         
 		// Host
 		if (p_playData.Host)

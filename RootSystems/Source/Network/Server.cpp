@@ -27,9 +27,8 @@ namespace RootForce
 			m_peer->SetIncomingPassword(p_config.Password.c_str(), p_config.Password.size() + 1);
 
 			// Create a server info entity
-			ECS::Entity* serverInfoEntity = m_world->GetEntityManager()->CreateEntity();
-			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
-			m_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
+			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 
 			serverInfo->Information.ServerName = p_config.ServerName.c_str();
 			serverInfo->Information.MapName = p_config.MapName.c_str();
