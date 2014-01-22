@@ -281,7 +281,10 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
-		ShadowPass();
+		{
+			PROFILE("Shadow Pass", g_context.m_profiler)
+			ShadowPass();
+		}
 
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
@@ -291,8 +294,6 @@ namespace Render
 			PROFILE("Geometry Pass", g_context.m_profiler);
 			GeometryPass();
 		}
-
-		
 
 		{
 			PROFILE("Lighting Pass", g_context.m_profiler);

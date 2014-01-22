@@ -35,7 +35,7 @@ namespace RootForce
 
 		renderable->m_pass = RootForce::RenderPass::RENDERPASS_DYNAMIC;
 		renderable->m_material =  m_engineContext->m_resourceManager->GetMaterial("testchar");
-		renderable->m_material->m_diffuseMap =  m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_diffuseMap =  texture;
 		renderable->m_material->m_normalMap =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_specularMap =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap_Anim");

@@ -67,7 +67,6 @@ namespace RootForce
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
 
-
 		// Add camera entity.	
 		ECS::Entity* cameraEntity = m_world->GetEntityManager()->CreateEntity();
 
@@ -76,9 +75,9 @@ namespace RootForce
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
-		camera->m_near = 0.5f;
-		camera->m_far = 100000.0f;
-		camera->m_fov = 45.0f;
+		camera->m_frustrum.m_near = 0.5f;
+		camera->m_frustrum.m_far = 100000.0f;
+		camera->m_frustrum.m_fov = 45.0f;
 		float apsectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
 		camera->m_frustrum = Frustum(45.0f, 0.1f, 1000.0f, apsectRatio);
@@ -92,12 +91,12 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
-		m_quadTree.Init(m_engineContext, m_world);
+		//m_quadTree.Init(m_engineContext, m_world);
 	}
 
 	void WorldSystem::Process()
 	{
-		if(m_showDebug)
+		/*if(m_showDebug)
 		{
 			m_quadTree.RenderDebug();
 
@@ -122,12 +121,11 @@ namespace RootForce
 
 		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
 
-		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);
+		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);*/
 	}
 
 	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
 	{
-
 		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
@@ -148,6 +146,5 @@ namespace RootForce
 	{
 		m_showDebug = p_value;
 	}
-
 }
 #endif
