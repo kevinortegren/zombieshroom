@@ -65,6 +65,8 @@ bool ambientInfoExists = false;
 void ExportToLevel();
 void LoadSceneFromMaya();
 
+Render::TextureInterface* painter;
+
 string PL = "PointLight";
 
 int main(int argc, char* argv[]) 
@@ -115,6 +117,9 @@ int main(int argc, char* argv[])
 			Initialize(g_engineContext);
 
 			LoadSceneFromMaya();
+
+			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
+			painter->CreateEmptyTexture(256, 256, Render::TextureFormat::TEXTURE_RGBA);
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +194,8 @@ int main(int argc, char* argv[])
 						WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
 						cout << RM.PpaintList[updateID]->heigth << endl;
 						cout << RM.PpaintList[updateID]->width << endl;
+						
+						painter->BufferData(RM.PpaintList[updateID]->Pixels);
 						ReleaseMutex(RM.TextureMutexHandle);
 					}
 				}
@@ -378,10 +385,16 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap)
 {
 	
-	if(textureName == "" || textureName == "NONE" || textureName == "PaintTexture")
+	if(textureName == "" || textureName == "NONE")
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
+		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+	}
+	else if(textureName == "PaintTexture")
+	{
+		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		mat->m_diffuseMap = painter;
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
 	else
@@ -455,16 +468,20 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
 
-	Render::ParticleSystemDescription desc;
-	desc.m_initalPos = RM.PlocatorList[index]->transformation.position;
-	desc.m_initalVel = glm::vec3(0,0,0);
-	desc.m_size = glm::vec2(0.5f, 0.5f);
+
+	/*
+	particle->m_particleSystems.resize(1);
+	particle->m_particleSystems[0].m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);
+	particle->m_particleSystems[0].m_material = g_engineContext.m_resourceManager->GetMaterial("test");
+	particle->m_particleSystems[0].m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+	particle->m_particleSystems[0].m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+	
 
 	particle->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);
 	particle->m_material = g_engineContext.m_resourceManager->GetMaterial("test");
 	particle->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
 	particle->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-
+	*/
 	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
 	{
 		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
@@ -527,9 +544,9 @@ void UpdateCamera(int index)
 		//Rotate 180 to fix camera
 		cameraTransform->m_orientation.Yaw(180);
 
-		camera->m_far = RM.PcameraList[index]->farClippingPlane;					
-		camera->m_near = RM.PcameraList[index]->nearClippingPlane;
-		camera->m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
+		camera->m_frustrum.m_far = RM.PcameraList[index]->farClippingPlane;					
+		camera->m_frustrum.m_near = RM.PcameraList[index]->nearClippingPlane;
+		camera->m_frustrum.m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
 
 		ReleaseMutex(RM.CameraMutexHandle);
 	}

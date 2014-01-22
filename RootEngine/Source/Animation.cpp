@@ -5,8 +5,9 @@ namespace RootEngine
 {
 	namespace RootAnimation
 	{
-		Animation::Animation() : m_numBones(0)
+		Animation::Animation(Logging* p_logging) : m_numBones(0)
 		{
+			m_logging = p_logging;
 		}
 
 		Animation::~Animation()
@@ -74,6 +75,45 @@ namespace RootEngine
 		glm::mat4x4 Animation::GetBoneOffset( unsigned int p_index )
 		{
 			return m_boneInfo[p_index].m_boneOffset;
+		}
+
+		void Animation::SplitAnimation()
+		{
+			unsigned int startFrame = 0;
+			double startTime = 0;
+			unsigned int numKeyFrames = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mNumPositionKeys;
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of key frames: %d", numKeyFrames);
+			for (unsigned int keyFrame = 0; keyFrame < numKeyFrames; keyFrame++)
+			{
+				bool tPose = true;
+				for (unsigned int channel = 0; channel < m_aiImporter->GetScene()->mAnimations[0]->mNumChannels; channel++)
+				{
+					aiQuaternion rotkey = m_aiImporter->GetScene()->mAnimations[0]->mChannels[channel]->mRotationKeys[keyFrame].mValue;
+					if (!(rotkey == aiQuaternion(0,0,0)))
+					{
+						tPose = false;
+						break;
+					}
+				}
+				if(tPose)
+				{
+					AnimClip clip;
+					clip.m_startTime = startTime;
+					clip.m_duration = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mRotationKeys[keyFrame - 1].mTime - startTime;
+					clip.m_startFrame = startFrame;
+					clip.m_stopFrame = keyFrame - 1;
+					m_animClips.push_back(clip);
+					startTime = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mRotationKeys[keyFrame + 1].mTime;
+					startFrame = keyFrame + 1;
+				}
+				
+			}
+			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of animation clips: %d", m_animClips.size());
+		}
+
+		AnimClip* Animation::GetAnimClip(unsigned int p_index)
+		{
+			return &m_animClips[p_index];
 		}
 
 	}

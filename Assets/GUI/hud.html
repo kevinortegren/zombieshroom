@@ -5,25 +5,25 @@
 		<script type="text/javascript" src="hud.js"></script>
 	</head>
 	<body onload="OnLoad();">
-		<div id="score">
+		<div id="score" style="z-index:100;">
 			<img src="Team.png" style="height: 45%;"/> <a id="TeamScore" style="color: green">573</a> : <a id="EnemyScore" style="color: red;">195</a><br />
 			<img src="Swordaxe.png" style="height: 45%;"/> <a id="PlayerScore" style="color: green">21</a> <img src="RIP.png" style="height: 45%;"/> <a id="PlayerDeaths" style="color: red;">16</a>
 		</div>
-		<div id="TimeLeftContainer">
-      <a id="TimeLeft">
-        30:00
-      </a>
+		<div id="TimeLeftContainer" style="z-index:100;">
+		  <a id="TimeLeft">
+			30:00
+		  </a>
 		</div>
-		<div id="chatbody">
+		<div id="chatbody" style="z-index:100;">
 			<div id="chatlog">
 			</div>
 			<input id="chatinput" type="text" />
 		</div>
-		<div id="healthcontainer">
+		<div id="healthcontainer" style="z-index:0;">
 			<img src="health.png" />
 			<a id="Health" style="display: inline-block; vertical-align: middle;"> 100 </a>
 		</div>
-		<div id="abilitybar">
+		<div id="abilitybar" style="z-index:0;">
 			<div id="slot0" class="slot">
 				<div id="slot0-cooldown" class="cooldown">
 					RMB
@@ -48,6 +48,12 @@
 		<div class="verticaltablehax" style="z-index:-500;">
 			<div class="verticalcenterhax" style="text-align: center">
 				<img id="crosshair" src="crosshair.png" />
+			</div>
+		</div>
+		<div id="deathscreen" style="z-index:50;">
+			<div id="deathtop">
+			</div>
+			<div id="deathbottom">
 			</div>
 		</div>
 	</body>

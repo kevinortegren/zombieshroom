@@ -5,11 +5,15 @@ layout(location = 1) in vec3 in_initialVel;
 layout(location = 2) in vec2 in_scale;
 layout(location = 3) in float in_age;
 layout(location = 4) in float in_type;
+layout(location = 5) in vec4 in_color;
+layout(location = 6) in vec3 in_accel;
 
 out vec3 vert_initialVel;
 out vec2 vert_scale;
 out float vert_age;
 out float vert_type;
+out vec4 vert_color;
+out vec3 vert_accel;
 
 void main()
 {
@@ -17,6 +21,8 @@ void main()
 	vert_scale = in_scale;
 	vert_age = in_age;
 	vert_type = in_type;
+	vert_color = in_color;
+	vert_accel = in_accel;
 
 	gl_Position = vec4( in_initialPos, 1.0f );
 }

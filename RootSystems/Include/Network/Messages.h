@@ -34,7 +34,9 @@ namespace RootForce
 				UserCommandPickUpAbility,
 				UserCommandJump,
 				UserCommandStopJumping,
-				HACK_TransformUpdate
+				HACK_TransformUpdate,
+				UserCommandMoveStop,
+				UserCommandStrafeStop,
 			};
 		}
 

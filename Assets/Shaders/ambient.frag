@@ -11,8 +11,5 @@ layout(std140) uniform Lights
 };
 
 void main() {
-
-	vec3 diffuse = texture(g_Diffuse, ex_TexCoord).xyz;
-
-    out_Color = vec4(g_Ambient.xyz * diffuse, 1.0f);
+    out_Color = vec4(g_Ambient.xyz * texture(g_Diffuse, ex_TexCoord.st).xyz, 1.0f);
 }

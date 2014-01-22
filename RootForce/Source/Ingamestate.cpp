@@ -9,28 +9,8 @@ namespace RootForce
 	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
 		, m_sharedSystems(p_sharedSystems)
-	{
-		RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
-        RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
-        RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
-		RootForce::HealthComponent::SetTypeId(RootForce::ComponentType::HEALTH);
-        RootForce::PlayerControl::SetTypeId(RootForce::ComponentType::PLAYERCONTROL);
-        RootForce::Physics::SetTypeId(RootForce::ComponentType::PHYSICS);
-        RootForce::Network::NetworkClientComponent::SetTypeId(RootForce::ComponentType::NETWORKCLIENT);
-        RootForce::Network::NetworkComponent::SetTypeId(RootForce::ComponentType::NETWORK);
-        RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
-        RootForce::LookAtBehavior::SetTypeId(RootForce::ComponentType::LOOKATBEHAVIOR);
-        RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
-        RootForce::Script::SetTypeId(RootForce::ComponentType::SCRIPT);
-        RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
-        RootForce::CollisionResponder::SetTypeId(RootForce::ComponentType::COLLISIONRESPONDER);
-		RootForce::ScoreComponent::SetTypeId(RootForce::ComponentType::SCORE);
-		RootForce::Animation::SetTypeId(RootForce::ComponentType::ANIMATION);
-		RootForce::UserAbility::SetTypeId(RootForce::ComponentType::ABILITY);
-		RootForce::Identity::SetTypeId(RootForce::ComponentType::IDENTITY);
-		RootForce::TDMRuleSet::SetTypeId(RootForce::ComponentType::TDMRULES);
-		RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
-
+	{	
+		ComponentType::Initialize();
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -38,6 +18,7 @@ namespace RootForce
 	void IngameState::Initialize()
 	{
 		//Bind c++ functions and members to Lua
+		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::logging_f, RootForce::LuaAPI::logging_m, "Logging");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
@@ -52,24 +33,32 @@ namespace RootForce
 		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-        
+		
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+		keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
+		keybindings[0].Edge = true;
 
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+		keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
+		keybindings[1].Edge = true;
 
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
 		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+		keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
+		keybindings[2].Edge = true;
 
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+		keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
+		keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
 		keybindings[4].Action = RootForce::PlayerAction::JUMP;
@@ -78,6 +67,18 @@ namespace RootForce
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
 		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
 		keybindings[5].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
+		keybindings[keybindings.size()-1].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
+		keybindings[keybindings.size()-1].Edge = true;
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
+		keybindings[keybindings.size()-1].Edge = true;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -85,25 +86,24 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// System responsible for executing script based on actions.
-		m_scriptSystem = new RootForce::ScriptSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem, "ScriptSystem");
-
 		// Initialize physics system
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
 
-		m_collisionSystem = new RootForce::CollisionSystem(g_world);
+		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
 
-		// Initialize render and point light system.
+		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+
+		m_shadowSystem = new RootForce::ShadowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
@@ -125,8 +125,21 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 
+		// Action system handles local and remote player issued actions and updates the world accordingly
+		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem, "ActionSystem");
+
+		// Respawn system respawns players after they die
+		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
+
+		// State system updates the current state of an entity for animation purposes
+		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+
 		m_displayPhysicsDebug = false;
-		m_displayNormals = false;		
+		m_displayNormals = false;
+		m_displayWorldDebug = false;
 	}
 
 	void IngameState::Enter()
@@ -138,14 +151,12 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 
-		// Load the level and create a world
-
 		//Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher());
-		m_hud->SetAbility(1, "TestBall");
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->SetAbility(1, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -164,19 +175,51 @@ namespace RootForce
 
 		for(int i = 0; i < 5; i++)
 		{
+			//Create particle entity
 			ECS::Entity* p = g_world->GetEntityManager()->CreateEntity();
+			//Add transform
 			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(p);
+			t->m_position = pos[i];
+			//Add Particle Emitter
 			RootForce::ParticleEmitter* e = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p);	
-		
-			Render::ParticleSystemDescription desc;
-			desc.m_initalPos = pos[i];
-			desc.m_initalVel = glm::vec3(0,0,0);
-			desc.m_size = glm::vec2(0.05f, 0.05f);
+			//Add particle system to emitter
+			RootForce::ParticleSystemStruct particleSystem;
+			e->m_particleSystems.push_back(particleSystem);
 
-			e->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);	
-			e->m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
-			e->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-			e->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+			//Set Particle system values
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_system = g_engineContext.m_renderer->CreateParticleSystem();	
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_material = g_engineContext.m_resourceManager->GetMaterial("particle");
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin = 15.0f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax = 15.0f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin = 1.0f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMax = 1.0f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin = glm::vec2(0.05f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax = glm::vec2(0.05f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd = glm::vec2(1.0f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd = glm::vec4(1.0f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity = glm::vec3(0.0f, -9.0f, 0.0f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_direction = glm::vec3(0.0f);
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_spread = 1.0f;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.03f;
+
+			//Point system values to params
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &t->m_position;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPEEDMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPEEDMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMax;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEMIN]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEMAX]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEEND]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::COLOR]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_color;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::COLOREND]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::GRAVITY]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::DIRECTION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_direction;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPREAD]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spread;
+			e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPAWNTIME]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime;
 		}
 
 		/* TEMP END. */
@@ -211,21 +254,44 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 
 		//Update all the data that is displayed in the HUD
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Health) );
-		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Score) );
-		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>( g_world->GetTagManager()->GetEntityByTag("Player") )->Deaths) );
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
+		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<ScoreComponent>(player)->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 
 		m_hud->Update();
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		if(event.EventType == RootServer::UserCommands::CLIENT_RAGEQUIT)
+		switch (event.EventType)
+		{
+		case RootServer::UserCommands::CLIENT_RAGEQUIT:
 			return GameStates::Menu;
-
+		case RootServer::UserCommands::CLIENT_SUICIDE:
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			break;
+		default:
+			break;
+		}
 #ifdef _DEBUG
-		//Debug drawing TODO: Remove for release
+		
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			if(m_displayWorldDebug)
+			{
+				m_displayWorldDebug = false;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+			else
+			{
+				m_displayWorldDebug = true;
+				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
+			}
+		}
+
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayPhysicsDebug)
@@ -239,37 +305,59 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-				g_engineContext.m_renderer->DisplayNormals(false);
 #endif
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			if(m_displayNormals)
+			{
+				m_displayNormals = false;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+			else
+			{
+				m_displayNormals = true;
+				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
+			}
+		}
+
 
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-		
-		m_sharedSystems.m_worldSystem->Process();
-
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
-			if(!m_hud->GetChatSystem()->IsFocused())
+
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
 		}
 
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
-
-        {
-            PROFILE("Collision system", g_engineContext.m_profiler);
-            m_collisionSystem->Process();
-        }
-        
+		//m_animationSystem->Process();
 		{
-			PROFILE("Script system", g_engineContext.m_profiler);
-			m_scriptSystem->Process();
+			PROFILE("Action system", g_engineContext.m_profiler);
+			m_actionSystem->Process();
+		}
+
+		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
+
+		{
+			PROFILE("Respawn system", g_engineContext.m_profiler);
+			m_respawnSystem->Process();
+		}
+
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
+			g_engineContext.m_physics->Update(p_deltaTime);
+			m_physicsSystem->Process();
+		}
+
+		{
+			PROFILE("Collision system", g_engineContext.m_profiler);
+			m_collisionSystem->Process();
+		}
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
 		}
 
 		if (m_networkContext.m_server != nullptr)
@@ -282,43 +370,46 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-        
-		{
-            PROFILE("Camera systems", g_engineContext.m_profiler);
-            m_playerControlSystem->UpdateAimingDevice();
-            m_thirdPersonBehaviorSystem->Process();
-            m_lookAtSystem->Process();
-            m_cameraSystem->Process();
-        }
 		
+		{
+			PROFILE("Camera systems", g_engineContext.m_profiler);
+			m_playerControlSystem->UpdateAimingDevice();
+			m_thirdPersonBehaviorSystem->Process();
+			m_lookAtSystem->Process();
+			m_cameraSystem->Process();
+		}
+		
+		{
+			PROFILE("Shadow system", g_engineContext.m_profiler);
+			m_shadowSystem->Process();
+		}
+
 		{ 
-			PROFILE("_ParticleSystem", g_engineContext.m_profiler);
+			PROFILE("ParticleSystem", g_engineContext.m_profiler);
 			m_particleSystem->Process();
 		}
 
 		{
-			PROFILE("AnimationSystem", g_engineContext.m_profiler);
-			m_animationSystem->Process();
+			PROFILE("World System", g_engineContext.m_profiler);
+			m_sharedSystems.m_worldSystem->Process();
 		}
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
-            m_pointLightSystem->Process();
+			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 
 		}
-
+		t.join();
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();
 		}
 
-
-
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();
-        
-        g_engineContext.m_profiler->Update(p_deltaTime);
+		
+		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
 			PROFILE("GUI", g_engineContext.m_profiler);
@@ -327,7 +418,7 @@ namespace RootForce
 			g_engineContext.m_gui->Render(m_hud->GetView());
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
-        
+		
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();

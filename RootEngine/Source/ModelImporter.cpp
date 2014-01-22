@@ -59,10 +59,8 @@ namespace RootEngine
 
 		if(aiscene->HasAnimations())
 		{
-			for (unsigned int i = 0 ; i < aiscene->mNumAnimations ; i++) 
-			{
-				m_model->m_animation->SetAiImporter(m_importer);
-			}
+			m_model->m_animation->SetAiImporter(m_importer);
+			m_model->m_animation->SplitAnimation();
 		}
 
 		return m_model;
@@ -75,7 +73,7 @@ namespace RootEngine
 
 	void ModelImporter::Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename )
 	{
-		for(int i = 0; i < p_node->mNumMeshes; ++i)
+		for(unsigned i = 0; i < p_node->mNumMeshes; ++i)
 		{
 			InitMesh(i, p_scene->mMeshes[i], p_filename);
 
@@ -83,7 +81,7 @@ namespace RootEngine
 			m_model->m_transform = glm::transpose(m_model->m_transform);
 		}
 
-		for(int i = 0; i < p_node->mNumChildren; ++i)
+		for(unsigned i = 0; i < p_node->mNumChildren; ++i)
 		{
 			Traverse(p_node->mChildren[i], p_scene, p_filename);
 		}
@@ -290,7 +288,7 @@ namespace RootEngine
 	{
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
 
-		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation();
+		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(m_context->m_logger);
 		m_boneData.resize(p_aiMesh->mNumVertices);
 		//Loop through all the bones in the mesh
 		for(unsigned int i = 0; i < p_aiMesh->mNumBones; i++)

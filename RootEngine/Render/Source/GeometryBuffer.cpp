@@ -1,5 +1,7 @@
 #include <RootEngine/Render/Include/GeometryBuffer.h>
 
+#include <RootEngine/Render/Include/RenderExtern.h>
+
 namespace Render
 {
 	GeometryBuffer::~GeometryBuffer()
@@ -30,6 +32,17 @@ namespace Render
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthHandle, 0);
 
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+			break;
+		default:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+			break;
+		}
+
 		glGenTextures(1, &m_diffuseHandle);
 		glBindTexture(GL_TEXTURE_2D, m_diffuseHandle);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -51,25 +64,14 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalsHandle, 0);
-
-		glGenTextures(1, &m_backgroundHandle);
-		glBindTexture(GL_TEXTURE_2D, m_backgroundHandle);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_backgroundHandle, 0);	
 	}
 
 	void GeometryBuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-		glDrawBuffers(4, buffers);
+		GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+		glDrawBuffers(3, buffers);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
@@ -86,9 +88,6 @@ namespace Render
 
 		glActiveTexture(GL_TEXTURE0 + 2);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GeometryBuffer::Read()
@@ -101,10 +100,6 @@ namespace Render
 
 		glActiveTexture(GL_TEXTURE0 + 2);
 		glBindTexture(GL_TEXTURE_2D, m_depthHandle);
-
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, m_backgroundHandle);
-	
 	}
 
 	void GeometryBuffer::Resize(int p_width, int p_height)
@@ -112,8 +107,6 @@ namespace Render
 		glDeleteTextures(1, &m_diffuseHandle);
 		glDeleteTextures(1, &m_normalsHandle);
 		glDeleteTextures(1, &m_depthHandle);
-		glDeleteTextures(1, &m_backgroundHandle);
-
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 

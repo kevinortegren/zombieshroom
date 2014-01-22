@@ -13,6 +13,11 @@ namespace RootForce
 		float m_range;
 	};
 
+	struct DirectionalLight : public ECS::Component<DirectionalLight>
+	{
+		glm::vec4 m_color;
+	};
+
 	class PointLightSystem : public ECS::EntitySystem
 	{
 	public:

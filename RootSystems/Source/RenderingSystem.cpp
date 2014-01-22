@@ -10,7 +10,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-		
+		int a = 0;
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -34,18 +34,13 @@ namespace RootForce
 			return;
 		}
 
-		glm::mat4x4 translation = glm::translate(glm::mat4(1.0f), transform->m_position);
-		//glm::mat4x4 rotation = glm::inverse(renderable->m_model->m_transform) * glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis()) * renderable->m_model->m_transform;
-		glm::mat4x4 rotation = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
-		glm::mat4x4 scale = glm::scale(transform->m_scale);
-
-		m_matrices[p_entity].m_model = translation * rotation * scale;
+		m_matrices[p_entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_position);
+		m_matrices[p_entity].m_model = glm::rotate(m_matrices[p_entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+		m_matrices[p_entity].m_model = glm::scale(m_matrices[p_entity].m_model, transform->m_scale);
 
 		m_matrices[p_entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[p_entity].m_model))));
 
-		//m_matrices[p_entity].m_model = m_matrices[p_entity].m_model;
 		m_matrices[p_entity].m_model = m_matrices[p_entity].m_model;
-
 
 		for(auto itr = renderable->m_model->m_meshes.begin(); itr != renderable->m_model->m_meshes.end(); ++itr)
 		{

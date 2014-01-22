@@ -46,12 +46,18 @@ namespace Render
 
 	void LightingDevice::AddDirectionalLight(const DirectionalLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_DIRECTIONALLIGHTS)
+			return;
+
 		m_lightVars.m_dlights[index] = p_light;
 		m_numDirectionalLights++;
 	}
 
 	void LightingDevice::AddPointLight(const PointLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_POINTLIGHTS)
+			return;
+
 		m_lightVars.m_plights[index] = p_light;
 		m_numPointLights++;
 	}
@@ -71,7 +77,6 @@ namespace Render
 		auto ambient = m_lightingTech->GetPrograms()[0];
 		auto directional = m_lightingTech->GetPrograms()[1];
 		auto pointlight = m_lightingTech->GetPrograms()[2];
-		auto background = m_lightingTech->GetPrograms()[3];
 
 		p_fullscreenQuad.Bind();
 
@@ -86,10 +91,6 @@ namespace Render
 		// Pointlights.
 		pointlight->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numPointLights);
-
-		// Forward blending.
-		background->Apply();
-		p_fullscreenQuad.Draw();
 
 		p_fullscreenQuad.Unbind();
 

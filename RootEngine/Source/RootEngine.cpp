@@ -77,7 +77,8 @@ namespace RootEngine
 		m_renderer = nullptr;
 
 		m_memTracker = new MemoryTracker(&g_logger);
-		
+		m_profiler.SetMemoryTracker(m_memTracker);
+
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
 		m_subsystemSharedContext.m_memTracker = m_memTracker;

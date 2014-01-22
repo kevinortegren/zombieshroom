@@ -8,19 +8,6 @@ namespace RootForce
 
 	void MatchStateSystem::Process()
 	{
-		if(m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->Health >= 0 &&
-			m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->IsDead == false)
-		{
-			m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->IsDead = true;
-			//Send a message over the network that a player has been killed and who by whom he was killed
-		}
-
-		if(m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->WantsRespawn)
-		{
-			m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->WantsRespawn = false;
-			m_world->GetEntityManager()->GetComponent<HealthComponent>(m_world->GetTagManager()->GetEntityByTag("Player"))->Health = 100;
-			//Respawn player at random spawnpoint
-		}
 	}
 
 	void MatchStateSystem::UpdateDeltatime( float p_deltaTime )

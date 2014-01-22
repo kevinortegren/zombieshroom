@@ -7,10 +7,10 @@
         - name: PerObject
           slot: 1
       uniforms:
-        - sem: MODEL
-          offset: 0
-        - sem: NORMAL
-          offset: 64
+          - sem: MODEL
+            offset: 0
+          - sem: NORMAL
+            offset: 64
       textures:
         - name: g_Diffuse
           slot: 0
