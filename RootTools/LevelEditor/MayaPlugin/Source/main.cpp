@@ -97,8 +97,6 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 		id = MModelMessage::addAfterDuplicateCallback(DuplicationCb, nullptr, &status);
 		AddCallbackID(status, id);	//Unresolved external symbol
-
-
 	}
 
 	return status;
@@ -107,10 +105,11 @@ void GivePaintId(int index, string filePath)
 {
 	if (filePath == "PaintTexture")
 	{
-		Print(SM.meshList[index].modelName, " given paintID! _______________________________________________________________________________________");
+		
 
 		if(SM.meshList[index].paintIndex == -1)
 		{
+			Print(SM.meshList[index].modelName, " given paintID ", paintCount);
 			SM.meshList[index].paintIndex = paintCount;
 
 			paintCount++;
@@ -180,8 +179,6 @@ void Export()
 				{
 					for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
 					{
-						
-
 						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
 						if ((SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length() <= THRESHOLD)
 						{
@@ -682,13 +679,15 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			{
 				Print("Mesh ", mesh.name(), " at index ", i);
 				removeID = i;
-				for(int j = i; j < currNrMeshes; j++)
+
+				for(int j = i; j < currNrMeshes-1; j++)
 				{
 					g_mayaMeshList[j] = g_mayaMeshList[j+1];
 					MayaMeshToList(g_mayaMeshList[j], j, true, true, true);
-					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);
+					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);					
 				}
-																					//Will crash if it reaches g_maxMeshes
+					
+				//g_mayaMeshList[currNrMeshes].~MObject();					//Will crash if it reaches g_maxMeshes
 				currNrMeshes--;
 				SM.RemoveMesh(removeID, currNrMeshes);
 			}
@@ -733,10 +732,10 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 	MObject source = srcPlug.node(&status1);
 	MObject destination = destPlug.node(&status2);
 	
-	Print("-_-_-_-_-_-_-_ ConnectionCB _-_-_-_-_-_-_-_-_-_-_");
-	Print("source is ", source.apiTypeStr());
-	Print("destination is ", destination.apiTypeStr());
-	Print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+	//Print("-_-_-_-_-_-_-_ ConnectionCB _-_-_-_-_-_-_-_-_-_-_");
+	//Print("source is ", source.apiTypeStr());
+	//Print("destination is ", destination.apiTypeStr());
+	//Print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
 
 	if (Status(__LINE__, status1) && Status(__LINE__, status2))
 	{
@@ -871,6 +870,7 @@ void checkForNewLights(MObject &node, void *clientData)
 	{
 		MObject transform = light.parent(0, &status);
 		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+
 		AddCallbackID(status, id);
 	}
 }
@@ -986,7 +986,7 @@ MString cleanFullPathName(const char * str)
 {
 	//Are being used to remove retarded symbols from fullpathname.
 	string tmpString = str;
-	char chars[] = "| _";
+	char chars[] = "| _:";
 	for (unsigned int i = 0; i < strlen(chars); ++i)
 	{
 		tmpString.erase(std::remove(tmpString.begin(), tmpString.end(), chars[i]), tmpString.end());
@@ -1087,6 +1087,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node);
 		materialName = material_node.name();
 		string texPath = texturepath.asChar();
+
+		
 
 		MImage texture;
 

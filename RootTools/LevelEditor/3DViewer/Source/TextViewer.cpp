@@ -607,15 +607,10 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-	numberMeshes = *RM.NumberOfMeshes;
-	ReleaseMutex(RM.MeshMutexHandle);
-	
+	numberMeshes = *RM.NumberOfMeshes;	
 
 	if(MeshIndex != -1)					
 	{
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");		
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-
 		bool newMaterial = false;
 		int size = Entities.size()-1;
 		if(MeshIndex > size)
@@ -694,17 +689,20 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 		}
 
-		ReleaseMutex(RM.MeshMutexHandle);
+		
 	}
 
 	//Remove mesh at index
-	if(RemoveMeshIndex != -1 && RemoveMeshIndex < Entities.size() && RemoveMeshIndex > 0)	
+	if(RemoveMeshIndex < Entities.size() && RemoveMeshIndex >= 0)	
 	{					
 		cout << "Removing " << RemoveMeshIndex << " EntitySize " << Entities.size() << endl;
 		m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
 		m_world.GetEntityManager()->RemoveEntity(Entities[RemoveMeshIndex]);
 		Entities.erase(Entities.begin() + RemoveMeshIndex);
+		//*RM.PmeshList[RemoveMeshIndex] = Mesh();
 	}
+
+	ReleaseMutex(RM.MeshMutexHandle);
 }
 
 void UpdateLight(int index, bool remove, bool firstTimeLoad)

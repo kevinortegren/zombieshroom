@@ -340,6 +340,7 @@ void SharedMemory::RemoveMesh(int id, int nrOfMeshes)
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
 	*NumberOfMeshes = nrOfMeshes;
+	//meshList[id] = Mesh();
 
 	ReleaseMutex(MeshMutexHandle);
 
