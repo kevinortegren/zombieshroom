@@ -1,5 +1,7 @@
 #pragma once
 
+#include <climits>
+
 namespace ECS
 {
 	static unsigned int s_numComponents;

@@ -5,14 +5,27 @@
 #include <stdint.h>
 #include <vector>
 #include <Utility/ECS/Include/Entity.h>
-//#include <RootSystems/Include/Components.h> // DO NOT COMMENT IN, COMPILE ERRORS FROM HELL AWAIT YE (cyclical dependency)
+#include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
 
-
-
 namespace RootForce
 {
+	/** Forward declare serializable components */
+	struct Transform;
+	struct HealthComponent;
+	struct Physics;
+	struct LookAtBehavior;
+	struct Script;
+	struct PlayerComponent;
+	struct TDMRuleSet;
+	struct PlayerPhysics;
+
+	namespace Network
+	{
+		struct NetworkComponent;
+	}
+
 	namespace NetworkMessage
 	{
 		/** Define the message types */
@@ -38,41 +51,6 @@ namespace RootForce
 			};
 		}
 
-		/*
-			Sent at regular intervals from the server to the clients.
-		*/
-		/*
-		struct GameStateDelta
-		{
-			struct SerializableComponent
-			{
-				ComponentType::ComponentType Type;
-				unsigned int DataSize;
-				char* Data;
-
-				SerializableComponent();
-				~SerializableComponent();
-				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-				void SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
-				ECS::ComponentInterface* DeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
-			};
-
-			struct SerializableEntity
-			{
-				Network::NetworkEntityID ID;
-				RakNet::RakString ScriptName;
-				std::vector<SerializableComponent> Components;
-
-				void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-				void SerializeEntity(ECS::Entity* p_entity);
-				ECS::Entity* DeserializeEntity(const Network::NetworkEntityMap& p_map);
-			};
-
-			std::vector<SerializableEntity> Entities;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-		*/
 
 		/* 
 			Sent when a chat message is entered. This will be sent to the server and then sent to the given recipients. 
@@ -237,5 +215,73 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
+
+
+		/*
+			Serialize functions for components
+		*/
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HealthComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Physics* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Network::NetworkComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, LookAtBehavior* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Script* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
+
+
+		/*
+			Returns true if the specified component can be serialized. False otherwise.
+		*/
+		bool CanSerializeComponent(ComponentType::ComponentType p_type);
+
+		/*
+			Serialize a general component into a bitstream. Returns true if the component can be serialized, false otherwise.
+
+			Components are serialized in the following way:
+				- Type : ComponentType
+				- Data
+			The data is serialized differently for different component types.
+		*/
+		bool SerializeComponent(RakNet::BitStream* p_bs, ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type);
+
+		/*
+			Deserialize a component. This will create a new component in the given entity manager if the component doesn't exist on the given entity.
+			Returns nullptr on error.
+
+			The serialized data in the bitstream is assumed to be in the following order:
+				- Type : ComponentType
+				- Data
+			Where data can be deserialized differently depending on type.
+		*/
+		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
+
+		/*
+			Serialize an entity and all of its serializable components. The entity needs to have a script component registered in the given entity manager.
+			The entity does also need to be registered in the given network entity map. Returns false if these requirements are not met.
+
+			Entities are serialized in the following way:
+				- ID : NetworkEntityID
+				- ScriptName : RakString
+				- NumberOfComponents : int
+				- Components
+			Where components are serialized differently depending on type. See SerializeComponent for more information.
+		*/
+		bool SerializeEntity(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, const Network::NetworkEntityMap& p_map);
+
+		/*
+			Deserialize an entity and all of its serialized components. This will create an entity in the entity manager
+			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map.
+
+			The serialized data in the bitstream is assumed to be in the following order:
+				- ID : NetworkEntityID
+				- ScriptName : RakString
+				- NumberOfComponents : int
+				- Components
+			Where components are deserialized differently depending on their type. See DeserializeComponent for more information.
+		*/
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map);
 	}
 }

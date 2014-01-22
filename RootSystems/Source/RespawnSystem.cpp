@@ -70,9 +70,9 @@ namespace RootSystems
 			if(numspawns == chosenspwn)
 			{
 				int x,y,z;
-				x = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.x;
-				y = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
-				z = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
+				x = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.x;
+				y = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
+				z = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
 				m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %d %d %d",chosenspwn,x,y,z );
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}

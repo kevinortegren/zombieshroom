@@ -1,7 +1,18 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/CameraSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
+#include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/PlayerSystem.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/CollisionSystem.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 #include <cstring>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
@@ -32,8 +43,12 @@ namespace RootForce
 		{
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->m_position[i]);
+			
+			glm::quat q = p_c->m_orientation.GetQuaternion();
 			for (int i = 0; i < 4; ++i)
-				p_bs->Serialize(p_writeToBitstream, p_c->m_orientation.GetQuaternion()[i]);
+				p_bs->Serialize(p_writeToBitstream, q[i]);
+			p_c->m_orientation.SetOrientation(q);
+
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->m_scale[i]);
 		}
@@ -87,7 +102,7 @@ namespace RootForce
 			}
 		}
 
-		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Player* p_c)
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c)
 		{
 			if (p_writeToBitstream)
 			{
@@ -137,10 +152,11 @@ namespace RootForce
 		
 		
 
-		void GameStateDelta::SerializableComponent::SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type)
+		bool GameStateDelta::SerializableComponent::SerializeComponent(ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type)
 		{
 			Type = p_type;
 			
+			bool success = false;
 			RakNet::BitStream bs;
 			switch (p_type)
 			{
@@ -149,6 +165,7 @@ namespace RootForce
 					Transform* c = (Transform*) p_component;
 					
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::HEALTH:
@@ -156,6 +173,7 @@ namespace RootForce
 					HealthComponent* c = (HealthComponent*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::PHYSICS:
@@ -163,6 +181,7 @@ namespace RootForce
 					Physics* c = (Physics*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::NETWORK:
@@ -170,6 +189,7 @@ namespace RootForce
 					Network::NetworkComponent* c = (Network::NetworkComponent*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::LOOKATBEHAVIOR:
@@ -177,6 +197,7 @@ namespace RootForce
 					LookAtBehavior* c = (LookAtBehavior*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::SCRIPT:
@@ -184,13 +205,15 @@ namespace RootForce
 					Script* c = (Script*) p_component;
 					
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::PLAYER:
 				{
-					Player* c = (Player*) p_component;
+					PlayerComponent* c = (PlayerComponent*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::TDMRULES:
@@ -198,6 +221,7 @@ namespace RootForce
 					TDMRuleSet* c = (TDMRuleSet*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 
 				case ComponentType::PLAYERPHYSICS:
@@ -205,76 +229,87 @@ namespace RootForce
 					PlayerPhysics* c = (PlayerPhysics*) p_component;
 
 					RootForce::NetworkMessage::Serialize(true, &bs, c);
+					success = true;
 				} break;
 			}
 
-			DataSize = bs.GetNumberOfBytesUsed();
-			RakNet::BitSize_t bitsize = bs.CopyData((unsigned char**)&Data);
+			if (success)
+			{
+				DataSize = bs.GetNumberOfBytesUsed();
+				RakNet::BitSize_t bitsize = bs.CopyData((unsigned char**)&Data);
 
-			assert( (int)std::ceil(bitsize / 8.0f) == DataSize);
+				assert( (int)std::ceil(bitsize / 8.0f) == DataSize);
+			}
+
+			return success;
 		}
 
 		template <typename T>
-		T* CreateOrGetAndDeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		T* CreateOrGetAndDeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, RakNet::BitStream& p_bs)
 		{
 			T* c = p_entityManager->GetComponent<T>(p_entity);
 			if (c == nullptr)
-				p_entityManager->CreateComponent<T>(p_entity);
+				c = p_entityManager->CreateComponent<T>(p_entity);
 
-			RootForce::NetworkMessage::Serialize(false, &bs, c);
+			RootForce::NetworkMessage::Serialize(false, &p_bs, c);
+
+			return c;
 		}
 
 		ECS::ComponentInterface* GameStateDelta::SerializableComponent::DeserializeComponent(ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
 		{
 			RakNet::BitStream bs((unsigned char*)Data, DataSize, false);
 
+			ECS::ComponentInterface* component = nullptr;
 			switch (Type)
 			{
 				case ComponentType::TRANSFORM:
 				{
-					CreateOrGetAndDeserializeComponent<Transform>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Transform>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::HEALTH:
 				{
-					CreateOrGetAndDeserializeComponent<HealthComponent>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<HealthComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PHYSICS:
 				{
-					CreateOrGetAndDeserializeComponent<Physics>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Physics>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::NETWORK:
 				{
-					CreateOrGetAndDeserializeComponent<Network::NetworkComponent>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Network::NetworkComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::LOOKATBEHAVIOR:
 				{
-					CreateOrGetAndDeserializeComponent<LookAtBehavior>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<LookAtBehavior>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::SCRIPT:
 				{
-					CreateOrGetAndDeserializeComponent<Script>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<Script>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PLAYER:
 				{
-					CreateOrGetAndDeserializeComponent<Player>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<PlayerComponent>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::TDMRULES:
 				{
-					CreateOrGetAndDeserializeComponent<TDMRuleSet>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<TDMRuleSet>(p_entity, p_entityManager, bs);
 				} break;
 
 				case ComponentType::PLAYERPHYSICS:
 				{
-					CreateOrGetAndDeserializeComponent<PlayerPhysics>(p_entity, p_entityManager);
+					component = CreateOrGetAndDeserializeComponent<PlayerPhysics>(p_entity, p_entityManager, bs);
 				} break;
 			}
+
+			return component;
 		}
 
 
@@ -289,10 +324,80 @@ namespace RootForce
 			if (!p_writeToBitstream)
 				Components.resize(size);
 
-			for (int i = 0; i < Components.size(); ++i)
+			for (size_t i = 0; i < Components.size(); ++i)
 			{
 				Components[i].Serialize(p_writeToBitstream, p_bs);
 			}
+		}
+
+		bool GameStateDelta::SerializableEntity::SerializeEntity(ECS::Entity* p_entity, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
+		{
+			Network::NetworkEntityMap::const_iterator it;
+			for (it = p_map.begin(); it != p_map.end(); it++)
+			{
+				if (it->second == p_entity)
+					break;
+			}
+
+			if (it == p_map.end())
+			{
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No associated network entity ID", p_entity->GetId());
+				return false;
+			}
+
+			Script* script = p_world->GetEntityManager()->GetComponent<Script>(p_entity);
+			if (script == nullptr)
+			{
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No script component", p_entity->GetId());
+				return false;
+			}
+
+			ID = it->first;
+			ScriptName = RakNet::RakString(script->Name.c_str());
+
+			std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components = p_world->GetEntityManager()->GetAllComponents(p_entity);
+			for (size_t i = 0; i < components.size(); ++i)
+			{
+				Components.push_back(SerializableComponent());
+				if (!Components.back().SerializeComponent(components[i].second, (ComponentType::ComponentType)components[i].first))
+					Components.pop_back();
+			}
+
+			return true;
+		}
+
+		ECS::Entity* GameStateDelta::SerializableEntity::DeserializeEntity(ECS::World* p_world, Network::NetworkEntityMap& p_map)
+		{
+			ECS::Entity* entity;
+			Network::NetworkEntityMap::const_iterator it = p_map.find(ID);
+			
+			if (it == p_map.end())
+			{
+				// Entity doesn't exist, so create it.
+				entity = p_world->GetEntityManager()->CreateEntity();
+
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(ScriptName.C_String()), "OnCreate");
+				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
+				g_engineContext.m_script->AddParameterNumber(ID.UserID);
+				g_engineContext.m_script->AddParameterNumber(ID.ActionID);
+				g_engineContext.m_script->ExecuteScript();
+
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(ScriptName.C_String()), "AddClientComponents");
+				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
+				g_engineContext.m_script->ExecuteScript();
+			}
+			else
+			{
+				entity = it->second;
+			}
+
+			// Deserialize components
+			for (size_t i = 0; i < Components.size(); ++i)
+			{
+				Components[i].DeserializeComponent(entity, p_world->GetEntityManager());
+			}
+
+			return entity;
 		}
 
 		void GameStateDelta::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -303,7 +408,7 @@ namespace RootForce
 			if (!p_writeToBitstream)
 				Entities.resize(size);
 
-			for (int i = 0; i < Entities.size(); ++i)
+			for (size_t i = 0; i < Entities.size(); ++i)
 			{
 				Entities[i].Serialize(p_writeToBitstream, p_bs);
 			}
@@ -399,6 +504,372 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, GameMode);
 			p_bs->Serialize(p_writeToBitstream, MatchTimeSeconds);
 			p_bs->Serialize(p_writeToBitstream, KillCount);
+		}
+
+
+
+
+		/*
+		void GameStateDelta::SerializableComponent::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, Type);
+			p_bs->Serialize(p_writeToBitstream, DataSize);
+
+			if (!p_writeToBitstream)
+				Data = new char[DataSize];
+			p_bs->Serialize(p_writeToBitstream, Data, DataSize);
+		}
+		*/
+
+
+
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
+		{
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->m_position[i]);
+			
+			glm::quat q = p_c->m_orientation.GetQuaternion();
+			for (int i = 0; i < 4; ++i)
+				p_bs->Serialize(p_writeToBitstream, q[i]);
+			p_c->m_orientation.SetOrientation(q);
+
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->m_scale[i]);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HealthComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Health);
+			p_bs->Serialize(p_writeToBitstream, p_c->LastDamageSourceID);
+			p_bs->Serialize(p_writeToBitstream, p_c->IsDead);
+			p_bs->Serialize(p_writeToBitstream, p_c->WantsRespawn);
+			p_bs->Serialize(p_writeToBitstream, p_c->RespawnDelay);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Physics* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->m_mass);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Network::NetworkComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->ID);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, LookAtBehavior* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->m_displacement);
+
+			if (p_writeToBitstream)
+			{
+				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->m_targetTag.c_str()) );
+			}
+			else
+			{
+				RakNet::RakString s;
+				p_bs->Serialize(p_writeToBitstream, s);
+				p_c->m_targetTag = std::string(s.C_String());
+			}
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Script* p_c)
+		{
+			if (p_writeToBitstream)
+			{
+				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->Name.c_str()) );
+			}
+			else
+			{
+				RakNet::RakString s;
+				p_bs->Serialize(p_writeToBitstream, s);
+				p_c->Name = std::string(s.C_String());
+			}
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c)
+		{
+			if (p_writeToBitstream)
+			{
+				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->Name.c_str()) );
+			}
+			else
+			{
+				RakNet::RakString s;
+				p_bs->Serialize(p_writeToBitstream, s);
+				p_c->Name = std::string(s.C_String());
+			}
+
+			p_bs->Serialize(p_writeToBitstream, p_c->TeamID);
+
+			for (int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
+			{
+				if (p_writeToBitstream)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->AbilityScripts[i].c_str()) );
+				}
+				else
+				{
+					RakNet::RakString s;
+					p_bs->Serialize(p_writeToBitstream, s);
+					p_c->AbilityScripts[i] = std::string(s.C_String());
+				}
+			}
+			p_bs->Serialize(p_writeToBitstream, p_c->SelectedAbility);
+
+			p_bs->Serialize(p_writeToBitstream, p_c->Score);
+			p_bs->Serialize(p_writeToBitstream, p_c->Deaths);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->TimeLeft);
+			p_bs->Serialize(p_writeToBitstream, p_c->ScoreLimit);
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->TeamScore[i]);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->MovementSpeed);
+			p_bs->Serialize(p_writeToBitstream, p_c->JumpForce);
+		}
+
+
+		bool CanSerializeComponent(ComponentType::ComponentType p_type)
+		{
+			switch (p_type)
+			{
+				case ComponentType::TRANSFORM:
+				case ComponentType::HEALTH:
+				case ComponentType::PHYSICS:
+				case ComponentType::NETWORK:
+				case ComponentType::LOOKATBEHAVIOR:
+				case ComponentType::SCRIPT:
+				case ComponentType::PLAYER:
+				case ComponentType::TDMRULES:
+				case ComponentType::PLAYERPHYSICS:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		bool SerializeComponent(RakNet::BitStream* p_bs, ECS::ComponentInterface* p_component, ComponentType::ComponentType p_type)
+		{
+			if (CanSerializeComponent(p_type))
+				p_bs->Serialize(true, p_type);
+
+			switch (p_type)
+			{
+				case ComponentType::TRANSFORM:
+					Serialize(true, p_bs, (RootForce::Transform*) p_component);
+				return true;
+
+				case ComponentType::HEALTH:
+					Serialize(true, p_bs, (RootForce::HealthComponent*) p_component);
+				return true;
+
+				case ComponentType::PHYSICS:
+					Serialize(true, p_bs, (RootForce::Physics*) p_component);
+				return true;
+
+				case ComponentType::NETWORK:
+					Serialize(true, p_bs, (RootForce::Network::NetworkComponent*) p_component);
+				return true;
+
+				case ComponentType::LOOKATBEHAVIOR:
+					Serialize(true, p_bs, (RootForce::LookAtBehavior*) p_component);
+				return true;
+
+				case ComponentType::SCRIPT:
+					Serialize(true, p_bs, (RootForce::Script*) p_component);
+				return true;
+
+				case ComponentType::PLAYER:
+					Serialize(true, p_bs, (RootForce::PlayerComponent*) p_component);
+				return true;
+
+				case ComponentType::TDMRULES:
+					Serialize(true, p_bs, (RootForce::TDMRuleSet*) p_component);
+				return true;
+
+				case ComponentType::PLAYERPHYSICS:
+					Serialize(true, p_bs, (RootForce::PlayerPhysics*) p_component);
+				return true;
+			}
+
+			return false;
+		}
+
+		template <typename T>
+		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		{
+			T* component = p_entityManager->GetComponent<T>(p_entity);
+			if (component == nullptr)
+				component = p_entityManager->CreateComponent<T>(p_entity);
+
+			if (component == nullptr)
+				return nullptr;
+
+			Serialize(false, p_bs, component);
+
+			return component;
+		}
+
+		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		{
+			ComponentType::ComponentType type;
+			if (!p_bs->Serialize(false, type))
+				return nullptr;
+
+			ECS::ComponentInterface* component;
+			switch (type)
+			{
+				case ComponentType::TRANSFORM:
+					component = CreateOrGetDeserializedComponent<RootForce::Transform>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::HEALTH:
+					component = CreateOrGetDeserializedComponent<RootForce::HealthComponent>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::PHYSICS:
+					component = CreateOrGetDeserializedComponent<RootForce::Physics>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::NETWORK:
+					component = CreateOrGetDeserializedComponent<RootForce::Network::NetworkComponent>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::LOOKATBEHAVIOR:
+					component = CreateOrGetDeserializedComponent<RootForce::LookAtBehavior>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::SCRIPT:
+					component = CreateOrGetDeserializedComponent<RootForce::Script>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::PLAYER:
+					component = CreateOrGetDeserializedComponent<RootForce::PlayerComponent>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::TDMRULES:
+					component = CreateOrGetDeserializedComponent<RootForce::TDMRuleSet>(p_bs, p_entity, p_entityManager);
+				break;
+
+				case ComponentType::PLAYERPHYSICS:
+					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager);
+				break;
+
+				default:
+					return nullptr;
+			}
+
+			return component;
+		}
+
+		bool SerializeEntity(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, const Network::NetworkEntityMap& p_map)
+		{
+			// Find the entity in the network entity map.
+			Network::NetworkEntityMap::const_iterator it;
+			for (it = p_map.begin(); it != p_map.end(); it++)
+			{
+				if (it->second == p_entity)
+					break;
+			}
+
+			// If it doesn't exist, return false.
+			if (it == p_map.end())
+			{
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No associated network entity ID", p_entity->GetId());
+				return false;
+			}
+
+			// Make sure the entity has a script component.
+			Script* script = p_entityManager->GetComponent<Script>(p_entity);
+			if (script == nullptr)
+			{
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to serialize entity (ID: %d): No script component", p_entity->GetId());
+				return false;
+			}
+
+			// Serialize the network entity ID
+			p_bs->Serialize(true, it->first);
+
+			// Serialize the script name (that can be used to create this entity if it doesn't exist on the recipient side).
+			p_bs->Serialize(true, RakNet::RakString(script->Name.c_str()));
+
+			// Get all components associated with this entity and count the number of components we can serialize.
+			std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components = p_entityManager->GetAllComponents(p_entity);
+			
+			unsigned int count = 0;
+			for (size_t i = 0; i < components.size(); ++i)
+			{
+				if (CanSerializeComponent((ComponentType::ComponentType)components[i].first))
+					++count;
+			}
+
+			p_bs->Serialize(true, count);
+
+			// Serialize the components
+			for (size_t i = 0; i < components.size(); ++i)
+			{
+				if (CanSerializeComponent((ComponentType::ComponentType) components[i].first))
+					SerializeComponent(p_bs, components[i].second, (ComponentType::ComponentType) components[i].first);
+			}
+
+			return true;
+		}
+
+
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map)
+		{
+			Network::NetworkEntityID id;
+			RakNet::RakString scriptName;
+
+			if (!p_bs->Serialize(false, id))
+				return nullptr;
+			if (!p_bs->Serialize(false, scriptName))
+				return nullptr;
+
+			ECS::Entity* entity = nullptr;
+			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
+			if (it == p_map.end())
+			{
+				// Entity doesn't exist, use the script to create it.
+				entity = p_entityManager->CreateEntity();
+
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
+				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
+				g_engineContext.m_script->AddParameterNumber(id.UserID);
+				g_engineContext.m_script->AddParameterNumber(id.ActionID);
+				g_engineContext.m_script->ExecuteScript();
+
+				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "AddClientComponents");
+				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
+				g_engineContext.m_script->ExecuteScript();
+
+				p_map[id] = entity;
+			}
+			else
+			{
+				entity = p_map[id];
+			}
+
+			// Read the number of components
+			unsigned int count;
+			if (!p_bs->Serialize(false, count))
+				return nullptr;
+
+			// Deserialize all components
+			for (unsigned i = 0; i < count; ++i) 
+			{
+				if (DeserializeComponent(p_bs, entity, p_entityManager) == nullptr)
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
+			}
+
+			return entity;
 		}
 	}
 }
