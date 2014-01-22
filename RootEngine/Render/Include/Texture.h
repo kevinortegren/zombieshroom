@@ -15,13 +15,24 @@ namespace Render
 		};
 	}
 
+	namespace TextureFormat
+	{
+		enum TextureFormat
+		{
+			TEXTURE_RGBA,
+			TEXTURE_BGRA,
+			TEXTURE_RGB,
+			TEXTURE_BGR,
+			TEXTURE_DEPTH_COMPONENT
+		};
+	}
+
 	struct TextureInterface
 	{
 		virtual bool Load(const std::string filepath) = 0;
 		virtual bool LoadCubeMap(const std::string& filepath) = 0;
 
 		virtual void Enable(unsigned int slot) = 0;
-		virtual unsigned int GetID() = 0;
 		virtual unsigned int GetWidth() = 0;
 		virtual unsigned int GetHeight() = 0;
 		virtual glm::vec2 GetSize() = 0;
@@ -41,8 +52,8 @@ namespace Render
 
 		void Enable(unsigned int p_slot);
 		void SetParameter(int p_name, int p_parameter);
+		void CreateEmptyTexture(int p_width, int p_height, int p_format);
 
-		unsigned int GetID();
 		unsigned int GetWidth();
 		unsigned int GetHeight();
 		GLuint GetHandle() const;
