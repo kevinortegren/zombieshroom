@@ -160,6 +160,8 @@ namespace RootForce
 						g_engineContext.m_script->AddParameterNumber(id.UserID);
 						g_engineContext.m_script->AddParameterNumber(id.ActionID);
 						g_engineContext.m_script->ExecuteScript();
+
+						
 					}
 
 					// Add client components onto the entity

@@ -1,7 +1,9 @@
 Player = {}
 
-function Player.OnCreate(self, userId, actionId)
+function Player.OnCreate(userId, actionId)
+	
 	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
+
 	local transform = Transformation.New(self);
 	local playerPhysics = PlayerPhysics.New(self);
 	local health = Health.New(self);
@@ -54,36 +56,35 @@ function Player.OnCreate(self, userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
-	-- ToDo: Move AimingDevice tag to local player only
-	Entity.RegisterTag("AimingDevice", aimingEntity);
-end
+    
+    if Global.IsServer then
+        local renderable = Renderable.New(self);
+        local animation = Animation.New(self);
 
-function Player.AddClientComponents(self)
-	local renderable = Renderable.New(self);
-	local animation = Animation.New(self);
+        renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
+        renderable:SetModel("testchar");
+        renderable:SetMaterial("testchar");
+        renderable:SetMaterialDiffuse("WStexture");
+        renderable:SetMaterialSpecular("WSSpecular");
+        renderable:SetMaterialNormal("WSNormal");
+        renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
+        renderable:SetAnimation(animation);
+    end
+    
+    if Global.UserID == userId then
+        local playerControl = PlayerControl.New(self);
 
-	renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
-	renderable:SetModel("testchar");
-	renderable:SetMaterial("testchar");
-	renderable:SetMaterialDiffuse("WStexture");
-	renderable:SetMaterialSpecular("WSSpecular");
-	renderable:SetMaterialNormal("WSNormal");
-	renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
-	renderable:SetAnimation(animation);
-end
+        playerControl:SetMouseSensitivity(0.3);
 
-function Player.AddLocalClientComponents(self)
-	local playerControl = PlayerControl.New(self);
-
-	playerControl:SetMouseSensitivity(0.3);
-
-	Entity.RegisterTag("Player", self);
+        Entity.RegisterTag("Player", self);
+        Entity.RegisterTag("AimingDevice", aimingEntity);
+    end
 end
 
 function Player.OnCollide (self, entity)
 	-- Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
 end
 
-function Player.OnDestroy ()
-	
+function Player.OnDestroy (self)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
 end

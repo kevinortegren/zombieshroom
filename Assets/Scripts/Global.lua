@@ -1,3 +1,8 @@
+Global = {
+	UserID = -1;
+	IsClient = false;
+}
+
 EntityState = {
   ASCENDING = 0;
   DESCENDING = 1;
