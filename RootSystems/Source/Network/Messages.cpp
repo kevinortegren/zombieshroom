@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <Utility/ECS/Include/World.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Transform.h>
@@ -914,7 +915,7 @@ namespace RootForce
 			p_bs->Serialize(true, count);
 
 			// Serialize all serializable entities.
-			for (int i = 0; i < entities.size(); ++i)
+			for (size_t i = 0; i < entities.size(); ++i)
 			{
 				SerializeEntity(p_bs, entities[i], p_world->GetEntityManager(), p_map);
 			}

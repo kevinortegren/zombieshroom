@@ -9,6 +9,11 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
 
+namespace ECS
+{
+	class World;
+}
+
 namespace RootForce
 {
 	/** Forward declare serializable components */
