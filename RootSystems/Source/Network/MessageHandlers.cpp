@@ -385,17 +385,16 @@ namespace RootForce
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%s)", p_packet->systemAddress.ToString());
 
-					ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
-					m_world->GetTagManager()->RegisterEntity("Player", playerEntity);
-					
+					ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
+					ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<ClientComponent>(clientEntity);
+					clientComponent->State = ClientState::AWAITING_SERVER_INFO;
+
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::CONNECT;
 					id.SequenceID = 0;
 
-					networkEntityMap[id] = playerEntity;
-
-					// TODO: Set state for user, waiting for user information.
+					networkEntityMap[id] = clientEntity;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
@@ -461,8 +460,8 @@ namespace RootForce
 					id.ActionID = ReservedActionID::CONNECT;
 					id.SequenceID = 0;
 
-					PlayerComponent* player = m_world->GetEntityManager()->CreateComponent<PlayerComponent>(networkEntityMap[id]);
-					player->Name = m.Name.C_String();
+					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(networkEntityMap[id]);
+					clientComponent->Name = m.Name.C_String();
 					
 					// Send server information
 					RakNet::BitStream bs;
@@ -471,7 +470,8 @@ namespace RootForce
 
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 
-					// TODO: Set state for user, waiting for map load status.
+					// Set state for user, awaiting user connect.
+					clientComponent->State = ClientState::AWAITING_USER_CONNECT;
 				} return true;
 
 				case NetworkMessage::MessageType::PlayerCommand:
@@ -496,82 +496,86 @@ namespace RootForce
 
 						case NetworkMessage::LoadMapStatus::STATUS_COMPLETED:
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client (%s) successfully loaded map", p_packet->systemAddress.ToString());
-							
-							// TODO: IMPORTANT - LEVEL FINISHING TO LOAD DOESN'T NECESSARILY MEAN A CLIENT HAS FINISHED CONNECTING. MUST CHECK CLIENT STATE.
-
 							// Get the player information
 							NetworkEntityID id;
 							id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 							id.ActionID = ReservedActionID::CONNECT;
 							id.SequenceID = 0;
 
-							PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
-							std::string name = player->Name;
+							ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(networkEntityMap[id]);
 							
-							// Create the player, given a player entity.
-							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-							g_engineContext.m_script->AddParameterUserData(networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
-							g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
-							g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
-							g_engineContext.m_script->ExecuteScript();
-
-							player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
-							player->Name = name;
-
-							// Send a user connected message to all clients except connectee.
-							DataStructures::List<RakNet::SystemAddress> addresses;
-							DataStructures::List<RakNet::RakNetGUID> guids;
-							m_peer->GetSystemList(addresses, guids);
-
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							if (clientComponent->State == ClientState::AWAITING_USER_CONNECT)
 							{
-								if (addresses[i] != p_packet->systemAddress)
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client (%s) successfully loaded map", p_packet->systemAddress.ToString());
+							
+								// Create the player, given a player entity.
+								ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
+								id.SequenceID = 1;
+								networkEntityMap[id] = playerEntity;
+
+								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+								g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
+								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+								g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
+								g_engineContext.m_script->ExecuteScript();
+
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+								playerComponent->Name = clientComponent->Name;
+
+								// Send a user connected message to all clients except connectee.
+								DataStructures::List<RakNet::SystemAddress> addresses;
+								DataStructures::List<RakNet::RakNetGUID> guids;
+								m_peer->GetSystemList(addresses, guids);
+
+								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
+									if (addresses[i] != p_packet->systemAddress)
+									{
+										NetworkMessage::UserConnected n;
+										n.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+										n.IsYou = false;
+										n.Name = RakNet::RakString(playerComponent->Name.c_str());
+
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
+										n.Serialize(true, &bs);
+
+										m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									}
+								}
+
+								// Send a user connected message for all clients to the connectee.
+								for (unsigned int i = 0; i < addresses.Size(); ++i)
+								{
+									// Get player information
+									NetworkEntityID id;
+									id.UserID = i;
+									id.ActionID = ReservedActionID::CONNECT;
+									id.SequenceID = 1;
+
+									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+
+									// Craft message
 									NetworkMessage::UserConnected n;
 									n.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-									n.IsYou = false;
-									n.Name = RakNet::RakString(player->Name.c_str());
+									n.IsYou = n.User == i;
+									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
 									RakNet::BitStream bs;
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 									n.Serialize(true, &bs);
 
-									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
-							}
 
-							// Send a user connected message for all clients to the connectee.
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
-							{
-								// Get player information
-								NetworkEntityID id;
-								id.UserID = i;
-								id.ActionID = ReservedActionID::CONNECT;
-								id.SequenceID = 0;
+								// Send a game state snapshot to the connectee
+								{
+									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
+									NetworkMessage::SerializeWorld(&bs, m_world, networkEntityMap);
 
-								player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
-
-								// Craft message
-								NetworkMessage::UserConnected n;
-								n.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-								n.IsYou = n.User == i;
-								n.Name = RakNet::RakString(player->Name.c_str());
-
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
-								n.Serialize(true, &bs);
-
-								m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
-							}
-
-							// Send a game state snapshot to the connectee
-							{
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
-								NetworkMessage::SerializeWorld(&bs, m_world, networkEntityMap);
-
-								m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
+								}
 							}
 						} break;
 

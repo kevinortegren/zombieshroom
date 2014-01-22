@@ -80,7 +80,10 @@ namespace RootForce
 
 
 		/*
-			Added on a client entity, holding information about the client.
+			Added on a player entity, holding information about the client that owns it.
+
+			State shows if and what synchronous state the client is in.
+			
 		*/
 		struct ClientComponent : public ECS::Component<ClientComponent>
 		{
