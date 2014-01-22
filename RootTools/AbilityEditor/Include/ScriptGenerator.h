@@ -18,7 +18,7 @@ namespace AbilityEditorNameSpace
 
 	private:
 		void WriteOnCreate(OnCreate* p_onCreate, int i);
-		void WriteOnCollide(OnCollide* p_onCollide, int i);
+		void WriteOnCollide(OnCreate* p_onCreate, OnCollide* p_onCollide, int i);
 		void WriteOnDestroy(OnDestroy* p_onDestroy, int i);
 		void WriteAddClientComponents(OnCreate* p_onCreate, int i);
 

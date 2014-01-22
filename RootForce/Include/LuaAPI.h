@@ -478,6 +478,26 @@ namespace RootForce
 			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
+		static int PhysicsGetType(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			int *type = (int*)lua_newuserdata(p_luaState, sizeof(int));
+			*type = g_engineContext.m_physics->GetType((*(*rtemp)->m_handle));
+			luaL_setmetatable(p_luaState, "Int");
+			return 1;
+		}
+		static int PhysicsSetGravity(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+
+			g_engineContext.m_physics->SetGravity((*(*rtemp)->m_handle), (*v1));
+			return 0;
+		}
 		
 		//////////////////////////////////////////////////////////////////////////
 		//RENDERABLE
@@ -1045,6 +1065,8 @@ namespace RootForce
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
 			{"KnockBack", PhysicsKnockBack},
+			{"GetType", PhysicsGetType},
+			{"SetGravity", PhysicsSetGravity},
 			{NULL, NULL}
 		};
 
