@@ -681,7 +681,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 	}
 
 	//Remove mesh at index
-	if(RemoveMeshIndex != -1 && RemoveMeshIndex < Entities.size())	
+	if(RemoveMeshIndex != -1 && RemoveMeshIndex < Entities.size() && RemoveMeshIndex > 0)	
 	{					
 		cout << "Removing " << RemoveMeshIndex << " EntitySize " << Entities.size() << endl;
 		m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
@@ -758,7 +758,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 		ReleaseMutex(RM.LightMutexHandle);
 	}
 
-	if(RemoveLightIndex != -1 && RemoveLightIndex < size)	
+	if(RemoveLightIndex != -1 && RemoveLightIndex < size && RemoveLightIndex > 0)	
 	{					
 		m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);
 		m_world.GetEntityManager()->RemoveEntity(LightEntities[RemoveLightIndex]);
