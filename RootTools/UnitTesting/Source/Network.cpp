@@ -10,135 +10,333 @@
 using namespace RootForce::Network;
 using namespace RootForce::NetworkMessage;
 
-TEST(Network, SerializeComponent)
+#define SerializeComponentSetup(T)      \
+	ECS::World* worldA = CreateWorld();	\
+	ECS::World* worldB = CreateWorld();	\
+	ECS::Entity* A;					    \
+	ECS::Entity* B;						\
+	T* cA;								\
+	T* cB;								\
+	A = worldA->GetEntityManager()->CreateEntity();		\
+	B = worldB->GetEntityManager()->CreateEntity();		\
+	cA = worldA->GetEntityManager()->CreateComponent<T>(A);	\
+	cB = worldB->GetEntityManager()->CreateComponent<T>(B)
+
+#define SerializeComponentSerialize()	\
+	RakNet::BitStream bs;				\
+	Serialize(true, &bs, cA);			\
+	Serialize(false, &bs, cB)
+
+
+TEST(Network, SerializeTransform)
 {
-	ECS::World* worldA = CreateWorld();
-	ECS::World* worldB = CreateWorld();
+	SerializeComponentSetup(RootForce::Transform);
 
-	GameStateDelta::SerializableComponent mA;
-	GameStateDelta::SerializableComponent mB;
+	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	cA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	cA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
 
-	ECS::Entity* A;
-	ECS::Entity* B;
-
-	RootForce::Transform* transformA;
-	RootForce::Transform* transformB;
-
-	A = worldA->GetEntityManager()->CreateEntity();
-	B = worldB->GetEntityManager()->CreateEntity();
-
-	transformA = worldA->GetEntityManager()->CreateComponent<RootForce::Transform>(A);
-	transformA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
-	transformA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
-	transformA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
-
-	mA.SerializeComponent(transformA, RootForce::ComponentType::TRANSFORM);
+	SerializeComponentSerialize();
 	
-	RakNet::BitStream bs;
-	mA.Serialize(true, &bs);
-	mB.Serialize(false, &bs);
-
-	mB.DeserializeComponent(B, worldB->GetEntityManager());
-	transformB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
-
-	ASSERT_NE(transformB, nullptr);
-	ASSERT_EQ(transformA->m_position, transformB->m_position);
-	ASSERT_EQ(transformA->m_orientation.GetQuaternion(), transformB->m_orientation.GetQuaternion());
-	ASSERT_EQ(transformA->m_scale, transformB->m_scale);
+	ASSERT_EQ(cA->m_position, cB->m_position);
+	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
+	ASSERT_EQ(cA->m_scale, cB->m_scale);
 }
 
-TEST(Network, SerializeEntity)
+TEST(Network, SerializeHealthComponent)
+{
+	SerializeComponentSetup(RootForce::HealthComponent);
+	
+	cA->Health = 15;
+	cA->IsDead = true;
+	cA->LastDamageSourceID = 38;
+	cA->RespawnDelay = 2.0f;
+	cA->WantsRespawn = true;
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->Health, cB->Health);
+	ASSERT_EQ(cA->IsDead, cB->IsDead);
+	ASSERT_EQ(cA->LastDamageSourceID, cB->LastDamageSourceID);
+	ASSERT_EQ(cA->RespawnDelay, cB->RespawnDelay);
+	ASSERT_EQ(cA->WantsRespawn, cB->WantsRespawn);
+}
+
+TEST(Network, SerializePhysics)
+{
+	SerializeComponentSetup(RootForce::Physics);
+	
+	cA->m_mass = 3.0f;
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->m_mass, cB->m_mass);
+}
+
+TEST(Network, SerializeNetworkComponent)
+{
+	SerializeComponentSetup(RootForce::Network::NetworkComponent);
+	
+	cA->ID.UserID = 14;
+	cA->ID.ActionID = 56;
+	cA->ID.SequenceID = 37;
+	//cA->AssociatedInNetworkEntityMap = true;	// Local value
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->ID.UserID, cB->ID.UserID);
+	ASSERT_EQ(cA->ID.ActionID, cB->ID.ActionID);
+	ASSERT_EQ(cA->ID.SequenceID, cB->ID.SequenceID);
+	//ASSERT_EQ(cA->AssociatedInNetworkEntityMap, cB->AssociatedInNetworkEntityMap);
+}
+
+TEST(Network, SerializeLookAtBehavior)
+{
+	SerializeComponentSetup(RootForce::LookAtBehavior);
+	
+	cA->m_targetTag = "TinyTom";
+	cA->m_displacement = glm::vec3(1.0f, 2.0f, 3.0f);
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->m_targetTag, cB->m_targetTag);
+	ASSERT_EQ(cA->m_displacement, cB->m_displacement);
+}
+
+TEST(Network, SerializeScript)
+{
+	SerializeComponentSetup(RootForce::Script);
+	
+	cA->Name = "Destroy.lua";
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->Name, cB->Name);
+}
+
+TEST(Network, SerializePlayerComponent)
+{
+	SerializeComponentSetup(RootForce::PlayerComponent);
+	
+	cA->AbilityScripts[0] = "Ability.lua";
+	cA->AbilityScripts[1] = "";
+	cA->AbilityScripts[2] = "Test.lua";
+	cA->SelectedAbility = 1;
+	cA->Deaths = 99;
+	cA->Score = 1;
+	cA->Name = "Bill";
+	cA->TeamID = 7;
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->AbilityScripts[0], cB->AbilityScripts[0]);
+	ASSERT_EQ(cA->AbilityScripts[1], cB->AbilityScripts[1]);
+	ASSERT_EQ(cA->AbilityScripts[2], cB->AbilityScripts[2]);
+	ASSERT_EQ(cA->SelectedAbility, cB->SelectedAbility);
+	ASSERT_EQ(cA->Deaths, cB->Deaths);
+	ASSERT_EQ(cA->Score, cB->Score);
+	ASSERT_EQ(cA->Name, cB->Name);
+	ASSERT_EQ(cA->TeamID, cB->TeamID);
+}
+
+TEST(Network, SerializeTDMRuleSet)
+{
+	SerializeComponentSetup(RootForce::TDMRuleSet);
+	
+	cA->ScoreLimit = 65;
+	cA->TeamScore[0] = 15;
+	cA->TeamScore[1] = 64;
+	cA->TeamScore[2] = 17;
+	cA->TimeLeft = 15.0f;
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->ScoreLimit, cB->ScoreLimit);
+	ASSERT_EQ(cA->TeamScore[0], cB->TeamScore[0]);
+	ASSERT_EQ(cA->TeamScore[1], cB->TeamScore[1]);
+	ASSERT_EQ(cA->TeamScore[2], cB->TeamScore[2]);
+	ASSERT_EQ(cA->TimeLeft, cB->TimeLeft);
+}
+
+TEST(Network, SerializePlayerPhysics)
+{
+	SerializeComponentSetup(RootForce::PlayerPhysics);
+	
+	cA->MovementSpeed = 11.0f;
+	cA->JumpForce = 20.0f;
+
+	SerializeComponentSerialize();
+	
+	ASSERT_EQ(cA->MovementSpeed, cB->MovementSpeed);
+	ASSERT_EQ(cA->JumpForce, cB->JumpForce);
+}
+
+TEST(Network, SerializeComponentExisting)
 {
 	ECS::World* worldA = CreateWorld();
 	ECS::World* worldB = CreateWorld();
-
-	NetworkEntityMap mapA;
-	NetworkEntityMap mapB;
-
 	ECS::Entity* A;
 	ECS::Entity* B;
-
-	GameStateDelta::SerializableEntity mA;
-	GameStateDelta::SerializableEntity mB;
-
+	RootForce::Transform* cA;
+	RootForce::Transform* cB;
 	A = worldA->GetEntityManager()->CreateEntity();
+	B = worldB->GetEntityManager()->CreateEntity();
+	cA = worldA->GetEntityManager()->CreateComponent<RootForce::Transform>(A);
+	cB = worldB->GetEntityManager()->CreateComponent<RootForce::Transform>(B);
+
+	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	cA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	cA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
+
+	RakNet::BitStream bs;
+	SerializeComponent(&bs, cA, RootForce::ComponentType::TRANSFORM);
+	DeserializeComponent(&bs, B, worldB->GetEntityManager());
+
+	ASSERT_EQ(cA->m_position, cB->m_position);
+	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
+	ASSERT_EQ(cA->m_scale, cB->m_scale);
+}
+
+TEST(Network, SerializeComponentNonExisting)
+{
+	ECS::World* worldA = CreateWorld();
+	ECS::World* worldB = CreateWorld();
+	ECS::Entity* A;
+	ECS::Entity* B;
+	RootForce::Transform* cA;
+	RootForce::Transform* cB;
+	A = worldA->GetEntityManager()->CreateEntity();
+	B = worldB->GetEntityManager()->CreateEntity();
+	cA = worldA->GetEntityManager()->CreateComponent<RootForce::Transform>(A);
+	//cB = worldB->GetEntityManager()->CreateComponent<RootForce::Transform>(B); // Deserialize should be able to create the component if not existing.
+
+	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	cA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	cA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
+
+	RakNet::BitStream bs;
+	SerializeComponent(&bs, cA, RootForce::ComponentType::TRANSFORM);
+	DeserializeComponent(&bs, B, worldB->GetEntityManager());
+	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+
+	ASSERT_NE(cB, nullptr);
+	ASSERT_EQ(cA->m_position, cB->m_position);
+	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
+	ASSERT_EQ(cA->m_scale, cB->m_scale);
+}
+
+TEST(Network, SerializeEntityExisting)
+{
+	ECS::World* worldA = CreateWorld();
+	ECS::World* worldB = CreateWorld();
+	NetworkEntityMap mapA;
+	NetworkEntityMap mapB;
+	ECS::Entity* A;
+	ECS::Entity* B;
+	RootForce::Transform* cA;
+	RootForce::Transform* cB;
+	A = worldA->GetEntityManager()->CreateEntity();
+	B = worldB->GetEntityManager()->CreateEntity();
 	
+	NetworkEntityID id;
+	id.UserID = 4;
+	id.ActionID = 15;
+	id.SequenceID = 33;
+	mapA[id] = A;
+	mapB[id] = B;
+
+
 	g_world = worldA;
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
 	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->AddParameterNumber(0);
-	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(id.UserID);
+	g_engineContext.m_script->AddParameterNumber(id.ActionID);
 	g_engineContext.m_script->ExecuteScript();
 
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
 	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->ExecuteScript();
 
-	RootForce::Transform* transformA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
-	transformA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
-	transformA->m_orientation.SetOrientation(glm::quat(5.0f, 7.0f, 9.0f, 11.0f));
-	transformA->m_scale = glm::vec3(14.0f, 17.0f, 20.0f);
-	
-	NetworkEntityID idA;
-	idA.UserID = 0;
-	idA.ActionID = 0;
-	idA.SequenceID = 0;
-	mapA[idA] = A;
-
-	// Serialize the entity to the game state delta struct
-	mA.SerializeEntity(A, worldA, mapA);
+	cA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
+	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	cA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	cA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
 
 
-	// Serialize and deserialize to the bitstream
-	RakNet::BitStream bs;
-	mA.Serialize(true, &bs);
-	mB.Serialize(false, &bs);
-
-
-	// Deserialize the entity from the game state delta struct
 	g_world = worldB;
-	B = mB.DeserializeEntity(worldB, mapB);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(B, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(id.UserID);
+	g_engineContext.m_script->AddParameterNumber(id.ActionID);
+	g_engineContext.m_script->ExecuteScript();
 
-	RootForce::Transform* transformB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(B, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
 
-	ASSERT_NE(transformB, nullptr);
-	ASSERT_EQ(transformA->m_position, transformB->m_position);
-	ASSERT_EQ(transformA->m_orientation.GetQuaternion(), transformB->m_orientation.GetQuaternion());
-	ASSERT_EQ(transformA->m_scale, transformB->m_scale);
+	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+
+
+	RakNet::BitStream bs;
+	ASSERT_TRUE(SerializeEntity(&bs, A, worldA->GetEntityManager(), mapA));
+	ASSERT_NE(DeserializeEntity(&bs, worldB->GetEntityManager(), mapB), nullptr);
+
+	ASSERT_EQ(cA->m_position, cB->m_position);
+	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
+	ASSERT_EQ(cA->m_scale, cB->m_scale);
 }
 
-/*
-TEST(Network, SerializeEntity)
+
+TEST(Network, SerializeEntityNonExisting)
 {
-	RakNet::BitStream bs;
-	
 	ECS::World* worldA = CreateWorld();
 	ECS::World* worldB = CreateWorld();
-
-	RootForce::Network::NetworkEntityMap mapA;
-	RootForce::Network::NetworkEntityMap mapB;
-	
+	NetworkEntityMap mapA;
+	NetworkEntityMap mapB;
 	ECS::Entity* A;
 	ECS::Entity* B;
-
+	RootForce::Transform* cA;
+	RootForce::Transform* cB;
 	A = worldA->GetEntityManager()->CreateEntity();
-	RootForce::Transform* tA = worldA->GetEntityManager()->CreateComponent<RootForce::Transform>(A);
-	tA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
-	tA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
-	tA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
-	RootForce::Network::SerializeEntity(&bs, A, "Player", mapA, worldA);
-
-	B = RootForce::Network::DeserializeEntity(&bs, mapB, worldB);
-
-	ASSERT_EQ(worldB->GetEntityManager()->GetNumEntities(), 1);
-	ASSERT_NE(worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B), nullptr);
 	
-	RootForce::Transform* tB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
-	ASSERT_TRUE(tB->m_position == tA->m_position);
-	ASSERT_TRUE(tB->m_orientation.GetQuaternion() == tA->m_orientation.GetQuaternion());
-	ASSERT_TRUE(tB->m_scale == tA->m_scale);
+	NetworkEntityID id;
+	id.UserID = 4;
+	id.ActionID = 15;
+	id.SequenceID = 33;
+	mapA[id] = A;
+
+
+	g_world = worldA;
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
+	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(id.UserID);
+	g_engineContext.m_script->AddParameterNumber(id.ActionID);
+	g_engineContext.m_script->ExecuteScript();
+
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
+	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+
+	cA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
+	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
+	cA->m_orientation.SetOrientation(glm::quat(1.0f, 2.0f, 3.0f, 4.0f));
+	cA->m_scale = glm::vec3(1.0f, 2.0f, 3.0f);
+
+	
+	RakNet::BitStream bs;
+	ASSERT_TRUE(SerializeEntity(&bs, A, worldA->GetEntityManager(), mapA));
+
+	g_world = worldB;
+	B = DeserializeEntity(&bs, worldB->GetEntityManager(), mapB);
+	ASSERT_NE(B, nullptr);
+	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
+	ASSERT_NE(cB, nullptr);
+
+	ASSERT_EQ(cA->m_position, cB->m_position);
+	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
+	ASSERT_EQ(cA->m_scale, cB->m_scale);
 }
-*/
+
 
 TEST(Network, SequenceIDs)
 {

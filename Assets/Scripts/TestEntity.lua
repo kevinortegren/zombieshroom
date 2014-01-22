@@ -8,7 +8,7 @@ function TestEntity.OnCreate(self, userId, actionId)
 end
 
 function TestEntity.AddClientComponents(self)
-    local renderable = Renderable.New(self);
+	
 end
 
 function TestEntity.AddLocalClientComponents(self)
