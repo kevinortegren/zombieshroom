@@ -26,4 +26,19 @@ namespace Render
 			SPAWNTIME,
 		};
 	}
+
+	namespace TextureSemantic
+	{
+		enum TextureSemantic
+		{
+			DIFFUSE,
+			SPECULAR,
+			NORMAL,
+			DEPTH,
+			TEXTUREMAP,
+			TEXTURE_R,
+			TEXTURE_G,
+			TEXTURE_B
+		};
+	}
 }

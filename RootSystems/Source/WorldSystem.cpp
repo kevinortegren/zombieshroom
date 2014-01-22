@@ -44,8 +44,8 @@ namespace RootForce
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
-		r->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-		
+		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 
@@ -75,12 +75,9 @@ namespace RootForce
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
-		camera->m_frustrum.m_near = 0.5f;
-		camera->m_frustrum.m_far = 100000.0f;
-		camera->m_frustrum.m_fov = 45.0f;
-		float apsectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
+		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustrum = Frustum(45.0f, 0.1f, 1000.0f, apsectRatio);
+		camera->m_frustum = Frustum(45.0f, 0.1f, 1000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);

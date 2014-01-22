@@ -66,7 +66,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						p_node["Material"]["Diffuse"] >> diffuse;
 						if(renderable->m_material)
 						{
-							renderable->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
+							renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(diffuse, Render::TextureType::TEXTURE_2D);
 						}
 						else
 						{
@@ -78,14 +78,57 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					{
 						std::string specular;
 						p_node["Material"]["Specular"] >> specular;
-						renderable->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specular, Render::TextureType::TEXTURE_2D);
 					}
 					const YAML::Node* normalNode = materialNode->FindValue("Normal");
 					if(normalNode != nullptr)
 					{
 						std::string normal;
 						p_node["Material"]["Normal"] >> normal;
-						renderable->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normal, Render::TextureType::TEXTURE_2D);
+					}
+					const YAML::Node* tmNode = materialNode->FindValue("TextureMap");
+					if(tmNode != nullptr)
+					{
+						std::string texturemap;
+						p_node["Material"]["TextureMap"] >> texturemap;
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(texturemap, Render::TextureType::TEXTURE_2D);
+					}
+					const YAML::Node* drNode = materialNode->FindValue("DiffuseR");
+					if(drNode != nullptr)
+					{
+						std::string diffuseR;
+						p_node["Material"]["DiffuseR"] >> diffuseR;
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(diffuseR, Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+					}
+					const YAML::Node* dgNode = materialNode->FindValue("DiffuseG");
+					if(dgNode != nullptr)
+					{
+						std::string diffuseG;
+						p_node["Material"]["DiffuseG"] >> diffuseG;
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = g_engineContext.m_resourceManager->LoadTexture(diffuseG, Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+					}
+					const YAML::Node* dbNode = materialNode->FindValue("DiffuseB");
+					if(dbNode != nullptr)
+					{
+						std::string diffuseB;
+						p_node["Material"]["DiffuseB"] >> diffuseB;
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(diffuseB, Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+					}
+					const YAML::Node* tileFactorNode = materialNode->FindValue("TileFactor");
+					if(tileFactorNode != nullptr)
+					{
+						float tileFactor;
+						p_node["Material"]["TileFactor"] >> tileFactor;
+						renderable->m_material->m_tileFactor = tileFactor;
+						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
 					}
 				}
 

@@ -8,6 +8,6 @@ namespace RootForce
 {
 	struct Camera : public ECS::Component<Camera>
 	{
-		Frustum m_frustrum;
+		Frustum m_frustum;
 	};
 }

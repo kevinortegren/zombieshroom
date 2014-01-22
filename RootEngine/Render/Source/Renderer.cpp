@@ -153,7 +153,7 @@ namespace Render
 		m_geometryPass.Init(width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 512, 512);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(width, height);
@@ -170,7 +170,6 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color, 0);
 		
@@ -206,12 +205,9 @@ namespace Render
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
-		// Load default rendering effects.
+		// Load default forward rendering effect.
 		auto renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Forward");
 		m_renderTech = renderEffect->GetTechniques()[0];
-
-		auto m_normalEffect = g_context.m_resourceManager->LoadEffect("Normals");
-		m_normalTech = m_normalEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
@@ -280,7 +276,6 @@ namespace Render
 	void GLRenderer::AddRenderJob(const RenderJob& p_job)
 	{
 		m_jobs.push_back(p_job);
-		
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -305,12 +300,12 @@ namespace Render
 
 	void GLRenderer::Render()
 	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms.GetBufferId());
+
 		{
-			PROFILE("Shadow Pass", g_context.m_profiler)
+			PROFILE("Shadow pass", g_context.m_profiler);
 			ShadowPass();
 		}
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms.GetBufferId());
 
 		// Buffer Per Frame data.
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
@@ -370,54 +365,25 @@ namespace Render
 		{
 			(*job).m_mesh->Bind();
 
+			// Bind textures.
+			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
+			{
+				(*texture).second->Bind((*texture).first);
+			}
+
+			// Bind depth texture.
+			glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+			glBindTexture(GL_TEXTURE_2D, m_geometryPass.m_depthHandle);
+
 			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 			{
-				if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_IGNORE) == Render::TechniqueFlags::RENDER_IGNORE)
-					continue;
-
 				if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
 				{
+					// Buffer uniforms.
 					for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
 					{	
 						m_uniforms.BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 					}
-
-					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_DIFFUSE);
-					if((*job).m_material->m_diffuseMap != nullptr)
-					{
-						// Bind diffuse texture.
-						(*job).m_material->m_diffuseMap->Enable(RENDER_TEXTURE_DIFFUSE);
-					}
-					else
-					{
-						glBindTexture(GL_TEXTURE_2D, 0);
-					}
-				
-					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_SPECULAR);
-					if((*job).m_material->m_specularMap != nullptr)
-					{
-						// Bind specular texture.
-						(*job).m_material->m_specularMap->Enable(RENDER_TEXTURE_SPECULAR);
-					}
-					else
-					{
-						glBindTexture(GL_TEXTURE_2D, 0);
-					}
-
-					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_NORMAL);
-					if((*job).m_material->m_normalMap != nullptr)
-					{
-						// Bind normal texture.
-						(*job).m_material->m_normalMap->Enable(RENDER_TEXTURE_NORMAL);
-					}
-					else
-					{
-						glBindTexture(GL_TEXTURE_2D, 0);
-					}
-
-					// Bind depth buffer.
-					glActiveTexture(GL_TEXTURE0 + RENDER_TEXTURE_DEPTH);
-					glBindTexture(GL_TEXTURE_2D, m_geometryPass.m_depthHandle);
 
 					for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 					{
@@ -434,6 +400,12 @@ namespace Render
 						}
 					}
 				}
+			}
+
+			// Unbind textures.
+			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
+			{
+				(*texture).second->Unbind((*texture).first);
 			}
 
 			(*job).m_mesh->Unbind();
@@ -483,7 +455,7 @@ namespace Render
 		m_cameraBuffer.BufferSubData(0, sizeof(matrices), &matrices);
 
 		glCullFace(GL_FRONT);
-		glViewport(0, 0, 512, 512);
+		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
@@ -520,9 +492,7 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
-		
-		//TODO: Bind shadow depth texture.
-		m_shadowDevice.m_depthTexture->Enable(3);
+		m_shadowDevice.m_depthTexture->Bind(3);
 
 		glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 

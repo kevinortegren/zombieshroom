@@ -151,9 +151,9 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
 
 	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
-	camera->m_near = 0.1f;
-	camera->m_far = 1000.0f;
-	camera->m_fov = 45.0f;
+	camera->m_frustum.m_near = 0.1f;
+	camera->m_frustum.m_far = 1000.0f;
+	camera->m_frustum.m_fov = 45.0f;
 
 	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 	cameraTransform->m_position = glm::vec3(0.0f, 20.0f, 0.0f);

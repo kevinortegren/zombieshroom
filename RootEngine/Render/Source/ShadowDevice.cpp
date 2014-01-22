@@ -22,7 +22,8 @@ namespace Render
 
 	void ShadowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
-		
+		m_width = p_width;
+		m_height = p_height;
 		m_depthTexture = new Texture();
 		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -67,7 +68,6 @@ namespace Render
 
 	void ShadowDevice::Process()
 	{
-
 		m_numberOfShadowcasters = 0;
 	}
 

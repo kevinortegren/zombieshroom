@@ -46,9 +46,9 @@ namespace RootForce
 				glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
 				glm::mat4 viewMatrix = glm::inverse(rotation);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustrum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustrum.m_near, camera->m_frustrum.m_far);
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, camera->m_frustum.m_far);
 
-				camera->m_frustrum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
+				camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
 
 				m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 				m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);

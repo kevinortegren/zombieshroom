@@ -32,13 +32,13 @@ namespace Render
 		virtual bool Load(const std::string filepath) = 0;
 		virtual bool LoadCubeMap(const std::string& filepath) = 0;
 
-		virtual void Enable(unsigned int slot) = 0;
-		
+		virtual void Bind(unsigned int slot) = 0;
+		virtual void Unbind(unsigned int slot) = 0;
+
 		virtual void SetParameter(int p_name, int p_parameter) = 0;
 		virtual void CreateEmptyTexture(int p_width, int p_height, int p_format) = 0;
 
 		virtual void BufferData(void* pixels) = 0;
-
 
 		virtual unsigned int GetWidth() = 0;
 		virtual unsigned int GetHeight() = 0;
@@ -57,7 +57,9 @@ namespace Render
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);
 
-		void Enable(unsigned int p_slot);
+		void Bind(unsigned int p_slot);
+		void Unbind(unsigned int slot);
+
 		void SetParameter(int p_name, int p_parameter);
 		void CreateEmptyTexture(int p_width, int p_height, int p_format);
 		void BufferData(void* pixels);
