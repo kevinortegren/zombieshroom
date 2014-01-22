@@ -195,7 +195,7 @@ namespace RootForce
 					NetworkEntityID id;
 					id.UserID = m.User;
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = 1;
 					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
@@ -454,7 +454,7 @@ namespace RootForce
 					NetworkMessage::UserInformation m;
 					m.Serialize(false, p_bs);
 
-					// Update the player entity
+					// Update the client entity
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::CONNECT;
@@ -557,7 +557,7 @@ namespace RootForce
 
 									// Craft message
 									NetworkMessage::UserConnected n;
-									n.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+									n.User = i;
 									n.IsYou = n.User == i;
 									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
