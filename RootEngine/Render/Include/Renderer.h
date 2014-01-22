@@ -32,13 +32,6 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3 
 
-#define RENDER_TEXTURE_DIFFUSE 0
-#define RENDER_TEXTURE_SPECULAR 1
-#define RENDER_TEXTURE_NORMAL 2
-
-#define RENDER_TEXTURE_RANDOM 4
-#define RENDER_TEXTURE_DEPTH 5
-
 namespace Render
 {
 	class RendererInterface : public RootEngine::SubsystemInterface
@@ -50,7 +43,7 @@ namespace Render
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
 
-		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster) = 0;
+		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
 		
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
@@ -78,7 +71,7 @@ namespace Render
 
 		// Lighting.
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
-		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
+		virtual void AddDirectionalLight(const DirectionalLight& p_light, int p_index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
 	};
 
@@ -95,7 +88,7 @@ namespace Render
 
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
-		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster);
+		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
 
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
@@ -132,6 +125,7 @@ namespace Render
 		void RenderGeometry();
 
 		void GeometryPass();
+		void ShadowPass();
 		void LightingPass();
 		void ForwardPass();
 		void Output();
@@ -150,16 +144,16 @@ namespace Render
 		unsigned m_renderFlags;
 		
 		GeometryBuffer m_geometryPass;
-		LightingDevice m_lighting;
 		LineRenderer m_lineRenderer;
 
 		Mesh m_fullscreenQuad;
 	
 		ParticleSystemHandler m_particles;
-		//ShadowDevice m_shadowDevice;
+		LightingDevice m_lighting;
+		ShadowDevice m_shadowDevice;
 		
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
-
+		
 		struct
 		{
 			glm::mat4 m_projection;
@@ -174,8 +168,6 @@ namespace Render
 		Buffer m_uniforms;
 
 		std::shared_ptr<TechniqueInterface> m_renderTech;
-		std::shared_ptr<TechniqueInterface> m_normalTech;
-
 		bool m_displayNormals;
 	};
 }

@@ -22,5 +22,22 @@
             - name: mesh
               type: vertex
             - name: mesh
+              type: fragment         
+    - name: Normals
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      flags:
+        - name: Debug
+      programs:
+        - name: Normals
+          shaders:
+            - name: normals
+              type: vertex
+            - name: normals
+              type: geometry
+            - name: color
               type: fragment
 

@@ -4,7 +4,7 @@ find_path(AWESOMIUM_INCLUDE_DIRS
     Awesomium/WebCore.h
     HINTS "${CMAKE_SOURCE_DIR}/External/Include")
 
-find_library(AWESOMIUM_LIBRARY
+find_library(AWESOMIUM_LIBRARY_DEBUG
     NAMES awesomium
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
 	

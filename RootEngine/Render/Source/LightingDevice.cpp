@@ -46,12 +46,18 @@ namespace Render
 
 	void LightingDevice::AddDirectionalLight(const DirectionalLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_DIRECTIONALLIGHTS)
+			return;
+
 		m_lightVars.m_dlights[index] = p_light;
 		m_numDirectionalLights++;
 	}
 
 	void LightingDevice::AddPointLight(const PointLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_POINTLIGHTS)
+			return;
+
 		m_lightVars.m_plights[index] = p_light;
 		m_numPointLights++;
 	}

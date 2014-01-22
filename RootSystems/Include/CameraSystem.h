@@ -41,12 +41,14 @@ namespace RootForce
 				Orientation tempOrientation = transform->m_orientation;
 				tempOrientation.Yaw(180.0f);
 				glm::mat4 tempWorldMatrix;
-				tempWorldMatrix = glm::translate(glm::mat4(1.0f), transform->m_position);
-				tempWorldMatrix = glm::rotate(tempWorldMatrix, tempOrientation.GetAngle(), tempOrientation.GetAxis());
-				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
-				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
 
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_near, camera->m_far);
+				glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
+				glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
+				glm::mat4 viewMatrix = glm::inverse(rotation);
+
+				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, camera->m_frustum.m_far);
+
+				camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
 
 				m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 				m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);

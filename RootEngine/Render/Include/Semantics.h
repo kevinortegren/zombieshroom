@@ -9,6 +9,7 @@ namespace Render
 			NORMAL,
 			MODEL,
 			BONES,
+			SHADOW,
 			POSITION,
 			LIFETIMEMIN,
 			LIFETIMEMAX,
@@ -24,6 +25,21 @@ namespace Render
 			SPREAD,
 			SPAWNTIME,
 			TRANSPOSITION,
+		};
+	}
+
+	namespace TextureSemantic
+	{
+		enum TextureSemantic
+		{
+			DIFFUSE,
+			SPECULAR,
+			NORMAL,
+			DEPTH,
+			TEXTUREMAP,
+			TEXTURE_R,
+			TEXTURE_G,
+			TEXTURE_B
 		};
 	}
 }

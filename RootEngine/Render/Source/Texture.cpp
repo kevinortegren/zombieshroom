@@ -1,6 +1,8 @@
 #include <RootEngine/Render/Include/Texture.h>
 #include <gli/gli.hpp>
 
+#include <RootEngine/Render/Include/RenderExtern.h>
+
 namespace Render
 {
 	Texture::Texture()
@@ -86,9 +88,6 @@ namespace Render
 		glTexParameteri(m_target, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(m_target, GL_TEXTURE_MAX_LEVEL, GLint(cube.levels() - 1)); 
 
-		//glTexParameterf(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		//glTexParameterf(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-
 		GLenum faces[] = { 
 			GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 
 			GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
@@ -113,10 +112,16 @@ namespace Render
 		return true;
 	}
 
-	void Texture::Enable(unsigned int p_slot)
+	void Texture::Bind(unsigned int p_slot)
 	{
 		glActiveTexture(GL_TEXTURE0 + p_slot);
 		glBindTexture(m_target, m_textureHandle);
+	}
+
+	void Texture::Unbind(unsigned int p_slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + p_slot);
+		glBindTexture(m_target, 0);
 	}
 
 	void Texture::SetParameter(int p_name, int p_parameter)
@@ -126,9 +131,70 @@ namespace Render
 		glTexParameteri(m_target, p_name, p_parameter);
 	}
 
-	unsigned int Texture::GetID()
+	void Texture::CreateEmptyTexture(int p_width, int p_height, int p_format)
 	{
-		return m_textureHandle;
+		m_target = GL_TEXTURE_2D;
+		m_textureWidth = p_width;
+		m_textureHeight = p_height;
+		
+		glBindTexture(m_target, m_textureHandle);
+		if(p_format == TextureFormat::TEXTURE_RGBA || p_format == TextureFormat::TEXTURE_BGRA)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+
+			if(p_format == TextureFormat::TEXTURE_RGBA)
+				m_textureFormat = GL_RGBA;
+			else
+				m_textureFormat = GL_BGRA;
+
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+			glTexImage2D(m_target, 0, GL_RGBA, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGB || p_format == TextureFormat::TEXTURE_BGR)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+
+			if(p_format == TextureFormat::TEXTURE_RGB)
+				m_textureFormat = GL_RGB;
+			else
+				m_textureFormat = GL_BGR;
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			glTexImage2D(m_target, 0, GL_RGB, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+		}
+		else if(p_format == TextureFormat::TEXTURE_DEPTH_COMPONENT)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_DEPTH_COMPONENT;
+
+			glTexImage2D(m_target, 0, GL_DEPTH_COMPONENT32, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+		}
+		else
+		{
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Tried to create empty texture with unsupported format!");
+		}
+	}
+
+	void Texture::BufferData(void* pixels)
+	{
+		glBindTexture(m_target, m_textureHandle);
+
+		glTexSubImage2D(m_target,
+			0,
+			0, 0,
+			m_textureWidth,
+			m_textureHeight,
+			m_textureFormat,
+			m_textureType,
+			pixels); 
+
+		glBindTexture(m_target, 0);
 	}
 
 	unsigned int Texture::GetWidth()
