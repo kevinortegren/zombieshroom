@@ -864,7 +864,8 @@ namespace RootForce
 			{
 				// Entity doesn't exist, use the script to create it.
 				entity = p_entityManager->CreateEntity();
-
+				
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from DeserializeEntity");
 				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
 				g_engineContext.m_script->AddParameterUserData(entity, sizeof(ECS::Entity*), "Entity");
 				g_engineContext.m_script->AddParameterNumber(id.UserID);
