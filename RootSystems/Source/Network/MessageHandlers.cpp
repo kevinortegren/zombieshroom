@@ -154,6 +154,7 @@ namespace RootForce
 						networkEntityMap[id] = player;
 
 						// Call the OnCreate script
+						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from Message::UserConnected");
 						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
 						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
 						g_engineContext.m_script->AddParameterNumber(id.UserID);
@@ -512,7 +513,8 @@ namespace RootForce
 								ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
 								id.SequenceID = 1;
 								networkEntityMap[id] = playerEntity;
-
+								
+								g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from LoadMapStatus::Status_Completed");
 								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
 								g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
 								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
@@ -576,6 +578,7 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
+								clientComponent->State = ClientState::CONNECTED;
 							}
 						} break;
 
