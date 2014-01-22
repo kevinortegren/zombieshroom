@@ -407,7 +407,7 @@ namespace RootForce
 							PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
 							
 							// Create the player, given a player entity.
-							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
+							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
 							g_engineContext.m_script->AddParameterUserData(networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
 							g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
 							g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);

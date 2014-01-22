@@ -59,6 +59,11 @@ namespace RootSystems
 		unsigned numspawns = 0;
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
 			;
+		if(numspawns==0)
+		{
+			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "No spawnpoints found!");
+			return nullptr;
+		}
 		unsigned chosenspwn = rand()%numspawns;
 		numspawns = 0;
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
