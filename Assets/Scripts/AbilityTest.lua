@@ -7,7 +7,7 @@ function AbilityTest.OnCreate (self, userId, actionId)
 
 	local entity0 = Entity.New();
 
-	local collisionComp 0= Collision.New(entity0);
+	local collisionComp0 = Collision.New(entity0);
 	local colRespComp0 = CollisionResponder.New(entity0);
 	local physicsComp0 = Physics.New(entity0);
 	collisionComp0:CreateHandle(entity0:GetId(), 1, false);
@@ -16,11 +16,11 @@ function AbilityTest.OnCreate (self, userId, actionId)
 	physicsComp0:BindShape(collisionComp0, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp0:SetVelocity(collisionComp0, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
 	colRespComp0:SetContainer(collisionComp0);
-end
+--end
 
-function AbilityTest.AddClientComponents (self)
+--function AbilityTest.AddClientComponents (self)
 
-	local entity0 = Entity.New();
+	--local entity0 = Entity.New();
 
 	local renderComp0 = Renderable.New(entity0);
 	transformComp0:SetPos(posVec);
@@ -33,6 +33,7 @@ function AbilityTest.AddClientComponents (self)
 end
 
 function AbilityTest.OnCollide (self, entity)
+	AbilityTest.OnCreate(self, 1,1);
 end
 
 function AbilityTest.OnDestroy (args)

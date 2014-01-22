@@ -9,56 +9,47 @@ CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(pare
 
 void CustomTreeWidget::dropEvent( QDropEvent* event )
 {
-	if(event->source() != this)
+	if(event->mimeData()->objectName().compare("Abilities") == 0)
+	{
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,event->mimeData()->text());
+		item->setWhatsThis(0,"Entity");
+
+		this->addTopLevelItem(item);
+		m_onEvent->AddEntity(item->text(0));
+
+	}
+	else if(this->itemAt(event->pos()) != nullptr )
 	{
 
-		if(event->mimeData()->objectName().compare("Abilities") == 0)
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0,event->mimeData()->text());
+		item->setWhatsThis(0,event->mimeData()->objectName());
+		if((this->itemAt(event->pos())->whatsThis(0).compare("Entity") ==0))
 		{
-			QTreeWidgetItem* item = new QTreeWidgetItem;
-			item->setText(0,event->mimeData()->text());
-			item->setWhatsThis(0,"Entity");
-		
-			this->addTopLevelItem(item);
-			m_onEvent->AddEntity(item->text(0));
-	
+			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())), event->mimeData()->text()))
+			{
+				QMessageBox msgBox;
+				msgBox.setText("An entity can only contain one of each type of component");
+				msgBox.exec();
+				delete item;
+				return;
+			}
+			this->itemAt(event->pos())->addChild(item);
 		}
-		else if(this->itemAt(event->pos()) != nullptr )
+		else
 		{
-			unsigned int index = -1;
-			QTreeWidgetItem* item = new QTreeWidgetItem;
-			item->setText(0,event->mimeData()->text());
-			item->setWhatsThis(0,event->mimeData()->objectName());
-			if((this->itemAt(event->pos())->whatsThis(0).compare("Entity") ==0))
+			if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())->parent()), event->mimeData()->text()))
 			{
-				if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())), event->mimeData()->text()))
-				{
-					QMessageBox msgBox;
-					msgBox.setText("An entity can only contain one of each type of component");
-					msgBox.exec();
-					delete item;
-					return;
-				}
-
-				this->itemAt(event->pos())->addChild(item);
-				index =  this->indexOfTopLevelItem(item->parent());
+				QMessageBox msgBox;
+				msgBox.setText("An entity can only contain one of each type of component");
+				msgBox.exec();
+				return;
 			}
-			else
-			{
-				if(m_onEvent->CheckForExistingComponents(this->indexOfTopLevelItem(this->itemAt(event->pos())->parent()), event->mimeData()->text()))
-				{
-					QMessageBox msgBox;
-					msgBox.setText("An entity can only contain one of each type of component");
-					msgBox.exec();
-					return;
-				}
-				//this->itemAt(event->pos())->parent()->addChild(item);
-			
-			
-				index = this->indexOfTopLevelItem(item->parent()->parent());
-			}
-	
-			m_onEvent->AddComponent(index, item->text(0));
+			this->itemAt(event->pos())->parent()->addChild(item);
 		}
+		unsigned int index = this->indexOfTopLevelItem(item->parent());
+		m_onEvent->AddComponent(index, item->text(0));
 	}
 	
 }
@@ -91,14 +82,18 @@ void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 	}
 	if(p_item->whatsThis(0).compare("Entity") == 0)
 	{
-		m_onEvent->RemoveEntity(this->indexOfTopLevelItem(p_item));
-		delete this->takeTopLevelItem(this->indexOfTopLevelItem(p_item));
+		int test = this->indexOfTopLevelItem(p_item);
+		delete p_item;
+		//m_onEvent->RemoveEntity(this->indexOfTopLevelItem(p_item));
+		m_onEvent->RemoveEntity(test);
+		//delete this->takeTopLevelItem(this->indexOfTopLevelItem(p_item));
 	}
 	else if (p_item->whatsThis(0).compare("Components") == 0)
 	{
 
 		m_onEvent->RemoveComponent(this->indexOfTopLevelItem(p_item->parent()),p_item->text(0));
 		this->removeItemWidget(p_item,0);
+		delete p_item;
 		
 	}
 }
