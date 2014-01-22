@@ -143,11 +143,6 @@ namespace RootForce
 						// If we are a remote client, we need to create our own entities.
 						ECS::Entity* player = m_world->GetEntityManager()->CreateEntity();
 
-						if (m.IsYou)
-						{
-							m_world->GetTagManager()->RegisterEntity("Player", player);
-						}
-
 						networkEntityMap[id] = player;
 
 						// Call the OnCreate script
@@ -173,7 +168,7 @@ namespace RootForce
 						clientComponent->State = ClientState::CONNECTED;
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%s): %s", p_packet->systemAddress.ToString(), m.Name);
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%s): %s", p_packet->systemAddress.ToString(), m.Name.C_String());
 				} return true;
 
 				case NetworkMessage::MessageType::UserDisconnected:
@@ -405,6 +400,7 @@ namespace RootForce
 							id.SequenceID = 0;
 
 							PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+							std::string name = player->Name;
 							
 							// Create the player, given a player entity.
 							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
@@ -412,6 +408,9 @@ namespace RootForce
 							g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
 							g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
 							g_engineContext.m_script->ExecuteScript();
+
+							player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+							player->Name = name;
 
 							// Send a user connected message to all clients except connectee.
 							DataStructures::List<RakNet::SystemAddress> addresses;

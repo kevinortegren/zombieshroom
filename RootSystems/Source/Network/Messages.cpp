@@ -887,7 +887,7 @@ namespace RootForce
 				return nullptr;
 
 			// Deserialize all components
-			for (int i = 0; i < count; ++i) 
+			for (unsigned i = 0; i < count; ++i) 
 			{
 				if (DeserializeComponent(p_bs, entity, p_entityManager) == nullptr)
 					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());

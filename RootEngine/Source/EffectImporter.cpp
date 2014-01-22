@@ -204,6 +204,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::SPREAD, offset);
 						}
+						else if(sem == "SPAWNTIME")
+						{
+							technique->AddUniformParam(Render::Semantic::SPAWNTIME, offset);
+						}
 					}
 				}
 

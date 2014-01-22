@@ -22,6 +22,7 @@ namespace Render
 			GRAVITY,
 			DIRECTION,
 			SPREAD,
+			SPAWNTIME,
 		};
 	}
 }

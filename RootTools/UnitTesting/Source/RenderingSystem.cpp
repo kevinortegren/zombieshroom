@@ -4,6 +4,7 @@
 TEST(RenderingSystem, ProcessEmptyEntity) 
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootForce::RenderingSystem* system = new RootForce::RenderingSystem(world);

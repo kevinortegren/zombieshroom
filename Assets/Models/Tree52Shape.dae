@@ -3,7 +3,7 @@
   <asset>
     <contributor>
       <author>BTH</author>
-      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
+      <authoring_tool>OpenCOLLADA2014</authoring_tool>
       <comments>
 			ColladaMaya export options: 
 			bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;exportCgfxFileReferences=1;
@@ -13,29 +13,29 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Desktop/v11NewSceneAllImported.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v14.mb</source_data>
     </contributor>
-    <created>2014-01-17T14:34:30</created>
-    <modified>2014-01-17T14:34:30</modified>
+    <created>2014-01-22T08:07:46</created>
+    <modified>2014-01-22T08:07:46</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="TreeMaterial" name="TreeMaterial">
-      <instance_effect url="#TreeMaterial-fx"/>
+    <material id="GreenTree" name="GreenTree">
+      <instance_effect url="#GreenTree-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="TreeMaterial-fx">
+    <effect id="GreenTree-fx">
       <profile_COMMON>
-        <newparam sid="file2-surface">
+        <newparam sid="file10-surface">
           <surface type="2D">
-            <init_from>file2</init_from>
+            <init_from>file10</init_from>
           </surface>
         </newparam>
-        <newparam sid="file2-sampler">
+        <newparam sid="file10-sampler">
           <sampler2D>
-            <source>file2-surface</source>
+            <source>file10-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -47,7 +47,7 @@
               <color>0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="file2-sampler" texcoord="TEX0">
+              <texture texture="file10-sampler" texcoord="TEX0">
                 <extra>
                   <technique profile="OpenCOLLADAMaya">
                     <blend_mode>NONE</blend_mode>
@@ -85,13 +85,13 @@
     </effect>
   </library_effects>
   <library_images>
-    <image id="file2" name="file2">
-      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Models/V3.dds</init_from>
+    <image id="file10" name="file10">
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/Tree1GreenLeaf.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
           <image_sequence>0</image_sequence>
-          <originalMayaNodeId>file2</originalMayaNodeId>
+          <originalMayaNodeId>file10</originalMayaNodeId>
         </technique>
       </extra>
     </image>
@@ -151,7 +151,7 @@
         <vertices id="Tree52Shape-vertices" name="Tree52Shape-vertices">
           <input semantic="POSITION" source="#Tree52Shape-positions"/>
         </vertices>
-        <triangles material="Tree1_lambert2SG" count="894">
+        <triangles material="lambert10SG" count="894">
           <input semantic="VERTEX" source="#Tree52Shape-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Tree52Shape-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#Tree52Shape-map1" offset="2" set="0"/>
@@ -169,17 +169,17 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v11NewSceneAllImported">
+    <visual_scene id="VisualSceneNode" name="v14">
       <node id="Tree52" name="Tree52" type="NODE">
         <translate sid="translate">-40.25586 -23.54375 -21.87763</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">1.639203 1.639203 1.639203</scale>
+        <scale sid="scale">2.45219 2.45219 2.45219</scale>
         <instance_geometry url="#Tree52Shape">
           <bind_material>
             <technique_common>
-              <instance_material symbol="Tree1_lambert2SG" target="#TreeMaterial">
+              <instance_material symbol="lambert10SG" target="#GreenTree">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>

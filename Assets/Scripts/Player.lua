@@ -1,6 +1,7 @@
 Player = {}
 
 function Player.OnCreate(self, userId, actionId)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
 	local transform = Transformation.New(self);
 	local playerPhysics = PlayerPhysics.New(self);
 	local health = Health.New(self);
@@ -80,7 +81,7 @@ function Player.AddLocalClientComponents(self)
 end
 
 function Player.OnCollide (self, entity)
-	Logging.Log("Entity collided");
+	-- Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
 end
 
 function Player.OnDestroy ()

@@ -13,6 +13,8 @@
 #include <ComponentExporter.h>
 #include <ComponentImporter.h>
 
+#include <RootForce/Include/LuaAPI.h>
+
 #undef main
 
 /*
@@ -83,8 +85,13 @@ void Main::Start()
 {
 	// Register the components the server uses
 	RootForce::ComponentType::InitializeServerComponents();
+	//RootForce::ComponentType::Initialize();
+
+	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
+	g_engineContext.m_resourceManager->LoadScript("Global");
 
 	// Setup the importer/exporter
+	g_world = &m_world;
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	m_world.GetEntityImporter()->SetImporter(Importer);
 
@@ -100,8 +107,10 @@ void Main::Start()
 	m_world.GetEntityManager()->CreateComponent<RootForce::Network::ServerInformationComponent>(serverInfoEntity);
 	m_world.GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
 
+	m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(&m_world, &g_engineContext));
+
 	// Initialize the server
-	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf, true));
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, m_worldSystem.get(), conf, true));
 	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), &m_world));
 	m_serverMessageHandler->SetNetworkEntityMap(&m_networkEntityMap);
 	m_server->SetMessageHandler(m_serverMessageHandler.get());

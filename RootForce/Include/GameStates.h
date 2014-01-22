@@ -47,8 +47,6 @@ namespace RootForce
 
 	struct SharedSystems
 	{
-		// System responsible for updating the player.
-		std::shared_ptr<RootForce::PlayerSystem> m_playerSystem;
 		//System responsible for keeping track of match rules
 		std::shared_ptr<RootForce::MatchStateSystem> m_matchStateSystem;
 		// System responsible for creating the world.

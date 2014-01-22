@@ -7,7 +7,7 @@
 
 namespace Render
 {
-	void ParticleSystem::Init(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc, unsigned p_slot)
+	void ParticleSystem::Init(GLRenderer* p_renderer, unsigned p_slot)
 	{
 		m_slot = p_slot;
 
@@ -17,11 +17,13 @@ namespace Render
 		//TODO: Set values from descriptor.
 
 		// Emitter particle.
-		particles[0].m_initialPos = p_desc.m_initalPos;
-		particles[0].m_initialVel = p_desc.m_initalVel;
-		particles[0].m_size = p_desc.m_size;
-		particles[0].m_age = 0.0f;
-		particles[0].m_type = 0;
+		particles[0].m_initialPos	= glm::vec3(0.0f);
+		particles[0].m_initialVel	= glm::vec3(0.0f);
+		particles[0].m_size			= glm::vec2(0.0f);
+		particles[0].m_age			= 0.0f;
+		particles[0].m_type			= 0.0f;
+		particles[0].m_color		= glm::vec4(0.0f);
+		particles[0].m_accel		= glm::vec3(0.0f);
 
 		m_meshes[0] = p_renderer->CreateMesh();
 		m_meshes[0]->SetPrimitiveType(GL_POINTS);
@@ -47,12 +49,14 @@ namespace Render
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
-			attributes[i]->Init(5);
+			attributes[i]->Init(7);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 8 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 10 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 14 * sizeof(float));
 
 			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
 			m_meshes[i]->SetVertexAttribute(attributes[i]);
@@ -118,7 +122,7 @@ namespace Render
 		m_perObjectBuffer.BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
 	}
 
-	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer, const ParticleSystemDescription& p_desc)
+	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer)
 	{
 		unsigned slot = m_particleSystemsCount;
 		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
@@ -127,7 +131,7 @@ namespace Render
 			m_emptyParticleSlots.pop();	
 		}
 
-		m_particleSystems[slot].Init( p_renderer, p_desc, slot );
+		m_particleSystems[slot].Init( p_renderer, slot );
 		m_particleSystemsCount++;
 
 		return &m_particleSystems[slot++];

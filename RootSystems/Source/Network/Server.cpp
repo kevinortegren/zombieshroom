@@ -7,11 +7,14 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Server::Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config, bool p_isDedicated)
+		Server::Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated)
 			: m_logger(p_logger)
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
 		{
+			// Load the map
+			p_worldSystem->CreateWorld(p_config.MapName);
+
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
 

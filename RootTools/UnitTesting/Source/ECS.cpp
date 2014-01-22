@@ -6,6 +6,7 @@ TEST(ECS, GettingAllComponents)
 {
 	// Initialize a world and some components
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	// Create entities with different permutations of components
 	ECS::Entity* e12 = world->GetEntityManager()->CreateEntity();
