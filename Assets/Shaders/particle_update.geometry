@@ -59,10 +59,9 @@ vec3 GetRandomDir(float TexCoord)
 
 float GetRandomNumber(float TexCoord, float min, float max)
 {
-	vec3 direction = texture(g_Random, TexCoord + 10.0f).xyz;
+	vec3 direction = texture(g_Random, TexCoord + 0.2f).xyz;
 	float magnitud = max - min;
-	float rand = (direction.x + direction.y + direction.z)/3.0f;
-	float number =  rand * magnitud + min;
+	float number =  direction.x * magnitud + min;
     return number;
 }
 void main() 
@@ -73,6 +72,18 @@ void main()
 	{
 		if(lifeTime <= 0.0f)
 		{
+			//float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
+			//float yspread = GetRandomNumber(g_time+0.2f, -g_spread, g_spread);
+			//float cs = cos(xspread);
+			//float ss = sin(xspread);
+			
+			//float px	= g_direction.x * cs - g_direction.y * ss;
+			//float py	= g_direction.x * ss + g_direction.y * cs;
+
+			//vec3 vektre = vec3(px, py, 0);
+			//vektre *= cos(yspread);
+			//vektre.z = sin(yspread);
+
 			// Spawn new particles with new start values using the initial values.
 			vert_initialPos1 	= g_Position + g_transPos;
 			vert_initialVel1 	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
