@@ -144,7 +144,7 @@ namespace RootForce
 					NetworkEntityID id;
 					id.UserID = m.User;
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = 1;
 
 					if (clientComponent->IsRemote)
 					{
