@@ -1,55 +1,69 @@
 #include <RootForce/Include/ConnectingState.h>
-#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/ServerConfig.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
 	ConnectingState::ConnectingState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
-		, m_sharedSystems(p_sharedSystems)
+		, m_sharedSystems(p_sharedSystems),
+		m_loadingScreen(nullptr)
 	{}
+
+	ConnectingState::~ConnectingState()
+	{
+	}
 
 	void ConnectingState::Initialize()
 	{
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
+		m_loadingScreen = g_engineContext.m_gui->LoadURL("loading.html");
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
-		// Connect the client and create a server if necessary
+		// Render a frame of loading screen to indicate the loading state
+		while(m_loadingScreen->IsLoading())
+			g_engineContext.m_gui->Update();
+		g_engineContext.m_renderer->Clear();
+		g_engineContext.m_gui->Render(m_loadingScreen);
+		g_engineContext.m_renderer->Swap();
+		
+		ECS::Entity* serverInfoEntity = g_world->GetEntityManager()->CreateEntity();
+		g_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
+		g_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
+        
+		// Host
 		if (p_playData.Host)
 		{
-			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, p_playData.ServerName, p_playData.Port, p_playData.MaxPlayers));
-			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_engineContext.m_logger, g_world));
-			m_networkContext.m_client->Connect("127.0.0.1", p_playData.Port);
+			// Setup the server and connect a local client
+			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false));
+			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
+			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
+			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 
+			// Setup the rules
 			ECS::Entity* entity = g_world->GetEntityManager()->CreateEntity();
 			g_world->GetTagManager()->RegisterEntity("MatchState", entity);
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);;
-			rules->ScoreLimit = p_playData.Killcount;
-			rules->TimeLeft = (float)p_playData.MatchLength;
+			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);
+			rules->ScoreLimit = p_playData.ServerInfo.KillCount;
+			rules->TimeLeft = (float)p_playData.ServerInfo.MatchTime;
 			rules->TeamScore[1] = 0;
 			rules->TeamScore[2] = 0;
-			// Setup server info response
-			RootForce::Network::MessagePlayData response;
-			response.ServerName = p_playData.ServerName.c_str();
-			response.MapName = p_playData.MapName.c_str();
-			response.MaxPlayers = (uint8_t) p_playData.MaxPlayers;
-			response.MatchLength = (uint16_t) p_playData.MatchLength;
-			response.KillCount = (uint8_t) p_playData.Killcount;
-
-			m_networkContext.m_serverMessageHandler->SetPlayDataResponse(response);
 		}
 		else
 		{
-			m_networkContext.m_client->Connect(p_playData.Address.c_str(), p_playData.Port);
+			// Connect the client
+			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port, true);
 
+			// Setup the rules
 			ECS::Entity* ruleEntity = g_world->GetEntityManager()->CreateEntity();
 			g_world->GetTagManager()->RegisterEntity("MatchState", ruleEntity);
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(ruleEntity);;
+			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(ruleEntity);
 			rules->ScoreLimit = 20; //TODO: this will be sent through the  gameState snapshot once this has been implemented
 			rules->TimeLeft = 20;   // hardcoded for now so that the game does not crash
 			rules->TeamScore[1] = 0;
@@ -57,24 +71,15 @@ namespace RootForce
 		}
 
 		// Reset the network entity map
-		m_networkContext.m_networkEntityMap = std::shared_ptr<RootForce::Network::NetworkEntityMap>(new RootForce::Network::NetworkEntityMap);
+		g_networkEntityMap.clear();
 
-		// Set the network entity map on both message handlers
-		m_networkContext.m_client->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
-		m_networkContext.m_clientMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
-		m_networkContext.m_clientMessageHandler->SetPlayerSystem(m_sharedSystems.m_playerSystem.get());
+		// Setup the client
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
-		if (m_networkContext.m_serverMessageHandler != nullptr)
-			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(m_networkContext.m_networkEntityMap.get());
-
-		// Set the connection message handler on the client.
-		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
-		if (m_networkContext.m_server != nullptr)
-			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 	}
 
 	void ConnectingState::Exit()
-	{}
+	{
+	}
 
 	GameStates::GameStates ConnectingState::Update()
 	{
@@ -82,13 +87,23 @@ namespace RootForce
 			m_networkContext.m_server->Update();
 		m_networkContext.m_client->Update();
 
-		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTED)
+		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
+		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+		if (clientComponent->State == RootForce::Network::ClientState::CONNECTED)
 			return GameStates::Ingame;
-		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_FAILED)
+		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_SERVER_INFO)
+			return GameStates::Connecting;
+		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_USER_CONNECT)
+			return GameStates::Connecting;
+		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
+			return GameStates::Connecting;
+		if (clientComponent->State == RootForce::Network::ClientState::DISCONNECTED_TIMEOUT)
 			return GameStates::Menu;
-		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_FAILED_TOO_MANY_PLAYERS)
+		if (clientComponent->State == RootForce::Network::ClientState::DISCONNECTED_REFUSED)
 			return GameStates::Menu;
-		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
+		if (clientComponent->State == RootForce::Network::ClientState::DISCONNECTED_REFUSED_TOO_MANY_PLAYERS)
+			return GameStates::Menu;
+		if (clientComponent->State == RootForce::Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN)
 			return GameStates::Menu;
 
 		return GameStates::Connecting;

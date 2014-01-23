@@ -68,6 +68,7 @@ namespace RootForce
 		void Process();
 		void UpdateAimingDevice();
 	private:
+		static Network::ActionID_t s_nextActionID;
 		std::vector<Keybinding> m_keybindings;
 
 		glm::ivec2 m_deltaMouseMovement;

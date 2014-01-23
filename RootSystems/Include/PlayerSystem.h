@@ -1,23 +1,14 @@
 #pragma once
 
-#include <RootEngine/Include/GameSharedContext.h>
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\EntitySystem.h>
+#include <Utility/ECS/Include/Component.h>
+#include <glm/glm.hpp>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
 #define PLAYER_NUM_ABILITIES 3
 
 namespace RootForce
 {
-	namespace Ability
-	{
-		enum Ability
-		{
-			ABILITY_NONE,
-			ABILITY_TEST,
-		};
-	}
-
 	namespace EntityState
 	{
 		enum EntityState
@@ -32,6 +23,7 @@ namespace RootForce
 
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
+		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
 		bool Jump;
@@ -60,39 +52,22 @@ namespace RootForce
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		int Health;
-		int LastDamageSourceID;
+		Network::UserID_t LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
 	};
 
-	struct Identity : public ECS::Component<Identity>
+
+	struct PlayerComponent : public ECS::Component<PlayerComponent>
 	{
-		std::string Name; 
+		std::string Name;
 		int TeamID;
-	};
 
-	struct UserAbility : public ECS::Component<UserAbility>
-	{
-		std::array<Ability::Ability, PLAYER_NUM_ABILITIES> Abilities;
-		Ability::Ability SelectedAbility;
-	};
+		std::array<std::string, PLAYER_NUM_ABILITIES> AbilityScripts;
+		int SelectedAbility;
 
-	struct ScoreComponent : public ECS::Component<ScoreComponent>
-	{
 		int Score;
 		int Deaths;
-	};
-
-	class PlayerSystem : public ECS::VoidSystem
-	{
-	public:
-		PlayerSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world)
-			, m_engineContext(p_engineContext) {}
-		void CreatePlayer(int p_teamID);
-		void Process();
-	private:
-		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

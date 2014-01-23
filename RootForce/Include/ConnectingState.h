@@ -5,7 +5,7 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
 
 namespace RootForce
@@ -15,6 +15,7 @@ namespace RootForce
 	{
 	public:
 		ConnectingState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems);
+		~ConnectingState();
 
 		void Initialize();
 		void Enter(const GameStates::PlayData& p_playData);
@@ -23,5 +24,6 @@ namespace RootForce
 	private:
 		NetworkContext& m_networkContext;
 		SharedSystems& m_sharedSystems;
+		Awesomium::WebView* m_loadingScreen;
 	};
 }
