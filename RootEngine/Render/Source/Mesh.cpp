@@ -3,7 +3,7 @@
 namespace Render
 {
 	Mesh::Mesh()
-		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0), m_transformFeedback(0) {}
+		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0) {}
 
 	Mesh::~Mesh()
 	{
@@ -114,6 +114,7 @@ namespace Render
 	void Mesh::DrawTransformFeedback()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
+
 
 		glDrawTransformFeedback(m_primitive, m_transformFeedback);
 	}

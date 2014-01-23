@@ -22,7 +22,7 @@ namespace RootForce
 	struct Renderable : public ECS::Component<Renderable>
 	{
 		Renderable()
-			: m_model(nullptr), m_material(nullptr), m_pass(2) {}
+			: m_model(nullptr), m_material(nullptr), m_pass(2), m_renderFlags(0) {}
 
 		RootEngine::Model* m_model;
 		Render::Material* m_material;
