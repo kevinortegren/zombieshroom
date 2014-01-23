@@ -76,7 +76,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
-			//*s = g_world->GetGroupManager()->
+			g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, "Entity.GetByID not yet implemented");
 			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
 		}
