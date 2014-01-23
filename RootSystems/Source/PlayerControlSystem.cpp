@@ -97,23 +97,11 @@ namespace RootForce
 
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
-		PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
-		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
-		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
-		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
-		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
-		glm::vec3 facing = transform->m_orientation.GetFront();
-		glm::vec3 right = transform->m_orientation.GetRight();
-
 		glm::vec3 movement(0.0f);
-
-		// Get the speed of the player
-		float speed = playerphysics->MovementSpeed;
 
 		action->ActionID = s_nextActionID++;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
@@ -179,11 +167,11 @@ namespace RootForce
 		}
 
 		// Send player command updates to the server
-		Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
+		//Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 		ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 		
-		if (network->ID.UserID == playerNetworkComponent->ID.UserID && clientComponent->IsRemote)
+		if (/*network->ID.UserID == playerNetworkComponent->ID.UserID &&*/ clientComponent->IsRemote)
 		{
 			// If we issued this action, send it to the server as well.
 			RootForce::NetworkMessage::PlayerCommand m;
