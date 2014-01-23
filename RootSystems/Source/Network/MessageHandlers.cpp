@@ -180,23 +180,23 @@ namespace RootForce
 					NetworkMessage::UserDisconnected m;
 					m.Serialize(false, p_bs);
 
-					// Log the disconnect.
-					NetworkEntityID id;
-					id.UserID = m.User;
-					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
-					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
-
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
-					
-					// Call the OnDelete script
-					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDelete");
-					g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
-					g_engineContext.m_script->ExecuteScript();
-
 					// Remove all entities associated with that player.
 					if (clientComponent->IsRemote)
 					{
+						// Log the disconnect.
+						NetworkEntityID id;
+						id.UserID = m.User;
+						id.ActionID = ReservedActionID::CONNECT;
+						id.SequenceID = 0;
+						PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
+					
+						// Call the OnDelete script
+						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDestroy");
+						g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
+						g_engineContext.m_script->ExecuteScript();
+
 						id.UserID = m.User;
 						id.ActionID = ReservedActionID::ALL;
 						id.SequenceID = ReservedSequenceID::ALL;
@@ -420,7 +420,7 @@ namespace RootForce
 					id.SequenceID = 0;
 
 					// Call the OnDelete script
-					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDelete");
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDestroy");
 					g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
 					g_engineContext.m_script->ExecuteScript();
 
