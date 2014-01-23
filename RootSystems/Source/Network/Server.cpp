@@ -111,6 +111,7 @@ namespace RootForce
 
 			// Reduce time from delta timer and if 
 			m_worldDeltaTimer += m_world->GetDelta();
+			//m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "worldDeltaTimer = %f", m_worldDeltaTimer);
 			if(m_worldDeltaTimer > WORLD_DELTA_UPDATE_INTERVAL)
 			{
 				m_worldDeltaTimer = 0;
