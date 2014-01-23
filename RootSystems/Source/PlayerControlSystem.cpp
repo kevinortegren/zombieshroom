@@ -102,7 +102,8 @@ namespace RootForce
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		PlayerActionComponent* trueAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		PlayerActionComponent action = *trueAction;
 		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
@@ -115,26 +116,26 @@ namespace RootForce
 		// Get the speed of the player
 		float speed = playerphysics->MovementSpeed;
 
-		action->ActionID = s_nextActionID++;
+		action.ActionID = s_nextActionID++;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
 			case PlayerAction::MOVE_BACKWARDS_STOP:
-					action->MovePower += 1;
+					action.MovePower += 1;
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
 			case PlayerAction::MOVE_FORWARDS_STOP:
-					action->MovePower -= 1;
+					action.MovePower -= 1;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
 			case PlayerAction::STRAFE_LEFT_STOP:
-					action->StrafePower += 1;
+					action.StrafePower += 1;
 				break;
 			case PlayerAction::STRAFE_LEFT:
 			case PlayerAction::STRAFE_RIGHT_STOP:
-					action->StrafePower -= 1;
+					action.StrafePower -= 1;
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -143,32 +144,32 @@ namespace RootForce
 					// TODO: Update a camera controller with m_deltaMouseMovement.
 					//transform->m_orientation.Pitch(m_deltaMouseMovement.y * controller->m_mouseSensitivity);
 					//transform->m_orientation.YawGlobal(-m_deltaMouseMovement.x * controller->m_mouseSensitivity);
-					action->Angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
-					action->Angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
+					action.Angle.x = -m_deltaMouseMovement.x * controller->m_mouseSensitivity;
+					action.Angle.y += m_deltaMouseMovement.y * controller->m_mouseSensitivity;
 
-					if(action->Angle.y < -90.0f)
-						action->Angle.y = -90;
-					else if(action->Angle.y > 90.0f)
-						action->Angle.y = 90;
+					if(action.Angle.y < -90.0f)
+						action.Angle.y = -90;
+					else if(action.Angle.y > 90.0f)
+						action.Angle.y = 90;
 				}
 				break;
 			case PlayerAction::SELECT_ABILITY1:
-				action->SelectedAbility = 1;
+				action.SelectedAbility = 1;
 				break;
 			case PlayerAction::SELECT_ABILITY2:
-				action->SelectedAbility = 2;
+				action.SelectedAbility = 2;
 				break;
 			case PlayerAction::SELECT_ABILITY3:
-				action->SelectedAbility = 3;
+				action.SelectedAbility = 3;
 				break;
 			case PlayerAction::ACTIVATE_ABILITY:
 				{
-					action->ActivateAbility = true;
+					action.ActivateAbility = true;
 				}
 				break;
 			case PlayerAction::JUMP:
 				{
-					action->Jump = true;
+					action.Jump = true;
 				}
 				break;
 			default:
@@ -180,19 +181,25 @@ namespace RootForce
 
 		// Send player command updates to the server
 		RootForce::Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(entity);
-
+		RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(m_world->GetTagManager()->GetEntityByTag("Client"));
+		
 		if (network->ID.UserID == playerNetworkComponent->ID.UserID)
 		{
 			// If we issued this action, send it to the server as well.
 			RootForce::NetworkMessage::PlayerCommand m;
 			m.User = network->ID.UserID;
-			m.Action = *action;
+			m.Action = action;
 
 			RakNet::BitStream bs;
 			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
 			m.Serialize(true, &bs);
 
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+		}
+		if(clientComponent->IsRemote)
+		{
+			//PlayerActionComponent* trueAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+			*trueAction = action;
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
