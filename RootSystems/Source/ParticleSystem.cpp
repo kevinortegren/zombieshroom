@@ -1,6 +1,7 @@
 #include <RootSystems/Include/ParticleSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Render/Include/Renderer.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce

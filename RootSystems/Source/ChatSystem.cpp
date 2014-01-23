@@ -1,6 +1,7 @@
 #include "ChatSystem.h"
 #include <Awesomium/STLHelpers.h>
 #include <Awesomium/WebCore.h>
+#include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 #include <iostream>
 namespace RootForce

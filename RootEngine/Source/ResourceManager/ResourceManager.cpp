@@ -1,6 +1,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Script/Include/RootScript.h>
 namespace RootEngine
 {
 

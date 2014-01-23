@@ -15,7 +15,7 @@ namespace ECS
 	};
 
 	template<class T>
-	unsigned int Component<T>::s_typeId = UINT_MAX;
+	unsigned int Component<T>::s_typeId = 0xffffffff;
 
 	template<class T>
 	unsigned int Component<T>::GetTypeId()

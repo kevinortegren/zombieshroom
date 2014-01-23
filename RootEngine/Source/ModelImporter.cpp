@@ -1,5 +1,7 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 
