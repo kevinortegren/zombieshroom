@@ -1,5 +1,6 @@
 #include <Utility/DynamicLoader/Include/DynamicLoader.h>
 #include <RootEngine/Include/RootEngine.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <RootForce/Include/LuaAPI.h>
 
 #include <SDL2/SDL.h>

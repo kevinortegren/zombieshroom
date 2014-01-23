@@ -1,4 +1,6 @@
 #include <RootForce/Include/MenuState.h>
+#include <RootEngine/InputManager/Include/InputInterface.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;

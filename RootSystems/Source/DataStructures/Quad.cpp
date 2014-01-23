@@ -1,6 +1,7 @@
 #include <RootSystems/Include/DataStructures/Quad.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/Shapes/Plane.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <glm/gtx/transform.hpp>
 
 namespace RootForce
