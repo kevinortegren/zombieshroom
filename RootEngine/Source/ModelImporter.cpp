@@ -1,5 +1,7 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 
@@ -233,7 +235,8 @@ namespace RootEngine
 
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
-		m_model->m_meshes.push_back(mesh.get());
+		m_model->m_meshes[0] = mesh.get();
+		m_model->m_meshes[1] = nullptr;
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )

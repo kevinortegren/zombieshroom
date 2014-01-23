@@ -1,6 +1,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Script/Include/RootScript.h>
 namespace RootEngine
 {
 
@@ -160,7 +161,6 @@ namespace RootEngine
 		if(m_models.find(p_path) == m_models.end())
 		{
 			Model* model = new Model();
-			model->m_meshes.resize(1);
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"].get();
 			

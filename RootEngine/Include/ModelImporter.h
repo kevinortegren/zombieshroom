@@ -26,7 +26,7 @@ namespace RootEngine
 
 	struct Model
 	{
-		std::vector<Render::MeshInterface*> m_meshes;
+		Render::MeshInterface* m_meshes[2];
 		std::vector<Physics::PhysicsMeshInterface*> m_physicsMeshes;
 		RootEngine::RootAnimation::AnimationInterface* m_animation;
 		std::string m_textureHandles[3];

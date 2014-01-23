@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Utility\ECS\Include\World.h>
-#include <RootSystems\Include\Components.h>
+#include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/Components.h>
 
-#include <yaml-cpp\yaml.h>
+#include <yaml-cpp/yaml.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 

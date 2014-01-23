@@ -1,5 +1,7 @@
 #include <RootForce/Include/IngameState.h>
 #include <RootForce/Include/LuaAPI.h>
+#include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;

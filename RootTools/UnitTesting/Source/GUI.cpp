@@ -1,5 +1,6 @@
 #include "UnitTesting.h"
 #include <Awesomium/WebCore.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 TEST(GUITest, InitTest) 
 {
