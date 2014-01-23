@@ -2,6 +2,7 @@
 
 #include <PlayerControlSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
@@ -40,6 +41,11 @@ namespace RootForce
 	void PlayerControlSystem::SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics)
 	{
 		m_physics = p_physics;
+	}
+
+	void PlayerControlSystem::SetClientPeer(RakNet::RakPeerInterface* p_clientPeer)
+	{
+		m_clientPeer = p_clientPeer;
 	}
 
 	void PlayerControlSystem::Process()
@@ -98,6 +104,7 @@ namespace RootForce
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
 		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
+		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
 		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 		glm::vec3 facing = transform->m_orientation.GetFront();
@@ -169,6 +176,23 @@ namespace RootForce
 			}
 			
 			
+		}
+
+		// Send player command updates to the server
+		RootForce::Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(entity);
+
+		if (network->ID.UserID == playerNetworkComponent->ID.UserID)
+		{
+			// If we issued this action, send it to the server as well.
+			RootForce::NetworkMessage::PlayerCommand m;
+			m.User = network->ID.UserID;
+			m.Action = *action;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
+			m.Serialize(true, &bs);
+
+			m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 		}
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;

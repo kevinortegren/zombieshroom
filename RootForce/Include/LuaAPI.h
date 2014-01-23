@@ -12,6 +12,7 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
@@ -76,7 +77,20 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
-			//*s = g_world->GetGroupManager()->
+			g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, "Entity.GetByID not yet implemented");
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
+		static int EntityGetByNetworkID(lua_State* p_luaState)
+		{
+			NumberOfArgs(3); // UserID, ActionID, SequenceID
+			RootForce::Network::NetworkEntityID ID;
+			ID.UserID = (RootForce::Network::UserID_t) luaL_checknumber(p_luaState, 1);
+			ID.ActionID = (RootForce::Network::ActionID_t) luaL_checknumber(p_luaState, 2);
+			ID.SequenceID = (RootForce::Network::SequenceID_t) luaL_checknumber(p_luaState, 3);
+
+			ECS::Entity** s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*s = g_networkEntityMap[ID];
 			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
 		}
@@ -1647,6 +1661,7 @@ namespace RootForce
 			{"New", EntityCreate},
 			{"GetEntityByTag", EntityGetByTag},
 			{"GetEntityByID", EntityGetByID},
+			{"GetEntityByNetworkID", EntityGetByNetworkID},
 			{"RegisterTag", EntityRegisterTag},
 			{"RegisterGroup", EntityRegisterGroup},
 			{"UnegisterTag", EntityUnregisterTag},

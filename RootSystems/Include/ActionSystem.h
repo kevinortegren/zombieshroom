@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility\ECS\Include\Component.h>
 #include <Utility\ECS\Include\EntitySystem.h>
@@ -29,7 +30,7 @@ namespace RootSystems
 	public:
 		ActionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
-			, m_engineContext(p_engineContext) 
+			, m_engineContext(p_engineContext)
 		{
 			SetUsage<RootForce::PlayerActionComponent>();
 			SetUsage<RootForce::Network::NetworkComponent>();
