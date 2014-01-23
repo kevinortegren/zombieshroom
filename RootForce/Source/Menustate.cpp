@@ -20,6 +20,20 @@ namespace RootForce
 
 	void MenuState::Enter()
 	{
+		// Destroy any existing entities
+		Network::NetworkEntityID id;
+		id.UserID = Network::ReservedUserID::ALL;
+		id.ActionID = Network::ReservedActionID::ALL;
+		id.SequenceID = Network::ReservedSequenceID::ALL;
+		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager()); 
+		g_networkEntityMap.clear();
+		Network::NetworkComponent::s_sequenceIDMap.clear();
+
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
+		g_engineContext.m_physics->RemoveAll();
+
 		// Allow the mouse to be moved while in the menu
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
@@ -34,8 +48,8 @@ namespace RootForce
 		m_networkContext.m_server = nullptr;
 		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
-		g_networkEntityMap.clear();
-		Network::NetworkComponent::s_sequenceIDMap.clear();
+		
+		
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler

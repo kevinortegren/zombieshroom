@@ -219,6 +219,15 @@ namespace RootForce
 
 	void IngameState::Exit()
 	{
+		Network::NetworkEntityID id;
+		id.UserID = Network::ReservedUserID::ALL;
+		id.ActionID = Network::ReservedActionID::ALL;
+		id.SequenceID = Network::ReservedSequenceID::ALL;
+
+		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager());
+		g_networkEntityMap.clear();
+		Network::NetworkComponent::s_sequenceIDMap.clear();
+
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
