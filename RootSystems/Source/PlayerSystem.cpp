@@ -2,7 +2,6 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
-#include <RootForce/Include/ComponentImporter.h>
 
 namespace RootForce
 {
@@ -29,10 +28,7 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
-		RootForce::ParticleEmitter* emitter = entityManager->CreateComponent<RootForce::ParticleEmitter>(entity);
-
-		ImportParticleEmitter("fire", emitter, transform);
-
+		
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
 		renderable->m_params[Render::Semantic::BONES] = &animation->m_bones[0];
