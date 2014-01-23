@@ -2,6 +2,7 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootForce/Include/ComponentImporter.h>
 
 namespace RootForce
 {
@@ -28,6 +29,9 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
+		RootForce::ParticleEmitter* emitter = entityManager->CreateComponent<RootForce::ParticleEmitter>(entity);
+
+		ImportParticleEmitter("fire", emitter, transform);
 
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
@@ -40,7 +44,7 @@ namespace RootForce
 		renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]  =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR]  =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 
-		transform->m_position = glm::vec3(100, 10, 0);
+		transform->m_position = glm::vec3(0, 0, 0);
 
 		state->PrevPosition = transform->m_position;
 		state->CurrentState = RootForce::EntityState::DESCENDING;
@@ -84,6 +88,9 @@ namespace RootForce
 		score->Deaths = 0;
 		score->Score = 0;
 		identity->TeamID = p_teamID;
+
+		RootForce::Transform* dsfghs = entityManager->GetComponent<RootForce::Transform>(entity);
+
 	}
 
 	void PlayerSystem::Process()

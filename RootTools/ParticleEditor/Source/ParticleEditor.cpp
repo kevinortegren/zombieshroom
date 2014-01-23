@@ -11,7 +11,6 @@ ParticleEditor::~ParticleEditor()
 	delete m_particleTab;
 	delete m_colorTriangle;
 	delete m_colorEndTriangle;
-	delete m_particleImporter;
 }
 
 void ParticleEditor::ConnectSignalsAndSlots()
@@ -98,9 +97,6 @@ void ParticleEditor::Init()
 
 	ui.endcolorDockWidget->hide();
 	ui.colorDockWidget->hide();
-
-	m_particleImporter = new ParticleImporter();
-	m_particleImporter->SetGameSharedContext(m_context);
 }
 
 bool ParticleEditor::CheckExit()
@@ -197,7 +193,7 @@ void ParticleEditor::MenuOpen()
 
 	QString fullFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("PARTICLE-file (*.particle)"));
 
-	m_particleImporter->LoadParticleEmitter(fullFileName.toStdString(), e, t);
+	ImportParticleEmitter(fullFileName.toStdString(), e, t);
 
 	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
 	{

@@ -15,7 +15,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtCore/QTextStream>
 #include <yaml-cpp\yaml.h>
-#include <RootTools/ParticleEditor/Include/ParticleImporter.h>
+#include <RootForce/Include/ComponentImporter.h>
 
 
 class ParticleEditor : public QMainWindow
@@ -58,8 +58,6 @@ private:
 	QtColorTriangle* m_colorEndTriangle;
 	std::string m_workingDirectory;
 	RootForce::Transform* m_aimingDeviceTransform;
-
-	ParticleImporter* m_particleImporter;
 
 	int m_selectedEmitterIndex;
 	int m_selectedEntityIndex;
