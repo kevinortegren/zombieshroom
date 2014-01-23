@@ -43,6 +43,28 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]);
 						p_emitter << YAML::Key << "Normal" << YAML::Value << s;
 					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]);
+						p_emitter << YAML::Key << "TextureMap" << YAML::Value << s;
+					}
+
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]);
+						p_emitter << YAML::Key << "TextureRed" << YAML::Value << s;
+					}
+
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]);
+						p_emitter << YAML::Key << "TextureGreen" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]);
+						p_emitter << YAML::Key << "TextureBlue" << YAML::Value << s;
+					}
 					p_emitter << YAML::EndMap;
 				}
 			}

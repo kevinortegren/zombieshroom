@@ -19,15 +19,15 @@ const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
 
 const string g_levelName = "myTestLevel";
 
-const string g_textureR = "terrain_light_grass";
-const string g_textureG = "terrain_dark_grass";
-const string g_textureB = "terrain_stone";
+const string g_textureR = "RED";
+const string g_textureG = "GREEN";
+const string g_textureB = "BLUE";
 
 const int g_maxMessages = 30;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
 const int g_tileFactor = 4;
-const int g_maxPaintTextures = 1;
+const int g_maxPaintTextures = 2;
 
 struct UpdateMessage
 {

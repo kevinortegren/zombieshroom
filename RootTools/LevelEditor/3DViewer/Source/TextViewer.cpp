@@ -49,7 +49,7 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap);
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, int meshID);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
@@ -327,7 +327,7 @@ void LoadSceneFromMaya()
 
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath));
+		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath), -1);
 	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
@@ -384,36 +384,62 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap)
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, int meshID)
 {
-	
+	bool painted = false;
+	int paintID;
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	paintID = RM.PmeshList[meshID]->paintIndex;
+
+	for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
+	{
+		string flag = RM.PmeshList[meshID]->transformation.flags[i];
+		if(flag == "Painted")
+		{
+			painted = true;
+		}
+	}
+
+	ReleaseMutex(RM.MeshMutexHandle);
+
 	if(textureName == "" || textureName == "NONE")
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
-	else if(textureName == "PaintTexture")
+	else if(textureName == "PaintTexture" || painted)
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
-		mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
 
-		//OPEN MUTEX!!!!
+		if(textureName == "PaintTexture")
+			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+		else
+		{
+			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+		}
+
+		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+
 		painter->BufferData(RM.PpaintList[0]->Pixels);
-		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureRed, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		mat->m_textures[Render::TextureSemantic::TEXTURE_G] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureGreen, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_G] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureGreen, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[0]->textureBlue, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureBlue, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		mat->m_tileFactor = RM.PpaintList[0]->tileFactor;
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+
+		ReleaseMutex(RM.TextureMutexHandle);
 	}
 	else
 	{
@@ -654,7 +680,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath));
+			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath), MeshIndex);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
@@ -663,7 +689,6 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			{
 				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
 			}
-
 
 			/// ROTATION
 			glm::quat rotation;

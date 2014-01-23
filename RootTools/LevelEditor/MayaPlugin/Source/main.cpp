@@ -50,10 +50,11 @@ MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
 
-void PaintModel(int index, MImage& texture);
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor);
 int paintCount = 0;
+void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
 
-PaintTexture myTexture;
+PaintTexture myTextures[g_maxPaintTextures];
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -101,12 +102,21 @@ EXPORT MStatus initializePlugin(MObject obj)
 
 	return status;
 }
+
 void GivePaintId(int index, string filePath)
 {
-	if (filePath == "PaintTexture")
+	bool painted = false;
+	for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
 	{
-		
+		string flag = SM.meshList[index].transformation.flags[i];
+		if(flag == "Painted")
+		{
+			painted = true;
+		}
+	}
 
+	if (filePath == "PaintTexture" || painted)
+	{
 		if(SM.meshList[index].paintIndex == -1)
 		{
 			Print(SM.meshList[index].modelName, " given paintID ", paintCount);
@@ -121,7 +131,7 @@ void GivePaintId(int index, string filePath)
 	}
 }
 
-void PaintModel(int index, MImage& texture)
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor)
 {
 	HANDLE TextureMutexHandle;
 	DWORD milliseconds;
@@ -136,7 +146,7 @@ void PaintModel(int index, MImage& texture)
 
 		for(int i = 0; i < x*y*4; i++)
 		{
-			myTexture.Pixels[i] = texture.pixels()[i];
+			myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
 		}
 
 		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
@@ -145,13 +155,28 @@ void PaintModel(int index, MImage& texture)
 
 		SM.PpaintList[SM.meshList[index].paintIndex]->heigth = y;
 		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTexture.Pixels, x*y*4);
+		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
 
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, g_textureR.c_str(), g_maxNameLength);
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, g_textureG.c_str(), g_maxNameLength);
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, g_textureB.c_str(), g_maxNameLength);
-		SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = g_tileFactor;
+		if(Red != "")
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, Red.asChar(), g_maxNameLength);
+		else
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, g_textureR.c_str(), g_maxNameLength);
 
+		if(Green != "")
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, Green.asChar(), g_maxNameLength);
+		else
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, g_textureG.c_str(), g_maxNameLength);
+
+		if(Blue != "")
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, Blue.asChar(), g_maxNameLength);
+		else
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, g_textureB.c_str(), g_maxNameLength);
+
+		if(_tileFactor != 0)
+			SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = _tileFactor;
+		else
+			SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = g_tileFactor;
+	
 		*SM.NumberOfPaintTextures = paintCount;
 		ReleaseMutex(TextureMutexHandle);
 
@@ -1091,9 +1116,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node);
 		materialName = material_node.name();
-		string texPath = texturepath.asChar();
-
-		
+		string texPath = texturepath.asChar();		
 
 		MImage texture;
 
@@ -1101,17 +1124,17 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		GivePaintId(meshIndex, texPath);
 		if(SM.meshList[meshIndex].paintIndex != -1)
 		{
-			Print("BEFORE ", texture_node.name());
+			MString Red, Green, Blue;
+			int tileFactor;
 
+			ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
 			MObject temp = texture_node.object();
-
-			Print("AFTER: TYPE ", temp.apiTypeStr(), " NAME ", texture_node.name());
 			
 			MStatus hej = texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
 			if(hej)
 			{
 				Print("Success");
-				PaintModel(meshIndex, texture);
+				PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor);
 			}
 			else
 			{
@@ -1430,6 +1453,29 @@ void MayaCameraToList(MObject node, int cameraIndex)
 	}
 }
 
+void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor)
+{
+	MStatus status = MS::kSuccess;;
+	//Get the texture paths.
+
+	MPlug color_plugR,color_plugG,color_plugB, tile_plug;
+	MPlugArray connections;
+	color_plugR = material_node.findPlug("Red", true, &status);
+	color_plugG = material_node.findPlug("Green", true, &status);
+	color_plugB = material_node.findPlug("Blue", true, &status);
+	tile_plug = material_node.findPlug("TileFactor", true, &status);
+
+	Red = color_plugR.asString();
+	Green = color_plugG.asString();
+	Blue = color_plugB.asString();
+	tileFactor = tile_plug.asInt();
+
+
+	Print("Value in plug Red: ",color_plugR.asString());
+	Print("Value in plug Green: ",color_plugG.asString());
+	Print("Value in plug Blue: ",color_plugB.asString());
+}
+
 void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
 {
 	MStatus status = MS::kSuccess;
@@ -1487,7 +1533,6 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 			{
 				out_color_path = "PaintTexture";
 			}
-			//out_materialObject = FileNode;
 
 			break;
 		}
