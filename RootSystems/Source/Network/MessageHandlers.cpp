@@ -93,14 +93,17 @@ namespace RootForce
 
 				case ID_UNCONNECTED_PONG:
 				{
-					p_bs->IgnoreBytes(4); // Timestamp
+					if (clientComponent->State == ClientState::UNCONNECTED)
+					{
+						p_bs->IgnoreBytes(4); // Timestamp
 					
-					RootSystems::ServerInfoInternal info;
-					info.Information.Serialize(false, p_bs);
-					info.IP = p_packet->systemAddress.ToString(false);
-					info.Port = p_packet->systemAddress.GetPort();
+						RootSystems::ServerInfoInternal info;
+						info.Information.Serialize(false, p_bs);
+						info.IP = p_packet->systemAddress.ToString(false);
+						info.Port = p_packet->systemAddress.GetPort();
 
-					m_list->AddServer(info);
+						m_list->AddServer(info);
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::GameStateDelta:
