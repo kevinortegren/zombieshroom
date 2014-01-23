@@ -100,9 +100,9 @@ namespace AbilityEditorNameSpace
 
 		m_file << "function " << m_name << ".OnCreate (userId, actionId)\n";
 		m_file << "\tlocal self = Entity.New();\n";
-		m_file << "\tlocal playerEnt = Entity.GetEntityByTag(\"Player\");\n";
-		m_file << "\tlocal posVec = Entity.GetEntityByTag(\"Player\"):GetTransformation():GetPos();\n";
-		m_file << "\tlocal frontVec = Entity.GetEntityByTag(\"AimingDevice\"):GetTransformation():GetOrient():GetFront();\n";
+		m_file << "\tlocal playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
+		m_file << "\tlocal posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();\n";
+		m_file << "\tlocal frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
 		m_file << "\tlocal networkEnt = Network.New(self, userId, actionId);\n";
 		m_file << "\n";
 		m_entityOffset = entities->size();

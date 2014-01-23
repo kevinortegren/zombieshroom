@@ -2,9 +2,9 @@ AbilityTest = {};
 
 function AbilityTest.OnCreate (userId, actionId)
 	local self = Entity.New();
-	local playerEnt = Entity.GetEntityByTag("Player");
-	local posVec = Entity.GetEntityByTag("Player"):GetTransformation():GetPos();
-	local frontVec = Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetOrient():GetFront();
+	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();
+	local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
 
 	local collisionComp = Collision.New(self);
@@ -15,7 +15,6 @@ function AbilityTest.OnCreate (userId, actionId)
 	local scriptComp = Script.New(self, "AbilityTest");
 	physicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
-
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
