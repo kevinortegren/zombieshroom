@@ -86,7 +86,7 @@ $(document).ready(function() {
       PromptPassword();
       return;
     }
-    Menu.Connect(address[1], address[0]);
+    Menu.Connect(address[1], address[0], "");
   };
   $("#lan-connect").click( LanConnect );
   $("#lan-list").dblclick( LanConnect );
