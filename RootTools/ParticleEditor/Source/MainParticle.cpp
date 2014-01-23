@@ -142,8 +142,6 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
-	m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
-	g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
 	
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	
@@ -161,11 +159,11 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Add camera entity.	
-	ECS::Entity* cameraEntity = m_world.GetEntityManager()->CreateEntity();
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
-	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
+	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(m_cameraEntity);
+	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(m_cameraEntity);
 	cameraTransform->m_position = glm::vec3(0);
 	camera->m_frustum.m_near = 0.1f;
 	camera->m_frustum.m_far = 1000.0f;
@@ -178,8 +176,8 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	cameraThirdPerson->m_targetTag = "AimingDevice";
 	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	m_world.GetTagManager()->RegisterEntity("Camera", cameraEntity);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
+	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
 
 	p_particleEditorQt->SetContext(&g_engineContext);
 	p_particleEditorQt->SetWorld(&m_world);
@@ -216,7 +214,7 @@ void MainParticle::Update( float p_delta )
 	UpdateAimingDevice();
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
-	m_thirdPersonBehaviorSystem->Process();
+	UpdateThirdPerson();
 	m_particleSystem->Process();
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
@@ -257,4 +255,20 @@ void MainParticle::UpdateAimingDevice()
 				cameraThirdPerson->m_distance += m_deltaMouseMovement.x * 0.3f * speedZoomFac;
 		}
 	}
+}
+
+void MainParticle::UpdateThirdPerson()
+{
+	RootForce::ThirdPersonBehavior* thirdPersonBehavior = m_world.GetEntityManager()->GetComponent<RootForce::ThirdPersonBehavior>(m_cameraEntity);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_cameraEntity);
+	RootForce::Transform* targetTransform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_aimingDevice);
+	
+	//Move the entity
+	glm::vec3 targetPosition = targetTransform->m_position;
+	RootForce::Orientation tOrientation = targetTransform->m_orientation;
+	glm::vec3 localDisplacement(0.0f);
+	localDisplacement.z = -thirdPersonBehavior->m_distance;
+	glm::vec3 worldDisplacement;
+	worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
+	cameraTransform->m_position = targetPosition + worldDisplacement;
 }

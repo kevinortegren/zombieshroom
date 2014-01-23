@@ -25,6 +25,7 @@ public:
 	void Update(float p_delta);
 private:
 	void UpdateAimingDevice();
+	void UpdateThirdPerson();
 	bool m_running;
 	std::string m_workingDirectory;
 	void* m_engineModule;
@@ -37,9 +38,10 @@ private:
 	RootForce::ParticleSystem*				m_particleSystem;
 	RootForce::CameraSystem*				m_cameraSystem;
 	RootForce::LookAtSystem*				m_lookAtSystem;
-	RootForce::ThirdPersonBehaviorSystem*	m_thirdPersonBehaviorSystem;
 	ParticleEditor*							m_particleEditorQt;
-	ECS::Entity* m_aimingDevice;
+
+	ECS::Entity*							m_cameraEntity;
+	ECS::Entity*							m_aimingDevice;
 };
 
 
