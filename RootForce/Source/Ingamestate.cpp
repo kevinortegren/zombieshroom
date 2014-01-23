@@ -29,34 +29,34 @@ namespace RootForce
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
-		keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
-		keybindings[0].Edge = true;
+		//keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
+		//keybindings[0].Edge = true;
 
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
-		keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
-		keybindings[1].Edge = true;
+		//keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
+		//keybindings[1].Edge = true;
 
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
 		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
 		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
-		keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
-		keybindings[2].Edge = true;
+		//keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
+		//keybindings[2].Edge = true;
 
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
 		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
 		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
-		keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
-		keybindings[3].Edge = true;
+		//keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
+		//keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
 		keybindings[4].Action = RootForce::PlayerAction::JUMP;
-		keybindings[4].Edge = true;
+		//keybindings[4].Edge = true;
 		
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
 		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
-		keybindings[5].Edge = true;
+		//keybindings[5].Edge = true;
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;

@@ -59,6 +59,8 @@ namespace RootSystems
 			movement = glm::normalize(movement) * playphys->MovementSpeed;
 			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
+		action->MovePower = 0;
+		action->StrafePower = 0;
 
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
