@@ -163,6 +163,7 @@ namespace RootEngine
 			Model* model = new Model();
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			model->m_meshes[1] = nullptr;
 			
 			if(model)
 			{

@@ -10,13 +10,13 @@
         - name: g_Specular
           slot: 1
         - name: g_BlendMap
-          slot: 4
-        - name: g_DiffuseR
           slot: 5
-        - name: g_DiffuseG
+        - name: g_DiffuseR
           slot: 6
-        - name: g_DiffuseB
+        - name: g_DiffuseG
           slot: 7
+        - name: g_DiffuseB
+          slot: 8
       uniforms:
         - sem: MODEL
           offset: 0

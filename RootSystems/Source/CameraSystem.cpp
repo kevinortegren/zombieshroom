@@ -32,7 +32,7 @@ namespace RootForce
 			m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
 		}
 	}
-
+#ifndef COMPILE_LEVEL_EDITOR
 	void ThirdPersonBehaviorSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		Transform* transform = m_transforms.Get(p_entity);
@@ -63,4 +63,5 @@ namespace RootForce
 			}
 		}
 	}
+#endif
 }

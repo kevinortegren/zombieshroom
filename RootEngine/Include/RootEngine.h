@@ -8,7 +8,6 @@
 
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
-#include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/GUI/Include/guiInstance.h>

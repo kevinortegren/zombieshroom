@@ -335,20 +335,21 @@ void LoadSceneFromMaya()
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	numberMeshes = *RM.NumberOfMeshes;
-	ReleaseMutex(RM.MeshMutexHandle);
+	
 
 	for(int i = 0; i < numberMeshes; i++)
 	{				
-		//OPEN MUTEX?
 		string name = RM.PmeshList[i]->modelName;
 		Entities.push_back(CreateMeshEntity(&m_world, name, i));
 		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
 		auto mesh = model->m_meshes[0];
-		auto buffer = g_engineContext.m_renderer->CreateBuffer();
+		auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
 		mesh->SetVertexBuffer(buffer);
 
 		UpdateMesh(i, true, true, false);
 	}			
+
+	ReleaseMutex(RM.MeshMutexHandle);
 
 	///////////////////////// Load Lights ////////////////////////////////
 
@@ -686,10 +687,10 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
 			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
-			{
-				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-			}
+			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			//{
+			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			//}
 
 			/// ROTATION
 			glm::quat rotation;
@@ -738,7 +739,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		}
 
 		// SET INFORMATION TO GAME
-		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer());
+		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 
