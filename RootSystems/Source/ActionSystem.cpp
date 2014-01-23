@@ -71,11 +71,15 @@ namespace RootSystems
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-			
-			m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
-			m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
-			m_engineContext->m_script->AddParameterNumber(action->ActionID);
-			m_engineContext->m_script->ExecuteScript();
+
+			std::string abilityScript = player->AbilityScripts[player->SelectedAbility];
+			if (abilityScript != "")
+			{
+				m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+				m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
+				m_engineContext->m_script->AddParameterNumber(action->ActionID);
+				m_engineContext->m_script->ExecuteScript();
+			}
 		}
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)

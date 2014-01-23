@@ -73,6 +73,8 @@ namespace RootForce
 			ClientState::ClientState State;
 			RakNet::RakString Name;
 			bool IsRemote;
+
+			ClientComponent();
 		};
 	}
 }

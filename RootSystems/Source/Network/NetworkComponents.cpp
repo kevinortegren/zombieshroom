@@ -29,5 +29,9 @@ namespace RootForce
 
 			g_networkEntityMap[ID] = p_entity;
 		}
+
+		ClientComponent::ClientComponent()
+			: State(ClientState::UNCONNECTED)
+			, IsRemote(false) {}
 	}
 }
