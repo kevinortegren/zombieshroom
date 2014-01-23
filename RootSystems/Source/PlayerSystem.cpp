@@ -2,9 +2,6 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
-#include <RootForce/Include/ComponentImporter.h>
-
-extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
@@ -31,9 +28,6 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
-		RootForce::ParticleEmitter* emitter = entityManager->CreateComponent<RootForce::ParticleEmitter>(entity);
-
-		ImportParticleEmitter("fire", emitter, transform);
 
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
