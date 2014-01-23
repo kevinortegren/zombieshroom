@@ -44,9 +44,6 @@ namespace RootForce
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
-			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
-			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
-
 			switch (p_id)
 			{
 				case ID_CONNECTION_REQUEST_ACCEPTED:
@@ -245,6 +242,8 @@ namespace RootForce
 					if (clientComponent->IsRemote)
 					{
 						// Update server information
+						ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+						Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 						serverInfo->Information.MapName = m.MapName;
 
 						// Load the map
@@ -271,6 +270,8 @@ namespace RootForce
 					if (clientComponent->IsRemote)
 					{
 						// Update server information
+						ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+						Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 						serverInfo->Information.MaxPlayers = m.MaxPlayers;
 
 						// TODO: Update rules
@@ -285,6 +286,8 @@ namespace RootForce
 					if (clientComponent->IsRemote)
 					{
 						// Update server information
+						ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+						Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 						serverInfo->Information.GameMode = m.GameMode;
 
 						// TODO: Update rules
@@ -299,6 +302,8 @@ namespace RootForce
 					if (clientComponent->IsRemote)
 					{
 						// Update server information
+						ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+						Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 						serverInfo->Information.MatchTimeSeconds = m.Seconds;
 
 						// TODO: Update rules
@@ -313,6 +318,8 @@ namespace RootForce
 					if (clientComponent->IsRemote)
 					{
 						// Update server information
+						ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
+						Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 						serverInfo->Information.KillCount = m.Count;
 
 						// TODO: Update rules
