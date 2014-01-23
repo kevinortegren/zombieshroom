@@ -328,6 +328,7 @@ void AbilityEditor::BrowseName()
 	dial.setAcceptMode(QFileDialog::AcceptOpen);
 	QString asdf = dial.getOpenFileName();
 	QString name = &(asdf.toStdString().at(asdf.lastIndexOf("/")+1));
+	name.chop(name.size()-name.lastIndexOf("."));
 	//PLEASE REMOVE FILE ENDING THINGYSTUFF
 	m_propMan->setValue(m_propBrows->currentItem()->property(), name);
 }
