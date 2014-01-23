@@ -28,7 +28,7 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
-
+		
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
 		renderable->m_params[Render::Semantic::BONES] = &animation->m_bones[0];
@@ -40,7 +40,7 @@ namespace RootForce
 		renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]  =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR]  =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 
-		transform->m_position = glm::vec3(100, 10, 0);
+		transform->m_position = glm::vec3(0, 0, 0);
 
 		state->PrevPosition = transform->m_position;
 		state->CurrentState = RootForce::EntityState::DESCENDING;

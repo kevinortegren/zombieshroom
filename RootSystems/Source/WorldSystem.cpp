@@ -42,6 +42,7 @@ namespace RootForce
 
 		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
+		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
@@ -77,7 +78,7 @@ namespace RootForce
 		
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustum = Frustum(45.0f, 0.1f, 1000.0f, aspectRatio);
+		camera->m_frustum = Frustum(45.0f, 1.0f, 10000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);

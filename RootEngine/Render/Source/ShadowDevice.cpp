@@ -24,7 +24,7 @@ namespace Render
 	{
 		m_width = p_width;
 		m_height = p_height;
-		m_depthTexture = new Texture();
+		m_depthTexture = p_renderer->CreateTexture();
 		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

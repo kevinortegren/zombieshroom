@@ -6,6 +6,8 @@
 namespace Render
 {
 	Texture::Texture()
+		: m_textureHandle(0), m_target(0), m_textureWidth(0), m_textureHeight(0),
+		m_textureFormat(0), m_textureType(0) 
 	{
 		glGenTextures(1, &m_textureHandle);
 	}
@@ -124,12 +126,7 @@ namespace Render
 		glBindTexture(m_target, 0);
 	}
 
-	void Texture::SetParameter(int p_name, int p_parameter)
-	{
-		glBindTexture(m_target, m_textureHandle);
 
-		glTexParameteri(m_target, p_name, p_parameter);
-	}
 
 	void Texture::CreateEmptyTexture(int p_width, int p_height, int p_format)
 	{
@@ -181,6 +178,13 @@ namespace Render
 		}
 	}
 
+	void Texture::SetParameter(int p_name, int p_parameter)
+	{
+		glBindTexture(m_target, m_textureHandle);
+
+		glTexParameteri(m_target, p_name, p_parameter);
+	}
+
 	void Texture::BufferData(void* pixels)
 	{
 		glBindTexture(m_target, m_textureHandle);
@@ -197,17 +201,17 @@ namespace Render
 		glBindTexture(m_target, 0);
 	}
 
-	unsigned int Texture::GetWidth()
+	unsigned int Texture::GetWidth() const
 	{
 		return m_textureWidth;
 	}
 
-	unsigned int Texture::GetHeight()
+	unsigned int Texture::GetHeight() const
 	{
 		return m_textureHeight;
 	}
 
-	glm::vec2 Texture::GetSize()
+	glm::vec2 Texture::GetSize() const
 	{
 		return glm::vec2(m_textureWidth, m_textureHeight);
 	}

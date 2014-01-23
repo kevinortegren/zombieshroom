@@ -1,8 +1,9 @@
 #pragma once
 
 #include <RootEngine/Include/GameSharedContext.h>
-#include <Utility\ECS\Include\Component.h>
-#include <Utility\ECS\Include\EntitySystem.h>
+#include <Utility/ECS/Include/Component.h>
+#include <Utility/ECS/Include/EntitySystem.h>
+#include <glm/glm.hpp>
 #include <array>
 
 #define PLAYER_NUM_ABILITIES 3

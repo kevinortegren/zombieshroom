@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/Network/NetworkEntityMap.h>
 
 extern RootEngine::GameSharedContext g_engineContext;

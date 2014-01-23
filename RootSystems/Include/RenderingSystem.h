@@ -28,6 +28,7 @@ namespace RootForce
 		Render::Material* m_material;
 		std::map<Render::Semantic::Semantic, void*> m_params;
 		unsigned m_pass;
+		unsigned m_renderFlags;
 	};
 
 	struct MatrixData

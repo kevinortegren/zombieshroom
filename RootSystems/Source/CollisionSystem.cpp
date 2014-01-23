@@ -1,6 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/CollisionSystem.h>
-
+#include <RootEngine/Script/Include/RootScript.h>
 
 
 namespace RootForce

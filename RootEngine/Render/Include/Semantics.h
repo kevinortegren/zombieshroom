@@ -24,6 +24,7 @@ namespace Render
 			DIRECTION,
 			SPREAD,
 			SPAWNTIME,
+			TRANSPOSITION,
 		};
 	}
 
@@ -35,6 +36,7 @@ namespace Render
 			SPECULAR,
 			NORMAL,
 			DEPTH,
+			RANDOM,
 			TEXTUREMAP,
 			TEXTURE_R,
 			TEXTURE_G,
