@@ -2,6 +2,9 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootForce/Include/ComponentImporter.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
@@ -28,6 +31,9 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
+		RootForce::ParticleEmitter* emitter = entityManager->CreateComponent<RootForce::ParticleEmitter>(entity);
+
+		ImportParticleEmitter("fire", emitter, transform);
 
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
@@ -35,12 +41,12 @@ namespace RootForce
 
 		renderable->m_pass = RootForce::RenderPass::RENDERPASS_DYNAMIC;
 		renderable->m_material =  m_engineContext->m_resourceManager->GetMaterial("testchar");
-		renderable->m_material->m_diffuseMap =  m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);;
-		renderable->m_material->m_normalMap =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
-		renderable->m_material->m_specularMap =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_effect =  m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap_Anim");
+		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]  =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR]  =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 
-		transform->m_position = glm::vec3(100, 10, 0);
+		transform->m_position = glm::vec3(0, 0, 0);
 
 		state->PrevPosition = transform->m_position;
 		state->CurrentState = RootForce::EntityState::DESCENDING;
@@ -84,6 +90,9 @@ namespace RootForce
 		score->Deaths = 0;
 		score->Score = 0;
 		identity->TeamID = p_teamID;
+
+		RootForce::Transform* dsfghs = entityManager->GetComponent<RootForce::Transform>(entity);
+
 	}
 
 	void PlayerSystem::Process()

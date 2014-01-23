@@ -14,8 +14,6 @@ namespace Render
 		ParticleVertex particles[RENDER_NUM_PARTCILES];
 		memset(particles, 0, RENDER_NUM_PARTCILES * sizeof(ParticleVertex));
 
-		//TODO: Set values from descriptor.
-
 		// Emitter particle.
 		particles[0].m_initialPos	= glm::vec3(0.0f);
 		particles[0].m_initialVel	= glm::vec3(0.0f);
@@ -32,14 +30,11 @@ namespace Render
 		m_meshes[1]->SetPrimitiveType(GL_POINTS);
 		m_meshes[1]->SetTransformFeedback();
 
-		std::shared_ptr<BufferInterface> vertexBuffer[2];
+		BufferInterface* vertexBuffer[2];
 		std::shared_ptr<VertexAttributesInterface> attributes[2];
 
-		vertexBuffer[0] = p_renderer->CreateBuffer();
-		vertexBuffer[0]->Init(GL_ARRAY_BUFFER);
-
-		vertexBuffer[1] = p_renderer->CreateBuffer();
-		vertexBuffer[1]->Init(GL_ARRAY_BUFFER);
+		vertexBuffer[0] = p_renderer->CreateBuffer(GL_ARRAY_BUFFER);
+		vertexBuffer[1] = p_renderer->CreateBuffer(GL_ARRAY_BUFFER);
 
 		for (unsigned i = 0; i < 2 ; i++) {
 
@@ -57,7 +52,7 @@ namespace Render
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 10 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 14 * sizeof(float));
-
+		
 			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
 			m_meshes[i]->SetVertexAttribute(attributes[i]);
 		} 
@@ -103,23 +98,23 @@ namespace Render
 		m_perFrameVars.m_gameTime = 0;
 	}
 
-	void ParticleSystemHandler::Init( )
+	void ParticleSystemHandler::Init(GLRenderer* p_renderer)
 	{
 		m_floatDistrubution = std::uniform_real_distribution<float>(0.0f, 1.0f);
 
-		InitRandomTexture();
+		CreateRandom1DTexture();
 
-		glActiveTexture(GL_TEXTURE0 + 4);
+		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::RANDOM);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
-		m_perFrameBuffer.Init(GL_UNIFORM_BUFFER);
-		m_perFrameBuffer.BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
+		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
+		m_perFrameBuffer->BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
 
-		m_perObjectBuffer.Init(GL_UNIFORM_BUFFER);
+		m_perObjectBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
 		char data[RENDER_PARTICLES_UNIFORM_SIZE];
 		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
 
-		m_perObjectBuffer.BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
+		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
 	}
 
 	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer)
@@ -144,7 +139,7 @@ namespace Render
 			int offset = p_technique->m_uniformsParams[(*itr).first];
 			unsigned size = Render::GLRenderer::s_sizes[(*itr).first];
 
-			m_perObjectBuffer.BufferSubData(offset, size, (*itr).second);
+			m_perObjectBuffer->BufferSubData(offset, size, (*itr).second);
 		}
 	}
 
@@ -160,11 +155,10 @@ namespace Render
 		m_perFrameVars.m_dt = dt;
 		m_perFrameVars.m_gameTime += dt;
 
-		m_perFrameBuffer.BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
+		m_perFrameBuffer->BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, 5, m_perFrameBuffer.GetBufferId());
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer.GetBufferId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_perFrameBuffer->GetBufferId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer->GetBufferId());
 	}
 
 	void ParticleSystemHandler::EndTransform()
@@ -172,7 +166,7 @@ namespace Render
 		 glDisable(GL_RASTERIZER_DISCARD);
 	}
 
-	void ParticleSystemHandler::InitRandomTexture()
+	void ParticleSystemHandler::CreateRandom1DTexture()
 	{
 		std::vector<glm::vec3> randomVectors;
 		randomVectors.resize(RENDER_NUM_RANDOMVECTORS);

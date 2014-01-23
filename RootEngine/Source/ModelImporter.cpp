@@ -117,7 +117,7 @@ namespace RootEngine
 		//Load bones
 
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
-		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
+		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
 		std::vector<glm::vec3> positions;
@@ -200,7 +200,7 @@ namespace RootEngine
 
 		if(p_aiMesh->HasFaces())
 		{
-			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 
 			std::vector<unsigned int> indices;
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
@@ -218,12 +218,15 @@ namespace RootEngine
 			mesh->CreateIndexBuffer(&indices[0], indices.size());
 
 			// Create physics mesh.
-			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+			if(m_context->m_physics)
+			{
+				std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
 
-			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+				pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
 
-			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
-			m_model->m_physicsMeshes.push_back(pmesh.get());
+				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+				m_model->m_physicsMeshes.push_back(pmesh.get());
+			}
 		}
 
 		mesh->SetPrimitiveType(GL_TRIANGLES);

@@ -208,7 +208,7 @@ namespace RootForce
 			std::vector<Polygon> polygonsAfterZSplit;
 
 			// Split all polygons with the x-plane.
-			for(int i = 0; i < p_polygons.size(); ++i)
+			for(unsigned int i = 0; i < p_polygons.size(); ++i)
 			{
 				PolygonSplit result = SplitPolygon(zp, p_polygons[i]);
 
@@ -224,7 +224,7 @@ namespace RootForce
 			std::vector<Polygon> polygonsAfterXSplit;
 
 			// Split all polygons with the z-plane.
-			for(int i = 0; i < polygonsAfterZSplit.size(); ++i)
+			for(unsigned int i = 0; i < polygonsAfterZSplit.size(); ++i)
 			{
 				PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
 
@@ -255,7 +255,7 @@ namespace RootForce
 			std::vector<Polygon> br;
 			std::vector<Polygon> bl;
 
-			for(int i = 0; i < polygonsAfterXSplit.size(); ++i)
+			for(unsigned int i = 0; i < polygonsAfterXSplit.size(); ++i)
 			{
 				glm::vec3 polygonCenter = CalcCenterEx(polygonsAfterXSplit[i]);
 
@@ -339,10 +339,10 @@ namespace RootForce
 
 
 		float bias = 0.1f;
-		for(int i = 0; i < p_polygons.size(); ++i)
+		for(unsigned int i = 0; i < p_polygons.size(); ++i)
 		{
 			bool add = true;
-			for(int j = 0; j < p_polygons[i].m_indices.size(); ++j)
+			for(unsigned int j = 0; j < p_polygons[i].m_indices.size(); ++j)
 			{
 				glm::vec3 p = m_vertices[p_polygons[i].m_indices[j]].m_pos;
 
@@ -373,7 +373,7 @@ namespace RootForce
 		float sumX = 0;
 		float sumZ = 0;
 
-		for(int i = 0; i < p_polygon.m_indices.size(); ++i)
+		for(unsigned int i = 0; i < p_polygon.m_indices.size(); ++i)
 		{
 			sumX += m_vertices[p_polygon.m_indices[i]].m_pos.x;
 			sumZ += m_vertices[p_polygon.m_indices[i]].m_pos.z;
@@ -411,7 +411,7 @@ namespace RootForce
 		float y1 = 0;
 		float a = 0;
 
-		int i;
+		unsigned int i;
 		for(i = 0; i < p_polygon.m_indices.size()-1; ++i)
 		{
 			x0 = m_vertices[p_polygon.m_indices[i]].m_pos.x;
@@ -455,7 +455,7 @@ namespace RootForce
 
 		int sa = ClassifyPoint(p_divider, pa.m_pos);
 
-		for(int i = 0; i < p_polygon.m_indices.size(); ++i)
+		for(unsigned int i = 0; i < p_polygon.m_indices.size(); ++i)
 		{
 			Render::Vertex1P1N1UV pb = m_vertices[p_polygon.m_indices[i]];
 
@@ -591,9 +591,9 @@ namespace RootForce
 	{
 		std::vector<Triangle> triangles;
 
-		for(int i = 0; i < p_polygons.size(); ++i)
+		for(unsigned int i = 0; i < p_polygons.size(); ++i)
 		{
-			for(int j = 2; j < p_polygons[i].m_indices.size(); j++)
+			for(unsigned int j = 2; j < p_polygons[i].m_indices.size(); j++)
 			{
 				Triangle t;
 				t.m_indices[0] = p_polygons[i].m_indices[0];
@@ -619,7 +619,7 @@ namespace RootForce
 
 		int entityId = 0;
 
-		for(int i = 0; i < p_triangles.size(); i++)
+		for(unsigned int i = 0; i < p_triangles.size(); i++)
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
@@ -631,8 +631,8 @@ namespace RootForce
 				ss << p_key << entityId;
 
 				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
 				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -729,8 +729,8 @@ namespace RootForce
 		ss << p_key << entityId;
 
 		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
 		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -752,7 +752,7 @@ namespace RootForce
 
 		int entityId = 0;
 
-		for(int i = 0; i < p_triangles.size(); i++)
+		for(unsigned int i = 0; i < p_triangles.size(); i++)
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
@@ -764,8 +764,8 @@ namespace RootForce
 				ss << p_key << entityId;
 
 				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
 				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -796,8 +796,8 @@ namespace RootForce
 		ss << p_key << entityId;
 
 		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
 		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());

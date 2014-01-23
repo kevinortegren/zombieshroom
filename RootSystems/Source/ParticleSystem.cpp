@@ -27,9 +27,12 @@ namespace RootForce
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		ParticleEmitter* emitter = m_emitters.Get(p_entity);
+		Transform* trans = m_transforms.Get(p_entity);
 
 		for(auto itr = emitter->m_particleSystems.begin(); itr != emitter->m_particleSystems.end(); ++itr)
 		{
+			(*itr).m_params[Render::Semantic::TRANSPOSITION] = &trans->m_position;
+
 			auto updateTechnique = (*itr).m_material->m_effect->GetTechniques()[0];
 			
 			g_engineContext.m_renderer->SetParticleUniforms(updateTechnique.get(), (*itr).m_params);

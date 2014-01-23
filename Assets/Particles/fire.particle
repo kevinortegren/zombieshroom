@@ -1,0 +1,32 @@
+- POSITION: [0, 2.4, 0]
+  LIFETIMEMIN: 1
+  LIFETIMEMAX: 1
+  SPEEDMIN: 0
+  SPEEDMAX: 0.1
+  SIZEMIN: [0.21, 0.21]
+  SIZEMAX: [0.25, 0.25]
+  SIZEEND: [0, 0]
+  COLOR: [1, 0, 0, 1]
+  COLOREND: [0.733333, 1, 0, 1]
+  GRAVITY: [0, 2.7, 0]
+  DIRECTION: [0, 0, 0]
+  SPREAD: 1
+  SPAWNTIME: 0.03
+  TEXTURE: smoke
+  EFFECT: Particle/Particle
+- POSITION: [0, 2.4, 0]
+  LIFETIMEMIN: 2
+  LIFETIMEMAX: 5
+  SPEEDMIN: 0.1
+  SPEEDMAX: 0.1
+  SIZEMIN: [0, 0]
+  SIZEMAX: [0, 0]
+  SIZEEND: [0.37, 0.37]
+  COLOR: [1, 1, 1, 0]
+  COLOREND: [1, 1, 1, 0.286275]
+  GRAVITY: [0, 0.3, 0]
+  DIRECTION: [0, 0, 0]
+  SPREAD: 1
+  SPAWNTIME: 0.03
+  TEXTURE: smoke
+  EFFECT: Particle/Particle

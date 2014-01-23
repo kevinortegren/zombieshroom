@@ -30,7 +30,7 @@ namespace Render
 
 		std::shared_ptr<Technique> m_technique;
 		Shadowcaster m_shadowcasters[RENDER_MAX_SHADOWCASTERS];
-		Texture* m_depthTexture;
+		TextureInterface* m_depthTexture;
 	private:
 		int m_width;
 		int m_height;

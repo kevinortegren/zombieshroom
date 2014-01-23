@@ -235,8 +235,7 @@ namespace Render
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);
 
-		technique->m_perTechniqueBuffer = p_renderer->CreateBuffer();
-		technique->m_perTechniqueBuffer->Init(GL_UNIFORM_BUFFER);
+		technique->m_perTechniqueBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
 
 		m_techniques.push_back(technique);
 

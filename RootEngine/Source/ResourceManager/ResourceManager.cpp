@@ -128,7 +128,7 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> tex;
+			Render::TextureInterface* tex;
 			if(p_type == Render::TextureType::TEXTURE_2D)
 			{
 				tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
@@ -142,7 +142,7 @@ namespace RootEngine
 			{
 				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded texture '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
-				return m_textures[p_path].get();
+				return m_textures[p_path];
 			}
 			else
 			{
@@ -152,10 +152,8 @@ namespace RootEngine
 		}
 		else
 		{
-			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
-			return m_textures[p_path].get();
-		}
-		
+			return m_textures[p_path];
+		}	
 	}
 
 	Model* ResourceManager::CreateModel(const std::string& p_path)
@@ -183,19 +181,19 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> texture = m_context->m_renderer->CreateTexture();
+			Render::TextureInterface* texture = m_context->m_renderer->CreateTexture();
 	
 			if(texture)
 			{
 				m_textures[p_path] = texture;
-				return m_textures[p_path].get();
+				return m_textures[p_path];
 			}
 			else
 			{
 				return nullptr;
 			}
 		}
-		return m_textures[p_path].get();
+		return m_textures[p_path];
 	}
 
 	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
@@ -247,7 +245,7 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_handle) != m_textures.end())
 		{
-			return m_textures[p_handle].get();
+			return m_textures[p_handle];
 		}
 		else
 		{
@@ -289,7 +287,7 @@ namespace RootEngine
 	{
 		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
 		{
-			if((*itr).second.get() == p_texture)
+			if((*itr).second == p_texture)
 				return (*itr).first;
 		}
 		assert(false);

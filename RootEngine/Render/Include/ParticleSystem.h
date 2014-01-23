@@ -60,7 +60,7 @@ namespace Render
 	public:
 
 		ParticleSystemHandler();
-		void Init();
+		void Init(GLRenderer* p_renderer);
 		ParticleSystem* Create(GLRenderer* p_renderer);
 		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void Free(ParticleSystem* p_system);
@@ -69,15 +69,13 @@ namespace Render
 
 	private:
 
-		void InitRandomTexture();
+		void CreateRandom1DTexture();
 
-		// Number of active particle systems.
 		unsigned m_particleSystemsCount;
 
 		std::stack<unsigned> m_emptyParticleSlots;
 		std::array<ParticleSystem, RENDER_NUM_PARTICLESYSTEMS> m_particleSystems;
 		
-		GLuint m_randomTexture;
 		std::uniform_real_distribution<float> m_floatDistrubution;
 		std::default_random_engine m_generator;
 
@@ -88,7 +86,9 @@ namespace Render
 
 		} m_perFrameVars;
 
-		Buffer m_perFrameBuffer;
-		Buffer m_perObjectBuffer;
+		BufferInterface* m_perFrameBuffer;
+		BufferInterface* m_perObjectBuffer;
+
+		GLuint m_randomTexture;
 	};
 }

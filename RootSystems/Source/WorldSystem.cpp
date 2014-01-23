@@ -44,8 +44,8 @@ namespace RootForce
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
-		r->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-		
+		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 

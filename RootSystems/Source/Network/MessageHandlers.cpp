@@ -156,9 +156,9 @@ namespace RootForce
 						Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(entity);
 						renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 						renderable->m_material = m_engineContext->m_resourceManager->GetMaterial("testchar");
-						renderable->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
-						renderable->m_material->m_normalMap = m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
-						renderable->m_material->m_specularMap = m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("WStexture", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]  =  m_engineContext->m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TEXTURE_2D);
+						renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR]  =  m_engineContext->m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TEXTURE_2D);
 						renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_NormalMap");
 
 						// Log the connection
