@@ -1,6 +1,7 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -18,6 +19,11 @@ namespace RootSystems
 		m_physic.Init(m_world->GetEntityManager());
 		m_player.Init(m_world->GetEntityManager());
 		m_health.Init(m_world->GetEntityManager());
+	}
+
+	void ActionSystem::SetClientPeer(RakNet::RakPeerInterface* p_clientPeer)
+	{
+		m_clientPeer = p_clientPeer;
 	}
 
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
@@ -112,6 +118,26 @@ namespace RootSystems
 			action->Jump = false;
 		}
 
+
+		ECS::Entity* playerEntity = m_world->GetTagManager()->GetEntityByTag("Player");
+		if (playerEntity != nullptr)
+		{
+			RootForce::Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(playerEntity);
+
+			if (network->ID.UserID == playerNetworkComponent->ID.UserID)
+			{
+				// If we issued this action, send it to the server as well.
+				RootForce::NetworkMessage::PlayerCommand m;
+				m.User = network->ID.UserID;
+				m.Action = *action;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			}
+		}
 	}
 
 }
