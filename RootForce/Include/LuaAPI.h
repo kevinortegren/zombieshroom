@@ -467,7 +467,7 @@ namespace RootForce
 			RootForce::Physics* physics = *(RootForce::Physics**)luaL_checkudata(p_luaState, 4, "Physics");
 			RootForce::PlayerPhysics* playerPhysics = *(RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 5, "PlayerPhysics");
 			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 6, "CollisionResponder");
-			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity,
+			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
 				transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
 			return 0;
 		}
@@ -485,7 +485,7 @@ namespace RootForce
 		{
 			NumberOfArgs(4);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((ECS::Entity*)luaL_checkudata(p_luaState, 2, "Entity"), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) != 0 );
+			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle(*((ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity")), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) != 0 );
 			return 0;
 		}
 
@@ -577,14 +577,8 @@ namespace RootForce
 		static int PhysicsGetType(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			//lua_Number *type = (lua_Number*)lua_newuserdata(p_luaState, sizeof(lua_Number));
-			//*type = g_engineContext.m_physics->GetType((*(*rtemp)->m_handle));
-			//luaL_setmetatable(p_luaState, "Int");
-			//lua_Number
 			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
-
 			return 1;
 		}
 		static int PhysicsSetGravity(lua_State* p_luaState)

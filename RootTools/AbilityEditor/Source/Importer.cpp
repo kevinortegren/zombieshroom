@@ -195,6 +195,14 @@ namespace AbilityEditorNameSpace
 					p_node["Speed"] >> tempcomp->m_speed;
 				if(p_node.FindValue("Mass"))
 					p_node["Mass"] >> tempcomp->m_mass;
+				if(p_node.FindValue("Gravity"))
+				{
+					float x,y,z;
+					p_node["Gravity"][0] >> x;
+					p_node["Gravity"][1] >> y;
+					p_node["Gravity"][2] >> z;
+					tempcomp->m_gravity = QVector3D(x,y,z);
+				}
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

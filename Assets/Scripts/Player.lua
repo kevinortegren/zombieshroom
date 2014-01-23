@@ -35,6 +35,8 @@ function Player.OnCreate(userId, actionId)
 	playerPhysics:SetMovementSpeed(10);
 	playerPhysics:SetJumpForce(20);
 
+	--physics:SetGravity(collision, Vec3.New(0, 0, 0));
+
 	physics:SetMass(5);
 
 	collision:SetMeshHandle("testchar0");
