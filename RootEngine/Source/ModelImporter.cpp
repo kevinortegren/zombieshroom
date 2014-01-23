@@ -115,7 +115,7 @@ namespace RootEngine
 		//Load bones
 
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
-		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
+		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
 		std::vector<glm::vec3> positions;
@@ -198,7 +198,7 @@ namespace RootEngine
 
 		if(p_aiMesh->HasFaces())
 		{
-			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 
 			std::vector<unsigned int> indices;
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)

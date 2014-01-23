@@ -3,7 +3,7 @@
 namespace Render
 {
 	Mesh::Mesh()
-		: m_primitive(GL_TRIANGLES) {}
+		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0), m_transformFeedback(0) {}
 
 	Mesh::~Mesh()
 	{
@@ -12,13 +12,11 @@ namespace Render
 
 	void Mesh::CreateIndexBuffer(unsigned int* p_indices, unsigned int p_numberOfIndices)
 	{
-		m_elementBuffer->Init(GL_ELEMENT_ARRAY_BUFFER);
 		m_elementBuffer->BufferData(p_numberOfIndices, sizeof(GLuint), p_indices);
 	}
 
 	void Mesh::CreateVertexBuffer1P(Vertex1P* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, 3 * sizeof(float), p_vertices);
 		m_vertexAttributes->Init(1);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
@@ -26,7 +24,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1UV(Vertex1P1UV* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, 5 * sizeof(float), p_vertices);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
@@ -35,7 +32,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N(Vertex1P1N* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, 6 * sizeof(float), p_vertices);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
@@ -44,7 +40,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1C(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, 7 * sizeof(float), p_vertices);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
@@ -53,7 +48,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, 8 * sizeof(float), p_vertices);
 		m_vertexAttributes->Init(3);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
@@ -63,7 +57,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT), p_vertices);
 		m_vertexAttributes->Init(5);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT), 0);
@@ -75,7 +68,6 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV1T1BT1BID1W( Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices )
 	{
-		m_vertexBuffer->Init(GL_ARRAY_BUFFER);
 		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT1BID1W), p_vertices);
 		m_vertexAttributes->Init(7);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), 0);
@@ -146,12 +138,12 @@ namespace Render
 		glGenTransformFeedbacks(1, &m_transformFeedback);
 	}
 
-	void Mesh::SetElementBuffer(std::shared_ptr<BufferInterface> p_buffer)
+	void Mesh::SetElementBuffer(BufferInterface* p_buffer)
 	{
 		m_elementBuffer = p_buffer;
 	}
 
-	void Mesh::SetVertexBuffer(std::shared_ptr<BufferInterface> p_buffer)
+	void Mesh::SetVertexBuffer(BufferInterface* p_buffer)
 	{
 		m_vertexBuffer = p_buffer;
 	}
@@ -161,12 +153,12 @@ namespace Render
 		m_vertexAttributes = p_attribute;
 	}
 
-	std::shared_ptr<BufferInterface> Mesh::GetVertexBuffer()
+	BufferInterface* Mesh::GetVertexBuffer()
 	{
 		return m_vertexBuffer;
 	}
 
-	std::shared_ptr<BufferInterface> Mesh::GetElementBuffer()
+	BufferInterface* Mesh::GetElementBuffer()
 	{
 		return m_elementBuffer;
 	}
@@ -175,7 +167,4 @@ namespace Render
 	{
 		return m_vertexAttributes;
 	}
-
-	
-
 }

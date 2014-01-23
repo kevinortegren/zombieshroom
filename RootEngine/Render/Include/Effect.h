@@ -103,13 +103,12 @@ namespace Render
 		void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset);
 
 		std::map<Semantic::Semantic, unsigned int> m_uniformsParams;
-		std::shared_ptr<Render::BufferInterface> m_perTechniqueBuffer;
+		BufferInterface* m_perTechniqueBuffer;
 
 		unsigned m_flags;
 
 	private:
-		std::vector<std::shared_ptr<Program>> m_program;
-		
+		std::vector<std::shared_ptr<Program>> m_program;		
 	};
 
 	class EffectInterface
@@ -127,6 +126,5 @@ namespace Render
 
 	private:
 		std::vector<std::shared_ptr<Technique>> m_techniques;
-
 	};
 }
