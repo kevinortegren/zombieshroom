@@ -32,6 +32,8 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
 	// Call the OnCreate script
+	g_networkEntityMap.clear();
+	RootForce::Network::NetworkComponent::s_sequenceIDMap.clear();
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
 	g_engineContext.m_script->SetGlobalNumber("IsClient", true);
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
@@ -54,6 +56,7 @@ TEST(ActionSystem, ProcessEntity)
 
 	{
 		health->IsDead = true;
+		action->ActionID = 15;
 		action->Jump = true;
 		action->ActivateAbility = true;
 

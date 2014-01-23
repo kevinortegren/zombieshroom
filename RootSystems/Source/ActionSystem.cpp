@@ -1,5 +1,6 @@
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -9,6 +10,7 @@ namespace RootSystems
 	void ActionSystem::Init()
 	{
 		m_action.Init(m_world->GetEntityManager());
+		m_network.Init(m_world->GetEntityManager());
 		m_animation.Init(m_world->GetEntityManager());
 		m_collision.Init(m_world->GetEntityManager());
 		m_transform.Init(m_world->GetEntityManager());
@@ -24,6 +26,7 @@ namespace RootSystems
 		float dt = m_world->GetDelta();
 
 		RootForce::Transform* transform = m_transform.Get(p_entity);
+		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
 		RootForce::PlayerPhysics* playphys = m_physic.Get(p_entity);
 		RootForce::Collision* collision = m_collision.Get(p_entity);
 		RootForce::PlayerComponent* player = m_player.Get(p_entity);
@@ -67,9 +70,10 @@ namespace RootSystems
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-
-			// TODO: Generate action ID here
+			
 			m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+			m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
+			m_engineContext->m_script->AddParameterNumber(action->ActionID);
 			m_engineContext->m_script->ExecuteScript();
 		}
 

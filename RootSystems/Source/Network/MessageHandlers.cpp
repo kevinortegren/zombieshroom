@@ -204,7 +204,14 @@ namespace RootForce
 					// A local server would already have updated the entities.
 					if (clientComponent->IsRemote)
 					{
-						// TODO: Send action to action system
+						NetworkEntityID id;
+						id.UserID = m.User;
+						id.ActionID = ReservedActionID::CONNECT;
+						id.SequenceID = 0;
+
+						ECS::Entity* player = g_networkEntityMap[id];
+						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+						*playerAction = m.Action;
 					}
 				} return true;
 
@@ -474,8 +481,34 @@ namespace RootForce
 				{
 					NetworkMessage::PlayerCommand m;
 					m.Serialize(false, p_bs);
+					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
-					// TODO: Send action to action system.
+					// Update the action for the user
+					NetworkEntityID id;
+					id.UserID = m.User;
+					id.ActionID = ReservedActionID::CONNECT;
+					id.SequenceID = 0;
+
+					ECS::Entity* player = g_networkEntityMap[id];
+					PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+					*playerAction = m.Action;
+					
+					// Broadcast the action to all other clients
+					DataStructures::List<RakNet::SystemAddress> addresses;
+					DataStructures::List<RakNet::RakNetGUID> guids;
+					m_peer->GetSystemList(addresses, guids);
+
+					for (unsigned int i = 0; i < addresses.Size(); ++i)
+					{
+						if (i != id.UserID)
+						{
+							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+							m.Serialize(true, &bs);
+
+							m_peer->Send(&bs, MEDIUM_PRIORITY, UNRELIABLE, 0, addresses[i], false);
+						}
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::LoadMapStatus:

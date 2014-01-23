@@ -422,6 +422,7 @@ TEST(Network, MessageSerializationPlayerCommand)
 	PlayerCommand m1;
 	PlayerCommand m2;
 	m1.User = 4;
+	m1.Action.ActionID = 76;
 	m1.Action.MovePower = 1.0f;
 	m1.Action.StrafePower = -1.0f;
 	m1.Action.Jump = true;

@@ -32,6 +32,7 @@ namespace RootSystems
 			, m_engineContext(p_engineContext) 
 		{
 			SetUsage<RootForce::PlayerActionComponent>();
+			SetUsage<RootForce::Network::NetworkComponent>();
 			SetUsage<RootForce::Animation>();
 			SetUsage<RootForce::Collision>();
 			SetUsage<RootForce::Transform>();
@@ -48,6 +49,7 @@ namespace RootSystems
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::PlayerActionComponent> m_action;
+		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::Animation> m_animation;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;

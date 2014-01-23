@@ -46,6 +46,7 @@ namespace RootForce
 		void PlayerCommand::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action.ActionID);
 			p_bs->Serialize(p_writeToBitstream, Action.MovePower);
 			p_bs->Serialize(p_writeToBitstream, Action.StrafePower);
 			p_bs->Serialize(p_writeToBitstream, Action.Jump);

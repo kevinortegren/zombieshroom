@@ -6,6 +6,8 @@ extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
+	Network::ActionID_t PlayerControlSystem::s_nextActionID = 0;
+
 	Keybinding::Keybinding()
 		: Action(PlayerAction::NONE), Edge(false)
 	{}
@@ -106,6 +108,7 @@ namespace RootForce
 		// Get the speed of the player
 		float speed = playerphysics->MovementSpeed;
 
+		action->ActionID = s_nextActionID++;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)

@@ -23,6 +23,7 @@ namespace RootForce
 
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
+		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
 		bool Jump;
