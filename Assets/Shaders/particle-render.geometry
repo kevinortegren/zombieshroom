@@ -13,10 +13,12 @@ layout(std140) uniform PerFrame
 };
 
 in vec2 vert_scale[];
+in vec4 vert_color[];
 
 out vec2 gs_TexCoord;
 out vec2 gs_ScreenCoord;
 out float gs_Depth;
+out vec4 gs_color;
 
 void main(void) {
 	
@@ -33,6 +35,7 @@ void main(void) {
     gs_Depth = corner.z;
     gl_Position = positionH;
 	gs_TexCoord = vec2(0, 0);
+	gs_color = vert_color[0];
 	EmitVertex();
 
 	corner = positionV + vec4(scale.x, -scale.y, 0, 0);
@@ -42,6 +45,7 @@ void main(void) {
     gs_Depth = corner.z;
     gl_Position = positionH;
 	gs_TexCoord = vec2(1, 0);
+	gs_color = vert_color[0];
 	EmitVertex();
 	
 	corner = positionV + vec4(-scale.y, scale.x, 0, 0);
@@ -51,6 +55,7 @@ void main(void) {
     gs_Depth = corner.z;
     gl_Position = positionH;
 	gs_TexCoord = vec2(0, 1);
+	gs_color = vert_color[0];
 	EmitVertex();
 	
 	corner = positionV + vec4(scale.x, scale.y, 0, 0);
@@ -60,6 +65,7 @@ void main(void) {
     gs_Depth = corner.z;
     gl_Position = positionH;
 	gs_TexCoord = vec2(1, 1);
+	gs_color = vert_color[0];
 	EmitVertex();
 	
 	EndPrimitive();

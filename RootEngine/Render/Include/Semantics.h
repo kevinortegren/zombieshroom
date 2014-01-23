@@ -24,6 +24,7 @@ namespace Render
 			DIRECTION,
 			SPREAD,
 			SPAWNTIME,
+			TRANSPOSITION,
 		};
 	}
 
