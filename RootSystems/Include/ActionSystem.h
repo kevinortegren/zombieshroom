@@ -31,7 +31,6 @@ namespace RootSystems
 		ActionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext)
-			, m_clientPeer(nullptr)
 		{
 			SetUsage<RootForce::PlayerActionComponent>();
 			SetUsage<RootForce::Network::NetworkComponent>();
@@ -47,10 +46,8 @@ namespace RootSystems
 		void Init();
 
 		void ProcessEntity(ECS::Entity* p_entity);
-		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
-		RakNet::RakPeerInterface* m_clientPeer;
 
 		ECS::ComponentMapper<RootForce::PlayerActionComponent> m_action;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;

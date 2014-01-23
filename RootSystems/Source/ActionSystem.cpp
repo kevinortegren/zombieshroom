@@ -21,11 +21,6 @@ namespace RootSystems
 		m_health.Init(m_world->GetEntityManager());
 	}
 
-	void ActionSystem::SetClientPeer(RakNet::RakPeerInterface* p_clientPeer)
-	{
-		m_clientPeer = p_clientPeer;
-	}
-
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
 		// Get the properties we need.
@@ -40,8 +35,6 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
-
-		RootForce::PlayerActionComponent originalAction = *action;
 
 		if( health->IsDead )
 		{
@@ -121,25 +114,7 @@ namespace RootSystems
 		}
 
 
-		ECS::Entity* playerEntity = m_world->GetTagManager()->GetEntityByTag("Player");
-		if (playerEntity != nullptr)
-		{
-			RootForce::Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(playerEntity);
-
-			if (network->ID.UserID == playerNetworkComponent->ID.UserID)
-			{
-				// If we issued this action, send it to the server as well.
-				RootForce::NetworkMessage::PlayerCommand m;
-				m.User = network->ID.UserID;
-				m.Action = originalAction;
-
-				RakNet::BitStream bs;
-				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
-				m.Serialize(true, &bs);
-
-				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
-			}
-		}
+		
 	}
 
 }

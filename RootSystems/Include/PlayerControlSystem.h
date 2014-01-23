@@ -67,6 +67,7 @@ namespace RootForce
 		
 		void Process();
 		void UpdateAimingDevice();
+		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
 		static Network::ActionID_t s_nextActionID;
 		std::vector<Keybinding> m_keybindings;
@@ -79,5 +80,6 @@ namespace RootForce
 		Logging* m_logger;
 		RootEngine::InputManager::InputInterface* m_inputManager;
 		RootEngine::Physics::PhysicsInterface* m_physics;
+		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }
