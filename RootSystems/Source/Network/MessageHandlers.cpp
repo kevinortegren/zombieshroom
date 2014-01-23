@@ -488,15 +488,23 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
-					// Update the action for the user
+					// Check whether the user is a local client (we are letting local clients have authority of updating action components right now)
+					// TODO: See if we can update local client on server instead...
 					NetworkEntityID id;
 					id.UserID = m.User;
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-					ECS::Entity* player = g_networkEntityMap[id];
-					PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-					*playerAction = m.Action;
+					ECS::Entity* client = g_networkEntityMap[id];
+					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+					if (clientComponent->IsRemote)
+					{
+						// Update the action for the user
+						id.SequenceID = 0;
+						ECS::Entity* player = g_networkEntityMap[id];
+						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+						*playerAction = m.Action;
+					}
 					
 					// Broadcast the action to all other clients
 					DataStructures::List<RakNet::SystemAddress> addresses;

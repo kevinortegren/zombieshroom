@@ -166,20 +166,12 @@ namespace RootForce
 			
 		}
 
-		// Send player command updates to the server
-		//Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
-		/*
-		ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
-		Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 		
-		
-		if (network->ID.UserID == playerNetworkComponent->ID.UserID && clientComponent->IsRemote)
-		{
-			
-		}
-		*/
+		// Update the action component only if we are a remote client
+		//ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
+		//Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
-		// Send the action to the server as well.
+		// Send the action to the server.
 		RootForce::NetworkMessage::PlayerCommand m;
 		m.User = network->ID.UserID;
 		m.Action = *action;
