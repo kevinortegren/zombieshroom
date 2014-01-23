@@ -23,6 +23,7 @@ namespace Render
 
 		if(texture.empty())
 		{
+			g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Failed to load %s", filepath);
 			return false;
 		}
 

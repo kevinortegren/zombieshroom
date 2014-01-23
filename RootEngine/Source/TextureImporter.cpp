@@ -16,6 +16,9 @@ namespace RootEngine
 
 	Render::TextureInterface* TextureImporter::LoadTexture( const std::string p_fileName )
 	{
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Started to load %s", p_fileName);
+
+
 		Render::TextureInterface* texture = m_renderer->CreateTexture();
 
 		if (texture->Load(p_fileName)) 

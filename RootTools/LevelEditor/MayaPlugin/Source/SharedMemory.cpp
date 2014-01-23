@@ -7,8 +7,10 @@ SharedMemory::SharedMemory()
 	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
 	NumberOfCameras = nullptr;
 	NumberOfMaterials = nullptr;
+	NumberOfLocators = nullptr;
+	NumberOfMessages = 0;
+	export = 0;
 	InitalizeSharedMemory();
-	export = nullptr;
 }
 
 SharedMemory::~SharedMemory()
@@ -24,10 +26,10 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Light) * g_maxLights;
 	total_memory_size += sizeof(Camera) * g_maxCameras;
 	total_memory_size += sizeof(Material) * g_maxMeshes;
-	total_memory_size += sizeof(int) * 4;
-	total_memory_size += sizeof(glm::vec2) * 3;
-	total_memory_size += sizeof(int);
-	
+	total_memory_size += sizeof(Locator) * g_maxLocators;
+	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
+	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
+	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -54,9 +56,6 @@ int SharedMemory::InitalizeSharedMemory()
 	NumberOfMeshes = (int*)(mem);
 	mem = (unsigned char*)(NumberOfMeshes + sizeof(int));
 
-	MeshIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(MeshIdChange + sizeof(glm::vec2));
-
 	for(int i = 0; i < g_maxLights; i++)
 	{
 		PlightList[i] = ((Light*)mem) + i ;
@@ -66,17 +65,12 @@ int SharedMemory::InitalizeSharedMemory()
 	NumberOfLights = (int*)(mem);
 	mem = (unsigned char*)(mem + sizeof(int));
 
-	LightIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(mem + sizeof(glm::vec2));
-
 	for(int i = 0; i < g_maxCameras; i++)
 	{
 		PcameraList[i] = ((Camera*)mem) + i ;
 	}
 	mem = (unsigned char*)(mem + sizeof(Camera) * g_maxCameras);
 
-	CameraIdChange = (glm::vec2*)(mem);
-	mem = (unsigned char*)(mem + sizeof(glm::vec2));
 
 	NumberOfCameras = (int*)(mem);
 	mem = (unsigned char*)(mem + sizeof(int));
@@ -91,8 +85,40 @@ int SharedMemory::InitalizeSharedMemory()
 
 	mem = (unsigned char*)(mem + sizeof(int));
 
+
+	for(int i = 0; i < g_maxLocators; i++)
+	{
+		PlocatorList[i] = ((Locator*)mem) + i ;
+	}
+	mem = (unsigned char*)(mem + sizeof(Locator) * g_maxLocators);
+
+	NumberOfLocators = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
 	export = (int*)(mem);
-	
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	for(int i = 0; i < g_maxMessages; i++)
+	{
+		updateMessages[i] = ((UpdateMessage*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(UpdateMessage) * g_maxMessages);
+
+	NumberOfMessages = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	for(int i = 0; i < g_maxPaintTextures; i++)
+	{
+		PpaintList[i] = ((PaintTexture*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(PaintTexture) * g_maxPaintTextures);
+
+	NumberOfPaintTextures = (int*)(mem);
 
 	//if(first_process)
 	//{
@@ -101,37 +127,96 @@ int SharedMemory::InitalizeSharedMemory()
 	return 0;
 }
 
-void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
+void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove) //Valid types are "Mesh", "Camera", "Light", "Locator"
 {
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 
-	*NumberOfLights = nrOfLights;
-	*LightIdChange = glm::vec2(index,-1);
+	int nrOfMessages = *NumberOfMessages;
+	bool stop = false;
 
+	//Check if last message is of same type and don't add new if true
+	if(nrOfMessages > 0)
+	{
+		for(int i = 0; i < nrOfMessages; i++)
+		{
+			if(type == updateMessages[i]->name && (index == updateMessages[i]->updateID || index == updateMessages[i]->removeID))
+			{
+				stop = true;
+				break;
+			}
+		}
+	}
+
+	if(!stop && index != -1)
+	{
+		//Maybe check last message for duplicate aswell
+		if(*NumberOfMessages < g_maxMessages)
+		{
+			updateMessages[*NumberOfMessages]->updateTransform = updateTransform;
+			updateMessages[*NumberOfMessages]->updateShape = updateShape;
+			if(type != "")
+			{
+				memcpy(updateMessages[*NumberOfMessages]->name, type.c_str(), g_shortMaxNameLength);
+
+				if(remove)
+				{
+					updateMessages[*NumberOfMessages]->updateID = -1;
+					updateMessages[*NumberOfMessages]->removeID = index;
+				}
+				else
+				{
+					updateMessages[*NumberOfMessages]->updateID = index;
+					updateMessages[*NumberOfMessages]->removeID = -1;
+				}
+			}
+
+			*NumberOfMessages = *NumberOfMessages + 1;
+		}
+		else if(*NumberOfMessages > 0)
+		{
+			//Remove oldest / first message and try again
+			//UpdateMessage tempCopy[g_maxMessages];
+
+			for(int i = 0; i < g_maxMessages-1; i++)
+			{
+				*updateMessages[i] = *updateMessages[i+1];
+			}
+
+			updateMessages[g_maxMessages]->removeID = -1;
+			updateMessages[g_maxMessages]->updateID = -1;
+			updateMessages[g_maxMessages]->updateShape = false;
+			updateMessages[g_maxMessages]->updateTransform = false;
+			//*updateMessages = tempCopy;
+			*NumberOfMessages = *NumberOfMessages - 1;
+			AddUpdateMessage(type, index, updateTransform, updateShape, remove);
+		}
+	}
 	ReleaseMutex(IdMutexHandle);
+}
+
+void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
+{
+	AddUpdateMessage("Light", index, true, true, false);
 
 	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 	WaitForSingleObject(LightMutexHandle, milliseconds);
 
+		*NumberOfLights = nrOfLights;
 		memcpy(PlightList[index]->transformation.name, lightList[index].transformation.name, 50);
 		PlightList[index]->transformation.position = lightList[index].transformation.position;
 		PlightList[index]->transformation.scale = lightList[index].transformation.scale;
 		PlightList[index]->transformation.rotation = lightList[index].transformation.rotation;
 		PlightList[index]->color = lightList[index].color;
 		PlightList[index]->Intensity = lightList[index].Intensity;
+		memcpy(PlightList[index]->LightType, lightList[index].LightType,30);
 
 	ReleaseMutex(LightMutexHandle);
 }
 
 void SharedMemory::UpdateSharedCamera(int index)		
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-
-	*CameraIdChange = glm::vec2(index,-1);
-
-	ReleaseMutex(IdMutexHandle);
+	AddUpdateMessage("Camera", index, true, true, false);
 
 	CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
 	WaitForSingleObject(CameraMutexHandle, milliseconds);
@@ -149,15 +234,19 @@ void SharedMemory::UpdateSharedCamera(int index)
 
 void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool updateVertex, int nrOfMeshes)
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-	*NumberOfMeshes = nrOfMeshes;
-	MeshIdChange->x = index;	//Moved this codeblock up, didnt change shit.
-
-	ReleaseMutex(IdMutexHandle);
+	AddUpdateMessage("Mesh",index, updateTransformation, updateVertex, false);
 
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
+
+	*NumberOfMeshes = nrOfMeshes;
+	memset(PmeshList[index]->transformation.name, NULL, sizeof(PmeshList[index]->transformation.name));
+	memset(PmeshList[index]->modelName, NULL, sizeof(PmeshList[index]->modelName));
+	//memset(PmeshList[index]->materialName, NULL, sizeof(PmeshList[index]->materialName));
+
+	memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, g_maxNameLength);
+	memcpy(PmeshList[index]->modelName, meshList[index].modelName, g_maxNameLength);
+	//memcpy(PmeshList[index]->materialName, meshList[index].materialName, g_maxNameLength);
 
 	if(updateVertex)
 	{
@@ -168,35 +257,78 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->UV[i] = meshList[index].UV[i];
 		}
 
-		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;
-		
+		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;		
 	}	
 
 	if(updateTransformation)
-	{
-		memcpy(PmeshList[index]->transformation.name, meshList[index].transformation.name, 30); // DONT HAVE THE CORRECT LENGHT
-		memcpy(PmeshList[index]->modelName, meshList[index].modelName, 30);
+	{		
 		PmeshList[index]->transformation.position = meshList[index].transformation.position;
 		PmeshList[index]->transformation.scale = meshList[index].transformation.scale;
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
-	}	
+		PmeshList[index]->transformation.rotPivot = meshList[index].transformation.rotPivot;
+		PmeshList[index]->transformation.scalePivot = meshList[index].transformation.scalePivot;
+		PmeshList[index]->transformation.nrOfFlags = meshList[index].transformation.nrOfFlags;
+
+		for(int i = 0; i < g_maxNrOfFlags; i++)
+		{
+			memset(PmeshList[index]->transformation.flags[i], NULL, sizeof(PmeshList[index]->transformation.flags[i]));
+			memcpy(PmeshList[index]->transformation.flags[i], meshList[index].transformation.flags[i], g_shortMaxNameLength);
+		}
+		
+	}
 
 	ReleaseMutex(MeshMutexHandle);
 }
 
-void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int materialID, int meshID)
+void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
+{
+	AddUpdateMessage("Locator", index, true, true, false);
+
+	LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	
+	*NumberOfLocators = nrOfLocators;
+	memcpy(PlocatorList[index]->transformation.name, locatorList[index].transformation.name, g_maxNameLength);
+	PlocatorList[index]->transformation.position = locatorList[index].transformation.position;
+	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
+	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
+	PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
+
+	for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
+	{
+		memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
+		memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
+	}
+
+	ReleaseMutex(LocatorMutexHandle);
+}
+
+void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 {
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
-	*NumberOfMaterials = nrOfMaterials;
-	PmeshList[meshID]->MaterialID = materialID;
-
 	for(int i = 0; i < nrOfMaterials; i++)
 	{
-		memcpy(PmaterialList[i]->materialName, materialList[i].materialName, 30);
-		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, 100);
-		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, 100);
+		memcpy(PmaterialList[i]->materialName, materialList[i].materialName, g_maxNameLength);
+		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, g_maxPathLength);
+		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
+		memcpy(PmaterialList[i]->specularPath, materialList[i].specularPath, g_maxPathLength);
+	}
+
+	*NumberOfMaterials = nrOfMaterials;		
+
+	if(meshID != -1)
+	{
+		memcpy(PmeshList[meshID]->materialName, meshList[meshID].materialName, g_maxNameLength);
+
+		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+		WaitForSingleObject(IdMutexHandle, milliseconds);
+		AddUpdateMessage("Mesh", meshID, true, true, false);
+		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
+		ReleaseMutex(IdMutexHandle);
+
+		AddUpdateMessage("Mesh", meshID, true, true, false);
 	}
 
 	ReleaseMutex(MeshMutexHandle);
@@ -204,24 +336,25 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int materialID, int 
 
 void SharedMemory::RemoveMesh(int id, int nrOfMeshes)
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
 
-	MeshIdChange->y = id;
 	*NumberOfMeshes = nrOfMeshes;
+	//meshList[id] = Mesh();
 
-	ReleaseMutex(IdMutexHandle);
+	ReleaseMutex(MeshMutexHandle);
+
+	AddUpdateMessage("Mesh", id, false, false, true);
 }
 
 void SharedMemory::RemoveLight(int id, int nrOfLights)
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-
-	LightIdChange->y = id;
+	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(LightMutexHandle, milliseconds);
 	*NumberOfLights = nrOfLights;
+	ReleaseMutex(LightMutexHandle);
 
-	ReleaseMutex(IdMutexHandle);
+	AddUpdateMessage("Light", id, false, false, true);
 }
 
 int SharedMemory::shutdown()

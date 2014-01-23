@@ -103,7 +103,7 @@ namespace ECS
 		{
 			for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
 			{
-				RemoveComponent<T>((*itr));
+				RemoveComponent<T>((*itr).get());
 			}
 		}
 

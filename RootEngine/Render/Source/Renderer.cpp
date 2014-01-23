@@ -150,7 +150,7 @@ namespace Render
 		m_geometryPass.Init(width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 2048, 2048);
+		m_shadowDevice.Init(this, 4092, 4092);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height);
@@ -345,6 +345,8 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
+		m_geometryPass.Unbind();
+
 		///Bind GBuffer.
 		m_geometryPass.Bind();
 
@@ -400,6 +402,10 @@ namespace Render
 					}
 				}
 			}
+			
+			// Unbind depth texture.
+			glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+			glBindTexture(GL_TEXTURE_2D,0);
 
 			// Unbind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
@@ -448,17 +454,19 @@ namespace Render
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
+			if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+				continue;
+
 			if((*job).m_shadowMesh != nullptr)
 			{
-			(*job).m_mesh->Bind();
+				(*job).m_shadowMesh->Bind();
 
-			m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
+				m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
 
-			for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-			{	
-				m_uniforms->BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-			}
-
+				for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+				{	
+					m_uniforms->BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+				}
 
 				if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
 				{
@@ -543,6 +551,9 @@ namespace Render
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
+
+		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)

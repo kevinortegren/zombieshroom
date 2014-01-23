@@ -20,33 +20,45 @@ public:
 	Mesh meshList[g_maxMeshes];
 	Light lightList[g_maxLights];
 	Camera cameraList[g_maxCameras];
+	Material materialList[g_maxMeshes];
+	Locator locatorList[g_maxLocators];
+
 	int* NumberOfMeshes;
 	int* NumberOfLights;
 	int* NumberOfCameras;
+	int* NumberOfMaterials;
+	int* NumberOfLocators;
+
+	int* NumberOfMessages;
+	int* NumberOfPaintTextures;
+
+	UpdateMessage* updateMessages[g_maxMessages];
+
 	Mesh* PmeshList[g_maxMeshes];
 	Light* PlightList[g_maxLights];
 	Camera* PcameraList[g_maxCameras];
 	Material* PmaterialList[g_maxMeshes];
-	int* NumberOfMaterials;
+	Locator* PlocatorList[g_maxLocators];
+	PaintTexture* PpaintList[g_maxPaintTextures];
 
-	glm::vec2* MeshIdChange;
-	glm::vec2* CameraIdChange;
-	glm::vec2* LightIdChange;
 	int* export;
+
 	HANDLE MeshMutexHandle;
 	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 	HANDLE CameraMutexHandle;
+	HANDLE LocatorMutexHandle;
+	HANDLE TextureMutexHandle;
 	DWORD milliseconds;
-	
 
-	//ALOT OF DIFFRENCE HERE COMPARED TO SharedMemory why?
+	void ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape);
+	
 private:
 	//Functions
 	int shutdown();
-	void ReadMesh(int);
-	void ReadCamera(int);
-	void ReadLight(int);
+	//void ReadMesh(int);
+	//void ReadCamera(int);
+	//void ReadLight(int);
 
 	//Variables
 

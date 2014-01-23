@@ -5,8 +5,6 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Script/Include/RootScript.h>
 
-
-
 #ifndef COMPILING_LEVEL_EDITOR
 #include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
@@ -14,9 +12,6 @@
 #include <RootEngine/Include/Profiling.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
 #endif
-
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
 
 Logging	g_logger;
 

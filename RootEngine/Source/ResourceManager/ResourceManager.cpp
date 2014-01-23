@@ -163,11 +163,12 @@ namespace RootEngine
 			Model* model = new Model();
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			model->m_meshes[1] = nullptr;
 			
 			if(model)
 			{
 				m_models[p_path] = model;
-				return m_models[p_path];
+				return m_models.find(p_path)->second;
 			}
 			else
 			{
@@ -318,6 +319,13 @@ namespace RootEngine
 			return "";
 		}
 	}
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
+		}
+	}
 #endif
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)
 	{
@@ -354,11 +362,5 @@ namespace RootEngine
 		return m_workingDirectory;
 	}
 
-	void ResourceManager::ReloadAllScripts()
-	{
-		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
-		{
-			ForceLoadScript((*itr).second);
-		}
-	}
+
 }

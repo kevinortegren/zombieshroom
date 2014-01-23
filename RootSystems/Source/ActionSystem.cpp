@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
 #include <RootEngine/Script/Include/RootScript.h>
@@ -127,3 +128,4 @@ namespace RootSystems
 	}
 
 }
+#endif
