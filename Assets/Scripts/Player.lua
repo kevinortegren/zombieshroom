@@ -87,4 +87,6 @@ end
 
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
+  local collision = self.GetCollision();
+	Collision.RemovePlayerObjectFromWorld(collision);
 end

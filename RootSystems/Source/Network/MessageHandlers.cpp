@@ -189,6 +189,11 @@ namespace RootForce
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
 					
+					// Call the OnDelete script
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDelete");
+					g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
+					g_engineContext.m_script->ExecuteScript();
+
 					// Remove all entities associated with that player.
 					if (clientComponent->IsRemote)
 					{
@@ -405,11 +410,21 @@ namespace RootForce
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
+				case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
 					
-					// Remove all entities associated with that player
 					NetworkEntityID id;
+					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					id.ActionID = ReservedActionID::CONNECT;
+					id.SequenceID = 0;
+
+					// Call the OnDelete script
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDelete");
+					g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
+					g_engineContext.m_script->ExecuteScript();
+
+					// Remove all entities associated with that player
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::ALL;
 					id.SequenceID = ReservedSequenceID::ALL;
@@ -427,12 +442,17 @@ namespace RootForce
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				} return true;
 
-				case ID_CONNECTION_LOST:
+				/*case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
 					
 					NetworkMessage::UserDisconnected m;
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+
+					// Call the OnDelete script
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnDelete");
+					g_engineContext.m_script->AddParameterUserData(g_networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
+					g_engineContext.m_script->ExecuteScript();
 					
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserDisconnected);
@@ -440,7 +460,7 @@ namespace RootForce
 
 					// TODO: Send only to clients who have received user connected for all other clients?
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				} return true;
+				} return true;*/
 
 				case ID_UNCONNECTED_PING:
 				{
