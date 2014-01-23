@@ -168,22 +168,29 @@ namespace RootForce
 
 		// Send player command updates to the server
 		//Network::NetworkComponent* playerNetworkComponent = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
+		/*
 		ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 		
-		if (/*network->ID.UserID == playerNetworkComponent->ID.UserID &&*/ clientComponent->IsRemote)
+		
+		if (network->ID.UserID == playerNetworkComponent->ID.UserID && clientComponent->IsRemote)
 		{
-			// If we issued this action, send it to the server as well.
-			RootForce::NetworkMessage::PlayerCommand m;
-			m.User = network->ID.UserID;
-			m.Action = *action;
-
-			RakNet::BitStream bs;
-			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
-			m.Serialize(true, &bs);
-
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			
 		}
+		*/
+
+		// Send the action to the server as well.
+		RootForce::NetworkMessage::PlayerCommand m;
+		m.User = network->ID.UserID;
+		m.Action = *action;
+
+		RakNet::BitStream bs;
+		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
+		m.Serialize(true, &bs);
+
+		m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+
+
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
