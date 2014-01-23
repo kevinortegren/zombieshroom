@@ -121,8 +121,6 @@ int main(int argc, char* argv[])
 
 			LoadSceneFromMaya();
 
-
-
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -414,16 +412,20 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
 		if(textureName == "PaintTexture")
+		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
+		}
 		else
 		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 		}
 
 		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
 
-		painter->BufferData(RM.PpaintList[0]->Pixels);
+		painter->BufferData(RM.PpaintList[paintID]->Pixels);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -436,8 +438,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		mat->m_tileFactor = RM.PpaintList[0]->tileFactor;
-		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+		mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;		
 
 		ReleaseMutex(RM.TextureMutexHandle);
 	}
@@ -685,7 +686,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
 			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend"))
+			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
 			{
 				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
 			}

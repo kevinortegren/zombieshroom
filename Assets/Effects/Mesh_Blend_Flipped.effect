@@ -1,0 +1,33 @@
+- name: Mesh_Blend
+  techniques:
+    - name: Mesh_Blend_Flipped
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: g_Specular
+          slot: 1
+        - name: g_BlendMap
+          slot: 4
+        - name: g_DiffuseR
+          slot: 5
+        - name: g_DiffuseG
+          slot: 6
+        - name: g_DiffuseB
+          slot: 7
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: SIZEMIN
+          offset: 128
+      programs:
+        - name: Mesh_Blend
+          shaders:
+            - name: mesh_blend_flipped
+              type: vertex
+            - name: mesh_blend_flipped
+              type: fragment
