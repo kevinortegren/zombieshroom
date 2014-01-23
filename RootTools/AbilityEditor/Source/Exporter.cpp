@@ -165,6 +165,7 @@ namespace AbilityEditorNameSpace
 					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
 					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
 					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
+					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  physCon->m_gravity.x() << physCon->m_gravity.x() << physCon->m_gravity.x() << YAML::EndSeq;
 				}
 				break;
 			case AbilityComponents::ComponentType::OFFENSIVEABILITY:
