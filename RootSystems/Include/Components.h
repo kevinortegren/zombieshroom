@@ -47,7 +47,7 @@ namespace RootForce
 			SHADOWCASTER,
 			DIRECTIONALLIGHT,
 		};
-		
+#ifndef COMPILE_LEVEL_EDITOR
 		inline void Initialize()
 		{
 			RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -76,6 +76,7 @@ namespace RootForce
 			RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 			RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 		};
+#endif
 	}
 
 	

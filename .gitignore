@@ -8,3 +8,4 @@ CMakeFiles
 # Ignore diff files
 *.orig
 *.rej
+*.swatch

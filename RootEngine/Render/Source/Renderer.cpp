@@ -303,7 +303,7 @@ namespace Render
 
 		{
 			PROFILE("Shadow pass", g_context.m_profiler);
-			ShadowPass();
+			//ShadowPass();
 		}
 
 		// Buffer Per Frame data.
@@ -345,6 +345,8 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
+		m_geometryPass.Unbind();
+
 		///Bind GBuffer.
 		m_geometryPass.Bind();
 
@@ -400,6 +402,10 @@ namespace Render
 					}
 				}
 			}
+			
+			// Unbind depth texture.
+			glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+			glBindTexture(GL_TEXTURE_2D,0);
 
 			// Unbind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
@@ -543,6 +549,9 @@ namespace Render
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
+
+		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)

@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
 #include <RootEngine/Include/GameSharedContext.h>
@@ -66,3 +67,4 @@ namespace RootSystems
 	};
 
 }
+#endif

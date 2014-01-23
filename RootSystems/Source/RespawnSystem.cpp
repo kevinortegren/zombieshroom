@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "RespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
@@ -77,3 +78,4 @@ namespace RootSystems
 	}
 
 }
+#endif
