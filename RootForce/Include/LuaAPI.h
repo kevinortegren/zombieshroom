@@ -576,12 +576,15 @@ namespace RootForce
 		}
 		static int PhysicsGetType(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			int *type = (int*)lua_newuserdata(p_luaState, sizeof(int));
-			*type = g_engineContext.m_physics->GetType((*(*rtemp)->m_handle));
-			luaL_setmetatable(p_luaState, "Int");
+			//lua_Number *type = (lua_Number*)lua_newuserdata(p_luaState, sizeof(lua_Number));
+			//*type = g_engineContext.m_physics->GetType((*(*rtemp)->m_handle));
+			//luaL_setmetatable(p_luaState, "Int");
+			//lua_Number
+			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
+
 			return 1;
 		}
 		static int PhysicsSetGravity(lua_State* p_luaState)

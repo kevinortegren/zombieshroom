@@ -50,8 +50,6 @@ namespace AbilityEditorNameSpace
 
 			WriteOnCreate(p_onCreate, i);
 			m_file << "\n";
-			WriteAddClientComponents(p_onCreate, i);
-			m_file << "\n";
 			WriteOnCollide(p_onCreate, p_onCollide, i);
 			m_file << "\n";
 			WriteOnDestroy(p_onDestroy, i);
@@ -69,8 +67,6 @@ namespace AbilityEditorNameSpace
 			m_file << "\n";
 
 			WriteOnCreate(p_onCreate, i);
-			m_file << "\n";
-			WriteAddClientComponents(p_onCreate, i);
 			m_file << "\n";
 			WriteOnCollide(p_onCreate, p_onCollide, i);
 			m_file << "\n";
@@ -90,8 +86,6 @@ namespace AbilityEditorNameSpace
 
 			WriteOnCreate(p_onCreate, i);
 			m_file << "\n";
-			WriteAddClientComponents(p_onCreate, i);
-			m_file << "\n";
 			WriteOnCollide(p_onCreate, p_onCollide, i);
 			m_file << "\n";
 			WriteOnDestroy(p_onDestroy, i);
@@ -104,10 +98,12 @@ namespace AbilityEditorNameSpace
 	{
 		std::vector<AbilityEntity::Entity*>* entities = p_onCreate->GetEntities();
 
-		m_file << "function " << m_name << ".OnCreate (self, userId, actionId)\n";
+		m_file << "function " << m_name << ".OnCreate (userId, actionId)\n";
+		m_file << "\tlocal self = Entity.New();\n";
 		m_file << "\tlocal playerEnt = Entity.GetEntityByTag(\"Player\");\n";
 		m_file << "\tlocal posVec = Entity.GetEntityByTag(\"Player\"):GetTransformation():GetPos();\n";
 		m_file << "\tlocal frontVec = Entity.GetEntityByTag(\"AimingDevice\"):GetTransformation():GetOrient():GetFront();\n";
+		m_file << "\tlocal networkEnt = Network.New(self, userId, actionId);\n";
 		m_file << "\n";
 		m_entityOffset = entities->size();
 		
@@ -119,9 +115,9 @@ namespace AbilityEditorNameSpace
 			{
 				m_file << "\tlocal physicsComp = Physics.New(self);\n";
 				if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
-					m_file << "\tcollisionComp:CreateHandle(self:GetId(), 1, false);\n";
+					m_file << "\tcollisionComp:CreateHandle(self, 1, false);\n";
 				else
-					m_file << "\tcollisionComp:CreateHandle(self:GetId(), 1, true);\n";
+					m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
 			}
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::EXPLOSIVE))
 			{
@@ -181,36 +177,39 @@ namespace AbilityEditorNameSpace
 			}
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 		}
-		
-		m_file << "end\n";
-	}
+		m_file << "\t\ttransformComp:SetPos(posVec);\n";
+		m_file << "\tif Global.IsClient then\n";
 
-	void ScriptGenerator::WriteAddClientComponents( OnCreate* p_onCreate, int i )
-	{
-		m_file << "function " << m_name << ".AddClientComponents (self)\n";
-		m_file << "\n";
-		std::vector<AbilityEntity::Entity*>* entities = p_onCreate->GetEntities();
-		
 		if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
-			m_file << "\tlocal renderComp = Renderable.New(self);\n";
+			m_file << "\t\tlocal renderComp = Renderable.New(self);\n";
 		for (unsigned int j = 0; j < entities->at(i)->m_components->size(); j++)
 		{
 			// Setting values
 			if(entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::ABILITYMODEL)
 			{
-				m_file << "\ttransformComp:SetPos(posVec);\n";
-				m_file << "\trenderComp:SetModel(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_modelName << "\");\n";
-				m_file << "\trenderComp:SetMaterial(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_material << "\");\n";
-				m_file << "\trenderComp:SetMaterialDiffuse(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialDiffuse << "\");\n";
-				m_file << "\trenderComp:SetMaterialSpecular(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialSpecular << "\");\n";
-				m_file << "\trenderComp:SetMaterialNormal(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialNormal << "\");\n";
-				m_file << "\trenderComp:SetMaterialEffect(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialEffect << "\");\n";
+				
+				m_file << "\t\trenderComp:SetModel(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_modelName << "\");\n";
+				m_file << "\t\trenderComp:SetMaterial(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_material << "\");\n";
+				m_file << "\t\trenderComp:SetMaterialDiffuse(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialDiffuse << "\");\n";
+				m_file << "\t\trenderComp:SetMaterialSpecular(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialSpecular << "\");\n";
+				m_file << "\t\trenderComp:SetMaterialNormal(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialNormal << "\");\n";
+				m_file << "\t\trenderComp:SetMaterialEffect(\"" << ((AbilityComponents::AbilityModel*)entities->at(i)->m_components->at(j))->m_materialEffect << "\");\n";
 			}
 			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::ABILITYPARTICLE)
 			{
 				// TODO : Add stuff later
 			}
 		}
+
+		m_file << "\tend\n";
+
+		std::vector<QString> scriptNames = p_onCreate->GetScriptNames();
+		for (unsigned int j = 0; j < scriptNames.size(); j++)
+		{
+			scriptNames.at(j).chop(4);
+			m_file << "\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
+		}
+		
 		m_file << "end\n";
 	}
 
@@ -223,13 +222,12 @@ namespace AbilityEditorNameSpace
 		{
 			if(OCEntities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
 			{
-				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
-				m_file << "\tif type == 3 then\n";
-
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
-				m_file << "\tlocal hitPos = entity:GetTransform():GetPos();\n";
-				m_file << "\tlocal selfPos = self:GetTransform():GetPos();\n";
+				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
+				m_file << "\tif type == 3 then\n";
+				m_file << "\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
+				m_file << "\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
 				//The 2 in the following line is SuperMegaDunderUberHyper guessed, maybe think about it?
 				m_file << "\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << ((AbilityComponents::OffensiveAbility*)OCEntities->at(i)->m_components->at(j))->m_knockbackPower << ");\n";
 				m_file << "\tend\n";
@@ -248,7 +246,13 @@ namespace AbilityEditorNameSpace
 
 	void ScriptGenerator::WriteOnDestroy( OnDestroy* p_onDestroy, int i )
 	{
-		m_file << "function " << m_name << ".OnDestroy (args)\n";
+		m_file << "function " << m_name << ".OnDestroy (self)\n";
+		std::vector<QString> scriptNames = p_onDestroy->GetScriptNames();
+		for (unsigned int j = 0; j < scriptNames.size(); j++)
+		{
+			scriptNames.at(j).chop(4);
+			m_file << "\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
+		}
 		m_file << "end\n";
 	}
 }
