@@ -96,7 +96,6 @@ namespace RootForce
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
 
-		//m_networkContext.m_networkEntityMap = RootForce::Network::NetworkEntityMap();
 		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_networkContext));
 		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_networkContext, m_sharedSystems));
 		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_networkContext, m_sharedSystems));

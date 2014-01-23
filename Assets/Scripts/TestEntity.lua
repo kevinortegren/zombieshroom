@@ -2,15 +2,10 @@
 
 TestEntity = {}
 
-function TestEntity.OnCreate(self, userId, actionId)
+function TestEntity.OnCreate(userId, actionId)
+	local self = Entity.New();
+
     local transform = Transformation.New(self);
     local script = Script.New(self, "TestEntity");
-end
-
-function TestEntity.AddClientComponents(self)
-	
-end
-
-function TestEntity.AddLocalClientComponents(self)
-	
+	local network = Network.New(self, userId, actionId);
 end

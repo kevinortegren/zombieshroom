@@ -51,7 +51,8 @@ namespace RootForce
 		{
 			enum ReservedSequenceID
 			{
-				NONE = 0xFFFE,
+				NONE = 0xFFFD,
+				CLIENT_ENTITY,
 				ALL,
 			};
 		}

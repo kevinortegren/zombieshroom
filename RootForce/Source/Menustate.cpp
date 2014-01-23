@@ -2,6 +2,7 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {	
@@ -33,7 +34,7 @@ namespace RootForce
 		m_networkContext.m_server = nullptr;
 		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
-		m_networkContext.m_networkEntityMap.clear();
+		g_networkEntityMap.clear();
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler

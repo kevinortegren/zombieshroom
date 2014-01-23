@@ -35,7 +35,6 @@ namespace RootForce
 		public:
 			ClientMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
-			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetLanList(RootSystems::LanList* p_list);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void SetWorldSystem(WorldSystem* p_worldSystem);
@@ -43,7 +42,6 @@ namespace RootForce
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
 			ECS::World* m_world;
-			NetworkEntityMap* m_networkEntityMap;
 			RootSystems::LanList* m_list;
 			RootForce::ChatSystem* m_chatSystem;
 			WorldSystem* m_worldSystem;
@@ -58,12 +56,9 @@ namespace RootForce
 		public:
 			ServerMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
-			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
-
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
 		private:
 			ECS::World* m_world;
-			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }

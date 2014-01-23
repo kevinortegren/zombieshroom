@@ -42,7 +42,6 @@ namespace RootForce
 		std::shared_ptr<RootForce::Network::Client> m_client;
 		std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 		std::shared_ptr<RootForce::Network::ClientMessageHandler> m_clientMessageHandler;
-		RootForce::Network::NetworkEntityMap m_networkEntityMap;
 	};
 
 	struct SharedSystems

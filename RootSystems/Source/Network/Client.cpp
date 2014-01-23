@@ -29,6 +29,10 @@ namespace RootForce
 			m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
 			m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
 
+			// Let scripts know that we have a client and require client components on our entities.
+			g_engineContext.m_script->SetGlobalNumber("IsClient", true);
+
+			// Client-cruiser operational!
 			m_logger->LogText(LogTag::CLIENT, LogLevel::INIT_PRINT, "Client initialized successfully");
 		}
 
@@ -36,11 +40,6 @@ namespace RootForce
 		{
 			m_peer->Shutdown(1000);
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
-
-			//ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
-			//m_world->GetTagManager()->Unregister("Client");
-			//m_world->GetEntityManager()->RemoveAllComponents(clientEntity);
-			//m_world->GetEntityManager()->RemoveEntity(clientEntity);
 		}
 
 		void Client::PingNetwork(RootSystems::LanList* p_list, unsigned short p_port)

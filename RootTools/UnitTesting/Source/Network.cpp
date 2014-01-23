@@ -238,24 +238,23 @@ TEST(Network, SerializeEntityExisting)
 	A = worldA->GetEntityManager()->CreateEntity();
 	B = worldB->GetEntityManager()->CreateEntity();
 	
-	NetworkEntityID id;
-	id.UserID = 4;
-	id.ActionID = 15;
-	id.SequenceID = 33;
-	mapA[id] = A;
-	mapB[id] = B;
 
+	const UserID_t USER = 4;
+	const ActionID_t ACTION = 15;
+	NetworkEntityID id;
+	id.UserID = USER;
+	id.ActionID = ACTION;
+	id.SequenceID = 0;
 
 	g_world = worldA;
+	g_networkEntityMap = mapA;
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->AddParameterNumber(id.UserID);
-	g_engineContext.m_script->AddParameterNumber(id.ActionID);
+	g_engineContext.m_script->AddParameterNumber(USER);
+	g_engineContext.m_script->AddParameterNumber(ACTION);
 	g_engineContext.m_script->ExecuteScript();
-
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	mapA = g_networkEntityMap;
+	A = mapA[id];
+	NetworkComponent::s_sequenceIDMap.clear();
 
 	cA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
 	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
@@ -264,15 +263,14 @@ TEST(Network, SerializeEntityExisting)
 
 
 	g_world = worldB;
+	g_networkEntityMap = mapB;
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(B, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->AddParameterNumber(id.UserID);
-	g_engineContext.m_script->AddParameterNumber(id.ActionID);
+	g_engineContext.m_script->AddParameterNumber(USER);
+	g_engineContext.m_script->AddParameterNumber(ACTION);
 	g_engineContext.m_script->ExecuteScript();
-
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(B, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	mapB = g_networkEntityMap;
+	B = mapB[id];
+	NetworkComponent::s_sequenceIDMap.clear();
 
 	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
 
@@ -298,24 +296,24 @@ TEST(Network, SerializeEntityNonExisting)
 	RootForce::Transform* cA;
 	RootForce::Transform* cB;
 	A = worldA->GetEntityManager()->CreateEntity();
-	
+
+	const UserID_t USER = 4;
+	const ActionID_t ACTION = 15;
 	NetworkEntityID id;
-	id.UserID = 4;
-	id.ActionID = 15;
-	id.SequenceID = 33;
-	mapA[id] = A;
+	id.UserID = USER;
+	id.ActionID = ACTION;
+	id.SequenceID = 0;
 
 
 	g_world = worldA;
+	g_networkEntityMap = mapA;
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "OnCreate");
-	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->AddParameterNumber(id.UserID);
-	g_engineContext.m_script->AddParameterNumber(id.ActionID);
+	g_engineContext.m_script->AddParameterNumber(USER);
+	g_engineContext.m_script->AddParameterNumber(ACTION);
 	g_engineContext.m_script->ExecuteScript();
-
-	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("TestEntity"), "AddClientComponents");
-	g_engineContext.m_script->AddParameterUserData(A, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+	mapA = g_networkEntityMap;
+	A = mapA[id];
+	NetworkComponent::s_sequenceIDMap.clear();
 
 	cA = worldA->GetEntityManager()->GetComponent<RootForce::Transform>(A);
 	cA->m_position = glm::vec3(1.0f, 2.0f, 3.0f);
@@ -327,7 +325,9 @@ TEST(Network, SerializeEntityNonExisting)
 	ASSERT_TRUE(SerializeEntity(&bs, A, worldA->GetEntityManager(), mapA));
 
 	g_world = worldB;
-	B = DeserializeEntity(&bs, worldB->GetEntityManager(), mapB);
+	g_networkEntityMap = mapB;
+	B = DeserializeEntity(&bs, worldB->GetEntityManager(), g_networkEntityMap);
+	NetworkComponent::s_sequenceIDMap.clear();
 	ASSERT_NE(B, nullptr);
 	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
 	ASSERT_NE(cB, nullptr);
@@ -340,6 +340,9 @@ TEST(Network, SerializeEntityNonExisting)
 
 TEST(Network, SequenceIDs)
 {
+	g_networkEntityMap.clear();
+	ECS::Entity* entity = nullptr;
+
 	RootForce::Network::NetworkComponent::s_sequenceIDMap.clear();
 
 	RootForce::Network::NetworkComponent n1;
@@ -347,10 +350,10 @@ TEST(Network, SequenceIDs)
 	RootForce::Network::NetworkComponent n3;
 	RootForce::Network::NetworkComponent n4;
 
-	n1.SetID(0, 0);
-	n2.SetID(0, 1);
-	n3.SetID(0, 1);
-	n4.SetID(&n3);
+	n1.SetID(entity, 0, 0);
+	n2.SetID(entity, 0, 1);
+	n3.SetID(entity, 0, 1);
+	n4.SetID(entity, &n3);
 
 	ASSERT_EQ(n1.ID.SequenceID, 0);
 	ASSERT_EQ(n2.ID.SequenceID, 0);

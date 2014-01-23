@@ -1522,11 +1522,11 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int NetworkCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(3); // Entity, UserID, ActionID
 			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Network::NetworkComponent>(*e);
-			(*s)->SetID((RootForce::Network::UserID_t) luaL_checknumber(p_luaState, 2), (RootForce::Network::ActionID_t) luaL_checknumber(p_luaState, 3));
+			(*s)->SetID(*e, (RootForce::Network::UserID_t) luaL_checknumber(p_luaState, 2), (RootForce::Network::ActionID_t) luaL_checknumber(p_luaState, 3));
 			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}

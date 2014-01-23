@@ -1,10 +1,9 @@
 Player = {}
 
 function Player.OnCreate(userId, actionId)
-	
 	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
-  local player = Entity.New();
-
+	
+	local player = Entity.New();
 	local transform = Transformation.New(player);
 	local playerPhysics = PlayerPhysics.New(player);
 	local health = Health.New(player);
@@ -58,28 +57,28 @@ function Player.OnCreate(userId, actionId)
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
     
-  if Global.IsClient then
-    local renderable = Renderable.New(player);
-    local animation = Animation.New(player);
+	if Global.IsClient then
+		local renderable = Renderable.New(player);
+		local animation = Animation.New(player);
 
-    renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
-    renderable:SetModel("testchar");
-    renderable:SetMaterial("testchar");
-    renderable:SetMaterialDiffuse("WStexture");
-    renderable:SetMaterialSpecular("WSSpecular");
-    renderable:SetMaterialNormal("WSNormal");
-    renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
-    renderable:SetAnimation(animation);
-  end
+		renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
+		renderable:SetModel("testchar");
+		renderable:SetMaterial("testchar");
+		renderable:SetMaterialDiffuse("WStexture");
+		renderable:SetMaterialSpecular("WSSpecular");
+		renderable:SetMaterialNormal("WSNormal");
+		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
+		renderable:SetAnimation(animation);
+	end
   
-  if Global.UserID == userId then
-      local playerControl = PlayerControl.New(player);
+	if Global.UserID == userId then
+		local playerControl = PlayerControl.New(player);
 
-      playerControl:SetMouseSensitivity(0.3);
+		playerControl:SetMouseSensitivity(0.3);
 
-      Entity.RegisterTag("Player", player);
-      Entity.RegisterTag("AimingDevice", aimingEntity);
-  end
+		Entity.RegisterTag("Player", player);
+		Entity.RegisterTag("AimingDevice", aimingEntity);
+	end
 end
 
 function Player.OnCollide (self, entity)

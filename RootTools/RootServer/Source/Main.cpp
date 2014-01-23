@@ -112,7 +112,6 @@ void Main::Start()
 	// Initialize the server
 	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, m_worldSystem.get(), conf, true));
 	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), &m_world));
-	m_serverMessageHandler->SetNetworkEntityMap(&m_networkEntityMap);
 	m_server->SetMessageHandler(m_serverMessageHandler.get());
 
 	// Start the main loop

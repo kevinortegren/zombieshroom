@@ -8,6 +8,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
 
+#include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 
@@ -18,6 +19,7 @@
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
+RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {

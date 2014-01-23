@@ -14,6 +14,7 @@
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
+RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 class Main {
 public:
@@ -29,7 +30,6 @@ private:
 	void* m_engineModule;
 
 	ECS::World m_world;
-	RootForce::Network::NetworkEntityMap m_networkEntityMap;
 	std::shared_ptr<RootForce::Network::Server> m_server;
 	std::shared_ptr<RootForce::Network::ServerMessageHandler> m_serverMessageHandler;
 

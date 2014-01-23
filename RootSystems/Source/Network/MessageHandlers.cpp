@@ -6,6 +6,7 @@
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
@@ -19,16 +20,9 @@ namespace RootForce
 		ClientMessageHandler::ClientMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world)
 			: MessageHandler(p_peer)
 			, m_world(p_world)
-			, m_networkEntityMap(nullptr)
 			, m_list(nullptr)
 			, m_chatSystem(nullptr)
 			, m_worldSystem(nullptr) {}
-
-
-		void ClientMessageHandler::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
-		{
-			m_networkEntityMap = p_networkEntityMap;
-		}
 
 		void ClientMessageHandler::SetLanList(RootSystems::LanList* p_list)
 		{
@@ -52,8 +46,6 @@ namespace RootForce
 
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
-
-			NetworkEntityMap& networkEntityMap = *m_networkEntityMap;
 
 			switch (p_id)
 			{
@@ -119,7 +111,7 @@ namespace RootForce
 					// Local clients share world with server - does not need to do anything.
 					if (clientComponent->IsRemote)
 					{
-						NetworkMessage::DeserializeWorld(p_bs, m_world, networkEntityMap);
+						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap);
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 						{
@@ -141,55 +133,44 @@ namespace RootForce
 					NetworkMessage::UserConnected m;
 					m.Serialize(false, p_bs);
 
-					NetworkEntityID id;
-					id.UserID = m.User;
-					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 1;
-
-					g_engineContext.m_script->SetGlobalNumber("UserID", id.UserID);
-
+					// If we are a remote client, we need to create our own entities.
 					if (clientComponent->IsRemote)
 					{
-						// If we are a remote client, we need to create our own entities.
-						ECS::Entity* player = m_world->GetEntityManager()->CreateEntity();
-
-						networkEntityMap[id] = player;
+						// We have received a connection acknowledgement about ourselves, set our user ID.
+						if (m.IsYou)
+						{
+							g_engineContext.m_script->SetGlobalNumber("UserID", m.User);
+						}
 
 						// Call the OnCreate script
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from Message::UserConnected");
 						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
-						//g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-						g_engineContext.m_script->AddParameterNumber(id.UserID);
-						g_engineContext.m_script->AddParameterNumber(id.ActionID);
+						g_engineContext.m_script->AddParameterNumber(m.User);
+						g_engineContext.m_script->AddParameterNumber(ReservedActionID::CONNECT);
 						g_engineContext.m_script->ExecuteScript();
 
-						
+						// Get the player entity and store the name
+						NetworkEntityID id;
+						id.UserID = m.User;
+						id.ActionID = ReservedActionID::CONNECT;
+						id.SequenceID = 0;
+
+						ECS::Entity* playerEntity = g_networkEntityMap[id];
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+						playerComponent->Name = m.Name;
+
+						// Set the client state
+						clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
 					}
-
-					// Add client components onto the entity
-					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "AddClientComponents");
-					g_engineContext.m_script->AddParameterUserData(networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
-					g_engineContext.m_script->ExecuteScript();
-
-					if (m.IsYou)
+					else
 					{
-						// Add client components onto the entity
-						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "AddLocalClientComponents");
-						g_engineContext.m_script->AddParameterUserData(networkEntityMap[id], sizeof(ECS::Entity*), "Entity");
-						g_engineContext.m_script->ExecuteScript();
-
-						if (clientComponent->IsRemote)
-						{
-							clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
-						}
-						else
-						{
-							clientComponent->State = ClientState::CONNECTED;
-						}
+						// For a local client, just set the client state
+						clientComponent->State = ClientState::CONNECTED;
 					}
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%s): %s", p_packet->systemAddress.ToString(), m.Name.C_String());
 				} return true;
+
 
 				case NetworkMessage::MessageType::UserDisconnected:
 				{
@@ -200,8 +181,8 @@ namespace RootForce
 					NetworkEntityID id;
 					id.UserID = m.User;
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 1;
-					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+					id.SequenceID = 0;
+					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
 					
@@ -211,7 +192,7 @@ namespace RootForce
 						id.UserID = m.User;
 						id.ActionID = ReservedActionID::ALL;
 						id.SequenceID = ReservedSequenceID::ALL;
-						Network::DeleteEntities(networkEntityMap, id, m_world->GetEntityManager());
+						Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
 					}
 				} return true;
 
@@ -234,7 +215,7 @@ namespace RootForce
 
 					if (clientComponent->IsRemote)
 					{
-						Network::DeleteEntities(networkEntityMap, m.ID, m_world->GetEntityManager());
+						Network::DeleteEntities(g_networkEntityMap, m.ID, m_world->GetEntityManager());
 					}
 				} return true;
 
@@ -284,6 +265,8 @@ namespace RootForce
 					{
 						// Update server information
 						serverInfo->Information.MaxPlayers = m.MaxPlayers;
+
+						// TODO: Update rules
 					}
 				} return true;
 
@@ -296,6 +279,8 @@ namespace RootForce
 					{
 						// Update server information
 						serverInfo->Information.GameMode = m.GameMode;
+
+						// TODO: Update rules
 					}
 				} return true;
 
@@ -308,6 +293,8 @@ namespace RootForce
 					{
 						// Update server information
 						serverInfo->Information.MatchTimeSeconds = m.Seconds;
+
+						// TODO: Update rules
 					}
 				} return true;
 
@@ -320,6 +307,8 @@ namespace RootForce
 					{
 						// Update server information
 						serverInfo->Information.KillCount = m.Count;
+
+						// TODO: Update rules
 					}
 				} return true;
 
@@ -369,20 +358,12 @@ namespace RootForce
 
 		ServerMessageHandler::ServerMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world)
 			: MessageHandler(p_peer)
-			, m_world(p_world)
-			, m_networkEntityMap(nullptr) {}
-
-		void ServerMessageHandler::SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap)
-		{
-			m_networkEntityMap = p_networkEntityMap;
-		}
+			, m_world(p_world) {}
 
 		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
 		{
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
-
-			NetworkEntityMap& networkEntityMap = *m_networkEntityMap;
 
 			switch (p_id)
 			{
@@ -393,13 +374,14 @@ namespace RootForce
 					ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
 					ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<ClientComponent>(clientEntity);
 					clientComponent->State = ClientState::AWAITING_SERVER_INFO;
+					clientComponent->IsRemote = !p_packet->systemAddress.IsLoopback();
 
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-					networkEntityMap[id] = clientEntity;
+					g_networkEntityMap[id] = clientEntity;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
@@ -411,7 +393,7 @@ namespace RootForce
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::ALL;
 					id.SequenceID = ReservedSequenceID::ALL;
-					Network::DeleteEntities(networkEntityMap, id, m_world->GetEntityManager());
+					Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
 
 					// Notify clients of disconnected client
 					NetworkMessage::UserDisconnected m;
@@ -459,6 +441,7 @@ namespace RootForce
 					m.Sender = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					m.Serialize(true, &bs);
 
+					// TODO: Send to only connected clients?
 					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				} return true;
 
@@ -471,9 +454,9 @@ namespace RootForce
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(networkEntityMap[id]);
+					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
 					clientComponent->Name = m.Name.C_String();
 					
 					// Send server information
@@ -513,24 +496,30 @@ namespace RootForce
 							NetworkEntityID id;
 							id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 							id.ActionID = ReservedActionID::CONNECT;
-							id.SequenceID = 0;
+							id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-							ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(networkEntityMap[id]);
+							ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
 							
 							if (clientComponent->State == ClientState::AWAITING_USER_CONNECT)
 							{
 								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client (%s) successfully loaded map", p_packet->systemAddress.ToString());
 								
+								// If this client is a local client, set the UserID global first
+								if (!clientComponent->IsRemote)
+								{
+									g_engineContext.m_script->SetGlobalNumber("UserID", m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+								}
+
+								// Create the player
 								g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from LoadMapStatus::Status_Completed");
 								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-								//g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
 								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
 								g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
+								g_engineContext.m_script->ExecuteScript();
 								
 								// Get the newly created player entity
-								ECS::Entity* playerEntity = m_world->GetEntityManager()->CreateEntity();
-								id.SequenceID = 1;
-								networkEntityMap[id] = playerEntity;
+								id.SequenceID = 0;
+								ECS::Entity* playerEntity = g_networkEntityMap[id];
 
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								playerComponent->Name = clientComponent->Name;
@@ -564,9 +553,9 @@ namespace RootForce
 									NetworkEntityID id;
 									id.UserID = i;
 									id.ActionID = ReservedActionID::CONNECT;
-									id.SequenceID = 1;
+									id.SequenceID = 0;
 
-									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(networkEntityMap[id]);
+									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 									// Craft message
 									NetworkMessage::UserConnected n;
@@ -585,7 +574,7 @@ namespace RootForce
 								{
 									RakNet::BitStream bs;
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
-									NetworkMessage::SerializeWorld(&bs, m_world, networkEntityMap);
+									NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}

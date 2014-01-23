@@ -4,6 +4,7 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
@@ -42,7 +43,6 @@ namespace RootForce
 			// Setup the server and connect a local client
 			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
-			m_networkContext.m_serverMessageHandler->SetNetworkEntityMap(&m_networkContext.m_networkEntityMap);
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 
@@ -71,10 +71,9 @@ namespace RootForce
 		}
 
 		// Reset the network entity map
-		m_networkContext.m_networkEntityMap.clear();
+		g_networkEntityMap.clear();
 
 		// Setup the client
-		m_networkContext.m_clientMessageHandler->SetNetworkEntityMap(&m_networkContext.m_networkEntityMap);
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 	}
 

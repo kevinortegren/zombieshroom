@@ -10,43 +10,26 @@ namespace RootForce
 	{
 		/* 
 			Add this component onto every entity that you want to synchronize over the network.
-
-			The AssociatedInNetworkEntityMap field is read by the NetworkRegistrationSystem and entities
-			are added to a network entity map if the field is false.
 		*/
 		struct NetworkComponent : public ECS::Component<NetworkComponent>
 		{
 			typedef std::map<UserActionKey_t, SequenceID_t> SequenceIDMap;
 			static SequenceIDMap s_sequenceIDMap;
-			
+
 			NetworkEntityID ID;
-			bool AssociatedInNetworkEntityMap;
 			
 			NetworkComponent()
 			{
 				ID.UserID = ReservedUserID::NONE;
 				ID.ActionID = ReservedActionID::NONE;
 				ID.SequenceID = ReservedSequenceID::NONE;
-				AssociatedInNetworkEntityMap = false;
 			}
 
-			void SetID(UserID_t p_userID, ActionID_t p_actionID)
-			{
-				ID.UserID = p_userID;
-				ID.ActionID = p_actionID;
-
-				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
-				ID.SequenceID = s_sequenceIDMap[key]++;
-			}
-
-			void SetID(NetworkComponent* p_parent)
-			{
-				ID.UserID = p_parent->ID.UserID;
-				ID.ActionID = p_parent->ID.ActionID;
-				
-				UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
-				ID.SequenceID = s_sequenceIDMap[key]++;
-			}
+			/*
+				Calculate the correct sequence ID and associate the entity in the global network entity map.
+			*/
+			void SetID(ECS::Entity* p_entity, UserID_t p_userID, ActionID_t p_actionID);
+			void SetID(ECS::Entity* p_entity, NetworkComponent* p_parent);
 		};
 
 
