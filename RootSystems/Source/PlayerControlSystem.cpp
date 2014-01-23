@@ -194,9 +194,9 @@ namespace RootForce
 			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
 			m.Serialize(true, &bs);
 
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 		}
-		if(!clientComponent->IsRemote)
+		if(clientComponent->IsRemote)
 		{
 			//PlayerActionComponent* trueAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
 			*trueAction = action;

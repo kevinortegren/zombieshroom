@@ -108,6 +108,7 @@ namespace RootForce
 					// Local clients share world with server - does not need to do anything.
 					if (clientComponent->IsRemote)
 					{
+						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap);
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
