@@ -118,7 +118,7 @@ namespace RootSystems
 			action->Jump = false;
 		}
 
-		action->MovePower = 0;
-		action->StrafePower = 0;
+		//action->MovePower = 0;
+		//action->StrafePower = 0;
 	}
 }

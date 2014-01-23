@@ -105,6 +105,8 @@ namespace RootForce
 		glm::vec3 movement(0.0f);
 
 		action->ActionID = s_nextActionID++;
+		action->MovePower = 0;
+		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
