@@ -78,6 +78,7 @@ namespace RootForce
 
 		// Initialize physics system
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem, "PhysicsTransformCorrectionSystem");
 
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
