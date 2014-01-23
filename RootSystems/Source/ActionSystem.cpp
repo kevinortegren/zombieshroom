@@ -4,6 +4,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootSystems
 {

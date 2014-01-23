@@ -4,6 +4,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
@@ -189,6 +190,29 @@ namespace RootForce
 
 	void PlayerControlSystem::UpdateAimingDevice()
 	{
+		for (Network::NetworkEntityMap::iterator it = g_networkEntityMap.begin(); it != g_networkEntityMap.end(); it++)
+		{
+			if (it->first.ActionID == Network::ReservedActionID::CONNECT)
+			{
+				Network::NetworkEntityID id;
+				id.UserID = it->first.UserID;
+				id.ActionID = Network::ReservedActionID::CONNECT;
+				id.SequenceID = 0;
+
+				Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
+				PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(g_networkEntityMap[id]);
+
+				id.SequenceID = 1;
+
+				Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
+
+				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+			}
+		}
+
+		/*
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
@@ -196,6 +220,7 @@ namespace RootForce
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+		*/
 	}
 }
 
