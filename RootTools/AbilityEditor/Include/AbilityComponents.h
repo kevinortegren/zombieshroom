@@ -121,12 +121,12 @@ namespace AbilityEditorNameSpace
 				subprops = props.at(0)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_rotation[i] = atof(subprops.at(i)->valueText().toStdString().c_str());
+					m_rotation[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
 				subprops = props.at(1)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_scale[i] = atof(subprops.at(i)->valueText().toStdString().c_str());
+					m_scale[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
 			
 
@@ -285,8 +285,8 @@ namespace AbilityEditorNameSpace
 						 m_CollisionShape = it->first;
 					}
 				}
-				m_radius = atof(props.at(1)->valueText().toStdString().c_str());
-				m_height = atof(props.at(2)->valueText().toStdString().c_str());;
+				m_radius = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_height = p_propMan->variantProperty(props.at(2))->value().toFloat();
 				m_collisionModelShapeName = props.at(3)->valueText().toStdString();
 				
 			}
@@ -319,7 +319,7 @@ namespace AbilityEditorNameSpace
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
 				m_particleName = props.at(0)->valueText().toStdString();
-				m_size = atof(props.at(1)->valueText().toStdString().c_str());
+				m_size = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};
 
@@ -366,14 +366,19 @@ namespace AbilityEditorNameSpace
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
+				//QList<QVariant*> props, subprops;
+
 				props = p_propBrows->properties();
-				m_mass = atof(props.at(0)->valueText().toStdString().c_str());
-				m_speed = atof(props.at(1)->valueText().toStdString().c_str());
-				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
-				subprops = props.at(0)->subProperties();
+				//m_mass = atof(props.at(0)->valueText().toStdString().c_str());
+				//m_speed = atof(props.at(1)->valueText().toStdString().c_str());
+				m_mass = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_speed = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7    <---- SKRÄPKommentar
+				subprops = props.at(2)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_gravity[i] = atof(subprops.at(i)->valueText().toStdString().c_str());
+					m_gravity[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
 			}
 		};
@@ -405,8 +410,8 @@ namespace AbilityEditorNameSpace
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_damage = atof(props.at(0)->valueText().toStdString().c_str());
-				m_knockbackPower =  atof(props.at(1)->valueText().toStdString().c_str());
+				m_damage = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_knockbackPower = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};
 
@@ -431,7 +436,7 @@ namespace AbilityEditorNameSpace
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_radius = atof(props.at(0)->valueText().toStdString().c_str());
+				m_radius = p_propMan->variantProperty(props.at(0))->value().toFloat();
 			}
 		};	
 	}

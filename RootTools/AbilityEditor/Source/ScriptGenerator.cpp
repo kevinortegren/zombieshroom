@@ -177,7 +177,7 @@ namespace AbilityEditorNameSpace
 			}
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 		}
-		m_file << "\t\ttransformComp:SetPos(posVec);\n";
+		m_file << "\ttransformComp:SetPos(posVec);\n";
 		m_file << "\tif Global.IsClient then\n";
 
 		if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
