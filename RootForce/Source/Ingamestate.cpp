@@ -77,6 +77,8 @@ namespace RootForce
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
 		// Initialize physics system
+		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
+
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -343,6 +345,7 @@ namespace RootForce
 
         {
             PROFILE("Physics", g_engineContext.m_profiler);
+			m_physicsTransformCorrectionSystem->Process();
             g_engineContext.m_physics->Update(p_deltaTime);
             m_physicsSystem->Process();
         }
