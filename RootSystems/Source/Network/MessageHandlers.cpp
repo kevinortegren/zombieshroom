@@ -196,6 +196,7 @@ namespace RootForce
 						id.ActionID = ReservedActionID::ALL;
 						id.SequenceID = ReservedSequenceID::ALL;
 						Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
+						Network::NetworkComponent::ResetSequenceForUser(id.UserID);
 					}
 				} return true;
 
@@ -419,6 +420,7 @@ namespace RootForce
 					id.ActionID = ReservedActionID::ALL;
 					id.SequenceID = ReservedSequenceID::ALL;
 					Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
+					Network::NetworkComponent::ResetSequenceForUser(id.UserID);
 
 					// Notify clients of disconnected client
 					NetworkMessage::UserDisconnected m;
@@ -549,7 +551,7 @@ namespace RootForce
 								// Create the player
 								g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from LoadMapStatus::Status_Completed");
 								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+								g_engineContext.m_script->AddParameterNumber(id.UserID);
 								g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
 								g_engineContext.m_script->ExecuteScript();
 								
