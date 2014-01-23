@@ -1,6 +1,7 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <stdexcept>

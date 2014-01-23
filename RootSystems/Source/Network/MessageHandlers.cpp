@@ -3,6 +3,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;

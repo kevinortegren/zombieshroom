@@ -1,6 +1,7 @@
 #include <UnitTesting.h>
 #include <RakNet/BitStream.h>
 #include <Utility/ECS/Include/EntityManager.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>

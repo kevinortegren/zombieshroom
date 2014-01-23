@@ -1,4 +1,7 @@
 #include <RootForce/Include/MenuState.h>
+#include <RootEngine/InputManager/Include/InputInterface.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -12,7 +15,7 @@ namespace RootForce
 
 	void MenuState::Initialize(const std::string& p_workingDir)
 	{
-        m_workingDir = p_workingDir;
+		m_workingDir = p_workingDir;
 
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
@@ -41,7 +44,7 @@ namespace RootForce
 		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
 
 		// Reset the menu
-        m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
+		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
 		// Destroy any existing server/client and setup a new network client so we can search for LAN-servers
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));

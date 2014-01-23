@@ -1,6 +1,7 @@
 #include <RootForce/Include/ConnectingState.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/ServerConfig.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;

@@ -16,8 +16,8 @@ namespace RootForce
 		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
 		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
 		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
-		sunTransform->m_position = glm::vec3(0.0f, 0.0f, 100.0f);
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
+		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
 		sunShadowcaster->m_resolution = 512;
 		sunShadowcaster->m_levels = 1;
@@ -42,10 +42,11 @@ namespace RootForce
 
 		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
+		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
-		r->m_material->m_diffuseMap = m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-		
+		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 
@@ -67,7 +68,6 @@ namespace RootForce
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
 
-
 		// Add camera entity.	
 		ECS::Entity* cameraEntity = m_world->GetEntityManager()->CreateEntity();
 
@@ -76,9 +76,9 @@ namespace RootForce
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
-		camera->m_near = 0.1f;
-		camera->m_far = 1000.0f;
-		camera->m_fov = 45.0f;
+		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
+
+		camera->m_frustum = Frustum(45.0f, 1.0f, 10000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -89,12 +89,12 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
-		m_quadTree.Init(m_engineContext, m_world);
+		//m_quadTree.Init(m_engineContext, m_world);
 	}
 
 	void WorldSystem::Process()
 	{
-		if(m_showDebug)
+		/*if(m_showDebug)
 		{
 			m_quadTree.RenderDebug();
 
@@ -108,12 +108,41 @@ namespace RootForce
 				q->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,0,1));
 			}
 		}
+
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+
+		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum;
+
+		frustrum->DrawLines(glm::mat4(1), m_engineContext->m_renderer);
+
+		m_culledNodes = 0;
+
+		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
+
+		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);*/
+	}
+
+	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
+	{
+		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
+			}
+			else
+			{
+				for(unsigned int i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					CullNode( p_frustrum, p_node->GetChilds().at(i)); 
+				}
+			}
+		}
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
 	{
 		m_showDebug = p_value;
 	}
-
 }
 #endif

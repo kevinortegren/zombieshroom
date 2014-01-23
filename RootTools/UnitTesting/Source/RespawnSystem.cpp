@@ -1,6 +1,7 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/RespawnSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(RespawnSystem, ProcessEmptyEntity)
 {

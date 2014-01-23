@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/EntityManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Script.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <vector>
 
 extern RootEngine::GameSharedContext g_engineContext;

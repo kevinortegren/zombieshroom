@@ -4,8 +4,8 @@
 #include <RootEngine\Render\Include\Effect.h>
 #include <RootEngine\Render\Include\Light.h>
 
-#define RENDER_MAX_DIRECTIONALLIGHTS 16
-#define RENDER_MAX_POINTLIGHTS 16
+#define RENDER_MAX_DIRECTIONALLIGHTS 5
+#define RENDER_MAX_POINTLIGHTS 1000
 
 namespace Render
 {
@@ -14,7 +14,7 @@ namespace Render
 	public:
 		friend class GLRenderer;
 		LightingDevice();
-		void Init(int p_width, int p_height);
+		void Init(GLRenderer* p_renderer, int p_width, int p_height);
 
 		void SetAmbientLight(const glm::vec4& p_color);
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
@@ -33,7 +33,7 @@ namespace Render
 		
 		} m_lightVars;
 
-		Buffer m_lights;
+		BufferInterface* m_lights;
 
 		size_t m_numDirectionalLights;
 		size_t m_numPointLights;

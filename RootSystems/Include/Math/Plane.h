@@ -6,8 +6,8 @@ namespace RootForce
 {
 	struct Plane
 	{
-		Plane();
-		~Plane();
+		Plane(){}
+		~Plane(){}
 
 		enum
 		{

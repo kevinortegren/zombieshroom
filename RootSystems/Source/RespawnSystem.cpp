@@ -1,7 +1,8 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "RespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
-
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 namespace RootSystems
 {
@@ -69,11 +70,12 @@ namespace RootSystems
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
 			if(numspawns == chosenspwn)
 			{
-				int x,y,z;
-				x = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.x;
-				y = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
-				z = (int)m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
-				m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %d %d %d",chosenspwn,x,y,z );
+				float x,y,z;
+				x = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.x;
+				y = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
+				z = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
+				m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %f %f %f",chosenspwn,x,y,z );
+
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}
 
@@ -82,3 +84,4 @@ namespace RootSystems
 	}
 
 }
+#endif

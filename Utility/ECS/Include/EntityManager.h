@@ -34,6 +34,7 @@ namespace ECS
 				printf("Attempting to create a component without initialized type id. See ECS::Component<T>::SetTypeId(..)");
 				return nullptr;
 			}
+
 			// Allocate memory for component.
 			std::shared_ptr<T> component = std::shared_ptr<T>(new T);
 			
@@ -104,7 +105,7 @@ namespace ECS
 		{
 			for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
 			{
-				RemoveComponent<T>((*itr));
+				RemoveComponent<T>((*itr).get());
 			}
 		}
 

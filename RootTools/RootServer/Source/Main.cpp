@@ -12,6 +12,7 @@
 #include "ConsoleInput.h"
 #include <ComponentExporter.h>
 #include <ComponentImporter.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 #include <RootForce/Include/LuaAPI.h>
 

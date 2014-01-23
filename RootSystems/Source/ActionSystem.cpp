@@ -1,7 +1,9 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
@@ -122,3 +124,5 @@ namespace RootSystems
 		//action->StrafePower = 0;
 	}
 }
+
+#endif

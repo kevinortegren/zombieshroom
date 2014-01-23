@@ -1,6 +1,7 @@
 #pragma once
 
 #include <yaml-cpp\yaml.h>
+#include <RootSystems\Include\Components.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
@@ -9,7 +10,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 {
 	switch(p_type)
 	{
-		case 0:
+		case RootForce::ComponentType::RENDERABLE:
 			{
 				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
 				if(renderable->m_model != nullptr)
@@ -17,41 +18,75 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);
 					p_emitter << YAML::Key << "Model" << YAML::Value << s;
 				}
-				if(renderable->m_material.m_effect != nullptr)
+				if(renderable->m_material != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material.m_effect);
-					p_emitter << YAML::Key << "Effect" << YAML::Value << s;
-				}			
-				if(renderable->m_material.m_diffuseMap != nullptr)
-				{				
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_diffuseMap);
-					p_emitter << YAML::Key << "Diffuse" << YAML::Value << s;
-				}	
-				if(renderable->m_material.m_specularMap != nullptr)
-				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_specularMap);
-					p_emitter << YAML::Key << "Specular" << YAML::Value << s;
+					std::string s = g_engineContext.m_resourceManager->ResolveStringFromMaterial(renderable->m_material);
+					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
+					p_emitter << YAML::Key << "Name" << YAML::Value << s;
+					if(renderable->m_material->m_effect != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect);
+						p_emitter << YAML::Key << "Effect" << YAML::Value << s;
+					}			
+					if(renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] != nullptr)
+					{				
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
+						p_emitter << YAML::Key << "Diffuse" << YAML::Value << s;
+					}	
+					if(renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR]);
+						p_emitter << YAML::Key << "Specular" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]);
+						p_emitter << YAML::Key << "Normal" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]);
+						p_emitter << YAML::Key << "TextureMap" << YAML::Value << s;
+					}
+
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]);
+						p_emitter << YAML::Key << "TextureRed" << YAML::Value << s;
+					}
+
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]);
+						p_emitter << YAML::Key << "TextureGreen" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]);
+						p_emitter << YAML::Key << "TextureBlue" << YAML::Value << s;
+					}
+					p_emitter << YAML::EndMap;
 				}
-				if(renderable->m_material.m_normalMap != nullptr)
-				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material.m_normalMap);
-					p_emitter << YAML::Key << "Normal" << YAML::Value << s;
-				}	
 			}
 			break;
-		case 1:
+		case RootForce::ComponentType::TRANSFORM:
 			{
 				RootForce::Transform* transform = static_cast<RootForce::Transform*>(p_component);
 				glm::vec3 position = transform->m_position;
 				glm::vec3 scale = transform->m_scale;
-				glm::vec3 rotation = transform->m_orientation.GetAxis();
+				glm::mat3 rotation = transform->m_orientation.GetMatrix();
+
+				float x,y,z;
+				x = atan2(rotation[2][1], rotation[2][2]);
+				y = atan2(-rotation[2][0], sqrt(pow(rotation[2][1],2) + pow(rotation[2][2],2)));
+				z = atan2(rotation[1][0], rotation[0][0]);
 
 				p_emitter << YAML::Key << "Position" << YAML::Value << YAML::Flow << YAML::BeginSeq << position.x << position.y << position.z << YAML::EndSeq;
-				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
+				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << -glm::degrees(x) << -glm::degrees(y) << -glm::degrees(z) << YAML::EndSeq;
 				p_emitter << YAML::Key << "Scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
 			}
 			break;
-		case 2:
+		case RootForce::ComponentType::POINTLIGHT:
 			{
 				RootForce::PointLight* pointLight = static_cast<RootForce::PointLight*>(p_component);
 				glm::vec3 attenuation = pointLight->m_attenuation;
@@ -63,38 +98,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
 			}
 			break;
-		/*case 3:
+		case RootForce::ComponentType::PHYSICS:
 			{
-				RootForce::PlayerControl* input = static_cast<RootForce::PlayerControl*>(p_component);
-				p_emitter << YAML::Key << "Speed" << YAML::Value << input->m_speed;
+				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
+				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
 			}
-			break;
-		case 4:
+		case RootForce::ComponentType::COLLISION:
 			{
-				RootForce::PhysicsAccessor* accessor = static_cast<RootForce::PhysicsAccessor*>(p_component);
-				int type = g_engineContext.m_physics->GetType(*(accessor->m_handle));
-				float mass = g_engineContext.m_physics->GetMass(*(accessor->m_handle));
-				std::string modelHandle = g_engineContext.m_physics->GetPhysicsModelHandle(*(accessor->m_handle));
-				p_emitter << YAML::Key << "Type" << YAML::Value << type;
-				p_emitter << YAML::Key << "Mass" << YAML::Value << mass;
-				p_emitter << YAML::Key << "ModelHandle" << YAML::Value << modelHandle;
-				
-				if (type == RootEngine::Physics::PhysicsType::TYPE_PLAYER) 
-				{
-					float stepHeight = g_engineContext.m_physics->GetStepHeight(*(accessor->m_handle));
-					float modelHeight =g_engineContext.m_physics->GetModelHeight(*(accessor->m_handle));
-					float maxSpeed = g_engineContext.m_physics->GetMaxSpeed(*(accessor->m_handle));
-					p_emitter << YAML::Key << "StepHeight" << YAML::Value << stepHeight;
-					p_emitter << YAML::Key << "ModelHeight" << YAML::Value << modelHeight;
-					p_emitter << YAML::Key << "MaxSpeed" << YAML::Value << maxSpeed;
-				}
-
-			}
-			break;*/
-		case 12:
-			{
-				RootForce::Collision* col = static_cast<RootForce::Collision*>(p_component);
-				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << col->m_meshHandle;
+				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
+				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
 			}
 			break;
 		default:

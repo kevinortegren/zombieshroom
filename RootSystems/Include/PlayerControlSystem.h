@@ -8,6 +8,7 @@
 #include <RootEngine/InputManager/Include/InputInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RakNet/RakPeerInterface.h>
 
 namespace RootForce
 {

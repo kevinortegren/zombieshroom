@@ -35,6 +35,8 @@ namespace RootEngine
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
+		virtual Render::TextureInterface* CreateTexture(const std::string& p_path) = 0;
+
 		virtual bool RenameModel(Model* p_model, const std::string& p_name) = 0;
 
 		virtual Render::MeshInterface*	GetMesh(std::string p_handle) = 0;
@@ -75,6 +77,8 @@ namespace RootEngine
 		#endif
 
 		Model* CreateModel(const std::string& p_path);
+		Render::TextureInterface* CreateTexture(const std::string& p_path);
+
 		bool RenameModel(Model* p_model, const std::string& p_name);
 
 
@@ -97,12 +101,12 @@ namespace RootEngine
 	private:
 		//Resources
 		std::map<std::string, Model*> m_models;
-		std::map<std::string, std::shared_ptr<Render::MeshInterface>>			m_meshes;
-		std::map<std::string, std::shared_ptr<Render::EffectInterface>>			m_effects;
-		std::map<std::string, std::shared_ptr<Render::TextureInterface>>		m_textures;
-		std::map<std::string, std::shared_ptr<Render::Material>>				m_materials;
-		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>>	m_physicMeshes;
-		std::map<std::string, std::string>										m_scripts;
+		std::map<std::string, std::shared_ptr<Render::MeshInterface>> m_meshes;
+		std::map<std::string, std::shared_ptr<Render::EffectInterface>>	m_effects;
+		std::map<std::string, Render::TextureInterface*> m_textures;
+		std::map<std::string, std::shared_ptr<Render::Material>> m_materials;
+		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>> m_physicMeshes;
+		std::map<std::string, std::string> m_scripts;
 
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR

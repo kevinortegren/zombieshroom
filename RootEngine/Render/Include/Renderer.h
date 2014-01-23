@@ -32,26 +32,27 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3 
 
-#define RENDER_TEXTURE_DIFFUSE 0
-#define RENDER_TEXTURE_SPECULAR 1
-#define RENDER_TEXTURE_NORMAL 2
-
-#define RENDER_TEXTURE_RANDOM 4
-#define RENDER_TEXTURE_DEPTH 5
-
 namespace Render
 {
 	class RendererInterface : public RootEngine::SubsystemInterface
 	{
 	public:
+
+		// Init
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
 		virtual void SetResolution(int p_width, int p_height) = 0;
+		
+		virtual int GetWidth() const = 0;
+		virtual int GetHeight() const = 0;
 
+		// Camera
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
 
-		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster) = 0;
+		// Shadows
+		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
 		
+		// Rendering
 		virtual void AddRenderJob(const RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
@@ -59,15 +60,16 @@ namespace Render
 		virtual void Swap() = 0;
 		virtual void DisplayNormals(bool p_display) = 0;
 
-		virtual int GetWidth() = 0;
-		virtual int GetHeight() = 0;
-
 		// Resource creation.
-		virtual std::shared_ptr<BufferInterface> CreateBuffer() = 0;
+		virtual BufferInterface* CreateBuffer(GLenum p_type) = 0;
+		virtual void ReleaseBuffer(BufferInterface* p_buffer) = 0;
+
+		virtual TextureInterface* CreateTexture() = 0;
+		virtual void ReleaseTexture(TextureInterface* p_texture) = 0;
+
 		virtual std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() = 0;
 		virtual std::shared_ptr<MeshInterface> CreateMesh() = 0;
 		virtual std::shared_ptr<EffectInterface> CreateEffect() = 0;
-		virtual std::shared_ptr<TextureInterface> CreateTexture() = 0;
 		virtual std::shared_ptr<Material> CreateMaterial() = 0;
 
 		// Particle systems.
@@ -78,7 +80,7 @@ namespace Render
 
 		// Lighting.
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
-		virtual void AddDirectionalLight(const DirectionalLight& p_light, int index) = 0;
+		virtual void AddDirectionalLight(const DirectionalLight& p_light, int p_index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
 	};
 
@@ -86,16 +88,18 @@ namespace Render
 	{
 	public:
 		GLRenderer();
-		~GLRenderer();
-
 		void Startup();
 		void Shutdown();
 		void SetupSDLContext(SDL_Window* p_window);
 		void SetResolution(int p_width, int p_height);
 
+		int GetWidth() const;
+		int GetHeight() const;
+
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
-		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster);
+
+		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
 
 		void Clear();
 		void AddRenderJob(const RenderJob& p_job);
@@ -103,16 +107,16 @@ namespace Render
 		void Render();
 		void Swap();
 		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
-		bool CheckExtension(const char* p_extension);
+		
+		BufferInterface* CreateBuffer(GLenum p_type);
+		void ReleaseBuffer(BufferInterface* p_buffer);
 
-		virtual int GetWidth();
-		virtual int GetHeight();
+		TextureInterface* CreateTexture();
+		void ReleaseTexture(TextureInterface* p_texture);
 
-		std::shared_ptr<BufferInterface> CreateBuffer() { return std::shared_ptr<BufferInterface>(new Buffer); }
-		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes() { return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); }
-		std::shared_ptr<MeshInterface> CreateMesh() { return std::shared_ptr<MeshInterface>(new Mesh); }
-		std::shared_ptr<EffectInterface> CreateEffect() { return std::shared_ptr<EffectInterface>(new Effect); }
-		std::shared_ptr<TextureInterface> CreateTexture() { return std::shared_ptr<TextureInterface>(new Texture); }
+		std::shared_ptr<VertexAttributesInterface> CreateVertexAttributes();
+		std::shared_ptr<MeshInterface> CreateMesh();
+		std::shared_ptr<EffectInterface> CreateEffect();
 		std::shared_ptr<Material> CreateMaterial();
 
 		ParticleSystem* CreateParticleSystem();
@@ -128,15 +132,26 @@ namespace Render
 
 	private:
 
+		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
 		void RenderGeometry();
 
 		void GeometryPass();
+		void ShadowPass();
 		void LightingPass();
 		void ForwardPass();
 		void Output();
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
+		void PrintResourceUsage();
+
+		unsigned m_renderFlags;
+
+		std::vector<RenderJob> m_jobs;
+		std::vector<Render::BufferInterface*> m_buffers;
+		std::vector<Render::TextureInterface*> m_textures;
+
+		int m_renderAllocations;
 
 		SDL_GLContext m_glContext;
 		SDL_Window* m_window;
@@ -146,20 +161,15 @@ namespace Render
 		GLuint m_fbo;
 		GLuint m_color;
 
-		std::vector<RenderJob> m_jobs;
-		unsigned m_renderFlags;
-		
-		GeometryBuffer m_geometryPass;
-		LightingDevice m_lighting;
-		LineRenderer m_lineRenderer;
-
 		Mesh m_fullscreenQuad;
-	
+		GeometryBuffer m_geometryPass;
+		LineRenderer m_lineRenderer;
 		ParticleSystemHandler m_particles;
-		//ShadowDevice m_shadowDevice;
+		LightingDevice m_lighting;
+		ShadowDevice m_shadowDevice;
 		
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
-
+		
 		struct
 		{
 			glm::mat4 m_projection;
@@ -170,12 +180,10 @@ namespace Render
 
 		} m_cameraVars;
 
-		Buffer m_cameraBuffer;
-		Buffer m_uniforms;
+		BufferInterface* m_cameraBuffer;
+		BufferInterface* m_uniforms;
 
 		std::shared_ptr<TechniqueInterface> m_renderTech;
-		std::shared_ptr<TechniqueInterface> m_normalTech;
-
 		bool m_displayNormals;
 	};
 }

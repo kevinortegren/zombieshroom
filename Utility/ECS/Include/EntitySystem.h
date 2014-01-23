@@ -54,7 +54,7 @@ namespace ECS
 
 	protected:
 		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;
-		std::set<Entity*, CompareById> m_activeEntities;
+		std::set<Entity*> m_activeEntities;
 	};
 
 	class IntervalEntitySystem : EntitySystem

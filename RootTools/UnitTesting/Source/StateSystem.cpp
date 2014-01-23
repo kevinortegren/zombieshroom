@@ -2,6 +2,7 @@
 #include <RootSystems/Include/StateSystem.h>
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(StateSystem, ProcessEmptyEntity)
 {

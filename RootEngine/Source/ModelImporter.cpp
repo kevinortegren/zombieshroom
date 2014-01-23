@@ -1,5 +1,7 @@
 #include <RootEngine/Include/ModelImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Physics/Include/PhysicsMesh.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 
@@ -19,9 +21,14 @@ namespace RootEngine
 	Model* ModelImporter::LoadModel(const std::string p_fileName)
 	{
 		m_model = new Model(); //Owned by ResourceManager
+
 		std::shared_ptr<Assimp::Importer> m_importer = std::shared_ptr<Assimp::Importer>(new Assimp::Importer);
 		const aiScene* aiscene = m_importer->ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
-		
+		if(!aiscene)
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Error parsing scene %s: %s", p_fileName, m_importer->GetErrorString());
+		}
+
 		if(aiscene->HasAnimations())
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
@@ -36,14 +43,11 @@ namespace RootEngine
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
 				}
-			}*/
-			
+			}*/	
 		}
 		
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
-
-		
 
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
@@ -115,7 +119,7 @@ namespace RootEngine
 		//Load bones
 
 		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
-		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer());	
+		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
 		std::vector<glm::vec3> positions;
@@ -198,7 +202,7 @@ namespace RootEngine
 
 		if(p_aiMesh->HasFaces())
 		{
-			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 
 			std::vector<unsigned int> indices;
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
@@ -216,12 +220,15 @@ namespace RootEngine
 			mesh->CreateIndexBuffer(&indices[0], indices.size());
 
 			// Create physics mesh.
-			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+			if(m_context->m_physics)
+			{
+				std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
 
-			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+				pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
 
-			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
-			m_model->m_physicsMeshes.push_back(pmesh.get());
+				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+				m_model->m_physicsMeshes.push_back(pmesh.get());
+			}
 		}
 
 		mesh->SetPrimitiveType(GL_TRIANGLES);
@@ -230,7 +237,8 @@ namespace RootEngine
 
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
-		m_model->m_meshes.push_back(mesh.get());
+		m_model->m_meshes[0] = mesh.get();
+		m_model->m_meshes[1] = nullptr;
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )

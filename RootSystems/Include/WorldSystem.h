@@ -5,6 +5,7 @@
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Frustum.h>
 #include <array>
 
 #define PLAYER_NUM_ABILITIES 1
@@ -20,9 +21,11 @@ namespace RootForce
 		void CreateWorld(const std::string& p_worldName);
 		void Process();
 		void ShowDebug(bool p_value);
+		void CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;
 		bool m_showDebug;
+		unsigned m_culledNodes;
 	};
 }

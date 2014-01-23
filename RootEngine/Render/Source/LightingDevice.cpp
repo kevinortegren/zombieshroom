@@ -11,16 +11,16 @@ namespace Render
 
 	}
 
-	void LightingDevice::Init(int p_width, int p_height)
+	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
 		// Load effects.	
 		auto deferred = g_context.m_resourceManager->LoadEffect("Renderer/Deferred");
 		m_lightingTech = deferred->GetTechniques()[0];
 
 		// Light uniforms.
-		m_lights.Init(GL_UNIFORM_BUFFER);
-		m_lights.BufferData(1, sizeof(m_lightVars), &m_lightVars);
-		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_lights.GetBufferId());
+		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
+		m_lights->BufferData(1, sizeof(m_lightVars), &m_lightVars);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_LIGHTS, m_lights->GetBufferId());
 
 		// Setup la-buffer.
 		glGenFramebuffers(1, &m_fbo);
@@ -46,12 +46,18 @@ namespace Render
 
 	void LightingDevice::AddDirectionalLight(const DirectionalLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_DIRECTIONALLIGHTS)
+			return;
+
 		m_lightVars.m_dlights[index] = p_light;
 		m_numDirectionalLights++;
 	}
 
 	void LightingDevice::AddPointLight(const PointLight& p_light, int index)
 	{
+		if(index > RENDER_MAX_POINTLIGHTS)
+			return;
+
 		m_lightVars.m_plights[index] = p_light;
 		m_numPointLights++;
 	}
@@ -66,7 +72,7 @@ namespace Render
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_lights.BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
+		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
 		auto ambient = m_lightingTech->GetPrograms()[0];
 		auto directional = m_lightingTech->GetPrograms()[1];
@@ -94,7 +100,7 @@ namespace Render
 		m_numPointLights = 0;
 	}
 
-	void Resize(int p_width, int p_height)
+	void LightingDevice::Resize(int p_width, int p_height)
 	{
 		//TODO
 	}

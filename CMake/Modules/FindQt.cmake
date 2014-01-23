@@ -15,3 +15,6 @@ find_library(QTWIDGETS_LIBRARY
 find_library(QTPROPWIDGET_LIBRARY
     NAMES QtSolutions_PropertyBrowser-headd
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
+find_library(QTCOLORTRIANGLE_LIBRARY
+    NAMES QtSolutions_ColorTriangle-2.6d
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")

@@ -1,8 +1,11 @@
 #include "ChatSystem.h"
 #include <Awesomium/STLHelpers.h>
 #include <Awesomium/WebCore.h>
+#include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 #include <iostream>
+#include <RootEngine/GUI/Include/guiInstance.h>
+
 namespace RootForce
 {
 
