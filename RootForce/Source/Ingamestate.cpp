@@ -164,9 +164,6 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
-		/* TEMP FROM HERE: */
-		
-		/* TEMP END. */
 	}
 
 	void IngameState::Exit()
@@ -186,11 +183,11 @@ namespace RootForce
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			return GameStates::Menu;
-	}
+		}
 
 		// Check for disconnection from the server
 		if (m_networkContext.m_clientMessageHandler->GetClientState() == RootForce::Network::ClientState::CONNECTION_LOST)
-	{
+		{
 			return GameStates::Menu;
 		}
 		

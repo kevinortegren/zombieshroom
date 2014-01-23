@@ -71,7 +71,7 @@ namespace RootEngine
 		Profiling m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
 		DebugOverlay m_debugOverlay;
-		Network::NetworkManager*		m_network;
+		Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;
