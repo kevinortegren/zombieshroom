@@ -132,10 +132,11 @@ namespace AbilityEditorNameSpace
 		
 		// Setting values
 		
+		//Some standard values
 		//Collision Shape variables
 		float radius = 1;
 		float height = 1;
-		std::string colShape = "Sphere";
+		int colShape = 3;
 		//Physics Controlled variables
 		float speed = 1;
 		float mass = 1;
@@ -151,6 +152,7 @@ namespace AbilityEditorNameSpace
 			{
 				radius = ((AbilityComponents::CollisionShape*)entities->at(i)->m_components->at(j))->m_radius;
 				height = ((AbilityComponents::CollisionShape*)entities->at(i)->m_components->at(j))->m_height;
+				colShape = ((AbilityComponents::CollisionShape*)entities->at(i)->m_components->at(j))->m_CollisionShape;
 			}
 			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::PHYSICSCONTROLLED)
 			{
@@ -169,7 +171,23 @@ namespace AbilityEditorNameSpace
 		}
 		if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
 		{
-			m_file << "\tphysicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+			if (colShape == AbilityComponents::CollisionShape::CYLINDER)
+			{
+				m_file << "\tphysicsComp:BindCylinderShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+			}
+			else if (colShape == AbilityComponents::CollisionShape::CONE)
+			{
+				m_file << "\tphysicsComp:BindConeShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+			}
+			else if (colShape == AbilityComponents::CollisionShape::SPHERE)
+			{
+				m_file << "\tphysicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+			}
+			else if (colShape == AbilityComponents::CollisionShape::MESH)
+			{
+				m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+			}
+			
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
 			{
 				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
