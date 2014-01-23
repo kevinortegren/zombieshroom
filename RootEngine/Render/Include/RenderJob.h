@@ -14,6 +14,7 @@ namespace Render
 		enum RenderFlags
 		{
 			RENDER_TRANSFORMFEEDBACK = 0x01,
+			RENDER_IGNORE_CASTSHADOW = 0x04
 		};
 	}
 

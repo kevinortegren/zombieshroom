@@ -46,7 +46,7 @@ namespace RootForce
 		{
 			Render::RenderJob job;
 			job.m_mesh = (*itr);
-
+			job.m_flags = renderable->m_renderFlags;
 			job.m_params = renderable->m_params;
 			job.m_params[Render::Semantic::MODEL] = &m_matrices[p_entity].m_model;
 			job.m_params[Render::Semantic::NORMAL] = &m_matrices[p_entity].m_normal;

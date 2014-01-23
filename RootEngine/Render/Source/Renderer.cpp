@@ -448,6 +448,9 @@ namespace Render
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
+			if(((*job).m_flags & RenderFlags::RENDER_IGNORE_CASTSHADOW) == RenderFlags::RENDER_IGNORE_CASTSHADOW)
+				continue;
+
 			(*job).m_mesh->Bind();
 
 			m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
