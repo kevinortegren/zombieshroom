@@ -3,6 +3,24 @@ Global = {
 	IsClient = false;
 }
 
+ReservedUserID = {
+	NONE = 0xFFFD;
+	UNCONNECTED = 0xFFFE;
+	ALL = 0xFFFF;
+}
+
+ReservedActionID = {
+	NONE = 0xFFFFFFFD;
+	CONNECT = 0xFFFFFFFE;
+	ALL = 0xFFFFFFFF;
+}
+
+ReservedSequenceID = {
+	NONE = 0xFFFD;
+	CLIENT_ENTITY = 0xFFFE;
+	ALL = 0xFFFF;
+}
+
 EntityState = {
   ASCENDING = 0;
   DESCENDING = 1;
