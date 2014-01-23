@@ -25,6 +25,8 @@ namespace Render
 			SPREAD,
 			SPAWNTIME,
 			TRANSPOSITION,
+			ORBITSPEED,
+			ORBITRADIUS,
 		};
 	}
 

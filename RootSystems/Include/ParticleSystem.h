@@ -28,6 +28,8 @@ namespace RootForce
 		float 		m_spread;
 		float		m_spawnTime;
 		std::string m_name;
+		float		m_orbitSpeed;
+		float		m_orbitRadius;
 	};
 
 	struct ParticleEmitter : public ECS::Component<ParticleEmitter>
