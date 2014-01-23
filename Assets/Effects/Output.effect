@@ -1,6 +1,6 @@
 - name: Output
   techniques:
-    - name: bar
+    - name: Output
       programs:
         - name: Output
           shaders:

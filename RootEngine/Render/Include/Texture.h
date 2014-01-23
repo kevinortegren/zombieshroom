@@ -34,15 +34,14 @@ namespace Render
 
 		virtual void Bind(unsigned int slot) = 0;
 		virtual void Unbind(unsigned int slot) = 0;
-
-		virtual void SetParameter(int p_name, int p_parameter) = 0;
+		
 		virtual void CreateEmptyTexture(int p_width, int p_height, int p_format) = 0;
-
+		virtual void SetParameter(int p_name, int p_parameter) = 0;
 		virtual void BufferData(void* pixels) = 0;
 
-		virtual unsigned int GetWidth() = 0;
-		virtual unsigned int GetHeight() = 0;
-		virtual glm::vec2 GetSize() = 0;
+		virtual unsigned int GetWidth() const = 0;
+		virtual unsigned int GetHeight() const = 0;
+		virtual glm::vec2 GetSize() const = 0;
 		virtual glm::vec2 GetInverseTextureSize() const = 0;
 		virtual GLuint GetHandle() const = 0;
 		virtual GLenum GetTarget() const = 0;
@@ -51,28 +50,30 @@ namespace Render
 	class Texture : public TextureInterface
 	{
 	public:
-		Texture();
-		~Texture();
-
+		friend class GLRenderer;
+		
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);
 
 		void Bind(unsigned int p_slot);
 		void Unbind(unsigned int slot);
 
-		void SetParameter(int p_name, int p_parameter);
 		void CreateEmptyTexture(int p_width, int p_height, int p_format);
+		void SetParameter(int p_name, int p_parameter);	
 		void BufferData(void* pixels);
-		unsigned int GetWidth();
-		unsigned int GetHeight();
+
+		unsigned int GetWidth() const;
+		unsigned int GetHeight() const;
 		GLuint GetHandle() const;
 		GLenum GetTarget() const;
 
-
-		glm::vec2 GetSize();
+		glm::vec2 GetSize() const;
 		glm::vec2 GetInverseTextureSize() const;
 		
 	private:
+		Texture();
+		~Texture();
+
 		GLuint m_textureHandle;
 		GLenum m_target;
 		int m_textureWidth;

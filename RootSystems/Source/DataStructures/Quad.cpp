@@ -630,8 +630,8 @@ namespace RootForce
 				ss << p_key << entityId;
 
 				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
 				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -728,8 +728,8 @@ namespace RootForce
 		ss << p_key << entityId;
 
 		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
 		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -763,8 +763,8 @@ namespace RootForce
 				ss << p_key << entityId;
 
 				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
 				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
@@ -795,8 +795,8 @@ namespace RootForce
 		ss << p_key << entityId;
 
 		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer());
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer());
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
 		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());

@@ -7,7 +7,7 @@ namespace Render
 {
 	void LineRenderer::Init(GLRenderer* p_renderer)
 	{
-		m_lineMesh.SetVertexBuffer(p_renderer->CreateBuffer());
+		m_lineMesh.SetVertexBuffer(p_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_lineMesh.SetVertexAttribute(p_renderer->CreateVertexAttributes());
 		m_lineMesh.SetPrimitiveType(GL_LINES);
 		m_lineMesh.CreateVertexBuffer1P1C(0, 0);
