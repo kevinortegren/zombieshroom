@@ -28,7 +28,7 @@ namespace RootForce
 		RootForce::PlayerActionComponent* action = entityManager->CreateComponent<RootForce::PlayerActionComponent>(entity);
 
 		RootForce::StateComponent* state = entityManager->CreateComponent<RootForce::StateComponent>(entity);
-
+		
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("testchar");
 		
 		renderable->m_params[Render::Semantic::BONES] = &animation->m_bones[0];
