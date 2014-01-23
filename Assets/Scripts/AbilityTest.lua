@@ -13,9 +13,9 @@ function AbilityTest.OnCreate (userId, actionId)
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
-	physicsComp:BindShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
+	physicsComp:BindCylinderShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 0, 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
-	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
+	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
 	if Global.IsClient then
@@ -36,7 +36,7 @@ function AbilityTest.OnCollide (self, entity)
 	if type == 3 then
 		local hitPos = entity:GetTransformation():GetPos();
 		local selfPos = self:GetTransformation():GetPos();
-		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 9);
+		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20);
 	end
 end
 
