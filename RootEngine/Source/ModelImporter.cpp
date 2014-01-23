@@ -230,7 +230,8 @@ namespace RootEngine
 
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
-		m_model->m_meshes.push_back(mesh.get());
+		m_model->m_meshes[0] = mesh.get();
+		m_model->m_meshes[1] = nullptr;
 	}
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
