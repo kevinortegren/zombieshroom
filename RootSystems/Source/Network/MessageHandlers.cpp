@@ -533,7 +533,7 @@ namespace RootForce
 
 					for (unsigned int i = 0; i < addresses.Size(); ++i)
 					{
-						if (i != id.UserID)
+						if (i != id.UserID && !addresses[i].IsLoopback())
 						{
 							RakNet::BitStream bs;
 							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
