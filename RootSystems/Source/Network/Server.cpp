@@ -3,6 +3,8 @@
 #include <RakNet/BitStream.h>
 #include <stdexcept>
 
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+
 namespace RootForce
 {
 	namespace Network
@@ -11,6 +13,7 @@ namespace RootForce
 			: m_logger(p_logger)
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
+			, m_worldDeltaTimer(0)
 		{
 			// Load the map
 			p_worldSystem->CreateWorld(p_config.MapName);
@@ -104,6 +107,19 @@ namespace RootForce
 			for (size_t i = 0; i < packets.size(); ++i)
 			{
 				m_peer->DeallocatePacket(packets[i]);
+			}
+
+			// Reduce time from delta timer and if 
+			m_worldDeltaTimer += m_world->GetDelta();
+			if(m_worldDeltaTimer > WORLD_DELTA_UPDATE_INTERVAL)
+			{
+				m_worldDeltaTimer = 0;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
+				NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
+
+				m_peer->Send(&bs, HIGH_PRIORITY, UNRELIABLE_SEQUENCED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 		}
 

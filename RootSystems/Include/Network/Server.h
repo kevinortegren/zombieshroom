@@ -7,6 +7,8 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 
+#define WORLD_DELTA_UPDATE_INTERVAL 0.5
+
 namespace RootForce
 {
 	namespace Network
@@ -31,6 +33,7 @@ namespace RootForce
 			NetworkMessage::ServerInformation m_information;
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
+			float m_worldDeltaTimer;
 
 			void UpdatePingResponse();
 		};
