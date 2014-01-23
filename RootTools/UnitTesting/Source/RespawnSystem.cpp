@@ -5,6 +5,7 @@
 TEST(RespawnSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
@@ -21,11 +22,24 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 TEST(RespawnSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
+
+	ECS::Entity* mockSpawn = world->GetEntityManager()->CreateEntity();
+	RootForce::Transform* mockSpawnTransform = world->GetEntityManager()->CreateComponent<RootForce::Transform>(mockSpawn);
+	mockSpawnTransform->m_position = glm::vec3(5, 5, 10);
+	world->GetGroupManager()->RegisterEntity("SpawnPoint", mockSpawn);
 
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
+	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+	
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);

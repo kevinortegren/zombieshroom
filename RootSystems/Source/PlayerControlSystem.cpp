@@ -6,6 +6,8 @@ extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
+	Network::ActionID_t PlayerControlSystem::s_nextActionID = 0;
+
 	Keybinding::Keybinding()
 		: Action(PlayerAction::NONE), Edge(false)
 	{}
@@ -90,11 +92,10 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+		PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-		
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
 		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
 
@@ -107,6 +108,7 @@ namespace RootForce
 		// Get the speed of the player
 		float speed = playerphysics->MovementSpeed;
 
+		action->ActionID = s_nextActionID++;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)

@@ -50,8 +50,17 @@ namespace RootEngine
 			m_parameterCount = 0;
 		}
 
+		void ScriptManager::AddParameterUserData(void* p_data, size_t p_size, const std::string& p_metaTable)
+		{
+			void** p = (void**) lua_newuserdata(m_luaState, p_size);
+			*p = p_data;
+			luaL_setmetatable(m_luaState, p_metaTable.c_str());
+			m_parameterCount++;
+		}
+
 		void ScriptManager::AddParameterString(std::string p_string)
 		{
+			
 			lua_pushlstring(m_luaState, p_string.c_str(), p_string.length());
 			m_parameterCount++;
 		}
@@ -67,6 +76,31 @@ namespace RootEngine
 			lua_pushboolean(m_luaState, p_bool);
 			m_parameterCount++;
 		}
+
+		void ScriptManager::SetGlobalString(const std::string& p_variableName, const std::string& p_string)
+		{
+			lua_getglobal(m_luaState, "Global");
+			lua_pushstring(m_luaState, p_string.c_str());
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
+		}
+
+		void ScriptManager::SetGlobalNumber(const std::string& p_variableName, double p_double)
+		{	
+			lua_getglobal(m_luaState, "Global");
+			lua_pushnumber(m_luaState, p_double);
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
+		}
+
+		void ScriptManager::SetGlobalBoolean(const std::string& p_variableName, bool p_bool)
+		{
+			lua_getglobal(m_luaState, "Global");
+			lua_pushboolean(m_luaState, p_bool);
+			lua_setfield(m_luaState, -2, p_variableName.c_str());
+			lua_pop(m_luaState, 1);
+		}
+
 
 		void ScriptManager::RegisterFunction(std::string p_funcName, lua_CFunction p_func)
 		{

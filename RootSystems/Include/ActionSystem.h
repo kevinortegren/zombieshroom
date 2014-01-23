@@ -24,14 +24,6 @@ namespace RootForce
 
 namespace RootSystems
 {
-
-	struct ActionEvent
-	{
-		uint32_t UserID;
-		RootForce::Network::MessageType::MessageType ActionType;
-		RakNet::BitStream ParameterStream;
-	};
-
 	class ActionSystem : public ECS::EntitySystem
 	{
 	public:
@@ -40,12 +32,13 @@ namespace RootSystems
 			, m_engineContext(p_engineContext) 
 		{
 			SetUsage<RootForce::PlayerActionComponent>();
+			SetUsage<RootForce::Network::NetworkComponent>();
 			SetUsage<RootForce::Animation>();
 			SetUsage<RootForce::Collision>();
 			SetUsage<RootForce::Transform>();
 			SetUsage<RootForce::StateComponent>();
 			SetUsage<RootForce::PlayerPhysics>();
-			SetUsage<RootForce::UserAbility>();
+			SetUsage<RootForce::PlayerComponent>();
 			SetUsage<RootForce::HealthComponent>();
 
 		}
@@ -56,12 +49,13 @@ namespace RootSystems
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::PlayerActionComponent> m_action;
+		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::Animation> m_animation;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::StateComponent> m_state;
 		ECS::ComponentMapper<RootForce::PlayerPhysics> m_physic;
-		ECS::ComponentMapper<RootForce::UserAbility> m_ability;
+		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 	};
 

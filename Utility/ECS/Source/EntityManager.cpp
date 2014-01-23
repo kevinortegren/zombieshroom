@@ -83,3 +83,14 @@ void ECS::EntityManager::RemoveAllEntitiesAndComponents()
 	}
 	m_entities.clear();
 }
+
+std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
+{
+	std::vector<ECS::Entity*> result(m_entities.size());
+	for (int i = 0; i < m_entities.size(); ++i)
+	{
+		result[i] = m_entities[i].get();
+	}
+
+	return result;
+}

@@ -17,6 +17,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTreeView>
@@ -51,6 +52,7 @@ public:
     QWidget *tabConditions;
     CustomListWidget *listWidget;
     QWidget *propertyWidget;
+    QPushButton *pushButton;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuNew;
@@ -138,6 +140,9 @@ public:
         propertyWidget = new QWidget(centralWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
         propertyWidget->setGeometry(QRect(10, 410, 571, 231));
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setGeometry(QRect(290, 380, 21, 23));
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -190,6 +195,7 @@ public:
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabAbilities), QApplication::translate("AbilityEditorClass", "Existing Abilities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
+        pushButton->setText(QApplication::translate("AbilityEditorClass", "...", 0));
         menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
         menuNew->setTitle(QApplication::translate("AbilityEditorClass", "New", 0));
     } // retranslateUi
