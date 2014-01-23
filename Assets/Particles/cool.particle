@@ -14,6 +14,7 @@
   SPAWNTIME: 0.03
   TEXTURE: blockMana
   EFFECT: Particle/Particle
+  NAME: Blocks
 - POSITION: [0, 0, -1.6]
   LIFETIMEMIN: 1
   LIFETIMEMAX: 0.5
@@ -30,6 +31,7 @@
   SPAWNTIME: 0.01
   TEXTURE: smoke
   EFFECT: Particle/Particle
+  NAME: CoolFire
 - POSITION: [1.1, 0.8, 0]
   LIFETIMEMIN: 19
   LIFETIMEMAX: 19
@@ -46,6 +48,7 @@
   SPAWNTIME: 0.01
   TEXTURE: smoke
   EFFECT: Particle/Particle
+  NAME: SnowCrazy1
 - POSITION: [1.1, 0.8, 0]
   LIFETIMEMIN: 19
   LIFETIMEMAX: 19
@@ -62,3 +65,4 @@
   SPAWNTIME: 0.01
   TEXTURE: smoke
   EFFECT: Particle/Particle
+  NAME: SnowCrazy2
