@@ -202,7 +202,7 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					// A local server would already have updated the entities.
-					if (clientComponent->IsRemote)
+					if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
 					{
 						NetworkEntityID id;
 						id.UserID = m.User;

@@ -41,6 +41,8 @@ namespace RootSystems
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
 
+		RootForce::PlayerActionComponent originalAction = *action;
+
 		if( health->IsDead )
 		{
 			if(action->ActivateAbility)
@@ -129,7 +131,7 @@ namespace RootSystems
 				// If we issued this action, send it to the server as well.
 				RootForce::NetworkMessage::PlayerCommand m;
 				m.User = network->ID.UserID;
-				m.Action = *action;
+				m.Action = originalAction;
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
