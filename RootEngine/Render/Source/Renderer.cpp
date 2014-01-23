@@ -448,29 +448,28 @@ namespace Render
 
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
-			if((*job).m_shadowMesh != nullptr)
-			{
-			(*job).m_mesh->Bind();
+			//if((*job).m_shadowMesh != nullptr)
+			//{
+				(*job).m_mesh->Bind();
 
-			m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
+				m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
 
-			for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-			{	
-				m_uniforms->BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-			}
-
+				for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+				{	
+					m_uniforms->BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+				}
 
 				if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
 				{
-					(*job).m_shadowMesh->DrawTransformFeedback();
+					(*job).m_mesh->DrawTransformFeedback();
 				}
 				else
 				{
-					(*job).m_shadowMesh->Draw();		
+					(*job).m_mesh->Draw();		
 				}
 
-				(*job).m_shadowMesh->Unbind();
-			}
+				(*job).m_mesh->Unbind();
+			//}
 		}
 
 		glCullFace(GL_BACK);
