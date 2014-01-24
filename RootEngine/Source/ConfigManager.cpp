@@ -46,13 +46,14 @@ namespace RootEngine
 		out << YAML::EndMap;
 
 		std::ofstream file;
-		file.open("config.yaml");
+		file.open(p_filepath);
 		file << out.c_str();
 	}
 
 	void ConfigManager::CreateDefaultConfig()
 	{
 		// Default values.
+		m_values["Name"] = "Player";
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
 		m_values["ServerName"] = "RootForce server";
@@ -102,6 +103,15 @@ namespace RootEngine
 		if(m_values.find(p_key) != m_values.end())
 			return m_values[p_key];
 		return std::string("");
+	}
+	std::map<std::string, std::string> ConfigManager::GetConfigValuePairs()
+	{
+		return m_values;
+	}
+		
+	void ConfigManager::SetConfigValue(const std::string& p_key, const std::string& p_value)
+	{
+		m_values[p_key] = p_value;
 	}
 
 	void ConfigManager::Parse(const YAML::Node& p_node, const std::string& p_key)

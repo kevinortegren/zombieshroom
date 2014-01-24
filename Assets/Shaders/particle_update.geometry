@@ -64,6 +64,20 @@ float GetRandomNumber(float TexCoord, float min, float max)
 	float number =  direction.x * magnitud + min;
     return number;
 }
+
+mat4 rotationMatrix(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
 void main() 
 {	
 	float lifeTime = vert_age[0] - g_dt;
@@ -73,16 +87,6 @@ void main()
 		if(lifeTime <= 0.0f)
 		{
 			//float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
-			//float yspread = GetRandomNumber(g_time+0.2f, -g_spread, g_spread);
-			//float cs = cos(xspread);
-			//float ss = sin(xspread);
-			
-			//float px	= g_direction.x * cs - g_direction.y * ss;
-			//float py	= g_direction.x * ss + g_direction.y * cs;
-
-			//vec3 vektre = vec3(px, py, 0);
-			//vektre *= cos(yspread);
-			//vektre.z = sin(yspread);
 
 			// Spawn new particles with new start values using the initial values.
 			vert_initialPos1 	= g_Position + g_transPos;

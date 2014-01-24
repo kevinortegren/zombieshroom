@@ -33,6 +33,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 
@@ -56,6 +57,7 @@ public:
     QAction *actionGrid_2;
     QAction *actionColor_Triangle;
     QAction *actionEndColor_Triangle;
+    QAction *actionHelp;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *tabProperties;
@@ -78,11 +80,9 @@ public:
     QDoubleSpinBox *posSpinBoxX;
     QDoubleSpinBox *speedMinSpinBox;
     QLabel *label_2;
-    QDoubleSpinBox *speedEndSpinBox;
     QLabel *label;
     QDoubleSpinBox *posSpinBoxZ;
     QDoubleSpinBox *spawnTimeSpinBox;
-    QLabel *label_14;
     QLabel *label_10;
     QLabel *label_17;
     QLabel *label_11;
@@ -121,6 +121,12 @@ public:
     QPushButton *renameEmitterButton;
     QPushButton *deleteEmitterButton;
     QLineEdit *nameEmitterLineEdit;
+    QDockWidget *aboutWidget;
+    QWidget *dockWidgetContents_2;
+    QTextBrowser *textBrowser;
+    QDockWidget *helpWidget;
+    QWidget *dockWidgetContents_6;
+    QTextBrowser *textBrowser_2;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuHelp;
@@ -220,6 +226,8 @@ public:
         actionColor_Triangle->setObjectName(QStringLiteral("actionColor_Triangle"));
         actionEndColor_Triangle = new QAction(ParticleEditorClass);
         actionEndColor_Triangle->setObjectName(QStringLiteral("actionEndColor_Triangle"));
+        actionHelp = new QAction(ParticleEditorClass);
+        actionHelp->setObjectName(QStringLiteral("actionHelp"));
         centralWidget = new QWidget(ParticleEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
@@ -320,14 +328,6 @@ public:
 
         gridLayout->addWidget(label_2, 5, 1, 1, 1);
 
-        speedEndSpinBox = new QDoubleSpinBox(gridLayoutWidget);
-        speedEndSpinBox->setObjectName(QStringLiteral("speedEndSpinBox"));
-        speedEndSpinBox->setMaximum(1024);
-        speedEndSpinBox->setSingleStep(0.1);
-        speedEndSpinBox->setValue(1);
-
-        gridLayout->addWidget(speedEndSpinBox, 9, 8, 1, 1);
-
         label = new QLabel(gridLayoutWidget);
         label->setObjectName(QStringLiteral("label"));
 
@@ -348,11 +348,6 @@ public:
         spawnTimeSpinBox->setValue(0.1);
 
         gridLayout->addWidget(spawnTimeSpinBox, 13, 8, 1, 1);
-
-        label_14 = new QLabel(gridLayoutWidget);
-        label_14->setObjectName(QStringLiteral("label_14"));
-
-        gridLayout->addWidget(label_14, 9, 7, 1, 1);
 
         label_10 = new QLabel(gridLayoutWidget);
         label_10->setObjectName(QStringLiteral("label_10"));
@@ -575,6 +570,30 @@ public:
 
         formLayout->setWidget(0, QFormLayout::FieldRole, nameEmitterLineEdit);
 
+        aboutWidget = new QDockWidget(centralWidget);
+        aboutWidget->setObjectName(QStringLiteral("aboutWidget"));
+        aboutWidget->setGeometry(QRect(268, -2, 301, 115));
+        aboutWidget->setFloating(true);
+        aboutWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
+        aboutWidget->setAllowedAreas(Qt::NoDockWidgetArea);
+        dockWidgetContents_2 = new QWidget();
+        dockWidgetContents_2->setObjectName(QStringLiteral("dockWidgetContents_2"));
+        textBrowser = new QTextBrowser(dockWidgetContents_2);
+        textBrowser->setObjectName(QStringLiteral("textBrowser"));
+        textBrowser->setGeometry(QRect(2, 0, 301, 131));
+        aboutWidget->setWidget(dockWidgetContents_2);
+        helpWidget = new QDockWidget(centralWidget);
+        helpWidget->setObjectName(QStringLiteral("helpWidget"));
+        helpWidget->setGeometry(QRect(574, 0, 417, 221));
+        helpWidget->setFloating(true);
+        helpWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
+        helpWidget->setAllowedAreas(Qt::NoDockWidgetArea);
+        dockWidgetContents_6 = new QWidget();
+        dockWidgetContents_6->setObjectName(QStringLiteral("dockWidgetContents_6"));
+        textBrowser_2 = new QTextBrowser(dockWidgetContents_6);
+        textBrowser_2->setObjectName(QStringLiteral("textBrowser_2"));
+        textBrowser_2->setGeometry(QRect(2, 0, 417, 235));
+        helpWidget->setWidget(dockWidgetContents_6);
         ParticleEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(ParticleEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -803,6 +822,7 @@ public:
         menuFile->addAction(actionSave_As);
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
+        menuHelp->addAction(actionHelp);
         menuHelp->addAction(actionAbout);
         menuView->addAction(actionStats);
         menuView->addAction(actionGrid_2);
@@ -841,6 +861,7 @@ public:
         actionGrid_2->setText(QApplication::translate("ParticleEditorClass", "Grid", 0));
         actionColor_Triangle->setText(QApplication::translate("ParticleEditorClass", "Color Triangle", 0));
         actionEndColor_Triangle->setText(QApplication::translate("ParticleEditorClass", "EndColor Triangle", 0));
+        actionHelp->setText(QApplication::translate("ParticleEditorClass", "Help", 0));
         groupBox_3->setTitle(QApplication::translate("ParticleEditorClass", "Properties", 0));
         groupBox_5->setTitle(QApplication::translate("ParticleEditorClass", "Template properties", 0));
         label_15->setText(QApplication::translate("ParticleEditorClass", "Hej", 0));
@@ -857,7 +878,6 @@ public:
         label_9->setText(QApplication::translate("ParticleEditorClass", "LifeMin:", 0));
         label_2->setText(QApplication::translate("ParticleEditorClass", "SizeMin:", 0));
         label->setText(QApplication::translate("ParticleEditorClass", "Pos:", 0));
-        label_14->setText(QApplication::translate("ParticleEditorClass", "SpeedEnd:", 0));
         label_10->setText(QApplication::translate("ParticleEditorClass", "LifeMax:", 0));
         label_17->setText(QApplication::translate("ParticleEditorClass", "SpawnTime:", 0));
         label_11->setText(QApplication::translate("ParticleEditorClass", "SpeedMax:", 0));
@@ -877,6 +897,35 @@ public:
         renameEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Rename", 0));
         deleteEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Delete", 0));
         nameEmitterLineEdit->setPlaceholderText(QApplication::translate("ParticleEditorClass", "EmitterName", 0));
+        aboutWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "About", 0));
+        textBrowser->setHtml(QApplication::translate("ParticleEditorClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">Root Engine Particle Editor</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Version 0.99</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-botto"
+                        "m:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Created by Group 6 @ BTH 2014</span></p></body></html>", 0));
+        helpWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Help", 0));
+        textBrowser_2->setHtml(QApplication::translate("ParticleEditorClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">How-to</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Shortcuts:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600; font-style:italic;\">QT</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; ma"
+                        "rgin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Ctrl+N 	New project</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Ctrl+O  	Open project</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Ctrl+S  	Save project</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600; font-style:italic;\">Viewer window</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Alt+LMB  	Rotation around look-at point</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-"
+                        "indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Alt+MMB  	Move look-at point(panning)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Alt+RMB  	Zoom</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Scroll wheel 	Zoom</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p></body></html>", 0));
         menuFile->setTitle(QApplication::translate("ParticleEditorClass", "File", 0));
         menuHelp->setTitle(QApplication::translate("ParticleEditorClass", "Help", 0));
         menuView->setTitle(QApplication::translate("ParticleEditorClass", "View", 0));

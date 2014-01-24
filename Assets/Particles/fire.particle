@@ -14,6 +14,7 @@
   SPAWNTIME: 0.03
   TEXTURE: smoke
   EFFECT: Particle/Particle
+  NAME: Fire
 - POSITION: [0, 2.4, 0]
   LIFETIMEMIN: 2
   LIFETIMEMAX: 5
@@ -30,3 +31,4 @@
   SPAWNTIME: 0.03
   TEXTURE: smoke
   EFFECT: Particle/Particle
+  NAME: Smoke

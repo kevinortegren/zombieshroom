@@ -58,7 +58,7 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, &p_onCollide->GetEntities()->at(i));
+				ExportEntity(out, p_onCollide->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
 			
@@ -74,7 +74,7 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, &p_onDestroy->GetEntities()->at(i));
+				ExportEntity(out, p_onDestroy->GetEntities()->at(i));
 				out << YAML::EndMap;
 			}
 	
@@ -94,7 +94,7 @@ namespace AbilityEditorNameSpace
 
 	void Exporter::ExportEntity( YAML::Emitter& p_emitter, AbilityEntity::Entity* p_entity )
 	{
-		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name;
+		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name.toStdString();
 		p_emitter << YAML::Key << "Components";
 		p_emitter << YAML::Value << YAML::BeginSeq;
 		
@@ -121,8 +121,8 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::TRANSFORM:
 				{
 					AbilityComponents::Transform* transform = static_cast<AbilityComponents::Transform*>(p_component);
-					glm::vec3 rotation = transform->m_rotation;
-					glm::vec3 scale = transform->m_scale;
+					glm::vec3 rotation = glm::vec3(transform->m_rotation.x(), transform->m_rotation.y(), transform->m_rotation.z());
+					glm::vec3 scale = glm::vec3(transform->m_scale.x(), transform->m_scale.y(), transform->m_scale.z());
 					p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
 					
@@ -165,6 +165,8 @@ namespace AbilityEditorNameSpace
 					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
 					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
 					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
+					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
+					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 				}
 				break;
 			case AbilityComponents::ComponentType::OFFENSIVEABILITY:

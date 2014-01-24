@@ -111,16 +111,16 @@ namespace Physics
 		else if(pointer2->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
 
-		if(pointer1->m_collidedEntityId != nullptr)
+		if(pointer1->m_collidedEntities != nullptr)
 		{
 			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-				pointer1->m_collidedEntityId->insert(pointer2->m_entityId);
+				pointer1->m_collidedEntities->insert(pointer2->m_entity);
 		}
 			
-		if(pointer2->m_collidedEntityId != nullptr)
+		if(pointer2->m_collidedEntities != nullptr)
 		{
 			if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-				pointer2->m_collidedEntityId->insert(pointer1->m_entityId);
+				pointer2->m_collidedEntities->insert(pointer1->m_entity);
 		}
 
 
@@ -256,7 +256,7 @@ namespace Physics
 
 	}
 
-	int* RootPhysics::CreateHandle( unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled )
+	int* RootPhysics::CreateHandle( void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled )
 	{
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex = -1;
@@ -264,7 +264,7 @@ namespace Physics
 		userPointer->m_type = p_physicsType;
 		userPointer->m_id = new int();
 		userPointer->m_externalControlled = p_externalControlled;
-		userPointer->m_entityId = p_entityId;
+		userPointer->m_entity = p_entity;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 
 		return userPointer->m_id;
@@ -518,7 +518,7 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_type = PhysicsType::TYPE_STATIC;
 		userPointer->m_id = new int();
-		userPointer->m_entityId = -1;
+		userPointer->m_entity = nullptr;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		planeBody->setUserPointer((void*)userPointer);
 
@@ -673,7 +673,7 @@ namespace Physics
 
 	//////////////////////////////////////////////////////////////////////////
 	//Use this to add a static object to the World, i.e trees, rocks and the ground. Both position and rotation are vec3
-	int* RootPhysics::AddStaticObjectToWorld(unsigned int p_entityId)
+	int* RootPhysics::AddStaticObjectToWorld(void* p_entity)
 	{
 
 		CustomUserPointer* userPointer = new CustomUserPointer();
@@ -682,13 +682,13 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_STATIC;
 		userPointer->m_id = new int();
 		
-		userPointer->m_entityId = p_entityId;
+		userPointer->m_entity = p_entity;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 
 		return userPointer->m_id;
 	}
 
-	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation , float p_mass )
+	int* RootPhysics::AddDynamicObjectToWorld(std::string p_modelHandle,void* p_entity,  glm::vec3 p_position, glm::quat p_rotation, float p_mass )
 	{	
 		btRigidBody* objectBody = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
 		objectBody->setActivationState(DISABLE_DEACTIVATION);
@@ -705,20 +705,20 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_DYNAMIC;
 		userPointer->m_id = new int();
 		userPointer->m_modelHandle = p_modelHandle;
-		userPointer->m_entityId = p_entityId;
+		userPointer->m_entity = p_entity;
 	
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		objectBody->setUserPointer((void*)userPointer);
 		return userPointer->m_id;
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld( std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId )
+	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<void*>* p_enityCollided)
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
 		
-		player->Init(m_dynamicWorld, tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3*sizeof(int), 
-			tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
+		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
+			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
@@ -728,8 +728,8 @@ namespace Physics
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
-		userPointer->m_entityId = p_entityId;
-		userPointer->m_collidedEntityId = p_enityCollidedId;
+		userPointer->m_entity = p_entity;
+		userPointer->m_collidedEntities = p_enityCollided;
 		userPointer->m_externalControlled = true;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
@@ -808,7 +808,7 @@ namespace Physics
 		m_userPointer.push_back(userPointer);
 		userPointer->m_id = new int();
 		*(userPointer->m_id) = m_userPointer.size()-1;
-		userPointer->m_entityId = p_abilityInfo.m_entityId;
+		userPointer->m_entity = p_abilityInfo.m_entity;
 		userPointer->m_externalControlled = false;
 		body->setUserPointer((void*)userPointer);
 
@@ -1045,9 +1045,9 @@ namespace Physics
 		
 	}
 
-	std::set<unsigned int>* RootPhysics::GetCollisionVector( int p_objectHandle )
+	std::set<void*>* RootPhysics::GetCollisionVector( int p_objectHandle )
 	{
-		return (m_userPointer.at(p_objectHandle)->m_collidedEntityId);
+		return (m_userPointer.at(p_objectHandle)->m_collidedEntities);
 	}
 
 
@@ -1229,9 +1229,9 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId )
+	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<void*>* p_enityCollidedId )
 	{
-		m_userPointer.at(p_objectHandle)->m_collidedEntityId = p_enityCollidedId;
+		m_userPointer.at(p_objectHandle)->m_collidedEntities = p_enityCollidedId;
 	}
 
 	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )

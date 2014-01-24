@@ -77,5 +77,10 @@ void main() {
 
 	float visibility = texture(g_ShadowDepth, vec3(shadowCoord.xy, shadowCoord.z));
 
+	if(shadowCoord.x <= 0 || shadowCoord.x >= 1 || shadowCoord.y <= 0 || shadowCoord.y >= 1)
+	{
+		visibility = 1;
+	}
+
 	out_Color *= visibility;
 }

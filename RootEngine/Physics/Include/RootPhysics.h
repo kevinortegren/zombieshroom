@@ -42,7 +42,7 @@ namespace RootEngine
 		}
 		struct AbilityPhysicsInfo
 		{
-			int m_entityId; 
+			void* m_entity; 
 			float m_radius;
 			float m_height; 
 			glm::vec3 m_position; 
@@ -62,14 +62,14 @@ namespace RootEngine
 		{
 			PhysicsType::PhysicsType m_type;
 			int m_vectorIndex;
-			unsigned int m_entityId; //My entity id
-			std::set<unsigned int>* m_collidedEntityId; //List of all entities collided with since last update
+			void* m_entity; //My entity
+			std::set<void*>* m_collidedEntities; //List of all entities collided with since last update
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			std::string m_modelHandle;
 			bool m_externalControlled;
 			CustomUserPointer()
 			{
-				m_collidedEntityId = nullptr;
+				m_collidedEntities = nullptr;
 			}
 
 			~CustomUserPointer()
@@ -99,13 +99,13 @@ namespace RootEngine
 
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
-			virtual int* AddStaticObjectToWorld( unsigned int p_entityId) = 0; ///Legacy func, will be removed before release
-			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;///Legacy func, will be removed before release
-			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId) = 0;///Legacy func, will be removed before release
+			virtual int* AddStaticObjectToWorld( void* p_entity) = 0; ///Legacy func, will be removed before release
+			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, void* p_entity,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;///Legacy func, will be removed before release
+			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<void*>* p_enityCollided) = 0;///Legacy func, will be removed before release
 			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;///Legacy func, will be removed before release
 
 			///Creates a handle
-			virtual int* CreateHandle(unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
+			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
 
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -121,7 +121,7 @@ namespace RootEngine
 			virtual float GetMaxSpeed(int p_objectHandle) = 0;
 			virtual float GetStepHeight(int p_objectHandle) = 0;
 			virtual float GetModelHeight(int p_objectHandle) = 0;
-			virtual std::set<unsigned int>* GetCollisionVector(int p_objectHandle) = 0;
+			virtual std::set<void*>* GetCollisionVector(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
 			//Setters
@@ -131,7 +131,7 @@ namespace RootEngine
 			virtual void SetGravity(int p_objectHandle, glm::vec3 p_gravity) = 0;
 			virtual void SetPosition(int p_objectHandle, glm::vec3 p_position) = 0;
 			virtual void Move(int p_objectHandle , glm::vec3 p_position) = 0;
-			virtual void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId) = 0;
+			virtual void SetCollisionContainer(int p_objectHandle ,std::set<void*>* p_enityCollidedId) = 0;
 
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
@@ -161,7 +161,7 @@ namespace RootEngine
 
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 
-			int* CreateHandle(unsigned int p_entityId, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
+			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
 			//Binds
 			void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);
@@ -171,9 +171,9 @@ namespace RootEngine
 			void BindHullShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld);
 
 
-			int* AddStaticObjectToWorld( unsigned int p_entityId);
-			int* AddDynamicObjectToWorld(std::string p_modelHandle,unsigned int p_entityId,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
-			int* AddPlayerObjectToWorld(std::string p_modelHandle,unsigned int p_entityId, glm::vec3 p_position, glm::quat p_rotation, float p_mass,float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<unsigned int>* p_enityCollidedId);
+			int* AddStaticObjectToWorld( void* p_entityId);
+			int* AddDynamicObjectToWorld(std::string p_modelHandle,void* p_entity,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<void*>* p_enityCollided);
 			int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo);
 
 			//Getters
@@ -184,7 +184,7 @@ namespace RootEngine
 			float GetMaxSpeed(int p_objectHandle);
 			float GetStepHeight(int p_objectHandle);
 			float GetModelHeight(int p_objectHandle);
-			std::set<unsigned int>* GetCollisionVector(int p_objectHandle);
+			std::set<void*>* GetCollisionVector(int p_objectHandle);
 			std::string GetPhysicsModelHandle(int p_objectHandle);
 			glm::quat GetOrientation(int p_objectHandle);
 			//Setters
@@ -194,7 +194,7 @@ namespace RootEngine
 			void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation);
 			void SetPosition(int p_objectHandle, glm::vec3 p_position);
 			void Move(int p_objectHandle , glm::vec3 p_position);
-			void SetCollisionContainer(int p_objectHandle ,std::set<unsigned int>* p_enityCollidedId);
+			void SetCollisionContainer(int p_objectHandle ,std::set<void*>* p_enityCollidedId);
 			void RemoveObject(int p_objectHandle);
 			void RemoveAll();
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }

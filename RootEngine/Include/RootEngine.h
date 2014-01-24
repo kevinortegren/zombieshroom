@@ -8,7 +8,6 @@
 
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
-#include <RootEngine/Network/Include/NetworkManager.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
@@ -72,7 +71,7 @@ namespace RootEngine
 		Profiling m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
 		DebugOverlay m_debugOverlay;
-		Network::NetworkManager*		m_network;
+		Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface* m_inputSys;
 		Physics::PhysicsInterface* m_physics;

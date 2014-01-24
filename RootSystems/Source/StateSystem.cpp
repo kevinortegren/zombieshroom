@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "StateSystem.h"
 
 
@@ -35,4 +36,5 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 
 	state->PrevPosition = transform->m_position;
 }
+#endif
 

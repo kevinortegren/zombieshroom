@@ -22,7 +22,7 @@ namespace Render
 		particles[0].m_type			= 0.0f;
 		particles[0].m_color		= glm::vec4(0.0f);
 		particles[0].m_accel		= glm::vec3(0.0f);
-
+		
 		m_meshes[0] = p_renderer->CreateMesh();
 		m_meshes[0]->SetPrimitiveType(GL_POINTS);
 		m_meshes[0]->SetTransformFeedback();

@@ -3,9 +3,31 @@
 #include <stdint.h>
 #include <string>
 #include <RakNet/BitStream.h>
+#include <RootSystems/Include/Network/Messages.h>
 
 namespace RootSystems
 {
+	/*
+	struct ServerInfoInternal
+	{
+		RakNet::RakString Name;
+		RakNet::RakString MapFile;
+		uint8_t NumPlayers;
+		uint8_t MaxPlayers;
+		bool PasswordProtected;
+		char IP[16];
+		USHORT Port;
+	};
+	*/
+
+	struct ServerInfoInternal
+	{
+		RootForce::NetworkMessage::ServerInformation Information;
+		std::string IP;
+		uint16_t Port;
+	};
+
+	/*
 	static const int SERVER_INFO_NAME_SIZE = 128;
 	static const int SERVER_INFO_MAP_FILE_SIZE = 64;
 
@@ -74,4 +96,5 @@ namespace RootSystems
 			Port = p_packet->systemAddress.GetPort();
 		}
 	};
+	*/
 }

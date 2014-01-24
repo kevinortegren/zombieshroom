@@ -15,7 +15,7 @@ namespace RootForce
 
 	struct CollisionResponder : public ECS::Component<CollisionResponder>
 	{
-		std::set<unsigned int> m_collidedEntityId;
+		std::set<void*> m_collidedEntities;
 	};
 
 	class CollisionSystem : public ECS::EntitySystem

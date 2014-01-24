@@ -1,32 +1,18 @@
 #pragma once
 
-//#include <RootEngine/Include/Logging/Logging.h>
-//#include <RootEngine/Include/ResourceManager/ResourceManager.h>
-//#include <RootEngine/Render/Include/Renderer.h>
-//#include <RootEngine/Include/Profiling.h>
-//#ifndef COMPILE_LEVEL_EDITOR
-//#include <RootEngine/Network/Include/NetworkManager.h>
-//#include <RootEngine/GUI/Include/guiInstance.h>
-//#include <RootEngine/Physics/Include/RootPhysics.h>
-//#include <RootEngine/Include/DebugOverlay/DebugOverlayInterface.h>
-//#include <RootEngine/InputManager/Include/InputManager.h>
-//#include <RootEngine/Script/Include/ScriptManager.h>
-//#include <RootEngine/Include/ConfigManager.h>
-//#endif
-
 namespace Render
 {
 	class RendererInterface;
 }
 
 #ifndef COMPILE_LEVEL_EDITOR
-namespace Network
-{
-	class NetworkInterface;
-}
 
 namespace RootEngine
 {
+	namespace Network
+	{
+		class NetworkInterface;
+	}
 	namespace GUISystem
 	{
 		class GUISystemInterface;

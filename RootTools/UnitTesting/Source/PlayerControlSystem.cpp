@@ -1,10 +1,12 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(PlayerControlSystem, Process)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	// Initialize the keybindings we need for the test(not the complete list that is normally used)
 	std::vector<RootForce::Keybinding> keybindings(6);
@@ -47,9 +49,18 @@ TEST(PlayerControlSystem, Process)
 	system->SetPhysicsInterface(g_engineContext.m_physics);
 	system->SetKeybindings(keybindings);
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
+	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetGlobalNumber("IsClient", true);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
-		RootEngine::InputManager::InputInterface* ii = g_engineContext.m_inputSys;
+
+	RootEngine::InputManager::InputInterface* ii = g_engineContext.m_inputSys;
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 

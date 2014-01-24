@@ -8,7 +8,7 @@
     - name: Particle_Update
       bindings:   
         - name: PerFrame
-          slot: 5
+          slot: 0
         - name: PerObject
           slot: 1
       textures:

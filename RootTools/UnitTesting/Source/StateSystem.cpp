@@ -2,10 +2,12 @@
 #include <RootSystems/Include/StateSystem.h>
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(StateSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::StateSystem* system = new RootSystems::StateSystem(world, &g_engineContext);
@@ -33,7 +35,14 @@ TEST(StateSystem, ProcessEntity)
 	RootSystems::ActionSystem* aSystem = new RootSystems::ActionSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(aSystem, "ActionSystem");
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
+	// Call the OnCreate script
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+	
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::StateComponent* state = world->GetEntityManager()->GetComponent<RootForce::StateComponent>(testity);

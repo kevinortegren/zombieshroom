@@ -82,7 +82,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Script already exists: %s.lua", p_scriptName.c_str());
 			return p_scriptName;
 		}
 		
@@ -90,6 +90,9 @@ namespace RootEngine
 
 	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
 	{
+		// Do not reload global variables.
+		if (p_scriptName == "Global.lua")
+			return p_scriptName;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: '%s.lua', it may already exist in Resource Manager!", p_scriptName.c_str());
 		m_context->m_script->LoadScript(p_scriptName + ".lua");
 		m_scripts[p_scriptName] = p_scriptName;
@@ -163,11 +166,12 @@ namespace RootEngine
 			Model* model = new Model();
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			model->m_meshes[1] = nullptr;
 			
 			if(model)
 			{
 				m_models[p_path] = model;
-				return m_models[p_path];
+				return m_models.find(p_path)->second;
 			}
 			else
 			{
@@ -318,6 +322,13 @@ namespace RootEngine
 			return "";
 		}
 	}
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
+		}
+	}
 #endif
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)
 	{
@@ -354,11 +365,5 @@ namespace RootEngine
 		return m_workingDirectory;
 	}
 
-	void ResourceManager::ReloadAllScripts()
-	{
-		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
-		{
-			ForceLoadScript((*itr).second);
-		}
-	}
+
 }

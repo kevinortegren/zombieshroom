@@ -13,6 +13,7 @@
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world; // because LUA needs it
+RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace UnitTesting
 {

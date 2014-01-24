@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "RespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
@@ -59,6 +60,11 @@ namespace RootSystems
 		unsigned numspawns = 0;
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
 			;
+		if(numspawns==0)
+		{
+			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "No spawnpoints found!");
+			return nullptr;
+		}
 		unsigned chosenspwn = rand()%numspawns;
 		numspawns = 0;
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
@@ -69,6 +75,7 @@ namespace RootSystems
 				y = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
 				z = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
 				m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %f %f %f",chosenspwn,x,y,z );
+
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}
 
@@ -77,3 +84,4 @@ namespace RootSystems
 	}
 
 }
+#endif

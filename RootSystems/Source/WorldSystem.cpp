@@ -42,6 +42,7 @@ namespace RootForce
 
 		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
+		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
@@ -62,7 +63,7 @@ namespace RootForce
 			Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 
 			//collision->m_handle = m_engineContext->m_physics->AddStaticObjectToWorld(entity->GetId());
-			collision->m_handle = m_engineContext->m_physics->CreateHandle(entity->GetId(), RootEngine::Physics::PhysicsType::TYPE_STATIC, false);
+			collision->m_handle = m_engineContext->m_physics->CreateHandle(entity, RootEngine::Physics::PhysicsType::TYPE_STATIC, false);
 			m_engineContext->m_physics->BindMeshShape(*(collision->m_handle), collision->m_meshHandle,
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}

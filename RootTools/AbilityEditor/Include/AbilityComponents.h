@@ -4,6 +4,16 @@
 #include <vector>
 #include <map>
 #include <QtCore/QStringList>
+#include <QtPropertyBrowser/QtVariantProperty>
+#include <QtPropertyBrowser/QtVariantPropertyManager>
+#include <QtPropertyBrowser/QtTreePropertyBrowser>
+#include <QtPropertyBrowser/QtVariantEditorFactory>
+#include <QtPropertyBrowser/QtEnumPropertyManager>
+#include <QtPropertyBrowser/QtEnumEditorFactory>
+#include <Qt/QtGui/QVector3D>
+#include <Qt/QtWidgets/QMessageBox>
+#include <Qt/QtWidgets/QSpinBox>
+
 namespace AbilityEditorNameSpace
 {
 
@@ -48,26 +58,102 @@ namespace AbilityEditorNameSpace
 			{
 				m_type = p_type;
 			}
+			virtual void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;			
+			virtual void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;
 		};
 	
 		////////////////////////////////////////////////////////On create components ////////////////////////////////////////////////////////
 		struct Transform: MainComponent
 		{ 
-			glm::vec3 m_rotation;
-			glm::vec3 m_scale;
-			Transform(glm::vec3 p_rotation = glm::vec3(0.0f), glm::vec3 p_scale = glm::vec3(1.0f)): MainComponent(ComponentType::TRANSFORM)
+			QVector3D m_rotation;
+			QVector3D m_scale;
+			Transform(QVector3D p_rotation = QVector3D(0,0,0), QVector3D p_scale = QVector3D(1,1,1)): MainComponent(ComponentType::TRANSFORM)
 			{
 				m_rotation = p_rotation;
 				m_scale = p_scale;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* rotation, *scale , *x, *y, *z;
+				QList<QtProperty*> list;
+				QString combinedValue;
+				//Show rotation vector
+				rotation = p_propMan->addProperty(QVariant::String, "Rotation");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_rotation.x());
+				p_propMan->setValue(y, m_rotation.y());
+				p_propMan->setValue(z, m_rotation.z());
+				rotation->addSubProperty(x);
+				rotation->addSubProperty(y);
+				rotation->addSubProperty(z);
+				list = rotation->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(rotation,combinedValue);
+
+				//show Scale vector
+				scale = p_propMan->addProperty(QVariant::String, "Scale");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_scale.x());
+				p_propMan->setValue(y, m_scale.y());
+				p_propMan->setValue(z, m_scale.z());		
+				scale->addSubProperty(x);
+				scale->addSubProperty(y);
+				scale->addSubProperty(z);
+				list = scale->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(scale,combinedValue);
+
+				//Add to browser widget
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(rotation);
+				p_propBrows->addProperty(scale);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
+				subprops = props.at(0)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_rotation[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
+				subprops = props.at(1)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_scale[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
+			
+
 			}
 		};
 
 		struct Collision : MainComponent
 		{
-			//bool m_externallyControlled;
-			Collision() : MainComponent(ComponentType::COLLISION)
+			bool m_collidesWithWorld;
+			Collision(bool p_colWithWorld = true) : MainComponent(ComponentType::COLLISION)
 			{
+				m_collidesWithWorld = p_colWithWorld;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* collidesWithWorld;
 
+				collidesWithWorld = p_propMan->addProperty(QVariant::Bool, "Collides with world" );
+				p_propMan->setValue(collidesWithWorld, m_collidesWithWorld);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(collidesWithWorld);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_collidesWithWorld = props.at(0)->valueText().compare("True") == 0 ? true : false;
 			}
 		};
 
@@ -92,6 +178,41 @@ namespace AbilityEditorNameSpace
 				m_materialNormal = p_materialNormal;
 				m_materialEffect = p_materialEffect;
 			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* modelname, *material, *diffuse, *specular, *normal, *effect ;
+
+				modelname = p_propMan->addProperty(QVariant::String, "Model name" );
+				p_propMan->setValue(modelname, m_modelName.c_str());
+				material = p_propMan->addProperty(QVariant::String, "Material name");
+				p_propMan->setValue(material, m_material.c_str());
+				diffuse = p_propMan->addProperty(QVariant::String, "Diffuse name");
+				p_propMan->setValue(diffuse, m_materialDiffuse.c_str());
+				specular = p_propMan->addProperty(QVariant::String, "Specular name");
+				p_propMan->setValue(specular, m_materialSpecular.c_str());
+				normal = p_propMan->addProperty(QVariant::String, "normal name");
+				p_propMan->setValue(normal,m_materialNormal.c_str());
+				effect = p_propMan->addProperty(QVariant::String, "Effect name");
+				p_propMan->setValue(effect, m_materialEffect.c_str());
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(modelname);
+				p_propBrows->addProperty(material);
+				p_propBrows->addProperty(diffuse);
+				p_propBrows->addProperty(specular);
+				p_propBrows->addProperty(normal);
+				p_propBrows->addProperty(effect);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_modelName = props.at(0)->valueText().toStdString();
+				m_material = props.at(1)->valueText().toStdString();
+				m_materialDiffuse = props.at(2)->valueText().toStdString();
+				m_materialSpecular = props.at(3)->valueText().toStdString();
+				m_materialNormal = props.at(4)->valueText().toStdString();
+				m_materialEffect =props.at(5)->valueText().toStdString();
+			}
 		};
 
 		struct CollisionShape : MainComponent
@@ -101,19 +222,73 @@ namespace AbilityEditorNameSpace
 				CONE,
 				CYLINDER,
 				SPHERE,
-				MESH
+				MESH,
+				END_OF_ENUM
 			};
 			
+			std::map<shape, QString> m_enumToText;
 			shape m_CollisionShape;
 			float m_radius;
 			float m_height;
 			std::string m_collisionModelShapeName;
-			CollisionShape(shape p_collisionShape = shape::SPHERE, float p_radius = 0.0f, float p_height = 0.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
+			CollisionShape(shape p_collisionShape = shape::CONE, float p_radius = 0.0f, float p_height = 0.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
 			{
 				m_CollisionShape = p_collisionShape;
 				m_radius = p_radius;
 				m_height = p_height;
 				m_collisionModelShapeName = p_collisionModelShapeName;
+				m_enumToText[CONE] = "Cone";
+				m_enumToText[CYLINDER] = "Cylinder";
+				m_enumToText[SPHERE] = "Sphere";
+				m_enumToText[MESH] = "Mesh";
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* radius, *height, *collisionModelname;	
+				QtProperty* collisionShape;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(shape)i];
+				}
+				collisionShape = enumMan->addProperty("Collision shape");
+				enumMan->setEnumNames(collisionShape,enumTypes);
+				enumMan->setValue(collisionShape, m_CollisionShape);
+				//collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
+				//p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
+				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere or Mesh");
+				radius = p_propMan->addProperty(QVariant::Double, "Radius");
+				p_propMan->setValue(radius, m_radius);
+				height = p_propMan->addProperty(QVariant::Double, "Height");
+				p_propMan->setValue(height, m_height);
+				collisionModelname = p_propMan->addProperty(QVariant::String, "CollisionModel name");
+				p_propMan->setValue(collisionModelname, m_collisionModelShapeName.c_str());
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
+				p_propBrows->addProperty(collisionShape);
+				p_propBrows->addProperty(radius);
+				p_propBrows->addProperty(height);
+				p_propBrows->addProperty(collisionModelname);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				bool foundShape = false;
+				std::map<shape, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
+				{
+					if(it->second == props.at(0)->valueText())
+					{
+						 m_CollisionShape = it->first;
+					}
+				}
+				m_radius = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_height = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_collisionModelShapeName = props.at(3)->valueText().toStdString();
+				
 			}
 
 		};
@@ -124,7 +299,27 @@ namespace AbilityEditorNameSpace
 			float m_size;
 			AbilityParticle(float p_size = 1.0f) : MainComponent(ComponentType::ABILITYPARTICLE)
 			{
+				m_particleName = "";
 				m_size = p_size;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* particleName, *size;
+
+				particleName = p_propMan->addProperty(QVariant::String, "ParticleName" );
+				p_propMan->setValue(particleName, m_particleName.c_str());
+				size = p_propMan->addProperty(QVariant::Double, "Size");
+				p_propMan->setValue(size, m_size);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(particleName);
+				p_propBrows->addProperty(size);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_particleName = props.at(0)->valueText().toStdString();
+				m_size = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};
 
@@ -132,10 +327,59 @@ namespace AbilityEditorNameSpace
 		{
 			float m_speed;
 			float m_mass;
-			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f) : MainComponent(ComponentType::PHYSICSCONTROLLED)
+			QVector3D m_gravity;
+			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f)) : MainComponent(ComponentType::PHYSICSCONTROLLED)
 			{
 				m_speed = p_speed;
 				m_mass = p_mass;
+				m_gravity =	p_gravity;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* speed, *mass, *gravity, *x, *y, *z;
+				QList<QtProperty*> list;
+				QString combinedValue;
+				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
+				p_propMan->setValue(speed, m_speed);
+				mass = p_propMan->addProperty(QVariant::Double, "Mass");
+				p_propMan->setValue(mass, m_mass);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(mass);
+				p_propBrows->addProperty(speed);
+
+				//Show gravity vector
+				gravity = p_propMan->addProperty(QVariant::String, "Gravity");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_gravity.x());
+				p_propMan->setValue(y, m_gravity.y());
+				p_propMan->setValue(z, m_gravity.z());
+				gravity->addSubProperty(x);
+				gravity->addSubProperty(y);
+				gravity->addSubProperty(z);
+				list = gravity->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(gravity,combinedValue);
+				p_propBrows->addProperty(gravity);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				//QList<QVariant*> props, subprops;
+
+				props = p_propBrows->properties();
+				//m_mass = atof(props.at(0)->valueText().toStdString().c_str());
+				//m_speed = atof(props.at(1)->valueText().toStdString().c_str());
+				m_mass = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_speed = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7    <---- SKRÄPKommentar
+				subprops = props.at(2)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_gravity[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
 			}
 		};
 
@@ -149,6 +393,26 @@ namespace AbilityEditorNameSpace
 				m_damage = p_damage;
 				m_knockbackPower = p_knockbackPower;
 			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* damage, *knockbackpower;
+
+				damage = p_propMan->addProperty(QVariant::Double, "Damage" );
+				p_propMan->setValue(damage, m_damage);
+				knockbackpower = p_propMan->addProperty(QVariant::Double, "KnockbackPower" );
+				p_propMan->setValue(knockbackpower, m_knockbackPower);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(damage);
+				p_propBrows->addProperty(knockbackpower);
+
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_damage = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_knockbackPower = p_propMan->variantProperty(props.at(1))->value().toFloat();
+			}
 		};
 
 		struct Explosive : MainComponent
@@ -158,6 +422,22 @@ namespace AbilityEditorNameSpace
 			{
 				m_radius = p_radius;
 			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* radius;
+
+				radius = p_propMan->addProperty(QVariant::String, "Radius" );
+				p_propMan->setValue(radius, m_radius);
+			
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(radius);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_radius = p_propMan->variantProperty(props.at(0))->value().toFloat();
+			}
 		};	
 	}
 	namespace AbilityEntity
@@ -165,24 +445,27 @@ namespace AbilityEditorNameSpace
 		//The one struct to rule them all
 		struct Entity
 		{
-			std::string m_name;
+			QString m_name;
 			std::vector<AbilityComponents::MainComponent*>* m_components;
-			std::map<QString, int> m_nameToEnumMapper;
-			Entity(std::string p_name)
+			std::map<QString, AbilityComponents::ComponentType::ComponentType> m_nameToEnumMapper;
+			Entity(QString p_name)
 			{
 				for(int i = 0 ; i < AbilityComponents::ComponentType::END_OF_ENUM; i++)
 				{
-					m_nameToEnumMapper[AbilityComponents::g_componentNameList.m_compNames.at(i)] = i;
+					m_nameToEnumMapper[AbilityComponents::g_componentNameList.m_compNames.at(i)] = (AbilityComponents::ComponentType::ComponentType)i;
 				}
 				m_name = p_name;
 				m_components = new std::vector<AbilityComponents::MainComponent*>();
 			}
 			~Entity()
 			{
-				for(unsigned int i = m_components->size() -1; i > 0; i --)
+				if(m_components->size() > 0)
 				{
-					delete m_components->at(i);
-					m_components->pop_back();
+					for(unsigned int i = m_components->size() -1 ; i > 0; i --)
+					{
+						delete m_components->at(i);
+						m_components->pop_back();
+					}
 				}
 				delete m_components;
 			}
@@ -264,6 +547,62 @@ namespace AbilityEditorNameSpace
 						m_components->erase(m_components->begin() + i);
 						break;
 					}
+			}
+			bool DoesComponentExist(QString p_componentName)
+			{
+				return DoesComponentExist((AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper.at(p_componentName));
+			}
+			bool DoesComponentExist(AbilityComponents::ComponentType::ComponentType p_type)
+			{
+				for(unsigned int i = 0; i < m_components->size(); i++)
+				{
+					if(m_components->at(i)->m_type == p_type)
+						return true;
+				}
+				return false;
+			}
+			void ViewComponentData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory ,  QString p_name)
+			{
+				AbilityComponents::ComponentType::ComponentType type = (AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper[p_name];
+				for(unsigned int i = 0 ; i < m_components->size(); i++)
+				{
+					if(m_components->at(i)->m_type == type)
+					{
+						m_components->at(i)->ViewData(p_propMan, p_propBrows, p_factory);
+					}
+				}
+			}
+			void SaveComponentData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory ,  QString p_name)
+			{
+				AbilityComponents::ComponentType::ComponentType type = (AbilityComponents::ComponentType::ComponentType)m_nameToEnumMapper[p_name];
+				for(unsigned int i = 0 ; i < m_components->size(); i++)
+				{
+					if(m_components->at(i)->m_type == type)
+					{
+						m_components->at(i)->SaveData(p_propMan,p_propBrows, p_factory);
+					}
+				}
+			}
+			QString GetComponentNameFromId(unsigned int p_id)
+			{
+				AbilityComponents::ComponentType::ComponentType findType = m_components->at(p_id)->m_type;
+				std::map<QString, AbilityComponents::ComponentType::ComponentType>::const_iterator it;
+				for(it = m_nameToEnumMapper.begin(); it != m_nameToEnumMapper.end(); ++it)
+				{
+					if(it->second == findType)
+					{
+						return it->first;
+					}
+				}
+				return "";
+			}
+			void RemoveAllComponents()
+			{
+				for(unsigned int i = 0; i < m_components->size(); i++)
+				{	
+					delete m_components->at(i);
+					m_components->erase(m_components->begin() + i);
+				}
 			}
 		};
 	}

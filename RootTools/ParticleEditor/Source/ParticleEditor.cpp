@@ -4,6 +4,8 @@ ParticleEditor::ParticleEditor(QWidget *parent)
 	: QMainWindow(parent), m_running(true), m_showGrid(true)
 {
 	ui.setupUi(this);
+	ui.aboutWidget->hide();
+	ui.helpWidget->hide();
 }
 
 ParticleEditor::~ParticleEditor()
@@ -16,6 +18,7 @@ ParticleEditor::~ParticleEditor()
 void ParticleEditor::ConnectSignalsAndSlots()
 {
 	connect(ui.actionExit,			SIGNAL(triggered()),						this, SLOT(MenuExit()));
+	connect(ui.actionHelp,			SIGNAL(triggered()),						this, SLOT(MenuHelpHelp()));
 	connect(ui.actionAbout,			SIGNAL(triggered()),						this, SLOT(MenuHelpAbout()));
 	connect(ui.actionNew,			SIGNAL(triggered()),						this, SLOT(MenuNew()));
 	connect(ui.actionOpen,			SIGNAL(triggered()),						this, SLOT(MenuOpen()));
@@ -97,6 +100,14 @@ void ParticleEditor::Init()
 
 	ui.endcolorDockWidget->hide();
 	ui.colorDockWidget->hide();
+
+	//Add new tab
+	m_particleTab->AddTab();
+
+	m_savePath = "";
+
+	Saved();
+
 }
 
 bool ParticleEditor::CheckExit()
@@ -106,21 +117,13 @@ bool ParticleEditor::CheckExit()
 
 void ParticleEditor::closeEvent( QCloseEvent *event )
 {
-	//Give the user a choice to abort the close event with a message box
-	QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit Particle Editor",
-		tr("Sure you want to quit Particle Editor?\nYou won't be able to edit or view particle systems if you do."),
-		QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-		QMessageBox::Yes);
-	if (resBtn != QMessageBox::Yes)
-	{
+	if(SaveWarningDialog() == QMessageBox::Cancel)
 		event->ignore();
-	} 
-	else 
+	else
 	{
 		event->accept();
 		m_running = false;
 	}
-	
 }
 
 void ParticleEditor::Update( float p_dt )
@@ -146,8 +149,11 @@ void ParticleEditor::MenuExit()
 
 void ParticleEditor::MenuNew()
 {
-	//Add new tab
-	m_particleTab->AddTab();
+	
+	if(SaveWarningDialog() == QMessageBox::Cancel)
+		return;
+
+	ClearScene();
 
 	//Enable the New Emitter button 
 	ui.newEmitterButton->setEnabled(true);
@@ -169,10 +175,20 @@ void ParticleEditor::MenuNew()
 	{
 		m_selectedEntityIndex = 0; 
 	}
+	m_particleTab->setTabText(0, "Untitled project 0");
+	Saved();
 }
 
 void ParticleEditor::MenuOpen()
 {
+	if(SaveWarningDialog() == QMessageBox::Cancel)
+		return;
+
+	QString fullFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("PARTICLE-file (*.particle)"));
+	if(fullFileName.compare("") == 0)
+		return;
+
+	ClearScene();
 	//Enable the New Emitter button 
 	ui.newEmitterButton->setEnabled(true);
 
@@ -191,14 +207,13 @@ void ParticleEditor::MenuOpen()
 		m_selectedEntityIndex = 0; 
 	}
 
-	QString fullFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("PARTICLE-file (*.particle)"));
-
-	ImportParticleEmitter(fullFileName.toStdString(), e, t);
+	
+	ImportParticleEmitter(fullFileName.toStdString(), e, t, true);
 
 	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
 	{
 		//Add an item representing the emitter to the emitter list with the specified name
-		QListWidgetItem* tempItem = new QListWidgetItem("System" + QString::number(i));
+		QListWidgetItem* tempItem = new QListWidgetItem(QString::fromStdString(e->m_particleSystems[i].m_name));
 		ui.listWidget->addItem(tempItem);
 		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter created: %s", ui.nameEmitterLineEdit->text().toStdString().c_str());
 
@@ -215,57 +230,23 @@ void ParticleEditor::MenuOpen()
 			ui.listWidget->setCurrentItem(tempItem);
 		}
 	}
-	
+
+	QFileInfo fileinfo(fullFileName);
+	m_particleTab->setTabText(0, fileinfo.baseName());
+	Saved();
 }
 
 void ParticleEditor::MenuSave()
 {
-
+	if(m_savePath.compare("") == 0)
+		ManuSaveAs();
+	else
+		ExportParticle(QString::fromStdString(m_savePath));
 }
 
 void ParticleEditor::ManuSaveAs()
 {
-	ECS::Entity* entity = m_emitterEntities.at(0);
-	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
-
-	QString fullFileName = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("PARTICLE-file (*.particle)"));
-	QFile file(fullFileName);
-	YAML::Emitter emitter;
-
-	emitter << YAML::BeginSeq;
-
-	for(auto itr = e->m_particleSystems.begin(); itr != e->m_particleSystems.end(); ++itr)
-	{
-		// Export Particle systems
-		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_position.x << (*itr).m_position.y << (*itr).m_position.z << YAML::EndSeq; 
-		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr).m_lifeTimeMin;
-		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr).m_lifeTimeMax;
-		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr).m_speedMin;
-		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr).m_speedMax;
-		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMin.x << (*itr).m_sizeMin.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMax.x << (*itr).m_sizeMax.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeEnd.x << (*itr).m_sizeEnd.y << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_color.r << (*itr).m_color.g << (*itr).m_color.b << (*itr).m_color.a << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_colorEnd.r << (*itr).m_colorEnd.g << (*itr).m_colorEnd.b << (*itr).m_colorEnd.a << YAML::EndSeq; 
-		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_gravity.x << (*itr).m_gravity.y << (*itr).m_gravity.z << YAML::EndSeq; 
-		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_direction.x << (*itr).m_direction.y << (*itr).m_direction.z << YAML::EndSeq; 
-		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr).m_spread;
-		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr).m_spawnTime;
-		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
-		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr).m_material->m_effect);
-		emitter << YAML::EndMap;
-	}
-	
-	emitter << YAML::EndSeq;
-
-	//Write exported yaml to file
-	if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		QTextStream out(&file);
-		out << emitter.c_str();
-		file.close();
-	}
+	ExportParticle(QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("PARTICLE-file (*.particle)")));
 }
 
 void ParticleEditor::MenuViewStats()
@@ -275,7 +256,7 @@ void ParticleEditor::MenuViewStats()
 
 void ParticleEditor::MenuHelpAbout()
 {
-
+	ui.aboutWidget->show();
 }
 
 void ParticleEditor::NewEmitter()
@@ -315,6 +296,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_direction = glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_spread	= 1.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime = 0.05f;
+	e->m_particleSystems[e->m_particleSystems.size()-1].m_name		= ui.nameEmitterLineEdit->text().toStdString();
 
 	//Map data to params list for buffering
 	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_position;
@@ -353,6 +335,7 @@ void ParticleEditor::NewEmitter()
 
 	//Empty the name field
 	ui.nameEmitterLineEdit->setText("");
+	Changed();
 }
 
 void ParticleEditor::DeleteEmitter()
@@ -392,6 +375,7 @@ void ParticleEditor::DeleteEmitter()
 		//Select first emitter
 		EmitterSelected(ui.listWidget->item(0));
 	}
+	Changed();
 }
 
 void ParticleEditor::RenameEmitter()
@@ -410,6 +394,7 @@ void ParticleEditor::RenameEmitter()
 		temp->setText(ui.nameEmitterLineEdit->text());
 		ui.nameEmitterLineEdit->setText("");
 	}
+	Changed();
 }
 
 void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
@@ -472,18 +457,21 @@ void ParticleEditor::PositionXChanged( double p_x )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_position.x = (float)p_x;
+	Changed();
 }
 
 void ParticleEditor::PositionYChanged( double p_y )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_position.y = (float)p_y;
+	Changed();
 }
 
 void ParticleEditor::PositionZChanged( double p_z )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_position.z = (float)p_z;
+	Changed();
 }
 
 void ParticleEditor::SizeMinXChanged( double p_val )
@@ -491,6 +479,7 @@ void ParticleEditor::SizeMinXChanged( double p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMin.x = (float)p_val;
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMin.y = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::SizeMaxXChanged( double p_val )
@@ -498,6 +487,7 @@ void ParticleEditor::SizeMaxXChanged( double p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.x = (float)p_val;
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.y = (float)p_val;
+	Changed();
 }
 
 
@@ -506,78 +496,91 @@ void ParticleEditor::SizeEndXChanged( double p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.x = (float)p_val;
 	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.y = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::LifeTimeMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMin = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::LifeTimeMaxChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMax = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::GravityXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.x = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::GravityYChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.y = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::GravityZChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.z = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::DirectionXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.x = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::DirectionYChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.y = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::DirectionZChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.z = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::SpeedMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_speedMin = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::SpeedMaxChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_speedMax = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::SpreadChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_spread = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::SpawnTimeChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_spawnTime = (float)p_val;
+	Changed();
 }
 
 void ParticleEditor::ColorChanged( const QColor& p_val )
@@ -595,6 +598,7 @@ void ParticleEditor::ColorChanged( const QColor& p_val )
 	ui.colorSpinBoxR->setValue(red);
 	ui.colorSpinBoxG->setValue(green);
 	ui.colorSpinBoxB->setValue(blue);
+	Changed();
 }
 
 void ParticleEditor::ColorEndChanged( const QColor& p_val )
@@ -612,6 +616,7 @@ void ParticleEditor::ColorEndChanged( const QColor& p_val )
 	ui.endcolorSpinBoxR->setValue(red);
 	ui.endcolorSpinBoxG->setValue(green);
 	ui.endcolorSpinBoxB->setValue(blue);
+	Changed();
 }
 
 void ParticleEditor::MenuViewColorTriangle()
@@ -673,6 +678,7 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+	Changed();
 }
 
 void ParticleEditor::FocusButtonClicked()
@@ -691,6 +697,7 @@ void ParticleEditor::colorAlphaSliderChanged( int p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	ui.colorSpinBoxA->setValue(alpha);
 	pe->m_particleSystems[m_selectedEmitterIndex].m_color.a = alpha;
+	Changed();
 }
 
 void ParticleEditor::endColorAlphaSliderChanged( int p_val )
@@ -699,6 +706,7 @@ void ParticleEditor::endColorAlphaSliderChanged( int p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	ui.endcolorSpinBoxA->setValue(alpha);
 	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a = alpha;
+	Changed();
 }
 
 void ParticleEditor::ShowMessageBox( QString p_msg )
@@ -742,6 +750,144 @@ void ParticleEditor::SetLookAtSpinBox( glm::vec3 p_pos )
 	ui.lookAtSpinBoxX->setValue(p_pos.x);
 	ui.lookAtSpinBoxY->setValue(p_pos.y);
 	ui.lookAtSpinBoxZ->setValue(p_pos.z);
+}
+
+void ParticleEditor::ClearScene()
+{
+	for(auto itr = m_emitterEntities.begin(); itr != m_emitterEntities.end(); ++itr)
+	{
+		m_world->GetEntityManager()->RemoveAllComponents((*itr));
+		m_world->GetEntityManager()->RemoveEntity((*itr));
+	}
+	m_emitterEntities.clear();
+
+	m_selectedEmitterIndex = -1;
+	m_selectedEntityIndex = -1;
+
+	ui.endcolorDockWidget->hide();
+	ui.colorDockWidget->hide();
+	ui.tabWidget->hide();
+
+	while(ui.listWidget->count() > 0)
+	{
+		delete ui.listWidget->takeItem(0);
+	}
+}
+
+void ParticleEditor::ExportParticle( QString p_fullFilePath )
+{
+	if(p_fullFilePath.compare("") == 0)
+		return;
+
+	ECS::Entity* entity = m_emitterEntities.at(0);
+	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
+	QFile file(p_fullFilePath);
+	YAML::Emitter emitter;
+
+	emitter << YAML::BeginSeq;
+
+	for(auto itr = e->m_particleSystems.begin(); itr != e->m_particleSystems.end(); ++itr)
+	{
+		// Export Particle systems
+		emitter << YAML::BeginMap;
+		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_position.x << (*itr).m_position.y << (*itr).m_position.z << YAML::EndSeq; 
+		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr).m_lifeTimeMin;
+		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr).m_lifeTimeMax;
+		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr).m_speedMin;
+		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr).m_speedMax;
+		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMin.x << (*itr).m_sizeMin.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMax.x << (*itr).m_sizeMax.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeEnd.x << (*itr).m_sizeEnd.y << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_color.r << (*itr).m_color.g << (*itr).m_color.b << (*itr).m_color.a << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_colorEnd.r << (*itr).m_colorEnd.g << (*itr).m_colorEnd.b << (*itr).m_colorEnd.a << YAML::EndSeq; 
+		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_gravity.x << (*itr).m_gravity.y << (*itr).m_gravity.z << YAML::EndSeq; 
+		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_direction.x << (*itr).m_direction.y << (*itr).m_direction.z << YAML::EndSeq; 
+		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr).m_spread;
+		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr).m_spawnTime;
+		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
+		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr).m_material->m_effect);
+		emitter << YAML::Key << "NAME"			<< YAML::Value << (*itr).m_name;
+		emitter << YAML::EndMap;
+	}
+
+	emitter << YAML::EndSeq;
+
+	//Write exported yaml to file
+	if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream out(&file);
+		out << emitter.c_str();
+		file.close();
+	}
+	m_savePath = p_fullFilePath.toStdString();
+	QFileInfo fileinfo(p_fullFilePath);
+	m_particleTab->setTabText(0, fileinfo.baseName());
+	Saved();
+}
+
+bool ParticleEditor::IsSaved()
+{
+	if(m_savePath.compare("") == 0)
+		return false;
+	else
+		return true;
+}
+
+QMessageBox::StandardButton ParticleEditor::SaveWarningDialog()
+{
+	if(m_changed)
+	{
+		if(m_selectedEmitterIndex != -1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("The document has been modified.");
+			msgBox.setInformativeText("Do you want to save your changes?");
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			int ret = msgBox.exec();
+
+			switch (ret) {
+			case QMessageBox::Save:
+				{
+					MenuSave();
+					return QMessageBox::Save;
+				}
+				break;
+			case QMessageBox::Discard:
+				{
+					return QMessageBox::Discard;
+				}
+				break;
+			case QMessageBox::Cancel:
+				{
+					return QMessageBox::Cancel;
+				}
+				break;
+			default:
+				// should never be reached
+				break;
+			}
+		}
+	}
+	else
+	{
+		return QMessageBox::Save;
+	}
+}
+
+void ParticleEditor::Changed()
+{
+	m_changed = true;
+}
+
+void ParticleEditor::MenuHelpHelp()
+{
+	ui.helpWidget->show();
+}
+
+void ParticleEditor::Saved()
+{
+	m_changed = false;
 }
 
 

@@ -27,6 +27,7 @@ namespace RootForce
 		glm::vec3 	m_direction;
 		float 		m_spread;
 		float		m_spawnTime;
+		std::string m_name;
 	};
 
 	struct ParticleEmitter : public ECS::Component<ParticleEmitter>

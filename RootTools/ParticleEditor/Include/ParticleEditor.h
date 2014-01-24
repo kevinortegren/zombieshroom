@@ -45,8 +45,13 @@ private:
 	//METHODS
 	void closeEvent(QCloseEvent *event);
 	void DrawGridX(float p_spacing, glm::vec4 p_color);
-	
+	void ClearScene();
 	void ShowMessageBox(QString p_msg);
+	void ExportParticle(QString p_fullFilePath);
+	bool IsSaved();
+	void Changed();
+	void Saved();
+	QMessageBox::StandardButton SaveWarningDialog();
 
 	//MEMBERS
 	ECS::World* m_world;
@@ -71,6 +76,10 @@ private:
 	float m_gridSpace;
 	float m_collectedTime;
 
+	std::string m_savePath;
+
+	bool m_changed;
+
 private slots:
 	void MenuNew();
 	void MenuOpen();
@@ -79,6 +88,7 @@ private slots:
 	void MenuExit();
 	void MenuViewStats();
 	void MenuHelpAbout();
+	void MenuHelpHelp();
 	void MenuViewColorTriangle();
 	void MenuViewColorEndTriangle();
 	void NewEmitter();

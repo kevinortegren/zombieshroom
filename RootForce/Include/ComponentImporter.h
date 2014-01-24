@@ -9,9 +9,14 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 
-static void ImportParticleEmitter(const std::string& p_filename, RootForce::ParticleEmitter* p_particleEmitter, RootForce::Transform* p_particleTransform)
+static void ImportParticleEmitter(const std::string& p_filename, RootForce::ParticleEmitter* p_particleEmitter, RootForce::Transform* p_particleTransform, bool p_fullFilePath)
 {
-	std::string filePath = g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Particles\\" + p_filename + ".particle";
+	std::string filePath;
+
+	if(p_fullFilePath)
+		filePath = p_filename;
+	else
+		filePath = g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Particles\\" + p_filename + ".particle";
 
 	std::ifstream file(filePath, std::ifstream::in);
 	if(!file.good())
@@ -75,6 +80,8 @@ static void ImportParticleEmitter(const std::string& p_filename, RootForce::Part
 		doc[i]["SPREAD"]		>> p_particleEmitter->m_particleSystems[i].m_spread;
 		//Spawn time
 		doc[i]["SPAWNTIME"]		>> p_particleEmitter->m_particleSystems[i].m_spawnTime;
+		//Name
+		doc[i]["NAME"]			>> p_particleEmitter->m_particleSystems[i].m_name;
 
 		//Set params
 		p_particleEmitter->m_particleSystems[i].m_params[Render::Semantic::POSITION]		= &p_particleEmitter->m_particleSystems[i].m_position;
@@ -339,7 +346,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				p_node["File"] >> particleName;
 
-				ImportParticleEmitter(particleName, particleEmitter, trans);
+				ImportParticleEmitter(particleName, particleEmitter, trans, false);
 			}
 			break;
 		default:
