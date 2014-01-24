@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v15.mb</source_data>
     </contributor>
-    <created>2014-01-22T10:30:23</created>
-    <modified>2014-01-22T10:30:23</modified>
+    <created>2014-01-24T08:34:43</created>
+    <modified>2014-01-24T08:34:43</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -86,7 +86,7 @@
   </library_effects>
   <library_images>
     <image id="file9" name="file9">
-      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/Tree2GreenLeaf.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/Output/Assets/Models/Tree2GreenLeaf.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>

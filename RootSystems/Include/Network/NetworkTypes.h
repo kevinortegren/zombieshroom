@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <cstdint>
 #include <map>
 
@@ -100,3 +102,5 @@ namespace RootForce
 		void DeleteEntities(NetworkEntityMap& p_map, NetworkEntityID p_id, ECS::EntityManager* p_entityManager);
 	}
 }
+
+#endif

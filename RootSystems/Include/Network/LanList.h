@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <stdint.h>
 #include <vector>
@@ -21,3 +23,5 @@ namespace RootSystems
 		std::vector<std::pair<uint64_t, RootSystems::ServerInfoInternal>> m_list;
 	};
 }
+
+#endif

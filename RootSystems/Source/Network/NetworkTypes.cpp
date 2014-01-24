@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <Utility/ECS/Include/EntityManager.h>
@@ -51,3 +53,5 @@ namespace RootForce
 		}
 	}
 }
+
+#endif
