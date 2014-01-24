@@ -143,6 +143,7 @@ namespace AbilityEditorNameSpace
 		QVector3D grav = QVector3D(0,9.82f,0);
 		//Transform variables
 		QVector3D rotation = QVector3D(0,0,0);
+		QVector3D scale = QVector3D(1.0f,1.0f,1.0f);
 		//Collision variable
 		bool colWithWorld = true;
 
@@ -163,6 +164,7 @@ namespace AbilityEditorNameSpace
 			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::TRANSFORM)
 			{
 				rotation = ((AbilityComponents::Transform*)entities->at(i)->m_components->at(j))->m_rotation;
+				scale = ((AbilityComponents::Transform*)entities->at(i)->m_components->at(j))->m_scale;
 			}
 			if (entities->at(i)->m_components->at(j)->m_type == AbilityComponents::ComponentType::COLLISION)
 			{
@@ -185,7 +187,7 @@ namespace AbilityEditorNameSpace
 			}
 			else if (colShape == AbilityComponents::CollisionShape::MESH)
 			{
-				m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), Vec3.New(" << scale.x() << ", " << scale.y() << ", " << scale.z() << "), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 			}
 			
 			if(entities->at(i)->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
