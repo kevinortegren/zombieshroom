@@ -1,6 +1,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Script/Include/RootScript.h>
 namespace RootEngine
 {
 
@@ -81,7 +82,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Script already exists: %s.lua", p_scriptName.c_str());
 			return p_scriptName;
 		}
 		
@@ -89,6 +90,9 @@ namespace RootEngine
 
 	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
 	{
+		// Do not reload global variables.
+		if (p_scriptName == "Global.lua")
+			return p_scriptName;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: '%s.lua', it may already exist in Resource Manager!", p_scriptName.c_str());
 		m_context->m_script->LoadScript(p_scriptName + ".lua");
 		m_scripts[p_scriptName] = p_scriptName;
@@ -127,7 +131,7 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> tex;
+			Render::TextureInterface* tex;
 			if(p_type == Render::TextureType::TEXTURE_2D)
 			{
 				tex = m_textureImporter->LoadTexture(m_workingDirectory + "Assets\\Textures\\" + p_path + ".dds");
@@ -141,7 +145,7 @@ namespace RootEngine
 			{
 				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded texture '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
-				return m_textures[p_path].get();
+				return m_textures[p_path];
 			}
 			else
 			{
@@ -151,10 +155,8 @@ namespace RootEngine
 		}
 		else
 		{
-			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Texture already exists: %s", p_path.c_str());
-			return m_textures[p_path].get();
-		}
-		
+			return m_textures[p_path];
+		}	
 	}
 
 	Model* ResourceManager::CreateModel(const std::string& p_path)
@@ -162,14 +164,14 @@ namespace RootEngine
 		if(m_models.find(p_path) == m_models.end())
 		{
 			Model* model = new Model();
-			model->m_meshes.resize(1);
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			model->m_meshes[1] = nullptr;
 			
 			if(model)
 			{
 				m_models[p_path] = model;
-				return m_models[p_path];
+				return m_models.find(p_path)->second;
 			}
 			else
 			{
@@ -183,19 +185,19 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_path) == m_textures.end())
 		{
-			std::shared_ptr<Render::TextureInterface> texture = m_context->m_renderer->CreateTexture();
+			Render::TextureInterface* texture = m_context->m_renderer->CreateTexture();
 	
 			if(texture)
 			{
 				m_textures[p_path] = texture;
-				return m_textures[p_path].get();
+				return m_textures[p_path];
 			}
 			else
 			{
 				return nullptr;
 			}
 		}
-		return m_textures[p_path].get();
+		return m_textures[p_path];
 	}
 
 	bool ResourceManager::RenameModel(Model* p_model, const std::string& p_name)
@@ -247,7 +249,7 @@ namespace RootEngine
 	{
 		if(m_textures.find(p_handle) != m_textures.end())
 		{
-			return m_textures[p_handle].get();
+			return m_textures[p_handle];
 		}
 		else
 		{
@@ -289,7 +291,7 @@ namespace RootEngine
 	{
 		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
 		{
-			if((*itr).second.get() == p_texture)
+			if((*itr).second == p_texture)
 				return (*itr).first;
 		}
 		assert(false);
@@ -318,6 +320,13 @@ namespace RootEngine
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get script: %s.lua, but it has never been loaded!", p_scriptName.c_str());
 			return "";
+		}
+	}
+	void ResourceManager::ReloadAllScripts()
+	{
+		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
+		{
+			ForceLoadScript((*itr).second);
 		}
 	}
 #endif
@@ -356,11 +365,5 @@ namespace RootEngine
 		return m_workingDirectory;
 	}
 
-	void ResourceManager::ReloadAllScripts()
-	{
-		for(auto itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
-		{
-			ForceLoadScript((*itr).second);
-		}
-	}
+
 }

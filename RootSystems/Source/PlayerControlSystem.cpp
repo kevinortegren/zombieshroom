@@ -2,10 +2,14 @@
 
 #include <PlayerControlSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
+	Network::ActionID_t PlayerControlSystem::s_nextActionID = 0;
+
 	Keybinding::Keybinding()
 		: Action(PlayerAction::NONE), Edge(false)
 	{}
@@ -38,6 +42,11 @@ namespace RootForce
 	void PlayerControlSystem::SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics)
 	{
 		m_physics = p_physics;
+	}
+
+	void PlayerControlSystem::SetClientPeer(RakNet::RakPeerInterface* p_clientPeer)
+	{
+		m_clientPeer = p_clientPeer;
 	}
 
 	void PlayerControlSystem::Process()
@@ -89,24 +98,15 @@ namespace RootForce
 
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
 
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
-		PlayerPhysics* playerphysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(entity);
-		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
-		UserAbility* ability = m_world->GetEntityManager()->GetComponent<UserAbility>(entity);
-		
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
-		StateComponent* state = m_world->GetEntityManager()->GetComponent<StateComponent>(entity);
-
-		// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
-		glm::vec3 facing = transform->m_orientation.GetFront();
-		glm::vec3 right = transform->m_orientation.GetRight();
+		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
 		glm::vec3 movement(0.0f);
 
-		// Get the speed of the player
-		float speed = playerphysics->MovementSpeed;
-
+		action->ActionID = s_nextActionID++;
+		action->MovePower = 0;
+		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
@@ -169,11 +169,59 @@ namespace RootForce
 			
 		}
 
+		
+		// Update the action component only if we are a remote client
+		//ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
+		//Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+
+		// Send the action to the server.
+		RootForce::NetworkMessage::PlayerCommand m;
+		m.User = network->ID.UserID;
+		m.Action = *action;
+
+		RakNet::BitStream bs;
+		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
+		m.Serialize(true, &bs);
+
+		m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+
+
+
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 
 	void PlayerControlSystem::UpdateAimingDevice()
 	{
+		for (Network::NetworkEntityMap::iterator it = g_networkEntityMap.begin(); it != g_networkEntityMap.end(); it++)
+		{
+			if (it->first.ActionID == Network::ReservedActionID::CONNECT)
+			{
+				Network::NetworkEntityID id;
+				id.UserID = it->first.UserID;
+				id.ActionID = Network::ReservedActionID::CONNECT;
+				id.SequenceID = 0;
+				ECS::Entity* playerEntity = g_networkEntityMap[id];
+				if (playerEntity == nullptr)
+					continue;
+
+				Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
+				PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(g_networkEntityMap[id]);
+
+				id.SequenceID = 1;
+				ECS::Entity* aimingDeviceEntity = g_networkEntityMap[id];
+				if (aimingDeviceEntity == nullptr)
+					continue;
+
+				Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
+
+				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+				
+			}
+		}
+
+		/*
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
@@ -181,6 +229,7 @@ namespace RootForce
 		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 		aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+		*/
 	}
 }
 

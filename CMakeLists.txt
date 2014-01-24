@@ -58,6 +58,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${QTCORE_LIBRARY}
 			${QTWIDGETS_LIBRARY}
 			${QTPROPWIDGET_LIBRARY}
+			${QTCOLORTRIANGLE_LIBRARY}
 		)
 		else()
 		set(EXTERNAL_LIBRARIES
@@ -107,6 +108,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(/wd4005)    # Disable macro redefinition warning
+add_definitions(/MP)        # Multicore compiling
 
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

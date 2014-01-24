@@ -1,5 +1,6 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/CollisionSystem.h>
-
+#include <RootEngine/Script/Include/RootScript.h>
 
 
 namespace RootForce
@@ -19,24 +20,17 @@ namespace RootForce
 	{
 		CollisionResponder* cr = m_responders.Get(p_entity);
 
-		for(auto itr = cr->m_collidedEntityId.begin(); itr != cr->m_collidedEntityId.end(); ++itr)
+		for(auto itr = cr->m_collidedEntities.begin(); itr != cr->m_collidedEntities.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
 			
 			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
-			m_engineContext->m_script->AddParameterNumber((*itr));
+			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+			m_engineContext->m_script->AddParameterUserData((*itr), sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->ExecuteScript();
-
-			/*
-			fuck this
-			Action action(ActionType::ACTION_COLLIDE);
-			action.m_data.m_collision.m_entityId = (*itr);
-
-			script->m_actions.push_back(action);
-			*/
 		}
 
-		cr->m_collidedEntityId.clear();
+		cr->m_collidedEntities.clear();
 	}
 
 	void CollisionSystem::End()
@@ -44,3 +38,4 @@ namespace RootForce
 
 	}
 }
+#endif

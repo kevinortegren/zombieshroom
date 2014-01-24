@@ -29,8 +29,12 @@
           Model: OceanShape
           Material:
             Name: lambert6
-            Effect: Mesh
-            Diffuse: water
+            Effect: Mesh_Blend
+            TextureMap: terrain_splash
+            DiffuseR: terrain_dark_grass
+            DiffuseG: terrain_light_grass
+            DiffuseB: terrain_stone
+            TileFactor: 10.0
         - Entity: 2
           Model: TerrainShape
           Material:
@@ -279,10 +283,10 @@
     - Type: 10
       Data:
         []
-    - Type: 11
+    - Type: 12
       Data:
         []
-    - Type: 12
+    - Type: 11
       Data:
         - Entity: 1
           MeshHandle: OceanShape0

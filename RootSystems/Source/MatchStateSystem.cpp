@@ -1,11 +1,12 @@
 #include "MatchStateSystem.h"
 #include <RootSystems/Include/PlayerSystem.h>
-#include <RootSystems/Include/Network/NetworkEntityMap.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootForce/Include/GameStates.h>
+
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+
 namespace RootForce
 {
-
-
 	void MatchStateSystem::Process()
 	{
 	}
@@ -45,9 +46,18 @@ namespace RootForce
 
 	void MatchStateSystem::AwardPlayerKill( int p_killerID, int p_deadID )
 	{
-		m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_killerID))->Score ++;
+		Network::NetworkEntityID killerNetworkID;
+		killerNetworkID.UserID = p_killerID;
+		killerNetworkID.ActionID = Network::ReservedActionID::CONNECT;
+		killerNetworkID.SequenceID = 0;
 
-		m_world->GetEntityManager()->GetComponent<ScoreComponent>(m_networkContext->m_networkEntityMap->GetPlayerEntityFromUserID(p_deadID))->Deaths ++;
+		Network::NetworkEntityID deadNetworkID;
+		deadNetworkID.UserID = p_deadID;
+		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
+		deadNetworkID.SequenceID = 0;
+
+		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID])->Score ++;
+		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Score ++;
 	}
 
 	

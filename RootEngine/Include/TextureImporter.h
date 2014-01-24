@@ -17,8 +17,8 @@ namespace RootEngine
 		TextureImporter(Logging* p_logger, Render::RendererInterface* p_renderer);
 		~TextureImporter();
 
-		std::shared_ptr<Render::TextureInterface> LoadTexture(const std::string p_fileName);
-		std::shared_ptr<Render::TextureInterface> LoadCubeTexture(const std::string p_fileName);
+		Render::TextureInterface* LoadTexture(const std::string p_fileName);
+		Render::TextureInterface* LoadCubeTexture(const std::string p_fileName);
 
 	private:
 		Logging*					m_logger;

@@ -1,17 +1,15 @@
 #include <RootEngine/Render/Include/Buffer.h>
 
-Render::Buffer::Buffer()
-	: m_numElements(0), m_size(0), m_elementSize(0) {}
+Render::Buffer::Buffer(GLenum p_type)
+	: m_numElements(0), m_size(0), m_elementSize(0)
+{
+	m_type = p_type;
+	glGenBuffers(1, &m_id);
+}
 
 Render::Buffer::~Buffer()
 {
 	glDeleteBuffers(1, &m_id);
-}
-
-void Render::Buffer::Init(GLenum p_type)
-{
-	m_type = p_type;
-	glGenBuffers(1, &m_id);
 }
 
 void Render::Buffer::BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data)

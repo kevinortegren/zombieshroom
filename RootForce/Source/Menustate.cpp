@@ -1,7 +1,11 @@
 #include <RootForce/Include/MenuState.h>
+#include <RootEngine/InputManager/Include/InputInterface.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {	
@@ -19,6 +23,20 @@ namespace RootForce
 
 	void MenuState::Enter()
 	{
+		// Destroy any existing entities
+		Network::NetworkEntityID id;
+		id.UserID = Network::ReservedUserID::ALL;
+		id.ActionID = Network::ReservedActionID::ALL;
+		id.SequenceID = Network::ReservedSequenceID::ALL;
+		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager()); 
+		g_networkEntityMap.clear();
+		Network::NetworkComponent::s_sequenceIDMap.clear();
+
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
+		g_engineContext.m_physics->RemoveAll();
+
 		// Allow the mouse to be moved while in the menu
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
@@ -28,17 +46,11 @@ namespace RootForce
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
-		// Destroy any existing server
-		m_networkContext.m_server.reset();
-		m_networkContext.m_client.reset();
-		m_networkContext.m_clientMessageHandler.reset();
-
-		//Setup network client so we can search for lan-servers
+		// Destroy any existing server/client and setup a new network client so we can search for LAN-servers
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
 		m_networkContext.m_server = nullptr;
-		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_engineContext.m_logger, &g_engineContext, g_world));
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
-		m_networkContext.m_networkEntityMap = nullptr;
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler
@@ -87,13 +99,13 @@ namespace RootForce
 			{
 				// Retrieve hosting data and go into a connecting state.
 				m_playData.Host = true;
-				m_playData.ServerName = Awesomium::ToString(event.data[0].ToString());
-				m_playData.Port = event.data[1].ToInteger();
-				m_playData.Password = Awesomium::ToString(event.data[2].ToString());
-				m_playData.MaxPlayers = event.data[3].ToInteger();
-				m_playData.MatchLength = event.data[4].ToInteger();
-				m_playData.Killcount = event.data[5].ToInteger();
-				m_playData.MapName = Awesomium::ToString(event.data[6].ToString());
+				m_playData.ServerInfo.ServerName = Awesomium::ToString(event.data[0].ToString());
+				m_playData.ServerInfo.Port = event.data[1].ToInteger();
+				m_playData.ServerInfo.Password = Awesomium::ToString(event.data[2].ToString());
+				m_playData.ServerInfo.MaxPlayers = event.data[3].ToInteger();
+				m_playData.ServerInfo.MatchTime = event.data[4].ToInteger();
+				m_playData.ServerInfo.KillCount = event.data[5].ToInteger();
+				m_playData.ServerInfo.MapName = Awesomium::ToString(event.data[6].ToString());
 
 				result = GameStates::Connecting;
 			} break;
@@ -102,8 +114,9 @@ namespace RootForce
 			{
 				// Retrieve connection data and go into a connecting state.
 				m_playData.Host = false;
-				m_playData.Address = Awesomium::ToString(event.data[1].ToString());
-				m_playData.Port = event.data[0].ToInteger();
+				m_playData.ClientInfo.Address = Awesomium::ToString(event.data[1].ToString());
+				m_playData.ClientInfo.Password = Awesomium::ToString(event.data[2].ToString());
+				m_playData.ClientInfo.Port = event.data[0].ToInteger();
 
 				result = GameStates::Connecting;
 			} break;

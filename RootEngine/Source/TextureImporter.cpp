@@ -14,9 +14,12 @@ namespace RootEngine
 
 	}
 
-	std::shared_ptr<Render::TextureInterface> TextureImporter::LoadTexture( const std::string p_fileName )
+	Render::TextureInterface* TextureImporter::LoadTexture( const std::string p_fileName )
 	{
-		std::shared_ptr<Render::TextureInterface> texture = m_renderer->CreateTexture();
+		m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Started to load %s", p_fileName);
+
+
+		Render::TextureInterface* texture = m_renderer->CreateTexture();
 
 		if (texture->Load(p_fileName)) 
 			return texture;
@@ -24,9 +27,9 @@ namespace RootEngine
 			return nullptr;
 	}
 
-	std::shared_ptr<Render::TextureInterface> TextureImporter::LoadCubeTexture( const std::string p_fileName )
+	Render::TextureInterface* TextureImporter::LoadCubeTexture( const std::string p_fileName )
 	{
-		std::shared_ptr<Render::TextureInterface> texture = m_renderer->CreateTexture();
+		Render::TextureInterface* texture = m_renderer->CreateTexture();
 
 		if (texture->LoadCubeMap(p_fileName)) 
 			return texture;

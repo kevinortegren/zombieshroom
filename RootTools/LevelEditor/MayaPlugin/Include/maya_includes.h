@@ -15,6 +15,7 @@
 // Wrappers
 #include <maya/MGlobal.h>
 #include <maya/MCallbackIdArray.h>
+#include <maya/MSelectionList.h>
 
 // Messages
 #include <maya/MMessage.h>
@@ -25,11 +26,14 @@
 #include <maya/MNodeMessage.h>
 #include <maya/MSceneMessage.h>
 #include <maya/MUiMessage.h>
+#include <maya/MModelMessage.h>
 
 // Libs
 #pragma comment(lib, "Foundation.lib") // Länka mot Foundation.lib
 #pragma comment(lib, "OpenMaya.lib") // Länka mot OpenMaya.lib
 #pragma comment(lib, "OpenMayaUI.lib")
+
+#include <maya/MImage.h>
 
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MPointArray.h>
@@ -45,6 +49,9 @@
 #include <maya/MFnLambertShader.h>
 #include <maya/MFnBlinnShader.h>
 #include <maya/MPlugArray.h>
+
+#include <maya/MQuaternion.h>
+#include <maya/MPxLocatorNode.h>
 
 #ifdef _DEBUG
 	#define PrintMayaError

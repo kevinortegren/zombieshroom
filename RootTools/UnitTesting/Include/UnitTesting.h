@@ -9,6 +9,7 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 inline ECS::World* CreateWorld()
 {

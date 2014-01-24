@@ -24,9 +24,23 @@ namespace Render
 			DIRECTION,
 			SPREAD,
 			SPAWNTIME,
+			TRANSPOSITION,
 		};
 	}
 
-	static std::map<Semantic::Semantic, unsigned> s_sizes;
-
+	namespace TextureSemantic
+	{
+		enum TextureSemantic
+		{
+			DIFFUSE,
+			SPECULAR,
+			NORMAL,
+			DEPTH,
+			RANDOM,
+			TEXTUREMAP,
+			TEXTURE_R,
+			TEXTURE_G,
+			TEXTURE_B
+		};
+	}
 }

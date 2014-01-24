@@ -41,4 +41,25 @@ namespace RootForce
 		RootEngine::Physics::PhysicsInterface* m_physics;
 		Logging::LoggingInterface* m_logger;
 	};
+
+	// Alt. DoThisBeforePhysicsSystemSystem.
+	struct PhysicsTransformCorrectionSystem : public ECS::EntitySystem
+	{
+		PhysicsTransformCorrectionSystem(ECS::World* p_world)
+			: ECS::EntitySystem(p_world)
+		{
+			SetUsage<Physics>();
+			SetUsage<Collision>();
+			SetUsage<Transform>();
+		}
+
+		void Init();
+		void Begin();
+		void ProcessEntity(ECS::Entity* p_entity);
+		void End();
+	private:
+		ECS::ComponentMapper<Physics> m_physicsAccessor;
+		ECS::ComponentMapper<Collision> m_collisions;
+		ECS::ComponentMapper<Transform> m_transforms;
+	};
 }

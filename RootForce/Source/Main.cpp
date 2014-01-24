@@ -94,7 +94,6 @@ namespace RootForce
 			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
 
 		// Initialize shared systems
-		m_sharedSystems.m_playerSystem = std::shared_ptr<RootForce::PlayerSystem>(new RootForce::PlayerSystem(g_world, &g_engineContext));
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
 
 		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_networkContext));
@@ -178,6 +177,7 @@ namespace RootForce
 	{
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->Reset();
+
 		SDL_Event event;
 		while(SDL_PollEvent(&event))
 		{
