@@ -41,4 +41,6 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	local collision = self:GetCollision();
+	Collision.RemoveObjectFromWorld(collision);
 end
