@@ -126,10 +126,13 @@ namespace RootForce
 
 				case NetworkMessage::MessageType::Chat:
 				{
-					NetworkMessage::Chat m;
-					m.Serialize(false, p_bs);
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						NetworkMessage::Chat m;
+						m.Serialize(false, p_bs);
 
-					m_chatSystem->JSAddMessage(m.Message.C_String());
+						m_chatSystem->JSAddMessage(m.Message.C_String());
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::UserConnected:
