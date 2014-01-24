@@ -133,7 +133,14 @@ namespace RootForce
 						NetworkMessage::Chat m;
 						m.Serialize(false, p_bs);
 
-						m_chatSystem->JSAddMessage(m.Message.C_String());
+						NetworkEntityID id;
+						id.UserID = m.Sender;
+						id.ActionID = ReservedActionID::CONNECT;
+						id.SequenceID = 0;
+						PlayerComponent* senderPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
+
+						std::string message = senderPlayerComponent->Name + ": " + m.Message.C_String();
+						m_chatSystem->JSAddMessage(message);
 					}
 				} return true;
 
