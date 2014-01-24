@@ -125,7 +125,7 @@ namespace RootForce
 				NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
 
 				m_peer->Send(&bs, HIGH_PRIORITY, UNRELIABLE_SEQUENCED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Sending DeltaWorld snapshot");
+				m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Sending DeltaWorld snapshot: %d bytes", bs.GetNumberOfBytesUsed());
 			}
 		}
 
