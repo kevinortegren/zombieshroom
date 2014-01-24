@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/Server.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
@@ -147,3 +149,5 @@ namespace RootForce
 		}
 	}
 }
+
+#endif

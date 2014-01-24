@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <stdint.h>
 #include <string>
 #include <RakNet/BitStream.h>
@@ -98,3 +100,5 @@ namespace RootSystems
 	};
 	*/
 }
+
+#endif

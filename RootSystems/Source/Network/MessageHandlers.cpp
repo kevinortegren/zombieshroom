@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
@@ -651,3 +653,5 @@ namespace RootForce
 		}
 	}
 }
+
+#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <Utility/ECS/Include/Component.h>
@@ -79,3 +81,5 @@ namespace RootForce
 		};
 	}
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "Network/LanList.h"
 
 #include <External/Include/SDL2/SDL_timer.h>
@@ -29,3 +31,5 @@ namespace RootSystems
 		return first.first < second.first;
 	}
 }
+
+#endif

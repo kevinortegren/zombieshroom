@@ -10,6 +10,8 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/WorldSystem.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 namespace RootForce
 {
 	namespace GameStates
@@ -53,3 +55,5 @@ namespace RootForce
 		// TODO: Add more
 	};
 }
+
+#endif
