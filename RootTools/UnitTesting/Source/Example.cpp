@@ -21,6 +21,7 @@ TEST(TestTest, OfDoom)
 TEST(TestTest, OfDoom2) 
 {
 	ECS::World* world = new ECS::World();
+	g_world = world;
 	EXPECT_NE(world, nullptr);
 	RootForce::Network::MessageHandler messhand(world, g_engineContext.m_logger, g_engineContext.m_network, RootForce::Network::MessageHandler::DEDICATED, 5567);
 	messhand.Update();

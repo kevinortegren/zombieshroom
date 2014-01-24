@@ -90,6 +90,8 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
+			if (m_components.size() <= Component<T>::GetTypeId())
+				return nullptr;
 			if(p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
 				return nullptr;
 
@@ -112,6 +114,7 @@ namespace ECS
 		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
 		int GetNumEntities() const { return m_entities.size(); }
 
+		std::vector<ECS::Entity*> GetAllEntities();
 	private:
 
 		EntitySystemManager* m_systemManager;

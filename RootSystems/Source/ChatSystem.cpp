@@ -1,9 +1,13 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "ChatSystem.h"
 #include <Awesomium/STLHelpers.h>
 #include <Awesomium/WebCore.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 #include <iostream>
+#include <RootEngine/GUI/Include/guiInstance.h>
+
 namespace RootForce
 {
 
@@ -11,9 +15,14 @@ namespace RootForce
 	{
 		m_view = p_view;
 		m_hasFocus = false;
-		m_view->Focus();
-
 		m_engineContext = p_engineContext;
+		
+		while(m_view->IsLoading())
+		{
+			m_engineContext->m_gui->Update();
+		}
+		m_view->Focus(); // Give the view the focus, necessary for JavaScript to catch the input events
+
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("ChatSystem"));
 
 		if(result.IsObject())
@@ -85,3 +94,5 @@ namespace RootForce
 
 
 }
+
+#endif

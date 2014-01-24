@@ -1,17 +1,13 @@
 #pragma once
-
+#include "MainOnEvent.h"
 #include "AbilityComponents.h"
 namespace AbilityEditorNameSpace
 {
-	class OnCollide
+	class OnCollide : public MainOnEvent
 	{
-		public:
-			OnCollide();
-			~OnCollide();
-			void AddEntity(std::string p_name);
-			void AddComponent(AbilityComponents::ComponentType::ComponentType p_type);
-			std::vector<AbilityEntity::Entity>* GetEntities() { return &m_entities; }
-		private:
-			std::vector<AbilityEntity::Entity> m_entities;
+	public:
+		OnCollide();
+		~OnCollide();
+	private:
 	};
 }

@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "Network/LanList.h"
 
 #include <External/Include/SDL2/SDL_timer.h>
@@ -19,13 +21,15 @@ namespace RootSystems
 	std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal>> LanList::GetList()
 	{
 		std::sort(m_list.begin(), m_list.end(), &LanList::ServerCompare);
-		std::vector<std::pair<uint64_t,RootSystems::ServerInfoInternal>> tmp = m_list;
+		std::vector<std::pair<uint64_t, RootSystems::ServerInfoInternal>> tmp = m_list;
 		m_list.clear();
 		return tmp;
 	}
 
-	bool LanList::ServerCompare(std::pair<uint64_t,RootSystems::ServerInfoInternal>& first, std::pair<uint64_t,RootSystems::ServerInfoInternal>& second)
+	bool LanList::ServerCompare(std::pair<uint64_t, RootSystems::ServerInfoInternal>& first, std::pair<uint64_t, RootSystems::ServerInfoInternal>& second)
 	{
 		return first.first < second.first;
 	}
 }
+
+#endif

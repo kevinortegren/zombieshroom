@@ -18,7 +18,8 @@ namespace ECS
 			m_systemManager(this),
 			m_entityManager(&m_systemManager),
 			m_exporter(this),
-			m_importer(this)
+			m_importer(this),
+			m_dt(0)
 		{}
 
 		EntityManager* GetEntityManager();

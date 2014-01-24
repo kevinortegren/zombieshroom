@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
@@ -22,11 +24,10 @@ namespace RootForce
 			Client(Logging* p_logger, ECS::World* p_world);
 			~Client();
 
-			bool Connect(const char* p_address, unsigned short p_port);
+			bool Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port, bool p_isRemote);
 			void PingNetwork(RootSystems::LanList* p_list, unsigned short p_port);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
-			void SetNetworkEntityMap(NetworkEntityMap* p_networkEntityMap);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void Update();
 
@@ -37,7 +38,8 @@ namespace RootForce
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
 			RootForce::ChatSystem* m_chatSystem;
-			NetworkEntityMap* m_networkEntityMap;
 		};
 	}
 }
+
+#endif

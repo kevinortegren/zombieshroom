@@ -82,7 +82,7 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Script already exists: %s.lua", p_scriptName.c_str());
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Script already exists: %s.lua", p_scriptName.c_str());
 			return p_scriptName;
 		}
 		
@@ -90,6 +90,9 @@ namespace RootEngine
 
 	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
 	{
+		// Do not reload global variables.
+		if (p_scriptName == "Global.lua")
+			return p_scriptName;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: '%s.lua', it may already exist in Resource Manager!", p_scriptName.c_str());
 		m_context->m_script->LoadScript(p_scriptName + ".lua");
 		m_scripts[p_scriptName] = p_scriptName;

@@ -3,7 +3,7 @@
   <asset>
     <contributor>
       <author>BTH</author>
-      <authoring_tool>OpenCOLLADA2014</authoring_tool>
+      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
       <comments>
 			ColladaMaya export options: 
 			bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;exportCgfxFileReferences=1;
@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v14.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Desktop/v16.mb</source_data>
     </contributor>
-    <created>2014-01-22T08:07:46</created>
-    <modified>2014-01-22T08:07:46</modified>
+    <created>2014-01-24T10:34:39</created>
+    <modified>2014-01-24T10:34:39</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -86,7 +86,7 @@
   </library_effects>
   <library_images>
     <image id="file10" name="file10">
-      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/Tree1GreenLeaf.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/Output/Assets/Models/Tree1GreenLeaf.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -169,7 +169,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v14">
+    <visual_scene id="VisualSceneNode" name="v16">
       <node id="Tree52" name="Tree52" type="NODE">
         <translate sid="translate">-40.25586 -23.54375 -21.87763</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>

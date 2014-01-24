@@ -1,8 +1,11 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RakNet/RakPeerInterface.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootSystems/Include/Network/ServerConfig.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 
@@ -13,11 +16,11 @@ namespace RootForce
 		class Server
 		{
 		public:
-			Server(Logging* p_logger, const std::string& p_name, unsigned short p_port, unsigned int p_maxConnections = 12);
+			Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated);
 			~Server();
-			
-			RootSystems::ServerInfo GetServerInfo() const;
-			void SetServerInfo(const RootSystems::ServerInfo& p_info);
+
+			const NetworkMessage::ServerInformation& GetServerInformation() const;
+			void SetServerInformation(const NetworkMessage::ServerInformation& p_information);
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
 			void Update();
@@ -25,12 +28,16 @@ namespace RootForce
 			RakNet::RakPeerInterface* GetPeerInterface();
 		private:
 			Logging* m_logger;
+			ECS::World* m_world;
 
-			RootSystems::ServerInfo m_info;
+			NetworkMessage::ServerInformation m_information;
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
+			float m_worldDeltaTimer;
 
 			void UpdatePingResponse();
 		};
 	}
 }
+
+#endif

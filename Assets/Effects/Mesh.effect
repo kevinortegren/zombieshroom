@@ -22,22 +22,27 @@
             - name: mesh
               type: vertex
             - name: mesh
-              type: fragment         
-    - name: Normals
-      bindings:
-        - name: PerFrame
-          slot: 0
-        - name: PerObject
-          slot: 1
-      flags:
-        - name: Debug
-      programs:
-        - name: Normals
-          shaders:
-            - name: normals
-              type: vertex
-            - name: normals
-              type: geometry
-            - name: color
               type: fragment
+              
+    -  name: Mesh_Shadow
+       bindings:
+         - name: PerFrame
+           slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+       flags:
+         - name: Shadow
+       programs:
+         - name: Shadow
+           shaders:
+             - name: shadow
+               type: vertex
+           depth:
+             write: 1
+             test: 1
+
+              
 

@@ -1,10 +1,12 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(ActionSystem, ProcessEmptyEntity) 
 {
 	ECS::World* world = CreateWorld();
+	g_world = world;
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
@@ -30,13 +32,22 @@ TEST(ActionSystem, ProcessEntity)
 	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
 	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
 
-	RootForce::PlayerSystem(world, &g_engineContext).CreatePlayer(0);
-	g_engineContext.m_resourceManager->LoadScript("AbilityTest");
+	// Call the OnCreate script
+	g_networkEntityMap.clear();
+	RootForce::Network::NetworkComponent::s_sequenceIDMap.clear();
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetGlobalNumber("IsClient", true);
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
+	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->ExecuteScript();
+
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
 
 	RootForce::PlayerActionComponent* action = world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(testity);
 	RootForce::HealthComponent* health = world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(testity);
-	RootForce::UserAbility* ability = world->GetEntityManager()->GetComponent<RootForce::UserAbility>(testity);
+	RootForce::PlayerComponent* player = world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(testity);
 	RootForce::Transform* transform = world->GetEntityManager()->GetComponent<RootForce::Transform>(testity);
 	g_engineContext.m_physics->CreatePlane(glm::vec3(0,1,0),glm::vec3(0,-50,0)); 
 	
@@ -46,6 +57,7 @@ TEST(ActionSystem, ProcessEntity)
 
 	{
 		health->IsDead = true;
+		action->ActionID = 15;
 		action->Jump = true;
 		action->ActivateAbility = true;
 
