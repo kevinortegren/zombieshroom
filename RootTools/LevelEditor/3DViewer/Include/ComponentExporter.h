@@ -65,6 +65,14 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]);
 						p_emitter << YAML::Key << "TextureBlue" << YAML::Value << s;
 					}
+					if(renderable->m_material->m_tileFactor != 0)
+					{
+						std::ostringstream oss;
+						oss << renderable->m_material->m_tileFactor;
+						
+						std::string s = oss.str();
+						p_emitter << YAML::Key << "TileFactor" << YAML::Value << s;
+					}
 					p_emitter << YAML::EndMap;
 				}
 			}
