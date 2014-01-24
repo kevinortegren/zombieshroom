@@ -273,6 +273,8 @@ namespace AbilityEditorNameSpace
 			scriptNames.at(j).chop(4);
 			m_file << "\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
 		}
+		m_file << "\tlocal collision = self:GetCollision();\n";
+		m_file << "\tCollision.RemoveObjectFromWorld(collision);\n";
 		m_file << "end\n";
 	}
 }
