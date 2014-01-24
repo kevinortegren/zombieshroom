@@ -86,11 +86,24 @@ void main()
 	{
 		if(lifeTime <= 0.0f)
 		{
-			//float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
-
 			// Spawn new particles with new start values using the initial values.
 			vert_initialPos1 	= g_Position + g_transPos;
-			vert_initialVel1 	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+
+			if(g_direction == vec3(0,0,0))
+			{
+				vert_initialVel1	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+			}
+			else
+			{
+				float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
+				float yspread = GetRandomNumber(g_time+0.2f, -g_spread, g_spread);
+				float zspread = GetRandomNumber(g_time+0.3f, -g_spread, g_spread);
+				
+				vec3 vektre = vec3(xspread, yspread, zspread);
+
+				vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+			}
+
 			vert_scale1 		= vec2(GetRandomNumber(g_time, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time, g_sizeMin.y, g_sizeMax.y));
 			vert_age1 			= GetRandomNumber(g_time, g_lifeTimeMin, g_lifeTimeMax);
 			vert_type1 			= 1.0f;

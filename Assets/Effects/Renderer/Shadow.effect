@@ -17,6 +17,7 @@
           depth:
             write: 1
             test: 1
+            
     - name: Shadow_depth_anim
       bindings:
         - name: PerFrame

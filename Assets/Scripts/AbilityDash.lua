@@ -2,9 +2,9 @@ ACTION_CREATE = 0;
 ACTION_COLLIDE = 1;
 
 --Set table name
-AbilityTest = {};
+AbilityDash = {};
 
-function AbilityTest.OnCreate(userId, actionId)
+function AbilityDash.OnCreate(userId, actionId)
 	--local playerEnt = Entity.GetEntityByTag("Player");
 	--local frontVec  = Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetOrient():GetFront();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -15,10 +15,10 @@ function AbilityTest.OnCreate(userId, actionId)
 	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.1,0)+frontVec, 100);
 end
 
-function AbilityTest.OnCollide (entityId)
+function AbilityDash.OnCollide (entityId)
 	
 end
 
-function AbilityTest.OnDestroy ()
+function AbilityDash.OnDestroy ()
 
 end

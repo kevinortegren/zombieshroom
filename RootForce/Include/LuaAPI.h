@@ -481,12 +481,12 @@ namespace RootForce
 			RootForce::Physics* physics = *(RootForce::Physics**)luaL_checkudata(p_luaState, 4, "Physics");
 			RootForce::PlayerPhysics* playerPhysics = *(RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 5, "PlayerPhysics");
 			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 6, "CollisionResponder");
-			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , entity,
+			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
 				transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
 			return 0;
 		}
 
-		static int CollisionRemovePlayerObjectFromWorld(lua_State* p_luaState)
+		static int CollisionRemoveObjectFromWorld(lua_State* p_luaState)
 		{
 			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
 			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
@@ -507,7 +507,7 @@ namespace RootForce
 		{
 			NumberOfArgs(4);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle((ECS::Entity*)luaL_checkudata(p_luaState, 2, "Entity"), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) != 0 );
+			(*rtemp)->m_handle = g_engineContext.m_physics->CreateHandle(*((ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity")), (RootEngine::Physics::PhysicsType::PhysicsType)((int)luaL_checknumber(p_luaState, 3)), lua_toboolean(p_luaState, 4) != 0 );
 			return 0;
 		}
 
@@ -567,7 +567,7 @@ namespace RootForce
 			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
-		static int PhysicsBindShape(lua_State* p_luaState)
+		static int PhysicsBindShapeSphere(lua_State* p_luaState)
 		{
 			NumberOfArgs(7);
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
@@ -579,6 +579,49 @@ namespace RootForce
 			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, mass, collideWorld);
 			return 0;
 		}
+
+		static int PhysicsBindShapeCone(lua_State* p_luaState)
+		{
+			NumberOfArgs(8);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
+			float height = (float)luaL_checknumber(p_luaState,5);
+			float radius = (float)luaL_checknumber(p_luaState, 6);
+			float mass = (float)luaL_checknumber(p_luaState, 7);
+			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
+			g_engineContext.m_physics->BindConeShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, mass, collideWorld);
+			return 0;
+		}
+
+		static int PhysicsBindShapeCylinder(lua_State* p_luaState)
+		{
+			NumberOfArgs(8);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
+			float height = (float)luaL_checknumber(p_luaState,5);
+			float radius = (float)luaL_checknumber(p_luaState, 6);
+			float mass = (float)luaL_checknumber(p_luaState, 7);
+			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
+			g_engineContext.m_physics->BindCylinderShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, mass, collideWorld);
+			return 0;
+		}
+
+		static int PhysicsBindShapeMesh(lua_State* p_luaState)
+		{
+			NumberOfArgs(8);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			std::string handle = luaL_checkstring(p_luaState, 3);
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3");
+			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 5, "Quat");
+			glm::vec3* scale = (glm::vec3*)luaL_checkudata(p_luaState, 6, "Vec3");
+			float mass = (float)luaL_checknumber(p_luaState, 7);
+			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
+			g_engineContext.m_physics->BindMeshShape((*(*rtemp)->m_handle), handle, (*v1), (*q1), *scale ,  mass, collideWorld);
+			return 0;
+		}
+
 		static int PhysicsSetVelocity(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
@@ -594,6 +637,23 @@ namespace RootForce
 			NumberOfArgs(4);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
+			return 0;
+		}
+		static int PhysicsGetType(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
+			return 1;
+		}
+		static int PhysicsSetGravity(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+
+			g_engineContext.m_physics->SetGravity((*(*rtemp)->m_handle), (*v1));
 			return 0;
 		}
 		
@@ -1715,7 +1775,7 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
-			{"RemovePlayerObjectFromWorld", CollisionRemovePlayerObjectFromWorld},
+			{"RemoveObjectFromWorld", CollisionRemoveObjectFromWorld},
 			{NULL, NULL}
 		};
 
@@ -1734,10 +1794,15 @@ namespace RootForce
 
 		static const struct luaL_Reg physicsaccessor_m [] = {
 			{"SetMass", PhysicsSetMass},
-			{"BindShape", PhysicsBindShape},
+			{"BindSphereShape", PhysicsBindShapeSphere},
+			{"BindConeShape", PhysicsBindShapeCone},
+			{"BindCylinderShape", PhysicsBindShapeCylinder},
+			{"BindMeshShape", PhysicsBindShapeMesh},
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
 			{"KnockBack", PhysicsKnockBack},
+			{"GetType", PhysicsGetType},
+			{"SetGravity", PhysicsSetGravity},
 			{NULL, NULL}
 		};
 

@@ -29,11 +29,14 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetActivateAbility(false);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityTest");
+	playerComponent:SetAbility(0, "AbilityBall");
+	playerComponent:SetAbility(1, "AbilityDash");
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(10);
 	playerPhysics:SetJumpForce(20);
+
+	--physics:SetGravity(collision, Vec3.New(0, 0, 0));
 
 	physics:SetMass(5);
 
@@ -88,5 +91,5 @@ end
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
     local collision = self:GetCollision();
-	Collision.RemovePlayerObjectFromWorld(collision);
+	Collision.RemoveObjectFromWorld(collision);
 end

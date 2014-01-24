@@ -35,7 +35,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onCreate[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onCreate[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
@@ -56,7 +58,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onCollide[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onCollide[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
@@ -78,7 +82,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string entityName;
 				onDestroy[i]["EntityName"] >> entityName;
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(entityName);
+				QString temp;
+				temp.append(entityName.c_str());
+				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
 				const YAML::Node& comps = onDestroy[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{
@@ -111,15 +117,19 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::Transform* tempcomp = new AbilityComponents::Transform();
 				if(p_node.FindValue("Rotation"))
 				{
-					p_node["Rotation"][0] >> tempcomp->m_rotation.x;
-					p_node["Rotation"][1] >> tempcomp->m_rotation.y;
-					p_node["Rotation"][2] >> tempcomp->m_rotation.z;
+					float x,y,z;
+					p_node["Rotation"][0] >> x;
+					p_node["Rotation"][1] >> y;
+					p_node["Rotation"][2] >> z;
+					tempcomp->m_rotation = QVector3D(x,y,z);
 				}
 				if(p_node.FindValue("scale"))
 				{
-					p_node["scale"][0] >> tempcomp->m_scale.x;
-					p_node["scale"][1] >> tempcomp->m_scale.y;
-					p_node["scale"][2] >> tempcomp->m_scale.z;
+					float x,y,z;
+					p_node["scale"][0] >> x;
+					p_node["scale"][1] >> y;
+					p_node["scale"][2] >> z;
+					tempcomp->m_scale = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
@@ -185,6 +195,14 @@ namespace AbilityEditorNameSpace
 					p_node["Speed"] >> tempcomp->m_speed;
 				if(p_node.FindValue("Mass"))
 					p_node["Mass"] >> tempcomp->m_mass;
+				if(p_node.FindValue("Gravity"))
+				{
+					float x,y,z;
+					p_node["Gravity"][0] >> x;
+					p_node["Gravity"][1] >> y;
+					p_node["Gravity"][2] >> z;
+					tempcomp->m_gravity = QVector3D(x,y,z);
+				}
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
