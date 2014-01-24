@@ -486,7 +486,7 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CollisionRemovePlayerObjectFromWorld(lua_State* p_luaState)
+		static int CollisionRemoveObjectFromWorld(lua_State* p_luaState)
 		{
 			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
 			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
@@ -1775,7 +1775,7 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
-			{"RemovePlayerObjectFromWorld", CollisionRemovePlayerObjectFromWorld},
+			{"RemoveObjectFromWorld", CollisionRemoveObjectFromWorld},
 			{NULL, NULL}
 		};
 

@@ -27,3 +27,27 @@
               type: vertex
             - name: mesh_normal_anim
               type: fragment
+              
+    -  name: Mesh_Normal_Anim_Shadow
+       bindings:
+         - name: PerFrame
+           slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+         - sem: NORMAL
+           offset: 64
+         - sem: BONES
+           offset: 128
+       flags:
+         - name: Shadow
+       programs:
+         - name: Shadow_Anim
+           shaders:
+             - name: shadow_anim
+               type: vertex
+           depth:
+             write: 1
+             test: 1

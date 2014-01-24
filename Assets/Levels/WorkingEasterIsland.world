@@ -720,9 +720,14 @@
         - Entity: 110
           Model: Terrain1Shape
           Material:
-            Name: TerrainMaterial
-            Effect: Mesh
-            Diffuse: TerrainV2
+            Name: PaintMaterial
+            Effect: Mesh_Blend
+            Diffuse: Terrain1Shape_color
+            TextureMap: Terrain1Shape_color
+            TextureRed: dirt
+            TextureGreen: grass
+            TextureBlue: RockWall
+            TileFactor: 24
         - Entity: 111
           Model: Terrain2Shape
           Material:

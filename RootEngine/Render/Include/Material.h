@@ -9,7 +9,7 @@ namespace Render
 	{
 	private:
 		Material() : 
-			m_effect(nullptr)
+			m_effect(nullptr), m_tileFactor(0)
 		{}
 	public:
 		friend class GLRenderer;
