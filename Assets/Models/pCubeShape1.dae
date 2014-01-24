@@ -3,7 +3,7 @@
   <asset>
     <contributor>
       <author>BTH</author>
-      <authoring_tool>OpenCOLLADA2014</authoring_tool>
+      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
       <comments>
 			ColladaMaya export options: 
 			bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;exportCgfxFileReferences=1;
@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Documents/maya/projects/default/untitled</source_data>
+      <source_data>file:///C:/Users/BTH/Desktop/temporer.mb</source_data>
     </contributor>
-    <created>2014-01-16T14:20:32</created>
-    <modified>2014-01-16T14:20:32</modified>
+    <created>2014-01-22T14:38:40</created>
+    <modified>2014-01-22T14:38:40</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -28,16 +28,6 @@
   <library_effects>
     <effect id="lambert1-fx">
       <profile_COMMON>
-        <newparam sid="file2-surface">
-          <surface type="2D">
-            <init_from>file2</init_from>
-          </surface>
-        </newparam>
-        <newparam sid="file2-sampler">
-          <sampler2D>
-            <source>file2-surface</source>
-          </sampler2D>
-        </newparam>
         <technique sid="common">
           <lambert>
             <emission>
@@ -47,58 +37,10 @@
               <color>0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="file2-sampler" texcoord="TEX0">
-                <extra>
-                  <technique profile="OpenCOLLADAMaya">
-                    <blend_mode>NONE</blend_mode>
-                    <coverageU>1</coverageU>
-                    <coverageV>1</coverageV>
-                    <fast>0</fast>
-                    <mirrorU>0</mirrorU>
-                    <mirrorV>0</mirrorV>
-                    <noiseU>0</noiseU>
-                    <noiseV>0</noiseV>
-                    <offsetU>0</offsetU>
-                    <offsetV>0</offsetV>
-                    <repeatU>1</repeatU>
-                    <repeatV>1</repeatV>
-                    <rotateFrame>0</rotateFrame>
-                    <rotateUV>0</rotateUV>
-                    <stagger>0</stagger>
-                    <translateFrameU>0</translateFrameU>
-                    <translateFrameV>0</translateFrameV>
-                    <wrapU>1</wrapU>
-                    <wrapV>1</wrapV>
-                  </technique>
-                </extra>
-              </texture>
+              <color>0.4 0.4 0.4 1</color>
             </diffuse>
-            <transparent opaque="A_ONE">
-              <texture texture="file2-sampler" texcoord="TEX1">
-                <extra>
-                  <technique profile="OpenCOLLADAMaya">
-                    <blend_mode>NONE</blend_mode>
-                    <coverageU>1</coverageU>
-                    <coverageV>1</coverageV>
-                    <fast>0</fast>
-                    <mirrorU>0</mirrorU>
-                    <mirrorV>0</mirrorV>
-                    <noiseU>0</noiseU>
-                    <noiseV>0</noiseV>
-                    <offsetU>0</offsetU>
-                    <offsetV>0</offsetV>
-                    <repeatU>1</repeatU>
-                    <repeatV>1</repeatV>
-                    <rotateFrame>0</rotateFrame>
-                    <rotateUV>0</rotateUV>
-                    <stagger>0</stagger>
-                    <translateFrameU>0</translateFrameU>
-                    <translateFrameV>0</translateFrameV>
-                    <wrapU>1</wrapU>
-                    <wrapV>1</wrapV>
-                  </technique>
-                </extra>
-              </texture>
+            <transparent opaque="RGB_ZERO">
+              <color>0 0 0 1</color>
             </transparent>
             <transparency>
               <float>1</float>
@@ -108,23 +50,11 @@
       </profile_COMMON>
     </effect>
   </library_effects>
-  <library_images>
-    <image id="file2" name="file2">
-      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/blockStandard.dds</init_from>
-      <extra>
-        <technique profile="OpenCOLLADAMaya">
-          <dgnode_type>kFile</dgnode_type>
-          <image_sequence>0</image_sequence>
-          <originalMayaNodeId>file2</originalMayaNodeId>
-        </technique>
-      </extra>
-    </image>
-  </library_images>
   <library_geometries>
     <geometry id="pCubeShape1" name="pCubeShape1">
       <mesh>
         <source id="pCubeShape1-positions" name="pCubeShape1-positions">
-          <float_array id="pCubeShape1-positions-array" count="24">-1.706356 -2.240383 3.893119 1.706356 -2.240383 3.893119 -1.706356 2.240383 3.893119 1.706356 2.240383 3.893119 -1.706356 2.240383 -3.893119 1.706356 2.240383 -3.893119 -1.706356 -2.240383 -3.893119 1.706356 -2.240383 -3.893119</float_array>
+          <float_array id="pCubeShape1-positions-array" count="24">-9.823427 -2.593487 2.278696 9.823427 -2.593487 2.278696 -9.823427 2.593487 2.278696 9.823427 2.593487 2.278696 -9.823427 2.593487 -2.278696 9.823427 2.593487 -2.278696 -9.823427 -2.593487 -2.278696 9.823427 -2.593487 -2.278696</float_array>
           <technique_common>
             <accessor source="#pCubeShape1-positions-array" count="8" stride="3">
               <param name="X" type="float"/>
@@ -193,9 +123,9 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="untitled">
+    <visual_scene id="VisualSceneNode" name="temporer">
       <node id="pCube1" name="pCube1" type="NODE">
-        <translate sid="translate">2.607458 0.6898407 5.11076</translate>
+        <translate sid="translate">34.9087 2.593487 -0.09624685</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
@@ -203,10 +133,7 @@
         <instance_geometry url="#pCubeShape1">
           <bind_material>
             <technique_common>
-              <instance_material symbol="initialShadingGroup" target="#lambert1">
-                <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
-                <bind_vertex_input semantic="TEX1" input_semantic="TEXCOORD" input_set="0"/>
-              </instance_material>
+              <instance_material symbol="initialShadingGroup" target="#lambert1"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
