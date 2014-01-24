@@ -1,6 +1,6 @@
-AbilityTest = {};
+AbilityBall = {};
 
-function AbilityTest.OnCreate (userId, actionId)
+function AbilityBall.OnCreate (userId, actionId)
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();
@@ -12,7 +12,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
-	local scriptComp = Script.New(self, "AbilityTest");
+	local scriptComp = Script.New(self, "AbilityBall");
 	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
@@ -29,7 +29,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	end
 end
 
-function AbilityTest.OnCollide (self, entity)
+function AbilityBall.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
@@ -40,5 +40,5 @@ function AbilityTest.OnCollide (self, entity)
 	end
 end
 
-function AbilityTest.OnDestroy (self)
+function AbilityBall.OnDestroy (self)
 end
