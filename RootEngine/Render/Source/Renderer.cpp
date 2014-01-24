@@ -459,27 +459,34 @@ namespace Render
 			if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
 				continue;
 
-			if((*job).m_shadowMesh != nullptr)
+			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 			{
-				(*job).m_shadowMesh->Bind();
-
-				m_shadowDevice.m_technique->GetPrograms()[0]->Apply();
-
-				for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-				{	
-					m_uniforms->BufferSubData(m_shadowDevice.m_technique->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-				}
-
-				if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+				if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 				{
-					(*job).m_shadowMesh->DrawTransformFeedback();
-				}
-				else
-				{
-					(*job).m_shadowMesh->Draw();		
-				}
+					if((*job).m_shadowMesh != nullptr)
+					{
+						(*job).m_shadowMesh->Bind();
 
-				(*job).m_shadowMesh->Unbind();
+						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+						}
+
+						(*tech)->GetPrograms()[0]->Apply();
+
+
+						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+						{
+							(*job).m_shadowMesh->DrawTransformFeedback();
+						}
+						else
+						{
+							(*job).m_shadowMesh->Draw();		
+						}
+
+						(*job).m_shadowMesh->Unbind();
+					}
+				}
 			}
 		}
 
