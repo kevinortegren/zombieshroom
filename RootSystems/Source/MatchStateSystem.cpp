@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "MatchStateSystem.h"
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
@@ -63,3 +65,5 @@ namespace RootForce
 	
 
 }
+
+#endif

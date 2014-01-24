@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <map>
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/PhysicsSystem.h>
@@ -84,3 +86,5 @@ namespace RootForce
 		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }
+
+#endif

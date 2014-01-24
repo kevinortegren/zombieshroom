@@ -1,5 +1,7 @@
 #include <Network/NetworkComponents.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
@@ -53,3 +55,5 @@ namespace RootForce
 			, IsRemote(false) {}
 	}
 }
+
+#endif

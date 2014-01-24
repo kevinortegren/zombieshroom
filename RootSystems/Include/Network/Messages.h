@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <stdint.h>
@@ -315,3 +317,5 @@ namespace RootForce
 		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map);
 	}
 }
+
+#endif

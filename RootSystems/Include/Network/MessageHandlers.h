@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <Utility/ECS/Include/World.h>
 #include <RakNet/RakPeerInterface.h>
 #include <RakNet/MessageIdentifiers.h>
@@ -62,3 +64,5 @@ namespace RootForce
 		};
 	}
 }
+
+#endif

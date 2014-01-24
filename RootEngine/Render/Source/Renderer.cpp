@@ -369,6 +369,7 @@ namespace Render
 			// Bind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
 			{
+				if((*texture).second != nullptr)
 				(*texture).second->Bind((*texture).first);
 			}
 
@@ -410,6 +411,7 @@ namespace Render
 			// Unbind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
 			{
+				if((*texture).second != nullptr)
 				(*texture).second->Unbind((*texture).first);
 			}
 

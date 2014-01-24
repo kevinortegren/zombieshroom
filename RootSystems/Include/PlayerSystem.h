@@ -21,6 +21,7 @@ namespace RootForce
 		};
 	}
 
+#ifndef COMPILE_LEVEL_EDITOR
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
 		Network::ActionID_t ActionID;
@@ -31,6 +32,7 @@ namespace RootForce
 		bool ActivateAbility;
 		uint8_t SelectedAbility;
 	};
+#endif
 
 	struct PlayerPhysics : public ECS::Component<PlayerPhysics>
 	{
@@ -49,6 +51,7 @@ namespace RootForce
 		float m_mouseSensitivity;
 	};
 
+#ifndef COMPILE_LEVEL_EDITOR
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		int Health;
@@ -57,6 +60,7 @@ namespace RootForce
 		bool WantsRespawn;
 		float RespawnDelay;
 	};
+#endif
 
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>
