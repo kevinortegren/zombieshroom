@@ -23,7 +23,8 @@ namespace RootForce
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
+		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
+		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
 		g_engineContext.m_resourceManager->LoadScript("Player");
         
 		// Initialize the system for controlling the player.
@@ -152,7 +153,8 @@ namespace RootForce
 
 		//Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
-		m_hud->SetAbility(1, "TestDash");
+		m_hud->SetAbility(1, "TestBall");
+		m_hud->SetAbility(2, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
