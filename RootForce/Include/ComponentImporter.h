@@ -188,30 +188,30 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						p_node["Material"]["TextureMap"] >> texturemap;
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(texturemap, Render::TextureType::TEXTURE_2D);
 					}
-					const YAML::Node* drNode = materialNode->FindValue("DiffuseR");
+					const YAML::Node* drNode = materialNode->FindValue("TextureRed");
 					if(drNode != nullptr)
 					{
 						std::string diffuseR;
-						p_node["Material"]["DiffuseR"] >> diffuseR;
+						p_node["Material"]["TextureRed"] >> diffuseR;
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(diffuseR, Render::TextureType::TEXTURE_2D);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 					}
-					const YAML::Node* dgNode = materialNode->FindValue("DiffuseG");
+					const YAML::Node* dgNode = materialNode->FindValue("TextureGreen");
 					if(dgNode != nullptr)
 					{
 						std::string diffuseG;
-						p_node["Material"]["DiffuseG"] >> diffuseG;
+						p_node["Material"]["TextureGreen"] >> diffuseG;
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = g_engineContext.m_resourceManager->LoadTexture(diffuseG, Render::TextureType::TEXTURE_2D);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 					}
-					const YAML::Node* dbNode = materialNode->FindValue("DiffuseB");
+					const YAML::Node* dbNode = materialNode->FindValue("TextureBlue");
 					if(dbNode != nullptr)
 					{
 						std::string diffuseB;
-						p_node["Material"]["DiffuseB"] >> diffuseB;
+						p_node["Material"]["TextureBlue"] >> diffuseB;
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(diffuseB, Render::TextureType::TEXTURE_2D);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 						renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);

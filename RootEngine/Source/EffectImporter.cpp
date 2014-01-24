@@ -258,6 +258,10 @@ namespace RootEngine
 					{
 						technique->m_flags |= Render::TechniqueFlags::RENDER_DEBUG;
 					}
+					else if(name == "Shadow")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_SHADOW;
+					}
 				}
 			}
 			else
