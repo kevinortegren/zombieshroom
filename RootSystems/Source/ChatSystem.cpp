@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "ChatSystem.h"
 #include <Awesomium/STLHelpers.h>
 #include <Awesomium/WebCore.h>
@@ -92,3 +94,5 @@ namespace RootForce
 
 
 }
+
+#endif

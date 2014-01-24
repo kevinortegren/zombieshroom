@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
@@ -39,3 +41,5 @@ namespace RootForce
 		};
 	}
 }
+
+#endif

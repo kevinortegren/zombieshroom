@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <PhysicsSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
@@ -85,3 +87,5 @@ namespace RootForce
 	}
 
 }
+
+#endif

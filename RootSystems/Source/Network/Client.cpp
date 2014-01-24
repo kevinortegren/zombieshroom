@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Transform.h>
@@ -142,3 +144,5 @@ namespace RootForce
 		}
 	}
 }
+
+#endif

@@ -17,7 +17,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
-#include <RootSystems\Include\Components.h>
+#include <RootSystems\Include\ComponentTypes.h>
 #include <ComponentExporter.h>
 
 #undef main
