@@ -998,10 +998,13 @@ int nodeExists(MObject node)
 	{
 		MFnDagNode locator = node;
 
+		MFnTransform locTrans = locator.parent(0);
 		for(int i = 0; i < currNrLocators; i++)
 		{
 			MFnDagNode temp = g_mayaLocatorList[i];
-			if(temp.name() == locator.name())
+			MFnTransform tempTrans = temp.parent(0);
+
+			if(tempTrans.name() == locTrans.name())
 			{
 				answer = i;
 				break;

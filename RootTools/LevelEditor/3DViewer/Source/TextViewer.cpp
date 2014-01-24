@@ -19,6 +19,7 @@
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
 #include <RootSystems\Include\ComponentTypes.h>
 #include <ComponentExporter.h>
+#include <RootSystems/Include/ParticleImporter.h>
 
 #undef main
 
@@ -42,8 +43,7 @@ RootForce::ParticleSystem* particleSystem;
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
 std::vector<ECS::Entity*> Entities;
-std::vector<ECS::Entity*> particleEntities;
-std::vector<ECS::Entity*> spawnPointEntities;
+std::vector<ECS::Entity*> locatorEntities;
 
 void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
@@ -64,6 +64,7 @@ bool ambientInfoExists = false;
 
 void ExportToLevel();
 void LoadSceneFromMaya();
+void UpdateParticle(int index);
 
 Render::TextureInterface* painter;
 
@@ -160,7 +161,14 @@ int main(int argc, char* argv[])
 
 				if(type == "Locator")
 				{
-					cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
+					//cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
+
+					for(int i = 0; i < RM.PlocatorList[updateID]->transformation.nrOfFlags; i++)
+					{
+						string temp = RM.PlocatorList[updateID]->transformation.flags[i];
+						if(temp == "Particle")
+							UpdateParticle(updateID);
+					}
 				}
 
 				//UPDATE
@@ -513,27 +521,25 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
+	locatorEntities.push_back(entity);
 
+	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
-	/*
-	particle->m_particleSystems.resize(1);
-	particle->m_particleSystems[0].m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);
-	particle->m_particleSystems[0].m_material = g_engineContext.m_resourceManager->GetMaterial("test");
-	particle->m_particleSystems[0].m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
-	particle->m_particleSystems[0].m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	
+	ImportParticleEmitter(p_name, particle, transform, false);
 
-	particle->m_system = g_engineContext.m_renderer->CreateParticleSystem(desc);
-	particle->m_material = g_engineContext.m_resourceManager->GetMaterial("test");
-	particle->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Particle/Particle");
-	particle->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	*/
 	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
 	{
 		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
 	}
 
 	return entity;
+}
+
+void UpdateParticle(int index)
+{
+	RootForce::Transform* transform =  m_world.GetEntityManager()->GetComponent<RootForce::Transform>(locatorEntities[index]);
+	
+	transform->m_position = RM.PlocatorList[index]->transformation.position;
 }
 
 void CreateCameraEntity(int index)
@@ -614,7 +620,7 @@ void LoadLocators()
 			string flagName = "Particle";
 			if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
 			{
-				particleEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
+				locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
 			}
 		}
 
@@ -625,7 +631,7 @@ void LoadLocators()
 
 			if(flagName == flagName2)
 			{
-				spawnPointEntities.push_back(CreateTransformEntity(&m_world, i));
+				locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 			}
 		}
 
