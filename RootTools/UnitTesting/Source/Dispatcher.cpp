@@ -1,6 +1,7 @@
 #include "UnitTesting.h"
 #include <Awesomium/WebCore.h>
 #include <RootSystems/Include/ChatSystem.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 TEST(Dispatcher, EmptyBind)
 {

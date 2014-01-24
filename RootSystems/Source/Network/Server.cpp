@@ -5,6 +5,8 @@
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
+#define WORLD_DELTA_UPDATE_INTERVAL 2.0
+
 namespace RootForce
 {
 	namespace Network

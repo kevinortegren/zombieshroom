@@ -7,8 +7,6 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 
-#define WORLD_DELTA_UPDATE_INTERVAL 0.5
-
 namespace RootForce
 {
 	namespace Network

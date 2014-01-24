@@ -1,4 +1,5 @@
 #include <UnitTesting.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(Script, Glowballs)
 {

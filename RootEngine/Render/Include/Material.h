@@ -9,16 +9,12 @@ namespace Render
 	{
 	private:
 		Material() : 
-			m_diffuseMap(nullptr),
-			m_specularMap(nullptr),
-			m_normalMap(nullptr),
 			m_effect(nullptr)
 		{}
 	public:
 		friend class GLRenderer;
-		Render::TextureInterface* m_diffuseMap;
-		Render::TextureInterface* m_specularMap;
-		Render::TextureInterface* m_normalMap;
+		std::map<Render::TextureSemantic::TextureSemantic, Render::TextureInterface*> m_textures;
+		float m_tileFactor;
 		Render::EffectInterface* m_effect;
 	};
 }

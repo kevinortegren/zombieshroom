@@ -13,20 +13,20 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v14.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/LevelSaveFile/v15.mb</source_data>
     </contributor>
-    <created>2014-01-22T08:07:46</created>
-    <modified>2014-01-22T08:07:46</modified>
+    <created>2014-01-22T10:30:23</created>
+    <modified>2014-01-22T10:30:23</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="Treeyellow" name="Treeyellow">
-      <instance_effect url="#Treeyellow-fx"/>
+    <material id="blinn2" name="blinn2">
+      <instance_effect url="#blinn2-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="Treeyellow-fx">
+    <effect id="blinn2-fx">
       <profile_COMMON>
         <newparam sid="file6-surface">
           <surface type="2D">
@@ -38,8 +38,18 @@
             <source>file6-surface</source>
           </sampler2D>
         </newparam>
+        <newparam sid="file12-surface">
+          <surface type="2D">
+            <init_from>file12</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="file12-sampler">
+          <sampler2D>
+            <source>file12-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
-          <lambert>
+          <blinn>
             <emission>
               <color>0 0 0 1</color>
             </emission>
@@ -73,18 +83,64 @@
                 </extra>
               </texture>
             </diffuse>
+            <specular>
+              <texture texture="file12-sampler" texcoord="TEX1">
+                <extra>
+                  <technique profile="OpenCOLLADAMaya">
+                    <blend_mode>NONE</blend_mode>
+                    <coverageU>1</coverageU>
+                    <coverageV>1</coverageV>
+                    <fast>0</fast>
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <noiseU>0</noiseU>
+                    <noiseV>0</noiseV>
+                    <offsetU>0</offsetU>
+                    <offsetV>0</offsetV>
+                    <repeatU>1</repeatU>
+                    <repeatV>1</repeatV>
+                    <rotateFrame>0</rotateFrame>
+                    <rotateUV>0</rotateUV>
+                    <stagger>0</stagger>
+                    <translateFrameU>0</translateFrameU>
+                    <translateFrameV>0</translateFrameV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                  </technique>
+                </extra>
+              </texture>
+            </specular>
+            <shininess>
+              <float>0.3</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <reflectivity>
+              <float>0.5</float>
+            </reflectivity>
             <transparent opaque="RGB_ZERO">
               <color>0 0 0 1</color>
             </transparent>
             <transparency>
               <float>1</float>
             </transparency>
-          </lambert>
+          </blinn>
         </technique>
       </profile_COMMON>
     </effect>
   </library_effects>
   <library_images>
+    <image id="file12" name="file12">
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/Tree1Specular.dds</init_from>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <dgnode_type>kFile</dgnode_type>
+          <image_sequence>0</image_sequence>
+          <originalMayaNodeId>file12</originalMayaNodeId>
+        </technique>
+      </extra>
+    </image>
     <image id="file6" name="file6">
       <init_from>file:///C:/Users/BTH/Documents/zombieshroomMain/Assets/Models/Tree1yellowLeaf.dds</init_from>
       <extra>
@@ -169,7 +225,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v14">
+    <visual_scene id="VisualSceneNode" name="v15">
       <node id="TreeStump8" name="TreeStump8" type="NODE">
         <translate sid="translate">-43.16879 -34.18533 77.6355</translate>
         <rotate sid="rotateZ">0 0 1 0.450582</rotate>
@@ -179,8 +235,9 @@
         <instance_geometry url="#TreeStump8Shape">
           <bind_material>
             <technique_common>
-              <instance_material symbol="lambert6SG" target="#Treeyellow">
+              <instance_material symbol="lambert6SG" target="#blinn2">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
+                <bind_vertex_input semantic="TEX1" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>
           </bind_material>

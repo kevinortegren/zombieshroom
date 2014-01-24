@@ -16,8 +16,8 @@ namespace RootForce
 
 	bool Rectangle::IsPointContained(glm::vec2 p_point)
 	{
-		return ((p_point.x > m_x && p_point.x < m_x + m_width) &&
-		( p_point.y > m_y && p_point.y < m_y + m_height ));
+		return ((p_point.x >= m_x && p_point.x <= m_x + m_width) &&
+		( p_point.y >= m_y && p_point.y <= m_y + m_height ));
 	}
 }
 

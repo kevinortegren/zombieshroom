@@ -4,6 +4,7 @@ namespace RootForce
 {
 	namespace ComponentType
 	{
+#ifndef COMPILE_LEVEL_EDITOR
 		void Initialize()
 		{
 			RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -49,5 +50,6 @@ namespace RootForce
             RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
 		}
+#endif
 	}
 }

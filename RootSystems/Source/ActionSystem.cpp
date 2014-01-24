@@ -1,9 +1,12 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "ActionSystem.h"
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootSystems
 {
@@ -59,8 +62,6 @@ namespace RootSystems
 			movement = glm::normalize(movement) * playphys->MovementSpeed;
 			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
-		action->MovePower = 0;
-		action->StrafePower = 0;
 
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
@@ -73,11 +74,15 @@ namespace RootSystems
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-			
-			m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
-			m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
-			m_engineContext->m_script->AddParameterNumber(action->ActionID);
-			m_engineContext->m_script->ExecuteScript();
+
+			std::string abilityScript = player->AbilityScripts[player->SelectedAbility];
+			if (abilityScript != "")
+			{
+				m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+				m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
+				m_engineContext->m_script->AddParameterNumber(action->ActionID);
+				m_engineContext->m_script->ExecuteScript();
+			}
 		}
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)
@@ -94,13 +99,13 @@ namespace RootSystems
 		{
 			//if(action->StrafePower == 0 && action->MovePower == 0)
 			animation->m_animClip = RootForce::AnimationClip::IDLE;
-			if(action->MovePower == -1)
+			if(action->MovePower < 0)
 				animation->m_animClip = RootForce::AnimationClip::WALKING;
-			else if(action->MovePower == 1)
+			else if(action->MovePower > 0)
 				animation->m_animClip = RootForce::AnimationClip::WALKING;
-			if(action->StrafePower == 1)
+			if(action->StrafePower > 0)
 				animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
-			else if(action->StrafePower == -1)
+			else if(action->StrafePower < 0)
 				animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
 		}
 		// Issue a jump if applicable
@@ -115,8 +120,9 @@ namespace RootSystems
 			action->Jump = false;
 		}
 
-
-		
+		//action->MovePower = 0;
+		//action->StrafePower = 0;
 	}
-
 }
+
+#endif

@@ -1,6 +1,8 @@
 #include "Menu.h"
 
 #include <External/Include/dirent/dirent.h>
+#include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
 
 namespace RootForce
 {

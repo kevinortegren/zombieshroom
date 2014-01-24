@@ -1,7 +1,12 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <Utility/ECS/Include/EntityManager.h>
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Script.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <vector>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
@@ -29,6 +34,16 @@ namespace RootForce
 
 			for (size_t i = 0; i < destroy.size(); ++i)
 			{
+				// If the entity has a script component, call its OnDestroy script.
+				Script* script = p_entityManager->GetComponent<Script>(destroy[i]->second);
+				if (script != nullptr)
+				{
+					g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
+					g_engineContext.m_script->AddParameterUserData(destroy[i]->second, sizeof(ECS::Entity*), "Entity");
+					g_engineContext.m_script->ExecuteScript();
+				}
+
+				// Remove the entity from the world
 				p_entityManager->RemoveAllComponents(destroy[i]->second);
 				p_entityManager->RemoveEntity(destroy[i]->second);
 				p_map.erase(destroy[i]);

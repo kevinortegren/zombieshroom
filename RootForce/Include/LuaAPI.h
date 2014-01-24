@@ -486,6 +486,14 @@ namespace RootForce
 			return 0;
 		}
 
+		static int CollisionRemovePlayerObjectFromWorld(lua_State* p_luaState)
+		{
+			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
+			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			g_engineContext.m_physics->RemoveObject(*collision->m_handle);
+			return 0;
+		}
+
 		static int CollisionSetMeshHandle(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -690,7 +698,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			(*rtemp)->m_material->m_diffuseMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
 			return 0;
 		}
 
@@ -698,7 +706,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			(*rtemp)->m_material->m_specularMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
 			return 0;
 		}
 
@@ -706,7 +714,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			(*rtemp)->m_material->m_normalMap = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			(*rtemp)->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
 			return 0;
 		}
 
@@ -744,7 +752,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_diffuseMap).c_str());
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]).c_str());
 			return 1;
 		}
 
@@ -752,7 +760,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_specularMap).c_str());
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_textures[Render::TextureSemantic::SPECULAR]).c_str());
 			return 1;
 		}
 
@@ -760,7 +768,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_normalMap).c_str());
+			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromTexture((*rtemp)->m_material->m_textures[Render::TextureSemantic::NORMAL]).c_str());
 			return 1;
 		}
 
@@ -1767,6 +1775,7 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
+			{"RemovePlayerObjectFromWorld", CollisionRemovePlayerObjectFromWorld},
 			{NULL, NULL}
 		};
 

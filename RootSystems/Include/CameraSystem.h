@@ -25,33 +25,7 @@ namespace RootForce
 			m_transforms.Init(m_world->GetEntityManager());
 		}
 
-		void ProcessEntity(ECS::Entity* p_entity)
-		{
-			if(m_world->GetTagManager()->GetEntityByTag("Camera") == p_entity)
-			{
-				Transform* transform = m_transforms.Get(p_entity);
-				Camera* camera = m_cameras.Get(p_entity);
-
-				ECS::Entity* skybox = m_world->GetTagManager()->GetEntityByTag("Skybox");
-				if(skybox)
-				{
-					m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
-				}
-
-				Orientation tempOrientation = transform->m_orientation;
-				tempOrientation.Yaw(180.0f);
-				glm::mat4 tempWorldMatrix;
-				tempWorldMatrix = glm::translate(glm::mat4(1.0f), transform->m_position);
-				tempWorldMatrix = glm::rotate(tempWorldMatrix, tempOrientation.GetAngle(), tempOrientation.GetAxis());
-				tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
-				glm::mat4 viewMatrix = glm::inverse(tempWorldMatrix);
-
-				glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_near, camera->m_far);
-
-				m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
-				m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
-			}
-		}
+		void ProcessEntity(ECS::Entity* p_entity);
 
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
@@ -121,6 +95,7 @@ namespace RootForce
 		ECS::ComponentMapper<LookAtBehavior> m_lookAtBehaviors;
 	};
 	
+#ifndef COMPILE_LEVEL_EDITOR
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
 		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 12.0f;}
@@ -147,36 +122,7 @@ namespace RootForce
 			m_transforms.Init(m_world->GetEntityManager());
 		}
 
-		void ProcessEntity(ECS::Entity* p_entity)
-		{
-			Transform* transform = m_transforms.Get(p_entity);
-			ThirdPersonBehavior* thirdPersonBehavior = m_thirdPersonBehaviors.Get(p_entity);
-
-			if(thirdPersonBehavior->m_targetTag != "")
-			{
-				ECS::Entity* target = m_world->GetTagManager()->GetEntityByTag(thirdPersonBehavior->m_targetTag);
-				if(target)
-				{
-					Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(target);
-					if(targetTransform)
-					{
-						//Move the entity
-						glm::vec3 targetPosition = targetTransform->m_position;
-						Orientation tOrientation = targetTransform->m_orientation;
-						glm::vec3 localDisplacement(0.0f);
-						localDisplacement.z = -thirdPersonBehavior->m_distance;
-						glm::vec3 worldDisplacement;
-						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-						float distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
-						transform->m_position = targetPosition + worldDisplacement*distFrac;
-					}
-					else
-					{
-						m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "ThirdPersonBehavior target is missing a transform component!");
-					}
-				}
-			}
-		}
+		void ProcessEntity(ECS::Entity* p_entity);
 
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
@@ -184,4 +130,7 @@ namespace RootForce
 		ECS::ComponentMapper<ThirdPersonBehavior> m_thirdPersonBehaviors;
 		glm::ivec2 m_deltaMouseMovement;
 	};
+#endif
 }
+
+

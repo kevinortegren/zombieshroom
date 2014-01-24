@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 	try 
 	{
-        RootForce::Main m(path);
-        m.Start();
+		RootForce::Main m(path);
+		m.Start();
 	} 
 	catch (std::exception& e) 
 	{
@@ -118,7 +118,7 @@ namespace RootForce
 	{
 		// Start the main loop!
 		while(m_running)
-        {
+		{
 			switch (m_currentState)
 			{
 				case RootForce::GameStates::Menu:
@@ -170,13 +170,14 @@ namespace RootForce
 					m_running = false;
 				} break;
 			}
-        }
+		}
 	}
 
 	void Main::HandleEvents()
 	{
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->Reset();
+
 		SDL_Event event;
 		while(SDL_PollEvent(&event))
 		{

@@ -208,6 +208,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::SPAWNTIME, offset);
 						}
+						else if(sem == "TRANSPOSITION")
+						{
+							technique->AddUniformParam(Render::Semantic::TRANSPOSITION, offset);
+						}
 					}
 				}
 
@@ -227,33 +231,39 @@ namespace RootEngine
 				}
 
 
-				if(techniques[i].FindValue("flags") != nullptr)
-				{
-					const YAML::Node& flags = techniques[i]["flags"];
-					for(size_t j = 0; j < flags.size(); ++j)
-					{
-						std::string name;
-						flags[j]["name"] >> name;
 
-						if(name == "RenderIgnore")
-						{
-							technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
-						}
-						else if(name == "Forward")
-						{
-							technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
-						}
-						else if(name == "Deferred")
-						{
-							technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
-						}
+			}
+
+			if(techniques[i].FindValue("flags") != nullptr)
+			{
+				const YAML::Node& flags = techniques[i]["flags"];
+				for(size_t j = 0; j < flags.size(); ++j)
+				{
+					std::string name;
+					flags[j]["name"] >> name;
+
+					if(name == "RenderIgnore")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_IGNORE;
+					}
+					else if(name == "Forward")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+					}
+					else if(name == "Deferred")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+					}
+					else if(name == "Debug")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEBUG;
 					}
 				}
-				else
-				{
-					// Assume deffered technique if no flags found.
-					technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
-				}
+			}
+			else
+			{
+				// Assume deffered technique if no flags found.
+				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
 			}
 		}
 

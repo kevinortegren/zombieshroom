@@ -1,4 +1,7 @@
 #include <PhysicsSystem.h>
+#include <RootEngine/Include/GameSharedContext.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
@@ -47,4 +50,38 @@ namespace RootForce
 	{
 
 	}
+
+
+
+	void PhysicsTransformCorrectionSystem::Init()
+	{
+		m_physicsAccessor.Init(m_world->GetEntityManager());
+		m_collisions.Init(m_world->GetEntityManager());
+		m_transforms.Init(m_world->GetEntityManager());
+	}
+
+	void PhysicsTransformCorrectionSystem::Begin()
+	{
+
+	}
+
+	void PhysicsTransformCorrectionSystem::ProcessEntity(ECS::Entity* p_entity)
+	{
+		if(g_engineContext.m_physics && g_engineContext.m_logger)
+		{
+			Transform* transform = m_transforms.Get(p_entity);
+			Collision* collision = m_collisions.Get(p_entity);
+
+			Physics* accessor = m_physicsAccessor.Get(p_entity);
+
+			g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
+			g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
+		}
+	}
+
+	void PhysicsTransformCorrectionSystem:: End()
+	{
+
+	}
+
 }

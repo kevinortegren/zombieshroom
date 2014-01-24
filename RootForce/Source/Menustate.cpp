@@ -1,4 +1,7 @@
 #include <RootForce/Include/MenuState.h>
+#include <RootEngine/InputManager/Include/InputInterface.h>
+#include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -12,7 +15,7 @@ namespace RootForce
 
 	void MenuState::Initialize(const std::string& p_workingDir)
 	{
-        m_workingDir = p_workingDir;
+		m_workingDir = p_workingDir;
 
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
@@ -20,6 +23,20 @@ namespace RootForce
 
 	void MenuState::Enter()
 	{
+		// Destroy any existing entities
+		Network::NetworkEntityID id;
+		id.UserID = Network::ReservedUserID::ALL;
+		id.ActionID = Network::ReservedActionID::ALL;
+		id.SequenceID = Network::ReservedSequenceID::ALL;
+		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager()); 
+		g_networkEntityMap.clear();
+		Network::NetworkComponent::s_sequenceIDMap.clear();
+
+		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetTagManager()->UnregisterAll();
+		g_world->GetGroupManager()->UnregisterAll();
+		g_engineContext.m_physics->RemoveAll();
+
 		// Allow the mouse to be moved while in the menu
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
@@ -27,15 +44,13 @@ namespace RootForce
 		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
 
 		// Reset the menu
-        m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
+		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
 		// Destroy any existing server/client and setup a new network client so we can search for LAN-servers
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
 		m_networkContext.m_server = nullptr;
 		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
-		g_networkEntityMap.clear();
-		Network::NetworkComponent::s_sequenceIDMap.clear();
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler

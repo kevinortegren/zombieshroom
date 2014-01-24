@@ -3,6 +3,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -93,14 +94,17 @@ namespace RootForce
 
 				case ID_UNCONNECTED_PONG:
 				{
-					p_bs->IgnoreBytes(4); // Timestamp
+					if (clientComponent->State == ClientState::UNCONNECTED)
+					{
+						p_bs->IgnoreBytes(4); // Timestamp
 					
-					RootSystems::ServerInfoInternal info;
-					info.Information.Serialize(false, p_bs);
-					info.IP = p_packet->systemAddress.ToString(false);
-					info.Port = p_packet->systemAddress.GetPort();
+						RootSystems::ServerInfoInternal info;
+						info.Information.Serialize(false, p_bs);
+						info.IP = p_packet->systemAddress.ToString(false);
+						info.Port = p_packet->systemAddress.GetPort();
 
-					m_list->AddServer(info);
+						m_list->AddServer(info);
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::GameStateDelta:
@@ -177,22 +181,23 @@ namespace RootForce
 					NetworkMessage::UserDisconnected m;
 					m.Serialize(false, p_bs);
 
-					// Log the disconnect.
-					NetworkEntityID id;
-					id.UserID = m.User;
-					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
-					PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
-
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
-					
 					// Remove all entities associated with that player.
 					if (clientComponent->IsRemote)
 					{
+						// Log the disconnect.
+						NetworkEntityID id;
+						id.UserID = m.User;
+						id.ActionID = ReservedActionID::CONNECT;
+						id.SequenceID = 0;
+						PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
+
 						id.UserID = m.User;
 						id.ActionID = ReservedActionID::ALL;
 						id.SequenceID = ReservedSequenceID::ALL;
 						Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
+						Network::NetworkComponent::ResetSequenceForUser(id.UserID);
 					}
 				} return true;
 
@@ -402,32 +407,23 @@ namespace RootForce
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
-				{
-					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
-					
-					// Remove all entities associated with that player
-					NetworkEntityID id;
-					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-					id.ActionID = ReservedActionID::ALL;
-					id.SequenceID = ReservedSequenceID::ALL;
-					Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
-
-					// Notify clients of disconnected client
-					NetworkMessage::UserDisconnected m;
-					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-					
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserDisconnected);
-					m.Serialize(true, &bs);
-
-					// TODO: Send only to clients who have received user connected for all other clients?
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				} return true;
-
 				case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
 					
+					NetworkEntityID id;
+					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					id.ActionID = ReservedActionID::CONNECT;
+					id.SequenceID = 0;
+
+					// Remove all entities associated with that player
+					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					id.ActionID = ReservedActionID::ALL;
+					id.SequenceID = ReservedSequenceID::ALL;
+					Network::DeleteEntities(g_networkEntityMap, id, m_world->GetEntityManager());
+					Network::NetworkComponent::ResetSequenceForUser(id.UserID);
+
+					// Notify clients of disconnected client
 					NetworkMessage::UserDisconnected m;
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					
@@ -493,15 +489,23 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
-					// Update the action for the user
+					// Check whether the user is a local client (we are letting local clients have authority of updating action components right now)
+					// TODO: See if we can update local client on server instead...
 					NetworkEntityID id;
 					id.UserID = m.User;
 					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = 0;
+					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-					ECS::Entity* player = g_networkEntityMap[id];
-					PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-					*playerAction = m.Action;
+					ECS::Entity* client = g_networkEntityMap[id];
+					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+					if (clientComponent->IsRemote)
+					{
+						// Update the action for the user
+						id.SequenceID = 0;
+						ECS::Entity* player = g_networkEntityMap[id];
+						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+						*playerAction = m.Action;
+					}
 					
 					// Broadcast the action to all other clients
 					DataStructures::List<RakNet::SystemAddress> addresses;
@@ -510,7 +514,7 @@ namespace RootForce
 
 					for (unsigned int i = 0; i < addresses.Size(); ++i)
 					{
-						if (i != id.UserID)
+						if (i != id.UserID && !addresses[i].IsLoopback())
 						{
 							RakNet::BitStream bs;
 							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
@@ -556,7 +560,7 @@ namespace RootForce
 								// Create the player
 								g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from LoadMapStatus::Status_Completed");
 								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
-								g_engineContext.m_script->AddParameterNumber(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress));
+								g_engineContext.m_script->AddParameterNumber(id.UserID);
 								g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::CONNECT);
 								g_engineContext.m_script->ExecuteScript();
 								

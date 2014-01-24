@@ -29,5 +29,27 @@ namespace RootForce
 
 			g_networkEntityMap[ID] = p_entity;
 		}
+
+		void NetworkComponent::ResetSequenceForUser(UserID_t p_id)
+		{
+			std::vector<SequenceIDMap::iterator> destroy;
+			for (SequenceIDMap::iterator it = s_sequenceIDMap.begin(); it != s_sequenceIDMap.end(); it++)
+			{
+				UserID_t id = (UserID_t) ((it->first & 0xFFFF000000000000) >> 48);
+				if (id == p_id)
+				{
+					destroy.push_back(it);
+				}
+			}
+
+			for (SequenceIDMap::iterator it : destroy)
+			{
+				s_sequenceIDMap.erase(it);
+			}
+		}
+
+		ClientComponent::ClientComponent()
+			: State(ClientState::UNCONNECTED)
+			, IsRemote(false) {}
 	}
 }

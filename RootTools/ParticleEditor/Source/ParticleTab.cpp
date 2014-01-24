@@ -4,8 +4,8 @@ ParticleTab::ParticleTab(QWidget *parent)
 	: QTabWidget(parent)
 {
 	setObjectName(QStringLiteral("tabWidget_2"));
-	setTabsClosable(true);
-	setMovable(true);
+	setTabsClosable(false);
+	setMovable(false);
 	connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(RemoveTab(int)));
 	m_numTabs = 0;
 }

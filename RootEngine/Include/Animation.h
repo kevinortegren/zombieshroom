@@ -1,4 +1,5 @@
 #pragma once
+#ifndef COMPILE_LEVEL_EDITOR
 
 #include <vector>
 #include <map>
@@ -84,3 +85,5 @@ namespace RootEngine
 		};
 	}
 }
+
+#endif

@@ -12,6 +12,7 @@ layout(std140) uniform PerFrame
 in vec2 gs_TexCoord;
 in vec2 gs_ScreenCoord;
 in float gs_Depth;
+in vec4 gs_color;
 
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Depth;
@@ -37,5 +38,5 @@ void main(void) {
     
 	depthDiff = clamp(depthDiff / 30.0f, 0.0f, 1.0f);
 
-    out_Color = vec4(frag_color.xyz, frag_color.a * depthDiff);
+    out_Color = vec4(frag_color.xyz, frag_color.a * depthDiff) * gs_color;
 }

@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
 #include <RakNet/RakPeerInterface.h>
@@ -61,3 +62,4 @@ namespace RootSystems
 	};
 
 }
+#endif

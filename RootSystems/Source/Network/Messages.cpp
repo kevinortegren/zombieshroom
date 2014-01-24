@@ -11,6 +11,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;

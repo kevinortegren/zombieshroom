@@ -1,6 +1,7 @@
 #include "UnitTesting.h"
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 TEST(PlayerControlSystem, Process)
 {
