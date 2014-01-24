@@ -687,10 +687,10 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
 			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
-			//{
-			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-			//}
+			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			{
+				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			}
 
 			/// ROTATION
 			glm::quat rotation;
