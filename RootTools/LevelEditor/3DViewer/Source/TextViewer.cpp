@@ -394,6 +394,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, int meshID)
 {
 	bool painted = false;
+	bool painting = false;
 	int paintID;
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -406,6 +407,10 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		{
 			painted = true;
 		}
+		if(flag == "Painting")
+		{
+			painting = true;
+		}
 	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
@@ -416,11 +421,11 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
-	else if(textureName == "PaintTexture" || painted)
+	else if(textureName == "PaintTexture" || painted || painting)
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
-		if(textureName == "PaintTexture")
+		if(textureName == "PaintTexture" || painting)
 		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");

@@ -106,6 +106,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 void GivePaintId(int index, string filePath)
 {
 	bool painted = false;
+	bool painting = false;
 	for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
 	{
 		string flag = SM.meshList[index].transformation.flags[i];
@@ -113,9 +114,13 @@ void GivePaintId(int index, string filePath)
 		{
 			painted = true;
 		}
+		if(flag == "Painting")
+		{
+			painting = true;
+		}
 	}
 
-	if (filePath == "PaintTexture" || painted)
+	if (filePath == "PaintTexture" || painted || painting)
 	{
 		if(SM.meshList[index].paintIndex == -1)
 		{
