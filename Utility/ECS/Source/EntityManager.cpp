@@ -61,12 +61,12 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	for(size_t i = 0; i < m_components.size(); ++i) 
 	{
 		if(m_components[i].size() > p_entity->m_id) {
-			m_components[i][p_entity->m_id] = nullptr;
 			p_entity->m_flag ^= (1ULL << i); 
 		}
 	}
 
 	m_systemManager->RemoveEntityFromSystems(p_entity);
+	p_entity = nullptr;
 }
 
 std::vector<ECS::ComponentInterface*>* ECS::EntityManager::GetComponentList(int p_typeId)
