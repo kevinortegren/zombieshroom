@@ -326,6 +326,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		WaitForSingleObject(IdMutexHandle, milliseconds);
 		AddUpdateMessage("Mesh", meshID, true, true, false);
 		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
+		PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
 		ReleaseMutex(IdMutexHandle);
 
 		AddUpdateMessage("Mesh", meshID, true, true, false);

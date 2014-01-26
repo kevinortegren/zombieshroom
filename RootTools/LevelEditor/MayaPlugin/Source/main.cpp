@@ -50,7 +50,7 @@ MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
 
-void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor);
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting);
 int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
 
@@ -136,7 +136,7 @@ void GivePaintId(int index, string filePath)
 	}
 }
 
-void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor)
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting)
 {
 	HANDLE TextureMutexHandle;
 	DWORD milliseconds;
@@ -149,18 +149,22 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		Print("Painting");
 		Print("SIZE X Y ", x, " ", y);
 
-		for(int i = 0; i < x*y*4; i++)
-		{
-			myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
-		}
-
 		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(TextureMutexHandle, SM.milliseconds);
 		//Print("Done");
 
 		SM.PpaintList[SM.meshList[index].paintIndex]->heigth = y;
 		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
+
+		if(painting)
+		{
+			for(int i = 0; i < x*y*4; i++)
+			{
+				myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
+			}
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
+
+		}
 
 		if(Red != "")
 			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, Red.asChar(), g_maxNameLength);
@@ -1128,6 +1132,22 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 		MImage texture;
 
+		bool painted = false;
+		bool painting = false;
+
+		for(int i = 0; i < SM.meshList[meshIndex].transformation.nrOfFlags; i++)
+		{
+		string flag = SM.meshList[meshIndex].transformation.flags[i];
+		if(flag == "Painted")
+		{
+			painted = true;
+		}
+		if(flag == "Painting")
+		{
+			painting = true;
+		}
+		}
+
 		//PAINT STUFF
 		GivePaintId(meshIndex, texPath);
 		if(SM.meshList[meshIndex].paintIndex != -1)
@@ -1136,18 +1156,15 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			int tileFactor;
 
 			ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
-			MObject temp = texture_node.object();
 			
-			MStatus hej = texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
-			if(hej)
+			if(painting)
 			{
-				Print("Success");
-				PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor);
+				MObject temp = texture_node.object();
+				texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
 			}
-			else
-			{
-				Print("FAIL!");
-			}			
+			
+			PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor, painting);
+			
 		}
 
 		//Check if the material already exists.

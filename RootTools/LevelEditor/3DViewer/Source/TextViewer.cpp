@@ -60,7 +60,7 @@ void UpdateCamera(int index);
 void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 void UpdateLight(int index, bool remove, bool firstTimeLoad);
-bool ambientInfoExists = false;
+
 
 void ExportToLevel();
 void LoadSceneFromMaya();
@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
 						cout << RM.PpaintList[updateID]->heigth << endl;
 						cout << RM.PpaintList[updateID]->width << endl;
 						
-						painter->BufferData(RM.PpaintList[updateID]->Pixels);
+						//painter->BufferData(RM.PpaintList[updateID]->Pixels);
 						ReleaseMutex(RM.TextureMutexHandle);
 					}
 				}
@@ -423,23 +423,23 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	}
 	else if(textureName == "PaintTexture" || painted || painting)
 	{
+			RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 
 		if(textureName == "PaintTexture" || painting)
-		{
-			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+		{			
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
+			painter->BufferData(RM.PpaintList[paintID]->Pixels);
+			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
 		}
-		else
+		else if(painted)
 		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 		}
-
-		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
-
-		painter->BufferData(RM.PpaintList[paintID]->Pixels);
+		
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -462,13 +462,13 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 		if(normalMap != "" && normalMap != "NONE")
 		{
-		mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 		}
 		if(specularMap != "" && specularMap != "NONE")
 		{
-		mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
 		}
-		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh"); //Måste ha tangenter (använd Mesh_NormalMap)
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
 
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
@@ -776,6 +776,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 {
 	int LightIndex = -1;
 	int RemoveLightIndex = -1;
+	bool ambientInfoExists = false;
 
 	if(remove)
 	{
