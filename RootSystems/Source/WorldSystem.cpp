@@ -71,6 +71,7 @@ namespace RootForce
 
 		RootForce::Camera* camera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		RootForce::Transform* cameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
@@ -87,7 +88,7 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
 
-		//m_quadTree.Init(m_engineContext, m_world);
+		m_quadTree.Init(m_engineContext, m_world);
 	}
 
 	void WorldSystem::Process()
@@ -96,7 +97,7 @@ namespace RootForce
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
 		
-		//m_quadTree.Render(frustrum, m_quadTree.GetRoot());
+		m_quadTree.Render(frustrum, m_quadTree.GetRoot());
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

@@ -2,9 +2,9 @@
 #include <Utility\ECS\Include\EntitySystemManager.h>
 
 ECS::EntityManager::EntityManager(EntitySystemManager* p_systemManager)
-	: m_nextID(0), m_systemManager(p_systemManager)
+	: m_nextID(0), m_systemManager(p_systemManager), m_allocator(30)
 {
-	m_components.resize(s_numComponents + 1);	
+	m_components.resize(30);	
 }
 
 ECS::Entity* ECS::EntityManager::CreateEntity()
@@ -36,6 +36,11 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 	}
 }
 
+ECS::ComponentAllocator* ECS::EntityManager::GetAllocator()
+{
+	return &m_allocator;
+}
+
 std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManager::GetAllComponents(Entity* p_entity)
 {
 	std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> components;
@@ -46,7 +51,7 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 		{
 			std::pair<unsigned int, ECS::ComponentInterface*> c;
 			c.first = type;
-			c.second = m_components[type][p_entity->m_id].get();
+			c.second = m_components[type][p_entity->m_id];
 			
 			components.push_back(c);
 		}
@@ -68,7 +73,7 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	m_systemManager->RemoveEntityFromSystems(p_entity);
 }
 
-std::vector<std::shared_ptr<ECS::ComponentInterface>>& ECS::EntityManager::GetComponentList(int p_typeId)
+std::vector<ECS::ComponentInterface*>& ECS::EntityManager::GetComponentList(int p_typeId)
  {  
 	 return m_components[p_typeId]; 
 }

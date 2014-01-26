@@ -14,6 +14,35 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(10);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StateComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(100);
+
+
+
+
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 

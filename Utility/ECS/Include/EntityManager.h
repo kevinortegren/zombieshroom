@@ -2,6 +2,7 @@
 
 #include <Utility\ECS\Include\Entity.h>
 #include <Utility\ECS\Include\Component.h>
+#include <Utility\ECS\Include\ComponentAllocator.h>
 #include <memory>
 #include <vector>
 #include <stack>
@@ -25,6 +26,8 @@ namespace ECS
 		void RemoveEntity(ECS::Entity* p_entity);
 		void RemoveAllEntitiesAndComponents();
 
+		ComponentAllocator* GetAllocator();
+
 		template<class T> 
 		T* CreateComponent(Entity* p_entity)
 		{
@@ -35,9 +38,8 @@ namespace ECS
 				return nullptr;
 			}
 
-			// Allocate memory for component.
-			std::shared_ptr<T> component = std::shared_ptr<T>(new T);
-			
+			T* component = new (m_allocator.Allocate<T>()) T;
+
 			/* Component TypeId is enumerated 0,1,2.. etc.
 			So we resize the component type vector to match the ids.
 			*/
@@ -45,7 +47,7 @@ namespace ECS
 				m_components.resize(Component<T>::GetTypeId() + 1);
 
 			// By using the component id we can retrieve the vector of components of that type.
-			std::vector<std::shared_ptr<ComponentInterface>>& componentList = m_components[Component<T>::GetTypeId()];
+			std::vector<ComponentInterface*>& componentList = m_components[Component<T>::GetTypeId()];
 
 			/* Entity ID is enumerated 0,1,2.. etc.
 			So we resize the component vector to match the number of entities. */
@@ -60,7 +62,7 @@ namespace ECS
 
 			m_systemManager->AddEntityToSystems(p_entity);
 
-			return component.get();
+			return component;
 		}
 
 		template<class T>
@@ -79,6 +81,8 @@ namespace ECS
 		{
 			if(p_entity->m_id > m_components[Component<T>::GetTypeId()].size())
 			{
+				m_allocator.Free<T>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
+
 				m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
 
 				p_entity->m_componentTypes.set(Component<T>::GetTypeId(), 0);
@@ -95,7 +99,7 @@ namespace ECS
 			if(p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
 				return nullptr;
 
-			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id].get());
+			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
 		}
 
 		std::vector<std::pair<unsigned int, ComponentInterface*>> GetAllComponents(Entity* p_entity);
@@ -111,7 +115,8 @@ namespace ECS
 
 		void RemoveAllComponents(Entity* p_entity);
 		
-		std::vector<std::shared_ptr<ComponentInterface>>& GetComponentList(int p_typeId);
+		std::vector<ComponentInterface*>& GetComponentList(int p_typeId);
+
 		int GetNumEntities() const { return m_entities.size(); }
 
 		std::vector<ECS::Entity*> GetAllEntities();
@@ -121,6 +126,8 @@ namespace ECS
 		int m_nextID;
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		std::stack<int> m_recyledIds;
-		std::vector<std::vector<std::shared_ptr<ComponentInterface>>> m_components; // CompID, EntityId, CompType.
+		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
+
+		ComponentAllocator m_allocator;
 	};
 }

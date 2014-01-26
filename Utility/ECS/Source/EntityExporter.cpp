@@ -61,7 +61,7 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 			out << YAML::BeginMap;
 			out << YAML::Key << "Entity" << YAML::Value << j;
-			m_exporter(out, m_world->GetEntityManager()->m_components[i][j].get(), i);
+			m_exporter(out, m_world->GetEntityManager()->m_components[i][j], i);
 			out << YAML::EndMap;
 		}
 		out << YAML::EndSeq;
