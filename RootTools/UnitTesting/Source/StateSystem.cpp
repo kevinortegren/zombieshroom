@@ -11,7 +11,7 @@ TEST(StateSystem, ProcessEmptyEntity)
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::StateSystem* system = new RootSystems::StateSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(system, "StateSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(system);
 	// Will test that an empty entity (an entity missing the necessary components does not crash the system
 	system->Process();
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -27,13 +27,13 @@ TEST(StateSystem, ProcessEntity)
 	g_world = world;
 
 	RootSystems::StateSystem* system = new RootSystems::StateSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(system, "StateSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(system);
 	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
 	pSystem->SetPhysicsInterface(g_engineContext.m_physics);
 	pSystem->SetLoggingInterface(g_engineContext.m_logger);
-	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
+	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem);
 	RootSystems::ActionSystem* aSystem = new RootSystems::ActionSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(aSystem, "ActionSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(aSystem);
 
 	// Call the OnCreate script
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);

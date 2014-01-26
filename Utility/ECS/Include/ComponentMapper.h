@@ -16,10 +16,10 @@ namespace ECS
 
 		T* Get(Entity* p_entity)
 		{
-			return static_cast<T*>(m_componentList[p_entity->GetId()]);
+			return static_cast<T*>(m_componentList->at(p_entity->GetId()));
 		}
 		
 	private:
-		std::vector<ECS::ComponentInterface*> m_componentList;
+		std::vector<ECS::ComponentInterface*>* m_componentList;
 	};
 }

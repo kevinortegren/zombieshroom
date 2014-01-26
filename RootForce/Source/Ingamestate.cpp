@@ -28,7 +28,6 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(20);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(100);
@@ -39,9 +38,6 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(100);
-
-
-
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -110,57 +106,57 @@ namespace RootForce
 
 		// Initialize physics system
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem, "PhysicsTransformCorrectionSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem);
 
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
-		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
 
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
 
 		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
 		m_shadowSystem = new RootForce::ShadowSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
-		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_animationSystem->SetGameSharedContext(&g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem);
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
 		m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem);
 
 		// Action system handles local and remote player issued actions and updates the world accordingly
 		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem, "ActionSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem);
 
 		// Respawn system respawns players after they die
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
 
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;

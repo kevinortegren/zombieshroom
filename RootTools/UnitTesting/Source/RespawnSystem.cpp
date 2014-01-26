@@ -10,7 +10,7 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system);
 	// Will test that an empty entity (an entity missing the necessary components does not crash the system
 	system->Process();
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -31,7 +31,7 @@ TEST(RespawnSystem, ProcessEntity)
 	world->GetGroupManager()->RegisterEntity("SpawnPoint", mockSpawn);
 
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system, "RespawnSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system);
 
 	// Call the OnCreate script
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
