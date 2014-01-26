@@ -6,6 +6,9 @@
 #include <cstdint>
 #include <set>
 #include <memory>
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 namespace ECS
 {
@@ -52,7 +55,7 @@ namespace ECS
 	};
 
 	// System to process a set of entities at a set time interval.
-	class IntervalEntitySystem : EntitySystem
+	class IntervalEntitySystem : public EntitySystem
 	{
 	public:
 		friend class EntitySystemManager;
@@ -66,5 +69,29 @@ namespace ECS
 	private:
 		float m_interval;
 		float m_time;
+	};
+
+	// System to be executed on different thread.
+	class ConcurrentSystem : public EntitySystem
+	{
+	public:
+		friend class EntitySystemManager;
+
+		ConcurrentSystem(World* p_world)
+			: EntitySystem(p_world) { m_run = false; m_terminate = false; }
+
+		void Process();	
+		void Run();
+		bool IsRunning();
+		
+		void Start();
+		void Terminate();
+
+		void Synch();
+
+	private:
+		std::atomic_bool m_run;
+		std::atomic_bool m_terminate;
+		std::thread m_thread;
 	};
 }

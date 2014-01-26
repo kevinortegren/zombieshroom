@@ -158,6 +158,7 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -185,10 +186,13 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		m_animationSystem->Start();
 	}
 
 	void IngameState::Exit()
 	{
+		m_animationSystem->Terminate();
+
 		Network::NetworkEntityID id;
 		id.UserID = Network::ReservedUserID::ALL;
 		id.ActionID = Network::ReservedActionID::ALL;
@@ -298,6 +302,7 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
@@ -305,13 +310,12 @@ namespace RootForce
 			m_playerControlSystem->Process();
 		}
 
-		//m_animationSystem->Process();
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			m_actionSystem->Process();
 		}
 
-		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
+		m_animationSystem->Run();
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
@@ -375,7 +379,9 @@ namespace RootForce
 			m_renderingSystem->Process();
 
 		}
-		t.join();
+
+		m_animationSystem->Synch();
+
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();
