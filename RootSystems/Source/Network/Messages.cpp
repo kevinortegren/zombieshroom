@@ -298,19 +298,17 @@ namespace RootForce
 		template <typename T>
 		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_discard)
 		{
-			T* component = nullptr;
+			T* component = p_entityManager->GetComponent<T>(p_entity);
+			if (component == nullptr)
+				component = p_entityManager->CreateComponent<T>(p_entity);
+
+			if (component == nullptr)
+				return nullptr;
 			
 			T c;
 			Serialize(false, p_bs, &c);
 			if (!p_discard)
 			{
-				component = p_entityManager->GetComponent<T>(p_entity);
-				if (component == nullptr)
-					component = p_entityManager->CreateComponent<T>(p_entity);
-
-				if (component == nullptr)
-					return nullptr;
-
 				*component = c;
 			}
 
