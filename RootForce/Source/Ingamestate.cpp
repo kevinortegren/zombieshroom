@@ -138,6 +138,10 @@ namespace RootForce
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
+		//Initialize Ragdoll system
+		m_ragdollSystem = new RootForce::RagdollSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::RagdollSystem>(m_ragdollSystem);
+
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
@@ -320,6 +324,11 @@ namespace RootForce
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_respawnSystem->Process();
+		}
+
+		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
 		}
 
         {
