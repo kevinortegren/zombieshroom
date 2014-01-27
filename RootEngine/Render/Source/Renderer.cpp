@@ -527,7 +527,7 @@ namespace Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Bind la-texture.
-		glActiveTexture(GL_TEXTURE0 + 3);
+		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
 
 		// Output lighting to forward buffer.
@@ -637,7 +637,21 @@ namespace Render
 			bufferSize += (*itr)->GetBufferSize();
 		}
 
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Buffer memory usage: %d", bufferSize);
+		bufferSize /= 1000;
+
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Buffer memory usage: %d kb", bufferSize);
+
+		int textureSize = 0;
+		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+		{
+			textureSize += ((*itr)->GetWidth() * (*itr)->GetHeight() * (*itr)->GetBytesPerPixel()) / (*itr)->GetCompressRatio();
+			
+		}
+
+		textureSize /= 1000;
+
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Texture memory usage: %d kb", textureSize);
+
 	}
 
 	int GLRenderer::GetWidth() const

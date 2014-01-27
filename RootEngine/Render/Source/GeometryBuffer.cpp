@@ -90,7 +90,7 @@ namespace Render
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		CreateBuffers(p_width, p_height);
+		CreateTextures(p_width, p_height);
 
 		UnbindTextures();
 	}

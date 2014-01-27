@@ -45,7 +45,12 @@ namespace Render
 		virtual glm::vec2 GetInverseTextureSize() const = 0;
 		virtual GLuint GetHandle() const = 0;
 		virtual GLenum GetTarget() const = 0;
+
+		virtual int GetCompressRatio() const = 0;
+		virtual int GetBytesPerPixel() const = 0;			
+		virtual int GetMipsLevels() const = 0;
 	};
+
 
 	class Texture : public TextureInterface
 	{
@@ -69,6 +74,10 @@ namespace Render
 
 		glm::vec2 GetSize() const;
 		glm::vec2 GetInverseTextureSize() const;
+
+		int GetCompressRatio() const;
+		int GetBytesPerPixel() const;
+		int GetMipsLevels() const;
 		
 	private:
 		Texture();
@@ -80,5 +89,8 @@ namespace Render
 		int m_textureHeight;
 		GLenum m_textureFormat;
 		GLenum m_textureType;
+		int m_compressRatio;
+		int m_bpp;
+		int m_levels;
 	};
 }
