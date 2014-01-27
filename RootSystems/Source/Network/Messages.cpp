@@ -58,8 +58,6 @@ namespace RootForce
 
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, Position[i]);
-			for (int i = 0; i < 4; ++i)
-				p_bs->Serialize(p_writeToBitstream, Orientation[i]);
 		}
 
 		void DestroyEntities::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
