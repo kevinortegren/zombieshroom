@@ -14,10 +14,11 @@ namespace Render
 		~GeometryBuffer();
 
 		void Init(GLRenderer* p_renderer, int p_width, int p_height);
-		void CreateBuffers(int p_width, int p_height);
-		void Bind();
-		void Unbind();
-		void Read();
+		void CreateTextures(int p_width, int p_height);
+		void Enable();
+		
+		void BindTextures();
+		void UnbindTextures();
 		void Resize(int p_width, int p_height);
 	private:
 

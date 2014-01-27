@@ -134,7 +134,7 @@ namespace Render
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
-		void RenderGeometry();
+		void ProcessRenderJobs();
 
 		void GeometryPass();
 		void ShadowPass();
@@ -161,7 +161,6 @@ namespace Render
 
 		// Scratch framebuffer.
 		GLuint m_fbo;
-
 		GLuint m_activeTarget;
 		GLenum m_activeTexture;
 

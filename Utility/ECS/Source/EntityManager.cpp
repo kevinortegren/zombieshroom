@@ -66,7 +66,6 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	}
 
 	m_systemManager->RemoveEntityFromSystems(p_entity);
-	p_entity = nullptr;
 }
 
 std::vector<ECS::ComponentInterface*>* ECS::EntityManager::GetComponentList(int p_typeId)

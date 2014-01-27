@@ -20,12 +20,12 @@ namespace Render
 		m_normalsTexture = p_renderer->CreateTexture();
 		m_glowTexture = p_renderer->CreateTexture();
 
-		CreateBuffers(p_width, p_height);
+		CreateTextures(p_width, p_height);
 
-		Unbind();
+		UnbindTextures();
 	}
 
-	void GeometryBuffer::CreateBuffers(int p_width, int p_height)
+	void GeometryBuffer::CreateTextures(int p_width, int p_height)
 	{
 		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
 		m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -43,7 +43,7 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
 	}
 
-	void GeometryBuffer::Bind()
+	void GeometryBuffer::Enable()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -53,7 +53,22 @@ namespace Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void GeometryBuffer::Unbind()
+	void GeometryBuffer::BindTextures()
+	{
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, m_diffuseTexture->GetHandle());
+
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, m_normalsTexture->GetHandle());
+
+		glActiveTexture(GL_TEXTURE0 + 2);
+		glBindTexture(GL_TEXTURE_2D, m_depthTexture->GetHandle());
+
+		glActiveTexture(GL_TEXTURE0 + 4);
+		glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
+	}
+
+	void GeometryBuffer::UnbindTextures()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -70,20 +85,6 @@ namespace Render
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void GeometryBuffer::Read()
-	{
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, m_diffuseTexture->GetHandle());
-
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, m_normalsTexture->GetHandle());
-
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, m_depthTexture->GetHandle());
-
-		glActiveTexture(GL_TEXTURE0 + 4);
-		glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
-	}
 
 	void GeometryBuffer::Resize(int p_width, int p_height)
 	{
@@ -91,6 +92,6 @@ namespace Render
 
 		CreateBuffers(p_width, p_height);
 
-		Unbind();
+		UnbindTextures();
 	}
 }

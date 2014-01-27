@@ -356,25 +356,24 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
-		m_gbuffer.Unbind();
-
-		///Bind GBuffer.
-		m_gbuffer.Bind();
-
+		m_gbuffer.UnbindTextures();
+		m_gbuffer.Enable();
 		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED;
 
 		std::sort(m_jobs.begin(), m_jobs.end(), [](RenderJob& a, RenderJob& b)->bool{ return a.m_renderPass < b.m_renderPass; });
 
-		RenderGeometry();
+		ProcessRenderJobs();
 		
-		m_gbuffer.Unbind(); // Unbind GBuffer and restore backbuffer.
-		m_gbuffer.Read(); // Enable the GBuffer for reads. */
+		// Bind textures for read.
+		m_gbuffer.BindTextures();
 	}
 
-	void GLRenderer::RenderGeometry()
+	void GLRenderer::ProcessRenderJobs()
 	{
+		// Itterate jobs.
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
+			// Bind VAO.
 			(*job).m_mesh->Bind();
 
 			// Bind textures.
@@ -384,6 +383,7 @@ namespace Render
 				(*texture).second->Bind((*texture).first);
 			}
 
+			// Itterate techniques.
 			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 			{
 				if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
@@ -394,6 +394,7 @@ namespace Render
 						m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 					}
 
+					// Itterate programs.
 					for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 					{
 						// Apply program.
@@ -418,6 +419,7 @@ namespace Render
 				(*texture).second->Unbind((*texture).first);
 			}
 
+			// Unbind VAO.
 			(*job).m_mesh->Unbind();
 		}
 	}
@@ -470,13 +472,14 @@ namespace Render
 					{
 						(*job).m_shadowMesh->Bind();
 
+						// Buffer uniforms.
 						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
 						{	
 							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 						}
 
+						// Apply shadowing shader program.
 						(*tech)->GetPrograms()[0]->Apply();
-
 
 						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
 						{
@@ -512,6 +515,7 @@ namespace Render
 		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
 		m_uniforms->BufferSubData(0, sizeof(glm::mat4), &lvp);
 
+		// Apply lighting.
 		m_lighting.Process(m_fullscreenQuad);
 
 		// Bind forward target.
@@ -522,8 +526,8 @@ namespace Render
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Read la-buffer.
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+		// Bind la-texture.
+		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
 
 		// Output lighting to forward buffer.
@@ -532,16 +536,13 @@ namespace Render
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
-
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLRenderer::ForwardPass()
 	{
 		m_renderFlags = Render::TechniqueFlags::RENDER_FORWARD;
 
-		RenderGeometry();
+		ProcessRenderJobs();
 
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
@@ -551,6 +552,13 @@ namespace Render
 
 	void GLRenderer::PostProcessPass()
 	{
+		// Bind gbuffer.
+		m_gbuffer.BindTextures();
+
+		// Bind la-texture.
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
+
 		m_fullscreenQuad.Bind();
 
 		m_activeTarget = GL_COLOR_ATTACHMENT1;
@@ -563,7 +571,7 @@ namespace Render
 				for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 				{
 					// Set input.
-					glActiveTexture(GL_TEXTURE0 + 0);
+					glActiveTexture(GL_TEXTURE0 + 5);
 					glBindTexture(GL_TEXTURE_2D, m_activeTexture);
 
 					// Set Output.
@@ -589,8 +597,8 @@ namespace Render
 		// Bind backbuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		// Read forward texture.
-		glActiveTexture(GL_TEXTURE0 + 3);
+		// Bind active target.
+		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, m_activeTexture);
 
 		m_renderTech->GetPrograms()[0]->Apply();
@@ -599,7 +607,8 @@ namespace Render
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
-		glActiveTexture(GL_TEXTURE0 + 3);
+		// Unbind active target.
+		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

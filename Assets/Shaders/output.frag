@@ -1,6 +1,6 @@
 #version 400
 
-uniform sampler2D g_Background;
+uniform sampler2D g_Input;
 
 in vec2 ex_TexCoord;
 

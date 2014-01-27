@@ -7,10 +7,10 @@
         - name: PerObject
           slot: 1
       textures:
-        - name: g_Input
-          slot: 0
         - name: g_Glow
           slot: 4
+      - name: g_Input
+          slot: 5
       programs:
       - name: glow
         shaders:
