@@ -1,0 +1,48 @@
+# Sample effect for a simple particle system.
+
+- name: Water_Compute_Tech
+  
+  # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
+  techniques:
+
+    - name: Water_Compute
+      flags:
+        - name: RenderIgnore
+
+      # Program specification and feedback.
+      programs:
+        - name: water_update
+          shaders:
+            - name: water_update
+              type: compute
+
+    - name: Water_Render
+      bindings:
+        - name: PerFrame
+          slot: 0        
+      textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Depth
+          slot: 3
+          
+      flags:
+        - name: Forward   
+      programs:
+        - name: water_render
+          shaders:
+            - name: water-render
+              type: vertex
+            - name: water-render
+              type: fragment
+          
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Addative = 2
+          blend: 1
+          
+          # Depth settings.
+          depth:
+            write: 0
+            test: 1

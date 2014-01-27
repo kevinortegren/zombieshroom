@@ -69,6 +69,11 @@ namespace RootEngine
 						glType = GL_GEOMETRY_SHADER;
 						extension = ".geometry";
 					}
+					else if(type == "compute")
+					{
+						glType = GL_COMPUTE_SHADER;
+						extension = ".compute";
+					}
 
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());
