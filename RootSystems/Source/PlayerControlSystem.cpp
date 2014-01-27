@@ -97,10 +97,12 @@ namespace RootForce
 
 
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Player");
+		ECS::Entity* aimingDevice = m_world->GetTagManager()->GetEntityByTag("AimingDevice");
 
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
+		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
 		glm::vec3 movement(0.0f);
@@ -180,6 +182,8 @@ namespace RootForce
 		m.User = network->ID.UserID;
 		m.Action = *action;
 		m.Position = transform->m_position;
+		m.Orientation = transform->m_orientation.GetQuaternion();
+		m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
 
 		RakNet::BitStream bs;
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
