@@ -185,12 +185,12 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
-		//m_animationSystem->Start();
+		m_animationSystem->Start();
 	}
 
 	void IngameState::Exit()
 	{
-		//m_animationSystem->Terminate();
+		m_animationSystem->Terminate();
 
 		Network::NetworkEntityID id;
 		id.UserID = Network::ReservedUserID::ALL;
@@ -314,7 +314,7 @@ namespace RootForce
 			m_actionSystem->Process();
 		}
 
-		//m_animationSystem->Run();
+		m_animationSystem->Run();
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
@@ -379,7 +379,7 @@ namespace RootForce
 
 		}
 
-		//m_animationSystem->Synch();
+		m_animationSystem->Synch();
 
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
