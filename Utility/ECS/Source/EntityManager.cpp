@@ -11,10 +11,10 @@ ECS::EntityManager::EntityManager(EntitySystemManager* p_systemManager)
 ECS::Entity* ECS::EntityManager::CreateEntity()
 {
 	int id = m_nextID;
-	if(m_recyledIds.size() > 0)
+	if(m_recycledIds.size() > 0)
 	{
-		id = m_recyledIds.top();
-		m_recyledIds.pop();
+		id = m_recycledIds.top();
+		m_recycledIds.pop();
 		m_nextID--;
 	}
 
@@ -28,7 +28,7 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
-	m_recyledIds.push(p_entity->m_id);
+	m_recycledIds.push(p_entity->m_id);
 	p_entity = nullptr;
 }
 
@@ -80,8 +80,15 @@ void ECS::EntityManager::RemoveAllEntitiesAndComponents()
 	for(int i = size - 1; i > -1; i--)
 	{
 		RemoveAllComponents(&m_entities[i]);
-		m_recyledIds.push(m_entities[i].m_id);
 	}
+
+	// Clear stack.
+	while (!m_recycledIds.empty() )
+	{
+		m_recycledIds.pop();
+	}
+
+	m_nextID = 0;
 }
 
 std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()

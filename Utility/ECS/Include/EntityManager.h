@@ -111,7 +111,7 @@ namespace ECS
 		EntitySystemManager* m_systemManager;
 		int m_nextID;
 		std::vector<Entity> m_entities;
-		std::stack<int> m_recyledIds;
+		std::stack<int> m_recycledIds;
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;
