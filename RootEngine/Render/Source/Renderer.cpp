@@ -147,7 +147,7 @@ namespace Render
 		CheckExtension("NV_texture_multisample");
 
 		// Setup GBuffer.
-		m_geometryPass.Init(width, height);
+		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
 		m_shadowDevice.Init(this, 4092, 4092);
@@ -155,23 +155,21 @@ namespace Render
 		// Setup lighting device.
 		m_lighting.Init(this, width, height);
 	
-		// Setup render target for forward renderer to use.
+		// Setup render target for forward renderer and post processes to use.
 		glGenFramebuffers(1, &m_fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		glGenTextures(1, &m_color);
-		glBindTexture(GL_TEXTURE_2D, m_color);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		m_color0 = CreateTexture();
+		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color, 0);
-		
+		m_color1 = CreateTexture();
+		m_color1->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_color1->GetHandle(), 0);
+
 		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_geometryPass.m_depthHandle, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -233,6 +231,12 @@ namespace Render
 		m_lineRenderer.Init(this);
 
 		PrintResourceUsage();
+
+		// Test PPS.
+
+		auto a = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
+
+		m_postProcessEffects.push_back(a);
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -264,7 +268,7 @@ namespace Render
 	{
 		SDL_SetWindowSize(m_window, p_width, p_height);	
 
-		m_geometryPass.Resize(p_width, p_height);
+		m_gbuffer.Resize(p_width, p_height);
 		m_lighting.Resize(p_width, p_height);
 
 		glViewport(0, 0, p_width, p_height);
@@ -328,6 +332,11 @@ namespace Render
 		}
 
 		{
+			PROFILE("PostProcess Pass", g_context.m_profiler);
+			PostProcessPass();
+		}
+
+		{
 			PROFILE("Output", g_context.m_profiler);
 			Output();
 		}
@@ -347,10 +356,10 @@ namespace Render
 
 	void GLRenderer::GeometryPass()
 	{
-		m_geometryPass.Unbind();
+		m_gbuffer.Unbind();
 
 		///Bind GBuffer.
-		m_geometryPass.Bind();
+		m_gbuffer.Bind();
 
 		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED;
 
@@ -358,8 +367,8 @@ namespace Render
 
 		RenderGeometry();
 		
-		m_geometryPass.Unbind(); // Unbind GBuffer and restore backbuffer.
-		m_geometryPass.Read(); // Enable the GBuffer for reads. */
+		m_gbuffer.Unbind(); // Unbind GBuffer and restore backbuffer.
+		m_gbuffer.Read(); // Enable the GBuffer for reads. */
 	}
 
 	void GLRenderer::RenderGeometry()
@@ -374,10 +383,6 @@ namespace Render
 				if((*texture).second != nullptr)
 				(*texture).second->Bind((*texture).first);
 			}
-
-			// Bind depth texture.
-			glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
-			glBindTexture(GL_TEXTURE_2D, m_geometryPass.m_depthHandle);
 
 			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 			{
@@ -406,10 +411,6 @@ namespace Render
 				}
 			}
 			
-			// Unbind depth texture.
-			glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
-			glBindTexture(GL_TEXTURE_2D,0);
-
 			// Unbind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
 			{
@@ -516,7 +517,7 @@ namespace Render
 		// Bind forward target.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, buffers);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -548,14 +549,49 @@ namespace Render
 		}
 	}
 
+	void GLRenderer::PostProcessPass()
+	{
+		m_fullscreenQuad.Bind();
+
+		m_activeTarget = GL_COLOR_ATTACHMENT1;
+		m_activeTexture = m_color0->GetHandle();
+
+		for(auto effect = m_postProcessEffects.begin(); effect != m_postProcessEffects.end(); ++effect)
+		{
+			for(auto tech = (*effect)->GetTechniques().begin(); tech != (*effect)->GetTechniques().end(); ++tech)
+			{
+				for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
+				{
+					// Set input.
+					glActiveTexture(GL_TEXTURE0 + 0);
+					glBindTexture(GL_TEXTURE_2D, m_activeTexture);
+
+					// Set Output.
+					GLenum buffers[] = { m_activeTarget };
+					glDrawBuffers(1, buffers);
+
+					(*program)->Apply();
+
+					m_fullscreenQuad.Draw();
+
+					// Swap input/output.
+					m_activeTarget = ((m_activeTarget == GL_COLOR_ATTACHMENT0) ? GL_COLOR_ATTACHMENT1 : GL_COLOR_ATTACHMENT0);
+					m_activeTexture = ((m_activeTexture == m_color1->GetHandle()) ? m_color0->GetHandle() : m_color1->GetHandle());
+				}
+			}
+		}
+
+		m_fullscreenQuad.Unbind();
+	}
+
 	void GLRenderer::Output()
 	{
 		// Bind backbuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Read forward texture.
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
-		glBindTexture(GL_TEXTURE_2D, m_color);
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, m_activeTexture);
 
 		m_renderTech->GetPrograms()[0]->Apply();
 
@@ -563,7 +599,7 @@ namespace Render
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::DEPTH);
+		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

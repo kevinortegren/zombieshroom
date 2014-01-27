@@ -127,8 +127,6 @@ namespace Render
 		glBindTexture(m_target, 0);
 	}
 
-
-
 	void Texture::CreateEmptyTexture(int p_width, int p_height, int p_format)
 	{
 		m_target = GL_TEXTURE_2D;
