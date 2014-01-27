@@ -1699,6 +1699,68 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->m_mouseSensitivity);
 			return 1;
 		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		//TDMRULESET
+		//////////////////////////////////////////////////////////////////////////
+		static int TDMRuleSetCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)lua_newuserdata(p_luaState, sizeof(RootForce::TDMRuleSet*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(*e);
+			luaL_setmetatable(p_luaState, "TDMRuleSet");
+			return 1;
+		}
+		static int TDMRuleSetSetScoreLimit(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->ScoreLimit = (int)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int TDMRuleSetSetTimeLeft(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TimeLeft = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int TDMRuleSetSetTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(3); // self, teamId, score
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)] = (int)luaL_checknumber(p_luaState, 3);
+			return 0;
+		}
+		static int TDMRuleSetIncrementTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(2); // self, teamId
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)]++;
+			return 0;
+		}
+		static int TDMRuleSetGetScoreLimit(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->ScoreLimit);
+			return 1;
+		}
+		static int TDMRuleSetGetTimeLeft(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->TimeLeft);
+			return 1;
+		}
+		static int TDMRuleSetGetTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(2); // self, teamId
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)]);
+			return 1;
+		}
 
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
@@ -2061,6 +2123,22 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg tdmruleset_f [] = {
+			{"New", TDMRuleSetCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg tdmruleset_m [] = {
+			{"SetScoreLimit", TDMRuleSetSetScoreLimit},
+			{"SetTimeLeft", TDMRuleSetSetTimeLeft},
+			{"SetTeamScore", TDMRuleSetSetTeamScore},
+			{"IncrementTeamScore", TDMRuleSetIncrementTeamScore},
+			{"GetScoreLimit", TDMRuleSetGetScoreLimit},
+			{"GetTimeLeft", TDMRuleSetGetTimeLeft},
+			{"GetTeamScore", TDMRuleSetGetTeamScore},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2109,6 +2187,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statecomponent_f, RootForce::LuaAPI::statecomponent_m, "StateComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
