@@ -45,7 +45,7 @@ void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
 void DuplicationCb(void *clientData);
 void checkForDuplicatedMeshes(MObject node);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
@@ -1111,6 +1111,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MString normalpath = "";
 		MString materialName = "";
 		MString specularName = "";
+		MString glowName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
 		MFnDependencyNode texture_node;
@@ -1126,7 +1127,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node, glowName);
 		materialName = material_node.name();
 		string texPath = texturepath.asChar();		
 
@@ -1569,6 +1570,40 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 	}
 }
 
+void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
+{
+		MStatus status = MS::kSuccess;;
+	
+	MPlug normal_plug;
+	MPlugArray connections;
+	normal_plug = material_node.findPlug("glowIntensity", true, &status);
+	if(status == true)
+	Print("GLOW");
+
+	MPlugArray bv_connections;
+	normal_plug.connectedTo(bv_connections, true, false, &status);
+
+	bool found_glow = false;
+
+	for(unsigned int j=0; j<bv_connections.length(); ++j)
+	{
+		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
+		{
+			Print("FoundTexture!");
+			MFnDependencyNode test1(bv_connections[j].node(&status));
+			MPlug ftn = test1.findPlug("ftn", &status);
+			out_glow_path = ftn.asString(MDGContext::fsNormal);
+			Print(out_glow_path);
+			found_glow = true;
+		}
+	}
+
+	if (!found_glow)
+	{
+		out_glow_path = "NONE";
+	}
+}
+
 void ExtractBump(MFnDependencyNode &material_node, MString &out_bump_path, float &out_bump_depth)
 {
 	MStatus status = MS::kSuccess;;
@@ -1656,7 +1691,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	}
 
 }
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path)
 {
 	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
@@ -1677,6 +1712,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
+			ExtractGlow(material_node, out_glow_path);
 		}
 	}
 }

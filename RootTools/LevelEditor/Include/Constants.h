@@ -67,8 +67,6 @@ struct Mesh
 	glm::vec3 vertex[g_maxVerticesPerMesh];
 	glm::vec2 UV[g_maxVerticesPerMesh];
 	glm::vec3 normal[g_maxVerticesPerMesh];
-	/*char texturePath[100];
-	char normalPath[100];*/
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
 	//int indices[g_maxVerticesPerMesh*3];
 	char materialName[g_maxNameLength];
@@ -87,6 +85,7 @@ struct Material
 	char texturePath[g_maxPathLength];
 	char normalPath[g_maxPathLength];
 	char specularPath[g_maxPathLength];
+	char glowPath[g_maxPathLength];
 };
 
 struct Camera

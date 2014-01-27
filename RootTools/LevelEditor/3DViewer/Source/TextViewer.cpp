@@ -49,7 +49,7 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, int meshID);
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
@@ -333,7 +333,7 @@ void LoadSceneFromMaya()
 
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath), -1);
+		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1);
 	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
@@ -391,7 +391,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, int meshID)
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID)
 {
 	bool painted = false;
 	bool painting = false;
@@ -467,6 +467,10 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		if(specularMap != "" && specularMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
+		}
+		if(glowMap != "" && glowMap != "NONE")
+		{
+			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
 		}
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
@@ -693,7 +697,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath), MeshIndex);
+			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath),GetNameFromPath(RM.PmaterialList[MeshIndex]->glowPath), MeshIndex);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 

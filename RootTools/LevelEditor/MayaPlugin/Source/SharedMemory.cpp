@@ -314,6 +314,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, g_maxPathLength);
 		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
 		memcpy(PmaterialList[i]->specularPath, materialList[i].specularPath, g_maxPathLength);
+		memcpy(PmaterialList[i]->glowPath, materialList[i].glowPath, g_maxPathLength);
 	}
 
 	*NumberOfMaterials = nrOfMaterials;		
