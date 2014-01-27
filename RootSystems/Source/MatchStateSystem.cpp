@@ -48,7 +48,7 @@ namespace RootForce
 			return false;
 	}
 
-	void MatchStateSystem::AwardPlayerKill( int p_killerID, int p_deadID )
+	void MatchStateSystem::AwardPlayerKill( RootForce::Network::SynchronizedID_t p_killerID, RootForce::Network::SynchronizedID_t p_deadID )
 	{
 		Network::NetworkEntityID killerNetworkID;
 		killerNetworkID.UserID = p_killerID;

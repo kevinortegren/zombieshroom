@@ -249,8 +249,11 @@ namespace RootForce
 		case RootServer::UserCommands::CLIENT_RAGEQUIT:
 			return GameStates::Menu;
 		case RootServer::UserCommands::CLIENT_SUICIDE:
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			break;
+			{
+				// ToDo: Send a network message to server to indicate a suicide
+				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+				MatchStateSystem::AwardPlayerKill(0, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.SynchronizedID);
+			} break;
 		default:
 			break;
 		}

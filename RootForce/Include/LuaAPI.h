@@ -208,15 +208,6 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
-		static int EntityGetHealth(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::HealthComponent **s = (RootForce::HealthComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::HealthComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(*e);
-			luaL_setmetatable(p_luaState, "Health");
-			return 1;
-		}
 		static int EntityGetPlayer(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -233,15 +224,6 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
-			return 1;
-		}
-		static int EntityGetNetwork(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
-			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
@@ -1643,7 +1625,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
-			lua_pushnumber(p_luaState, (*s)->ID.SynchronizedID);
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.SynchronizedID);
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
