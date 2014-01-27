@@ -694,6 +694,23 @@ namespace Render
 	{
 		m_shadowDevice.AddShadowcaster(p_shadowcaster, p_index);
 	}
+
+	void GLRenderer::Compute( ComputeJob* p_job )
+	{
+		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
+		{
+				if((*texture).second != nullptr)
+					(*texture).second->Bind((*texture).first);
+		}
+
+		for(auto tech = p_job->m_effect->GetTechniques().begin(); tech != p_job->m_effect->GetTechniques().end(); ++tech)
+		{
+			// Apply program.
+			(*tech)->GetPrograms()[0]->Apply();
+			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
+		}
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

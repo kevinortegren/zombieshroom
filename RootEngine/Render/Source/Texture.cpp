@@ -173,10 +173,21 @@ namespace Render
 
 			glTexImage2D(m_target, 0, GL_DEPTH_COMPONENT32, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
+		else if(p_format == TextureFormat::TEXTURE_R32)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_R32F;
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+			glTexImage2D(m_target, 0, GL_R, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+			glClearTexImage(m_target, 0, GL_R, GL_FLOAT, NULL);
+		}
 		else
 		{
 			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Tried to create empty texture with unsupported format!");
 		}
+		
 	}
 
 	void Texture::SetParameter(int p_name, int p_parameter)
