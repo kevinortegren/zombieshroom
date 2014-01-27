@@ -10,3 +10,5 @@ CMakeFiles
 *.rej
 *.swatch
 *.ma
+Level_Build/
+Master_Build/
