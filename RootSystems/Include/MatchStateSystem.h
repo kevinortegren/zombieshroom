@@ -30,7 +30,7 @@ namespace RootForce
 		float GetTimeLeft();
 		int GetTeamScore(int p_team);
 
-		void AwardPlayerKill(int p_killerID, int p_deadID); //Assign score and death after a kills has been made
+		static void AwardPlayerKill(int p_killerID, int p_deadID); //Assign score and death after a kills has been made
 	private:
 		NetworkContext* m_networkContext;
 		RootEngine::GameSharedContext* m_gameSharedContext;
