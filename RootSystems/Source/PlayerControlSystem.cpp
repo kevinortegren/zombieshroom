@@ -100,6 +100,7 @@ namespace RootForce
 
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 
 		glm::vec3 movement(0.0f);
@@ -178,6 +179,8 @@ namespace RootForce
 		RootForce::NetworkMessage::PlayerCommand m;
 		m.User = network->ID.UserID;
 		m.Action = *action;
+		m.Position = transform->m_position;
+		m.Orientation = transform->m_orientation.GetQuaternion();
 
 		RakNet::BitStream bs;
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);

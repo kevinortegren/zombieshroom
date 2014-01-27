@@ -10,6 +10,8 @@
 #include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace ECS
 {
@@ -114,6 +116,8 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			PlayerActionComponent Action;
+			glm::vec3 Position;
+			glm::quat Orientation;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -256,14 +260,14 @@ namespace RootForce
 
 		/*
 			Deserialize a component. This will create a new component in the given entity manager if the component doesn't exist on the given entity.
-			Returns nullptr on error.
+			Returns nullptr on error. Do not deserialize transform on our own player entity.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- Type : ComponentType
 				- Data
 			Where data can be deserialized differently depending on type.
 		*/
-		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
+		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_isSelf);
 
 		/*
 			Check whether an entity can be serialized. This will check whether it exists in the network entity map and whether it has a script component.
@@ -285,7 +289,7 @@ namespace RootForce
 
 		/*
 			Deserialize an entity and all of its serialized components. This will create an entity in the entity manager
-			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map.
+			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map. Do not deserialize transform on our own player entity.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- ID : NetworkEntityID
@@ -294,7 +298,7 @@ namespace RootForce
 				- Components
 			Where components are deserialized differently depending on their type. See DeserializeComponent for more information.
 		*/
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map);
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self);
 
 		/*
 			Serialize all entities in the world along with all their components that can be serialized.
@@ -307,14 +311,14 @@ namespace RootForce
 		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map);
 
 		/*
-			Deserialize a world, creating any entities that are not existing, and updating all serializable components.
+			Deserialize a world, creating any entities that are not existing, and updating all serializable components. Do not deserialize transform on our own player entity.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- NumberOfEntities
 				- Entities
 			See DeserializeEntity for how entities are serialized.
 		*/
-		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map);
+		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map, Network::UserID_t p_self);
 	}
 }
 

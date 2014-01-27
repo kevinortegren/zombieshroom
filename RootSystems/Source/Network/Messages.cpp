@@ -55,6 +55,11 @@ namespace RootForce
 				p_bs->Serialize(p_writeToBitstream, Action.Angle[i]);
 			p_bs->Serialize(p_writeToBitstream, Action.ActivateAbility);
 			p_bs->Serialize(p_writeToBitstream, Action.SelectedAbility);
+
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, Position[i]);
+			for (int i = 0; i < 4; ++i)
+				p_bs->Serialize(p_writeToBitstream, Orientation[i]);
 		}
 
 		void DestroyEntities::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -291,7 +296,7 @@ namespace RootForce
 		}
 
 		template <typename T>
-		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_discard)
 		{
 			T* component = p_entityManager->GetComponent<T>(p_entity);
 			if (component == nullptr)
@@ -299,13 +304,18 @@ namespace RootForce
 
 			if (component == nullptr)
 				return nullptr;
-
-			Serialize(false, p_bs, component);
+			
+			T c;
+			Serialize(false, p_bs, &c);
+			if (!p_discard)
+			{
+				*component = c;
+			}
 
 			return component;
 		}
 
-		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager)
+		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_isSelf)
 		{
 			ComponentType::ComponentType type;
 			if (!p_bs->Serialize(false, type))
@@ -315,39 +325,40 @@ namespace RootForce
 			switch (type)
 			{
 				case ComponentType::TRANSFORM:
-					component = CreateOrGetDeserializedComponent<RootForce::Transform>(p_bs, p_entity, p_entityManager);
+					// Discard if this is our own player entity or aiming device.
+					component = CreateOrGetDeserializedComponent<RootForce::Transform>(p_bs, p_entity, p_entityManager, p_isSelf);
 				break;
 
 				case ComponentType::HEALTH:
-					component = CreateOrGetDeserializedComponent<RootForce::HealthComponent>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::HealthComponent>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::PHYSICS:
-					component = CreateOrGetDeserializedComponent<RootForce::Physics>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::Physics>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::NETWORK:
-					component = CreateOrGetDeserializedComponent<RootForce::Network::NetworkComponent>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::Network::NetworkComponent>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::LOOKATBEHAVIOR:
-					component = CreateOrGetDeserializedComponent<RootForce::LookAtBehavior>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::LookAtBehavior>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::SCRIPT:
-					component = CreateOrGetDeserializedComponent<RootForce::Script>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::Script>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::PLAYER:
-					component = CreateOrGetDeserializedComponent<RootForce::PlayerComponent>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::PlayerComponent>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::TDMRULES:
-					component = CreateOrGetDeserializedComponent<RootForce::TDMRuleSet>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::TDMRuleSet>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				case ComponentType::PLAYERPHYSICS:
-					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager);
+					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager, false);
 				break;
 
 				default:
@@ -435,7 +446,7 @@ namespace RootForce
 		}
 
 
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map)
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
 		{
 			Network::NetworkEntityID id;
 			RakNet::RakString scriptName;
@@ -469,9 +480,10 @@ namespace RootForce
 				return nullptr;
 
 			// Deserialize all components
+			bool isSelf = (id.UserID == p_self) && (id.ActionID == Network::ReservedActionID::CONNECT);
 			for (unsigned i = 0; i < count; ++i) 
 			{
-				if (DeserializeComponent(p_bs, entity, p_entityManager) == nullptr)
+				if (DeserializeComponent(p_bs, entity, p_entityManager, isSelf) == nullptr)
 					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
 			}
 
@@ -503,7 +515,7 @@ namespace RootForce
 		}
 
 
-		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map)
+		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
 		{
 			// Read the number of entities
 			int count;
@@ -512,7 +524,7 @@ namespace RootForce
 			// Deserialize all entities
 			for (int i = 0; i < count; ++i)
 			{
-				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map);
+				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self);
 			}
 		}
 	}
