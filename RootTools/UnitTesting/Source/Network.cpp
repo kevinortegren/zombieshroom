@@ -431,6 +431,8 @@ TEST(Network, MessageSerializationPlayerCommand)
 	m1.Action.ActivateAbility = true;
 	m1.Action.SelectedAbility = 2;
 	m1.Position = glm::vec3(1.0f, 2.0f, 3.0f);
+	m1.Orientation = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);
+	m1.AimingDeviceOrientation = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);
 
 	SerializeAndDeserialize(m1, m2);
 	ASSERT_EQ(memcmp(&m1, &m2, sizeof(PlayerCommand)), 0);

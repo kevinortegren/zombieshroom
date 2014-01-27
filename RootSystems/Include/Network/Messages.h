@@ -117,6 +117,8 @@ namespace RootForce
 			Network::UserID_t User;
 			PlayerActionComponent Action;
 			glm::vec3 Position;
+			glm::quat Orientation;
+			glm::quat AimingDeviceOrientation;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

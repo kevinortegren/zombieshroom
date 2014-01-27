@@ -229,13 +229,19 @@ namespace RootForce
 						id.SequenceID = 0;
 
 						ECS::Entity* player = g_networkEntityMap[id];
+						id.SequenceID = 1;
+						ECS::Entity* aimingDevice = g_networkEntityMap[id];
+
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
 
 						// Set the position of the player
 						// TODO: Extrapolate with time stamp
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
+						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
 				} return true;
 
@@ -522,13 +528,19 @@ namespace RootForce
 						// Update the action for the user
 						id.SequenceID = 0;
 						ECS::Entity* player = g_networkEntityMap[id];
+						id.SequenceID = 1;
+						ECS::Entity* aimingDevice = g_networkEntityMap[id];
+
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
 
 						// Set the position of the player
 						// TODO: Add time stamp extrapolation here as well
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
+						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
 					
 					// Broadcast the action to all other clients
