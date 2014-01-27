@@ -51,6 +51,7 @@ private:
 	bool IsSaved();
 	void Changed();
 	void Saved();
+
 	QMessageBox::StandardButton SaveWarningDialog();
 
 	//MEMBERS
@@ -121,5 +122,8 @@ private slots:
 	void FocusButtonClicked();
 	void colorAlphaSliderChanged(int p_val);
 	void endColorAlphaSliderChanged(int p_val);
+	void TemplateChanged(int p_val);
+	void OrbitRadiusChanged(double p_val);
+	void OrbitSpeedChanged(double p_val);
 };
 

@@ -245,44 +245,12 @@
          <x>5</x>
          <y>328</y>
          <width>497</width>
-         <height>353</height>
+         <height>429</height>
         </rect>
        </property>
        <property name="title">
         <string>Template properties</string>
        </property>
-       <widget class="QStackedWidget" name="stackedWidget">
-        <property name="geometry">
-         <rect>
-          <x>2</x>
-          <y>74</y>
-          <width>489</width>
-          <height>355</height>
-         </rect>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="page">
-         <widget class="QLabel" name="label_15">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>24</y>
-            <width>61</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Hej</string>
-          </property>
-         </widget>
-        </widget>
-        <widget class="QWidget" name="page_3"/>
-        <widget class="QWidget" name="page_4"/>
-        <widget class="QWidget" name="page_5"/>
-        <widget class="QWidget" name="page_2"/>
-       </widget>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="geometry">
          <rect>
@@ -335,6 +303,104 @@
           </property>
          </item>
         </widget>
+       </widget>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>72</y>
+          <width>489</width>
+          <height>355</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="page"/>
+        <widget class="QWidget" name="page_3">
+         <widget class="QWidget" name="gridLayoutWidget_3">
+          <property name="geometry">
+           <rect>
+            <x>6</x>
+            <y>4</y>
+            <width>479</width>
+            <height>347</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="2">
+            <widget class="QDial" name="orbitSpeedDial"/>
+           </item>
+           <item row="1" column="2">
+            <widget class="QDial" name="orbitRadiusDial">
+             <property name="wrapping">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="orbitSpeedSpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="orbitRadiusSpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Orbit radius</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Orbit speed</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="orbitAxisComboBox">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>X</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Y</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Z</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Orbit axis</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="page_4"/>
+        <widget class="QWidget" name="page_5"/>
+        <widget class="QWidget" name="page_2"/>
        </widget>
       </widget>
       <widget class="QWidget" name="gridLayoutWidget">

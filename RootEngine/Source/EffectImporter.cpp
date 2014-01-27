@@ -212,6 +212,14 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::TRANSPOSITION, offset);
 						}
+						else if(sem == "ORBITSPEED")
+						{
+							technique->AddUniformParam(Render::Semantic::ORBITSPEED, offset);
+						}
+						else if(sem == "ORBITRADIUS")
+						{
+							technique->AddUniformParam(Render::Semantic::ORBITRADIUS, offset);
+						}
 					}
 				}
 
