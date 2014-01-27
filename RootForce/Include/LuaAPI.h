@@ -243,6 +243,7 @@ namespace RootForce
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+
 			luaL_setmetatable(p_luaState, "Transformation");
 			return 1;
 		}

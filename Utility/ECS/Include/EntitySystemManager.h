@@ -17,27 +17,20 @@ namespace ECS
 
 		EntitySystemManager(World* p_world)
 			: m_world(p_world) {}
-		~EntitySystemManager();
 
 		template<class T>
-		void AddSystem(T* p_system, const char* p_systemName)
+		void AddSystem(T* p_system)
 		{
-			assert(m_systems.find(p_systemName) == m_systems.end());
-			
-			m_systems[p_systemName] = p_system;
-		}
-
-		template<class T>
-		T* GetSystem(const char* p_systemName)
-		{
-			return static_cast<T*>(m_systems[p_systemName]);
+			p_system->Init();
+			m_systems.push_back(p_system);
 		}
 
 	private:
+
 		void AddEntityToSystems(Entity* p_entity);
 		void RemoveEntityFromSystems(Entity* p_entity);
 
 		World* m_world;
-		std::map<std::string, EntitySystem*> m_systems;
+		std::vector<EntitySystem*> m_systems;
 	};
 }

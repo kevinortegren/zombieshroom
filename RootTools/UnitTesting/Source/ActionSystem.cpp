@@ -10,7 +10,7 @@ TEST(ActionSystem, ProcessEmptyEntity)
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
-	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system);
 	// Will test that an empty entity (an entity missing the necessary components does not crash the system
 	system->Process();
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -29,8 +29,8 @@ TEST(ActionSystem, ProcessEntity)
 	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
 	pSystem->SetPhysicsInterface(g_engineContext.m_physics);
 	pSystem->SetLoggingInterface(g_engineContext.m_logger);
-	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system, "ActionSystem");
-	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem, "PhysicsSystem");
+	world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(system);
+	world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(pSystem);
 
 	// Call the OnCreate script
 	g_networkEntityMap.clear();

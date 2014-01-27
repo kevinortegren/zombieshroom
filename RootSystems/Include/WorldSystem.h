@@ -21,7 +21,6 @@ namespace RootForce
 		void CreateWorld(const std::string& p_worldName);
 		void Process();
 		void ShowDebug(bool p_value);
-		void CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node);
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;

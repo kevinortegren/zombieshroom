@@ -18,7 +18,7 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	auto range = m_world->GetGroupManager()->GetEntitiesInGroup("NonExport");
 	for(auto itr = range.first; itr != range.second; ++itr)
 	{
-		nonExportIds[itr->second->GetId()] = true;
+		nonExportIds[itr->second->m_id] = true;
 	}
 
 	YAML::Emitter out;
@@ -31,10 +31,10 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
 	{
-		if(nonExportIds[m_world->GetEntityManager()->m_entities[i]->GetId()])
+		if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
 			continue;
 
-		out << m_world->GetEntityManager()->m_entities[i]->GetId();
+		out << m_world->GetEntityManager()->m_entities[i].m_id;
 	}
 
 	out << YAML::EndSeq;
@@ -61,7 +61,7 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 			out << YAML::BeginMap;
 			out << YAML::Key << "Entity" << YAML::Value << j;
-			m_exporter(out, m_world->GetEntityManager()->m_components[i][j].get(), i);
+			m_exporter(out, m_world->GetEntityManager()->m_components[i][j], i);
 			out << YAML::EndMap;
 		}
 		out << YAML::EndSeq;
@@ -77,11 +77,11 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	
 	for(auto itr = m_world->GetTagManager()->m_tags.begin(); itr != m_world->GetTagManager()->m_tags.end(); ++itr)
 	{
-		if(nonExportIds[(*itr).second->GetId()])
+		if(nonExportIds[(*itr).second->m_id])
 			continue;
 
 		out << YAML::BeginMap;
-		out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
+		out << YAML::Key << "Id" << YAML::Value << (*itr).second->m_id;
 		out << YAML::Key << "Tag" << YAML::Value << (*itr).first;
 		out << YAML::EndMap;
 	}
@@ -99,7 +99,7 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 		if((*itr).first != "NonExport")
 		{
 			out << YAML::BeginMap;
-			out << YAML::Key << "Id" << YAML::Value << (*itr).second->GetId();
+			out << YAML::Key << "Id" << YAML::Value << (*itr).second->m_id;
 			out << YAML::Key << "Group" << YAML::Value << (*itr).first;
 			out << YAML::EndMap;
 		}

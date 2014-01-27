@@ -6,7 +6,7 @@
 
 namespace RootForce
 {
-	QuadNode::QuadNode(AABB& p_bounds)
+	QuadNode::QuadNode(const AABB& p_bounds)
 		: m_bounds(p_bounds) {}
 
 	void QuadNode::AddChild(QuadNode* p_child)
@@ -26,21 +26,105 @@ namespace RootForce
 		return m_childs;
 	}
 
+	void QuadTree::RenderDebug()
+	{
+		RenderNode(m_root);
+	}
+
+	void QuadTree::RenderNode(QuadNode* p_node)
+	{
+		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0));
+
+		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
+		{
+			RenderNode(p_node->m_childs[i]);
+		}
+	}
+
+	QuadNode* QuadTree::GetRoot() const
+	{
+		return m_root;
+	}
+
+	QuadNode* QuadTree::PickRoot(glm::vec2 p_position)
+	{
+		return PickNode(m_root, p_position);
+	}
+
+	QuadNode* QuadTree::PickNode(QuadNode* p_node, glm::vec2 p_position)
+	{
+		QuadNode* currentNode = p_node;
+		if( currentNode->m_bounds.GetXZRect().IsPointContained(p_position) )
+		{
+			if(currentNode->m_childs.size() == 0)
+			{
+				return currentNode;
+			}
+
+			for( unsigned i = 0; i < currentNode->m_childs.size(); ++i)
+			{
+				QuadNode* r = PickNode(currentNode->m_childs[i], p_position);
+				if(r != nullptr)
+				{
+					return r;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	void QuadTree::Render(RootForce::Frustum* p_frustrum, QuadNode* p_node) const
+	{
+		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				ECS::Entity* entity;
+				RootForce::Renderable* renderable;
+
+				for(unsigned i = 0; i < p_node->m_indices.size(); ++i)
+				{
+					entity = m_entities[p_node->m_indices[i]];
+					renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+
+					Render::RenderJob job;
+					job.m_mesh = renderable->m_model->m_meshes[0];
+					job.m_shadowMesh = renderable->m_model->m_meshes[0];
+					job.m_flags = renderable->m_renderFlags;
+					job.m_material = renderable->m_material;
+					job.m_renderPass = renderable->m_pass;
+
+					m_context->m_renderer->AddRenderJob(job);
+				}
+
+				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1));
+			}
+			else
+			{
+				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					Render( p_frustrum, p_node->GetChilds().at(i)); 
+				}
+			}
+		}
+	}
+
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
 		m_vertices.clear();
-		m_globalPolygonList.clear();
 		m_materials.clear();
 
 		m_context = p_context;
 		m_world = p_world;
 
-		// Find Static entities.
+		// Get working set.
 		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
-		unsigned int indexOffset = 0;
+		unsigned indexOffset = 0;
+		unsigned matPtr = 0;
 
-		int matPtr = 0;
+		std::vector<Polygon> polygons;
 
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
@@ -50,7 +134,7 @@ namespace RootForce
 			auto material = renderable->m_material;
 			auto mesh = renderable->m_model->m_meshes[0];
 
-			unsigned int materialIndex = m_materials.size();
+			unsigned materialIndex = m_materials.size();
 
 			m_materials.push_back(material);
 
@@ -66,18 +150,18 @@ namespace RootForce
 			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
 			int offset = 0;
-
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
 				Render::Vertex1P1N1UV v;
 				memcpy(&v, &data[i], sizeof(Render::Vertex1P1N1UV));
 
+				// Transform vertex to world space.
 				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
 				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
 
 				m_vertices.push_back(std::move(v));
 
-				offset ++;
+				offset++;
 			}
 
 			glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -101,7 +185,7 @@ namespace RootForce
 
 				p.m_materialIndex = materialIndex;
 
-				m_globalPolygonList.push_back(std::move(p));
+				polygons.push_back(std::move(p));
 			}
 
 			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -116,9 +200,7 @@ namespace RootForce
 		maxX = maxY = maxZ = -99999;
 		minX = minY = minZ = 99999;
 
-		unsigned numTriangles = m_globalPolygonList.size();
-
-		for(auto itr = m_globalPolygonList.begin(); itr != m_globalPolygonList.end(); ++itr)
+		for(auto itr = polygons.begin(); itr != polygons.end(); ++itr)
 		{
 			Render::Vertex1P1N1UV ps[3];
 
@@ -157,19 +239,20 @@ namespace RootForce
 
 		m_root = new QuadNode(quadTreeBounds);
 
-		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", numTriangles);
-
-		Subdivide(m_root, m_globalPolygonList);
-
+		// Delete working set.
 		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 		for(auto b = a.first; b != a.second; ++b)
 		{
 			m_world->GetEntityManager()->RemoveAllComponents(b->second);
 			m_world->GetEntityManager()->RemoveEntity(b->second);
 		}
+
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
+
+		Subdivide(m_root, polygons);
 	}
 
-	int QuadTree::RoundToPow2(int p_value)
+	int QuadTree::RoundToPow2(int p_value) const
 	{
 		return (int)pow(2, ceil(log(p_value)/log(2)));
 	}
@@ -184,7 +267,7 @@ namespace RootForce
 		{
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Polygons: %d", p_polygons.size());
 
-			AABB* aabb = &p_node->m_bounds;
+			const AABB* aabb = &p_node->m_bounds;
 
 			// Calculate center of the aabb.
 			glm::vec3 center = aabb->GetCenter();
@@ -208,7 +291,7 @@ namespace RootForce
 			std::vector<Polygon> polygonsAfterZSplit;
 
 			// Split all polygons with the x-plane.
-			for(unsigned int i = 0; i < p_polygons.size(); ++i)
+			for(unsigned i = 0; i < p_polygons.size(); ++i)
 			{
 				PolygonSplit result = SplitPolygon(zp, p_polygons[i]);
 
@@ -224,7 +307,7 @@ namespace RootForce
 			std::vector<Polygon> polygonsAfterXSplit;
 
 			// Split all polygons with the z-plane.
-			for(unsigned int i = 0; i < polygonsAfterZSplit.size(); ++i)
+			for(unsigned i = 0; i < polygonsAfterZSplit.size(); ++i)
 			{
 				PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
 
@@ -255,32 +338,29 @@ namespace RootForce
 			std::vector<Polygon> br;
 			std::vector<Polygon> bl;
 
-			for(unsigned int i = 0; i < polygonsAfterXSplit.size(); ++i)
+			for(unsigned i = 0; i < polygonsAfterXSplit.size(); ++i)
 			{
-				glm::vec3 polygonCenter = CalcCenterEx(polygonsAfterXSplit[i]);
+				glm::vec2 polygonCenter = CalcXZCenter(polygonsAfterXSplit[i]);
 
-				if(polygonCenter.x >= center.x && polygonCenter.z >= center.z)
+				if(polygonCenter.x >= center.x && polygonCenter.y >= center.z)
 				{
 					tr.push_back(polygonsAfterXSplit[i]);
 				}
-
-				else if(polygonCenter.x >= center.x && polygonCenter.z <= center.z)
+				else if(polygonCenter.x >= center.x && polygonCenter.y <= center.z)
 				{
 					br.push_back(polygonsAfterXSplit[i]);
 				}
-
-				else if(polygonCenter.x <= center.x && polygonCenter.z <= center.z)
+				else if(polygonCenter.x <= center.x && polygonCenter.y <= center.z)
 				{
 					bl.push_back(polygonsAfterXSplit[i]);
 				}
-				else if(polygonCenter.x <= center.x && polygonCenter.z >= center.z)
+				else if(polygonCenter.x <= center.x && polygonCenter.y >= center.z)
 				{
 					tl.push_back(polygonsAfterXSplit[i]);
 				}
 			}
 
 			int size = bl.size() + br.size() + tl.size() + tr.size();
-
 			int diff = polygonsAfterXSplit.size() - size;
 
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygon Diff: %d", diff);
@@ -289,11 +369,6 @@ namespace RootForce
 			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB);
 			QuadNode* topLeftChild = new QuadNode(topLeftAABB);
 			QuadNode* topRightChild = new QuadNode(topRightAABB);
-
-			bottomLeftChild->m_key = p_node->m_key + "BL";
-			bottomRightChild->m_key = p_node->m_key + "BR";
-			topLeftChild->m_key = p_node->m_key + "TL";
-			topRightChild->m_key = p_node->m_key + "TR";
 
 			p_node->AddChild(bottomLeftChild);
 			p_node->AddChild(bottomRightChild);
@@ -304,144 +379,15 @@ namespace RootForce
 			Subdivide( topRightChild, tr );
 			Subdivide( bottomLeftChild, bl );
 			Subdivide( bottomRightChild, br );
-
 		}
 		else
 		{
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Polygons: %d", p_polygons.size());
 
-			auto a = Trianglulate(p_polygons);
+			std::vector<Triangle> triangles = Trianglulate(p_polygons);
 
-			CreateEntities(a, p_node->m_key);
+			p_node->m_indices = CreateEntities(triangles);
 		}
-	}
-
-	std::vector<Polygon> QuadTree::DividePolygons( Rectangle p_rect, std::vector<Polygon> p_polygons )
-	{
-		std::vector<Polygon> polygons;
-
-		for(auto polygon = p_polygons.begin(); polygon != p_polygons.end(); ++polygon)
-		{
-			glm::vec3 center = CalcCenter((*polygon));
-
-			if(p_rect.IsPointContained(glm::vec2(center.x, center.z)))
-			{
-				polygons.push_back((*polygon));
-			}
-		}
-
-		return polygons;
-	}
-
-	std::vector<Polygon> QuadTree::DividePolygonsEx( Rectangle p_rect, std::vector<Polygon> p_polygons )
-	{
-		std::vector<Polygon> polygons;
-
-
-		float bias = 0.1f;
-		for(unsigned int i = 0; i < p_polygons.size(); ++i)
-		{
-			bool add = true;
-			for(unsigned int j = 0; j < p_polygons[i].m_indices.size(); ++j)
-			{
-				glm::vec3 p = m_vertices[p_polygons[i].m_indices[j]].m_pos;
-
-				if((p.x+bias >= p_rect.m_x && p.x <= p_rect.m_x + p_rect.m_width-bias) &&
-					( p.z+bias >= p_rect.m_y && p.z <= p_rect.m_y + p_rect.m_height-bias ))
-				{
-
-				}
-				else
-				{
-					add = false;
-					break;
-				}
-
-			}
-
-			if(add)
-			{
-				polygons.push_back(p_polygons[i]);
-			}	
-		}
-
-		return polygons;
-	}
-
-	glm::vec3 QuadTree::CalcCenterEx(Polygon& p_polygon)
-	{
-		float sumX = 0;
-		float sumZ = 0;
-
-		for(unsigned int i = 0; i < p_polygon.m_indices.size(); ++i)
-		{
-			sumX += m_vertices[p_polygon.m_indices[i]].m_pos.x;
-			sumZ += m_vertices[p_polygon.m_indices[i]].m_pos.z;
-		}
-
-		sumX /= p_polygon.m_indices.size();
-		sumZ /= p_polygon.m_indices.size();
-
-		return glm::vec3(sumX, 0, sumZ);
-	}
-
-	glm::vec3 QuadTree::CalcCenter(Polygon& p_polygon)
-	{
-		if(p_polygon.m_indices.size() == 3)
-		{
-			float centerX = (m_vertices[p_polygon.m_indices[0]].m_pos.x + m_vertices[p_polygon.m_indices[1]].m_pos.x + m_vertices[p_polygon.m_indices[2]].m_pos.x) / 3;
-			float centerz = (m_vertices[p_polygon.m_indices[0]].m_pos.z + m_vertices[p_polygon.m_indices[1]].m_pos.z + m_vertices[p_polygon.m_indices[2]].m_pos.z) / 3;
-
-			return glm::vec3(centerX, 0, centerz);
-		}
-		else if(p_polygon.m_indices.size() == 4)
-		{
-			float centerX = (m_vertices[p_polygon.m_indices[0]].m_pos.x + m_vertices[p_polygon.m_indices[1]].m_pos.x + m_vertices[p_polygon.m_indices[2]].m_pos.x + m_vertices[p_polygon.m_indices[3]].m_pos.x) / 4;
-			float centerz = (m_vertices[p_polygon.m_indices[0]].m_pos.z + m_vertices[p_polygon.m_indices[1]].m_pos.z + m_vertices[p_polygon.m_indices[2]].m_pos.z + m_vertices[p_polygon.m_indices[3]].m_pos.x) / 4;
-
-			return glm::vec3(centerX, 0, centerz);
-		}
-
-		float area = 0;
-		float cx = 0;
-		float cy = 0;
-		float x0 = 0;
-		float y0 = 0;
-		float x1 = 0;
-		float y1 = 0;
-		float a = 0;
-
-		unsigned int i;
-		for(i = 0; i < p_polygon.m_indices.size()-1; ++i)
-		{
-			x0 = m_vertices[p_polygon.m_indices[i]].m_pos.x;
-			y0 = m_vertices[p_polygon.m_indices[i]].m_pos.z;
-			x1 = m_vertices[p_polygon.m_indices[i+1]].m_pos.x;
-			y1 = m_vertices[p_polygon.m_indices[i+1]].m_pos.z;
-
-			a = x0 * y1 - x1 * y0;
-			area += a;
-
-			cx += (x0 + x1) * a;
-			cy += (y0 + y1) * a;
-		}
-
-		x0 = m_vertices[p_polygon.m_indices[i]].m_pos.x;
-		y0 = m_vertices[p_polygon.m_indices[i]].m_pos.z;
-		x1 = m_vertices[p_polygon.m_indices[0]].m_pos.x;
-		y1 = m_vertices[p_polygon.m_indices[0]].m_pos.z;
-
-		a = x0 * y1 - x1 * y0;
-		area += a;
-
-		cx += (x0 + x1) * a;
-		cy += (y0 + y1) * a;
-
-		area *= 0.5f;
-		cx *= 1.0f / (6.0f * area);
-		cy *= 1.0f / (6.0f * area);
-		
-		return glm::vec3(cx, 0, cy);
 	}
 
 	PolygonSplit QuadTree::SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon)
@@ -451,21 +397,21 @@ namespace RootForce
 		split.m_back.m_materialIndex = p_polygon.m_materialIndex;
 		split.m_front.m_materialIndex = p_polygon.m_materialIndex;
 
-		Render::Vertex1P1N1UV pa = m_vertices[p_polygon.m_indices[p_polygon.m_indices.size()-1]];
+		Render::Vertex1P1N1UV vertexA = m_vertices[p_polygon.m_indices[p_polygon.m_indices.size()-1]];
 
-		int sa = ClassifyPoint(p_divider, pa.m_pos);
+		Side::Side sideA = ClassifyPoint(p_divider, vertexA.m_pos);
 
 		for(unsigned int i = 0; i < p_polygon.m_indices.size(); ++i)
 		{
-			Render::Vertex1P1N1UV pb = m_vertices[p_polygon.m_indices[i]];
+			Render::Vertex1P1N1UV vertexB = m_vertices[p_polygon.m_indices[i]];
 
-			int sb = ClassifyPoint(p_divider, pb.m_pos);
+			Side::Side sideB = ClassifyPoint(p_divider, vertexB.m_pos);
 
-			if(sb == Side::BACK) // Behind
+			if(sideB == Side::BACK) // Behind
 			{
-				if(sa == Side::FRONT) // Infront
+				if(sideA == Side::FRONT) // Infront
 				{
-					int index = SplitVertex(p_divider, pa, pb);
+					int index = SplitVertex(p_divider, vertexA, vertexB);
 
 					split.m_front.m_indices.push_back(index);
 					split.m_back.m_indices.push_back(index);			
@@ -474,11 +420,11 @@ namespace RootForce
 				split.m_back.m_indices.push_back(p_polygon.m_indices[i]);
 
 			}
-			else if(sb == Side::FRONT)// Infront
+			else if(sideB == Side::FRONT)// Infront
 			{
-				if(sa == Side::BACK) // Behind
+				if(sideA == Side::BACK) // Behind
 				{
-					int index = SplitVertex(p_divider, pa, pb);
+					int index = SplitVertex(p_divider, vertexA, vertexB);
 
 					split.m_front.m_indices.push_back(index);
 					split.m_back.m_indices.push_back(index);
@@ -492,34 +438,14 @@ namespace RootForce
 				split.m_back.m_indices.push_back(p_polygon.m_indices[i]);
 			}
 
-			pa = pb;
-			sa = sb;
+			vertexA = vertexB;
+			sideA = sideB;
 		}
 
 		return split;
 	}
 
-	int QuadTree::SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1)
-	{
-
-		Line l;
-		l.m_origin = p_p0.m_pos;
-		l.m_direction = p_p1.m_pos - p_p0.m_pos;
-
-		float t = PlaneIntersectLine(p_divider, l);
-
-		Render::Vertex1P1N1UV newVertex;
-		newVertex.m_pos = l.m_origin + l.m_direction * t;
-		newVertex.m_normal = p_p0.m_normal + (p_p1.m_normal - p_p0.m_normal) * t;
-		newVertex.m_UV = p_p0.m_UV + (p_p1.m_UV - p_p0.m_UV) * t;
-
-		int index = m_vertices.size();
-		m_vertices.push_back(newVertex);
-
-		return index;
-	}
-
-	Side::Side QuadTree::ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position)
+	Side::Side QuadTree::ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position) const
 	{
 		glm::vec4 plane = glm::vec4(p_divider.a, p_divider.b, p_divider.c, p_divider.d);
 
@@ -539,61 +465,51 @@ namespace RootForce
 		}
 	}
 
-	QuadNode* QuadTree::PickRoot(glm::vec2 p_position)
+	unsigned QuadTree::SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1)
 	{
-		return PickNode(m_root, p_position);
+		Line line;
+		line.m_origin = p_p0.m_pos;
+		line.m_direction = p_p1.m_pos - p_p0.m_pos;
+
+		float t = PlaneIntersectLine(p_divider, line);
+
+		// Create new vertex.
+		Render::Vertex1P1N1UV newVertex;
+		newVertex.m_pos = line.m_origin + line.m_direction * t;
+		newVertex.m_normal = p_p0.m_normal + (p_p1.m_normal - p_p0.m_normal) * t;
+		newVertex.m_UV = p_p0.m_UV + (p_p1.m_UV - p_p0.m_UV) * t;
+
+		unsigned index = m_vertices.size();
+		m_vertices.push_back(newVertex);
+
+		return index;
 	}
 
-	QuadNode* QuadTree::PickNode(QuadNode* p_node, glm::vec2 p_position)
+	glm::vec2 QuadTree::CalcXZCenter(const Polygon& p_polygon) const
 	{
-		QuadNode* currentNode = p_node;
-		if( currentNode->m_bounds.GetXZRect().IsPointContained(p_position) )
-		{
-			if(currentNode->m_childs.size() == 0)
-			{
-				return currentNode;
-			}
+		float sumX = 0;
+		float sumZ = 0;
 
-			for( unsigned i = 0; i < currentNode->m_childs.size(); ++i)
-			{
-				QuadNode* r = PickNode(currentNode->m_childs[i], p_position);
-				if(r != nullptr)
-				{
-					return r;
-				}
-			}
+		float invPolygonSize = 1.0f / p_polygon.m_indices.size();
+
+		for(unsigned i = 0; i < p_polygon.m_indices.size(); ++i)
+		{
+			sumX += m_vertices[p_polygon.m_indices[i]].m_pos.x;
+			sumZ += m_vertices[p_polygon.m_indices[i]].m_pos.z;
 		}
 
-		return nullptr;
+		sumX *= invPolygonSize;
+		sumZ *= invPolygonSize;
+
+		return glm::vec2(sumX, sumZ);
 	}
 
-	void QuadTree::RenderDebug()
-	{
-		RenderNode(m_root);
-	}
-
-	void QuadTree::RenderNode(QuadNode* p_node)
-	{
-		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0));
-
-		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
-		{
-			RenderNode(p_node->m_childs[i]);
-		}
-	}
-
-	QuadNode* QuadTree::GetRoot() const
-	{
-		return m_root;
-	}
-
-	std::vector<Triangle> QuadTree::Trianglulate(std::vector<Polygon> p_polygons)
+	std::vector<Triangle> QuadTree::Trianglulate(const std::vector<Polygon>& p_polygons) const
 	{
 		std::vector<Triangle> triangles;
-
-		for(unsigned int i = 0; i < p_polygons.size(); ++i)
+		for(unsigned i = 0; i < p_polygons.size(); ++i)
 		{
-			for(unsigned int j = 2; j < p_polygons[i].m_indices.size(); j++)
+			for(unsigned j = 2; j < p_polygons[i].m_indices.size(); j++)
 			{
 				Triangle t;
 				t.m_indices[0] = p_polygons[i].m_indices[0];
@@ -608,204 +524,104 @@ namespace RootForce
 		return triangles;
 	}
 
-	void QuadTree::CreateEntities(std::vector<Triangle> p_triangles, std::string p_key)
+	std::vector<unsigned> QuadTree::CreateEntities(std::vector<Triangle>& p_triangles)
 	{
 		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_materialIndex < b.m_materialIndex; });
 
-		std::vector<unsigned int> indices;
+		std::vector<unsigned> indices;
 		std::vector<Render::Vertex1P1N1UV> vertices;
+		std::vector<unsigned> entitiesIds;
 
-		unsigned int currentMaterialIndex = p_triangles[0].m_materialIndex;
+		unsigned currentMaterialIndex = p_triangles[0].m_materialIndex;
+		unsigned entityId = 0;
 
-		int entityId = 0;
-
-		for(unsigned int i = 0; i < p_triangles.size(); i++)
+		for(unsigned i = 0; i < p_triangles.size(); i++)
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
+				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
+
 				// Create entity.
-				ECS::Entity* e1 = m_world->GetEntityManager()->CreateEntity();
-				RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e1);
+				ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
-				std::stringstream ss;
-				ss << p_key << entityId;
+				entityId = m_entities.size();
+				m_entities.push_back(entity);
 
-				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+				std::stringstream modelNameStringStream;
+				modelNameStringStream << "static" << entityId;
+
+				// Create renderable.
+				RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+				renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
+				renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+				renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
+				renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
+				renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
 				
-				r->m_material = m_materials[currentMaterialIndex];
-
-				// TODO: Remove this for static meshes.
-				RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(e1);
-				t->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-				t->m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+				renderable->m_material = m_materials[currentMaterialIndex];
 
 				currentMaterialIndex = p_triangles[i].m_materialIndex;
-				entityId++;
 
 				indices.clear();
 				vertices.clear();
+
+				entitiesIds.push_back(entityId);
 			}
 
-			Render::Vertex1P1N1UV p0 = m_vertices[p_triangles[i].m_indices[0]];
-			
-			int index = -1;
-			for(auto itr = vertices.begin(); itr != vertices.end(); ++itr)
+			Render::Vertex1P1N1UV vertex;
+			int index;
+			for(unsigned j = 0; j < 3; ++j)
 			{
-				if((*itr).m_pos == p0.m_pos && (*itr).m_UV == p0.m_UV && (*itr).m_normal == p0.m_normal)
+				vertex = m_vertices[p_triangles[i].m_indices[j]];
+
+				index = -1;
+				for(auto itr = vertices.begin(); itr != vertices.end(); ++itr)
 				{
-					index = itr - vertices.begin();
+					if((*itr).m_pos == vertex.m_pos && (*itr).m_UV == vertex.m_UV && (*itr).m_normal == vertex.m_normal)
+					{
+						index = itr - vertices.begin();
+					}
+				}
+				if(index == -1)
+				{
+					vertices.push_back(vertex);
+					indices.push_back(vertices.size()-1);
+				}
+				else
+				{
+					indices.push_back(index);
 				}
 			}
-			if(index == -1)
-			{
-				vertices.push_back(p0);
-				indices.push_back(vertices.size()-1);
-			}
-			else
-			{
-				indices.push_back(index);
-
-			}
-
-			Render::Vertex1P1N1UV p1 = m_vertices[p_triangles[i].m_indices[1]];
-
-			index = -1;
-			for(auto itr = vertices.begin(); itr != vertices.end(); ++itr)
-			{
-				if((*itr).m_pos == p1.m_pos && (*itr).m_UV == p1.m_UV && (*itr).m_normal == p1.m_normal)
-				{
-					index = itr - vertices.begin();
-				}
-			}
-			if(index == -1)
-			{
-				vertices.push_back(p1);
-				indices.push_back(vertices.size()-1);
-			}
-			else
-			{
-				indices.push_back(index);
-
-			}
-
-
-			Render::Vertex1P1N1UV p2 = m_vertices[p_triangles[i].m_indices[2]];
-
-			index = -1;
-			for(auto itr = vertices.begin(); itr != vertices.end(); ++itr)
-			{
-				if((*itr).m_pos == p2.m_pos && (*itr).m_UV == p2.m_UV && (*itr).m_normal == p2.m_normal)
-				{
-					index = itr - vertices.begin();
-				}
-			}
-			if(index == -1)
-			{
-				vertices.push_back(p2);
-				indices.push_back(vertices.size()-1);
-			}
-			else
-			{
-				indices.push_back(index);
-
-			}
-
-
-			// Push triangle face.
-			/*indices.push_back(p_triangles[i].m_indices[0]);
-			indices.push_back(p_triangles[i].m_indices[1]);
-			indices.push_back(p_triangles[i].m_indices[2]);*/
 		}
 
-		ECS::Entity* e2 = m_world->GetEntityManager()->CreateEntity();
-		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e2);
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
 
-		std::stringstream ss;
-		ss << p_key << entityId;
+		// Create entity.
+		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
-		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-		r->m_material = m_materials[currentMaterialIndex];
-		
-		// TODO: Remove this for static meshes.
-		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(e2);
-		t->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-		t->m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
-	}
+		entityId = m_entities.size();
+		m_entities.push_back(entity);
 
-	void QuadTree::CreateEntitiesEx(std::vector<Triangle> p_triangles, std::string p_key)
-	{
-		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_materialIndex < b.m_materialIndex; });
+		std::stringstream modelNameStringStream;
+		modelNameStringStream << "static" << entityId;
 
-		std::vector<unsigned int> indices;
-
-		unsigned int currentMaterialIndex = p_triangles[0].m_materialIndex;
-
-		int entityId = 0;
-
-		for(unsigned int i = 0; i < p_triangles.size(); i++)
-		{
-			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
-			{
-				// Create entity.
-				ECS::Entity* e1 = m_world->GetEntityManager()->CreateEntity();
-				RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e1);
-
-				std::stringstream ss;
-				ss << p_key << entityId;
-
-				r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-				r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-				r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-				r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-				r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
-				r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+		// Create renderable.
+		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+		renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
+		renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
+		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
+		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
 				
-				r->m_material = m_materials[currentMaterialIndex];
+		renderable->m_material = m_materials[currentMaterialIndex];
 
-				// TODO: Remove this for static meshes.
-				RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(e1);
-				t->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-				t->m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
-
-				currentMaterialIndex = p_triangles[i].m_materialIndex;
-				entityId++;
-
-				indices.clear();
-			}
-
-			// Push triangle face.
-			indices.push_back(p_triangles[i].m_indices[0]);
-			indices.push_back(p_triangles[i].m_indices[1]);
-			indices.push_back(p_triangles[i].m_indices[2]);
-		}
-
-		ECS::Entity* e2 = m_world->GetEntityManager()->CreateEntity();
-		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(e2);
-
-		std::stringstream ss;
-		ss << p_key << entityId;
-
-		r->m_model = m_context->m_resourceManager->CreateModel(ss.str());
-		r->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-		r->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-		r->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		r->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&m_vertices[0], m_vertices.size());
-		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-		r->m_material = m_materials[currentMaterialIndex];
+		indices.clear();
+		vertices.clear();
 		
-		// TODO: Remove this for static meshes.
-		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(e2);
-		t->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-		t->m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		entitiesIds.push_back(entityId);
+
+		return entitiesIds;
 	}
 }

@@ -17,6 +17,7 @@
 #include <RootForce/Include/ComponentExporter.h>
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
+#include <RootSystems/Include/ConcurrentTest.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -63,6 +64,5 @@ namespace RootForce
 		RootSystems::ActionSystem* m_actionSystem;
 		RootSystems::RespawnSystem* m_respawnSystem;
 		RootSystems::StateSystem* m_stateSystem;
-
 	};
 }

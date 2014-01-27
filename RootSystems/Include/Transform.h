@@ -10,9 +10,10 @@ namespace RootForce
 	{
 		Transform()
 		{
-			m_position = glm::vec3(0.0f);
-			m_scale = glm::vec3(1.0f);
+			m_position = glm::vec3(0);
+			m_scale = glm::vec3(1);
 		}
+
 		glm::vec3 m_position;
 		Orientation m_orientation;
 		glm::vec3 m_scale;
