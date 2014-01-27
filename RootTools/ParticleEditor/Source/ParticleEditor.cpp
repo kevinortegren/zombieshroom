@@ -57,9 +57,9 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.focusButton,			SIGNAL(clicked()),							this, SLOT(FocusButtonClicked()));
 	connect(ui.colorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(colorAlphaSliderChanged(int)));
 	connect(ui.endcolorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(endColorAlphaSliderChanged(int)));
-	connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
-	connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
-	connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
+	//connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
+	//connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
+	//connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
 }
 
 void ParticleEditor::Init()
