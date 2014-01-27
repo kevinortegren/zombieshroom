@@ -55,6 +55,8 @@ int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
 
 PaintTexture myTextures[g_maxPaintTextures];
+MSpace::Space g_space_world = MSpace::kTransform;
+MSpace::Space g_space_local = MSpace::kObject;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -1052,15 +1054,14 @@ void MayaLocatorToList(MObject object)
 		glm::vec3 position;
 
 		MFnTransform trans = locator.parent(0);
-		MSpace::Space space_transform = MSpace::kTransform;
 
 		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
 		trans.getScale(scale);
 		trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
 
-		position.x = trans.getTranslation(space_transform).x;
-		position.y = trans.getTranslation(space_transform).y;
-		position.z = trans.getTranslation(space_transform).z;
+		position.x = trans.getTranslation(g_space_world).x;
+		position.y = trans.getTranslation(g_space_world).y;
+		position.z = trans.getTranslation(g_space_world).z;
 
 		SM.locatorList[index].transformation.position.x = position.x;
 		SM.locatorList[index].transformation.position.y = position.y;
@@ -1089,8 +1090,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
 	MVector rotPivot, scalePivot;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
+
 
 	MIntArray triangleCounts, triangleVertices;
 
@@ -1218,7 +1218,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		{///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
 
 		//Get points from mesh
-		mesh.getPoints(points_, space_local);
+		mesh.getPoints(points_, g_space_local);
 
 		//Convert points to float array
 		points_.get(floatPoints);
@@ -1343,9 +1343,9 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 			transform.getScale(scale);
 			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-			position.x = transform.getTranslation(space_transform).x;
-			position.y = transform.getTranslation(space_transform).y;
-			position.z = transform.getTranslation(space_transform).z;
+			position.x = transform.getTranslation(g_space_world).x;
+			position.y = transform.getTranslation(g_space_world).y;
+			position.z = transform.getTranslation(g_space_world).z;
 
 			SM.meshList[meshIndex].transformation.position.x = position.x;
 			SM.meshList[meshIndex].transformation.position.y = position.y;
@@ -1381,8 +1381,6 @@ void MayaLightToList(MObject node, int lightIndex)
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
 	const MString PL = "PointLight";
 	const MString DL = "DirectionalLight";
 	const MString AL = "AmbientLight";
@@ -1427,9 +1425,9 @@ void MayaLightToList(MObject node, int lightIndex)
 			transform.getScale(scale);
 			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-			SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(space_transform).x;
-			SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(space_transform).y;
-			SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(space_transform).z;
+			SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+			SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+			SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
 
 			SM.lightList[lightIndex].transformation.scale.x = scale[0];
 			SM.lightList[lightIndex].transformation.scale.y = scale[1];
@@ -1450,8 +1448,6 @@ void MayaCameraToList(MObject node, int cameraIndex)
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
 
 	///////////////////////	CAMERA
 	if(node.hasFn(MFn::kCamera))
@@ -1462,9 +1458,9 @@ void MayaCameraToList(MObject node, int cameraIndex)
 		//SM.cameraList[cameraIndex].transformation.name = camera.fullPathName().asChar();
 		SM.cameraList[cameraIndex].aspectRatio = camera.aspectRatio();
 
-		SM.cameraList[cameraIndex].eyePoint.x = camera.eyePoint(space_transform).x;
-		SM.cameraList[cameraIndex].eyePoint.y = camera.eyePoint(space_transform).y;
-		SM.cameraList[cameraIndex].eyePoint.z = camera.eyePoint(space_transform).z;
+		SM.cameraList[cameraIndex].eyePoint.x = camera.eyePoint(g_space_world).x;
+		SM.cameraList[cameraIndex].eyePoint.y = camera.eyePoint(g_space_world).y;
+		SM.cameraList[cameraIndex].eyePoint.z = camera.eyePoint(g_space_world).z;
 
 		SM.cameraList[cameraIndex].farClippingPlane = camera.farClippingPlane();
 		SM.cameraList[cameraIndex].horizontalFieldOfView = camera.horizontalFieldOfView();
@@ -1492,9 +1488,9 @@ void MayaCameraToList(MObject node, int cameraIndex)
 			transform.getScale(scale);
 			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-			SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(space_transform).x;
-			SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(space_transform).y;
-			SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(space_transform).z;
+			SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+			SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+			SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
 
 			SM.cameraList[cameraIndex].transformation.scale.x = scale[0];
 			SM.cameraList[cameraIndex].transformation.scale.y = scale[1];
