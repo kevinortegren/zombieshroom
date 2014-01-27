@@ -9,7 +9,7 @@ const int g_maxMeshes = 300;
 const int g_maxCameras = 15;
 const int g_maxLights = 10;
 
-const int g_maxVerticesPerMesh = 30000;
+const int g_maxVerticesPerMesh = 20000;
 const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
@@ -17,7 +17,7 @@ const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 20;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
 
-const string g_levelName = "myTestLevel";
+const string g_levelName = "NormalDebugging";
 
 const string g_textureR = "RED";
 const string g_textureG = "GREEN";
@@ -26,7 +26,7 @@ const string g_textureB = "BLUE";
 const int g_maxMessages = 30;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
-const int g_tileFactor = 4;
+const int g_tileFactor = 24;
 const int g_maxPaintTextures = 2;
 
 struct UpdateMessage
@@ -67,6 +67,8 @@ struct Mesh
 	glm::vec3 vertex[g_maxVerticesPerMesh];
 	glm::vec2 UV[g_maxVerticesPerMesh];
 	glm::vec3 normal[g_maxVerticesPerMesh];
+	glm::vec3 tangent[g_maxVerticesPerMesh];
+	glm::vec3 binormal[g_maxVerticesPerMesh];
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
 	//int indices[g_maxVerticesPerMesh*3];
 	char materialName[g_maxNameLength];

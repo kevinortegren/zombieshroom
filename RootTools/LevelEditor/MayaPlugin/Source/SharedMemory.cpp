@@ -255,6 +255,8 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->vertex[i] = meshList[index].vertex[i];
 		PmeshList[index]->normal[i] = meshList[index].normal[i];
 		PmeshList[index]->UV[i] = meshList[index].UV[i];
+		PmeshList[index]->tangent[i] = meshList[index].tangent[i];
+		PmeshList[index]->binormal[i] = meshList[index].binormal[i];
 		}
 
 		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;		

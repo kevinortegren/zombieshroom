@@ -423,7 +423,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	}
 	else if(textureName == "PaintTexture" || painted || painting)
 	{
-			RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
 
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
@@ -460,19 +460,25 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	{
 		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-		if(normalMap != "" && normalMap != "NONE")
-		{
-			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
-		}
 		if(specularMap != "" && specularMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
+
 		}
 		if(glowMap != "" && glowMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
 		}
+		if(normalMap != "" && normalMap != "NONE")
+		{
+			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+		}
+		else
+		{
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+		}
+			
 	}
 
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
@@ -697,7 +703,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[MeshIndex]->normalPath), GetNameFromPath(RM.PmaterialList[MeshIndex]->specularPath),GetNameFromPath(RM.PmaterialList[MeshIndex]->glowPath), MeshIndex);
+			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
@@ -742,21 +748,23 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		if(updateShape)
 		{
 		// COPY VERTICES
-		Render::Vertex1P1N1UV* m_vertices;
-		m_vertices = new Render::Vertex1P1N1UV[g_maxVerticesPerMesh];
+		Render::Vertex1P1N1UV1T1BT* m_vertices;
+		m_vertices = new Render::Vertex1P1N1UV1T1BT[g_maxVerticesPerMesh];
 
 		for(int j = 0; j < RM.PmeshList[MeshIndex]->nrOfVertices; j++)
 		{
 			m_vertices[j].m_pos = RM.PmeshList[MeshIndex]->vertex[j];
 			m_vertices[j].m_normal = RM.PmeshList[MeshIndex]->normal[j];
 			m_vertices[j].m_UV = RM.PmeshList[MeshIndex]->UV[j];
+			m_vertices[j].m_tangent = RM.PmeshList[MeshIndex]->tangent[j];
+			m_vertices[j].m_bitangent = RM.PmeshList[MeshIndex]->binormal[j];
 
 		}
 
 		// SET INFORMATION TO GAME
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
-		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(reinterpret_cast<Render::Vertex1P1N1UV*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
+		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 
 		}
 
