@@ -117,7 +117,9 @@ namespace RootForce
 							|| clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA))
 					{
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
-						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap);
+
+						NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
+						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 						{
@@ -229,6 +231,12 @@ namespace RootForce
 						ECS::Entity* player = g_networkEntityMap[id];
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
+
+						// Set the position of the player
+						// TODO: Extrapolate with time stamp
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
 					}
 				} return true;
 
@@ -517,6 +525,12 @@ namespace RootForce
 						ECS::Entity* player = g_networkEntityMap[id];
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
+
+						// Set the position of the player
+						// TODO: Add time stamp extrapolation here as well
+						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+						transform->m_position = m.Position;
+						transform->m_orientation.SetOrientation(m.Orientation);
 					}
 					
 					// Broadcast the action to all other clients

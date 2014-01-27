@@ -10,6 +10,8 @@
 #include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/PlayerSystem.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace ECS
 {
@@ -114,6 +116,8 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			PlayerActionComponent Action;
+			glm::vec3 Position;
+			glm::quat Orientation;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -263,7 +267,7 @@ namespace RootForce
 				- Data
 			Where data can be deserialized differently depending on type.
 		*/
-		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager);
+		ECS::ComponentInterface* DeserializeComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_isSelf);
 
 		/*
 			Check whether an entity can be serialized. This will check whether it exists in the network entity map and whether it has a script component.
@@ -294,7 +298,7 @@ namespace RootForce
 				- Components
 			Where components are deserialized differently depending on their type. See DeserializeComponent for more information.
 		*/
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map);
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self);
 
 		/*
 			Serialize all entities in the world along with all their components that can be serialized.
@@ -314,7 +318,7 @@ namespace RootForce
 				- Entities
 			See DeserializeEntity for how entities are serialized.
 		*/
-		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map);
+		void DeserializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, Network::NetworkEntityMap& p_map, Network::UserID_t p_self);
 	}
 }
 
