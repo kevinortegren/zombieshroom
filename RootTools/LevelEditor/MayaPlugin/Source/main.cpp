@@ -1226,6 +1226,12 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MIntArray polygonVertices;
 		MPoint UVpoint;
 		float2 UV;
+
+		MPoint TangentPoint;
+		MVector tempTangent;
+		MVector tempBiNormal;
+		MFloatVectorArray tangentsArray;
+
 		int triangleVertices[3];
 		MVector normal;
 		int count = 0;
@@ -1234,6 +1240,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		SM.meshList[meshIndex].nrOfVertices = 0;
 
 		int uvID;
+		//int tangentID;
+		//int biNormalID;
 		mesh.getNormals(normals);
 
 		//goes through the polygons extracting information. 
@@ -1252,6 +1260,9 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 				nrOfTriangles = 1;
 			
 			mesh.getPolygonVertices(i, polygonVertices);
+
+			//mesh.getTangents(tangentsArray, space_local);
+			//mesh.getBinormals(biNormalArray, space_local);
 
 			mesh.getFaceNormalIds(i, normalIDs);
 
@@ -1293,6 +1304,25 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 					SM.meshList[meshIndex].UV[count].x = U;
 					SM.meshList[meshIndex].UV[count].y = 1-V;
+
+					int herp = mesh.getTangentId(i, localIndex[j]);
+					mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, space_local);
+
+					//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
+					//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
+					//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
+
+					mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, space_local, 0);
+					
+					//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
+
+					SM.meshList[meshIndex].binormal[count].x = tempBiNormal.x;
+					SM.meshList[meshIndex].binormal[count].y = tempBiNormal.y;
+					SM.meshList[meshIndex].binormal[count].z = tempBiNormal.z;
+
+					SM.meshList[meshIndex].tangent[count].x = tempTangent.x;
+					SM.meshList[meshIndex].tangent[count].y = tempTangent.y;
+					SM.meshList[meshIndex].tangent[count].z = tempTangent.z;
 
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
