@@ -50,16 +50,16 @@ namespace RootEngine
 			case SDL_MOUSEMOTION:
 				//m_deltaMousePos.x = p_event.motion.x - m_globMousePos.x;
 				//m_deltaMousePos.y = p_event.motion.y - m_globMousePos.y;
-				m_globMousePos.x = p_event.motion.x;
-				m_globMousePos.y = p_event.motion.y;
+				m_globMousePos.x = -p_event.motion.x;
+				m_globMousePos.y = -p_event.motion.y;
 
-				m_deltaMousePos.x = p_event.motion.xrel;
-				m_deltaMousePos.y = p_event.motion.yrel;
+				m_deltaMousePos.x = -p_event.motion.xrel;
+				m_deltaMousePos.y = -p_event.motion.yrel;
 				if(m_lockMouseEnabled)
 				{
 					//int w, h;
 					//SDL_GetWindowSize(NULL, &w, &h);
-					SDL_WarpMouseInWindow(NULL, 100, 100);
+					SDL_WarpMouseInWindow(NULL, 500, 400);
 				}
 				break;
 			default:
@@ -120,7 +120,7 @@ namespace RootEngine
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{
 			m_lockMouseEnabled = p_enable;
-			SDL_SetRelativeMouseMode((SDL_bool) p_enable);
+			//SDL_SetRelativeMouseMode((SDL_bool) p_enable);
 			//SDL_ShowCursor(!p_enable);
 		}
 		//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)
