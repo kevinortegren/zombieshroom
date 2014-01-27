@@ -236,6 +236,7 @@ namespace Render
 
 		// Test PPS.
 
+		/*
 		auto a = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
 
 		float weights[10];
@@ -253,6 +254,7 @@ namespace Render
 		}
 
 		m_postProcessEffects.push_back(a);
+		*/
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
