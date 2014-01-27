@@ -2,37 +2,28 @@
   techniques:
     - name: Glow
       bindings:
-        - name: PerFrame
-          slot: 0
-        - name: PerObject
-          slot: 1
+        - name: PerTech
+          slot: 3
       textures:
         - name: g_Glow
           slot: 4
-        - name: g_Input
-          slot: 5
-          
-      
+
       programs:
-      - name: glow
+      
+      # Vertical blur pass
+      - name: glow_vertical
         shaders:
           - name: postprocess
             type: vertex
-          - name: glow
+          - name: glow_vertical
             type: fragment
-        depth:
-          write: 0
-          test: 0
-        blend: 0
+        blend: 2
         
-        
-      - name: glow2
+      # Horizontal blur pass
+      - name: glow_horizontal
         shaders:
           - name: postprocess
             type: vertex
-          - name: glow2
+          - name: glow_horizontal
             type: fragment
-        depth:
-          write: 0
-          test: 0
-        blend: 0
+        blend: 2

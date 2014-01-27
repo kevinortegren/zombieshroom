@@ -7,6 +7,8 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
+#include <RootEngine/Render/Include/Math/Math.h>
+
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -235,6 +237,20 @@ namespace Render
 		// Test PPS.
 
 		auto a = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
+
+		float weights[10];
+
+		float sum = 0;
+		for( int i = 0;i < 10; i++ )
+		{
+			weights[i] = RootEngine::gauss(i, 9);
+			sum += 2 * weights[i];
+		}
+
+		for( int i = 0; i < 10; i++ )
+		{
+			weights[i] = weights[i] / sum;
+		}
 
 		m_postProcessEffects.push_back(a);
 	}
