@@ -180,7 +180,6 @@ namespace RootForce
 		m.User = network->ID.UserID;
 		m.Action = *action;
 		m.Position = transform->m_position;
-		m.Orientation = transform->m_orientation.GetQuaternion();
 
 		RakNet::BitStream bs;
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
