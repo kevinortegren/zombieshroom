@@ -131,9 +131,14 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						renderable->m_material->m_tileFactor = tileFactor;
 						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
 					}
-				}
-
-				
+					const YAML::Node* glowNode = materialNode->FindValue("Glow");
+					if(glowNode != nullptr)
+					{
+						std::string glow;
+						p_node["Material"]["Glow"] >> glow;
+						renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glow, Render::TextureType::TEXTURE_2D);
+					}
+				}	
 			}
 			break;
 		case RootForce::ComponentType::TRANSFORM:

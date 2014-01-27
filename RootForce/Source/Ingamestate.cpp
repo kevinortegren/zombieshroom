@@ -14,19 +14,19 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
@@ -158,7 +158,6 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
-
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -186,12 +185,12 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
-		m_animationSystem->Start();
+		//m_animationSystem->Start();
 	}
 
 	void IngameState::Exit()
 	{
-		m_animationSystem->Terminate();
+		//m_animationSystem->Terminate();
 
 		Network::NetworkEntityID id;
 		id.UserID = Network::ReservedUserID::ALL;
@@ -315,7 +314,7 @@ namespace RootForce
 			m_actionSystem->Process();
 		}
 
-		m_animationSystem->Run();
+		//m_animationSystem->Run();
 
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
@@ -380,7 +379,7 @@ namespace RootForce
 
 		}
 
-		m_animationSystem->Synch();
+		//m_animationSystem->Synch();
 
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);

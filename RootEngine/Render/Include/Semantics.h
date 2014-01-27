@@ -42,7 +42,8 @@ namespace Render
 			TEXTUREMAP,
 			TEXTURE_R,
 			TEXTURE_G,
-			TEXTURE_B
+			TEXTURE_B,
+			GLOW
 		};
 	}
 }
