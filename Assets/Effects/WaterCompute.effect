@@ -5,7 +5,10 @@
   # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
   techniques:
 
-    - name: Water_Compute       
+    - name: Water_Compute  
+      bindings:   
+        - name: PerFrame
+          slot: 2     
       images:
         - name: g_prevTex
           slot: 0

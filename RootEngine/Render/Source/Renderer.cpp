@@ -795,11 +795,7 @@ namespace Render
 
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
-			
-			glUniform1i(glGetUniformLocation((*tech)->GetPrograms()[0]->GetHandle(), "prevTex"), 0);
-			glUniform1i(glGetUniformLocation((*tech)->GetPrograms()[0]->GetHandle(), "currTex"), 1);
 		
-
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		}

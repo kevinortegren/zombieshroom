@@ -1,0 +1,25 @@
+- name: Mesh
+  techniques:
+    - name: Mesh
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+          - sem: MODEL
+            offset: 0
+          - sem: NORMAL
+            offset: 64
+      textures:
+        - name: g_Diffuse
+          slot: 0
+      programs:
+        - name: Mesh
+          shaders:
+            - name: watermesh
+              type: vertex
+            - name: watermesh
+              type: fragment
+              
+

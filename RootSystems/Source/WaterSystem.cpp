@@ -33,7 +33,29 @@ namespace RootForce
 		m_texture[1]->CreateEmptyTexture(256, 256, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 		
-	
+		m_texture[0]->Bind(0);
+		std::vector<float> emptyData(1, 1);
+		glTexSubImage2D(GL_TEXTURE_2D,
+			0,
+			10, 10,
+			1,
+			1,
+			GL_RED,
+			GL_FLOAT,
+			&emptyData[0]); 
+		m_texture[0]->Unbind(0);
+
+		m_texture[1]->Bind(0);
+		glTexSubImage2D(GL_TEXTURE_2D,
+			0,
+			10, 10,
+			1,
+			1,
+			GL_RED,
+			GL_FLOAT,
+			&emptyData[0]); 
+		m_texture[1]->Unbind(0);
+
 		m_currTex = 0;
 
 		//Create render material
@@ -42,7 +64,7 @@ namespace RootForce
 
 		m_computeJob.m_effect = m_material->m_effect;
 		m_computeJob.m_groupDim = glm::uvec3(256/16, 256/16, 1);
-		m_computeJob.m_textures[0]		= m_texture[0];
+		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
 		
 		float speed = 1.0f;
@@ -56,9 +78,9 @@ namespace RootForce
 		m_mk2     = (4.0f-8.0f*e) / d;
 		m_mk3     = (2.0f*e) / d;
 
-	/*	m_computeJob.m_params[Render::Semantic::MK1] = &m_mk1;
+		m_computeJob.m_params[Render::Semantic::MK1] = &m_mk1;
 		m_computeJob.m_params[Render::Semantic::MK2] = &m_mk2;
-		m_computeJob.m_params[Render::Semantic::MK3] = &m_mk3;*/
+		m_computeJob.m_params[Render::Semantic::MK3] = &m_mk3;
 	}
 
 	void WaterSystem::Begin()
@@ -69,11 +91,11 @@ namespace RootForce
 	void WaterSystem::Process()
 	{
 		m_context->m_renderer->Compute(&m_computeJob);
-		m_computeJob.m_textures[0]->Bind(0);
+		/*m_computeJob.m_textures[0]->Bind(0);
 		float Pixels[256*256];
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, Pixels );
 		m_computeJob.m_textures[1]->Bind(0);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, Pixels );
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, Pixels );*/
 
 		std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
 	}
