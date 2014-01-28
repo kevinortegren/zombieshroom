@@ -92,15 +92,15 @@ namespace RootForce
 			{
 				RakNet::Packet* packet = packets[i];
 				RakNet::BitStream bs(packet->data, packet->length, false);
-
-				bs.IgnoreBytes(sizeof(RakNet::MessageID));
-				RakNet::Time time;
-				bs.Read(time);
-
-			
-				RakNet::MessageID id;
-				bs.Read(id);
+				RakNet::MessageID id = 0;
+				RakNet::Time time = 0;
 				
+				bs.Read(id);
+				if (id == ID_TIMESTAMP)
+				{
+					bs.Read(time);
+					bs.Read(id);
+				}
 
 				if (m_messageHandler != nullptr)
 				{
