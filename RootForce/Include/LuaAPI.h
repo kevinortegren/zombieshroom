@@ -179,15 +179,17 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
 		}
-		static int EntityGetPlayerPhysics(lua_State* p_luaState)
+
+		static int EntityGetNetwork(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics *));
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(*e);
-			luaL_setmetatable(p_luaState, "PlayerPhysics");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
+			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
+
 		static int EntityGetHealth(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -195,6 +197,15 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(*e);
 			luaL_setmetatable(p_luaState, "Health");
+			return 1;
+		}
+		static int EntityGetPlayerPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(*e);
+			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
 		static int EntityGetPlayer(lua_State* p_luaState)
@@ -213,15 +224,6 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
-			return 1;
-		}
-		static int EntityGetNetwork(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
-			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
@@ -1351,10 +1353,16 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(3); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
+
+			if((*s)->Health <= 0)
+			{
+				MatchStateSystem::AwardPlayerKill((*s)->LastDamageSourceID, (Network::UserID_t) luaL_checknumber(p_luaState, 4));
+			}
+			
 			return 0;
 		}
 		static int HealthSetHealth(lua_State* p_luaState)
@@ -1613,6 +1621,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
+		static int NetworkGetUserId(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.SynchronizedID);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ANIMATION
 		//////////////////////////////////////////////////////////////////////////
@@ -1790,6 +1805,8 @@ namespace RootForce
 			{"GetPhysics", EntityGetPhysics},
 			{"GetCollision", EntityGetCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
+			{"GetNetwork", EntityGetNetwork},
+			{"GetHealth", EntityGetHealth},
 			{NULL, NULL}
 		};
 
@@ -2087,6 +2104,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg network_m [] = {
+			{"GetUserId", NetworkGetUserId},
 			{NULL, NULL}
 		};
 

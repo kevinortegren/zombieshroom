@@ -6,6 +6,7 @@
 #include <RootForce/Include/GameStates.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -47,7 +48,7 @@ namespace RootForce
 			return false;
 	}
 
-	void MatchStateSystem::AwardPlayerKill( int p_killerID, int p_deadID )
+	void MatchStateSystem::AwardPlayerKill( RootForce::Network::SynchronizedID_t p_killerID, RootForce::Network::SynchronizedID_t p_deadID )
 	{
 		Network::NetworkEntityID killerNetworkID;
 		killerNetworkID.UserID = p_killerID;
@@ -59,10 +60,17 @@ namespace RootForce
 		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
 		deadNetworkID.SequenceID = 0;
 		
-		// ToDo: Award score for killer team
+		// Award score for killer team
+		if(p_killerID >= 0)
+		{
+			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
+			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID]);
 
-		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID])->Score ++;
-		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Deaths ++;
+			rules->TeamScore[killerPlayerComponent->TeamID]++;
+			killerPlayerComponent->Score++;
+		}
+		g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Deaths ++;
 	}
 
 	
