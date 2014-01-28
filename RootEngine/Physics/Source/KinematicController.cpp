@@ -180,6 +180,7 @@ void KinematicController::SetGravity( float p_gravity )
 
 void KinematicController::SetPosition(const btVector3& p_position)
 {
+	
 	m_kinController->warp(p_position);
 }
 

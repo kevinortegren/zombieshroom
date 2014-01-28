@@ -1626,6 +1626,18 @@ namespace RootForce
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
+		//RAGDOLL
+		//////////////////////////////////////////////////////////////////////////
+		static int RagdollCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Ragdoll **s = (RootForce::Ragdoll**)lua_newuserdata(p_luaState, sizeof(RootForce::Ragdoll*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Ragdoll>(*e);
+			luaL_setmetatable(p_luaState, "Ragdoll");
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
 		//STATECOMPONENT
 		//////////////////////////////////////////////////////////////////////////
 		static int StateComponentCreate(lua_State* p_luaState)
@@ -2037,6 +2049,16 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg ragdoll_f [] = {
+			{"New", RagdollCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg ragdoll_m [] = {
+			{NULL, NULL}
+		};
+
+		
 		static const struct luaL_Reg statecomponent_f [] = {
 			{"New", StateComponentCreate},
 			{NULL, NULL}
@@ -2107,6 +2129,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playeraction_f, RootForce::LuaAPI::playeraction_m, "PlayerAction");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::network_f, RootForce::LuaAPI::network_m, "Network");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::ragdoll_f, RootForce::LuaAPI::ragdoll_m, "Ragdoll");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statecomponent_f, RootForce::LuaAPI::statecomponent_m, "StateComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");

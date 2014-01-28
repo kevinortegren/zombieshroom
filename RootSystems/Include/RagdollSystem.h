@@ -1,3 +1,4 @@
+#pragma once
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/AnimationSystem.h>
@@ -7,8 +8,11 @@ namespace RootForce
 {
 	struct Ragdoll : public ECS::Component<Ragdoll>
 	{
+		bool m_initialized;
+		int padding;
 		//Empty for now, might need stuff later
 	};
+
 	struct RagdollSystem : public ECS::EntitySystem
 	{
 	public:
@@ -33,7 +37,8 @@ namespace RootForce
 		ECS::ComponentMapper<Collision> m_collisions;
 
 	private:
-
+		void NameMapper( std::map<std::string, int> * p_nameToIndex, aiNode* p_rootNode, RootEngine::RootAnimation::AnimationInterface* p_anim, const aiScene* p_aiScene);
+		bool RagdollSystem::DoesAnimNodeExist(const aiAnimation* pAnimation, const std::string NodeName);
 		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

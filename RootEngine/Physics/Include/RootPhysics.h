@@ -8,7 +8,7 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
-
+#include <RootEngine/Physics/Include/Ragdoll.h>
 #if defined(_WINDLL)
 #define PHYSICS_DLL_EXPORT __declspec(dllexport)
 #else
@@ -26,7 +26,8 @@ namespace RootEngine
 				TYPE_STATIC,
 				TYPE_ABILITY,
 				TYPE_DYNAMIC,
-				TYPE_PLAYER
+				TYPE_PLAYER,
+				TYPE_RAGDOLL
 			};
 		}
 		namespace PhysicsShape	
@@ -67,9 +68,11 @@ namespace RootEngine
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			std::string m_modelHandle;
 			bool m_externalControlled;
+			int m_ragdollIndex;
 			CustomUserPointer()
 			{
 				m_collidedEntities = nullptr;
+				m_ragdollIndex = -1;
 			}
 
 			~CustomUserPointer()
@@ -81,7 +84,7 @@ namespace RootEngine
 		class PhysicsInterface : public RootEngine::SubsystemInterface
 		{
 		public:
-
+			
 			virtual void Init() = 0;
 			virtual void CreatePlane(glm::vec3 p_normal, glm::vec3 p_position) = 0;
 			virtual void Update(float p_dt) = 0;
@@ -107,6 +110,8 @@ namespace RootEngine
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
 
+			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex) = 0;
+
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
 			virtual void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -121,6 +126,7 @@ namespace RootEngine
 			virtual float GetMaxSpeed(int p_objectHandle) = 0;
 			virtual float GetStepHeight(int p_objectHandle) = 0;
 			virtual float GetModelHeight(int p_objectHandle) = 0;
+			virtual void GetBones(int p_objectHandle, glm::mat4 &p_bones) = 0;
 			virtual std::set<void*>* GetCollisionVector(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
@@ -163,6 +169,8 @@ namespace RootEngine
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
+			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex);
+
 			//Binds
 			void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);
 			void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld);
@@ -179,6 +187,7 @@ namespace RootEngine
 			//Getters
 			glm::vec3 GetPos(int p_objectHandle);	
 			glm::vec3 GetVelocity(int p_objectHandle);
+			void GetBones(int p_objectHandle, glm::mat4 &p_bones);
 			float GetMass(int p_objectHandle);
 			int GetType(int p_objectHandle);
 			float GetMaxSpeed(int p_objectHandle);
@@ -228,6 +237,7 @@ namespace RootEngine
 			std::vector<btRigidBody*> m_dynamicObjects;
 			std::vector<ObjectController*> m_externallyControlled;
 			std::vector<KinematicController*> m_playerObjects;
+			std::vector<Ragdoll::Ragdoll*> m_ragdolls;
 			float m_dt;
 			bool m_debugDrawEnabled;
 			float m_removeMeLater;

@@ -4,6 +4,7 @@
 #include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <RootEngine/Physics/Include/BulletCharacter.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
+
 #include <vector>
 class KinematicController 
 {

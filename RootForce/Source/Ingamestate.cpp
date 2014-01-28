@@ -13,7 +13,7 @@ namespace RootForce
 		, m_sharedSystems(p_sharedSystems)
 	{	
 		ComponentType::Initialize();
-
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
@@ -38,6 +38,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(100);
+		
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}

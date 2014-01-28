@@ -716,10 +716,8 @@ namespace Physics
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
-		
 		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
 			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
-
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex =  m_playerObjects.size()-1;
@@ -1265,6 +1263,34 @@ namespace Physics
 			return m_playerObjects.at(index)->IsOnGround();
 		} 
 		return false;
+	}
+
+	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		if(index  != -1)
+		{
+			//If ragdoll already exists just update positions and start ragdolling
+			m_ragdolls.at(index)->Activate(p_bones);
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+		}
+		else
+		{
+			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
+
+			//skape ragdoll fanskapet
+			m_ragdolls.push_back(ragdoll);
+			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+		}
+		
+	}
+
+	void RootPhysics::GetBones( int p_objectHandle, glm::mat4 &p_bones )
+	{
+
 	}
 
 }
