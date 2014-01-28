@@ -4,6 +4,7 @@
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
+#include <RootEngine/Render/Include/ComputeJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/GeometryBuffer.h>
 #include <RootEngine/Render/Include/LineRenderer.h>
@@ -82,6 +83,8 @@ namespace Render
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
 		virtual void AddDirectionalLight(const DirectionalLight& p_light, int p_index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
+
+		virtual void Compute(ComputeJob* p_job) = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -130,16 +133,19 @@ namespace Render
 
 		static std::map<Semantic::Semantic, unsigned> s_sizes;
 
+		void Compute(ComputeJob* p_job);
+
 	private:
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
-		void RenderGeometry();
+		void ProcessRenderJobs();
 
 		void GeometryPass();
 		void ShadowPass();
 		void LightingPass();
 		void ForwardPass();
+		void PostProcessPass();
 		void Output();
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
@@ -158,16 +164,23 @@ namespace Render
 		int m_width;
 		int m_height;
 
+		// Scratch framebuffer.
 		GLuint m_fbo;
-		GLuint m_color;
+		GLuint m_activeTarget;
+		GLenum m_activeTexture;
 
-		Mesh m_fullscreenQuad;
-		GeometryBuffer m_geometryPass;
+		Render::TextureInterface* m_color0;
+		Render::TextureInterface* m_color1;
+
+		GeometryBuffer m_gbuffer;
 		LineRenderer m_lineRenderer;
 		ParticleSystemHandler m_particles;
 		LightingDevice m_lighting;
 		ShadowDevice m_shadowDevice;
 		
+		Mesh m_fullscreenQuad;
+		std::vector<Render::EffectInterface*> m_postProcessEffects;
+
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
 		
 		struct

@@ -5,11 +5,16 @@
   # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
   techniques:
 
-    - name: Water_Compute
+    - name: Water_Compute       
+      textures:
+        - name: g_prevTex
+          slot: 10
+        - name: g_currTex
+          slot: 11
       flags:
         - name: RenderIgnore
 
-      # Program specification and feedback.
+      # Program specification
       programs:
         - name: water_update
           shaders:
@@ -35,6 +40,10 @@
               type: vertex
             - name: water-render
               type: fragment
+            - name: water-render
+              type: tess_control
+            - name: water-render
+              type: tess_evaluation
           
           # Blend Mode:
           # None = 0

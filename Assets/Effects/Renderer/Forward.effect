@@ -2,8 +2,8 @@
   techniques:
     - name: Forward
       textures:
-        - name: g_Background
-          slot: 3
+        - name: g_Input
+          slot: 5
       programs:
         - name: output
           shaders:
