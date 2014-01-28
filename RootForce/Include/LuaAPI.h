@@ -199,6 +199,17 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Health");
 			return 1;
 		}
+
+		static int GetPlayerComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
+			luaL_setmetatable(p_luaState, "PlayerComponent");
+			return 1;
+		}
+
 		static int EntityGetPlayerPhysics(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1807,6 +1818,7 @@ namespace RootForce
 			{"GetCollisionResponder", EntityGetCollisionResponder},
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
+			{"GetPlayerComponent", GetPlayerComponent},
 			{NULL, NULL}
 		};
 
