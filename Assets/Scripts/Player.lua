@@ -49,7 +49,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
 	-- ToDo: Get and set a correct team id
-	playerComponent:SetTeamId(userId - math.floor(userId/2) * 2);
+	playerComponent:SetTeamId(1 + userId - math.floor(userId/2) * 2);
 
 	Entity.RegisterGroup("NonExport", player);
 
@@ -67,7 +67,11 @@ function Player.OnCreate(userId, actionId)
 		renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
 		renderable:SetModel("testchar");
 		renderable:SetMaterial("testchar");
-		renderable:SetMaterialDiffuse("WStexture");
+		if playerComponent:GetTeamId() == 1 then
+			renderable:SetMaterialDiffuse("TestBlue");
+		else
+			renderable:SetMaterialDiffuse("TestRed");
+		end
 		renderable:SetMaterialSpecular("WSSpecular");
 		renderable:SetMaterialNormal("WSNormal");
 		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
