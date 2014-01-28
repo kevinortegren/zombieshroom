@@ -7,7 +7,7 @@ namespace Render
 {
 	Texture::Texture()
 		: m_textureHandle(0), m_target(0), m_textureWidth(0), m_textureHeight(0),
-		m_textureFormat(0), m_textureType(0) 
+		m_textureFormat(0), m_textureType(0), m_compressRatio(1), m_levels(0)
 	{
 		glGenTextures(1, &m_textureHandle);
 	}
@@ -47,8 +47,13 @@ namespace Render
 			GLsizei(texture.dimensions().x),
 			GLsizei(texture.dimensions().y));
 
+		m_levels = texture.levels();
+
 		if(gli::is_compressed(texture.format()))
 		{
+			// DXT3
+			m_compressRatio = 4;
+			
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)
 			{
 				 glCompressedTexSubImage2D(m_target,
@@ -100,6 +105,11 @@ namespace Render
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		};
 
+		m_levels = cube.faces();
+
+		// DXT3
+		m_compressRatio = 4;
+
 		for(gli::texture2D::size_type i = 0; i < cube.faces(); i++)  {
 
 			 glCompressedTexImage2D(faces[i],
@@ -127,18 +137,18 @@ namespace Render
 		glBindTexture(m_target, 0);
 	}
 
-
-
 	void Texture::CreateEmptyTexture(int p_width, int p_height, int p_format)
 	{
 		m_target = GL_TEXTURE_2D;
 		m_textureWidth = p_width;
 		m_textureHeight = p_height;
+		m_levels = 1;
 		
 		glBindTexture(m_target, m_textureHandle);
 		if(p_format == TextureFormat::TEXTURE_RGBA || p_format == TextureFormat::TEXTURE_BGRA)
 		{
 			m_textureType = GL_UNSIGNED_BYTE;
+			m_bpp = 4;
 
 			if(p_format == TextureFormat::TEXTURE_RGBA)
 				m_textureFormat = GL_RGBA;
@@ -155,6 +165,7 @@ namespace Render
 		else if(p_format == TextureFormat::TEXTURE_RGB || p_format == TextureFormat::TEXTURE_BGR)
 		{
 			m_textureType = GL_UNSIGNED_BYTE;
+			m_bpp = 3;
 
 			if(p_format == TextureFormat::TEXTURE_RGB)
 				m_textureFormat = GL_RGB;
@@ -170,6 +181,7 @@ namespace Render
 		{
 			m_textureType = GL_FLOAT;
 			m_textureFormat = GL_DEPTH_COMPONENT;
+			m_bpp = 4;
 
 			glTexImage2D(m_target, 0, GL_DEPTH_COMPONENT32, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
@@ -241,6 +253,21 @@ namespace Render
 	glm::vec2 Texture::GetInverseTextureSize() const
 	{
 		return glm::vec2(1 / (float)m_textureWidth, 1 / (float)m_textureWidth);
+	}
+
+	int Texture::GetCompressRatio() const
+	{
+		return m_compressRatio;
+	}
+
+	int Texture::GetBytesPerPixel() const
+	{
+		return m_bpp;
+	}
+	
+	int Texture::GetMipsLevels() const
+	{
+		return m_levels;
 	}
 }
 

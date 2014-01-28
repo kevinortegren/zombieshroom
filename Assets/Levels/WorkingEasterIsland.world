@@ -141,6 +141,7 @@
             Name: StoneMaterial
             Effect: Mesh
             Diffuse: RockTexture
+            Glow: Leef
         - Entity: 14
           Model: Stone45Shape
           Material:

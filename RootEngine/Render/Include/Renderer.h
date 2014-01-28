@@ -139,12 +139,13 @@ namespace Render
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
-		void RenderGeometry();
+		void ProcessRenderJobs();
 
 		void GeometryPass();
 		void ShadowPass();
 		void LightingPass();
 		void ForwardPass();
+		void PostProcessPass();
 		void Output();
 
 		int GetAvailableVideoMemory(); //Returns currently accessible VRAM in kilobytes
@@ -163,16 +164,23 @@ namespace Render
 		int m_width;
 		int m_height;
 
+		// Scratch framebuffer.
 		GLuint m_fbo;
-		GLuint m_color;
+		GLuint m_activeTarget;
+		GLenum m_activeTexture;
 
-		Mesh m_fullscreenQuad;
-		GeometryBuffer m_geometryPass;
+		Render::TextureInterface* m_color0;
+		Render::TextureInterface* m_color1;
+
+		GeometryBuffer m_gbuffer;
 		LineRenderer m_lineRenderer;
 		ParticleSystemHandler m_particles;
 		LightingDevice m_lighting;
 		ShadowDevice m_shadowDevice;
 		
+		Mesh m_fullscreenQuad;
+		std::vector<Render::EffectInterface*> m_postProcessEffects;
+
 		std::map<Material*, std::vector<MeshInterface*>> m_materialMeshMap; //For optimization by means of material sorting
 		
 		struct
