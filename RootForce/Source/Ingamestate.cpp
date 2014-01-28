@@ -215,6 +215,11 @@ namespace RootForce
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
+		ECS::Entity* debugEntity = g_world->GetTagManager()->GetEntityByTag("LatestBall");
+		Transform* debugTransform = nullptr;
+		if (debugEntity != nullptr)
+			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
+
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -309,10 +314,23 @@ namespace RootForce
 			m_playerControlSystem->Process();
 		}
 
+		if (m_networkContext.m_server != nullptr)
+		{
+			PROFILE("Server", g_engineContext.m_profiler);
+			m_networkContext.m_server->Update();
+		}
+
+		{
+			PROFILE("Client", g_engineContext.m_profiler);
+			m_networkContext.m_client->Update();
+		}
+
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			m_actionSystem->Process();
 		}
+
+
 
 		m_animationSystem->Run();
 
@@ -338,16 +356,7 @@ namespace RootForce
 			m_stateSystem->Process();
 		}
 
-		if (m_networkContext.m_server != nullptr)
-		{
-			PROFILE("Server", g_engineContext.m_profiler);
-			m_networkContext.m_server->Update();
-		}
-
-		{
-			PROFILE("Client", g_engineContext.m_profiler);
-			m_networkContext.m_client->Update();
-		}
+		
 		
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
