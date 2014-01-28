@@ -1252,6 +1252,10 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetPosition(temp);
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		{
+			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
 	}
 
 

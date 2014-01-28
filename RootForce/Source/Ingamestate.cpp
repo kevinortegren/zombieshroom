@@ -333,7 +333,7 @@ namespace RootForce
 			m_actionSystem->Process();
 		}
 
-
+		
 
 		m_animationSystem->Run();
 
@@ -342,6 +342,10 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
+		if (debugEntity != nullptr)
+			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER RESPAWN SYSTEM: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
+
+
         {
             PROFILE("Physics", g_engineContext.m_profiler);
 			m_physicsTransformCorrectionSystem->Process();
@@ -349,9 +353,7 @@ namespace RootForce
             m_physicsSystem->Process();
         }
 
-		if (debugEntity != nullptr)
-			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER PHYSICS: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
-
+		
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
 			m_collisionSystem->Process();
