@@ -83,7 +83,8 @@ namespace RootForce
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 		
 		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
+		cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
+		cameraThirdPerson->m_distance = 8.0f;
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
