@@ -67,6 +67,7 @@ int ReadMemory::InitalizeSharedMemory()
 	}
 	mem = (unsigned char*)(mem + sizeof(Camera) * g_maxCameras);
 
+
 	NumberOfCameras = (int*)(mem);
 	mem = (unsigned char*)(mem + sizeof(int));
 
@@ -79,6 +80,7 @@ int ReadMemory::InitalizeSharedMemory()
 	NumberOfMaterials = (int*)(mem);
 
 	mem = (unsigned char*)(mem + sizeof(int));
+
 
 	for(int i = 0; i < g_maxLocators; i++)
 	{
@@ -98,7 +100,7 @@ int ReadMemory::InitalizeSharedMemory()
 	{
 		updateMessages[i] = ((UpdateMessage*)mem) + i ;
 	}
-	
+
 	mem = (unsigned char*)(mem + sizeof(UpdateMessage) * g_maxMessages);
 
 	NumberOfMessages = (int*)(mem);
@@ -134,7 +136,7 @@ void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_re
 		out_updateTransform = updateMessages[0]->updateTransform;
 		out_updateShape = updateMessages[0]->updateShape;
 
-		for(int i = 0; i < g_maxMessages-1; i++)
+		for(int i = 0; i < *NumberOfMessages-1; i++)
 		{
 			*updateMessages[i] = *updateMessages[i+1];
 		}
@@ -147,6 +149,22 @@ void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_re
 		out_removeIndex = -1;
 		out_updateTransform = false;
 		out_updateShape = false;
+	}
+
+	ReleaseMutex(IdMutexHandle);
+}
+
+void ReadMemory::ClearAllMessages()
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	UpdateMessage mess;
+	string nada = "";
+	memcpy(mess.name, nada.c_str(), g_shortMaxNameLength);
+
+	for(int i = 0; i < g_maxMessages; i++)
+	{		
+		*updateMessages[i] = mess;
 	}
 
 	ReleaseMutex(IdMutexHandle);

@@ -52,6 +52,7 @@ public:
 	DWORD milliseconds;
 
 	void ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape);
+	void ClearAllMessages();
 	
 private:
 	//Functions

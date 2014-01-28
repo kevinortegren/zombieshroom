@@ -135,7 +135,8 @@ int main(int argc, char* argv[])
 				m_world.SetDelta(dt);
 
 				string type;
-				int updateID, removeID;
+				int updateID = -1;
+				int	removeID = -1;
 				bool updateTransform, updateShape;
 
 				//GET A MESSAGE
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
 				if(type != "")
 				{
 					cout << type << " ID " << updateID << endl;
-					cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
+					//cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
 				}
 
 				// GET EXPORT STATE
@@ -178,7 +179,10 @@ int main(int argc, char* argv[])
 					if(removeID == -1)
 						UpdateMesh(updateID, updateTransform, updateShape, false);
 					else
+					{
 						UpdateMesh(removeID, updateTransform, updateShape, true);
+						cout << "RemoveID " << removeID << endl;
+					}
 				}
 
 				if(type == "Light")
@@ -316,6 +320,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 
 void LoadSceneFromMaya()
 {
+	RM.ClearAllMessages();
 	//LOAD						
 	LoadLocators();
 
@@ -451,6 +456,13 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureBlue, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		//UPDATE TILEFACTOR
+		RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+		if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+		{
+			rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+		}
 
 		mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;		
 
@@ -708,10 +720,10 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
 			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
-			{
-				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-			}
+			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			//{
+			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			//}
 
 			/// ROTATION
 			glm::quat rotation;
@@ -772,13 +784,11 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 	}
 
 	//Remove mesh at index
-	if(RemoveMeshIndex < Entities.size() && RemoveMeshIndex >= 0)	
-	{					
-		cout << "Removing " << RemoveMeshIndex << " EntitySize " << Entities.size() << endl;
-		m_world.GetEntityManager()->RemoveAllComponents(Entities[RemoveMeshIndex]);
-		m_world.GetEntityManager()->RemoveEntity(Entities[RemoveMeshIndex]);
-		Entities.erase(Entities.begin() + RemoveMeshIndex);
-		//*RM.PmeshList[RemoveMeshIndex] = Mesh();
+	if(RemoveMeshIndex >= 0)	
+	{
+		m_world.GetEntityManager()->RemoveAllComponents(Entities[Entities.size()-1]);
+		m_world.GetEntityManager()->RemoveEntity(Entities[Entities.size()-1]);
+		Entities.pop_back();
 	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
@@ -853,17 +863,18 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 		ReleaseMutex(RM.LightMutexHandle);
 	}
 
-	if(RemoveLightIndex != -1 && RemoveLightIndex < size && RemoveLightIndex > 0)	
+	if(RemoveLightIndex >= 0)	
 	{					
-		m_world.GetEntityManager()->RemoveAllComponents(LightEntities[RemoveLightIndex]);
-		m_world.GetEntityManager()->RemoveEntity(LightEntities[RemoveLightIndex]);
-		LightEntities.erase(LightEntities.begin() + RemoveLightIndex);
+		m_world.GetEntityManager()->RemoveAllComponents(LightEntities[LightEntities.size()-1]);
+		m_world.GetEntityManager()->RemoveEntity(LightEntities[LightEntities.size()-1]);
+		LightEntities.pop_back();
+		//LightEntities.erase(LightEntities.begin() + RemoveLightIndex);
 	}
 }
 
 void ExportToLevel()
 {
-	for(int i = 0; i < Entities.size()-1; i++)
+	for(int i = 0; i < Entities.size(); i++)
 	{
 		//UPDATE modelName for all Entities from shared memory
 

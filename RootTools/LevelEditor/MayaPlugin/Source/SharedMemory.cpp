@@ -140,7 +140,7 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 	{
 		for(int i = 0; i < nrOfMessages; i++)
 		{
-			if(type == updateMessages[i]->name && (index == updateMessages[i]->updateID || index == updateMessages[i]->removeID))
+			if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
 			{
 				stop = true;
 				break;
@@ -148,37 +148,37 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 		}
 	}
 
-	if(!stop && index != -1)
+	if(!stop && index >= 0)
 	{
 		//Maybe check last message for duplicate aswell
-		if(*NumberOfMessages < g_maxMessages)
+		if(nrOfMessages < g_maxMessages)
 		{
-			updateMessages[*NumberOfMessages]->updateTransform = updateTransform;
-			updateMessages[*NumberOfMessages]->updateShape = updateShape;
+			updateMessages[nrOfMessages]->updateTransform = updateTransform;
+			updateMessages[nrOfMessages]->updateShape = updateShape;
 			if(type != "")
 			{
-				memcpy(updateMessages[*NumberOfMessages]->name, type.c_str(), g_shortMaxNameLength);
-
+				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_shortMaxNameLength);
+				int minusOne = -1;
 				if(remove)
 				{
-					updateMessages[*NumberOfMessages]->updateID = -1;
-					updateMessages[*NumberOfMessages]->removeID = index;
+					updateMessages[nrOfMessages]->updateID = minusOne;
+					updateMessages[nrOfMessages]->removeID = index;
 				}
 				else
 				{
-					updateMessages[*NumberOfMessages]->updateID = index;
-					updateMessages[*NumberOfMessages]->removeID = -1;
+					updateMessages[nrOfMessages]->updateID = index;
+					updateMessages[nrOfMessages]->removeID = minusOne;
 				}
 			}
-
-			*NumberOfMessages = *NumberOfMessages + 1;
+			nrOfMessages++;
+			*NumberOfMessages = nrOfMessages;
 		}
-		else if(*NumberOfMessages > 0)
+		else if(nrOfMessages > 0)
 		{
 			//Remove oldest / first message and try again
 			//UpdateMessage tempCopy[g_maxMessages];
 
-			for(int i = 0; i < g_maxMessages-1; i++)
+			for(int i = 0; i < nrOfMessages-1; i++)
 			{
 				*updateMessages[i] = *updateMessages[i+1];
 			}
@@ -188,7 +188,8 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 			updateMessages[g_maxMessages]->updateShape = false;
 			updateMessages[g_maxMessages]->updateTransform = false;
 			//*updateMessages = tempCopy;
-			*NumberOfMessages = *NumberOfMessages - 1;
+			nrOfMessages--;
+			*NumberOfMessages = nrOfMessages;
 			AddUpdateMessage(type, index, updateTransform, updateShape, remove);
 		}
 	}

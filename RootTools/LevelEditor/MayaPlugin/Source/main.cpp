@@ -504,7 +504,7 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 	if(index != -1)
 	{
 		MayaMeshToList(node, index, true, true, true);
-		SM.UpdateSharedMesh(index, true, true, currNrMeshes);
+		//SM.UpdateSharedMesh(index, true, true, currNrMeshes);
 	}
 }
 
@@ -720,17 +720,18 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			{
 				Print("Mesh ", mesh.name(), " at index ", i);
 				removeID = i;
+				currNrMeshes--;				
 
-				for(int j = i; j < currNrMeshes-1; j++)
+				for(int j = i; j < currNrMeshes; j++)
 				{
 					g_mayaMeshList[j] = g_mayaMeshList[j+1];
 					MayaMeshToList(g_mayaMeshList[j], j, true, true, true);
-					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);					
+					//SM.UpdateSharedMesh(j, true, true, currNrMeshes);					
 				}
 					
-				//g_mayaMeshList[currNrMeshes].~MObject();					//Will crash if it reaches g_maxMeshes
-				currNrMeshes--;
 				SM.RemoveMesh(removeID, currNrMeshes);
+				//g_mayaMeshList[currNrMeshes].~MObject();					//Will crash if it reaches g_maxMeshes
+
 			}
 		}	
 	}
@@ -744,13 +745,14 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			if(listLight.name() == light.name())
 			{
 				removeID = i;
+				currNrLights--;
+
 				for(int j = i; j < currNrLights; j++)
 				{
 					g_mayaLightList[j] = g_mayaLightList[j+1];
-					MayaLightToList(g_mayaLightList[j], j);
-					SM.UpdateSharedLight(j,currNrLights-1);
+					MayaLightToList(g_mayaLightList[j], j);					
 				}
-				currNrLights--;
+				
 				SM.RemoveLight(removeID, currNrMeshes);
 			}
 		}
@@ -1306,13 +1308,13 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 					SM.meshList[meshIndex].UV[count].y = 1-V;
 
 					int herp = mesh.getTangentId(i, localIndex[j]);
-					mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, space_local);
+					mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, g_space_local);
 
 					//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
 					//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
 					//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
 
-					mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, space_local, 0);
+					mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, g_space_local, 0);
 					
 					//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
 
