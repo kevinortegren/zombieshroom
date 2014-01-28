@@ -122,10 +122,6 @@ namespace RootForce
 					{
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
-
-
-
-
 						NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
 						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
 
@@ -244,13 +240,22 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						// TODO: Extrapolate with time stamp
+						
 						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
-						transform->m_position = m.Position + playerPhysics->MovementSpeed * lastHalfPing;
+						transform->m_position = m.Position;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
+
+						// Extrapolate the position using ping time
+						glm::vec3 facing = transform->m_orientation.GetFront();
+						glm::vec3 right = transform->m_orientation.GetRight();
+						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
+						if (movement != glm::vec3(0))
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+
+						transform->m_position += movement;
 					}
 				} return true;
 
@@ -560,9 +565,18 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						transform->m_position = m.Position + playerPhysics->MovementSpeed * lastHalfPing;
+						transform->m_position = m.Position;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
+
+						// Extrapolate the position using ping time
+						glm::vec3 facing = transform->m_orientation.GetFront();
+						glm::vec3 right = transform->m_orientation.GetRight();
+						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
+						if (movement != glm::vec3(0))
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+
+						transform->m_position += movement;
 					}
 					
 					// Broadcast the action to all other clients
