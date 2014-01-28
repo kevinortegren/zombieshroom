@@ -3,12 +3,13 @@
 in vec2 vert_texCoord;
 
 // Uniforms
-layout(std140) buffer PerTech
+layout(std140) uniform PerTech
 {
     float g_Weights[10];
 };
 
 // Textures
+uniform sampler2D g_Glow;
 uniform sampler2D g_Input;
 
 // Constants
@@ -19,9 +20,10 @@ out vec4 frag_color;
 
 void main()
 {
-    float dy = 1.0 / textureSize( g_Input, 0).y;
-    
-    vec4 blur = texture(g_Input, TexelCoord) * g_Weights[0];
+    float dy = 1.0 / 256.0f;
+
+    vec4 blur = texture(g_Input, vert_texCoord) * g_Weights[0];
+    vec4 glow = texture(g_Glow, vert_texCoord);
     
     for( int i = 1; i < 10; i++ )
 	{
@@ -29,5 +31,5 @@ void main()
 		blur += texture(g_Input, vert_texCoord - vec2( 0.0, PixelOffset[i] ) * dy ) * g_Weights[i];
 	}
     
-	frag_color = blur;
+	frag_color = glow + blur;
 }

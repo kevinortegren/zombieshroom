@@ -1,4 +1,4 @@
-
+﻿
 #include <GL/glew.h>
 
 #include <RootEngine/Include/Logging/Logging.h>
@@ -232,29 +232,9 @@ namespace Render
 		m_particles.Init(this);
 		m_lineRenderer.Init(this);
 
+		InitialziePostProcesses();
+
 		PrintResourceUsage();
-
-		// Test PPS.
-
-		/*
-		auto a = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
-
-		float weights[10];
-
-		float sum = 0;
-		for( int i = 0;i < 10; i++ )
-		{
-			weights[i] = RootEngine::gauss(i, 9);
-			sum += 2 * weights[i];
-		}
-
-		for( int i = 0; i < 10; i++ )
-		{
-			weights[i] = weights[i] / sum;
-		}
-
-		m_postProcessEffects.push_back(a);
-		*/
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -280,6 +260,28 @@ namespace Render
 		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
+	}
+
+	void GLRenderer::InitialziePostProcesses()
+	{
+		// Setup glow.
+		EffectInterface* glowEffect = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
+
+		float weights[10];
+		float sum = 0;
+		for(int i = 0; i < 10; i++)
+		{
+			weights[i] = RootEngine::gauss(i, 9);
+			sum += 2 * weights[i];
+		}
+		for(int i = 0; i < 10; i++)
+		{
+			weights[i] = weights[i] / sum;
+		}
+
+		glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(10, sizeof(float), weights);
+
+		m_postProcessEffects.push_back(glowEffect);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -586,13 +588,15 @@ namespace Render
 		{
 			for(auto tech = (*effect)->GetTechniques().begin(); tech != (*effect)->GetTechniques().end(); ++tech)
 			{
+				(*tech)->Apply();
+
 				for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 				{
 					// Set input.
 					glActiveTexture(GL_TEXTURE0 + 5);
 					glBindTexture(GL_TEXTURE_2D, m_activeTexture);
 
-					// Set Output.
+					// Set output.
 					GLenum buffers[] = { m_activeTarget };
 					glDrawBuffers(1, buffers);
 
@@ -601,6 +605,7 @@ namespace Render
 					m_fullscreenQuad.Draw();
 
 					// Swap input/output.
+					
 					m_activeTarget = ((m_activeTarget == GL_COLOR_ATTACHMENT0) ? GL_COLOR_ATTACHMENT1 : GL_COLOR_ATTACHMENT0);
 					m_activeTexture = ((m_activeTexture == m_color1->GetHandle()) ? m_color0->GetHandle() : m_color1->GetHandle());
 				}

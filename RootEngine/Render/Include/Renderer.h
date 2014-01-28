@@ -119,6 +119,8 @@ namespace Render
 		std::shared_ptr<EffectInterface> CreateEffect();
 		std::shared_ptr<Material> CreateMaterial();
 
+		void InitialziePostProcesses();
+
 		ParticleSystem* CreateParticleSystem();
 		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);

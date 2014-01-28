@@ -16,6 +16,8 @@
           slot: 0
         - name: g_Specular
           slot: 1
+        - name: g_Glow
+          slot: 9
       programs:
         - name: Mesh
           shaders:

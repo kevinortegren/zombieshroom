@@ -61,13 +61,19 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
-	for(size_t i = 0; i < m_components.size(); ++i) 
+	for(int i = 0; i < m_components.size(); ++i)
 	{
-		if((int)m_components[i].size() > p_entity->m_id) {
-			p_entity->m_flag ^= (1ULL << i); 
+		if(p_entity->m_id < m_components[i].size())
+		{
+			if(m_components[i][p_entity->m_id] != nullptr)
+			{
+				m_allocator.FreePtrFromList(m_components[i][p_entity->m_id], i);
+				m_components[i][p_entity->m_id] = nullptr;
+			}
 		}
 	}
 
+	p_entity->m_flag = 0;
 	m_systemManager->RemoveEntityFromSystems(p_entity);
 }
 
