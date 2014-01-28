@@ -28,5 +28,5 @@ void main()
 
 	diffuse = vec4(frag_color, specTerm);
 	normals = vec3(bumpNormal * 0.5 + 0.5);
-	glow = vec4(0.0f);
+	glow = vec4(vec3(1,0,0), 1.0f);
 }
