@@ -22,10 +22,16 @@ namespace RootForce
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 
+		void SetAABB(const RootForce::AABB& p_worldAABB)
+		{
+			m_worldAABB = p_worldAABB;
+		}
+
 		ECS::ComponentMapper<Shadowcaster> m_shadowcasters;
 		ECS::ComponentMapper<Transform> m_transforms;
 
 	private:
 		int m_shadowcasterCount;
+		RootForce::AABB m_worldAABB;
 	};
 }

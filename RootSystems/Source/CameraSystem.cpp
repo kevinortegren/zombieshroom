@@ -28,6 +28,7 @@ namespace RootForce
 
 			camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
 
+			camera->m_viewMatrix = viewMatrix;
 			m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 			m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
 		}

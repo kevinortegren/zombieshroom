@@ -239,17 +239,17 @@ namespace RootForce
 
 		m_root = new QuadNode(quadTreeBounds);
 
-		// Delete working set.
-		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
-		for(auto b = a.first; b != a.second; ++b)
-		{
-			m_world->GetEntityManager()->RemoveAllComponents(b->second);
-			m_world->GetEntityManager()->RemoveEntity(b->second);
-		}
+		//// Delete working set.
+		//auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		//for(auto b = a.first; b != a.second; ++b)
+		//{
+		//	m_world->GetEntityManager()->RemoveAllComponents(b->second);
+		//	m_world->GetEntityManager()->RemoveEntity(b->second);
+		//}
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
 
-		Subdivide(m_root, polygons);
+		//Subdivide(m_root, polygons);
 	}
 
 	int QuadTree::RoundToPow2(int p_value) const
