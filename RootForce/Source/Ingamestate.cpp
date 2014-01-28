@@ -14,30 +14,30 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(20);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(20);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(10);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(20);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StateComponent>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StateComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -240,7 +240,7 @@ namespace RootForce
 		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<PlayerComponent>(player)->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<PlayerComponent>(player)->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
-		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
+		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 

@@ -44,15 +44,18 @@ function AbilityBall.OnCollide (self, entity)
 		local selfPos = self:GetTransformation():GetPos();
 		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
 		
-		-- Get Ability's owner's ID to award kill if any
-		local abilityOwnerNetwork = self:GetNetwork();
-		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		-- Deal damage to the colliding player
 		local health = entity:GetHealth();
-		local network = entity:GetNetwork();
-		local receiverId = network:GetUserID();
-		
-		health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+		if not health:IsDead() then
+			-- Get Ability's owner's ID to award kill if any
+			local abilityOwnerNetwork = self:GetNetwork();
+			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+			
+			local network = entity:GetNetwork();
+			local receiverId = network:GetUserId();
+			
+			health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+		end
 	end
 end
 

@@ -1353,7 +1353,7 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3); // self, damageSourceUserId, damageAmount, receiverUserId
+			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
