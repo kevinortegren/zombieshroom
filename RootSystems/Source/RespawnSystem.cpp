@@ -78,8 +78,6 @@ namespace RootSystems
 
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}
-
-		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::FATAL_ERROR, "No spawnpoint found for respawn");
 		return nullptr;
 	}
 
