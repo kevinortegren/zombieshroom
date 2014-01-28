@@ -2,8 +2,8 @@
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
   <asset>
     <contributor>
-      <author>Mattias</author>
-      <authoring_tool>OpenCOLLADA2014</authoring_tool>
+      <author>BTH</author>
+      <authoring_tool>OpenCOLLADA2014 x64</authoring_tool>
       <comments>
 			ColladaMaya export options: 
 			bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;exportCgfxFileReferences=1;
@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/Mattias/Desktop/LevelExportStuff/LagoonV3.0001.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.2.mb</source_data>
     </contributor>
-    <created>2014-01-26T18:57:57</created>
-    <modified>2014-01-26T18:57:57</modified>
+    <created>2014-01-27T14:38:19</created>
+    <modified>2014-01-27T14:38:19</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -86,7 +86,7 @@
   </library_effects>
   <library_images>
     <image id="file2" name="file2">
-      <init_from>file:///D:/Zombieshroom/MASTER/Assets/Models/water.dds</init_from>
+      <init_from>file:///C:/Users/BTH/Documents/Output/Assets/Models/water.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -97,86 +97,86 @@
     </image>
   </library_images>
   <library_geometries>
-    <geometry id="waterPlaneShape" name="waterPlaneShape">
+    <geometry id="WaterPlaneShape" name="WaterPlaneShape">
       <mesh>
-        <source id="waterPlaneShape-positions" name="waterPlaneShape-positions">
-          <float_array id="waterPlaneShape-positions-array" count="12">-1868.943 0 1447.276 1868.943 0 1447.276 -1868.943 0 -1447.276 1868.943 0 -1447.276</float_array>
+        <source id="WaterPlaneShape-positions" name="WaterPlaneShape-positions">
+          <float_array id="WaterPlaneShape-positions-array" count="12">-1366.347 0 1185.014 1366.347 0 1185.014 -1366.347 0 -1185.014 1366.347 0 -1185.014</float_array>
           <technique_common>
-            <accessor source="#waterPlaneShape-positions-array" count="4" stride="3">
+            <accessor source="#WaterPlaneShape-positions-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="waterPlaneShape-normals" name="waterPlaneShape-normals">
-          <float_array id="waterPlaneShape-normals-array" count="12">0 1 0 0 1 0 0 1 0 0 1 0</float_array>
+        <source id="WaterPlaneShape-normals" name="WaterPlaneShape-normals">
+          <float_array id="WaterPlaneShape-normals-array" count="12">0 0.9999999 0 0 0.9999999 0 0 0.9999999 0 0 0.9999999 0</float_array>
           <technique_common>
-            <accessor source="#waterPlaneShape-normals-array" count="4" stride="3">
+            <accessor source="#WaterPlaneShape-normals-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="waterPlaneShape-map1" name="waterPlaneShape-map1">
-          <float_array id="waterPlaneShape-map1-array" count="8">0 0 1 0 0 0.774382 1 0.774382</float_array>
+        <source id="WaterPlaneShape-map1" name="WaterPlaneShape-map1">
+          <float_array id="WaterPlaneShape-map1-array" count="8">0 0 1 0 0 0.8672863 1 0.8672863</float_array>
           <technique_common>
-            <accessor source="#waterPlaneShape-map1-array" count="4" stride="2">
+            <accessor source="#WaterPlaneShape-map1-array" count="4" stride="2">
               <param name="S" type="float"/>
               <param name="T" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="waterPlaneShape-textangents">
-          <float_array id="waterPlaneShape-textangents-array" count="18">1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0</float_array>
+        <source id="WaterPlaneShape-textangents">
+          <float_array id="WaterPlaneShape-textangents-array" count="12">1 0 0 1 0 0 1 0 0 1 0 0</float_array>
           <technique_common>
-            <accessor source="#waterPlaneShape-textangents-array" count="6" stride="3">
+            <accessor source="#WaterPlaneShape-textangents-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="waterPlaneShape-texbinormals">
-          <float_array id="waterPlaneShape-texbinormals-array" count="18">0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1</float_array>
+        <source id="WaterPlaneShape-texbinormals">
+          <float_array id="WaterPlaneShape-texbinormals-array" count="12">0 0 -1 0 0 -1 0 0 -1 0 0 -1</float_array>
           <technique_common>
-            <accessor source="#waterPlaneShape-texbinormals-array" count="6" stride="3">
+            <accessor source="#WaterPlaneShape-texbinormals-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <vertices id="waterPlaneShape-vertices" name="waterPlaneShape-vertices">
-          <input semantic="POSITION" source="#waterPlaneShape-positions"/>
-          <input semantic="NORMAL" source="#waterPlaneShape-normals"/>
+        <vertices id="WaterPlaneShape-vertices" name="WaterPlaneShape-vertices">
+          <input semantic="POSITION" source="#WaterPlaneShape-positions"/>
+          <input semantic="NORMAL" source="#WaterPlaneShape-normals"/>
         </vertices>
         <triangles material="lambert3SG" count="2">
-          <input semantic="VERTEX" source="#waterPlaneShape-vertices" offset="0"/>
-          <input semantic="TEXCOORD" source="#waterPlaneShape-map1" offset="1" set="0"/>
-          <input semantic="TEXTANGENT" source="#waterPlaneShape-textangents" offset="2" set="0"/>
-          <input semantic="TEXBINORMAL" source="#waterPlaneShape-texbinormals" offset="2" set="0"/>
-          <p>0 0 0 1 1 1 2 2 2 2 2 3 1 1 4 3 3 5</p>
+          <input semantic="VERTEX" source="#WaterPlaneShape-vertices" offset="0"/>
+          <input semantic="TEXCOORD" source="#WaterPlaneShape-map1" offset="1" set="0"/>
+          <input semantic="TEXTANGENT" source="#WaterPlaneShape-textangents" offset="2" set="0"/>
+          <input semantic="TEXBINORMAL" source="#WaterPlaneShape-texbinormals" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 3 2 2 3 1 1 1 3 3 2</p>
         </triangles>
       </mesh>
       <extra>
         <technique profile="OpenCOLLADAMaya">
-          <originalMayaNodeId>waterPlaneShape</originalMayaNodeId>
+          <originalMayaNodeId>WaterPlaneShape</originalMayaNodeId>
           <double_sided>1</double_sided>
         </technique>
       </extra>
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="LagoonV3.0001">
-      <node id="waterPlane" name="waterPlane" type="NODE">
-        <translate sid="translate">-227.5396 -10.1228 -67.88327</translate>
+    <visual_scene id="VisualSceneNode" name="TortugaCoveV0.2">
+      <node id="WaterPlane" name="WaterPlane" type="NODE">
+        <translate sid="translate">435.1217 -4.873179 8.776069</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">1.349511 1.40818 1.349511</scale>
-        <instance_geometry url="#waterPlaneShape">
+        <scale sid="scale">1 1 1</scale>
+        <instance_geometry url="#WaterPlaneShape">
           <bind_material>
             <technique_common>
               <instance_material symbol="lambert3SG" target="#Water">
@@ -187,7 +187,7 @@
         </instance_geometry>
         <extra>
           <technique profile="OpenCOLLADAMaya">
-            <originalMayaNodeId>waterPlane</originalMayaNodeId>
+            <originalMayaNodeId>WaterPlane</originalMayaNodeId>
           </technique>
         </extra>
       </node>

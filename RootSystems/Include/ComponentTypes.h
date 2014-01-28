@@ -31,6 +31,7 @@ namespace RootForce
 			SERVERINFORMATION,
 			CLIENT,
 			RAGDOLL
+
 		};
 	}
 }

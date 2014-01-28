@@ -26,16 +26,14 @@ namespace RootForce
 			Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
 			if(ragdoll->m_firstTime)
 			{	
-				glm::mat4 test[20];
-				for(int i = 0; i < 14; i++)
-					test[i] = renderable->m_model->m_animation->GetBoneOffset(i);
+				
 				renderable->m_model->m_animation->GetScene()->mRootNode->mChildren[0]->mName;
 				//mappa namn till index själv, jobbiga jävla anrop annars
 				//renderable->m_model->m_animation->GetIndexFromBoneName()
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
 				
-				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), test, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
+				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
 				//Start the ragdoll in Rootphysics;
 				//animation->m_bones <- send that to physics and it should do something that should work most likely
 				ragdoll->m_firstTime = false;
@@ -46,7 +44,7 @@ namespace RootForce
 				test = m_engineContext->m_physics->GetBones(*(collision->m_handle));
 				if(test != nullptr)
 					for(int i = 0; i < 14; i++)
-						animation->m_bones[i] = test[i] * renderable->m_model->m_animation->GetBoneOffset(i);
+						animation->m_bones[i] = test[i] ;//* renderable->m_model->m_animation->GetBoneOffset(i);
 			}
 		
 		}

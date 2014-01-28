@@ -1083,7 +1083,7 @@ namespace Physics
 
 			return glm::vec3(temp[0], temp[1], temp[2]);
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
@@ -1114,7 +1114,7 @@ namespace Physics
 			
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->Move(p_velocity, m_dynamicWorld);
 		}

@@ -45,7 +45,7 @@ namespace Ragdoll
 			const float* data = glm::value_ptr(p_bones[index]);
 			trans.setFromOpenGLMatrix(data);
 			std::string test= p_rootNode->mName.data;
-			trans.setOrigin(trans.getOrigin());
+			trans.setOrigin(trans.getOrigin() + p_pos);
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(1.0f, motionstate, shape, inertia);
 			m_bodies[index] = body;
@@ -63,8 +63,8 @@ namespace Ragdoll
 					localA.getBasis().setEulerZYX(0,0,-PI_2*5); localA.setOrigin(body->getWorldTransform().getOrigin());
 					localB.getBasis().setEulerZYX(0,0,-PI_2*5); localB.setOrigin(childbody->getWorldTransform().getOrigin());
 					btConeTwistConstraint* constraint = new btConeTwistConstraint(*body, *childbody, localA, localB);
-					constraint->setLimit(PI_2,PI_2, 0);
-					m_dynamicWorld->addConstraint(constraint);
+					constraint->setLimit(0,0, 0);
+					m_dynamicWorld->addConstraint(constraint, true);
 					constraint->setDbgDrawSize(0.5f);
 					
 				}

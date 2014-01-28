@@ -8,6 +8,7 @@
 #include <RootEngine/Include/TextureImporter.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
+#include <RootEngine/Include/ParticleImporter.h>
 
 #pragma warning(disable: 4715)//Temporary solution
 
@@ -39,9 +40,10 @@ namespace RootEngine
 
 		virtual bool RenameModel(Model* p_model, const std::string& p_name) = 0;
 
-		virtual Render::MeshInterface*	GetMesh(std::string p_handle) = 0;
+		virtual Render::MeshInterface*		GetMesh(std::string p_handle) = 0;
 		virtual Render::EffectInterface*	LoadEffect(std::string p_path) = 0;
 		virtual Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type) = 0;
+		virtual std::vector<ParticleSystemStruct*> LoadParticleEmitter(std::string p_handle, bool p_fullPath) = 0;
 
 		virtual const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture) = 0;
 		virtual const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect) = 0;
@@ -85,11 +87,13 @@ namespace RootEngine
 		Render::MeshInterface*		GetMesh(std::string p_handle);
 		Render::EffectInterface*	LoadEffect(std::string p_path);
 		Render::TextureInterface*	LoadTexture(std::string p_path, Render::TextureType::TextureType p_type);
+		std::vector<ParticleSystemStruct*> LoadParticleEmitter(std::string p_handle, bool p_fullPath);
 
 		Model*							GetModel(std::string p_handle);
 		Render::EffectInterface*		GetEffect(std::string p_handle);
 		Render::TextureInterface*		GetTexture(std::string p_handle);
 		Render::Material*				GetMaterial(std::string p_handle);
+		
 
 		const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture);
 		const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect);
@@ -107,6 +111,7 @@ namespace RootEngine
 		std::map<std::string, std::shared_ptr<Render::Material>> m_materials;
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>> m_physicMeshes;
 		std::map<std::string, std::string> m_scripts;
+		std::map<std::string, std::vector<ParticleSystemStruct*>> m_particles;
 
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR
@@ -115,6 +120,7 @@ namespace RootEngine
 
 		std::shared_ptr<EffectImporter>		m_effectImporter;
 		std::shared_ptr<TextureImporter>	m_textureImporter;
+		std::shared_ptr<ParticleImporter>	m_particleImporter;
 
 		//Other
 		GameSharedContext* m_context;

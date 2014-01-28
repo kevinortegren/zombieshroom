@@ -124,6 +124,15 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(100);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(10);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
+	
+
 	// Initialize render and point light system.
 	m_renderingSystem = new RootForce::RenderingSystem(g_world);
 	g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
