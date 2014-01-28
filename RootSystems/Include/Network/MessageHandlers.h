@@ -26,6 +26,7 @@ namespace RootForce
 			virtual bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet) = 0;
 		protected:
 			RakNet::RakPeerInterface* m_peer;
+			float m_lastHalfPing;
 		};
 
 

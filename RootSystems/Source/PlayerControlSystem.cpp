@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <PlayerControlSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
@@ -186,6 +187,8 @@ namespace RootForce
 		m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
 
 		RakNet::BitStream bs;
+		bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+		bs.Write(RakNet::GetTime());
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
 		m.Serialize(true, &bs);
 

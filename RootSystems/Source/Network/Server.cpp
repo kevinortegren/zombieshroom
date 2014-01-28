@@ -89,21 +89,24 @@ namespace RootForce
 			for (size_t i = 0; i < packets.size(); ++i)
 			{
 				RakNet::Packet* packet = packets[i];
-
-				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
-				bs.Read(id);
 
-				if (m_messageHandler != nullptr)
+				while (bs.GetNumberOfUnreadBits() > 0)
 				{
-					if (!m_messageHandler->ParsePacket(id, &bs, packet))
+					RakNet::MessageID id;
+					bs.Read(id);
+
+					if (m_messageHandler != nullptr)
 					{
-						m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
+						if (!m_messageHandler->ParsePacket(id, &bs, packet))
+						{
+							m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
+						}
 					}
-				}
-				else
-				{
-					m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
+					else
+					{
+						m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
+					}
 				}
 			}
 

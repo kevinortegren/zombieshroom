@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
@@ -49,6 +50,14 @@ namespace RootForce
 
 			switch (p_id)
 			{
+				case ID_TIMESTAMP:
+				{
+					RakNet::Time time;
+					p_bs->Read(time);
+
+					m_lastHalfPing = float(RakNet::GetTime() - m_lastHalfPing) * 0.001f;
+				} return true;
+
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
@@ -241,9 +250,10 @@ namespace RootForce
 
 						// Set the position of the player
 						// TODO: Extrapolate with time stamp
+						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
-						transform->m_position = m.Position;
+						transform->m_position = m.Position + playerPhysics->MovementSpeed * m_lastHalfPing;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
@@ -418,6 +428,14 @@ namespace RootForce
 
 			switch (p_id)
 			{
+				case ID_TIMESTAMP:
+				{
+					RakNet::Time time;
+					p_bs->Read(time);
+
+					m_lastHalfPing = float(RakNet::GetTime() - m_lastHalfPing) * 0.001f;
+				} return true;
+
 				case ID_NEW_INCOMING_CONNECTION:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%s)", p_packet->systemAddress.ToString());
@@ -527,22 +545,23 @@ namespace RootForce
 
 					ECS::Entity* client = g_networkEntityMap[id];
 					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+
+					id.SequenceID = 0;
+					ECS::Entity* player = g_networkEntityMap[id];
+					id.SequenceID = 1;
+					ECS::Entity* aimingDevice = g_networkEntityMap[id];
+					PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
+					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+					Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
+
 					if (clientComponent->IsRemote)
 					{
 						// Update the action for the user
-						id.SequenceID = 0;
-						ECS::Entity* player = g_networkEntityMap[id];
-						id.SequenceID = 1;
-						ECS::Entity* aimingDevice = g_networkEntityMap[id];
-
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						// TODO: Add time stamp extrapolation here as well
-						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
-						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
-						transform->m_position = m.Position;
+						transform->m_position = m.Position + playerPhysics->MovementSpeed * m_lastHalfPing;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
@@ -552,11 +571,17 @@ namespace RootForce
 					DataStructures::List<RakNet::RakNetGUID> guids;
 					m_peer->GetSystemList(addresses, guids);
 
+					m.Position = transform->m_position;
+					m.Orientation = transform->m_orientation.GetQuaternion();
+					m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
+
 					for (unsigned int i = 0; i < addresses.Size(); ++i)
 					{
 						if (i != id.UserID && !addresses[i].IsLoopback())
 						{
 							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
 							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
 							m.Serialize(true, &bs);
 
