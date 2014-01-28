@@ -30,6 +30,11 @@ namespace RootForce
 
 			transform->m_position = m_physics->GetPos(*(collision->m_handle));
 			transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(collision->m_handle)));
+			if (m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
+			{
+				// Players do not have a current velocity.
+				accessor->m_velocity = m_physics->GetVelocity(*collision->m_handle);
+			}
 		}
 	}
 
@@ -78,6 +83,10 @@ namespace RootForce
 
 			g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
 			g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
+			if (g_engineContext.m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
+			{
+				g_engineContext.m_physics->SetVelocity(*collision->m_handle, accessor->m_velocity);
+			}
 		}
 	}
 

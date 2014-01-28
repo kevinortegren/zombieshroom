@@ -215,6 +215,11 @@ namespace RootForce
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
+		ECS::Entity* debugEntity = g_world->GetTagManager()->GetEntityByTag("LatestBall");
+		Transform* debugTransform = nullptr;
+		if (debugEntity != nullptr)
+			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
+
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -309,35 +314,6 @@ namespace RootForce
 			m_playerControlSystem->Process();
 		}
 
-		{
-			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
-		}
-
-		m_animationSystem->Run();
-
-		{
-			PROFILE("Respawn system", g_engineContext.m_profiler);
-			m_respawnSystem->Process();
-		}
-
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
-			m_physicsTransformCorrectionSystem->Process();
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
-
-		{
-			PROFILE("Collision system", g_engineContext.m_profiler);
-			m_collisionSystem->Process();
-		}
-
-		{
-			PROFILE("StateSystem", g_engineContext.m_profiler);
-			m_stateSystem->Process();
-		}
-
 		if (m_networkContext.m_server != nullptr)
 		{
 			PROFILE("Server", g_engineContext.m_profiler);
@@ -348,6 +324,47 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
+
+		if (debugEntity != nullptr)
+			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER CLIENT: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
+
+		{
+			PROFILE("Action system", g_engineContext.m_profiler);
+			m_actionSystem->Process();
+		}
+
+		
+
+		m_animationSystem->Run();
+
+		{
+			PROFILE("Respawn system", g_engineContext.m_profiler);
+			m_respawnSystem->Process();
+		}
+
+		if (debugEntity != nullptr)
+			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER RESPAWN SYSTEM: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
+
+
+        {
+            PROFILE("Physics", g_engineContext.m_profiler);
+			m_physicsTransformCorrectionSystem->Process();
+            g_engineContext.m_physics->Update(p_deltaTime);
+            m_physicsSystem->Process();
+        }
+
+		
+		{
+			PROFILE("Collision system", g_engineContext.m_profiler);
+			m_collisionSystem->Process();
+		}
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
+
+		
 		
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);

@@ -28,6 +28,10 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
+
+	if Global.UserID == userId then
+		Entity.RegisterTag("LatestBall", self);
+	end
 end
 
 function AbilityBall.OnCollide (self, entity)
