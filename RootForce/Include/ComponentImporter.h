@@ -4,7 +4,6 @@
 #include <RootSystems/Include/Components.h>
 
 #include <yaml-cpp/yaml.h>
-#include <RootSystems/Include/ParticleImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -258,7 +257,10 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				p_node["File"] >> particleName;
 
-				ImportParticleEmitter(particleName, particleEmitter, trans, false);
+				particleEmitter->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(particleName, false);
+				
+				for(unsigned i = 0; i < particleEmitter->m_particleSystems.size(); i++)
+					particleEmitter->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 			}
 			break;
 		default:

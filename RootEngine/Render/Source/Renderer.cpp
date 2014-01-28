@@ -814,6 +814,11 @@ namespace Render
 		}
 	}
 
+	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )
+	{
+		m_particles.Free((ParticleSystem*)p_particleSys);
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

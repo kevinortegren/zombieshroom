@@ -210,13 +210,13 @@ void ParticleEditor::MenuOpen()
 		m_selectedEntityIndex = 0; 
 	}
 
-	
-	ImportParticleEmitter(fullFileName.toStdString(), e, t, true);
+	e->m_particleSystems = m_context->m_resourceManager->LoadParticleEmitter(fullFileName.toStdString(), true);
 
 	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
 	{
+		e->m_systems.push_back(m_context->m_renderer->CreateParticleSystem());
 		//Add an item representing the emitter to the emitter list with the specified name
-		QListWidgetItem* tempItem = new QListWidgetItem(QString::fromStdString(e->m_particleSystems[i].m_name));
+		QListWidgetItem* tempItem = new QListWidgetItem(QString::fromStdString(e->m_particleSystems[i]->m_name));
 		ui.listWidget->addItem(tempItem);
 		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter created: %s", ui.nameEmitterLineEdit->text().toStdString().c_str());
 
@@ -277,48 +277,47 @@ void ParticleEditor::NewEmitter()
 	RootForce::ParticleEmitter* e	= m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 
 	//Create a new particle emitter and push it to the component
-	RootForce::ParticleSystemStruct particleSystem;
-	e->m_particleSystems.push_back(particleSystem);
+	e->m_particleSystems.push_back(new RootEngine::ParticleSystemStruct());
+	e->m_systems.push_back(m_context->m_renderer->CreateParticleSystem());
 
 	//Set default data 
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_system = m_context->m_renderer->CreateParticleSystem();	
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_material = m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_position = glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin	= 2.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax	= 2.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin		= 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMax		= 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin		= glm::vec2(0.05f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax		= glm::vec2(0.05f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd		= glm::vec2(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_color			= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd		= glm::vec4(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity		= glm::vec3(0.0f, 0.0f, 0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_direction		= glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_spread		= 1.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_orbitSpeed	= 1.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_orbitRadius	= 0.5f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime		= 0.05f;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_name			= ui.nameEmitterLineEdit->text().toStdString();
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position		= glm::vec3(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin	= 2.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax	= 2.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin		= 0.1f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax		= 0.1f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin		= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax		= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd		= glm::vec2(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_color		= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd		= glm::vec4(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity		= glm::vec3(0.0f, 0.0f, 0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction	= glm::vec3(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread		= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed	= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius	= 0.5f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.05f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_name			= ui.nameEmitterLineEdit->text().toStdString();
 
 	//Map data to params list for buffering
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_position;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::LIFETIMEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_lifeTimeMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPEEDMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPEEDMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_speedMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEMIN]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEMAX]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SIZEEND]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_sizeEnd;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::COLOR]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_color;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::COLOREND]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_colorEnd;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::GRAVITY]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_gravity;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::DIRECTION]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_direction;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPREAD]			= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spread;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::SPAWNTIME]		= &e->m_particleSystems[e->m_particleSystems.size()-1].m_spawnTime;
-	e->m_particleSystems[e->m_particleSystems.size()-1].m_params[Render::Semantic::TRANSPOSITION]	= &t->m_position;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_position;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMIN]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMAX]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEEND]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOR]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_color;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOREND]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::GRAVITY]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::DIRECTION]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPREAD]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPAWNTIME]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::TRANSPOSITION]	= &t->m_position;
 
 	//Add an item representing the emitter to the emitter list with the specified name
 	QListWidgetItem* tempItem = new QListWidgetItem(ui.nameEmitterLineEdit->text());
@@ -354,6 +353,7 @@ void ParticleEditor::DeleteEmitter()
 	ECS::Entity* entity = m_emitterEntities.at(m_selectedEntityIndex);
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 
+	//delete e->m_particleSystems.at(index);
 	e->m_particleSystems.erase(e->m_particleSystems.begin() + index);
 
 	//Deletes the item
@@ -411,87 +411,87 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 	
 	//Position
-	ui.posSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.x);
-	ui.posSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.y);
-	ui.posSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_position.z);
+	ui.posSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_position.x);
+	ui.posSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_position.y);
+	ui.posSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_position.z);
 	//Lifetime
-	ui.lifeTimeMinSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMin);
-	ui.lifeTimeMaxSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMax);
+	ui.lifeTimeMinSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMin);
+	ui.lifeTimeMaxSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMax);
 	//Speed
-	ui.speedMinSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_speedMin);
-	ui.speedMaxSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_speedMax);
+	ui.speedMinSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMin);
+	ui.speedMaxSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMax);
 	//Size
-	ui.sizeMinSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMin.x);
-	ui.sizeMaxSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.x);
-	ui.sizeEndSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.x);
+	ui.sizeMinSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMin.x);
+	ui.sizeMaxSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMax.x);
+	ui.sizeEndSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeEnd.x);
 	
 	//Start color
-	float red	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.r*255.0f;
-	float green = pe->m_particleSystems[m_selectedEmitterIndex].m_color.g*255.0f;
-	float blue	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.b*255.0f;
-	float alpha	= pe->m_particleSystems[m_selectedEmitterIndex].m_color.a*255.0f;
+	float red	= pe->m_particleSystems[m_selectedEmitterIndex]->m_color.r*255.0f;
+	float green = pe->m_particleSystems[m_selectedEmitterIndex]->m_color.g*255.0f;
+	float blue	= pe->m_particleSystems[m_selectedEmitterIndex]->m_color.b*255.0f;
+	float alpha	= pe->m_particleSystems[m_selectedEmitterIndex]->m_color.a*255.0f;
 
 	QColor col(red, green, blue, alpha);
 	m_colorTriangle->setColor(col);
 	ui.colorAlphaSlider->setValue(alpha);
 
 	//End color
-	red		= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r*255.0f;
-	green	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g*255.0f;
-	blue	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b*255.0f;
-	alpha	= pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a*255.0f;
+	red		= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.r*255.0f;
+	green	= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.g*255.0f;
+	blue	= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.b*255.0f;
+	alpha	= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.a*255.0f;
 
 	QColor colEnd(red, green, blue, alpha);
 	m_colorEndTriangle->setColor(colEnd);
 	ui.endcolorAlphaSlider->setValue(alpha);
 	//Gravity
-	ui.gravitySpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.x);
-	ui.gravitySpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.y);
-	ui.gravitySpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.z);
+	ui.gravitySpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.x);
+	ui.gravitySpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.y);
+	ui.gravitySpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.z);
 	//Direction
-	ui.directionSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_direction.x);
-	ui.directionSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_direction.y);
-	ui.directionSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_direction.z);
+	ui.directionSpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.x);
+	ui.directionSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.y);
+	ui.directionSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.z);
 	//Spread
-	ui.spreadSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_spread);
+	ui.spreadSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spread);
 	//Spawntime
-	ui.spawnTimeSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex].m_spawnTime);
+	ui.spawnTimeSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime);
 }
 
 void ParticleEditor::PositionXChanged( double p_x )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_position.x = (float)p_x;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_position.x = (float)p_x;
 	Changed();
 }
 
 void ParticleEditor::PositionYChanged( double p_y )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_position.y = (float)p_y;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_position.y = (float)p_y;
 	Changed();
 }
 
 void ParticleEditor::PositionZChanged( double p_z )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_position.z = (float)p_z;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_position.z = (float)p_z;
 	Changed();
 }
 
 void ParticleEditor::SizeMinXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMin.x = (float)p_val;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMin.y = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMin.x = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMin.y = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::SizeMaxXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.x = (float)p_val;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeMax.y = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMax.x = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMax.y = (float)p_val;
 	Changed();
 }
 
@@ -499,92 +499,92 @@ void ParticleEditor::SizeMaxXChanged( double p_val )
 void ParticleEditor::SizeEndXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.x = (float)p_val;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_sizeEnd.y = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeEnd.x = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeEnd.y = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::LifeTimeMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMin = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMin = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::LifeTimeMaxChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_lifeTimeMax = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMax = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::GravityXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.x = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.x = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::GravityYChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.y = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.y = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::GravityZChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_gravity.z = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.z = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::DirectionXChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.x = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.x = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::DirectionYChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.y = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.y = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::DirectionZChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_direction.z = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.z = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::SpeedMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_speedMin = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMin = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::SpeedMaxChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_speedMax = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMax = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::SpreadChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_spread = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_spread = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::SpawnTimeChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_spawnTime = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime = (float)p_val;
 	Changed();
 }
 
@@ -596,9 +596,9 @@ void ParticleEditor::ColorChanged( const QColor& p_val )
 	float green = (float)p_val.green()/255.0f;
 	float blue	= (float)p_val.blue()/255.0f;
 	//Set particle data
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.r = red;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.g = green;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.b = blue;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_color.r = red;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_color.g = green;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_color.b = blue;
 	//Set UI
 	ui.colorSpinBoxR->setValue(red);
 	ui.colorSpinBoxG->setValue(green);
@@ -614,9 +614,9 @@ void ParticleEditor::ColorEndChanged( const QColor& p_val )
 	float green = (float)p_val.green()/255.0f;
 	float blue	= (float)p_val.blue()/255.0f;
 	//Set particle data
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.r = red;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.g = green;
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.b = blue;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.r = red;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.g = green;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.b = blue;
 	//Set UI
 	ui.endcolorSpinBoxR->setValue(red);
 	ui.endcolorSpinBoxG->setValue(green);
@@ -682,7 +682,7 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	}
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
 	Changed();
 }
 
@@ -701,7 +701,7 @@ void ParticleEditor::colorAlphaSliderChanged( int p_val )
 	float alpha = (float)p_val/255.0f;
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	ui.colorSpinBoxA->setValue(alpha);
-	pe->m_particleSystems[m_selectedEmitterIndex].m_color.a = alpha;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_color.a = alpha;
 	Changed();
 }
 
@@ -710,7 +710,7 @@ void ParticleEditor::endColorAlphaSliderChanged( int p_val )
 	float alpha = (float)p_val/255.0f;
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	ui.endcolorSpinBoxA->setValue(alpha);
-	pe->m_particleSystems[m_selectedEmitterIndex].m_colorEnd.a = alpha;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.a = alpha;
 	Changed();
 }
 
@@ -795,23 +795,23 @@ void ParticleEditor::ExportParticle( QString p_fullFilePath )
 	{
 		// Export Particle systems
 		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_position.x << (*itr).m_position.y << (*itr).m_position.z << YAML::EndSeq; 
-		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr).m_lifeTimeMin;
-		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr).m_lifeTimeMax;
-		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr).m_speedMin;
-		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr).m_speedMax;
-		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMin.x << (*itr).m_sizeMin.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeMax.x << (*itr).m_sizeMax.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_sizeEnd.x << (*itr).m_sizeEnd.y << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_color.r << (*itr).m_color.g << (*itr).m_color.b << (*itr).m_color.a << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_colorEnd.r << (*itr).m_colorEnd.g << (*itr).m_colorEnd.b << (*itr).m_colorEnd.a << YAML::EndSeq; 
-		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_gravity.x << (*itr).m_gravity.y << (*itr).m_gravity.z << YAML::EndSeq; 
-		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr).m_direction.x << (*itr).m_direction.y << (*itr).m_direction.z << YAML::EndSeq; 
-		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr).m_spread;
-		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr).m_spawnTime;
-		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr).m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
-		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr).m_material->m_effect);
-		emitter << YAML::Key << "NAME"			<< YAML::Value << (*itr).m_name;
+		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_position.x << (*itr)->m_position.y << (*itr)->m_position.z << YAML::EndSeq; 
+		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr)->m_lifeTimeMin;
+		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr)->m_lifeTimeMax;
+		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr)->m_speedMin;
+		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr)->m_speedMax;
+		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMin.x	<< (*itr)->m_sizeMin.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMax.x	<< (*itr)->m_sizeMax.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeEnd.x	<< (*itr)->m_sizeEnd.y << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_color.r		<< (*itr)->m_color.g		<< (*itr)->m_color.b		<< (*itr)->m_color.a << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_colorEnd.r	<< (*itr)->m_colorEnd.g		<< (*itr)->m_colorEnd.b		<< (*itr)->m_colorEnd.a << YAML::EndSeq; 
+		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_gravity.x	<< (*itr)->m_gravity.y		<< (*itr)->m_gravity.z		<< YAML::EndSeq; 
+		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_direction.x << (*itr)->m_direction.y	<< (*itr)->m_direction.z	<< YAML::EndSeq; 
+		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr)->m_spread;
+		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr)->m_spawnTime;
+		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
+		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr)->m_material->m_effect);
+		emitter << YAML::Key << "NAME"			<< YAML::Value << (*itr)->m_name;
 		emitter << YAML::EndMap;
 	}
 
@@ -901,19 +901,19 @@ void ParticleEditor::TemplateChanged( int p_val )
 
 	if(p_val == 0)
 	{
-		if(pe->m_particleSystems[m_selectedEmitterIndex].m_params.find(Render::Semantic::ORBITSPEED) != pe->m_particleSystems[m_selectedEmitterIndex].m_params.end())
-			pe->m_particleSystems[m_selectedEmitterIndex].m_params.erase(Render::Semantic::ORBITSPEED);
-		if(pe->m_particleSystems[m_selectedEmitterIndex].m_params.find(Render::Semantic::ORBITRADIUS) != pe->m_particleSystems[m_selectedEmitterIndex].m_params.end())
-			pe->m_particleSystems[m_selectedEmitterIndex].m_params.erase(Render::Semantic::ORBITRADIUS);
+		if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITSPEED) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
+			pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITSPEED);
+		if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITRADIUS) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
+			pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITRADIUS);
 		
-		pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
 	}
 	else if(p_val == 1)
 	{
-		pe->m_particleSystems[m_selectedEmitterIndex].m_params[Render::Semantic::ORBITSPEED]  = &pe->m_particleSystems[m_selectedEmitterIndex].m_orbitSpeed;
-		pe->m_particleSystems[m_selectedEmitterIndex].m_params[Render::Semantic::ORBITRADIUS] = &pe->m_particleSystems[m_selectedEmitterIndex].m_orbitRadius;
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITSPEED]  = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed;
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITRADIUS] = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitRadius;
 
-		pe->m_particleSystems[m_selectedEmitterIndex].m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleOrbit");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleOrbit");
 	}
 	Changed();
 }
@@ -921,14 +921,14 @@ void ParticleEditor::TemplateChanged( int p_val )
 void ParticleEditor::OrbitRadiusChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_orbitRadius = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitRadius = (float)p_val;
 	Changed();
 }
 
 void ParticleEditor::OrbitSpeedChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex].m_orbitSpeed = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed = (float)p_val;
 	Changed();
 }
 

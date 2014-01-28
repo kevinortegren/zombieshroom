@@ -118,6 +118,10 @@ namespace RootForce
 					{
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
+
+
+
+
 						NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
 						NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
 

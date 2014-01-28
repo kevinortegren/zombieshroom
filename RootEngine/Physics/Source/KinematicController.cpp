@@ -98,7 +98,8 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 {
 	btVector3 temp = btVector3(p_dir[0], p_dir[1], p_dir[2]);
-	temp.normalize();
+	if (!temp.fuzzyZero())
+		temp.normalize();
 	m_kinController->setVelocityForTimeInterval(temp*m_maxSpeed, p_dt);
 	if(!m_kinController->IsKnockbacked())// && !m_hasStepped)
 	{

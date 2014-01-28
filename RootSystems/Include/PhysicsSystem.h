@@ -15,6 +15,7 @@ namespace RootForce
 			: m_mass(0) {}
 
 		float m_mass;
+		glm::vec3 m_velocity;
 	};
 
 	struct PhysicsSystem : public ECS::EntitySystem
