@@ -49,7 +49,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
 	-- ToDo: Get and set a correct team id
-	playerComponent:SetTeamId(0);
+	playerComponent:SetTeamId(userId - math.floor(userId/2) * 2);
 
 	Entity.RegisterGroup("NonExport", player);
 

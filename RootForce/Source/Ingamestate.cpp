@@ -212,6 +212,7 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
+
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)

@@ -46,11 +46,14 @@ function AbilityBall.OnCollide (self, entity)
 		
 		-- Deal damage to the colliding player
 		local health = entity:GetHealth();
-		if not health:IsDead() then
-			-- Get Ability's owner's ID to award kill if any
-			local abilityOwnerNetwork = self:GetNetwork();
-			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-			
+		local targetPlayerComponent = entity:GetPlayerComponent();
+		
+		local abilityOwnerNetwork = self:GetNetwork();
+		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+		
+		if not health:IsDead() and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local network = entity:GetNetwork();
 			local receiverId = network:GetUserId();
 			
