@@ -50,7 +50,7 @@ function AbilityBall.OnCollide (self, entity)
 		-- Deal damage to the colliding player
 		local health = entity:GetHealth();
 		local network = entity:GetNetwork();
-		local receiverId = network:GetUserID();
+		local receiverId = network:GetUserId();
 		
 		health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
 	end
