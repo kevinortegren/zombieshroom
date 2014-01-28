@@ -1625,7 +1625,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
-			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.SynchronizedID);
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.UserID);
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////

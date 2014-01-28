@@ -11,8 +11,7 @@ namespace RootSystems
 	{
 		m_health.Init(m_world->GetEntityManager());
 		m_collision.Init(m_world->GetEntityManager());
-
-		m_spawnPoints = m_world->GetGroupManager()->GetEntitiesInGroup("SpawnPoint");
+		m_transform.Init(m_world->GetEntityManager());
 	}
 
 
@@ -22,6 +21,7 @@ namespace RootSystems
 
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::Collision* collision = m_collision.Get(p_entity);
+		RootForce::Transform* transform = m_transform.Get(p_entity);
 		
 
 		//If the player has 0 health and is not already dead, kill him
@@ -41,9 +41,12 @@ namespace RootSystems
 				// TODO: Find a spawn point
 				RootForce::Transform* spawnpoint = GetRandomSpawnpoint();
 				if(spawnpoint != nullptr)
-					m_engineContext->m_physics->SetPosition(*(collision->m_handle), spawnpoint->m_position);
+				{
+					transform->m_position = spawnpoint->m_position;
+					transform->m_orientation = spawnpoint->m_orientation;
+				}
 				else
-					m_engineContext->m_physics->SetPosition(*(collision->m_handle), glm::vec3(0,100,0));
+					transform->m_position = glm::vec3(0,100,0);
 
 				health->Health = 100;
 				health->IsDead = false;
@@ -79,6 +82,11 @@ namespace RootSystems
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}
 		return nullptr;
+	}
+
+	void RespawnSystem::LoadSpawnPoints()
+	{
+		m_spawnPoints = m_world->GetGroupManager()->GetEntitiesInGroup("SpawnPoint");
 	}
 
 }

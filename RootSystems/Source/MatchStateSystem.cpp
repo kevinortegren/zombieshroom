@@ -48,7 +48,7 @@ namespace RootForce
 			return false;
 	}
 
-	void MatchStateSystem::AwardPlayerKill( RootForce::Network::SynchronizedID_t p_killerID, RootForce::Network::SynchronizedID_t p_deadID )
+	void MatchStateSystem::AwardPlayerKill( RootForce::Network::UserID_t p_killerID, RootForce::Network::UserID_t p_deadID )
 	{
 		Network::NetworkEntityID killerNetworkID;
 		killerNetworkID.UserID = p_killerID;
@@ -61,7 +61,7 @@ namespace RootForce
 		deadNetworkID.SequenceID = 0;
 		
 		// Award score for killer team
-		if(p_killerID >= 0)
+		if(p_killerID != Network::ReservedUserID::NONE)
 		{
 			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);

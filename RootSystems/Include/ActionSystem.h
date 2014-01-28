@@ -48,6 +48,8 @@ namespace RootSystems
 
 		void ProcessEntity(ECS::Entity* p_entity);
 	private:
+		void UpdateAimingDevice();
+
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::PlayerActionComponent> m_action;

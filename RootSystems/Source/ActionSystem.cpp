@@ -122,7 +122,43 @@ namespace RootSystems
 
 		//action->MovePower = 0;
 		//action->StrafePower = 0;
+		UpdateAimingDevice();
 	}
+
+	void ActionSystem::UpdateAimingDevice()
+	{
+		for (RootForce::Network::NetworkEntityMap::iterator it = g_networkEntityMap.begin(); it != g_networkEntityMap.end(); it++)
+		{
+			if (it->first.ActionID == RootForce::Network::ReservedActionID::CONNECT)
+			{
+				RootForce::Network::NetworkEntityID id;
+				id.UserID = it->first.UserID;
+				id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
+				id.SequenceID = 0;
+				ECS::Entity* playerEntity = g_networkEntityMap[id];
+				if (playerEntity == nullptr)
+					continue;
+
+				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
+				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(g_networkEntityMap[id]);
+
+				id.SequenceID = 1;
+				ECS::Entity* aimingDeviceEntity = g_networkEntityMap[id];
+				if (aimingDeviceEntity == nullptr)
+					continue;
+
+				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
+
+				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+
+			}
+		}
+
+	}
+
 }
+
 
 #endif

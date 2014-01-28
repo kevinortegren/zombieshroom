@@ -186,6 +186,9 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		//Load the level spawn points into the respawn system
+		m_respawnSystem->LoadSpawnPoints();
+
 		m_animationSystem->Start();
 	}
 
@@ -252,7 +255,7 @@ namespace RootForce
 			{
 				// ToDo: Send a network message to server to indicate a suicide
 				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-				MatchStateSystem::AwardPlayerKill(0, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.SynchronizedID);
+				MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
 			} break;
 		default:
 			break;
@@ -355,7 +358,6 @@ namespace RootForce
 		
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			m_playerControlSystem->UpdateAimingDevice();
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
