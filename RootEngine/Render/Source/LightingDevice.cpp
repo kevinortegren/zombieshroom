@@ -90,7 +90,7 @@ namespace Render
 
 		// Pointlights.
 		pointlight->Apply();
-		p_fullscreenQuad.DrawInstanced(m_numPointLights);
+		//p_fullscreenQuad.DrawInstanced(m_numPointLights);
 
 		p_fullscreenQuad.Unbind();
 

@@ -167,8 +167,13 @@ namespace Render
 		m_color1 = CreateTexture();
 		m_color1->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
 
+		m_color2 = CreateTexture();
+		m_color2->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_color1->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_color2->GetHandle(), 0);
+
 
 		// Share depth attachment between gbuffer and forward.
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
@@ -277,6 +282,7 @@ namespace Render
 		for(int i = 0; i < 10; i++)
 		{
 			weights[i] = weights[i] / sum;
+			std::cout << weights[i] << std::endl;
 		}
 
 		glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(10, sizeof(float), weights);
@@ -541,8 +547,8 @@ namespace Render
 		// Bind forward target.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
+		GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, buffers);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -575,14 +581,14 @@ namespace Render
 		// Bind gbuffer.
 		m_gbuffer.BindTextures();
 
-		// Bind la-texture.
+		// Bind scene.
 		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
+		glBindTexture(GL_TEXTURE_2D, m_color0->GetHandle());
 
 		m_fullscreenQuad.Bind();
 
 		m_activeTarget = GL_COLOR_ATTACHMENT1;
-		m_activeTexture = m_color0->GetHandle();
+		m_activeTexture = m_color2->GetHandle();
 
 		for(auto effect = m_postProcessEffects.begin(); effect != m_postProcessEffects.end(); ++effect)
 		{
@@ -606,8 +612,8 @@ namespace Render
 
 					// Swap input/output.
 					
-					m_activeTarget = ((m_activeTarget == GL_COLOR_ATTACHMENT0) ? GL_COLOR_ATTACHMENT1 : GL_COLOR_ATTACHMENT0);
-					m_activeTexture = ((m_activeTexture == m_color1->GetHandle()) ? m_color0->GetHandle() : m_color1->GetHandle());
+					m_activeTarget = ((m_activeTarget == GL_COLOR_ATTACHMENT1) ? GL_COLOR_ATTACHMENT2 : GL_COLOR_ATTACHMENT1);
+					m_activeTexture = ((m_activeTexture == m_color1->GetHandle()) ? m_color2->GetHandle() : m_color1->GetHandle());
 				}
 			}
 		}

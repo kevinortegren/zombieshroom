@@ -12,7 +12,7 @@ uniform sampler2D g_Normal;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec3 normals;
-layout (location = 2) out vec4 background;
+layout (location = 2) out vec4 glow;
 
 void main()
 {
@@ -28,5 +28,5 @@ void main()
 
 	diffuse = vec4(frag_color, specTerm);
 	normals = vec3(bumpNormal * 0.5 + 0.5);
-	background.w = 0.0f;
+	glow = vec4(0.0f);
 }

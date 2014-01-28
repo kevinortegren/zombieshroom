@@ -9,6 +9,7 @@ layout(std140) uniform PerTech
 };
 
 // Textures
+uniform sampler2D g_Scene;
 uniform sampler2D g_Glow;
 uniform sampler2D g_Input;
 
@@ -20,7 +21,7 @@ out vec4 frag_color;
 
 void main()
 {
-    float dx = 1.0 / 256;
+    float dx = 1.0f / textureSize(g_Glow, 0).x;
 
     vec4 blur = texture(g_Glow, vert_texCoord) * g_Weights[0];
     

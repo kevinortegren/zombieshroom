@@ -168,6 +168,8 @@ namespace Render
 
 		Render::TextureInterface* m_color0;
 		Render::TextureInterface* m_color1;
+		Render::TextureInterface* m_color2;
+
 
 		GeometryBuffer m_gbuffer;
 		LineRenderer m_lineRenderer;

@@ -5,6 +5,8 @@
         - name: PerTech
           slot: 3
       textures:
+        - name: g_Scene
+          slot: 3
         - name: g_Glow
           slot: 4
         - name: g_Input
@@ -29,4 +31,4 @@
         depth:
           write: 0
           test: 0
-        blend: 2
+        blend: 0
