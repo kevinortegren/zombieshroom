@@ -154,6 +154,16 @@ void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_re
 	ReleaseMutex(IdMutexHandle);
 }
 
+UpdateMessage ReadMemory::PeekMessageAt(int index)
+{
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+
+	return *updateMessages[index];
+
+	ReleaseMutex(IdMutexHandle);
+}
+
 void ReadMemory::ClearAllMessages()
 {
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");

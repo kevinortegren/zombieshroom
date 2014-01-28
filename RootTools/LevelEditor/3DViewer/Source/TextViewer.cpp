@@ -133,14 +133,15 @@ int main(int argc, char* argv[])
 				old = now;
 
 				m_world.SetDelta(dt);
+				
 
 				string type;
 				int updateID = -1;
 				int	removeID = -1;
 				bool updateTransform, updateShape;
+				std::deque<UpdateMessage> localMessages;
+				int numberMessages = 0;
 
-				//GET A MESSAGE
-				RM.ReadMessage(type, updateID, removeID, updateTransform, updateShape);
 				if(type != "")
 				{
 					cout << type << " ID " << updateID << endl;
@@ -151,8 +152,16 @@ int main(int argc, char* argv[])
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
 				entityExport = *RM.export;				
+				numberMessages = *RM.NumberOfMessages;
 				ReleaseMutex(RM.IdMutexHandle);
 
+				for(int i = 0; i < numberMessages; i ++)
+				{
+					localMessages.push_back(RM.PeekMessageAt(i));
+				}
+
+				RM.ClearAllMessages();
+				
 				/////////////  EXPORT   ///////////////////////
 				if(entityExport == 2)
 				{			
@@ -172,45 +181,57 @@ int main(int argc, char* argv[])
 					}
 				}
 
+
 				//UPDATE
-
-				if(type == "Mesh")
+				while(localMessages.size() > 0)
 				{
-					if(removeID == -1)
-						UpdateMesh(updateID, updateTransform, updateShape, false);
-					else
+					updateID = localMessages[0].updateID;
+					removeID = localMessages[0].removeID;
+					type = localMessages[0].name;
+					updateShape = localMessages[0].updateShape;
+					updateTransform = localMessages[0].updateTransform;
+
+					localMessages.pop_front();
+
+					if(type == "Mesh")
 					{
-						UpdateMesh(removeID, updateTransform, updateShape, true);
-						cout << "RemoveID " << removeID << endl;
+						if(removeID == -1)
+							UpdateMesh(updateID, updateTransform, updateShape, false);
+						else
+						{
+							UpdateMesh(removeID, updateTransform, updateShape, true);
+							cout << "RemoveID " << removeID << endl;
+						}
+					}
+
+					if(type == "Light")
+					{
+						if(removeID == -1)
+							UpdateLight(updateID, false, false);
+						else
+							UpdateLight(removeID, true, false);
+					}
+
+					if(type == "Camera")
+					{
+						UpdateCamera(updateID);
+					}
+
+					if(type == "Texture")
+					{
+						if(updateID != -1)
+						{
+							RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+							WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+							cout << RM.PpaintList[updateID]->heigth << endl;
+							cout << RM.PpaintList[updateID]->width << endl;
+
+							//painter->BufferData(RM.PpaintList[updateID]->Pixels);
+							ReleaseMutex(RM.TextureMutexHandle);
+						}
 					}
 				}
-
-				if(type == "Light")
-				{
-					if(removeID == -1)
-						UpdateLight(updateID, false, false);
-					else
-						UpdateLight(removeID, true, false);
-				}
-
-				if(type == "Camera")
-				{
-					UpdateCamera(updateID);
-				}
-
-				if(type == "Texture")
-				{
-					if(updateID != -1)
-					{
-						RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-						WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
-						cout << RM.PpaintList[updateID]->heigth << endl;
-						cout << RM.PpaintList[updateID]->width << endl;
-						
-						//painter->BufferData(RM.PpaintList[updateID]->Pixels);
-						ReleaseMutex(RM.TextureMutexHandle);
-					}
-				}
+				
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
