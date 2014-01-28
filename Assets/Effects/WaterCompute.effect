@@ -6,11 +6,18 @@
   techniques:
 
     - name: Water_Compute       
-      textures:
+      images:
         - name: g_prevTex
-          slot: 10
+          slot: 0
         - name: g_currTex
-          slot: 11
+          slot: 1
+      uniforms:
+        - sem: MK1
+          offset: 0
+        - sem: MK2
+          offset: 4
+        - sem: MK3
+          offset: 8
       flags:
         - name: RenderIgnore
 
@@ -20,38 +27,3 @@
           shaders:
             - name: water_update
               type: compute
-
-    - name: Water_Render
-      bindings:
-        - name: PerFrame
-          slot: 0        
-      textures:
-        - name: g_Diffuse
-          slot: 0
-        - name: g_Depth
-          slot: 3
-          
-      flags:
-        - name: Forward   
-      programs:
-        - name: water_render
-          shaders:
-            - name: water-render
-              type: vertex
-            - name: water-render
-              type: fragment
-            - name: water-render
-              type: tess_control
-            - name: water-render
-              type: tess_evaluation
-          
-          # Blend Mode:
-          # None = 0
-          # AlphaBlend = 1
-          # Addative = 2
-          blend: 1
-          
-          # Depth settings.
-          depth:
-            write: 0
-            test: 1

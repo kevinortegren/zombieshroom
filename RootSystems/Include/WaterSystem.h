@@ -29,5 +29,6 @@ namespace RootForce
 		Render::ComputeJob						m_computeJob;
 
 		unsigned m_currTex;
+		float m_mk1, m_mk2, m_mk3;
 	};
 }

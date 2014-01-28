@@ -84,7 +84,7 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
@@ -280,6 +280,9 @@ namespace Render
 		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
+		s_sizes[Semantic::MK1]			= sizeof(float);
+		s_sizes[Semantic::MK2]			= sizeof(float);
+		s_sizes[Semantic::MK3]			= sizeof(float);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -777,14 +780,37 @@ namespace Render
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
+				{
 					(*texture).second->Bind((*texture).first);
+					(*texture).second->BindImage((*texture).first);
+				}
 		}
 
 		for(auto tech = p_job->m_effect->GetTechniques().begin(); tech != p_job->m_effect->GetTechniques().end(); ++tech)
 		{
+			for(auto param = p_job->m_params.begin(); param != p_job->m_params.end(); ++param)
+			{	
+				m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+			}
+
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
+			
+			glUniform1i(glGetUniformLocation((*tech)->GetPrograms()[0]->GetHandle(), "prevTex"), 0);
+			glUniform1i(glGetUniformLocation((*tech)->GetPrograms()[0]->GetHandle(), "currTex"), 1);
+		
+
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		}
+
+		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
+		{
+			if((*texture).second != nullptr)
+			{
+				(*texture).second->Unbind((*texture).first);
+				(*texture).second->UnBindImage((*texture).first);
+			}
 		}
 	}
 

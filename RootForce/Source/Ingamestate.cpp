@@ -158,6 +158,9 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
+		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
+		m_waterSystem->Init();
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -301,7 +304,11 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
-
+		{
+			PROFILE("Water system", g_engineContext.m_profiler);
+			m_waterSystem->Process();
+		}
+		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 

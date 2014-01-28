@@ -27,6 +27,9 @@ namespace Render
 			TRANSPOSITION,
 			ORBITSPEED,
 			ORBITRADIUS,
+			MK1,
+			MK2,
+			MK3,
 		};
 	}
 
@@ -44,8 +47,6 @@ namespace Render
 			TEXTURE_G,
 			TEXTURE_B,
 			GLOW,
-			COMPUTEIN,
-			COMPUTEOUT,
 		};
 	}
 }
