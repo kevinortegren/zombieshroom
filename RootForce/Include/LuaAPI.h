@@ -1703,6 +1703,24 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->m_mouseSensitivity);
 			return 1;
 		}
+		//////////////////////////////////////////////////////////////////////////
+		//ParticleEmitter
+		//////////////////////////////////////////////////////////////////////////
+		static int ParticleEmitterCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter**)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(*e);
+
+			(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
+
+			for(unsigned i = 0; i < (*s)->m_particleSystems.size(); i++)
+				(*s)->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
+
+			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			return 1;
+		}
 
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
@@ -2065,6 +2083,15 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg particlecomponent_f [] = {
+			{"New", ParticleEmitterCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg particlecomponent_m [] = {
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2113,6 +2140,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statecomponent_f, RootForce::LuaAPI::statecomponent_m, "StateComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
