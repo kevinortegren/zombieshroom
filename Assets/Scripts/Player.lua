@@ -66,10 +66,11 @@ function Player.OnCreate(userId, actionId)
 
 		renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
 		renderable:SetModel("testchar");
-		renderable:SetMaterial("testchar");
 		if playerComponent:GetTeamId() == 1 then
+			renderable:SetMaterial("BlueSpirit");
 			renderable:SetMaterialDiffuse("TestBlue");
 		else
+			renderable:SetMaterial("RedSpirit");
 			renderable:SetMaterialDiffuse("TestRed");
 		end
 		renderable:SetMaterialSpecular("WSSpecular");
@@ -81,7 +82,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
-		playerControl:SetMouseSensitivity(0.3);
+		playerControl:SetMouseSensitivity(3);
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
