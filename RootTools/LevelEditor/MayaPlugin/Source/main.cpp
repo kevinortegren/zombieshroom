@@ -7,7 +7,7 @@
 #include <sstream>;
 
 // Threshold for determining if two vertices are identical
-#define THRESHOLD 0.01f
+#define THRESHOLD 0.001f
 
 SharedMemory SM;
 
@@ -57,8 +57,8 @@ MString cleanFullPathName(const char * str);
 std::string GetNameFromPath( std::string p_path );
 
 PaintTexture myTextures[g_maxPaintTextures];
-MSpace::Space g_space_world = MSpace::kTransform;
-MSpace::Space g_space_local = MSpace::kObject;
+MSpace::Space g_space_world = MSpace::kPostTransform;
+MSpace::Space g_space_local = MSpace::kPreTransform;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -246,6 +246,7 @@ void Export()
 						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
 						if ((SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length() <= THRESHOLD)
 						{
+							//Om den är falsk hela vägen
 							exists = false;
 						}
 						else
@@ -294,7 +295,7 @@ void Export()
 
 			string outputDirectory = g_savepath + "Models/";
 			MString savepath = outputDirectory.c_str();
-			//ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
+
 			ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
 			
 			//Copy textures
@@ -325,6 +326,9 @@ void Export()
 	exportMaya = 0;
 
 	ReleaseMutex(SM.IdMutexHandle);
+
+	//GET BACCK OLD NAMES?
+	//loadScene();
 }
 
 void sortObjectList()
