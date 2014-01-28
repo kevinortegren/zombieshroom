@@ -8,7 +8,7 @@ namespace RootForce
 {
 	struct Ragdoll : public ECS::Component<Ragdoll>
 	{
-		bool m_initialized;
+		bool m_firstTime;
 		int padding;
 		//Empty for now, might need stuff later
 	};
@@ -38,7 +38,7 @@ namespace RootForce
 
 	private:
 		void NameMapper( std::map<std::string, int> * p_nameToIndex, aiNode* p_rootNode, RootEngine::RootAnimation::AnimationInterface* p_anim, const aiScene* p_aiScene);
-		bool RagdollSystem::DoesAnimNodeExist(const aiAnimation* pAnimation, const std::string NodeName);
+		bool RagdollSystem::DoesAnimNodeExist(const aiAnimation* pAnimation, const std::string p_nodeName);
 		RootEngine::GameSharedContext* m_engineContext;
 	};
 }

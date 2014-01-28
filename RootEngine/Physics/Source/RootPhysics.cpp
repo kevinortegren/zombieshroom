@@ -23,14 +23,13 @@ namespace Physics
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
 			CustomUserPointer* ptr = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
-			if (ptr->m_type == PhysicsType::TYPE_STATIC)
-			{
-				return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
-			}
-			else
-			{
-				return 1.0f;
-			}
+			if(ptr != nullptr)
+				if (ptr->m_type == PhysicsType::TYPE_STATIC)
+				{
+					return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+				}
+
+			return 1.0f;	
 		}
 	};
 
@@ -143,7 +142,7 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb |btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
@@ -461,7 +460,7 @@ namespace Physics
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 			m_dynamicWorld->addRigidBody(body);
@@ -924,6 +923,13 @@ namespace Physics
 			retVal[1] = temp.getY();
 			retVal[2] = temp.getZ();		
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			temp = m_ragdolls[0]->GetPos();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();
+		}
 		else
 		{
 			retVal = m_externallyControlled.at(index)->GetPos();
@@ -1004,6 +1010,16 @@ namespace Physics
 			retVal[1] = transform.getRotation().y();
 			retVal[2] = transform.getRotation().z();
 			retVal[3] = transform.getRotation().w();
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			btQuaternion temp = m_ragdolls.at(index)->GetOrientation();
+			retVal[0] = temp.x();
+			retVal[1] = temp.y();
+			retVal[2] = temp.z();
+			retVal[3] = temp.w();
+			return glm::quat(0,0,0,-1);
 		}
 		else //Todo: return externallycontrolled orientation if needed.
 		{
@@ -1127,9 +1143,14 @@ namespace Physics
 			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 			
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation);
+		}
+		else
+		{
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
 		}
 	}
 
@@ -1250,6 +1271,15 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetPosition(temp);
 		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		{
+			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+		//	m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			//m_playerObjects.at(index)->SetPosition(temp);
+		}
 	}
 
 
@@ -1265,7 +1295,7 @@ namespace Physics
 		return false;
 	}
 
-	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex )
+	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -1278,8 +1308,10 @@ namespace Physics
 		}
 		else
 		{
+			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
-
+			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, p_transform, m_playerObjects.at(indexplayer)->GetPosition());
 			//skape ragdoll fanskapet
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
@@ -1288,9 +1320,20 @@ namespace Physics
 		
 	}
 
-	void RootPhysics::GetBones( int p_objectHandle, glm::mat4 &p_bones )
+	glm::mat4* RootPhysics::GetBones( int p_objectHandle)
 	{
-
+		if(!DoesObjectExist(p_objectHandle))
+			return nullptr;
+		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		if(index  != -1)
+		{
+			return m_ragdolls.at(index)->GetBones();
+		}
+		else
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll", p_objectHandle);
+		}
+		return nullptr;
 	}
 
 }

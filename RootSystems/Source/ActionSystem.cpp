@@ -84,44 +84,50 @@ namespace RootSystems
 				m_engineContext->m_script->ExecuteScript();
 			}
 		}
+		if( animation->m_animClip != RootForce::AnimationClip::RAGDOLL)
+		{
 
-		if(state->CurrentState == RootForce::EntityState::ASCENDING)
-			animation->m_animClip = RootForce::AnimationClip::ASCEND;
-		else if(state->CurrentState == RootForce::EntityState::DESCENDING)
-			animation->m_animClip = RootForce::AnimationClip::DESCEND;
-		else if(state->CurrentState == RootForce::EntityState::LANDING)
-		{
-			animation->m_animClip = RootForce::AnimationClip::LANDING;
-			animation->m_locked = 1;
-			state->CurrentState = RootForce::EntityState::GROUNDED;
-		}
-		else
-		{
-			//if(action->StrafePower == 0 && action->MovePower == 0)
-			animation->m_animClip = RootForce::AnimationClip::IDLE;
-			if(action->MovePower < 0)
-				animation->m_animClip = RootForce::AnimationClip::WALKING;
-			else if(action->MovePower > 0)
-				animation->m_animClip = RootForce::AnimationClip::WALKING;
-			if(action->StrafePower > 0)
-				animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
-			else if(action->StrafePower < 0)
-				animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
-		}
-		// Issue a jump if applicable
-		if(action->Jump)
-		{
-			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
-			if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+		
+			if(state->CurrentState == RootForce::EntityState::ASCENDING)
+				animation->m_animClip = RootForce::AnimationClip::ASCEND;
+			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
+				animation->m_animClip = RootForce::AnimationClip::DESCEND;
+			else if(state->CurrentState == RootForce::EntityState::LANDING)
 			{
-				animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+				animation->m_animClip = RootForce::AnimationClip::LANDING;
 				animation->m_locked = 1;
+				state->CurrentState = RootForce::EntityState::GROUNDED;
 			}
-			action->Jump = false;
-		}
+			else
+			{
+				//if(action->StrafePower == 0 && action->MovePower == 0)
+				animation->m_animClip = RootForce::AnimationClip::IDLE;
+			
+				if(action->MovePower < 0)
+					animation->m_animClip = RootForce::AnimationClip::WALKING;
+				else if(action->MovePower > 0)
+					animation->m_animClip = RootForce::AnimationClip::WALKING;
+				if(action->StrafePower > 0)
+					animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+				else if(action->StrafePower < 0)
+					animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+			}
+			// Issue a jump if applicable
+			if(action->Jump)
+			{
+				m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+				if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+				{
+					//animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+					animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
+					animation->m_locked = 1;
+				}
+				action->Jump = false;
+			}
 
-		//action->MovePower = 0;
-		//action->StrafePower = 0;
+			action->MovePower = 0;
+			action->StrafePower = 0;
+		}
 	}
 }
 

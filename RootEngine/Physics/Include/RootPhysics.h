@@ -110,7 +110,7 @@ namespace RootEngine
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
 
-			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex) = 0;
+			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform ) = 0;
 
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -126,7 +126,7 @@ namespace RootEngine
 			virtual float GetMaxSpeed(int p_objectHandle) = 0;
 			virtual float GetStepHeight(int p_objectHandle) = 0;
 			virtual float GetModelHeight(int p_objectHandle) = 0;
-			virtual void GetBones(int p_objectHandle, glm::mat4 &p_bones) = 0;
+			virtual glm::mat4* GetBones(int p_objectHandle) = 0;
 			virtual std::set<void*>* GetCollisionVector(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
@@ -169,7 +169,7 @@ namespace RootEngine
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
-			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex);
+			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform );
 
 			//Binds
 			void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);
@@ -187,7 +187,7 @@ namespace RootEngine
 			//Getters
 			glm::vec3 GetPos(int p_objectHandle);	
 			glm::vec3 GetVelocity(int p_objectHandle);
-			void GetBones(int p_objectHandle, glm::mat4 &p_bones);
+			glm::mat4* GetBones(int p_objectHandle);
 			float GetMass(int p_objectHandle);
 			int GetType(int p_objectHandle);
 			float GetMaxSpeed(int p_objectHandle);
