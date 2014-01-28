@@ -67,6 +67,7 @@ namespace Render
 		BlendState m_blendState;
 		DepthState m_depthState;
 		FillMode m_fillMode;
+		glm::ivec4 m_viewport;
 
 	private:
 		GLuint m_glHandle;

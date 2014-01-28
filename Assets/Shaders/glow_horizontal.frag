@@ -21,18 +21,18 @@ out vec4 frag_color;
 
 void main()
 {
-    float dy = 1.0f / textureSize(g_Input, 0).y;
+    vec2 TexelCoord = gl_FragCoord.xy / vec2( 640, 360 );	
 
-    vec4 blur = texture(g_Input, vert_texCoord) * g_Weights[0];
-   
+   // Inverse size of Glow Sampler.
+   float dy = 1.0f / textureSize(g_Glow, 0).y;
+
+   vec4 blur = texture(g_Glow, TexelCoord) * g_Weights[0];
+
     for( int i = 1; i < 10; i++ )
 	{
-		blur += texture(g_Input, vert_texCoord + vec2( 0.0, PixelOffset[i] ) * dy ) * g_Weights[i];
-		blur += texture(g_Input, vert_texCoord - vec2( 0.0, PixelOffset[i] ) * dy ) * g_Weights[i];
+		blur += texture(g_Glow, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dy ) * g_Weights[i];
+		blur += texture(g_Glow, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dy ) * g_Weights[i];
 	}
     
-    vec4 scene = texture(g_Scene, vert_texCoord);
-    vec4 glow = texture(g_Glow, vert_texCoord);
-    
-	frag_color = scene + blur;
+	frag_color = blur;
 }

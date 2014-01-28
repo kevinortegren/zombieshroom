@@ -19,17 +19,26 @@ const float PixelOffset[10] =
 
 out vec4 frag_color;
 
+float Gaussian (float x, float deviation)
+{
+	return (1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation)));	
+}
+
 void main()
 {
-    float dx = 1.0f / textureSize(g_Glow, 0).x;
+    vec2 TexelCoord = gl_FragCoord.xy / textureSize(g_Scene, 0);
 
-    vec4 blur = texture(g_Glow, vert_texCoord) * g_Weights[0];
+    // Inverse size of Blur Sampler.
+    float dx = 1.0f / textureSize(g_Input, 0).x;
+
+    vec4 blur = texture(g_Input, TexelCoord) * g_Weights[0];
+    vec4 glow = texture(g_Glow, TexelCoord);
     
     for( int i = 1; i < 10; i++ )
 	{
-		blur += texture(g_Glow, vert_texCoord + vec2( 0.0, PixelOffset[i] ) * dx ) * g_Weights[i];
-		blur += texture(g_Glow, vert_texCoord - vec2( 0.0, PixelOffset[i] ) * dx ) * g_Weights[i];
+		blur += texture(g_Input, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dx ) * g_Weights[i];
+		blur += texture(g_Input, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dx ) * g_Weights[i];
 	}
     
-	frag_color = blur;
+	frag_color = texture(g_Scene, TexelCoord) + blur;
 }

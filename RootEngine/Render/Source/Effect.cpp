@@ -82,6 +82,8 @@ namespace Render
 		m_blendState = BLEND_NONE;
 		m_depthState.depthTest = true;
 		m_depthState.depthWrite = true;
+		m_viewport = glm::ivec4(0, 0, 1280, 720);
+
 	}
 
 	Program::~Program(void)
