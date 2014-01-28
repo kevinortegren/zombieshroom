@@ -43,21 +43,14 @@ namespace RootForce
 			m_worldSystem = p_worldSystem;
 		}
 
-		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp)
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 
 			switch (p_id)
 			{
-				case ID_TIMESTAMP:
-				{
-					RakNet::Time time;
-					p_bs->Read(time);
-
-					m_lastHalfPing = float(RakNet::GetTime() - m_lastHalfPing) * 0.001f;
-				} return true;
-
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
@@ -69,6 +62,8 @@ namespace RootForce
 					m.Name = clientComponent->Name;
 
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
 					m.Serialize(true, &bs);
 
@@ -253,7 +248,7 @@ namespace RootForce
 						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
-						transform->m_position = m.Position + playerPhysics->MovementSpeed * m_lastHalfPing;
+						transform->m_position = m.Position + playerPhysics->MovementSpeed * lastHalfPing;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
@@ -302,6 +297,8 @@ namespace RootForce
 					n.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
 					n.Serialize(true, &bs);
 
@@ -402,6 +399,8 @@ namespace RootForce
 					m.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
 					m.Serialize(true, &bs);
 
@@ -421,21 +420,15 @@ namespace RootForce
 			: MessageHandler(p_peer)
 			, m_world(p_world) {}
 
-		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp)
 		{
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 
+			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
+
 			switch (p_id)
 			{
-				case ID_TIMESTAMP:
-				{
-					RakNet::Time time;
-					p_bs->Read(time);
-
-					m_lastHalfPing = float(RakNet::GetTime() - m_lastHalfPing) * 0.001f;
-				} return true;
-
 				case ID_NEW_INCOMING_CONNECTION:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%s)", p_packet->systemAddress.ToString());
@@ -475,6 +468,8 @@ namespace RootForce
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserDisconnected);
 					m.Serialize(true, &bs);
 
@@ -496,6 +491,8 @@ namespace RootForce
 
 					// Forward the message to broadcast
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Chat);
 					
 					m.Sender = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
@@ -521,6 +518,8 @@ namespace RootForce
 					
 					// Send server information
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::ServerInformation);
 					serverInfo->Information.Serialize(true, &bs);
 
@@ -561,7 +560,7 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						transform->m_position = m.Position + playerPhysics->MovementSpeed * m_lastHalfPing;
+						transform->m_position = m.Position + playerPhysics->MovementSpeed * lastHalfPing;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 					}
@@ -651,6 +650,8 @@ namespace RootForce
 										n.Name = RakNet::RakString(playerComponent->Name.c_str());
 
 										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
 										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 										n.Serialize(true, &bs);
 
@@ -676,6 +677,8 @@ namespace RootForce
 									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
 									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+									bs.Write(RakNet::GetTime());
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 									n.Serialize(true, &bs);
 
@@ -685,6 +688,8 @@ namespace RootForce
 								// Send a game state snapshot to the connectee
 								{
 									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+									bs.Write(RakNet::GetTime());
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
 									NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
 

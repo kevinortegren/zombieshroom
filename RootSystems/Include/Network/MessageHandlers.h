@@ -2,6 +2,7 @@
 
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <Utility/ECS/Include/World.h>
 #include <RakNet/RakPeerInterface.h>
 #include <RakNet/MessageIdentifiers.h>
@@ -23,10 +24,9 @@ namespace RootForce
 			MessageHandler(RakNet::RakPeerInterface* p_peer);
 			virtual ~MessageHandler();
 
-			virtual bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet) = 0;
+			virtual bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp) = 0;
 		protected:
 			RakNet::RakPeerInterface* m_peer;
-			float m_lastHalfPing;
 		};
 
 
@@ -42,7 +42,7 @@ namespace RootForce
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void SetWorldSystem(WorldSystem* p_worldSystem);
 
-			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
+			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp);
 		private:
 			ECS::World* m_world;
 			RootSystems::LanList* m_list;
@@ -59,7 +59,7 @@ namespace RootForce
 		public:
 			ServerMessageHandler(RakNet::RakPeerInterface* p_peer, ECS::World* p_world);
 
-			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet);
+			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp);
 		private:
 			ECS::World* m_world;
 		};

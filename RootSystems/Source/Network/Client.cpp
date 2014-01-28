@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Transform.h>
@@ -92,23 +93,28 @@ namespace RootForce
 				RakNet::Packet* packet = packets[i];
 				RakNet::BitStream bs(packet->data, packet->length, false);
 
-				while (bs.GetNumberOfUnreadBits() > 0)
-				{
-					RakNet::MessageID id;
-					bs.Read(id);
+				bs.IgnoreBytes(sizeof(RakNet::MessageID));
+				RakNet::Time time;
+				bs.Read(time);
 
-					if (m_messageHandler != nullptr)
+			
+				RakNet::MessageID id;
+				bs.Read(id);
+				
+
+				if (m_messageHandler != nullptr)
+				{
+					if (!m_messageHandler->ParsePacket(id, &bs, packet, time))
 					{
-						if (!m_messageHandler->ParsePacket(id, &bs, packet))
-						{
-							m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
-						}
-					}
-					else
-					{
-						m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
+						m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
 					}
 				}
+				else
+				{
+					m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
+				}
+
+
 			}
 
 			// Deallocate the temporary list
@@ -133,6 +139,8 @@ namespace RootForce
 					c.Type = NetworkMessage::Chat::TYPE_CHAT;
 
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Chat);
 					c.Serialize(true, &bs);
 

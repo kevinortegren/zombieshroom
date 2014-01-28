@@ -325,9 +325,6 @@ namespace RootForce
 			m_networkContext.m_client->Update();
 		}
 
-		if (debugEntity != nullptr)
-			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER CLIENT: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
-
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			m_actionSystem->Process();
@@ -341,9 +338,6 @@ namespace RootForce
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_respawnSystem->Process();
 		}
-
-		if (debugEntity != nullptr)
-			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER RESPAWN SYSTEM: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
 
 
         {
