@@ -75,6 +75,7 @@ namespace Render
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual void FreeParticleSystem(ParticleSystemInterface* p_particleSys) = 0;
 		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
@@ -123,6 +124,7 @@ namespace Render
 		std::shared_ptr<Material> CreateMaterial();
 
 		ParticleSystem* CreateParticleSystem();
+		void FreeParticleSystem(ParticleSystemInterface* p_particleSys);
 		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
