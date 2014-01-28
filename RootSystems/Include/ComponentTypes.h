@@ -29,7 +29,7 @@ namespace RootForce
 			SHADOWCASTER,
 			DIRECTIONALLIGHT,
 			SERVERINFORMATION,
-			CLIENT
+			CLIENT,
 		};
 	}
 }
