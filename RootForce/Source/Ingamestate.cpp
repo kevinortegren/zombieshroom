@@ -324,6 +324,7 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
+		g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER CLIENT: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
@@ -345,6 +346,8 @@ namespace RootForce
             g_engineContext.m_physics->Update(p_deltaTime);
             m_physicsSystem->Process();
         }
+
+		g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "AFTER PHYSICS: Latest ball position: (%f, %f, %f)", debugTransform->m_position.x, debugTransform->m_position.y, debugTransform->m_position.z);
 
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
