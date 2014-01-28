@@ -53,6 +53,8 @@ int exportMaya;
 void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting);
 int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
+MString cleanFullPathName(const char * str);
+std::string GetNameFromPath( std::string p_path );
 
 PaintTexture myTextures[g_maxPaintTextures];
 MSpace::Space g_space_world = MSpace::kTransform;
@@ -126,14 +128,14 @@ void GivePaintId(int index, string filePath)
 	{
 		if(SM.meshList[index].paintIndex == -1)
 		{
-			Print(SM.meshList[index].modelName, " given paintID ", paintCount);
+			//Print(SM.meshList[index].modelName, " given paintID ", paintCount);
 			SM.meshList[index].paintIndex = paintCount;
 
 			paintCount++;
 		}
 		else
 		{
-			Print("Already has paintID!");
+			//Print("Already has paintID!");
 		}
 	}
 }
@@ -148,8 +150,8 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		//paintTexture.readFromTextureNode(
 		unsigned int x,y;
 		texture.getSize(x,y);
-		Print("Painting");
-		Print("SIZE X Y ", x, " ", y);
+		//Print("Painting");
+		//Print("SIZE X Y ", x, " ", y);
 
 		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(TextureMutexHandle, SM.milliseconds);
@@ -199,11 +201,32 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		//texture.release();
 }
 
+std::wstring s2ws(const std::string& s)
+{
+	int len;
+	int slength = (int)s.length() + 1;
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0); 
+	wchar_t* buf = new wchar_t[len];
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
+
+void copyTexture(string saveToDir, string texturePath)
+{
+	string textureName = GetNameFromPath(texturePath) + ".dds";			
+	string newTexturePath = saveToDir + textureName;
+	//FALSE = overwrites
+	Print("Copying", s2ws(texturePath).c_str(), " to ", s2ws(newTexturePath).c_str());
+	CopyFile(s2ws(texturePath).c_str(), s2ws(newTexturePath).c_str(), FALSE);
+}
+
 void Export()
 {	
 	for(int i = 0; i < currNrMeshes; i++)
 	{
-		Print("Index ", i, " ", SM.meshList[i].transformation.name);
+		//Print("Index ", i, " ", SM.meshList[i].transformation.name);
 		int count = 0;
 		int countVertex = 0;
 		bool exists = true;
@@ -254,7 +277,7 @@ void Export()
 		if(exists)
 		{
 			MFnMesh mesh = g_mayaMeshList[saveJ];
-			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
+			//Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
 			memset(SM.meshList[i].modelName, NULL, sizeof(SM.meshList[i].modelName));
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
 			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
@@ -272,8 +295,24 @@ void Export()
 			string outputDirectory = g_savepath + "Models/";
 			MString savepath = outputDirectory.c_str();
 			//ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
-			ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
-			Print(name);
+			ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
+			
+			//Copy textures
+			string saveToDir = g_savepath + "Textures/";
+			//DIFFUSE
+			string texturePath = SM.materialList[SM.meshList[i].MaterialID].texturePath;
+
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].texturePath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].normalPath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].specularPath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].glowPath);
+
+			//MString textureName = cleanFullPathName(texturePath.c_str());			
+			//string newTexturePath = savToDir + textureName.asChar();
+			////FALSE = overwrites
+			//CopyFile(s2ws(texturePath).c_str(), s2ws(newTexturePath).c_str(), FALSE);
+
+
 			MGlobal::executeCommand(ExportFunction);
 			Print(ExportFunction);
 		}
@@ -485,7 +524,7 @@ void DuplicationCb(void* clientdata)
 		if(temp.hasFn(MFn::kTransform))
 		{
 		MFnTransform tempTrans = temp; 
-		Print (tempTrans.name());
+		//Print (tempTrans.name());
 		checkForDuplicatedMeshes(tempTrans.child(0));
 		checkForNewCameras(tempTrans.child(0), nullptr);
 		//checkForNewLights(tempTrans.child(0), nullptr);		// NO NEEEAAAAAAD FOOOUUUUL
@@ -497,7 +536,7 @@ void DuplicationCb(void* clientdata)
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyMeshNodeCB");
+	//Print("dirtyMeshNodeCB");
 
 	int index = nodeExists(node);
 
@@ -510,7 +549,7 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyLightNode");
+	//Print("dirtyLightNode");
 	MStatus status;
 	MFnLight Light = node;
 
@@ -528,14 +567,14 @@ void getMeshFlags(MObject object, int index)
 	if(object.hasFn(MFn::kTransform))
 	{
 		MFnTransform trans = object;
-		Print("Getting flags for: ", SM.meshList[index].modelName);
+		//Print("Getting flags for: ", SM.meshList[index].modelName);
 
 		for(int i = 0; i < trans.parentCount(); i++)
 		{
 			if(trans.parent(i).hasFn(MFn::kTransform))
 			{
 				MFnTransform temp = trans.parent(i);
-				Print("Found parent: ", temp.name());
+				//Print("Found parent: ", temp.name());
 
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
@@ -547,14 +586,14 @@ void getMeshFlags(MObject object, int index)
 						if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
 						{
 							alreadyExists = true;
-							Print("Flag exists skipping...");
+							//Print("Flag exists skipping...");
 						}
 						else
 						{
 							if(SM.meshList[index].transformation.flags[j][0] == NULL)
 							{
 								memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
+								//Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
 								SM.meshList[index].transformation.nrOfFlags ++;
 								alreadyExists = true;
 							}
@@ -572,14 +611,14 @@ void getLocatorFlags(MObject object, int index)
 	if(object.hasFn(MFn::kTransform))
 	{
 		MFnTransform trans = object;
-		Print("Getting flags for: ", SM.locatorList[index].transformation.name);
+		//Print("Getting flags for: ", SM.locatorList[index].transformation.name);
 
 		for(int i = 0; i < trans.parentCount(); i++)
 		{
 			if(trans.parent(i).hasFn(MFn::kTransform))
 			{
 				MFnTransform temp = trans.parent(i);
-				Print("Found parent: ", temp.name());
+				//Print("Found parent: ", temp.name());
 
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
@@ -591,14 +630,14 @@ void getLocatorFlags(MObject object, int index)
 						if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
 						{
 							alreadyExists = true;
-							Print("Flag exists skipping...");
+							//Print("Flag exists skipping...");
 						}
 						else
 						{
 							if(SM.locatorList[index].transformation.flags[j][0] == NULL)
 							{
 								memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
+								//Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
 								SM.locatorList[index].transformation.nrOfFlags ++;
 								alreadyExists = true;
 							}
@@ -613,7 +652,7 @@ void getLocatorFlags(MObject object, int index)
 
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyTransformNodeCB");
+	//Print("dirtyTransformNodeCB");
 	
 	MStatus status = MS::kSuccess;
 	MFnTransform trans = node;
@@ -638,7 +677,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	if(trans.child(0, &status).hasFn(MFn::kLocator))
 	{		
-		Print("U moved a locator! Index ", nodeExists(trans.child(0)));
+		//Print("U moved a locator! Index ", nodeExists(trans.child(0)));
 		MayaLocatorToList(trans.child(0));
 	}
 }
@@ -647,7 +686,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 {// Reagerar precis INNAN man bytt textur!
-	Print("dirtyMaterialCB");
+	//Print("dirtyMaterialCB");
 
 	string materialName = "";
 	if(node.hasFn(MFn::kLambert))
@@ -661,12 +700,12 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 		for(int i = 0; i < currNrMeshes; i++)
 		{
 			string temp = SM.meshList[i].materialName;
-			Print("Comparing", temp.c_str(), " and ", materialName.c_str());
+		//	Print("Comparing", temp.c_str(), " and ", materialName.c_str());
 			if(SM.meshList[i].materialName == materialName)
 			{
 				MFnMesh mesh = g_mayaMeshList[i];
 
-				Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
+			//	Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
 				MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
 				SM.UpdateSharedMaterials(currNrMaterials, i);
 				SM.UpdateSharedMesh(i, true, true, currNrMeshes);
@@ -680,7 +719,7 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
 void NodeAddedCB(MObject &node, void *clientData)
 {
-	Print("NodeAddedCB");
+//	Print("NodeAddedCB");
 
 	//Callback when node is added.
 	checkForNewCameras(node, clientData);
@@ -702,14 +741,14 @@ void NodeAddedCB(MObject &node, void *clientData)
 
 void NodeRemovedCB(MObject &node, void *clientData)
 {
-	Print("NodeRemovedCB");
+//	Print("NodeRemovedCB");
 
 	//Callback when node is removed
 	int removeID = 0;
 
 	if(node.hasFn(MFn::kMesh))
 	{
-		Print("Removed a mesh!");
+	//	Print("Removed a mesh!");
 
 		MFnMesh mesh = node;
 
@@ -718,7 +757,7 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			MFnMesh listMesh = g_mayaMeshList[i];
 			if(listMesh.name() == mesh.name())
 			{
-				Print("Mesh ", mesh.name(), " at index ", i);
+			//	Print("Mesh ", mesh.name(), " at index ", i);
 				removeID = i;
 				currNrMeshes--;				
 
@@ -804,7 +843,7 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 			int id = nodeExists(destination);
 			if(id == -1)
 			{
-				Print("Adding CB to ", lambert.name());
+				//Print("Adding CB to ", lambert.name());
 				MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(destination, dirtyMaterialCB, nullptr, &status);
 				AddCallbackID(status, id);
 				g_mayaMaterialList[currNrMaterialObjects] = destination;
@@ -878,7 +917,7 @@ void checkForNewCameras(MObject &node, void *clientData)
 
 	if(node.hasFn(MFn::kCamera))
 	{
-		Print("New Camera Added!");
+		//Print("New Camera Added!");
 		g_mayaCameraList[currNrCameras] = node;
 		MayaCameraToList(node, currNrCameras);
 		currNrCameras++;
@@ -901,7 +940,7 @@ void checkForNewLights(MObject &node, void *clientData)
 
 	if(node.hasFn(MFn::kLight))
 	{
-		Print("New Light Added");
+		//Print("New Light Added");
 		g_mayaLightList[currNrLights] = node;
 		MayaLightToList(node, currNrLights);
 		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
@@ -998,7 +1037,7 @@ int nodeExists(MObject node)
 		for(int i = 0; i < currNrMaterialObjects; i++)
 		{
 			MFnLambertShader temp = g_mayaMaterialList[i];
-			Print("nodeExists() Comparing ", temp.name(), " and ", lambert.name());
+			//Print("nodeExists() Comparing ", temp.name(), " and ", lambert.name());
 			if(temp.name() == lambert.name())
 			{
 				answer = i;
@@ -1042,12 +1081,28 @@ MString cleanFullPathName(const char * str)
 	return TEMP;
 }
 
+std::string GetNameFromPath( std::string p_path )
+{
+	std::string cutPath;
+	std::string::size_type slashIndex, dotIndex;
+
+	// Extract the file name
+	cutPath  = p_path;
+	slashIndex = cutPath.find_last_of("/")+1;
+	if(slashIndex == 0)
+		slashIndex = cutPath.find_last_of("\\")+1;
+	cutPath  = cutPath.substr(slashIndex, cutPath.size());
+	dotIndex = cutPath.find_last_of(".");
+	cutPath  = cutPath.substr(0, dotIndex);
+	return cutPath;
+} 
+
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
 void MayaLocatorToList(MObject object)
 {
 	MFnDagNode locator = object;
 	int index = nodeExists(object);
-	Print("LOCATOR INDEX: ", nodeExists(object));
+//	Print("LOCATOR INDEX: ", nodeExists(object));
 
 	if(index != -1 && locator.parent(0).hasFn(MFn::kTransform))
 	{
@@ -1525,9 +1580,9 @@ void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString 
 	tileFactor = tile_plug.asInt();
 
 
-	Print("Value in plug Red: ",color_plugR.asString());
-	Print("Value in plug Green: ",color_plugG.asString());
-	Print("Value in plug Blue: ",color_plugB.asString());
+	//Print("Value in plug Red: ",color_plugR.asString());
+	//Print("Value in plug Green: ",color_plugG.asString());
+	//Print("Value in plug Blue: ",color_plugB.asString());
 }
 
 void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
