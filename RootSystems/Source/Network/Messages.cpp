@@ -145,6 +145,8 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Physics* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->m_mass);
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->m_velocity[i]);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Network::NetworkComponent* p_c)
