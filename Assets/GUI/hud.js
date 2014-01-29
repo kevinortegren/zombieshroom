@@ -80,7 +80,7 @@ function SetAbilityFocus(p_slot)
 }
 function StartCooldown(p_slot, p_duration)
 {
-	if(parseInt($("#slot"+p_slot+"-cooldown").css("background-position-y").split("px")[0]) == 75)
+	if(parseInt($("#slot"+p_slot+"-cooldown").css("background-position-y").split("px")[0]) > 70)
 	{
 		$("#slot"+p_slot+"-cooldown").stop();
 		$("#slot"+p_slot+"-cooldown").css("background-position", "50% 0px");
