@@ -144,11 +144,7 @@ namespace RootForce
 		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
 		Awesomium::JSObject jsArray;
 		for(auto itr = valuePairs.begin(); itr != valuePairs.end(); ++itr)
-		{
-			std::string key = itr->first;
-			std::replace(key.begin(), key.end(), '.', '-');
-			jsArray.SetProperty(Awesomium::WSLit(key.c_str()), Awesomium::WSLit(itr->second.c_str()));
-		}
+			jsArray.SetProperty(Awesomium::WSLit(itr->first.c_str()), Awesomium::WSLit(itr->second.c_str()));
 
 		return Awesomium::JSValue(jsArray);
 	}
@@ -165,14 +161,10 @@ namespace RootForce
 		Awesomium::JSObject map = p_array[0].ToObject();
 		Awesomium::JSArray keys = map.GetPropertyNames();
 		for(unsigned i = 0; i < keys.size(); i++)
-		{
-			std::string key = Awesomium::ToString(keys[i].ToString());
-			std::replace(key.begin(), key.end(), '-', '.');
 			m_context.m_configManager->SetConfigValue(
-				key,
+				Awesomium::ToString(keys[i].ToString()),
 				Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString())
 			);
-		}
 
 		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
 	}
