@@ -189,6 +189,8 @@ namespace RootForce
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
 		m_animationSystem->Start();
+
+		m_waterSystem->CreateRenderable();
 	}
 
 	void IngameState::Exit()

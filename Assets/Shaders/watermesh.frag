@@ -1,15 +1,13 @@
 #version 400
 
 in vec2 vert_texcoord;
-in vec4 view;
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
-layout (location = 2) out vec4 glow;
+out vec4 out_Color;
+
+uniform sampler2D g_Diffuse;
 
 void main()
 {
-	diffuse = vec4(0,0,1,1);
-	normals = vec3(0,1,0);
-	glow = vec4(0,0,0, 1.0f);
+	float frag_color = texture(g_Diffuse, vert_texcoord).r;
+	out_Color = vec4(frag_color,frag_color,frag_color, 1.0f);
 }

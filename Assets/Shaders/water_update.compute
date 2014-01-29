@@ -23,5 +23,4 @@ void main()
 			imageLoad(prevTex, storePos+ivec2(0,1)) + 
 			imageLoad(prevTex, storePos+ivec2(0,-1)))
 	);
-	//imageStore(currTex, storePos, vec4(1,0,0,0));
 }

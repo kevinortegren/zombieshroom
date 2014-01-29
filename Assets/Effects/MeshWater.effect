@@ -1,6 +1,6 @@
-- name: Mesh
+- name: MeshWater
   techniques:
-    - name: Mesh
+    - name: MeshWater
       bindings:
         - name: PerFrame
           slot: 0
@@ -12,8 +12,10 @@
           - sem: NORMAL
             offset: 64
       textures:
-        - name: g_Diffuse
-          slot: 0
+          - name: g_Diffuse
+            slot: 0
+      flags:
+        - name: Forward
       programs:
         - name: Mesh
           shaders:

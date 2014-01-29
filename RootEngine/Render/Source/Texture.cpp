@@ -196,7 +196,7 @@ namespace Render
 
 			glTexImage2D(m_target, 0, GL_R32F, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 			
-			std::vector<float> emptyData(p_width * p_height, 0);
+			std::vector<float> emptyData(p_width * p_height, 1);
 			BufferData(&emptyData[0]);
 		}
 		else
