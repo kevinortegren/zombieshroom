@@ -73,8 +73,6 @@ namespace RootSystems
 		player->SelectedAbility = action->SelectedAbility - 1;
 		if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].Cooldown <= 0)
 		{
-			action->ActivateAbility = false;
-
 			std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
 			if (abilityScript != "")
 			{
@@ -87,10 +85,13 @@ namespace RootSystems
 					player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 			}
 		}
-		else if(player->AbilityScripts[player->SelectedAbility].Cooldown > 0)
-		{
-			player->AbilityScripts[player->SelectedAbility].Cooldown -= dt;
-		}
+		if(player->AbilityScripts[0].Cooldown > 0)
+			player->AbilityScripts[0].Cooldown -= dt;
+		if(player->AbilityScripts[1].Cooldown > 0)
+			player->AbilityScripts[1].Cooldown -= dt;
+		if(player->AbilityScripts[2].Cooldown > 0)
+			player->AbilityScripts[2].Cooldown -= dt;
+		action->ActivateAbility = false;
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)
 			animation->m_animClip = RootForce::AnimationClip::ASCEND;
