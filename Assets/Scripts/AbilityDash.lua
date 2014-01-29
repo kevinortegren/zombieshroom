@@ -3,6 +3,7 @@ ACTION_COLLIDE = 1;
 
 --Set table name
 AbilityDash = {};
+AbilityDash.cooldown = 3;
 
 function AbilityDash.OnCreate(userId, actionId)
 	--local playerEnt = Entity.GetEntityByTag("Player");
@@ -13,6 +14,8 @@ function AbilityDash.OnCreate(userId, actionId)
 
 	local handle = playerEnt:GetCollision():GetHandle();
 	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.1,0)+frontVec, 100);
+	local playerComponent = playerEnt:GetPlayerComponent();
+	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityDash.cooldown);
 end
 
 function AbilityDash.OnCollide (entityId)

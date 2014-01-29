@@ -119,9 +119,9 @@ TEST(Network, SerializePlayerComponent)
 {
 	SerializeComponentSetup(RootForce::PlayerComponent);
 	
-	cA->AbilityScripts[0] = "Ability.lua";
-	cA->AbilityScripts[1] = "";
-	cA->AbilityScripts[2] = "Test.lua";
+	cA->AbilityScripts[0].Name = "Ability.lua";
+	cA->AbilityScripts[1].Name = "";
+	cA->AbilityScripts[2].Name = "Test.lua";
 	cA->SelectedAbility = 1;
 	cA->Deaths = 99;
 	cA->Score = 1;
@@ -130,9 +130,9 @@ TEST(Network, SerializePlayerComponent)
 
 	SerializeComponentSerialize();
 	
-	ASSERT_EQ(cA->AbilityScripts[0], cB->AbilityScripts[0]);
-	ASSERT_EQ(cA->AbilityScripts[1], cB->AbilityScripts[1]);
-	ASSERT_EQ(cA->AbilityScripts[2], cB->AbilityScripts[2]);
+	ASSERT_EQ(cA->AbilityScripts[0].Name, cB->AbilityScripts[0].Name);
+	ASSERT_EQ(cA->AbilityScripts[1].Name, cB->AbilityScripts[1].Name);
+	ASSERT_EQ(cA->AbilityScripts[2].Name, cB->AbilityScripts[2].Name);
 	ASSERT_EQ(cA->SelectedAbility, cB->SelectedAbility);
 	ASSERT_EQ(cA->Deaths, cB->Deaths);
 	ASSERT_EQ(cA->Score, cB->Score);
