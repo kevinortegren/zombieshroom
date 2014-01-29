@@ -43,7 +43,9 @@ namespace Render
 			TEXTURE_R,
 			TEXTURE_G,
 			TEXTURE_B,
-			GLOW
+			GLOW,
+			COMPUTEIN,
+			COMPUTEOUT,
 		};
 	}
 }

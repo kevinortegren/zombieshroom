@@ -18,6 +18,18 @@ namespace RootEngine
 			(*modelitr).second = nullptr;
 		}
 		m_models.clear();
+
+		for(auto partitr = m_particles.begin(); partitr != m_particles.end(); partitr++)
+		{
+			for(auto partvec = (*partitr).second.begin(); partvec != (*partitr).second.end(); partvec++)
+			{
+				delete (*partvec);
+				(*partvec) = nullptr;
+			}
+			(*partitr).second.clear();
+		}
+
+		m_models.clear();
 	}
 
 	void ResourceManager::Init(std::string p_workingDirectory, GameSharedContext* p_context)
@@ -32,6 +44,8 @@ namespace RootEngine
 		m_textureImporter = std::shared_ptr<TextureImporter>(new TextureImporter(m_context->m_logger, m_context->m_renderer));
 		
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
+
+		m_particleImporter = std::shared_ptr<ParticleImporter>(new ParticleImporter(m_context));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -157,6 +171,33 @@ namespace RootEngine
 		{
 			return m_textures[p_path];
 		}	
+	}
+
+	std::vector<ParticleSystemStruct*> ResourceManager::LoadParticleEmitter( std::string p_handle, bool p_fullPath )
+	{
+		std::vector<ParticleSystemStruct*> particleStruct;
+		if(m_particles.find(p_handle) == m_particles.end())
+		{
+			if(p_fullPath)
+				particleStruct = *m_particleImporter->LoadParticleSystem(p_handle);
+			else
+				particleStruct = *m_particleImporter->LoadParticleSystem(m_workingDirectory + "Assets\\Particles\\" + p_handle + ".particle");
+			
+			if(particleStruct.size() != 0)
+			{
+				m_particles[p_handle] = particleStruct;
+				return particleStruct;
+			}
+			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading particle '%s'", p_handle.c_str());
+				return particleStruct;
+			}
+		}
+		else
+		{
+			return m_particles[p_handle];
+		}
 	}
 
 	Model* ResourceManager::CreateModel(const std::string& p_path)
@@ -364,6 +405,8 @@ namespace RootEngine
 	{
 		return m_workingDirectory;
 	}
+
+	
 
 
 }

@@ -29,28 +29,28 @@ namespace RootForce
 		ParticleEmitter* emitter = m_emitters.Get(p_entity);
 		Transform* trans = m_transforms.Get(p_entity);
 
-		for(auto itr = emitter->m_particleSystems.begin(); itr != emitter->m_particleSystems.end(); ++itr)
+		for(unsigned i = 0; i < emitter->m_particleSystems.size(); i++)
 		{
-			(*itr).m_params[Render::Semantic::TRANSPOSITION] = &trans->m_position;
+			emitter->m_particleSystems[i]->m_params[Render::Semantic::TRANSPOSITION] = &trans->m_position;
 
-			auto updateTechnique = (*itr).m_material->m_effect->GetTechniques()[0];
-			
-			g_engineContext.m_renderer->SetParticleUniforms(updateTechnique.get(), (*itr).m_params);
+			auto updateTechnique = emitter->m_particleSystems[i]->m_material->m_effect->GetTechniques()[0];
+
+			g_engineContext.m_renderer->SetParticleUniforms(updateTechnique.get(), emitter->m_particleSystems[i]->m_params);
 
 			updateTechnique->Apply();
 
-			for(unsigned i = 0; i < updateTechnique->GetPrograms().size(); ++i)
+			for(unsigned j = 0; j < updateTechnique->GetPrograms().size(); ++j)
 			{
-				updateTechnique->GetPrograms()[i]->Apply();
+				updateTechnique->GetPrograms()[j]->Apply();
 
-				(*itr).m_system->Update();
+				emitter->m_systems[i]->Update();
 			}
 
 			Render::RenderJob job;
-			job.m_mesh = (*itr).m_system->GetMesh();
-			job.m_material = (*itr).m_material;
+			job.m_mesh = emitter->m_systems[i]->GetMesh();
+			job.m_material = emitter->m_particleSystems[i]->m_material;
 			job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
-		
+
 			g_engineContext.m_renderer->AddRenderJob(job);
 		}
 	}

@@ -74,6 +74,16 @@ namespace RootEngine
 						glType = GL_COMPUTE_SHADER;
 						extension = ".compute";
 					}
+					else if(type == "tess_evaluation")
+					{
+						glType = GL_TESS_EVALUATION_SHADER;
+						extension = ".tesseval";
+					}
+					else if(type == "tess_control")
+					{
+						glType = GL_TESS_CONTROL_SHADER;
+						extension = ".tesscontrol";
+					}
 
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());

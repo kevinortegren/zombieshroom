@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <PlayerControlSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
@@ -22,6 +23,7 @@ namespace RootForce
 
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
 		: ECS::VoidSystem(p_world) 
+		, m_clientPeer(nullptr)
 	{}
 
 	void PlayerControlSystem::SetKeybindings(const std::vector<Keybinding>& keybindings)
@@ -186,57 +188,20 @@ namespace RootForce
 		m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
 
 		RakNet::BitStream bs;
+		bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+		bs.Write(RakNet::GetTime());
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
 		m.Serialize(true, &bs);
 
-		m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+		if (m_clientPeer != nullptr)
+			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 
-	void PlayerControlSystem::UpdateAimingDevice()
-	{
-		for (Network::NetworkEntityMap::iterator it = g_networkEntityMap.begin(); it != g_networkEntityMap.end(); it++)
-		{
-			if (it->first.ActionID == Network::ReservedActionID::CONNECT)
-			{
-				Network::NetworkEntityID id;
-				id.UserID = it->first.UserID;
-				id.ActionID = Network::ReservedActionID::CONNECT;
-				id.SequenceID = 0;
-				ECS::Entity* playerEntity = g_networkEntityMap[id];
-				if (playerEntity == nullptr)
-					continue;
-
-				Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
-				PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(g_networkEntityMap[id]);
-
-				id.SequenceID = 1;
-				ECS::Entity* aimingDeviceEntity = g_networkEntityMap[id];
-				if (aimingDeviceEntity == nullptr)
-					continue;
-
-				Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(g_networkEntityMap[id]);
-
-				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
-				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
-				
-			}
-		}
-
-		/*
-		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
-		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(m_world->GetTagManager()->GetEntityByTag("AimingDevice"));
-		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));
-
-		aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-		aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
-		aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
-		*/
-	}
+	
 }
 
 #endif

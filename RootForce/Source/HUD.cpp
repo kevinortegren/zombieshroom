@@ -29,7 +29,7 @@ namespace RootForce
 		m_commandBuffer = m_commandBuffer + "Set('" + p_key + "','" + p_value + "');";
 	}
 
-	void HUD::StartCooldown( int p_slot, int p_duration )
+	void HUD::StartCooldown( int p_slot, float p_duration )
 	{
 		m_commandBuffer = m_commandBuffer + "StartCooldown('" + std::to_string(p_slot) + "'," + std::to_string(p_duration) + ");";
 	}

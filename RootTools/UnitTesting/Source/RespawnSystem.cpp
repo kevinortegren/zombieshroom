@@ -7,6 +7,7 @@ TEST(RespawnSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
@@ -24,6 +25,7 @@ TEST(RespawnSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	ECS::Entity* mockSpawn = world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* mockSpawnTransform = world->GetEntityManager()->CreateComponent<RootForce::Transform>(mockSpawn);
@@ -32,6 +34,7 @@ TEST(RespawnSystem, ProcessEntity)
 
 	RootSystems::RespawnSystem* system = new RootSystems::RespawnSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(system);
+	system->LoadSpawnPoints();
 
 	// Call the OnCreate script
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);

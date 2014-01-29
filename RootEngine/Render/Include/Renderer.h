@@ -4,6 +4,7 @@
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Camera.h>
 #include <RootEngine/Render/Include/RenderJob.h>
+#include <RootEngine/Render/Include/ComputeJob.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/GeometryBuffer.h>
 #include <RootEngine/Render/Include/LineRenderer.h>
@@ -74,6 +75,7 @@ namespace Render
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
+		virtual void FreeParticleSystem(ParticleSystemInterface* p_particleSys) = 0;
 		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
@@ -82,6 +84,8 @@ namespace Render
 		virtual void SetAmbientLight(const glm::vec4& p_color) = 0;
 		virtual void AddDirectionalLight(const DirectionalLight& p_light, int p_index) = 0;
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
+
+		virtual void Compute(ComputeJob* p_job) = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -122,6 +126,7 @@ namespace Render
 		void InitialziePostProcesses();
 
 		ParticleSystem* CreateParticleSystem();
+		void FreeParticleSystem(ParticleSystemInterface* p_particleSys);
 		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
@@ -131,6 +136,8 @@ namespace Render
 		void AddPointLight(const PointLight& p_light, int index);
 
 		static std::map<Semantic::Semantic, unsigned> s_sizes;
+
+		void Compute(ComputeJob* p_job);
 
 	private:
 

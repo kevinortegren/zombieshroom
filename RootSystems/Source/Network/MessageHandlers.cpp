@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/Messages.h>
@@ -42,10 +43,11 @@ namespace RootForce
 			m_worldSystem = p_worldSystem;
 		}
 
-		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ClientMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp)
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 
 			switch (p_id)
 			{
@@ -60,6 +62,8 @@ namespace RootForce
 					m.Name = clientComponent->Name;
 
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
 					m.Serialize(true, &bs);
 
@@ -186,7 +190,7 @@ namespace RootForce
 						clientComponent->State = ClientState::CONNECTED;
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%s): %s", p_packet->systemAddress.ToString(), m.Name.C_String());
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d: %s): %s", m.User, p_packet->systemAddress.ToString(), m.Name.C_String());
 				} return true;
 
 
@@ -236,12 +240,22 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						// TODO: Extrapolate with time stamp
+						
+						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 						transform->m_position = m.Position;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
+
+						// Extrapolate the position using ping time
+						glm::vec3 facing = transform->m_orientation.GetFront();
+						glm::vec3 right = transform->m_orientation.GetRight();
+						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
+						if (movement != glm::vec3(0))
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+
+						transform->m_position += movement;
 					}
 				} return true;
 
@@ -288,6 +302,8 @@ namespace RootForce
 					n.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
 					n.Serialize(true, &bs);
 
@@ -388,6 +404,8 @@ namespace RootForce
 					m.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::LoadMapStatus);
 					m.Serialize(true, &bs);
 
@@ -407,16 +425,18 @@ namespace RootForce
 			: MessageHandler(p_peer)
 			, m_world(p_world) {}
 
-		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet)
+		bool ServerMessageHandler::ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp)
 		{
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
+
+			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 
 			switch (p_id)
 			{
 				case ID_NEW_INCOMING_CONNECTION:
 				{
-					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%s)", p_packet->systemAddress.ToString());
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%d: %s)", m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), p_packet->systemAddress.ToString());
 
 					ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
 					ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<ClientComponent>(clientEntity);
@@ -453,6 +473,8 @@ namespace RootForce
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 					
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserDisconnected);
 					m.Serialize(true, &bs);
 
@@ -474,6 +496,8 @@ namespace RootForce
 
 					// Forward the message to broadcast
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Chat);
 					
 					m.Sender = (int8_t) m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
@@ -499,6 +523,8 @@ namespace RootForce
 					
 					// Send server information
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::ServerInformation);
 					serverInfo->Information.Serialize(true, &bs);
 
@@ -523,24 +549,34 @@ namespace RootForce
 
 					ECS::Entity* client = g_networkEntityMap[id];
 					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+
+					id.SequenceID = 0;
+					ECS::Entity* player = g_networkEntityMap[id];
+					id.SequenceID = 1;
+					ECS::Entity* aimingDevice = g_networkEntityMap[id];
+					PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
+					Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
+					Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
+
 					if (clientComponent->IsRemote)
 					{
 						// Update the action for the user
-						id.SequenceID = 0;
-						ECS::Entity* player = g_networkEntityMap[id];
-						id.SequenceID = 1;
-						ECS::Entity* aimingDevice = g_networkEntityMap[id];
-
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						// TODO: Add time stamp extrapolation here as well
-						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
-						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 						transform->m_position = m.Position;
 						transform->m_orientation.SetOrientation(m.Orientation);
 						aimingDeviceTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
+
+						// Extrapolate the position using ping time
+						glm::vec3 facing = transform->m_orientation.GetFront();
+						glm::vec3 right = transform->m_orientation.GetRight();
+						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
+						if (movement != glm::vec3(0))
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+
+						transform->m_position += movement;
 					}
 					
 					// Broadcast the action to all other clients
@@ -548,11 +584,17 @@ namespace RootForce
 					DataStructures::List<RakNet::RakNetGUID> guids;
 					m_peer->GetSystemList(addresses, guids);
 
+					m.Position = transform->m_position;
+					m.Orientation = transform->m_orientation.GetQuaternion();
+					m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
+
 					for (unsigned int i = 0; i < addresses.Size(); ++i)
 					{
 						if (i != id.UserID && !addresses[i].IsLoopback())
 						{
 							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
 							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
 							m.Serialize(true, &bs);
 
@@ -622,6 +664,8 @@ namespace RootForce
 										n.Name = RakNet::RakString(playerComponent->Name.c_str());
 
 										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
 										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 										n.Serialize(true, &bs);
 
@@ -647,6 +691,8 @@ namespace RootForce
 									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
 									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+									bs.Write(RakNet::GetTime());
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserConnected);
 									n.Serialize(true, &bs);
 
@@ -656,6 +702,8 @@ namespace RootForce
 								// Send a game state snapshot to the connectee
 								{
 									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+									bs.Write(RakNet::GetTime());
 									bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
 									NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
 

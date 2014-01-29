@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
@@ -89,14 +90,20 @@ namespace RootForce
 			for (size_t i = 0; i < packets.size(); ++i)
 			{
 				RakNet::Packet* packet = packets[i];
-
-				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
+				RakNet::MessageID id = 0;
+				RakNet::Time time = 0;
+				
 				bs.Read(id);
+				if (id == ID_TIMESTAMP)
+				{
+					bs.Read(time);
+					bs.Read(id);
+				}
 
 				if (m_messageHandler != nullptr)
 				{
-					if (!m_messageHandler->ParsePacket(id, &bs, packet))
+					if (!m_messageHandler->ParsePacket(id, &bs, packet, time))
 					{
 						m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
 					}
@@ -105,6 +112,7 @@ namespace RootForce
 				{
 					m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
 				}
+
 			}
 
 			// Deallocate the temporary list
@@ -121,6 +129,8 @@ namespace RootForce
 				m_worldDeltaTimer = 0;
 
 				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
 				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::GameStateDelta);
 				NetworkMessage::SerializeWorld(&bs, m_world, g_networkEntityMap);
 

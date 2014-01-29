@@ -28,10 +28,11 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
+	m_recycledIds.push(p_entity->m_id);
+
 	p_entity->m_id = -1;
 	p_entity->m_flag = 0;
-
-	m_recycledIds.push(p_entity->m_id);
+	
 	p_entity = nullptr;
 }
 
@@ -46,7 +47,7 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 	for (unsigned int type = 0; type < m_components.size(); ++type)
 	{
-		if (p_entity->m_id < m_components[type].size() && m_components[type][p_entity->m_id] != nullptr)
+		if (p_entity->m_id < (int)m_components[type].size() && m_components[type][p_entity->m_id] != nullptr)
 		{
 			std::pair<unsigned int, ECS::ComponentInterface*> c;
 			c.first = type;
@@ -101,11 +102,12 @@ void ECS::EntityManager::RemoveAllEntitiesAndComponents()
 
 std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 {
-	std::vector<ECS::Entity*> result(m_nextID);
+	std::vector<ECS::Entity*> result;
+	result.reserve(m_nextID);
 	for (int i = 0; i < m_nextID; ++i)
 	{
 		if(m_entities[i].m_id != -1)
-			result[i] = &m_entities[i];
+			result.push_back(&m_entities[i]);
 	}
 
 	return result;

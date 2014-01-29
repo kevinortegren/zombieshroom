@@ -9,3 +9,7 @@ function TestEntity.OnCreate(userId, actionId)
     local script = Script.New(self, "TestEntity");
 	local network = Network.New(self, userId, actionId);
 end
+
+function TestEntity.OnDestroy(self)
+  
+end
