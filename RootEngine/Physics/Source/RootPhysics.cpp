@@ -1311,7 +1311,12 @@ namespace Physics
 			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
-			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, p_transform, m_playerObjects.at(indexplayer)->GetPosition());
+			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			float data[16];
+			glm::mat4 matrix;
+			trans.getOpenGLMatrix(data);
+			matrix = glm::make_mat4(data);
+			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, matrix, m_playerObjects.at(indexplayer)->GetPosition());
 			//skape ragdoll fanskapet
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;

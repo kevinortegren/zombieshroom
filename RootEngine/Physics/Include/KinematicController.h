@@ -35,6 +35,7 @@ public:
 	bool IsOnGround();
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
 	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
+	btTransform GetTransform() const {return m_kinController->getGhostObject()->getWorldTransform();}
 
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;

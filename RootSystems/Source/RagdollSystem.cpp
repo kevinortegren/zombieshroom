@@ -28,6 +28,7 @@ namespace RootForce
 			{	
 				
 				renderable->m_model->m_animation->GetScene()->mRootNode->mChildren[0]->mName;
+				
 				//mappa namn till index själv, jobbiga jävla anrop annars
 				//renderable->m_model->m_animation->GetIndexFromBoneName()
 				std::map<std::string, int>  nameToIndex ;
