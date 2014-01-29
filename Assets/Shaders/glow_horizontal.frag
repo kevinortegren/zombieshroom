@@ -26,11 +26,12 @@ float Gaussian (float x, float deviation)
 
 void main()
 {
+	float blurS = 1.2f;
     float blurF = 5.0f;
 
     float deviation = blurF * 0.35;
 	deviation *= deviation;
-	float strength = 1.0 - 0.25f;
+	float strength = 1.0 - 0.3f;
     
     vec2 TexelCoord = gl_FragCoord.xy / vec2( 640, 360 );	
 
@@ -41,8 +42,8 @@ void main()
 
     for( int i = 1; i < 10; i++ )
 	{
-		blur += texture(g_Glow, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dy) * Gaussian(i * strength, deviation);
-		blur += texture(g_Glow, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dy) * Gaussian(i * strength, deviation);
+		blur += texture(g_Glow, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dy * blurS) * Gaussian(i * strength, deviation);
+		blur += texture(g_Glow, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dy * blurS) * Gaussian(i * strength, deviation);
 	}
     
     blur.w = 1.0;
