@@ -15,9 +15,9 @@ const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 20;
-const string g_savepath = "C:/ZombieShroom/Output/Assets/";
+const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
 
-const string g_levelName = "testLevel";
+const string g_levelName = "RootIslandV1";
 
 const string g_textureR = "RED";
 const string g_textureG = "GREEN";
@@ -27,7 +27,7 @@ const int g_maxMessages = g_maxMeshes;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
 const int g_tileFactor = 24;
-const int g_maxPaintTextures = 2;
+const int g_maxPaintTextures = 10;
 
 struct UpdateMessage
 {

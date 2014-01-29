@@ -479,13 +479,17 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//UPDATE TILEFACTOR
-		RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
-		if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+		if(meshID != -1)
 		{
-			rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-		}
+			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			{
+				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			}
 
-		mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;		
+			mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;	
+		}
+	
 
 		ReleaseMutex(RM.TextureMutexHandle);
 	}
@@ -769,6 +773,22 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
 			transform->m_position += modifiedPos;
+
+			cout << "position x " << transform->m_position.x << endl;
+			cout << "position y " << transform->m_position.y << endl;
+			cout << "position z " << transform->m_position.z << endl;
+
+			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
+
+			float x,y,z;
+			x = atan2(rotationTest[2][1], rotationTest[2][2]);
+			y = atan2(-rotationTest[2][0], sqrt(pow(rotationTest[2][1],2) + pow(rotationTest[2][2],2)));
+			z = atan2(rotationTest[1][0], rotationTest[0][0]);
+
+				
+			cout << "rot x " << -glm::degrees(x) << endl;
+			cout << "rot y " << -glm::degrees(y) << endl;
+			cout << "rot z " << -glm::degrees(z) << endl;
 
 			// Get material connected to mesh and set it from materiallist
 			
