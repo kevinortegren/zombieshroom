@@ -7,6 +7,7 @@ TEST(PlayerControlSystem, Process)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	// Initialize the keybindings we need for the test(not the complete list that is normally used)
 	std::vector<RootForce::Keybinding> keybindings(6);
