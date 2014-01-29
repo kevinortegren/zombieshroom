@@ -245,9 +245,12 @@ namespace RootForce
 		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-		m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-		m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-		m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+		if(playerComponent->AbilityScripts[0].Cooldown > 0)
+			m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+		if(playerComponent->AbilityScripts[1].Cooldown > 0)
+			m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+		if(playerComponent->AbilityScripts[2].Cooldown > 0)
+			m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
 		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 
 		m_hud->Update();
