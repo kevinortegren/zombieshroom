@@ -191,13 +191,12 @@ namespace Render
 			m_textureFormat = GL_RED;
 			m_bpp = 4;
 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-			glTexImage2D(m_target, 0, GL_R32F, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
-			
 			std::vector<float> emptyData(p_width * p_height, 1);
-			BufferData(&emptyData[0]);
+			glTexImage2D(m_target, 0, GL_R32F, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
 		}
 		else
 		{

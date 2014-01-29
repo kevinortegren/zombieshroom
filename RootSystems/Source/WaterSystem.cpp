@@ -96,10 +96,11 @@ namespace RootForce
 		RootForce::Renderable*	renderable	= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
 		trans->m_position = glm::vec3(0,1,0);
+		renderable->m_model = m_context->m_resourceManager->LoadCollada("256plane");
 		renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
 		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_texture[1];
 		renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
-		renderable->m_model = m_context->m_resourceManager->LoadCollada("256plane");
+		
 	}
 
 }
