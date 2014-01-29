@@ -8,6 +8,7 @@ TEST(StateSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::StateSystem* system = new RootSystems::StateSystem(world, &g_engineContext);
@@ -25,6 +26,7 @@ TEST(StateSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	RootSystems::StateSystem* system = new RootSystems::StateSystem(world, &g_engineContext);
 	world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(system);

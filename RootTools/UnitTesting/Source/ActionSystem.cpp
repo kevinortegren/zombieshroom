@@ -8,6 +8,7 @@ TEST(ActionSystem, ProcessEmptyEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
@@ -25,6 +26,7 @@ TEST(ActionSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
 	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
