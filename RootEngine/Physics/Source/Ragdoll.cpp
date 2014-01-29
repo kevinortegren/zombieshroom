@@ -63,7 +63,7 @@ namespace Ragdoll
 					CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
 					
 				}
-				//Add a constraint here somewhere ala constraint(mybody, m_bodies[myindex + 1 + i], variables , variable)
+				
 			}
 			return body;
 		}
