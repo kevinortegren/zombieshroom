@@ -791,6 +791,19 @@ namespace RootForce
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
+		//PARTICLE
+		//////////////////////////////////////////////////////////////////////////
+		static int ParticleEmitterCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(*e);
+			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			return 1;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//VEC2
 		//////////////////////////////////////////////////////////////////////////
 		static int Vec2Create(lua_State* p_luaState)
@@ -1753,6 +1766,13 @@ namespace RootForce
 			{"GetMaterialNormal",	RenderableGetNormal},
 			{"GetMaterialEffect",	RenderableGetEffect},
 			{"SetAnimation",		RenderableSetAnimation},
+			{NULL, NULL}
+		};
+
+		//Particle functions&methods
+		static const struct luaL_Reg particleEmitter_f [] = 
+		{
+			{"New", ParticleEmitterCreate},
 			{NULL, NULL}
 		};
 

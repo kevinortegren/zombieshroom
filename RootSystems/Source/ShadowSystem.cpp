@@ -46,53 +46,82 @@ namespace RootForce
 		worldCorners[6] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_maxY, m_worldAABB.m_minZ);
 		worldCorners[7] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_minY, m_worldAABB.m_minZ);
 
-		float maxWorldX = -99999;
-		float minWorldX = 99999;
-		float maxWorldY = -99999;
-		float minWorldY = 99999;
-		float maxWorldZ = -99999;
-		float minWorldZ = 99999;
+		m_maxWorldX = -99999;
+		m_minWorldX = 99999;
+		m_maxWorldY = -99999;
+		m_minWorldY = 99999;
+		m_maxWorldZ = -99999;
+		m_minWorldZ = 99999;
 		for(int i = 0; i < 8; i++)
 		{
 			glm::vec4 cornerInLightSpace = sc.m_viewMatrix * glm::vec4(worldCorners[i], 1.0f);
-			if(cornerInLightSpace.x < minWorldX)
+			if(cornerInLightSpace.x < m_minWorldX)
 			{
-				minWorldX = cornerInLightSpace.x;
+				m_minWorldX = cornerInLightSpace.x;
 			}
-			if(cornerInLightSpace.x > maxWorldX)
+			if(cornerInLightSpace.x > m_maxWorldX)
 			{
-				maxWorldX = cornerInLightSpace.x;
+				m_maxWorldX = cornerInLightSpace.x;
 			}
-			if(cornerInLightSpace.y < minWorldY)
+			if(cornerInLightSpace.y < m_minWorldY)
 			{
-				minWorldY = cornerInLightSpace.y;
+				m_minWorldY = cornerInLightSpace.y;
 			}
-			if(cornerInLightSpace.y > maxWorldY)
+			if(cornerInLightSpace.y > m_maxWorldY)
 			{
-				maxWorldY = cornerInLightSpace.y;
+				m_maxWorldY = cornerInLightSpace.y;
 			}
-			if(cornerInLightSpace.z < minWorldZ)
+			if(cornerInLightSpace.z < m_minWorldZ)
 			{
-				minWorldZ = cornerInLightSpace.z;
+				m_minWorldZ = cornerInLightSpace.z;
 			}
-			if(cornerInLightSpace.z > maxWorldZ)
+			if(cornerInLightSpace.z > m_maxWorldZ)
 			{
-				maxWorldZ = cornerInLightSpace.z;
+				m_maxWorldZ = cornerInLightSpace.z;
 			}
 		}
 
-		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
-		Frustum frustum = camera->m_frustum;
-		glm::mat4 invViewMatrix = glm::inverse(camera->m_viewMatrix);
+		Frustum subFrusta[RENDER_SHADOW_CASCADES];
+		subFrusta[0] = camera->m_frustum;
+		subFrusta[0].m_far = 20.0f;
+		subFrusta[0].RecalculatePlanes();
+		subFrusta[1] = camera->m_frustum;
+		subFrusta[1].m_near = 20.0f;
+		subFrusta[1].m_far = 100.0f;
+		subFrusta[1].RecalculatePlanes();
+		subFrusta[2] = camera->m_frustum;
+		subFrusta[2].m_near = 100.0f;
+		subFrusta[2].RecalculatePlanes();
+
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			//Set cascade ortho matrix
+			sc.m_projectionMatrices[i] = OrthoProjectionFromFrustum(&subFrusta[i], sc.m_viewMatrix);
+			subFrusta[i].DrawLines(glm::mat4(1.0f), g_engineContext.m_renderer);
+		}
+
+
+		g_engineContext.m_renderer->AddShadowcaster(sc, m_shadowcasterCount);
+
+		m_shadowcasterCount++;
+	}
+
+	void ShadowSystem::End()
+	{
+	}
+
+	glm::mat4 ShadowSystem::OrthoProjectionFromFrustum(Frustum* p_frustum, glm::mat4 p_lightViewMatrix)
+	{
 		glm::vec4 frustumCorners[8];
-		frustumCorners[0] = glm::vec4(frustum.ntl, 1.0f);
-		frustumCorners[1] = glm::vec4(frustum.nbl, 1.0f);
-		frustumCorners[3] = glm::vec4(frustum.nbr, 1.0f);
-		frustumCorners[4] = glm::vec4(frustum.ftl, 1.0f);
-		frustumCorners[5] = glm::vec4(frustum.ftr, 1.0f);
-		frustumCorners[6] = glm::vec4(frustum.fbl, 1.0f);
-		frustumCorners[7] = glm::vec4(frustum.fbr, 1.0f);
+		frustumCorners[0] = glm::vec4(p_frustum->ntl, 1.0f);
+		frustumCorners[1] = glm::vec4(p_frustum->nbl, 1.0f);
+		frustumCorners[3] = glm::vec4(p_frustum->nbr, 1.0f);
+		frustumCorners[4] = glm::vec4(p_frustum->ftl, 1.0f);
+		frustumCorners[5] = glm::vec4(p_frustum->ftr, 1.0f);
+		frustumCorners[6] = glm::vec4(p_frustum->fbl, 1.0f);
+		frustumCorners[7] = glm::vec4(p_frustum->fbr, 1.0f);
 
 		float maxFrustumX = -99999;
 		float minFrustumX = 99999;
@@ -102,7 +131,7 @@ namespace RootForce
 		float minFrustumZ = 99999;
 		for(int i = 0; i < 8; i++)
 		{
-			glm::vec4 cornerInLightSpace = sc.m_viewMatrix * frustumCorners[i];
+			glm::vec4 cornerInLightSpace = p_lightViewMatrix * frustumCorners[i];
 			if(cornerInLightSpace.x < minFrustumX)
 			{
 				minFrustumX = cornerInLightSpace.x;
@@ -128,22 +157,13 @@ namespace RootForce
 				maxFrustumZ = cornerInLightSpace.z;
 			}
 		}
-		float minX = glm::max(minWorldX, minFrustumX);
-		float maxX = glm::min(maxWorldX, maxFrustumX);
-		float minY = glm::max(minWorldY, minFrustumY);
-		float maxY = glm::min(maxWorldY, maxFrustumY);
-		float minZ = glm::max(minWorldZ, minFrustumZ);
-		float maxZ = maxWorldZ;
+		float minX = glm::max(m_minWorldX, minFrustumX);
+		float maxX = glm::min(m_maxWorldX, maxFrustumX);
+		float minY = glm::max(m_minWorldY, minFrustumY);
+		float maxY = glm::min(m_maxWorldY, maxFrustumY);
+		float minZ = glm::max(m_minWorldZ, minFrustumZ);
+		float maxZ = m_maxWorldZ;
 
-		sc.m_projectionMatrix = glm::ortho(minX, maxX, minY, maxY, -maxZ, -minZ);
-
-		g_engineContext.m_renderer->AddShadowcaster(sc, m_shadowcasterCount);
-
-		m_shadowcasterCount++;
-	}
-
-	void ShadowSystem::End()
-	{
-
+		return glm::ortho(minX, maxX, minY, maxY, -maxZ, -minZ);
 	}
 }

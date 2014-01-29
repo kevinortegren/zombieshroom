@@ -32,6 +32,7 @@
 #define RENDER_SLOT_PEROBJECT 1
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3 
+#define RENDER_SHADOW_CASCADES 3
 
 namespace Render
 {

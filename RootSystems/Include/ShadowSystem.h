@@ -31,6 +31,14 @@ namespace RootForce
 		ECS::ComponentMapper<Transform> m_transforms;
 
 	private:
+		float m_maxWorldX;
+		float m_minWorldX;
+		float m_minWorldY;
+		float m_maxWorldZ;
+		float m_minWorldZ;
+		float m_maxWorldY;
+
+		glm::mat4 OrthoProjectionFromFrustum(Frustum* p_frustum, glm::mat4 p_lightViewMatrix);
 		int m_shadowcasterCount;
 		RootForce::AABB m_worldAABB;
 	};

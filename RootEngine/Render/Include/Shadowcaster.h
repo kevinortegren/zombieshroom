@@ -8,7 +8,6 @@ namespace Render
 	{
 		//Low-level Shadowcaster for Renderer
 		glm::mat4 m_viewMatrix;
-		glm::mat4 m_projectionMatrix; //Identity matrix in ortho shadows
-		int m_resolution;
+		glm::mat4 m_projectionMatrices[3]; //Identity matrix in ortho shadows
 	};
 }

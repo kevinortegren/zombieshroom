@@ -17,7 +17,6 @@ namespace RootForce
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
 		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
-		sunShadowcaster->m_resolution = 512;
 		sunShadowcaster->m_levels = 1;
 
 		glm::vec3 fro = sunTransform->m_orientation.GetFront();
@@ -77,7 +76,7 @@ namespace RootForce
 		
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustum = Frustum(45.0f, 1.0f, 10000.0f, aspectRatio);
+		camera->m_frustum = Frustum(45.0f, 1.0f, 5000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -87,7 +86,21 @@ namespace RootForce
 		cameraThirdPerson->m_distance = 8.0f;
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
+		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);
+
+		// Add testcamera entity.	
+		ECS::Entity* testCameraEntity = m_world->GetEntityManager()->CreateEntity();
+
+		RootForce::Camera* testCamera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(testCameraEntity);
+		RootForce::Transform* testCameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(testCameraEntity);
+		testCameraTransform->m_position = glm::vec3(0.0f, 30.0f, 0.0f);
+		aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
+
+		testCamera->m_frustum = Frustum(45.0f, 1.0f, 1000.0f, aspectRatio);
+
+
+		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
 
 		m_quadTree.Init(m_engineContext, m_world);
 	}

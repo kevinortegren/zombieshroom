@@ -464,12 +464,12 @@ namespace Render
 		} matrices;
 
 		matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
-		matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrix;
+		matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0];
 		matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrix);
-		matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrix);
+		matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0]);
 		matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
 
-		glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+		glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0] * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
 
 		matrices.m_invViewProj = glm::inverse(viewProjection);
 		m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
@@ -530,7 +530,7 @@ namespace Render
 			);
 
 		// Buffer LightVP.
-		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrix * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
+		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0] * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
 		m_uniforms->BufferSubData(0, sizeof(glm::mat4), &lvp);
 
 		// Apply lighting.

@@ -5,30 +5,29 @@ namespace RootForce
 {
 	void CameraSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
+		Transform* transform = m_transforms.Get(p_entity);
+		Camera* camera = m_cameras.Get(p_entity);
+
+		Orientation tempOrientation = transform->m_orientation;
+		tempOrientation.Yaw(180.0f);
+		glm::mat4 tempWorldMatrix;
+
+		glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
+		glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
+		glm::mat4 viewMatrix = glm::inverse(rotation);
+
+		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, camera->m_frustum.m_far);
+
+		camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
+		camera->m_viewMatrix = viewMatrix;
+
 		if(m_world->GetTagManager()->GetEntityByTag("Camera") == p_entity)
 		{
-			Transform* transform = m_transforms.Get(p_entity);
-			Camera* camera = m_cameras.Get(p_entity);
-
 			ECS::Entity* skybox = m_world->GetTagManager()->GetEntityByTag("Skybox");
 			if(skybox)
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
 			}
-
-			Orientation tempOrientation = transform->m_orientation;
-			tempOrientation.Yaw(180.0f);
-			glm::mat4 tempWorldMatrix;
-
-			glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
-			glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
-			glm::mat4 viewMatrix = glm::inverse(rotation);
-
-			glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, camera->m_frustum.m_far);
-
-			camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
-
-			camera->m_viewMatrix = viewMatrix;
 			m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 			m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
 		}
