@@ -53,7 +53,7 @@ namespace RootEngine
 	void ConfigManager::CreateDefaultConfig()
 	{
 		// Default values.
-		m_values["Name"] = "Player";
+		m_values["settings.player.name"] = "Player";
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
 		m_values["ServerName"] = "RootForce server";

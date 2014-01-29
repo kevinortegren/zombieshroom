@@ -170,7 +170,7 @@ img
   vertical-align: middle;
 }
 
-*
+:not(input)
 {
 	-webkit-user-select: none;
 }
