@@ -123,6 +123,8 @@ namespace Render
 		std::shared_ptr<EffectInterface> CreateEffect();
 		std::shared_ptr<Material> CreateMaterial();
 
+		void InitialziePostProcesses();
+
 		ParticleSystem* CreateParticleSystem();
 		void FreeParticleSystem(ParticleSystemInterface* p_particleSys);
 		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
@@ -173,6 +175,10 @@ namespace Render
 
 		Render::TextureInterface* m_color0;
 		Render::TextureInterface* m_color1;
+		Render::TextureInterface* m_color2;
+
+		GLuint m_glowFbo;
+		Render::TextureInterface* m_glow;
 
 		GeometryBuffer m_gbuffer;
 		LineRenderer m_lineRenderer;

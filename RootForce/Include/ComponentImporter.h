@@ -151,12 +151,25 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				transform->m_position = position;
 
-				glm::vec3 rotation;
-				p_node["Rotation"][0] >> rotation.x;
-				p_node["Rotation"][1] >> rotation.y;
-				p_node["Rotation"][2] >> rotation.z;
+				if(p_node["Rotation"].size() == 4)
+				{
+					glm::quat rotation;
+					p_node["Rotation"][0] >> rotation.x;
+					p_node["Rotation"][1] >> rotation.y;
+					p_node["Rotation"][2] >> rotation.z;
+					p_node["Rotation"][3] >> rotation.w;
 
-				transform->m_orientation.SetOrientation(rotation.x, rotation.y, rotation.z);
+					transform->m_orientation.SetOrientation(rotation);
+				}
+				else
+				{
+					glm::vec3 rotation;
+					p_node["Rotation"][0] >> rotation.x;
+					p_node["Rotation"][1] >> rotation.y;
+					p_node["Rotation"][2] >> rotation.z;
+
+					transform->m_orientation.SetOrientation(rotation.x, rotation.y, rotation.z);
+				}
 
 				glm::vec3 scale;
 				p_node["Scale"][0] >> scale.x;

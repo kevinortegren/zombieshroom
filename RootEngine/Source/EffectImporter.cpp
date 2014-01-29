@@ -125,6 +125,26 @@ namespace RootEngine
 					program->m_depthState.depthTest = depthTest != 0;
 				}
 
+				if(programs[j].FindValue("viewport"))
+				{
+					int x;
+					programs[j]["viewport"]["x"] >> x;			
+					program->m_viewport.x = x;
+	
+					int y;
+					programs[j]["viewport"]["y"] >> y;		
+					program->m_viewport.y = y;
+
+					int w;
+					programs[j]["viewport"]["width"] >> w;			
+					program->m_viewport.z = w;
+
+					int h;
+					programs[j]["viewport"]["height"] >> h;		
+					program->m_viewport.w = h;
+
+				}
+
 				program->Compile();
 				program->Apply();
 
