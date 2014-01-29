@@ -45,7 +45,7 @@ namespace RootForce
 				test = m_engineContext->m_physics->GetBones(*(collision->m_handle));
 				if(test != nullptr)
 					for(int i = 0; i < 14; i++)
-						animation->m_bones[i] = test[i] * renderable->m_model->m_animation->GetBoneOffset(i);
+						animation->m_bones[i] = test[i] /** renderable->m_model->m_animation->GetBoneOffset(i)*/;
 			}
 		
 		}

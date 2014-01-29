@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 const float PI_2 = 1.57079632679489661923f;
-const float OFFSET = -0.05f;
+const float OFFSET = -0.5f;
 namespace Ragdoll
 {
 
@@ -59,6 +59,7 @@ namespace Ragdoll
 				if(childbody != nullptr)
 				{
 					CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
+					SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
 				}
 			}
 
@@ -109,7 +110,7 @@ namespace Ragdoll
 				if(childbody != nullptr)
 				{
 					CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
-					
+					SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
 				}
 				
 			}
@@ -178,9 +179,11 @@ namespace Ragdoll
 	glm::mat4* Ragdoll::GetBones()
 	{
 		glm::mat4* retVal = new glm::mat4[20];
+		
 		for(int i = 0; i < 14; i++)
 		{
 			btTransform trans = m_bodies[i]->getWorldTransform();
+			trans.getOrigin().normalize();
 			//trans.setRotation(btQuaternion(trans.getRotation().w(), trans.getRotation().x(), trans.getRotation().y(), trans.getRotation().z()));
 			float data[16];
 			trans.getOpenGLMatrix(data);
@@ -352,6 +355,21 @@ namespace Ragdoll
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 		}
+	}
+
+	void Ragdoll::SetBoneRelation( int p_childIndex, int p_parentIndex )
+	{
+		m_boneToFollow[p_childIndex] = p_parentIndex;
+		btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
+		btTransform parentTrans = m_bodies[p_parentIndex]->getWorldTransform();
+		float data[16];
+		childTrans.getOpenGLMatrix(data);
+		glm::mat4 childMat = glm::make_mat4(data);
+		parentTrans.getOpenGLMatrix(data);
+		glm::mat4 parentMat = glm::make_mat4(data);
+		parentMat = parentMat._inverse();
+
+		m_boneTransform[p_childIndex] = childMat * parentMat;
 	}
 
 }

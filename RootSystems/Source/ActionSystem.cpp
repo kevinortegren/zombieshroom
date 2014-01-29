@@ -46,8 +46,9 @@ namespace RootSystems
 				health->WantsRespawn = true;
 				action->ActivateAbility = false;
 				action->Jump = false;
+				
 			}
-
+			animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 			return;
 		}
 
@@ -62,7 +63,7 @@ namespace RootSystems
 			movement = glm::normalize(movement) * playphys->MovementSpeed;
 			m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 		}
-
+		
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
 		action->Angle.x = 0;
@@ -74,7 +75,7 @@ namespace RootSystems
 		if(action->ActivateAbility)
 		{
 			action->ActivateAbility = false;
-
+			
 			std::string abilityScript = player->AbilityScripts[player->SelectedAbility];
 			if (abilityScript != "")
 			{
@@ -104,7 +105,7 @@ namespace RootSystems
 				animation->m_animClip = RootForce::AnimationClip::IDLE;
 			
 				if(action->MovePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::WALKING;
+					animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 				else if(action->MovePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::WALKING;
 				if(action->StrafePower > 0)
@@ -118,8 +119,8 @@ namespace RootSystems
 				m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
 				if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 				{
-					//animation->m_animClip = RootForce::AnimationClip::JUMP_START;
-					animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
+					animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+					
 					animation->m_locked = 1;
 				}
 				action->Jump = false;
