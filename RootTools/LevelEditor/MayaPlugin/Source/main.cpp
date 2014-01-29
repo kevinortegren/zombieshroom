@@ -222,13 +222,17 @@ void copyTexture(string saveToDir, string texturePath)
 	CopyFile(s2ws(texturePath).c_str(), s2ws(newTexturePath).c_str(), FALSE);
 }
 
+float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
+{
+	return sqrt((myVector1.x - myVector2.x)*(myVector1.x - myVector2.x) + (myVector1.y - myVector2.y)*(myVector1.y - myVector2.y) + (myVector1.z - myVector2.z)*(myVector1.z - myVector2.z));
+}
+
 void Export()
 {	
 	for(int i = 0; i < currNrMeshes; i++)
 	{
 		//Print("Index ", i, " ", SM.meshList[i].transformation.name);
 		int count = 0;
-		int countVertex = 0;
 		bool exists = true;
 		int saveJ = 0;
 		if(i == 0)
@@ -239,12 +243,15 @@ void Export()
 		{
 			for(int j = 0; j < i; j++)
 			{
+				int countVertex = 0;
 				if(SM.meshList[i].nrOfVertices == SM.meshList[j].nrOfVertices)
 				{
 					for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
 					{
 						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
-						if ((SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length() <= THRESHOLD)
+						// (SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length();
+						float dist = getLengthOfVector(SM.meshList[i].vertex[v], SM.meshList[j].vertex[v]);
+						if (dist >= THRESHOLD)
 						{
 							//Om den är falsk hela vägen
 							exists = false;
