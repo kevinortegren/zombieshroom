@@ -17,6 +17,8 @@
           slot: 7
         - name: g_DiffuseB
           slot: 8
+        - name: g_Glow
+          slot: 9
       uniforms:
         - sem: MODEL
           offset: 0
