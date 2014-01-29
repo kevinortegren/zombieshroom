@@ -90,11 +90,12 @@ void ECS::EntityManager::RemoveAllEntitiesAndComponents()
 
 std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 {
-	std::vector<ECS::Entity*> result(m_nextID);
+	std::vector<ECS::Entity*> result;
+	result.reserve(m_nextID);
 	for (int i = 0; i < m_nextID; ++i)
 	{
 		if(m_entities[i].m_id != -1)
-			result[i] = &m_entities[i];
+			result.push_back(&m_entities[i]);
 	}
 
 	return result;
