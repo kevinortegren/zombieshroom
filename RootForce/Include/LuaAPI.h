@@ -1444,7 +1444,10 @@ namespace RootForce
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
 				return 0;
-			(*s)->AbilityScripts[index] = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			(*s)->AbilityScripts[index] = RootForce::AbilityInfo();
+			(*s)->AbilityScripts[index].Cooldown = 0;
+			(*s)->AbilityScripts[index].Charges = 1;
+			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)
@@ -1489,7 +1492,7 @@ namespace RootForce
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
 				return 0;
-			lua_pushstring(p_luaState, (*s)->AbilityScripts[index].c_str());
+			lua_pushstring(p_luaState, (*s)->AbilityScripts[index].Name.c_str());
 			return 1;
 		}
 		static int PlayerComponentGetSelectedAbility(lua_State* p_luaState)

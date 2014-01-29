@@ -71,18 +71,23 @@ namespace RootSystems
 		
 		// Activate ability! Pew pew!
 		player->SelectedAbility = action->SelectedAbility - 1;
-		if(action->ActivateAbility)
+		if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].Cooldown <= 0)
 		{
 			action->ActivateAbility = false;
 
-			std::string abilityScript = player->AbilityScripts[player->SelectedAbility];
+			std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
 			if (abilityScript != "")
 			{
-				m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(player->AbilityScripts[player->SelectedAbility]), "OnCreate");
+				m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityScript), "OnCreate");
 				m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
 				m_engineContext->m_script->AddParameterNumber(action->ActionID);
 				m_engineContext->m_script->ExecuteScript();
+
 			}
+		}
+		else if(player->AbilityScripts[player->SelectedAbility].Cooldown > 0)
+		{
+			player->AbilityScripts[player->SelectedAbility].Cooldown -= dt;
 		}
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)
