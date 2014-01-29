@@ -82,7 +82,9 @@ namespace RootSystems
 				m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
 				m_engineContext->m_script->AddParameterNumber(action->ActionID);
 				m_engineContext->m_script->ExecuteScript();
-
+				player->AbilityScripts[player->SelectedAbility].Charges --;
+				if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
+					player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 			}
 		}
 		else if(player->AbilityScripts[player->SelectedAbility].Cooldown > 0)

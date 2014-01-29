@@ -179,8 +179,6 @@ namespace RootForce
 
 		//Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
-		m_hud->SetAbility(1, "TestBall");
-		m_hud->SetAbility(2, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -244,6 +242,12 @@ namespace RootForce
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+		m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+		m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+		m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
 		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 
 		m_hud->Update();

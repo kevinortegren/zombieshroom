@@ -219,7 +219,7 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
-		static int EntityGetPlayer(lua_State* p_luaState)
+		/*static int EntityGetPlayer(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
@@ -227,7 +227,7 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
 			luaL_setmetatable(p_luaState, "Player");
 			return 1;
-		}
+		}*/
 		static int EntityGetPlayerAction(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1446,7 +1446,7 @@ namespace RootForce
 				return 0;
 			(*s)->AbilityScripts[index] = RootForce::AbilityInfo();
 			(*s)->AbilityScripts[index].Cooldown = 0;
-			(*s)->AbilityScripts[index].Charges = 1;
+			(*s)->AbilityScripts[index].Charges = -1;
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
 			return 0;
 		}
@@ -1476,6 +1476,13 @@ namespace RootForce
 			NumberOfArgs(2);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			(*s)->TeamID = (int) luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int PlayerComponentStartCooldown(lua_State* p_luaState)
+		{
+			NumberOfArgs(3); //Self, AbilityId, Cooldown(seconds)
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(int) luaL_checknumber(p_luaState, 2)].Cooldown = (float) luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int PlayerComponentGetName(lua_State* p_luaState)
@@ -2083,6 +2090,7 @@ namespace RootForce
 			{"SetDeaths",			PlayerComponentSetDeaths},
 			{"SetScore",			PlayerComponentSetScore},
 			{"SetTeamId",			PlayerComponentSetTeamId},
+			{"StartCooldown",		PlayerComponentStartCooldown},
 			{"GetName",				PlayerComponentGetName},
 			{"GetAbility",			PlayerComponentGetAbility},
 			{"GetSelectedAbility",	PlayerComponentGetSelectedAbility},

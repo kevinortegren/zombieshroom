@@ -13,6 +13,8 @@ function AbilityDash.OnCreate(userId, actionId)
 
 	local handle = playerEnt:GetCollision():GetHandle();
 	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.1,0)+frontVec, 100);
+	local playerComponent = playerEnt:GetPlayerComponent();
+	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), 10);
 end
 
 function AbilityDash.OnCollide (entityId)

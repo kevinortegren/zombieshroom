@@ -80,6 +80,7 @@ function SetAbilityFocus(p_slot)
 }
 function StartCooldown(p_slot, p_duration)
 {
+	$("#slot"+p_slot+"-cooldown").stop();
 	$("#slot"+p_slot+"-cooldown").css("background-position", "50% 0px");
 	$("#slot"+p_slot+"-cooldown").animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
 }
