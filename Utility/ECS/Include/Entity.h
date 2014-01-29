@@ -1,8 +1,7 @@
 #pragma once
 
 #include <bitset>
-
-#define ECS_ENTITY_BITS 32
+#include <cstdint>
 
 namespace ECS
 {
@@ -10,15 +9,17 @@ namespace ECS
 	{
 	public:
 		friend class EntityManager;
+		friend class EntitySystem;
 		friend class EntitySystemManager; 
+		friend class EntityExporter; 
 
-		Entity(unsigned int p_id)
-			: m_id(p_id) {}
+		Entity() : m_id(-1), m_flag(0) {}
 
-		unsigned int GetId() const { return m_id; }
+		int GetId() const { return m_id; }
+		int64_t GetFlag() const { return m_flag; }
 
 	private:
-		unsigned int m_id;
-		std::bitset<ECS_ENTITY_BITS> m_componentTypes;
+		int m_id;
+		int64_t m_flag;
 	};
 }

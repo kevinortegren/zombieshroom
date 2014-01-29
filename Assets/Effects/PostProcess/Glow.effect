@@ -1,0 +1,34 @@
+- name: Glow
+  techniques:
+    - name: Glow
+      bindings:
+        - name: PerTech
+          slot: 3
+      textures:
+        - name: g_Scene
+          slot: 3
+        - name: g_Glow
+          slot: 4
+        - name: g_Input
+          slot: 5        
+      programs:
+      - name: glow_horizontal
+        shaders:
+          - name: postprocess
+            type: vertex
+          - name: glow_horizontal
+            type: fragment
+        depth:
+          write: 0
+          test: 0
+        blend: 0
+      - name: glow_vertical
+        shaders:
+          - name: postprocess
+            type: vertex
+          - name: glow_vertical
+            type: fragment
+        depth:
+          write: 0
+          test: 0
+        blend: 0

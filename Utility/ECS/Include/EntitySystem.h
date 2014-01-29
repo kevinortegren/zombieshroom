@@ -3,22 +3,18 @@
 #include <Utility\ECS\Include\Entity.h>
 #include <Utility\ECS\Include\ComponentMapper.h>
 
-#include <bitset>
+#include <cstdint>
 #include <set>
 #include <memory>
-
-#define ECS_COMPSYSTEM_BITS 32
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 namespace ECS
 {
-	struct CompareById {
-		bool operator()(const Entity* lhs, const Entity* rhs) {
-			return lhs->GetId() < rhs->GetId();
-		}
-	};
-
 	class World;
 
+	// Simple system to perform custom logic on the world.
 	class VoidSystem
 	{
 	public:
@@ -31,18 +27,19 @@ namespace ECS
 		World* m_world;
 	};
 
+	// System to process a set of entities.
 	class EntitySystem : public VoidSystem
 	{
 	public:
 		friend class EntitySystemManager;
 
 		EntitySystem(World* p_world)
-			: VoidSystem(p_world) { }
+			: VoidSystem(p_world), m_flag(0) { }
 
 		template<class T>
 		void SetUsage()
 		{
-			m_componentTypes[Component<T>::GetTypeId()] = 1;
+			m_flag |= (1ULL << Component<T>::GetTypeId());
 		}
 
 		void Process();
@@ -53,11 +50,12 @@ namespace ECS
 		virtual void End(){}
 
 	protected:
-		std::bitset<ECS_COMPSYSTEM_BITS> m_componentTypes;
+		int64_t m_flag;
 		std::set<Entity*> m_activeEntities;
 	};
 
-	class IntervalEntitySystem : EntitySystem
+	// System to process a set of entities at a set time interval.
+	class IntervalEntitySystem : public EntitySystem
 	{
 	public:
 		friend class EntitySystemManager;
@@ -71,5 +69,29 @@ namespace ECS
 	private:
 		float m_interval;
 		float m_time;
+	};
+
+	// System to be executed on different thread.
+	class ConcurrentSystem : public EntitySystem
+	{
+	public:
+		friend class EntitySystemManager;
+
+		ConcurrentSystem(World* p_world)
+			: EntitySystem(p_world) { m_run = false; m_terminate = false; }
+
+		void Process();	
+		void Run();
+		bool IsRunning();
+		
+		void Start();
+		void Terminate();
+
+		void Synch();
+
+	private:
+		std::atomic_bool m_run;
+		std::atomic_bool m_terminate;
+		std::thread m_thread;
 	};
 }

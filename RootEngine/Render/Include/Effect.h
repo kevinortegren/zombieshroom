@@ -67,6 +67,7 @@ namespace Render
 		BlendState m_blendState;
 		DepthState m_depthState;
 		FillMode m_fillMode;
+		glm::ivec4 m_viewport;
 
 	private:
 		GLuint m_glHandle;
@@ -80,7 +81,7 @@ namespace Render
 			RENDER_FORWARD = 0x02,
 			RENDER_DEFERRED = 0x04,
 			RENDER_DEBUG = 0x08,
-			RENDER_SHADOW = 0x016
+			RENDER_SHADOW = 0x10
 		};
 	}
 

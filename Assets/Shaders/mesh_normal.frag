@@ -9,16 +9,19 @@ in vec3 vert_bitangent;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Specular;
 uniform sampler2D g_Normal;
+uniform sampler2D g_Glow;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec3 normals;
-layout (location = 2) out vec4 background;
+layout (location = 2) out vec4 glow;
 
 void main()
 {
 	float specTerm = texture(g_Specular, vert_texcoord).r;
 	vec3 frag_color = texture(g_Diffuse, vert_texcoord).xyz;
+	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
 	
+
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
 	normalT = normalT * 2.0f - 1.0f;
 
@@ -28,5 +31,5 @@ void main()
 
 	diffuse = vec4(frag_color, specTerm);
 	normals = vec3(bumpNormal * 0.5 + 0.5);
-	background.w = 0.0f;
+	glow = vec4(vec3(glow_color.xyz), 0.0f);
 }

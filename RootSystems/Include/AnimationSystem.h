@@ -42,10 +42,10 @@ namespace RootForce
 		std::map<std::string, aiQuaternion> m_blendRot;
 	};
 
-	struct AnimationSystem : public ECS::EntitySystem
+	struct AnimationSystem : public ECS::ConcurrentSystem
 	{
 		AnimationSystem(ECS::World* p_world)
-			: ECS::EntitySystem(p_world)
+			: ECS::ConcurrentSystem(p_world)
 		{
 			SetUsage<Animation>();
 			SetUsage<Renderable>();

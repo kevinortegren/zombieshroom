@@ -92,6 +92,8 @@ namespace UnitTesting
 
 		RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		g_engineContext.m_resourceManager->LoadScript("Global");
+
+		
 		/*
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
 		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");

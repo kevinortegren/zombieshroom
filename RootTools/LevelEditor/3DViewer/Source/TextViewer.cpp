@@ -19,7 +19,6 @@
 #include <RootTools\LevelEditor\3DViewer\Include\RawMeshPrimitives.h>
 #include <RootSystems\Include\ComponentTypes.h>
 #include <ComponentExporter.h>
-#include <RootSystems/Include/ParticleImporter.h>
 
 #undef main
 
@@ -323,20 +322,28 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
 
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(100);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(10000);
+
+
 	// Initialize systems.
 	renderingSystem = new RootForce::RenderingSystem(&m_world);
 	renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
-	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem, "RenderingSystem");
+	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem);
 
 	pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
-	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem, "PointLightSystem");
+	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem);
 
 	cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
-	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem, "CameraSystem");
+	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem);
 
 	particleSystem = new RootForce::ParticleSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem, "ParticleSystem");
+	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem);
 }
 
 void LoadSceneFromMaya()
@@ -577,7 +584,9 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
-	ImportParticleEmitter(p_name, particle, transform, false);
+	particle->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(p_name, false);
+	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
+		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 
 	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
 	{
@@ -629,8 +638,8 @@ void UpdateCamera(int index)
 	if(index != -1)
 	{
 
-		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(cameras[0]);
-		RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(cameras[0]);
+		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameras[0]);
+		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameras[0]);
 
 		RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
 		WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);

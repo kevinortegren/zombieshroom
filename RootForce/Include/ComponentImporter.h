@@ -4,7 +4,6 @@
 #include <RootSystems/Include/Components.h>
 
 #include <yaml-cpp/yaml.h>
-#include <RootSystems/Include/ParticleImporter.h>
 #include <RootEngine/Include/GameSharedContext.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -131,9 +130,14 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						renderable->m_material->m_tileFactor = tileFactor;
 						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
 					}
-				}
-
-				
+					const YAML::Node* glowNode = materialNode->FindValue("Glow");
+					if(glowNode != nullptr)
+					{
+						std::string glow;
+						p_node["Material"]["Glow"] >> glow;
+						renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glow, Render::TextureType::TEXTURE_2D);
+					}
+				}	
 			}
 			break;
 		case RootForce::ComponentType::TRANSFORM:
@@ -147,12 +151,25 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				transform->m_position = position;
 
-				glm::vec3 rotation;
-				p_node["Rotation"][0] >> rotation.x;
-				p_node["Rotation"][1] >> rotation.y;
-				p_node["Rotation"][2] >> rotation.z;
+				if(p_node["Rotation"].size() == 4)
+				{
+					glm::quat rotation;
+					p_node["Rotation"][0] >> rotation.x;
+					p_node["Rotation"][1] >> rotation.y;
+					p_node["Rotation"][2] >> rotation.z;
+					p_node["Rotation"][3] >> rotation.w;
 
-				transform->m_orientation.SetOrientation(rotation.x, rotation.y, rotation.z);
+					transform->m_orientation.SetOrientation(rotation);
+				}
+				else
+				{
+					glm::vec3 rotation;
+					p_node["Rotation"][0] >> rotation.x;
+					p_node["Rotation"][1] >> rotation.y;
+					p_node["Rotation"][2] >> rotation.z;
+
+					transform->m_orientation.SetOrientation(rotation.x, rotation.y, rotation.z);
+				}
 
 				glm::vec3 scale;
 				p_node["Scale"][0] >> scale.x;
@@ -253,7 +270,10 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				p_node["File"] >> particleName;
 
-				ImportParticleEmitter(particleName, particleEmitter, trans, false);
+				particleEmitter->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(particleName, false);
+				
+				for(unsigned i = 0; i < particleEmitter->m_particleSystems.size(); i++)
+					particleEmitter->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 			}
 			break;
 		default:

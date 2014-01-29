@@ -6,6 +6,7 @@
 #include <RootForce/Include/GameStates.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -35,18 +36,19 @@ namespace RootForce
 
 	bool MatchStateSystem::IsMatchOver()
 	{
-		if(m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TeamScore[1] >=
-			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->ScoreLimit || 
-			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TeamScore[2] >=
-			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->ScoreLimit)
+		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
+		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
+		if(ruleSet->ScoreLimit <= 0
+			&& (ruleSet->TeamScore[1] >= ruleSet->ScoreLimit || 
+			ruleSet->TeamScore[2] >= ruleSet->ScoreLimit))
 			return true;
-		else if(m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft >= 0)
+		else if(ruleSet->TimeLeft <= 0)
 			return true;
 		else
 			return false;
 	}
 
-	void MatchStateSystem::AwardPlayerKill( int p_killerID, int p_deadID )
+	void MatchStateSystem::AwardPlayerKill( RootForce::Network::UserID_t p_killerID, RootForce::Network::UserID_t p_deadID )
 	{
 		Network::NetworkEntityID killerNetworkID;
 		killerNetworkID.UserID = p_killerID;
@@ -57,9 +59,18 @@ namespace RootForce
 		deadNetworkID.UserID = p_deadID;
 		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
 		deadNetworkID.SequenceID = 0;
+		
+		// Award score for killer team
+		if(p_killerID != Network::ReservedUserID::NONE)
+		{
+			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
+			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID]);
 
-		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID])->Score ++;
-		m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Score ++;
+			rules->TeamScore[killerPlayerComponent->TeamID]++;
+			killerPlayerComponent->Score++;
+		}
+		g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Deaths ++;
 	}
 
 	

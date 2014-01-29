@@ -14,6 +14,31 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StateComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
+
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
@@ -81,57 +106,57 @@ namespace RootForce
 
 		// Initialize physics system
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem, "PhysicsTransformCorrectionSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem);
 
 		m_physicsSystem = new RootForce::PhysicsSystem(g_world);
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
-		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem, "PhysicsSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
 
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem, "CollisionSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
 
 		// Initialize render, shadow and point light system.
 		m_renderingSystem = new RootForce::RenderingSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 		m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
 		m_shadowSystem = new RootForce::ShadowSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem, "ShadowSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
-		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_animationSystem->SetGameSharedContext(&g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem, "AnimationSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem);
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
 		m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem, "ThirdPersonBehaviorSystem");
+		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem);
 
 		// Action system handles local and remote player issued actions and updates the world accordingly
 		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem, "ActionSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem);
 
 		// Respawn system respawns players after they die
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem, "RespawnSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
 
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem, "StateSystem");
+		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -153,17 +178,21 @@ namespace RootForce
 
 		//Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
-		m_hud->SetAbility(1, "TestBall");
-		m_hud->SetAbility(2, "TestDash");
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		//Load the level spawn points into the respawn system
+		m_respawnSystem->LoadSpawnPoints();
+
+		m_animationSystem->Start();
 	}
 
 	void IngameState::Exit()
 	{
+		m_animationSystem->Terminate();
+
 		Network::NetworkEntityID id;
 		id.UserID = Network::ReservedUserID::ALL;
 		id.ActionID = Network::ReservedActionID::ALL;
@@ -180,12 +209,18 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
+
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+
+		ECS::Entity* debugEntity = g_world->GetTagManager()->GetEntityByTag("LatestBall");
+		Transform* debugTransform = nullptr;
+		if (debugEntity != nullptr)
+			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
 
 		// Check for quitting condition
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -204,12 +239,22 @@ namespace RootForce
 
 		//Update all the data that is displayed in the HUD
 		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
-		m_hud->SetValue("PlayerScore", std::to_string(g_world->GetEntityManager()->GetComponent<PlayerComponent>(player)->Score) );
-		m_hud->SetValue("PlayerDeaths", std::to_string(g_world->GetEntityManager()->GetComponent<PlayerComponent>(player)->Deaths) );
-		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
-		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
+		m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+		if(playerComponent->AbilityScripts[0].Cooldown > 0)
+			m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+		if(playerComponent->AbilityScripts[1].Cooldown > 0)
+			m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+		if(playerComponent->AbilityScripts[2].Cooldown > 0)
+			m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
 		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 
 		m_hud->Update();
@@ -220,8 +265,11 @@ namespace RootForce
 		case RootServer::UserCommands::CLIENT_RAGEQUIT:
 			return GameStates::Menu;
 		case RootServer::UserCommands::CLIENT_SUICIDE:
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			break;
+			{
+				// ToDo: Send a network message to server to indicate a suicide
+				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+				MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			} break;
 		default:
 			break;
 		}
@@ -273,41 +321,12 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
 			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
 			m_playerControlSystem->Process();
-		}
-
-		//m_animationSystem->Process();
-		{
-			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
-		}
-
-		std::thread t(&RootForce::AnimationSystem::Process, m_animationSystem);
-
-		{
-			PROFILE("Respawn system", g_engineContext.m_profiler);
-			m_respawnSystem->Process();
-		}
-
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
-			m_physicsTransformCorrectionSystem->Process();
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
-
-		{
-			PROFILE("Collision system", g_engineContext.m_profiler);
-			m_collisionSystem->Process();
-		}
-
-		{
-			PROFILE("StateSystem", g_engineContext.m_profiler);
-			m_stateSystem->Process();
 		}
 
 		if (m_networkContext.m_server != nullptr)
@@ -320,10 +339,45 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
+
+		{
+			PROFILE("Action system", g_engineContext.m_profiler);
+			m_actionSystem->Process();
+		}
+
+		
+
+		m_animationSystem->Run();
+
+		{
+			PROFILE("Respawn system", g_engineContext.m_profiler);
+			m_respawnSystem->Process();
+		}
+
+
+        {
+            PROFILE("Physics", g_engineContext.m_profiler);
+			m_physicsTransformCorrectionSystem->Process();
+            g_engineContext.m_physics->Update(p_deltaTime);
+            m_physicsSystem->Process();
+        }
+
+		
+		{
+			PROFILE("Collision system", g_engineContext.m_profiler);
+			m_collisionSystem->Process();
+		}
+
+		{
+			PROFILE("StateSystem", g_engineContext.m_profiler);
+			m_stateSystem->Process();
+		}
+
+		
 		
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			m_playerControlSystem->UpdateAimingDevice();
+			m_actionSystem->UpdateAimingDevice();
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
@@ -350,7 +404,9 @@ namespace RootForce
 			m_renderingSystem->Process();
 
 		}
-		t.join();
+
+		m_animationSystem->Synch();
+
 		{
 			PROFILE("Rendering", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Render();

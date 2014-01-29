@@ -124,24 +124,33 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::ThirdPersonBehavior::SetTypeId(RootForce::ComponentType::THIRDPERSONBEHAVIOR);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(100);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(10);
+	g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100);
+	
+
 	// Initialize render and point light system.
 	m_renderingSystem = new RootForce::RenderingSystem(g_world);
-	g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem, "RenderingSystem");
+	g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
 	m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
-	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem, "PointLightSystem");
+	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 	m_particleSystem = new RootForce::ParticleSystem(g_world);
-	g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem, "ParticleSystem");
+	g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
 	// Initialize camera systems.
 	m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
-	g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem, "CameraSystem");
+	g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
-	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem, "LookAtSystem");
+	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 	
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	

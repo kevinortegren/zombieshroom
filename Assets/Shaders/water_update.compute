@@ -1,0 +1,23 @@
+#version 430
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout(r32f) readonly uniform image2D prevTex;
+layout(r32f) restrict uniform image2D currTex;
+
+uniform float mk1;
+uniform float mk2;
+uniform float mk3;
+
+void main() 
+{   
+	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+
+	imageStore(currTex, storePos, 
+		mk1*imageLoad(currTex, storePos) +
+		mk2*imageLoad(prevTex, storePos) +
+		mk3*(imageLoad(prevTex, storePos+ivec2(1,0)) + 
+			imageLoad(prevTex, storePos+ivec2(-1,0)) + 
+			imageLoad(prevTex, storePos+ivec2(0,1)) + 
+			imageLoad(prevTex, storePos+ivec2(0,-1)))
+	);
+}

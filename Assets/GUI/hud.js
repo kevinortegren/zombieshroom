@@ -80,11 +80,16 @@ function SetAbilityFocus(p_slot)
 }
 function StartCooldown(p_slot, p_duration)
 {
-	$("#slot"+p_slot+"-cooldown").css("background-position", "50% 0px");
-	$("#slot"+p_slot+"-cooldown").animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
+	var slot = $("#slot"+p_slot+"-cooldown");
+	if(parseInt(slot.css("background-position-y").split("px")[0]) == 75)
+	{
+		slot.css("background-position", "50% 0px");
+		slot.animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
+	}
 }
 
 // $(document).ready(function(){
 	// SetAbilityFocus(0);
 	// SetAbility(1, "TestBall");
+	// StartCooldown(1, 3);
 // });

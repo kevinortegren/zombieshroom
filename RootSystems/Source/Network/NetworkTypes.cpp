@@ -37,6 +37,8 @@ namespace RootForce
 			for (size_t i = 0; i < destroy.size(); ++i)
 			{
 				// If the entity has a script component, call its OnDestroy script.
+				if(!destroy[i]->second)
+					continue;
 				Script* script = p_entityManager->GetComponent<Script>(destroy[i]->second);
 				if (script != nullptr)
 				{

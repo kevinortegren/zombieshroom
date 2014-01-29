@@ -69,6 +69,21 @@ namespace RootEngine
 						glType = GL_GEOMETRY_SHADER;
 						extension = ".geometry";
 					}
+					else if(type == "compute")
+					{
+						glType = GL_COMPUTE_SHADER;
+						extension = ".compute";
+					}
+					else if(type == "tess_evaluation")
+					{
+						glType = GL_TESS_EVALUATION_SHADER;
+						extension = ".tesseval";
+					}
+					else if(type == "tess_control")
+					{
+						glType = GL_TESS_CONTROL_SHADER;
+						extension = ".tesscontrol";
+					}
 
 					std::string shader = std::string(m_workingDirectory + "Assets//Shaders//" + shaderName  + extension);
 					program->AttachShader(glType, shader.c_str());
@@ -108,6 +123,26 @@ namespace RootEngine
 					int depthTest;
 					programs[j]["depth"]["test"] >> depthTest;		
 					program->m_depthState.depthTest = depthTest != 0;
+				}
+
+				if(programs[j].FindValue("viewport"))
+				{
+					int x;
+					programs[j]["viewport"]["x"] >> x;			
+					program->m_viewport.x = x;
+	
+					int y;
+					programs[j]["viewport"]["y"] >> y;		
+					program->m_viewport.y = y;
+
+					int w;
+					programs[j]["viewport"]["width"] >> w;			
+					program->m_viewport.z = w;
+
+					int h;
+					programs[j]["viewport"]["height"] >> h;		
+					program->m_viewport.w = h;
+
 				}
 
 				program->Compile();
@@ -211,6 +246,14 @@ namespace RootEngine
 						else if(sem == "TRANSPOSITION")
 						{
 							technique->AddUniformParam(Render::Semantic::TRANSPOSITION, offset);
+						}
+						else if(sem == "ORBITSPEED")
+						{
+							technique->AddUniformParam(Render::Semantic::ORBITSPEED, offset);
+						}
+						else if(sem == "ORBITRADIUS")
+						{
+							technique->AddUniformParam(Render::Semantic::ORBITRADIUS, offset);
 						}
 					}
 				}
