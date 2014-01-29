@@ -48,7 +48,7 @@ namespace ECS
 
 			/* Entity ID is enumerated 0,1,2.. etc.
 			So we resize the component vector to match the number of entities. */
-			if(p_entity->m_id >= componentList.size())
+			if(p_entity->m_id >= (int)componentList.size())
 				componentList.resize(p_entity->m_id + 1);
 
 			// Use the entity id in the component vector and store the allocated component. 
@@ -82,7 +82,7 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
-			if(p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
+			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size())
 				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
@@ -111,7 +111,7 @@ namespace ECS
 		EntitySystemManager* m_systemManager;
 		int m_nextID;
 		std::vector<Entity> m_entities;
-		std::stack<int> m_recyledIds;
+		std::stack<int> m_recycledIds;
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;

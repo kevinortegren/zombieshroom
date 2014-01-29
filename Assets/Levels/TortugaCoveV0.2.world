@@ -1,0 +1,188 @@
+- Entities:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+- Components:
+    - Type: 0
+      Data:
+        - Entity: 8
+          Model: Mountain2MeshShape
+          Material:
+            Name: MountainPaint
+            Effect: Mesh_Blend
+            Diffuse: Mountain2MeshShape_color
+            TextureMap: Mountain2MeshShape_color
+            TextureRed: dirt
+            TextureGreen: rock_clear
+            TextureBlue: simpleRock
+            TileFactor: 24
+        - Entity: 9
+          Model: IslandTerrainMeshShape
+          Material:
+            Name: TerrainPaint
+            Effect: Mesh_Blend
+            Diffuse: RocksMeshShape_color_2
+            TextureMap: RocksMeshShape_color_2
+            TextureRed: sandTiles
+            TextureGreen: customGrass2
+            TextureBlue: rock_clear
+            TileFactor: 48
+        - Entity: 10
+          Model: WaterPlaneShape
+          Material:
+            Name: Water
+            Effect: Mesh
+            Diffuse: water
+        - Entity: 11
+        - Entity: 12
+        - Entity: 13
+        - Entity: 14
+    - Type: 1
+      Data:
+        - Entity: 0
+          Position: [-77.8333, 190.809, 179.726]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 1
+          Position: [37.7439, 145.144, 169.266]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 2
+          Position: [86.5978, 153.375, -145.167]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 3
+          Position: [-181.503, 242.93, -243.36]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [-189.563, 319.554, -247.577]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 5
+          Position: [12.9942, 190.751, -240.988]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 6
+          Position: [12.9942, 190.751, -240.988]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 8
+          Position: [41.7823, 79.1445, -307.36]
+          Rotation: [177.73, 17.4024, 177.425]
+          Scale: [0.711459, 0.711459, 0.711459]
+        - Entity: 9
+          Position: [249.816, 2.48697, 0]
+          Rotation: [-0, 0, -0]
+          Scale: [0.711459, 0.711459, 0.711459]
+        - Entity: 10
+          Position: [435.122, -4.87318, 8.77607]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 11
+          Position: [242.485, 174.425, 250.539]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 12
+          Position: [302.264, 46.4015, 6.93413]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 13
+          Position: [-47.346, 66.878, -4.73864]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+        - Entity: 14
+          Position: [387.204, 134.983, -306.936]
+          Rotation: [-0, 0, -0]
+          Scale: [1, 1, 1]
+    - Type: 2
+      Data:
+        - Entity: 11
+          Attenuation: [0, 0.0150376, 0]
+          Color: [1, 1, 0, 1]
+          Range: 1000
+        - Entity: 12
+          Attenuation: [0, 0.0150376, 0]
+          Color: [0, 1, 1, 1]
+          Range: 1000
+        - Entity: 13
+          Attenuation: [0, 0.0150376, 0]
+          Color: [1, 1, 0, 1]
+          Range: 1000
+        - Entity: 14
+          Attenuation: [0, 0.0150376, 0]
+          Color: [1, 1, 0, 1]
+          Range: 1000
+    - Type: 3
+      Data:
+        []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        - Entity: 8
+          MeshHandle: Mountain2MeshShape0
+        - Entity: 9
+          MeshHandle: IslandTerrainMeshShape0
+        - Entity: 10
+          MeshHandle: WaterPlaneShape0
+    - Type: 12
+      Data:
+        []
+    - Type: 13
+      Data:
+        []
+    - Type: 14
+      Data:
+        []
+- Tags:
+    []
+- Groups:
+    - Id: 8
+      Group: Painted
+    - Id: 9
+      Group: Painted
+    - Id: 0
+      Group: SpawnPoint
+    - Id: 1
+      Group: SpawnPoint
+    - Id: 2
+      Group: SpawnPoint
+    - Id: 3
+      Group: SpawnPoint
+    - Id: 4
+      Group: SpawnPoint
+    - Id: 8
+      Group: Static
+    - Id: 9
+      Group: Static

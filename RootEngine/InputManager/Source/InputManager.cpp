@@ -50,13 +50,25 @@ namespace RootEngine
 			case SDL_MOUSEMOTION:
 				//m_deltaMousePos.x = p_event.motion.x - m_globMousePos.x;
 				//m_deltaMousePos.y = p_event.motion.y - m_globMousePos.y;
-				m_globMousePos.x = p_event.motion.x;
-				m_globMousePos.y = p_event.motion.y;
+				if(SDL_GetRelativeMouseMode())
+				{
+					m_globMousePos.x = p_event.motion.x;
+					m_globMousePos.y = p_event.motion.y;
 
-				m_deltaMousePos.x = p_event.motion.xrel;
-				m_deltaMousePos.y = p_event.motion.yrel;
+					m_deltaMousePos.x = p_event.motion.xrel;
+					m_deltaMousePos.y = p_event.motion.yrel;
+				}
+				else
+				{
+					m_globMousePos.x = -p_event.motion.x;
+					m_globMousePos.y = -p_event.motion.y;
+
+					m_deltaMousePos.x = -p_event.motion.xrel;
+					m_deltaMousePos.y = -p_event.motion.yrel;
+				}
 				if(m_lockMouseEnabled)
 				{
+					
 					//int w, h;
 					//SDL_GetWindowSize(NULL, &w, &h);
 					SDL_WarpMouseInWindow(NULL, 100, 100);

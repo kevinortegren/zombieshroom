@@ -59,6 +59,9 @@ namespace RootForce
 			};
 		}
 
+		const SequenceID_t SID_PLAYER_ENTITY = 0;
+		const SequenceID_t SID_AIMING_DEVICE_ENTITY = 1;
+
 		/*
 			Uniquely identifies an entity across all peers.
 
@@ -78,6 +81,20 @@ namespace RootForce
 			};
 
 			SynchronizedID_t SynchronizedID;
+
+			NetworkEntityID::NetworkEntityID()
+			{
+				UserID = ReservedUserID::NONE;
+				ActionID = ReservedActionID::NONE;
+				SequenceID = ReservedSequenceID::NONE;
+			}
+
+			NetworkEntityID::NetworkEntityID(UserID_t p_user, ActionID_t p_action, SequenceID_t p_sequence)
+			{
+				UserID = p_user;
+				ActionID = p_action;
+				SequenceID = p_sequence;
+			}
 
 			bool operator<(const NetworkEntityID& p_rhs) const
 			{

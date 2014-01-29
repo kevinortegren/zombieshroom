@@ -16,6 +16,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
+	--local particleComp = ParticleEmitter.New(self, "fireball");
 	local scriptComp = Script.New(self, "AbilityBall");
 	
 	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);

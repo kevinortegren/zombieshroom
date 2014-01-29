@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <RootEngine/Render/Include/Texture.h>
 
 namespace Render
 {
@@ -11,16 +12,21 @@ namespace Render
 	friend class GLRenderer;
 	public:
 		~GeometryBuffer();
-		void Init(int p_width, int p_height);
-		void CreateBuffers(int p_width, int p_height);
-		void Bind();
-		void Unbind();
-		void Read();
+
+		void Init(GLRenderer* p_renderer, int p_width, int p_height);
+		void CreateTextures(int p_width, int p_height);
+		void Enable();
+		
+		void BindTextures();
+		void UnbindTextures();
 		void Resize(int p_width, int p_height);
 	private:
+
 		GLuint m_fbo;
-		GLuint m_depthHandle;	// 32bit Depth.
-		GLuint m_diffuseHandle; // 24bit Diffuse 8bit Specular;
-		GLuint m_normalsHandle;// 24bit ViewSpaceNormals 8bit Empty.
+
+		Render::TextureInterface* m_depthTexture; // 32bit Depth.
+		Render::TextureInterface* m_diffuseTexture; // 24bit Diffuse 8bit Specular;
+		Render::TextureInterface* m_normalsTexture; // 24bit ViewSpaceNormals 8bit Empty.
+		Render::TextureInterface* m_glowTexture; // 24bit Glow RGB 8bit Empty.
 	};
 }

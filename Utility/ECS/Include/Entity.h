@@ -13,11 +13,13 @@ namespace ECS
 		friend class EntitySystemManager; 
 		friend class EntityExporter; 
 
-		unsigned int GetId() const { return m_id; }
+		Entity() : m_id(-1), m_flag(0) {}
+
+		int GetId() const { return m_id; }
 		int64_t GetFlag() const { return m_flag; }
 
 	private:
-		unsigned int m_id;
+		int m_id;
 		int64_t m_flag;
 	};
 }

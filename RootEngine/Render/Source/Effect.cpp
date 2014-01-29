@@ -166,6 +166,7 @@ namespace Render
 				break;
 		}
 
+		// Set Depth modes.
 		if(m_depthState.depthWrite)
 		{
 			glDepthMask(GL_TRUE);
@@ -185,6 +186,7 @@ namespace Render
 			glDisable(GL_DEPTH_TEST);
 		}
 
+		// Use program.
 		glUseProgram( m_glHandle );
 	}
 

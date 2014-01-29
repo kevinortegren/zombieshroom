@@ -7,8 +7,8 @@ function Player.OnCreate(userId, actionId)
 	local transform = Transformation.New(player);
 	local playerPhysics = PlayerPhysics.New(player);
 	local health = Health.New(player);
-	local playerComponent = PlayerComponent.New(player);
 	local physics = Physics.New(player);
+	local playerComponent = PlayerComponent.New(player);
 	local collision = Collision.New(player);
 	local collisionResponder = CollisionResponder.New(player);
 	local script = Script.New(player, "Player");
@@ -36,12 +36,8 @@ function Player.OnCreate(userId, actionId)
 	playerPhysics:SetMovementSpeed(10);
 	playerPhysics:SetJumpForce(20);
 
-	--physics:SetGravity(collision, Vec3.New(0, 0, 0));
-
-	physics:SetMass(5);
-
 	collision:SetMeshHandle("testchar0");
-	Collision.AddPlayerObjectToWorld(player, collision, transform, physics, playerPhysics, collisionResponder);
+	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
 
 	health:SetHealth(100);
 	health:SetIsDead(false);

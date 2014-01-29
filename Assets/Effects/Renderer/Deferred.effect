@@ -17,6 +17,8 @@
           slot: 2
         - name: g_ShadowDepth
           slot: 3
+        - name: g_Glow
+          slot: 4
       programs:
         - name: ambient
           shaders:

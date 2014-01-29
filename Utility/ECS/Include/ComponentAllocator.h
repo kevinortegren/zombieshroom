@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/FreeList.h>
 #include <vector>
+#include <assert.h>
 
 namespace ECS
 {
@@ -15,6 +16,8 @@ namespace ECS
 		template<class T>
 		void CreateList(size_t p_numElements)
 		{
+			assert(sizeof(T) >= 4);
+
 			unsigned id = Component<T>::GetTypeId();
 
 			void* mem = operator new(p_numElements * sizeof(T));
@@ -42,6 +45,8 @@ namespace ECS
 
 			m_lists[id].first.Free(p_ptr);
 		}
+
+		void FreePtrFromList(void* p_ptr, int p_id);
 
 		std::vector<std::pair<FreeList, void*>> m_lists;
 	};

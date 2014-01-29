@@ -1,0 +1,29 @@
+- name: Glow
+  techniques:
+    - name: Glow
+      bindings:
+        - name: PerTech
+          slot: 3
+      textures:
+        - name: g_Glow
+          slot: 4
+
+      programs:
+      
+      # Vertical blur pass
+      - name: glow_vertical
+        shaders:
+          - name: postprocess
+            type: vertex
+          - name: glow_vertical
+            type: fragment
+        blend: 2
+        
+      # Horizontal blur pass
+      - name: glow_horizontal
+        shaders:
+          - name: postprocess
+            type: vertex
+          - name: glow_horizontal
+            type: fragment
+        blend: 2

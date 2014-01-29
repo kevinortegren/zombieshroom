@@ -55,7 +55,7 @@ TEST(PlayerControlSystem, Process)
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
 	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->AddParameterNumber(0);
-	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(RootForce::Network::ReservedActionID::CONNECT);
 	g_engineContext.m_script->ExecuteScript();
 
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");
@@ -82,6 +82,8 @@ TEST(PlayerControlSystem, Process)
 
 		falseevent.key.keysym.scancode = SDL_SCANCODE_DOWN;
 		ii->HandleInput(falseevent);
+		falseevent.key.keysym.scancode = SDL_SCANCODE_UP;
+		ii->HandleInput(falseevent);
 
 		system->Process();
 
@@ -89,8 +91,7 @@ TEST(PlayerControlSystem, Process)
 		EXPECT_EQ(action->MovePower, 0);
 
 		
-		falseevent.key.keysym.scancode = SDL_SCANCODE_UP;
-		falseevent.type = SDL_KEYUP;
+		falseevent.key.keysym.scancode = SDL_SCANCODE_DOWN;
 		ii->HandleInput(falseevent);
 
 		system->Process();
