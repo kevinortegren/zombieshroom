@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv5.mb</source_data>
     </contributor>
-    <created>2014-01-29T10:26:18</created>
-    <modified>2014-01-29T10:26:18</modified>
+    <created>2014-01-29T11:42:55</created>
+    <modified>2014-01-29T11:42:55</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -171,7 +171,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="RootIslandsv5">
       <node id="polySurface60" name="polySurface60" type="NODE">
-        <translate sid="translate">-56.45772 -21.51346 71.10582</translate>
+        <translate sid="translate">-56.54517 -21.51346 71.10582</translate>
         <translate sid="rotatePivot">0.1162169 4.434115 -13.16785</translate>
         <rotate sid="rotateZ">0 0 1 8.268764</rotate>
         <rotate sid="rotateY">0 1 0 -84.64663</rotate>
