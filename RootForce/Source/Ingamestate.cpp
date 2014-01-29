@@ -377,6 +377,7 @@ namespace RootForce
 		
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
+			m_actionSystem->UpdateAimingDevice();
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
