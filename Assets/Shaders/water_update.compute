@@ -4,23 +4,27 @@ layout (local_size_x = 16, local_size_y = 16) in;
 layout(r32f, binding = 0) uniform image2D prevTex;
 layout(r32f, binding = 1) uniform image2D currTex;
 
-layout(std140) uniform PerFrame
+layout(std140) uniform MK
 {
 	float mk1;
 	float mk2;
 	float mk3;
+	int xMax;
+	int yMax;
 };
 
 void main() 
 {   
 	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == yMax)
+		return;
 
-	imageStore(currTex, storePos, 
-		mk1*imageLoad(currTex, storePos) +
-		mk2*imageLoad(prevTex, storePos) +
-		mk3*(imageLoad(prevTex, storePos+ivec2(1,0)) + 
-			imageLoad(prevTex, storePos+ivec2(-1,0)) + 
-			imageLoad(prevTex, storePos+ivec2(0,1)) + 
-			imageLoad(prevTex, storePos+ivec2(0,-1)))
+	imageStore(prevTex, storePos,
+		mk1*imageLoad(prevTex, storePos) +
+		mk2*imageLoad(currTex, storePos) +
+		mk3*(imageLoad(currTex, storePos+ivec2(1,0)) + 
+			imageLoad(currTex, storePos+ivec2(-1,0)) + 
+			imageLoad(currTex, storePos+ivec2(0,1)) + 
+			imageLoad(currTex, storePos+ivec2(0,-1)))
 	);
 }

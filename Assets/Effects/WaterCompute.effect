@@ -7,8 +7,8 @@
 
     - name: Water_Compute  
       bindings:   
-        - name: PerFrame
-          slot: 2     
+        - name: MK
+          slot: 1     
       images:
         - name: g_prevTex
           slot: 0
@@ -21,6 +21,10 @@
           offset: 4
         - sem: MK3
           offset: 8
+        - sem: XMAX
+          offset: 12
+        - sem: YMAX
+          offset: 16
       flags:
         - name: RenderIgnore
 

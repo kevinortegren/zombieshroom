@@ -259,11 +259,19 @@ namespace RootEngine
 						}
 						else if(sem == "MK2")
 						{
-							technique->AddUniformParam(Render::Semantic::MK1, offset);
+							technique->AddUniformParam(Render::Semantic::MK2, offset);
 						}
 						else if(sem == "MK3")
 						{
-							technique->AddUniformParam(Render::Semantic::MK1, offset);
+							technique->AddUniformParam(Render::Semantic::MK3, offset);
+						}
+						else if(sem == "XMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::XMAX, offset);
+						}
+						else if(sem == "YMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::YMAX, offset);
 						}
 					}
 				}

@@ -30,6 +30,8 @@ namespace Render
 			MK1,
 			MK2,
 			MK3,
+			XMAX,
+			YMAX,
 		};
 	}
 

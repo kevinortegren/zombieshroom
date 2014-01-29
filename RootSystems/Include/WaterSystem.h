@@ -19,7 +19,7 @@ namespace RootForce
 		void Process();
 		void End();
 		void CreateRenderable();
-
+		void Disturb(int p_x, int p_z, float p_power);
 		
 	private:
 		Render::Material*						m_material;				
@@ -29,7 +29,8 @@ namespace RootForce
 		Render::ComputeJob						m_computeJob;
 		ECS::World*								m_world;
 
-		unsigned m_currTex;
 		float m_mk1, m_mk2, m_mk3;
+		float m_timeStep, m_dt;
+		int m_maxX, m_maxZ;
 	};
 }

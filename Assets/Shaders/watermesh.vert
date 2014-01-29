@@ -15,13 +15,13 @@ layout(std140) uniform PerObject
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 };
-//uniform sampler2D g_Diffuse;
+uniform sampler2D g_Diffuse;
 
 out vec2 vert_texcoord;
 
 void main()
 {
 	vert_texcoord = in_texcoord;
-	//float height = texture(g_Diffuse, in_texcoord).r;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position.x, in_position.y, in_position.z, 1.0f );
+	float height = texture(g_Diffuse, in_texcoord).r;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position.x, in_position.y+height, in_position.z, 1.0f );
 }

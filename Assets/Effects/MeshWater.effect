@@ -14,6 +14,8 @@
       textures:
           - name: g_Diffuse
             slot: 0
+          - name: g_Specular
+            slot: 1
       flags:
         - name: Forward
       programs:
@@ -23,5 +25,15 @@
               type: vertex
             - name: watermesh
               type: fragment
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Addative = 2
+          blend: 1
+          
+          # Depth settings.
+          depth:
+            write: 0
+            test: 1
               
 
