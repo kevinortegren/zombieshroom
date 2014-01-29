@@ -21,8 +21,8 @@ namespace Ragdoll
 		void SetOrientation(glm::quat p_orientation);
 	private:
 		btDiscreteDynamicsWorld* m_dynamicWorld;
-		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos );
-		btCylinderShape* CreateBone(std::string p_name);
+		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos, int p_massFactor );
+		btCollisionShape* CreateBone(std::string p_name);
 		void CreateConstraint(btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB);
 		btRigidBody* m_bodies[20];
 		btTypedConstraint* m_joints[20];
