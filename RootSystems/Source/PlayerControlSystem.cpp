@@ -23,6 +23,7 @@ namespace RootForce
 
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
 		: ECS::VoidSystem(p_world) 
+		, m_clientPeer(nullptr)
 	{}
 
 	void PlayerControlSystem::SetKeybindings(const std::vector<Keybinding>& keybindings)
@@ -192,7 +193,8 @@ namespace RootForce
 		bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerCommand);
 		m.Serialize(true, &bs);
 
-		m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+		if (m_clientPeer != nullptr)
+			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 
