@@ -27,7 +27,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="toolBoxWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabComponents">
        <attribute name="title">

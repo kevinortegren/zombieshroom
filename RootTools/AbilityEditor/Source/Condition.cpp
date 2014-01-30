@@ -23,6 +23,23 @@ namespace AbilityEditorNameSpace
 
 	}
 
+	void Condition::AddEntity( QString p_name )
+	{
+		m_entities.push_back(p_name);
+	}
+
+	void Condition::RemoveEntity( QString p_name )
+	{
+		for (int i = 0; i < m_entities.size(); i++)
+		{
+			if(m_entities.at(i).compare(p_name) == 0)
+			{
+				m_entities.erase(m_entities.begin() + i);
+				return;
+			}
+		}
+	}
+
 	
 }
 

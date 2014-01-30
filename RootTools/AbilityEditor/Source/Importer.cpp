@@ -37,7 +37,7 @@ namespace AbilityEditorNameSpace
 				onCreate[i]["EntityName"] >> entityName;
 				QString temp;
 				temp.append(entityName.c_str());
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
+				Entity* entity = new Entity(temp);
 				const YAML::Node& comps = onCreate[i]["Components"];
 				for(unsigned int j = 0; j < comps.size(); j++)
 				{

@@ -74,24 +74,24 @@ void AbilityEditor::Init()
 	this->setFixedSize(this->size());
 	this->statusBar()->setSizeGripEnabled(false);
 	
-	/*
-	connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
-	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
-	connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
-	connect(ui.abilityWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
+	
+	//connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
+	//connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
+	//connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
+	//connect(ui.OnTabWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
 	//connect(m_propMan, SIGNAL(valueChanged(QtProperty*, const QVariant&)), this, SLOT(ChangedTab()));
 	connect(ui.actionGenerate_Script, SIGNAL(triggered()), this, SLOT(GenerateScript()));
 	connect(ui.actionSave_As, SIGNAL(triggered()), this, SLOT(SaveAs()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(Save()));
 	connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(Load()));
-	connect(ui.treeView, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
-	connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
-	connect(ui.pushButton, SIGNAL(pressed()), this, SLOT(BrowseName()));
-	*/
+	connect(ui.listEntities, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
+	//connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
+	connect(ui.buttonNameBrowser, SIGNAL(pressed()), this, SLOT(BrowseName()));
+	
 
 	//Fix Ability name edit thingy
 }
-
+/*
 void AbilityEditor::ChangedTab()
 {
 	//int test = ui.abilityWidget->currentIndex();
@@ -116,9 +116,9 @@ void AbilityEditor::UpdatePropertyBrowser( )
 	
 	
 	
-	/*QTreeWidget* asdf = new QTreeWidget();
-	asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
-	int bajs = asdf->selectedItems().count();*/
+	//QTreeWidget* asdf = new QTreeWidget();
+	//asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
+	//int bajs = asdf->selectedItems().count();
 	if(m_propBrows != nullptr)
 	{
 		if(m_LastSelectedItem != nullptr)
@@ -135,14 +135,14 @@ void AbilityEditor::UpdatePropertyBrowser( )
 		m_LastSelectedItem = nullptr;
 	}
 	
-	/*QWidget* page = static_cast<QWidget*>(ui.abilityWidget->children().at(ui.abilityWidget->currentIndex()));
-	QTreeWidget* tree = static_cast<QTreeWidget*>(page->children().at(0));
-	QTreeWidgetItem* m_LastSelectedItem = tree->selectedItems().at(0);*/
+	//QWidget* page = static_cast<QWidget*>(ui.abilityWidget->children().at(ui.abilityWidget->currentIndex()));
+	//QTreeWidget* tree = static_cast<QTreeWidget*>(page->children().at(0));
+	//QTreeWidgetItem* m_LastSelectedItem = tree->selectedItems().at(0);
 	m_propBrows = new QtTreePropertyBrowser(ui.propertyWidget);
 	m_propBrows->setGeometry(ui.propertyWidget->geometry());
 	
 	
-	if(ui.abilityWidget->currentIndex() == 0 /*&& ui.treeOnCreate->hasFocus()*/) //On Create list
+	if(ui.abilityWidget->currentIndex() == 0)// && ui.treeOnCreate->hasFocus()) //On Create list
 	{
 		if(ui.treeOnCreate->selectedItems().count() == 0)
 			return;
@@ -152,7 +152,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 			ui.treeOnCreate->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
 		}
 	}
-	else if(ui.abilityWidget->currentIndex() == 1/* && ui.treeOnCollide->hasFocus()*/) //On Collide list
+	else if(ui.abilityWidget->currentIndex() == 1)// && ui.treeOnCollide->hasFocus()) //On Collide list
 	{
 		if(ui.treeOnCollide->selectedItems().count() == 0)
 			return;
@@ -162,7 +162,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 			ui.treeOnCollide->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
 		}
 	}
-	else if(ui.abilityWidget->currentIndex() == 2/* && ui.treeOnDestroy->hasFocus()*/) //On Destroy list
+	else if(ui.abilityWidget->currentIndex() == 2)// && ui.treeOnDestroy->hasFocus()) //On Destroy list
 	{
 		if(ui.treeOnDestroy->selectedItems().count() == 0)
 			return;
@@ -180,7 +180,7 @@ void AbilityEditor::UpdatePropertyBrowser( )
 
 
 }
-
+*/
 
 bool AbilityEditor::event( QEvent* event )
 {
@@ -191,7 +191,7 @@ bool AbilityEditor::event( QEvent* event )
 		if (ke->key() == Qt::Key_Delete)
 		{
 		
-			if(ui.abilityWidget->currentIndex() == 0 && ui.treeOnCreate->hasFocus()) //On Create list
+			if(ui.OnTabWidget->currentIndex() == 0 && ui.treeOnCreate->hasFocus()) //On Create list
 			{
 				if(ui.treeOnCreate->currentItem() != 0)
 				{
@@ -200,7 +200,7 @@ bool AbilityEditor::event( QEvent* event )
 					
 				}
 			}
-			else if(ui.abilityWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
+			else if(ui.OnTabWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
 			{
 				if(ui.treeOnCollide->currentItem() != 0)
 				{
@@ -209,7 +209,7 @@ bool AbilityEditor::event( QEvent* event )
 					
 				}
 			}
-			else if(ui.abilityWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
+			else if(ui.OnTabWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
 			{
 				if(ui.treeOnDestroy->currentItem() != 0)
 				{
@@ -291,7 +291,7 @@ void AbilityEditor::FileViewDrag( const QModelIndex& p_modelIndex )
 	drag->setPixmap(pixeimap);
 	Qt::DropAction dropAction = drag->exec();
 }
-
+/*
 void AbilityEditor::AddNewEntity()
 {
 	if (ui.abilityWidget->currentIndex() == 0)
@@ -322,7 +322,7 @@ void AbilityEditor::AddNewEntity()
 		m_onDestroy->AddEntity(item->text(0));
 	}
 }
-
+*/
 void AbilityEditor::BrowseName()
 {
 	QFileDialog dial(this);
