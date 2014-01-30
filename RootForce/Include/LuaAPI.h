@@ -736,6 +736,14 @@ namespace RootForce
 			return 0;
 		}
 
+		static int RenderableSetGlow(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 2), Render::TextureType::TEXTURE_2D);
+			return 0;
+		}
+
 		static int RenderableSetEffect(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -1868,6 +1876,7 @@ namespace RootForce
 			{"SetMaterialDiffuse",	RenderableSetDiffuse},
 			{"SetMaterialSpecular", RenderableSetSpecular},
 			{"SetMaterialNormal",	RenderableSetNormal},
+			{"SetMaterialGlow",		RenderableSetGlow},
 			{"SetMaterialEffect",	RenderableSetEffect},
 			{"GetPass",				RenderableGetPass},
 			{"GetModel",			RenderableGetModel},
