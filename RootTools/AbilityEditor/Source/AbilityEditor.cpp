@@ -44,6 +44,7 @@ void AbilityEditor::Init()
 	m_exporter = new AbilityEditorNameSpace::Exporter();
 	m_importer = new AbilityEditorNameSpace::Importer();
 
+	m_entity = new AbilityEditorNameSpace::Entity("NewAbility");
 
 	ui.listComponents->addItems(m_compNames);
 	//ui.listAbilities->addItem("Empty Entity");
@@ -87,6 +88,7 @@ void AbilityEditor::Init()
 	connect(ui.listEntities, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
 	//connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
 	connect(ui.buttonNameBrowser, SIGNAL(pressed()), this, SLOT(BrowseName()));
+	connect(ui.abilityNameEdit, SIGNAL(editingFinished()), this, SLOT(ChangeAbilityName()));
 	
 
 	//Fix Ability name edit thingy
@@ -241,7 +243,7 @@ void AbilityEditor::GenerateScript()
 	if(path.compare("") != 0)
 	{
 		QString name = &(path.toStdString().at(path.lastIndexOf("/")+1));
-		m_scriptGenerator->GenerateScript(path, name, m_onCreate, m_onCollide, m_onDestroy);
+		m_scriptGenerator->GenerateScript(path, name, m_entity, m_onCreate, m_onCollide, m_onDestroy);
 	}
 }
 
@@ -335,4 +337,9 @@ void AbilityEditor::BrowseName()
 		name.chop(name.size()-name.lastIndexOf("."));
 		m_propMan->setValue(m_propBrows->currentItem()->property(), name);
 	}
+}
+
+void AbilityEditor::ChangeAbilityName()
+{
+	m_entity->SetName(ui.abilityNameEdit->text());
 }

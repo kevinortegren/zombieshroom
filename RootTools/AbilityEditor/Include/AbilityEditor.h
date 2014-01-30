@@ -11,6 +11,7 @@
 #include "ScriptGenerator.h"
 #include "Exporter.h"
 #include "Importer.h"
+//#include "Entity.h"
 
 #include "GeneratedFiles/ui_AbilityEditor.h"
 
@@ -36,6 +37,7 @@ private slots:
 		void FileViewDrag(const QModelIndex& p_modelIndex);
 		void AddNewEntity();
 		void BrowseName();
+		void ChangeAbilityName();
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;
@@ -43,6 +45,7 @@ private:
 	QLayout* m_mainLayout;
 	QPainter* m_painter;
 	QPixmap* m_pixmap;
+	AbilityEditorNameSpace::Entity* m_entity;
 	AbilityEditorNameSpace::OnCreate* m_onCreate;
 	AbilityEditorNameSpace::OnCollide* m_onCollide;
 	AbilityEditorNameSpace::OnDestroy* m_onDestroy;
