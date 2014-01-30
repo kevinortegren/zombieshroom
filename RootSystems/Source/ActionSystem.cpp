@@ -159,7 +159,7 @@ namespace RootSystems
 
 				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
-				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 4.5f;
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 
 			}
 		}
