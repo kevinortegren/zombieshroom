@@ -1889,6 +1889,13 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		//Particle functions&methods
+		static const struct luaL_Reg particleEmitter_f [] = 
+		{
+			{"New", ParticleEmitterCreate},
+			{NULL, NULL}
+		};
+
 
 		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {

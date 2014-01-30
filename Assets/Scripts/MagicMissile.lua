@@ -1,6 +1,6 @@
-AbilityBall = {};
+MagicMissile = {};
 
-function AbilityBall.OnCreate (userId, actionId)
+function MagicMissile.OnCreate (userId, actionId)
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetPos();
@@ -12,13 +12,14 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
-	local scriptComp = Script.New(self, "AbilityBall");
+	local scriptComp = Script.New(self, "MagicMissile");
 	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
 	if Global.IsClient then
+		local particleComp = ParticleEmitter.New(self);
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
@@ -29,7 +30,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	end
 end
 
-function AbilityBall.OnCollide (self, entity)
+function MagicMissile.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
@@ -40,7 +41,7 @@ function AbilityBall.OnCollide (self, entity)
 	end
 end
 
-function AbilityBall.OnDestroy (self)
+function MagicMissile.OnDestroy (self)
 	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end

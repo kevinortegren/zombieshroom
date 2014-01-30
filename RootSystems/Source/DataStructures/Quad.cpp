@@ -33,7 +33,7 @@ namespace RootForce
 
 	void QuadTree::RenderNode(QuadNode* p_node)
 	{
-		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0));
+		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0), glm::mat4(1.0f));
 
 		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
 		{
@@ -98,7 +98,7 @@ namespace RootForce
 					m_context->m_renderer->AddRenderJob(job);
 				}
 
-				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1));
+				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
 			}
 			else
 			{
@@ -239,17 +239,17 @@ namespace RootForce
 
 		m_root = new QuadNode(quadTreeBounds);
 
-		// Delete working set.
-		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
-		for(auto b = a.first; b != a.second; ++b)
-		{
-			m_world->GetEntityManager()->RemoveAllComponents(b->second);
-			m_world->GetEntityManager()->RemoveEntity(b->second);
-		}
+		//// Delete working set.
+		//auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		//for(auto b = a.first; b != a.second; ++b)
+		//{
+		//	m_world->GetEntityManager()->RemoveAllComponents(b->second);
+		//	m_world->GetEntityManager()->RemoveEntity(b->second);
+		//}
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
 
-		Subdivide(m_root, polygons);
+		//Subdivide(m_root, polygons);
 	}
 
 	int QuadTree::RoundToPow2(int p_value) const

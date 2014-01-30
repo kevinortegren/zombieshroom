@@ -17,7 +17,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
@@ -50,8 +50,9 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
+		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
 		g_engineContext.m_resourceManager->LoadScript("Player");
-        
+
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -165,6 +166,8 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
+		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
 
@@ -354,13 +357,12 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
-
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
 			m_physicsTransformCorrectionSystem->Process();
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
+			g_engineContext.m_physics->Update(p_deltaTime);
+			m_physicsSystem->Process();
+		}
 
 		
 		{
