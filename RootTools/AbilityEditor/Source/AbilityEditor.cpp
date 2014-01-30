@@ -21,16 +21,16 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 AbilityEditor::~AbilityEditor()
 {
 	
-	if(m_LastSelectedItem != nullptr)
-	{
-
-		if(m_LastSelectedTab == 0) //On Create list
-			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-		else if(m_LastSelectedTab == 1) //On Collide list
-			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-		else if(m_LastSelectedTab == 2) //On Destroy list
-			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-	}
+// 	if(m_LastSelectedItem != nullptr)
+// 	{
+// 
+// 		if(m_LastSelectedTab == 0) //On Create list
+// 			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+// 		else if(m_LastSelectedTab == 1) //On Collide list
+// 			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+// 		else if(m_LastSelectedTab == 2) //On Destroy list
+// 			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+// 	}
 }
 
 void AbilityEditor::Init()
@@ -60,11 +60,11 @@ void AbilityEditor::Init()
 	m_fileViewModel = new QFileSystemModel;
 	m_fileViewModel->setRootPath(path);
 	m_fileViewModel->setNameFilters(filters);
-	ui.treeView->setModel(m_fileViewModel);
-	ui.treeView->setRootIndex(m_fileViewModel->index(path));
-	ui.treeView->setColumnHidden(1, true);
-	ui.treeView->setColumnHidden(2, true);
-	ui.treeView->setColumnHidden(3, true);
+	ui.listEntities->setModel(m_fileViewModel);
+	ui.listEntities->setRootIndex(m_fileViewModel->index(path));
+	ui.listEntities->setColumnHidden(1, true);
+	ui.listEntities->setColumnHidden(2, true);
+	ui.listEntities->setColumnHidden(3, true);
 	
 	//End Test
 
@@ -74,7 +74,7 @@ void AbilityEditor::Init()
 	this->setFixedSize(this->size());
 	this->statusBar()->setSizeGripEnabled(false);
 	
-
+	/*
 	connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
@@ -87,7 +87,9 @@ void AbilityEditor::Init()
 	connect(ui.treeView, SIGNAL(pressed(const QModelIndex&)), this, SLOT(FileViewDrag(const QModelIndex&)));
 	connect(ui.actionEntity, SIGNAL(triggered()), this, SLOT(AddNewEntity()));
 	connect(ui.pushButton, SIGNAL(pressed()), this, SLOT(BrowseName()));
-	
+	*/
+
+	//Fix Ability name edit thingy
 }
 
 void AbilityEditor::ChangedTab()

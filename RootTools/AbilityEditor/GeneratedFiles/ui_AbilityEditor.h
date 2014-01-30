@@ -13,17 +13,18 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTreeView>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include "CustomListWidget.h"
-#include "CustomTreeWidget.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -37,32 +38,40 @@ public:
     QAction *actionGenerate_Script;
     QAction *actionEntity;
     QWidget *centralWidget;
-    QTabWidget *abilityWidget;
-    QWidget *tabOnCreate;
-    CustomTreeWidget *treeOnCreate;
-    QWidget *tabOnCollide;
-    CustomTreeWidget *treeOnCollide;
-    QWidget *tabOnDestroy;
-    CustomTreeWidget *treeOnDestroy;
-    QTabWidget *toolBoxWidget;
-    QWidget *tabAbilities;
-    QTreeView *treeView;
-    QWidget *tabComponents;
-    CustomListWidget *listComponents;
-    QWidget *tabConditions;
-    CustomListWidget *listWidget;
+    QGridLayout *gridLayout;
     QWidget *propertyWidget;
-    QPushButton *pushButton;
+    QTabWidget *toolBoxWidget;
+    QWidget *tabEntities;
+    QVBoxLayout *verticalLayout_4;
+    QListWidget *listEntities;
+    QWidget *tabComponents;
+    QVBoxLayout *verticalLayout_5;
+    QListWidget *listComponents;
+    QWidget *tabConditions;
+    QVBoxLayout *verticalLayout_6;
+    QListWidget *listConditions;
+    QListWidget *listAbilityComponents;
+    QTabWidget *toolBoxWidget_2;
+    QWidget *tabOnCreate;
+    QVBoxLayout *verticalLayout;
+    QListWidget *listOnCreate;
+    QWidget *tabOnCollide;
+    QVBoxLayout *verticalLayout_2;
+    QListWidget *listOnCollide;
+    QWidget *tabOnDestroy;
+    QVBoxLayout *verticalLayout_3;
+    QListWidget *listOnDestroy;
+    QPushButton *buttonNameBrowser;
+    QLabel *labelComponent;
     QMenuBar *menuBar;
     QMenu *menuFile;
-    QMenu *menuNew;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *AbilityEditorClass)
     {
         if (AbilityEditorClass->objectName().isEmpty())
             AbilityEditorClass->setObjectName(QStringLiteral("AbilityEditorClass"));
-        AbilityEditorClass->resize(592, 682);
+        AbilityEditorClass->resize(783, 738);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -82,93 +91,135 @@ public:
         actionEntity->setObjectName(QStringLiteral("actionEntity"));
         centralWidget = new QWidget(AbilityEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        abilityWidget = new QTabWidget(centralWidget);
-        abilityWidget->setObjectName(QStringLiteral("abilityWidget"));
-        abilityWidget->setGeometry(QRect(10, 10, 271, 381));
-        tabOnCreate = new QWidget();
-        tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
-        treeOnCreate = new CustomTreeWidget(tabOnCreate);
-        treeOnCreate->setObjectName(QStringLiteral("treeOnCreate"));
-        treeOnCreate->setGeometry(QRect(0, 0, 261, 351));
-        treeOnCreate->setDragEnabled(true);
-        treeOnCreate->setDragDropMode(QAbstractItemView::DropOnly);
-        treeOnCreate->setDefaultDropAction(Qt::MoveAction);
-        abilityWidget->addTab(tabOnCreate, QString());
-        tabOnCollide = new QWidget();
-        tabOnCollide->setObjectName(QStringLiteral("tabOnCollide"));
-        treeOnCollide = new CustomTreeWidget(tabOnCollide);
-        treeOnCollide->setObjectName(QStringLiteral("treeOnCollide"));
-        treeOnCollide->setGeometry(QRect(0, 0, 261, 351));
-        treeOnCollide->setDragEnabled(true);
-        treeOnCollide->setDragDropOverwriteMode(true);
-        treeOnCollide->setDragDropMode(QAbstractItemView::DropOnly);
-        treeOnCollide->setDefaultDropAction(Qt::IgnoreAction);
-        treeOnCollide->setColumnCount(1);
-        abilityWidget->addTab(tabOnCollide, QString());
-        tabOnDestroy = new QWidget();
-        tabOnDestroy->setObjectName(QStringLiteral("tabOnDestroy"));
-        treeOnDestroy = new CustomTreeWidget(tabOnDestroy);
-        treeOnDestroy->setObjectName(QStringLiteral("treeOnDestroy"));
-        treeOnDestroy->setGeometry(QRect(0, 0, 261, 351));
-        treeOnDestroy->setDragEnabled(true);
-        treeOnDestroy->setDragDropMode(QAbstractItemView::DropOnly);
-        treeOnDestroy->setDefaultDropAction(Qt::MoveAction);
-        abilityWidget->addTab(tabOnDestroy, QString());
+        gridLayout = new QGridLayout(centralWidget);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        propertyWidget = new QWidget(centralWidget);
+        propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
+
+        gridLayout->addWidget(propertyWidget, 3, 1, 1, 1);
+
         toolBoxWidget = new QTabWidget(centralWidget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
-        toolBoxWidget->setGeometry(QRect(320, 10, 261, 381));
-        tabAbilities = new QWidget();
-        tabAbilities->setObjectName(QStringLiteral("tabAbilities"));
-        treeView = new QTreeView(tabAbilities);
-        treeView->setObjectName(QStringLiteral("treeView"));
-        treeView->setGeometry(QRect(0, 0, 251, 351));
-        toolBoxWidget->addTab(tabAbilities, QString());
+        tabEntities = new QWidget();
+        tabEntities->setObjectName(QStringLiteral("tabEntities"));
+        verticalLayout_4 = new QVBoxLayout(tabEntities);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        listEntities = new QListWidget(tabEntities);
+        listEntities->setObjectName(QStringLiteral("listEntities"));
+
+        verticalLayout_4->addWidget(listEntities);
+
+        toolBoxWidget->addTab(tabEntities, QString());
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
-        listComponents = new CustomListWidget(tabComponents);
+        verticalLayout_5 = new QVBoxLayout(tabComponents);
+        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        listComponents = new QListWidget(tabComponents);
         listComponents->setObjectName(QStringLiteral("listComponents"));
-        listComponents->setGeometry(QRect(0, 0, 251, 351));
-        listComponents->setDragEnabled(true);
-        listComponents->setDragDropMode(QAbstractItemView::NoDragDrop);
+
+        verticalLayout_5->addWidget(listComponents);
+
         toolBoxWidget->addTab(tabComponents, QString());
         tabConditions = new QWidget();
         tabConditions->setObjectName(QStringLiteral("tabConditions"));
-        listWidget = new CustomListWidget(tabConditions);
-        listWidget->setObjectName(QStringLiteral("listWidget"));
-        listWidget->setGeometry(QRect(0, 0, 251, 351));
+        verticalLayout_6 = new QVBoxLayout(tabConditions);
+        verticalLayout_6->setSpacing(6);
+        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
+        listConditions = new QListWidget(tabConditions);
+        listConditions->setObjectName(QStringLiteral("listConditions"));
+
+        verticalLayout_6->addWidget(listConditions);
+
         toolBoxWidget->addTab(tabConditions, QString());
-        propertyWidget = new QWidget(centralWidget);
-        propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
-        propertyWidget->setGeometry(QRect(10, 410, 571, 231));
-        pushButton = new QPushButton(centralWidget);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(290, 380, 21, 23));
+
+        gridLayout->addWidget(toolBoxWidget, 1, 1, 1, 1);
+
+        listAbilityComponents = new QListWidget(centralWidget);
+        listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
+
+        gridLayout->addWidget(listAbilityComponents, 1, 0, 1, 1);
+
+        toolBoxWidget_2 = new QTabWidget(centralWidget);
+        toolBoxWidget_2->setObjectName(QStringLiteral("toolBoxWidget_2"));
+        tabOnCreate = new QWidget();
+        tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
+        verticalLayout = new QVBoxLayout(tabOnCreate);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        listOnCreate = new QListWidget(tabOnCreate);
+        listOnCreate->setObjectName(QStringLiteral("listOnCreate"));
+
+        verticalLayout->addWidget(listOnCreate);
+
+        toolBoxWidget_2->addTab(tabOnCreate, QString());
+        tabOnCollide = new QWidget();
+        tabOnCollide->setObjectName(QStringLiteral("tabOnCollide"));
+        verticalLayout_2 = new QVBoxLayout(tabOnCollide);
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        listOnCollide = new QListWidget(tabOnCollide);
+        listOnCollide->setObjectName(QStringLiteral("listOnCollide"));
+
+        verticalLayout_2->addWidget(listOnCollide);
+
+        toolBoxWidget_2->addTab(tabOnCollide, QString());
+        tabOnDestroy = new QWidget();
+        tabOnDestroy->setObjectName(QStringLiteral("tabOnDestroy"));
+        verticalLayout_3 = new QVBoxLayout(tabOnDestroy);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        listOnDestroy = new QListWidget(tabOnDestroy);
+        listOnDestroy->setObjectName(QStringLiteral("listOnDestroy"));
+
+        verticalLayout_3->addWidget(listOnDestroy);
+
+        toolBoxWidget_2->addTab(tabOnDestroy, QString());
+
+        gridLayout->addWidget(toolBoxWidget_2, 3, 0, 1, 1);
+
+        buttonNameBrowser = new QPushButton(centralWidget);
+        buttonNameBrowser->setObjectName(QStringLiteral("buttonNameBrowser"));
+
+        gridLayout->addWidget(buttonNameBrowser, 0, 1, 1, 1, Qt::AlignRight);
+
+        labelComponent = new QLabel(centralWidget);
+        labelComponent->setObjectName(QStringLiteral("labelComponent"));
+        labelComponent->setFrameShape(QFrame::Box);
+
+        gridLayout->addWidget(labelComponent, 0, 0, 1, 1, Qt::AlignHCenter);
+
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 592, 21));
+        menuBar->setGeometry(QRect(0, 0, 783, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
-        menuNew = new QMenu(menuBar);
-        menuNew->setObjectName(QStringLiteral("menuNew"));
         AbilityEditorClass->setMenuBar(menuBar);
         statusBar = new QStatusBar(AbilityEditorClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         AbilityEditorClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
-        menuBar->addAction(menuNew->menuAction());
         menuFile->addAction(actionSave_As);
         menuFile->addAction(actionSave);
         menuFile->addAction(actionLoad);
         menuFile->addAction(actionGenerate_Script);
         menuFile->addAction(actionQuit);
-        menuNew->addAction(actionEntity);
 
         retranslateUi(AbilityEditorClass);
 
-        abilityWidget->setCurrentIndex(0);
         toolBoxWidget->setCurrentIndex(0);
+        toolBoxWidget_2->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(AbilityEditorClass);
@@ -183,21 +234,15 @@ public:
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
         actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script Folder...", 0));
         actionEntity->setText(QApplication::translate("AbilityEditorClass", "Entity", 0));
-        QTreeWidgetItem *___qtreewidgetitem = treeOnCreate->headerItem();
-        ___qtreewidgetitem->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
-        abilityWidget->setTabText(abilityWidget->indexOf(tabOnCreate), QApplication::translate("AbilityEditorClass", "On Create", 0));
-        QTreeWidgetItem *___qtreewidgetitem1 = treeOnCollide->headerItem();
-        ___qtreewidgetitem1->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
-        abilityWidget->setTabText(abilityWidget->indexOf(tabOnCollide), QApplication::translate("AbilityEditorClass", "On Collide", 0));
-        QTreeWidgetItem *___qtreewidgetitem2 = treeOnDestroy->headerItem();
-        ___qtreewidgetitem2->setText(0, QApplication::translate("AbilityEditorClass", "Entities", 0));
-        abilityWidget->setTabText(abilityWidget->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "On Destroy", 0));
-        toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabAbilities), QApplication::translate("AbilityEditorClass", "Existing Abilities", 0));
+        toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabEntities), QApplication::translate("AbilityEditorClass", "Entities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
-        pushButton->setText(QApplication::translate("AbilityEditorClass", "...", 0));
+        toolBoxWidget_2->setTabText(toolBoxWidget_2->indexOf(tabOnCreate), QApplication::translate("AbilityEditorClass", "OnCreate", 0));
+        toolBoxWidget_2->setTabText(toolBoxWidget_2->indexOf(tabOnCollide), QApplication::translate("AbilityEditorClass", "OnCollide", 0));
+        toolBoxWidget_2->setTabText(toolBoxWidget_2->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "OnDestroy", 0));
+        buttonNameBrowser->setText(QApplication::translate("AbilityEditorClass", "Browse name for property manager", 0));
+        labelComponent->setText(QApplication::translate("AbilityEditorClass", "Ability Components", 0));
         menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
-        menuNew->setTitle(QApplication::translate("AbilityEditorClass", "New", 0));
     } // retranslateUi
 
 };
