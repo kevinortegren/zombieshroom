@@ -9,6 +9,7 @@
 
 #include <RootEngine/Render/Include/Math/Math.h>
 
+
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -152,7 +153,7 @@ namespace Render
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 4092, 4092);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height);
@@ -445,82 +446,85 @@ namespace Render
 	void GLRenderer::ShadowPass()
 	{
 		m_shadowDevice.Process();
-
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.GetFramebuffer());
-		glDrawBuffers(0, NULL);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-		// Buffer Per Frame data.
-		struct
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
-			glm::mat4 m_projection;
-			glm::mat4 m_view;
-			glm::mat4 m_invView;
-			glm::mat4 m_invProj;
-			glm::mat4 m_invViewProj;
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glDrawBuffers(0, NULL);
 
-		} matrices;
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
-		matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0];
-		matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrix);
-		matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0]);
-		matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
-
-		glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0] * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
-
-		matrices.m_invViewProj = glm::inverse(viewProjection);
-		m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
-
-		glCullFace(GL_FRONT);
-		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
-
-		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
-		{
-			if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-				continue;
-
-			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
+			// Buffer Per Frame data.
+			struct
 			{
-				if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
+				glm::mat4 m_projection;
+				glm::mat4 m_view;
+				glm::mat4 m_invView;
+				glm::mat4 m_invProj;
+				glm::mat4 m_invViewProj;
+
+			} matrices;
+
+			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
+			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
+			matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i]);
+			matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
+
+			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+
+			matrices.m_invViewProj = glm::inverse(viewProjection);
+			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
+
+			glCullFace(GL_FRONT);
+			glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
+
+			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+			{
+				if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+					continue;
+
+				for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 				{
-					if((*job).m_shadowMesh != nullptr)
+					if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 					{
-						(*job).m_shadowMesh->Bind();
-
-						// Buffer uniforms.
-						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-						{	
-							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-						}
-
-						// Apply shadowing shader program.
-						(*tech)->GetPrograms()[0]->Apply();
-
-						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+						if((*job).m_shadowMesh != nullptr)
 						{
-							(*job).m_shadowMesh->DrawTransformFeedback();
-						}
-						else
-						{
-							(*job).m_shadowMesh->Draw();		
-						}
+							(*job).m_shadowMesh->Bind();
 
-						(*job).m_shadowMesh->Unbind();
+							// Buffer uniforms.
+							for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+							{	
+								m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+							}
+
+							// Apply shadowing shader program.
+							(*tech)->GetPrograms()[0]->Apply();
+
+							if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+							{
+								(*job).m_shadowMesh->DrawTransformFeedback();
+							}
+							else
+							{
+								(*job).m_shadowMesh->Draw();		
+							}
+
+							(*job).m_shadowMesh->Unbind();
+						}
 					}
 				}
 			}
 		}
-
 		glCullFace(GL_BACK);
 		glViewport(0, 0, m_width, m_height);
 	}
 
 	void GLRenderer::LightingPass()
 	{
-		m_shadowDevice.m_depthTexture->Bind(Render::TextureSemantic::DEPTH);
+		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+
 
 		glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 
@@ -529,10 +533,12 @@ namespace Render
 			0.5, 0.5, 0.5, 1.0
 			);
 
-		// Buffer LightVP.
-		glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[0] * m_shadowDevice.m_shadowcasters[0].m_viewMatrix;
-		m_uniforms->BufferSubData(0, sizeof(glm::mat4), &lvp);
-
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			// Buffer LightVP.
+			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
+		}
 		// Apply lighting.
 		m_lighting.Process(m_fullscreenQuad);
 

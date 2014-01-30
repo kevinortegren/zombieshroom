@@ -11,7 +11,7 @@ layout(std140) uniform PerFrame
 
 layout(std140) uniform PerObject
 {
-	mat4 shadowCasterViewProjectionMatrix;
+	mat4 shadowCasterViewProjectionMatrix[4];
 };
 
 struct DirectionalLight
@@ -27,7 +27,7 @@ in DirectionalLight ex_Light;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
-uniform sampler2DShadow g_ShadowDepth;
+uniform sampler2DArrayShadow g_ShadowDepth;
 
 out vec4 out_Color;
 
@@ -58,10 +58,27 @@ void main() {
 	vec3 position = GetVSPositionFromDepth();
 
 	vec4 worldPosition = invView * vec4(position, 1.0);
+	vec4 shadowCoord;
+	vec3 colors[4];
+	colors[0] = vec3(1.0, 0.0, 0.0);
+	colors[1] = vec3(0.0, 1.0, 0.0);
+	colors[2] = vec3(0.0, 0.0, 1.0);
+	colors[3] = vec3(0.0, 1.0, 1.0);
+	int cascade = 0;
+	int useCascade;
+	for(cascade = 0; cascade < 4; cascade++)
+	{
+		shadowCoord = shadowCasterViewProjectionMatrix[cascade] * worldPosition;
+		if(max(abs(shadowCoord.x - 0.5), abs(shadowCoord.y - 0.5)) < 0.48)
+		{
+			if(shadowCoord.z < 1)
+			{
+				useCascade = cascade;
+				break;
+			}
+		}
+	}
 
-	mat4 viewToLightViewProjection = shadowCasterViewProjectionMatrix * invView;
-	vec4 shadowCoord = viewToLightViewProjection * vec4(position, 1.0);
-	shadowCoord = shadowCasterViewProjectionMatrix * worldPosition;
 	
 	//shadowCoord /= shadowCoord.w; //unnecessary because orthographic
 
@@ -73,9 +90,9 @@ void main() {
 	vec3 spec_color = vec3(0) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-	out_Color = vec4(diffuse_color + spec_color, 1.0);
+	out_Color = vec4(diffuse_color + spec_color + colors[useCascade], 1.0);
 
-	float visibility = texture(g_ShadowDepth, vec3(shadowCoord.xy, shadowCoord.z));
+	float visibility = texture(g_ShadowDepth, vec4(shadowCoord.xy, useCascade, shadowCoord.z));
 
 	if(shadowCoord.x <= 0 || shadowCoord.x >= 1 || shadowCoord.y <= 0 || shadowCoord.y >= 1)
 	{

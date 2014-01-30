@@ -108,6 +108,9 @@ namespace RootForce
 	void WorldSystem::Process()
 	{
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		ECS::Entity* testCameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");
+		Transform* testCameraTransform = m_world->GetEntityManager()->GetComponent<Transform>(testCameraEntity);
+		testCameraTransform->m_orientation.Yaw(45.0f * m_world->GetDelta());
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
 		

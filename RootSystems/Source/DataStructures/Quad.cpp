@@ -33,7 +33,7 @@ namespace RootForce
 
 	void QuadTree::RenderNode(QuadNode* p_node)
 	{
-		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0));
+		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0), glm::mat4(1.0f));
 
 		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
 		{
@@ -98,7 +98,7 @@ namespace RootForce
 					m_context->m_renderer->AddRenderJob(job);
 				}
 
-				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1));
+				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
 			}
 			else
 			{
