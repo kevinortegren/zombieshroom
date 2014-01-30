@@ -21,12 +21,14 @@ namespace RootSystems
 		}
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
+		void LoadSpawnPoints();
 	private:
 		RootForce::Transform* GetRandomSpawnpoint();
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
+		ECS::ComponentMapper<RootForce::Transform> m_transform;
 
 		ECS::GroupManager::GroupRange m_spawnPoints;
 	};

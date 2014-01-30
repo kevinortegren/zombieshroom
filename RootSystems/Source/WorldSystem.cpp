@@ -3,8 +3,6 @@
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
 
-
-
 namespace RootForce
 {
 	void WorldSystem::CreateWorld(const std::string& p_worldName)
@@ -73,6 +71,7 @@ namespace RootForce
 
 		RootForce::Camera* camera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		RootForce::Transform* cameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
+
 		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
 		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 		
@@ -94,50 +93,11 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{
-		/*if(m_showDebug)
-		{
-			m_quadTree.RenderDebug();
-
-			ECS::Entity* e = m_world->GetTagManager()->GetEntityByTag("Player");
-
-			auto t = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(e);
-
-			QuadNode* q = m_quadTree.PickRoot(glm::vec2(t->m_position.x,t->m_position.z));
-			if(q != nullptr)
-			{
-				q->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,0,1));
-			}
-		}
-
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
-		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum;
-
-		frustrum->DrawLines(glm::mat4(1), m_engineContext->m_renderer);
-
-		m_culledNodes = 0;
-
-		CullNode(&m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustrum, m_quadTree.GetRoot());
-
-		//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "%d", m_culledNodes);*/
-	}
-
-	void WorldSystem::CullNode(RootForce::Frustum* p_frustrum, QuadNode* p_node)
-	{
-		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
-		{
-			if(p_node->GetChilds().size() == 0)
-			{
-				p_node->GetBounds().DebugDraw(m_engineContext->m_renderer, glm::vec3(0,1,1));
-			}
-			else
-			{
-				for(unsigned int i = 0; i < p_node->GetChilds().size(); ++i)
-				{
-					CullNode( p_frustrum, p_node->GetChilds().at(i)); 
-				}
-			}
-		}
+		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
+		
+		//m_quadTree.Render(frustrum, m_quadTree.GetRoot());
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

@@ -119,9 +119,9 @@ TEST(Network, SerializePlayerComponent)
 {
 	SerializeComponentSetup(RootForce::PlayerComponent);
 	
-	cA->AbilityScripts[0] = "Ability.lua";
-	cA->AbilityScripts[1] = "";
-	cA->AbilityScripts[2] = "Test.lua";
+	cA->AbilityScripts[0].Name = "Ability.lua";
+	cA->AbilityScripts[1].Name = "";
+	cA->AbilityScripts[2].Name = "Test.lua";
 	cA->SelectedAbility = 1;
 	cA->Deaths = 99;
 	cA->Score = 1;
@@ -130,9 +130,9 @@ TEST(Network, SerializePlayerComponent)
 
 	SerializeComponentSerialize();
 	
-	ASSERT_EQ(cA->AbilityScripts[0], cB->AbilityScripts[0]);
-	ASSERT_EQ(cA->AbilityScripts[1], cB->AbilityScripts[1]);
-	ASSERT_EQ(cA->AbilityScripts[2], cB->AbilityScripts[2]);
+	ASSERT_EQ(cA->AbilityScripts[0].Name, cB->AbilityScripts[0].Name);
+	ASSERT_EQ(cA->AbilityScripts[1].Name, cB->AbilityScripts[1].Name);
+	ASSERT_EQ(cA->AbilityScripts[2].Name, cB->AbilityScripts[2].Name);
 	ASSERT_EQ(cA->SelectedAbility, cB->SelectedAbility);
 	ASSERT_EQ(cA->Deaths, cB->Deaths);
 	ASSERT_EQ(cA->Score, cB->Score);
@@ -191,7 +191,7 @@ TEST(Network, SerializeComponentExisting)
 
 	RakNet::BitStream bs;
 	SerializeComponent(&bs, cA, RootForce::ComponentType::TRANSFORM);
-	DeserializeComponent(&bs, B, worldB->GetEntityManager());
+	DeserializeComponent(&bs, B, worldB->GetEntityManager(), false);
 
 	ASSERT_EQ(cA->m_position, cB->m_position);
 	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
@@ -217,7 +217,7 @@ TEST(Network, SerializeComponentNonExisting)
 
 	RakNet::BitStream bs;
 	SerializeComponent(&bs, cA, RootForce::ComponentType::TRANSFORM);
-	DeserializeComponent(&bs, B, worldB->GetEntityManager());
+	DeserializeComponent(&bs, B, worldB->GetEntityManager(), false);
 	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
 
 	ASSERT_NE(cB, nullptr);
@@ -278,7 +278,7 @@ TEST(Network, SerializeEntityExisting)
 
 	RakNet::BitStream bs;
 	ASSERT_TRUE(SerializeEntity(&bs, A, worldA->GetEntityManager(), mapA));
-	ASSERT_NE(DeserializeEntity(&bs, worldB->GetEntityManager(), mapB), nullptr);
+	ASSERT_NE(DeserializeEntity(&bs, worldB->GetEntityManager(), mapB, USER + 1), nullptr);
 
 	ASSERT_EQ(cA->m_position, cB->m_position);
 	ASSERT_EQ(cA->m_orientation.GetQuaternion(), cB->m_orientation.GetQuaternion());
@@ -327,7 +327,7 @@ TEST(Network, SerializeEntityNonExisting)
 
 	g_world = worldB;
 	g_networkEntityMap = mapB;
-	B = DeserializeEntity(&bs, worldB->GetEntityManager(), g_networkEntityMap);
+	B = DeserializeEntity(&bs, worldB->GetEntityManager(), g_networkEntityMap, USER + 1);
 	NetworkComponent::s_sequenceIDMap.clear();
 	ASSERT_NE(B, nullptr);
 	cB = worldB->GetEntityManager()->GetComponent<RootForce::Transform>(B);
@@ -430,6 +430,9 @@ TEST(Network, MessageSerializationPlayerCommand)
 	m1.Action.Angle = glm::vec2(1.5, 0.7);
 	m1.Action.ActivateAbility = true;
 	m1.Action.SelectedAbility = 2;
+	m1.Position = glm::vec3(1.0f, 2.0f, 3.0f);
+	m1.Orientation = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);
+	m1.AimingDeviceOrientation = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);
 
 	SerializeAndDeserialize(m1, m2);
 	ASSERT_EQ(memcmp(&m1, &m2, sizeof(PlayerCommand)), 0);

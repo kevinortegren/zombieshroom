@@ -21,6 +21,7 @@ namespace RootForce
 		};
 	}
 
+
 #ifndef COMPILE_LEVEL_EDITOR
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
@@ -62,13 +63,19 @@ namespace RootForce
 	};
 #endif
 
+	struct AbilityInfo
+	{
+		std::string Name;
+		float Cooldown;
+		int Charges;
+	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>
 	{
 		std::string Name;
 		int TeamID;
 
-		std::array<std::string, PLAYER_NUM_ABILITIES> AbilityScripts;
+		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
 
 		int Score;

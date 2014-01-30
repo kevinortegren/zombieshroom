@@ -82,6 +82,8 @@ namespace Render
 		m_blendState = BLEND_NONE;
 		m_depthState.depthTest = true;
 		m_depthState.depthWrite = true;
+		m_viewport = glm::ivec4(0, 0, 1280, 720);
+
 	}
 
 	Program::~Program(void)
@@ -166,6 +168,7 @@ namespace Render
 				break;
 		}
 
+		// Set Depth modes.
 		if(m_depthState.depthWrite)
 		{
 			glDepthMask(GL_TRUE);
@@ -185,6 +188,7 @@ namespace Render
 			glDisable(GL_DEPTH_TEST);
 		}
 
+		// Use program.
 		glUseProgram( m_glHandle );
 	}
 

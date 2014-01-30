@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
+#include <RakNet/GetTime.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Transform.h>
@@ -57,7 +58,7 @@ namespace RootForce
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 			clientComponent->IsRemote = p_isRemote;
 			clientComponent->State = ClientState::UNCONNECTED;
-			clientComponent->Name = g_engineContext.m_configManager->GetConfigValueAsString("Name").c_str();
+			clientComponent->Name = g_engineContext.m_configManager->GetConfigValueAsString("settings-player-name").c_str();
 
 			if (m_peer->Connect(p_address.c_str(), p_port, p_password.c_str(), p_password.size() + 1) != RakNet::CONNECTION_ATTEMPT_STARTED)
 				return false;
@@ -90,14 +91,20 @@ namespace RootForce
 			for (size_t i = 0; i < packets.size(); ++i)
 			{
 				RakNet::Packet* packet = packets[i];
-
-				RakNet::MessageID id;
 				RakNet::BitStream bs(packet->data, packet->length, false);
+				RakNet::MessageID id = 0;
+				RakNet::Time time = 0;
+				
 				bs.Read(id);
+				if (id == ID_TIMESTAMP)
+				{
+					bs.Read(time);
+					bs.Read(id);
+				}
 
 				if (m_messageHandler != nullptr)
 				{
-					if (!m_messageHandler->ParsePacket(id, &bs, packet))
+					if (!m_messageHandler->ParsePacket(id, &bs, packet, time))
 					{
 						m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Message handler neglected to parse message with ID: %u", id);
 					}
@@ -106,6 +113,8 @@ namespace RootForce
 				{
 					m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "No message handler to parse message with ID: %u", id);
 				}
+
+
 			}
 
 			// Deallocate the temporary list
@@ -130,6 +139,8 @@ namespace RootForce
 					c.Type = NetworkMessage::Chat::TYPE_CHAT;
 
 					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
 					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Chat);
 					c.Serialize(true, &bs);
 

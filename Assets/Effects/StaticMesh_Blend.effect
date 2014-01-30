@@ -1,0 +1,44 @@
+- name: Mesh_Blend
+  techniques:
+    - name: Mesh_Blend
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: g_Specular
+          slot: 1
+        - name: g_BlendMap
+          slot: 5
+        - name: g_DiffuseR
+          slot: 6
+        - name: g_DiffuseG
+          slot: 7
+        - name: g_DiffuseB
+          slot: 8
+      uniforms:
+        - sem: SIZEMIN
+          offset: 0
+      programs:
+        - name: Mesh_Blend
+          shaders:
+            - name: staticmesh_blend
+              type: vertex
+            - name: mesh_blend
+              type: fragment
+              
+    - name: Mesh_Blend_Shadow
+      bindings:
+        - name: PerFrame
+          slot: 0
+      flags:
+        - name: Shadow
+      programs:
+        - name: Shadow
+          shaders:
+            - name: staticmesh_shadow
+              type: vertex
+          depth:
+            write: 1
+            test: 1

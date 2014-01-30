@@ -1,0 +1,143 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+layout(points) in;
+layout(points, max_vertices = 2) out;
+
+uniform sampler1D g_Random;
+
+layout(std140) uniform PerFrame
+{
+	float g_dt;
+	float g_time;
+};
+
+layout(std140) uniform PerObject
+{
+	vec3	g_Position;
+	float 	g_lifeTimeMin;
+	vec3 	g_gravity;
+	float 	g_lifeTimeMax;
+	vec3 	g_direction;
+	float 	g_speedMin;
+	vec2 	g_sizeMin;
+	float 	g_speedMax;
+	float 	g_spread;
+	vec2 	g_sizeMax;
+	vec2 	g_sizeEnd;
+	vec4 	g_color;
+	vec4 	g_colorEnd;
+	vec3	g_transPos;
+	float	g_spawnTime;
+	float	g_orbitSpeed;
+	float	g_orbitRadius;
+};
+
+in vec3 vert_initialVel[];
+in vec2 vert_scale[];
+in float vert_age[];
+in float vert_type[];
+in vec4 vert_color[];
+in vec3 vert_accel[];
+
+
+// Transform feedback values.
+out vec3 vert_initialPos1;
+out vec3 vert_initialVel1;
+out vec2 vert_scale1;
+out float vert_age1;
+out float vert_type1;
+out vec4 vert_color1;
+out vec3 vert_accel1;
+
+
+
+vec3 GetRandomDir(float TexCoord)
+{
+    vec3 direction = texture(g_Random, TexCoord).xyz;
+    direction = direction * 2 - 1;
+    return direction;
+} 
+
+float GetRandomNumber(float TexCoord, float min, float max)
+{
+	vec3 direction = texture(g_Random, TexCoord + 0.2f).xyz;
+	float magnitud = max - min;
+	float number =  direction.x * magnitud + min;
+    return number;
+}
+
+void main() 
+{	
+	float lifeTime = vert_age[0] - g_dt;
+
+	if(vert_type[0] == 0)
+	{
+		if(lifeTime <= 0.0f)
+		{
+			// Spawn new particles with new start values using the initial values.
+
+			float cs = cos(g_time*g_orbitSpeed) * g_orbitRadius;
+			float ss = sin(g_time*g_orbitSpeed) * g_orbitRadius;
+			
+			vert_initialPos1 	= vec3(cs,0,ss) + g_Position + g_transPos;
+
+			if(g_direction == vec3(0,0,0))
+			{
+				vert_initialVel1	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+			}
+			else
+			{
+				float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
+				float yspread = GetRandomNumber(g_time+0.2f, -g_spread, g_spread);
+				float zspread = GetRandomNumber(g_time+0.3f, -g_spread, g_spread);
+				
+				vec3 vektre = vec3(xspread, yspread, zspread);
+
+				vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+			}
+
+			vert_scale1 		= vec2(GetRandomNumber(g_time, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time, g_sizeMin.y, g_sizeMax.y));
+			vert_age1 			= GetRandomNumber(g_time, g_lifeTimeMin, g_lifeTimeMax);
+			vert_type1 			= 1.0f;
+		 	vert_color1 		= g_color;
+		 	vert_accel1			= g_gravity;
+			lifeTime			= g_spawnTime;
+			EmitVertex();
+			EndPrimitive();
+		}
+
+		// Always output the emitter particle with initial values.
+		vert_initialPos1	= g_Position;
+		vert_initialVel1	= vert_initialVel[0];
+		vert_scale1			= vec2(0.0f, 0.0f);
+		vert_age1			= lifeTime;
+		vert_type1			= 0.0f;
+		vert_color1			= vert_color[0];  
+		vert_accel1			= vert_accel[0];
+		EmitVertex();
+		EndPrimitive();
+	}
+	else
+	{
+		// Update.
+		//Accel
+		vec3 DeltaV = g_dt * vert_accel[0]; 
+		//Pos
+		vec3 DeltaP = g_dt * vert_initialVel[0];
+
+		if(lifeTime > 0.0f)
+		{	
+			float linearFac = 1.0f - lifeTime / vert_age[0];
+			vert_initialPos1	= gl_in[0].gl_Position.xyz + DeltaP;		
+			vert_initialVel1	= vert_initialVel[0] + DeltaV;
+			vert_scale1			= mix(vert_scale[0], g_sizeEnd, linearFac);
+			vert_age1			= lifeTime;		
+			vert_type1			= 1.0f;
+			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
+			vert_accel1			= vert_accel[0];
+			EmitVertex();
+			EndPrimitive();
+		}
+	}
+}

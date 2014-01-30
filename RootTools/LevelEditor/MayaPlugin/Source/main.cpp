@@ -1259,6 +1259,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
 			memset(SM.materialList[currNrMaterials].specularPath, NULL, sizeof(SM.materialList[currNrMaterials].specularPath));
 			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
+			memset(SM.materialList[currNrMaterials].glowPath, NULL, sizeof(SM.materialList[currNrMaterials].glowPath));
+			memcpy(SM.materialList[currNrMaterials].glowPath, glowName.asChar(),glowName.numChars());
 			SM.meshList[meshIndex].MaterialID = currNrMaterials;
 
 			currNrMaterials++;

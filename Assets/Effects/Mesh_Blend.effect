@@ -17,6 +17,8 @@
           slot: 7
         - name: g_DiffuseB
           slot: 8
+        - name: g_Glow
+          slot: 9
       uniforms:
         - sem: MODEL
           offset: 0
@@ -31,3 +33,26 @@
               type: vertex
             - name: mesh_blend
               type: fragment
+    - name: Mesh_Blend_Shadow
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: SIZEMIN
+          offset: 128
+      flags:
+        - name: Shadow
+      programs:
+        - name: Shadow
+          shaders:
+            - name: shadow
+              type: vertex
+          depth:
+            write: 1
+            test: 1

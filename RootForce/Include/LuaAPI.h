@@ -179,15 +179,17 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
 		}
-		static int EntityGetPlayerPhysics(lua_State* p_luaState)
+
+		static int EntityGetNetwork(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics *));
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(*e);
-			luaL_setmetatable(p_luaState, "PlayerPhysics");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
+			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
+
 		static int EntityGetHealth(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -197,7 +199,27 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Health");
 			return 1;
 		}
-		static int EntityGetPlayer(lua_State* p_luaState)
+
+		static int GetPlayerComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
+			luaL_setmetatable(p_luaState, "PlayerComponent");
+			return 1;
+		}
+
+		static int EntityGetPlayerPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerPhysics *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerPhysics>(*e);
+			luaL_setmetatable(p_luaState, "PlayerPhysics");
+			return 1;
+		}
+		/*static int EntityGetPlayer(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
@@ -205,7 +227,7 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
 			luaL_setmetatable(p_luaState, "Player");
 			return 1;
-		}
+		}*/
 		static int EntityGetPlayerAction(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -213,15 +235,6 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
-			return 1;
-		}
-		static int EntityGetNetwork(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::Network::NetworkComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
-			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
@@ -243,6 +256,7 @@ namespace RootForce
 			RootForce::Transform **s = (RootForce::Transform **)lua_newuserdata(p_luaState, sizeof(RootForce::Transform *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+
 			luaL_setmetatable(p_luaState, "Transformation");
 			return 1;
 		}
@@ -474,15 +488,15 @@ namespace RootForce
 
 		static int CollisionAddPlayerObjectToWorld(lua_State* p_luaState)
 		{
-			NumberOfArgs(6); // entity, collision, transform, physics, playerPhysics, collisionResponder
+			NumberOfArgs(5); // entity, collision, transform, playerPhysics, collisionResponder
 			ECS::Entity** entity = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			RootForce::Transform* transform = *(RootForce::Transform**)luaL_checkudata(p_luaState, 3, "Transformation");
-			RootForce::Physics* physics = *(RootForce::Physics**)luaL_checkudata(p_luaState, 4, "Physics");
-			RootForce::PlayerPhysics* playerPhysics = *(RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 5, "PlayerPhysics");
-			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 6, "CollisionResponder");
+			
+			RootForce::PlayerPhysics* playerPhysics = *(RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 4, "PlayerPhysics");
+			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 5, "CollisionResponder");
 			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
-				transform->m_position, transform->m_orientation.GetQuaternion(), physics->m_mass, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
+				transform->m_position, transform->m_orientation.GetQuaternion(), 1, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
 			return 0;
 		}
 
@@ -570,55 +584,59 @@ namespace RootForce
 		static int PhysicsBindShapeSphere(lua_State* p_luaState)
 		{
 			NumberOfArgs(7);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
 			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
 			float radius = (float)luaL_checknumber(p_luaState, 5);
-			float mass = (float)luaL_checknumber(p_luaState, 6);
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 6);
 			bool collideWorld = lua_toboolean(p_luaState, 7) != 0;
-			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, mass, collideWorld);
+			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, (*ptemp)->m_mass, collideWorld);
 			return 0;
 		}
 
 		static int PhysicsBindShapeCone(lua_State* p_luaState)
 		{
 			NumberOfArgs(8);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
 			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
 			float height = (float)luaL_checknumber(p_luaState,5);
 			float radius = (float)luaL_checknumber(p_luaState, 6);
-			float mass = (float)luaL_checknumber(p_luaState, 7);
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindConeShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, mass, collideWorld);
+			g_engineContext.m_physics->BindConeShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld);
 			return 0;
 		}
 
 		static int PhysicsBindShapeCylinder(lua_State* p_luaState)
 		{
 			NumberOfArgs(8);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
 			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
 			float height = (float)luaL_checknumber(p_luaState,5);
 			float radius = (float)luaL_checknumber(p_luaState, 6);
-			float mass = (float)luaL_checknumber(p_luaState, 7);
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindCylinderShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, mass, collideWorld);
+			g_engineContext.m_physics->BindCylinderShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld);
 			return 0;
 		}
 
 		static int PhysicsBindShapeMesh(lua_State* p_luaState)
 		{
 			NumberOfArgs(8);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			std::string handle = luaL_checkstring(p_luaState, 3);
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3");
 			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 5, "Quat");
 			glm::vec3* scale = (glm::vec3*)luaL_checkudata(p_luaState, 6, "Vec3");
-			float mass = (float)luaL_checknumber(p_luaState, 7);
+			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindMeshShape((*(*rtemp)->m_handle), handle, (*v1), (*q1), *scale ,  mass, collideWorld);
+			g_engineContext.m_physics->BindMeshShape((*(*rtemp)->m_handle), handle, (*v1), (*q1), *scale , (*ptemp)->m_mass, collideWorld);
 			return 0;
 		}
 
@@ -627,9 +645,9 @@ namespace RootForce
 			NumberOfArgs(3);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			(*ptemp)->m_velocity = *(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
 
-			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*v1));
+			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*ptemp)->m_velocity);
 			return 0;
 		}
 		static int PhysicsKnockBack(lua_State* p_luaState)
@@ -1350,10 +1368,16 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
+
+			if((*s)->Health <= 0)
+			{
+				MatchStateSystem::AwardPlayerKill((*s)->LastDamageSourceID, (Network::UserID_t) luaL_checknumber(p_luaState, 4));
+			}
+			
 			return 0;
 		}
 		static int HealthSetHealth(lua_State* p_luaState)
@@ -1424,7 +1448,10 @@ namespace RootForce
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
 				return 0;
-			(*s)->AbilityScripts[index] = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			(*s)->AbilityScripts[index] = RootForce::AbilityInfo();
+			(*s)->AbilityScripts[index].Cooldown = 0;
+			(*s)->AbilityScripts[index].Charges = -1;
+			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)
@@ -1455,6 +1482,13 @@ namespace RootForce
 			(*s)->TeamID = (int) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
+		static int PlayerComponentStartCooldown(lua_State* p_luaState)
+		{
+			NumberOfArgs(3); //Self, AbilityId, Cooldown(seconds)
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(int) luaL_checknumber(p_luaState, 2)].Cooldown = (float) luaL_checknumber(p_luaState, 3);
+			return 0;
+		}
 		static int PlayerComponentGetName(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1469,7 +1503,7 @@ namespace RootForce
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
 				return 0;
-			lua_pushstring(p_luaState, (*s)->AbilityScripts[index].c_str());
+			lua_pushstring(p_luaState, (*s)->AbilityScripts[index].Name.c_str());
 			return 1;
 		}
 		static int PlayerComponentGetSelectedAbility(lua_State* p_luaState)
@@ -1612,6 +1646,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Network");
 			return 1;
 		}
+		static int NetworkGetUserId(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.UserID);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ANIMATION
 		//////////////////////////////////////////////////////////////////////////
@@ -1699,6 +1740,87 @@ namespace RootForce
 			return 1;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//TDMRULESET
+		//////////////////////////////////////////////////////////////////////////
+		static int TDMRuleSetCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)lua_newuserdata(p_luaState, sizeof(RootForce::TDMRuleSet*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(*e);
+			luaL_setmetatable(p_luaState, "TDMRuleSet");
+			return 1;
+		}
+		static int TDMRuleSetSetScoreLimit(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->ScoreLimit = (int)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int TDMRuleSetSetTimeLeft(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TimeLeft = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int TDMRuleSetSetTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(3); // self, teamId, score
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)] = (int)luaL_checknumber(p_luaState, 3);
+			return 0;
+		}
+		static int TDMRuleSetIncrementTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(2); // self, teamId
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			(*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)]++;
+			return 0;
+		}
+		static int TDMRuleSetGetScoreLimit(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->ScoreLimit);
+			return 1;
+		}
+		static int TDMRuleSetGetTimeLeft(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->TimeLeft);
+			return 1;
+		}
+		static int TDMRuleSetGetTeamScore(lua_State* p_luaState)
+		{
+			NumberOfArgs(2); // self, teamId
+			RootForce::TDMRuleSet **s = (RootForce::TDMRuleSet**)luaL_checkudata(p_luaState, 1, "TDMRuleSet");
+			lua_pushnumber(p_luaState, (*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)]);
+			return 1;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//ParticleEmitter
+		//////////////////////////////////////////////////////////////////////////
+		static int ParticleEmitterCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter**)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(*e);
+
+			(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
+
+			for(unsigned i = 0; i < (*s)->m_particleSystems.size(); i++)
+				(*s)->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
+
+			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			return 1;
+		}
+
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{NULL, NULL}
@@ -1727,6 +1849,9 @@ namespace RootForce
 			{"GetPhysics", EntityGetPhysics},
 			{"GetCollision", EntityGetCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
+			{"GetNetwork", EntityGetNetwork},
+			{"GetHealth", EntityGetHealth},
+			{"GetPlayerComponent", GetPlayerComponent},
 			{NULL, NULL}
 		};
 
@@ -1988,6 +2113,7 @@ namespace RootForce
 			{"SetDeaths",			PlayerComponentSetDeaths},
 			{"SetScore",			PlayerComponentSetScore},
 			{"SetTeamId",			PlayerComponentSetTeamId},
+			{"StartCooldown",		PlayerComponentStartCooldown},
 			{"GetName",				PlayerComponentGetName},
 			{"GetAbility",			PlayerComponentGetAbility},
 			{"GetSelectedAbility",	PlayerComponentGetSelectedAbility},
@@ -2024,6 +2150,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg network_m [] = {
+			{"GetUserId", NetworkGetUserId},
 			{NULL, NULL}
 		};
 
@@ -2057,6 +2184,31 @@ namespace RootForce
 		static const struct luaL_Reg playercontrol_m [] = {
 			{"SetMouseSensitivity", PlayerControlSetMouseSensitivity},
 			{"GetMouseSensitivity", PlayerControlGetMouseSensitivity},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg tdmruleset_f [] = {
+			{"New", TDMRuleSetCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg tdmruleset_m [] = {
+			{"SetScoreLimit", TDMRuleSetSetScoreLimit},
+			{"SetTimeLeft", TDMRuleSetSetTimeLeft},
+			{"SetTeamScore", TDMRuleSetSetTeamScore},
+			{"IncrementTeamScore", TDMRuleSetIncrementTeamScore},
+			{"GetScoreLimit", TDMRuleSetGetScoreLimit},
+			{"GetTimeLeft", TDMRuleSetGetTimeLeft},
+			{"GetTeamScore", TDMRuleSetGetTeamScore},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg particlecomponent_f [] = {
+			{"New", ParticleEmitterCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg particlecomponent_m [] = {
 			{NULL, NULL}
 		};
 
@@ -2108,6 +2260,8 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statecomponent_f, RootForce::LuaAPI::statecomponent_m, "StateComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");

@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDial>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
@@ -63,15 +64,24 @@ public:
     QWidget *tabProperties;
     QGroupBox *groupBox_3;
     QGroupBox *groupBox_5;
+    QGroupBox *groupBox_2;
+    QComboBox *templateComboBox;
     QStackedWidget *stackedWidget;
     QWidget *page;
-    QLabel *label_15;
     QWidget *page_3;
+    QWidget *gridLayoutWidget_3;
+    QGridLayout *gridLayout_3;
+    QDial *orbitSpeedDial;
+    QDial *orbitRadiusDial;
+    QDoubleSpinBox *orbitSpeedSpinBox;
+    QDoubleSpinBox *orbitRadiusSpinBox;
+    QLabel *label_15;
+    QLabel *label_14;
+    QComboBox *orbitAxisComboBox;
+    QLabel *label_19;
     QWidget *page_4;
     QWidget *page_5;
     QWidget *page_2;
-    QGroupBox *groupBox_2;
-    QComboBox *templateComboBox;
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
     QLabel *label_7;
@@ -251,18 +261,73 @@ public:
         groupBox_3->setFont(font1);
         groupBox_5 = new QGroupBox(groupBox_3);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
-        groupBox_5->setGeometry(QRect(5, 328, 497, 353));
+        groupBox_5->setGeometry(QRect(5, 328, 497, 429));
+        groupBox_2 = new QGroupBox(groupBox_5);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setGeometry(QRect(2, 14, 265, 57));
+        groupBox_2->setFont(font1);
+        templateComboBox = new QComboBox(groupBox_2);
+        templateComboBox->setObjectName(QStringLiteral("templateComboBox"));
+        templateComboBox->setGeometry(QRect(12, 24, 241, 22));
         stackedWidget = new QStackedWidget(groupBox_5);
         stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
-        stackedWidget->setGeometry(QRect(2, 74, 489, 355));
+        stackedWidget->setGeometry(QRect(4, 72, 489, 355));
         page = new QWidget();
         page->setObjectName(QStringLiteral("page"));
-        label_15 = new QLabel(page);
-        label_15->setObjectName(QStringLiteral("label_15"));
-        label_15->setGeometry(QRect(14, 24, 61, 25));
         stackedWidget->addWidget(page);
         page_3 = new QWidget();
         page_3->setObjectName(QStringLiteral("page_3"));
+        gridLayoutWidget_3 = new QWidget(page_3);
+        gridLayoutWidget_3->setObjectName(QStringLiteral("gridLayoutWidget_3"));
+        gridLayoutWidget_3->setGeometry(QRect(6, 4, 479, 347));
+        gridLayout_3 = new QGridLayout(gridLayoutWidget_3);
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setContentsMargins(11, 11, 11, 11);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setContentsMargins(0, 0, 0, 0);
+        orbitSpeedDial = new QDial(gridLayoutWidget_3);
+        orbitSpeedDial->setObjectName(QStringLiteral("orbitSpeedDial"));
+
+        gridLayout_3->addWidget(orbitSpeedDial, 0, 2, 1, 1);
+
+        orbitRadiusDial = new QDial(gridLayoutWidget_3);
+        orbitRadiusDial->setObjectName(QStringLiteral("orbitRadiusDial"));
+        orbitRadiusDial->setWrapping(true);
+
+        gridLayout_3->addWidget(orbitRadiusDial, 1, 2, 1, 1);
+
+        orbitSpeedSpinBox = new QDoubleSpinBox(gridLayoutWidget_3);
+        orbitSpeedSpinBox->setObjectName(QStringLiteral("orbitSpeedSpinBox"));
+        orbitSpeedSpinBox->setSingleStep(0.1);
+
+        gridLayout_3->addWidget(orbitSpeedSpinBox, 0, 1, 1, 1);
+
+        orbitRadiusSpinBox = new QDoubleSpinBox(gridLayoutWidget_3);
+        orbitRadiusSpinBox->setObjectName(QStringLiteral("orbitRadiusSpinBox"));
+        orbitRadiusSpinBox->setSingleStep(0.1);
+
+        gridLayout_3->addWidget(orbitRadiusSpinBox, 1, 1, 1, 1);
+
+        label_15 = new QLabel(gridLayoutWidget_3);
+        label_15->setObjectName(QStringLiteral("label_15"));
+
+        gridLayout_3->addWidget(label_15, 1, 0, 1, 1);
+
+        label_14 = new QLabel(gridLayoutWidget_3);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        gridLayout_3->addWidget(label_14, 0, 0, 1, 1);
+
+        orbitAxisComboBox = new QComboBox(gridLayoutWidget_3);
+        orbitAxisComboBox->setObjectName(QStringLiteral("orbitAxisComboBox"));
+
+        gridLayout_3->addWidget(orbitAxisComboBox, 2, 1, 1, 1);
+
+        label_19 = new QLabel(gridLayoutWidget_3);
+        label_19->setObjectName(QStringLiteral("label_19"));
+
+        gridLayout_3->addWidget(label_19, 2, 0, 1, 1);
+
         stackedWidget->addWidget(page_3);
         page_4 = new QWidget();
         page_4->setObjectName(QStringLiteral("page_4"));
@@ -273,13 +338,6 @@ public:
         page_2 = new QWidget();
         page_2->setObjectName(QStringLiteral("page_2"));
         stackedWidget->addWidget(page_2);
-        groupBox_2 = new QGroupBox(groupBox_5);
-        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(2, 14, 265, 57));
-        groupBox_2->setFont(font1);
-        templateComboBox = new QComboBox(groupBox_2);
-        templateComboBox->setObjectName(QStringLiteral("templateComboBox"));
-        templateComboBox->setGeometry(QRect(12, 24, 241, 22));
         gridLayoutWidget = new QWidget(groupBox_3);
         gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
         gridLayoutWidget->setGeometry(QRect(2, 16, 499, 307));
@@ -834,6 +892,7 @@ public:
 
         tabWidget->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
+        orbitAxisComboBox->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(ParticleEditorClass);
@@ -864,7 +923,6 @@ public:
         actionHelp->setText(QApplication::translate("ParticleEditorClass", "Help", 0));
         groupBox_3->setTitle(QApplication::translate("ParticleEditorClass", "Properties", 0));
         groupBox_5->setTitle(QApplication::translate("ParticleEditorClass", "Template properties", 0));
-        label_15->setText(QApplication::translate("ParticleEditorClass", "Hej", 0));
         groupBox_2->setTitle(QApplication::translate("ParticleEditorClass", "Template", 0));
         templateComboBox->clear();
         templateComboBox->insertItems(0, QStringList()
@@ -874,6 +932,15 @@ public:
          << QApplication::translate("ParticleEditorClass", "Pulsing", 0)
          << QApplication::translate("ParticleEditorClass", "Explosion", 0)
         );
+        label_15->setText(QApplication::translate("ParticleEditorClass", "Orbit radius", 0));
+        label_14->setText(QApplication::translate("ParticleEditorClass", "Orbit speed", 0));
+        orbitAxisComboBox->clear();
+        orbitAxisComboBox->insertItems(0, QStringList()
+         << QApplication::translate("ParticleEditorClass", "X", 0)
+         << QApplication::translate("ParticleEditorClass", "Y", 0)
+         << QApplication::translate("ParticleEditorClass", "Z", 0)
+        );
+        label_19->setText(QApplication::translate("ParticleEditorClass", "Orbit axis", 0));
         label_7->setText(QApplication::translate("ParticleEditorClass", "SpeedMin:", 0));
         label_9->setText(QApplication::translate("ParticleEditorClass", "LifeMin:", 0));
         label_2->setText(QApplication::translate("ParticleEditorClass", "SizeMin:", 0));
