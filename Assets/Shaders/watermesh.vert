@@ -1,4 +1,4 @@
-#version 400
+#version 410 core 
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -14,14 +14,14 @@ layout(std140) uniform PerObject
 {
 	mat4 modelMatrix;
 	mat4 normalMatrix;
+	vec3 gEyeWorldPos;
 };
-uniform sampler2D g_Diffuse;
 
-out vec2 vert_texcoord;
+out vec3 WorldPos_CS_in;
+out vec2 TexCoord_CS_in;
 
 void main()
-{
-	vert_texcoord = in_texcoord;
-	float height = texture(g_Diffuse, in_texcoord).r;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position.x, in_position.y+height, in_position.z, 1.0f );
+{  
+	TexCoord_CS_in	= in_texcoord;
+	WorldPos_CS_in	= (modelMatrix * vec4( in_position, 1.0f )).xyz;
 }

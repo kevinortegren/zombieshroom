@@ -283,6 +283,7 @@ namespace Render
 		s_sizes[Semantic::MK1]			= sizeof(float);
 		s_sizes[Semantic::MK2]			= sizeof(float);
 		s_sizes[Semantic::MK3]			= sizeof(float);
+		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -562,9 +563,8 @@ namespace Render
 	void GLRenderer::ForwardPass()
 	{
 		m_renderFlags = Render::TechniqueFlags::RENDER_FORWARD;
-
+		
 		ProcessRenderJobs();
-
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
 			m_lineRenderer.RenderLines();

@@ -40,6 +40,8 @@ namespace Render
 		virtual void CreateVertexBuffer1P1N1UV(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices) = 0;
 		virtual void CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices) = 0;
 		virtual void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices) = 0;
+
+		virtual void SetWireFrame(bool p_wireFrame) = 0;
 	};
 
 	class Mesh : public MeshInterface
@@ -78,6 +80,8 @@ namespace Render
 		void DrawInstanced(GLsizei p_instances);
 		void DrawTransformFeedback();
 
+		void SetWireFrame(bool p_wireFrame);
+
 	private:
 		BufferInterface* m_vertexBuffer;
 		BufferInterface* m_elementBuffer;
@@ -85,6 +89,7 @@ namespace Render
 		
 		GLuint m_transformFeedback;
 		GLenum m_primitive;
+		bool m_wireFrame;
 	};
 
 }

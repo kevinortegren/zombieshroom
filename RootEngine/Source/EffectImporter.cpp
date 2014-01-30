@@ -273,6 +273,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::YMAX, offset);
 						}
+						else if(sem == "EYEWORLDPOS")
+						{
+							technique->AddUniformParam(Render::Semantic::EYEWORLDPOS, offset);
+						}
 					}
 				}
 

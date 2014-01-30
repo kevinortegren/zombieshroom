@@ -312,7 +312,7 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F3) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->Disturb(100,100, -300);
+			m_waterSystem->Disturb(1000,1000, 20);
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();

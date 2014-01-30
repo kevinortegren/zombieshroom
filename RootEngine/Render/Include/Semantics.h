@@ -32,6 +32,7 @@ namespace Render
 			MK3,
 			XMAX,
 			YMAX,
+			EYEWORLDPOS,
 		};
 	}
 

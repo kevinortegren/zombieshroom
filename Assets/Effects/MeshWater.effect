@@ -11,29 +11,33 @@
             offset: 0
           - sem: NORMAL
             offset: 64
+          - sem: EYEWORLDPOS
+            offset: 128
       textures:
           - name: g_Diffuse
             slot: 0
           - name: g_Specular
             slot: 1
-      flags:
-        - name: Forward
       programs:
         - name: Mesh
           shaders:
             - name: watermesh
               type: vertex
             - name: watermesh
+              type: tess_control
+            - name: watermesh
+              type: tess_evaluation
+            - name: watermesh
               type: fragment
           # Blend Mode:
           # None = 0
           # AlphaBlend = 1
           # Addative = 2
-          blend: 1
+         # blend: 1
           
           # Depth settings.
           depth:
-            write: 0
+            write: 1
             test: 1
               
 
