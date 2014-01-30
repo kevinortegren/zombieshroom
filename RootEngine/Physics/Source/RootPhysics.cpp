@@ -55,35 +55,7 @@ namespace Physics
 	void RootPhysics::Shutdown()
 	{
 		//Magic loop of deleting, might not work with ghostobjects(players). Check this before release.
-		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
-		{
-			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			if (body && body->getMotionState())
-			{
-				delete body->getMotionState();
-			}
-			if(body && body->getCollisionShape())
-			{
-				btCollisionShape* temp = body->getCollisionShape();
-				delete temp;
-			}
-			m_dynamicWorld->removeCollisionObject( obj );
-			delete obj;
-		}
-		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
-		{
-			KinematicController* temp = m_playerObjects[i];
-			delete temp;
-		}
-		for(unsigned int i = 0; i < m_userPointer.size(); i++)
-		{
-			CustomUserPointer* temp = m_userPointer[i];
-			delete temp;
-		}
-		m_dynamicObjects.clear();
-		m_playerObjects.clear();
-		m_userPointer.clear();
+		RemoveAll();
 		delete m_debugDrawer;
 		delete m_dynamicWorld;
 		delete m_solver;
@@ -223,6 +195,11 @@ namespace Physics
 
 	void RootPhysics::RemoveAll()
 	{
+		for(unsigned int i = 0; i < m_ragdolls.size(); i++)
+		{
+			Ragdoll::Ragdoll* temp = m_ragdolls[i];
+			delete temp;
+		}
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 		{
 			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
@@ -249,6 +226,7 @@ namespace Physics
 			CustomUserPointer* temp = m_userPointer[i];
 			delete temp;
 		}
+		m_ragdolls.clear();
 		m_dynamicObjects.clear();
 		m_playerObjects.clear();
 		m_userPointer.clear();
