@@ -430,7 +430,8 @@ namespace RootForce
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
-	}
+		}
+
 		return GameStates::Ingame;
 	}
 }

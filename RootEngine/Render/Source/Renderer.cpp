@@ -292,7 +292,6 @@ namespace Render
 		for(int i = 0; i < 10; i++)
 		{
 			weights[i] = weights[i] / sum;
-			std::cout << weights[i] << std::endl;
 		}
 
 		glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(10, sizeof(float), weights);

@@ -85,7 +85,7 @@ namespace RootForce
 		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
 		Frustum frustum = camera->m_frustum;
-		frustum.DrawLines(glm::mat4(1.0f), g_engineContext.m_renderer);
+		//frustum.DrawLines(glm::mat4(1.0f), g_engineContext.m_renderer);
 		glm::vec4 frustumCorners[8];
 		frustumCorners[0] = glm::vec4(frustum.ntl, 1.0f);
 		frustumCorners[1] = glm::vec4(frustum.ntr, 1.0f);
