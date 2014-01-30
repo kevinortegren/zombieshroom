@@ -105,7 +105,7 @@ namespace RootSystems
 				animation->m_animClip = RootForce::AnimationClip::IDLE;
 			
 				if(action->MovePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
+					animation->m_animClip = RootForce::AnimationClip::WALKING;
 				else if(action->MovePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::WALKING;
 				if(action->StrafePower > 0)

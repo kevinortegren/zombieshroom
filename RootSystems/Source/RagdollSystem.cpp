@@ -43,13 +43,12 @@ namespace RootForce
 			else
 			{
 				
-				glm::mat4* test = new glm::mat4[20];
-				test = m_engineContext->m_physics->GetBones(*(collision->m_handle));
-				if(test != nullptr)
+				glm::mat4* bones = new glm::mat4[20];
+				bones = m_engineContext->m_physics->GetBones(*(collision->m_handle));
+				if(bones != nullptr)
 					for(int i = 0; i < 14; i++)
 					{
-						glm::mat4 testi = renderable->m_model->m_animation[0].GetBoneOffset(i);
-						animation->m_bones[i] = test[i] * renderable->m_model->m_animation[0].GetBoneOffset(i);
+						animation->m_bones[i] = bones[i] * renderable->m_model->m_animation[0].GetBoneOffset(i);
 					}
 			}
 		

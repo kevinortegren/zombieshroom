@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 const float PI_2 = 1.57079632679489661923f;
-const float OFFSET = -0.5f;
+const float OFFSET = -0.8f;
 namespace Ragdoll
 {
 
@@ -35,6 +35,7 @@ namespace Ragdoll
 	void Ragdoll::BuildRagdoll( glm::mat4 p_bones[20], aiNode* p_rootNode , std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos )
 	{
 		CreateBody(p_bones, p_rootNode, p_nameToIndex, p_transform, p_pos, 1);
+		m_boneToFollow[13] = 13;
 		////here be dragons nu är det fel i min hjärna
 		
 		
@@ -51,30 +52,38 @@ namespace Ragdoll
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
 			int index = p_nameToIndex[p_rootNode->mName.data];
+			glm::mat4 toGlm = glm::mat4();
+			aiMatrix4x4 test = p_rootNode->mTransformation; //this might be the thing that will solve everything, everyyythiiiinnnggg
+			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
+			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
-			glm::mat4 toTrans = p_transform * p_bones[index];
-
+			bonePos = bonePos /** p_bones[index]*/;
+			glm::mat4 toTrans = /*bonePos **/ p_transform;
+			
 			const float* data = glm::value_ptr(toTrans);
 // 			const float* data = glm::value_ptr(p_bones[index]);
  			trans.setFromOpenGLMatrix(data);
-			
+			//m_lastUpdatePos[index] = p_bones[index];
 			trans.setOrigin(trans.getOrigin());
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(mass, motionstate, shape, inertia);
 			body->setDamping(0.05f,0.85f);
-			body->setDeactivationTime(0.8);
-			body->setSleepingThresholds(1.6, 2.5);
-			body->setCcdMotionThreshold(0.7f);
-			body->setCcdSweptSphereRadius(0.4f);
+			//body->setDeactivationTime(0.8f);
+			//body->setSleepingThresholds(1.6f, 2.5f);
+			
+		//	body->setCcdMotionThreshold(0.6f);
+		//	body->setCcdSweptSphereRadius(0.3f);
+
+#pragma warning	Okej, ide är att vi skapar ett ghostobject som har samma pos som bodyn fast utan offseten från benen, sen tar vi inversen på den o gångrar med body transen så kanske nåt kul händer, annars vetefan.
 			m_bodies[index] = body;
-			m_lastUpdatePos[index] = toTrans;
+			m_lastUpdatePos[index] = bonePos * p_bones[index];
 			m_dynamicWorld->addRigidBody(body);
 			//int index = p_rootNode->mName;
 
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
 				//float PI_2 = 1.57079632679489661923f;
-				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_nameToIndex, toTrans, p_pos, p_massFactor+1);
+				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_nameToIndex, p_transform, p_pos, p_massFactor+1);
 				if(childbody != nullptr)
 				{
 					btTypedConstraint* temp = CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
@@ -100,46 +109,46 @@ namespace Ragdoll
 	{
 		
 		if(p_name.compare("Character1_Hips") == 0)
-			return new btCapsuleShape(0.1f, 0.1f);
+			return new btCapsuleShape(0.2f, 0.2f);
 			//return new btCylinderShape(btVector3(0.4f,0.2f,0.4f));
 		else if(p_name.compare("Character1_LeftArm") == 0)
-			return new btCapsuleShape(0.14f, 0.15f);	
+			return new btCapsuleShape(0.28f, 0.30f);	
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		else if(p_name.compare("Character1_LeftFoot") == 0)
-			return new btCapsuleShape(0.1f, 0.08f);
+			return new btCapsuleShape(0.2f, 0.16f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		else if(p_name.compare("Character1_LeftForeArm") == 0)
-			return new btCapsuleShape(0.14f, 0.15f);
+			return new btCapsuleShape(0.28f, 0.30f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		else if(p_name.compare("Character1_LeftHand") == 0)
-			return new btCapsuleShape(0.1f, 0.04f);
+			return new btCapsuleShape(0.2f, 0.08f);
 		//	return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		else if(p_name.compare("Character1_LeftLeg") == 0)
-			return new btCapsuleShape(0.14f, 0.2f);
+			return new btCapsuleShape(0.28f, 0.4f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
-			return new btCapsuleShape(0.14f, 0.2f);
+			return new btCapsuleShape(0.28f, 0.4f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		else if(p_name.compare("Character1_RightArm") == 0)
-			return new btCapsuleShape(0.14f, 0.15f);
+			return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		else if(p_name.compare("Character1_RightFoot") == 0)
-			return new btCapsuleShape(0.1f, 0.04f);
+			return new btCapsuleShape(0.2f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		else if(p_name.compare("Character1_RightForeArm") == 0)
-			return new btCapsuleShape(0.14f, 0.15f);
+			return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		else if(p_name.compare("Character1_RightHand") == 0)
-			return new btCapsuleShape(0.14, 0.04);
+			return new btCapsuleShape(0.28f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		else if(p_name.compare("Character1_RightLeg") == 0)
-			return new btCapsuleShape(0.14, 0.25);
+			return new btCapsuleShape(0.28f, 0.5f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
-			return new btCapsuleShape(0.14, 0.25);
+			return new btCapsuleShape(0.28f, 0.5f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		else if(p_name.compare("Character1_Spine") == 0)
-			return new btCapsuleShape(0.2f,0.3f);
+			return new btCapsuleShape(0.4f,0.6f);
 			//return new btCylinderShape(btVector3(0.4f,0.4f,0.4f));
 
 		return nullptr;
@@ -156,14 +165,25 @@ namespace Ragdoll
 		
 		for(int i = 0; i < 14; i++)
 		{
+			float data[16];
 			btTransform trans = m_bodies[i]->getWorldTransform();
+			trans.getOpenGLMatrix(data);
+			
 			//trans.getOrigin().normalize();
 			//trans.setRotation(btQuaternion(trans.getRotation().w(), trans.getRotation().x(), trans.getRotation().y(), trans.getRotation().z()));
-			float data[16];
+		
 		//	m_lastUpdatePos[i] = m_bodies[i]->getWorldTransform();
-			trans.getOpenGLMatrix(data);
-			retVal[i] = glm::make_mat4(data) /** m_lastUpdatePos[i]._inverse()*/;
-			m_lastUpdatePos[i] = glm::make_mat4(data);
+			int index = m_boneToFollow[i];
+		//	trans.getOrigin() = trans.getOrigin() - m_bodies[index]->getWorldTransform().getOrigin();
+		//	trans.getRotation() = trans.getRotation() - m_bodies[index]->getWorldTransform().getRotation();
+
+		//	trans.setOrigin((trans.getOrigin() - m_bodies[index]->getWorldTransform().getOrigin()));
+			float test[16];
+			trans.inverse().getOpenGLMatrix(test);
+		
+			
+			retVal[i] = glm::make_mat4(data) * m_lastUpdatePos[i] * glm::make_mat4(test); /* * m_lastUpdatePos[i]*//* * m_boneTransform[i]*/;
+			
 		}
 		return retVal;
 	}
@@ -207,7 +227,7 @@ namespace Ragdoll
 		//Hips - Left upper leg
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
 		{
-			localA.setOrigin(btVector3(-0.1, -0.24f- OFFSET, 0)); 
+			localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
 			localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
 			//constraint->setLimit(PI_2, PI_2, PI_2);
@@ -218,7 +238,7 @@ namespace Ragdoll
 		////Hips - Right upper leg
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
 		{
-			localA.setOrigin(btVector3(0.30, -0.3f - OFFSET, 0)); 
+			localA.setOrigin(btVector3(0.30f, -0.3f - OFFSET, 0)); 
 			localB.setOrigin(btVector3(0, 0.3f + OFFSET, 0));
 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
 			//constraint->setLimit(PI_2, PI_2, PI_2);
@@ -347,19 +367,24 @@ namespace Ragdoll
 		return nullptr;
 	}
 
-	void Ragdoll::SetBoneRelation( int p_childIndex, int p_parentIndex )
+	void Ragdoll::SetBoneRelation( int p_parentIndex, int p_childIndex )
 	{
 		m_boneToFollow[p_childIndex] = p_parentIndex;
-		btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
+		/*btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
 		btTransform parentTrans = m_bodies[p_parentIndex]->getWorldTransform();
 		float data[16];
 		childTrans.getOpenGLMatrix(data);
 		glm::mat4 childMat = glm::make_mat4(data);
 		parentTrans.getOpenGLMatrix(data);
 		glm::mat4 parentMat = glm::make_mat4(data);
-		//parentMat = parentMat._inverse();
+		parentMat = parentMat._inverse();
 
-		m_boneTransform[p_childIndex] = childMat * parentMat;
+		m_boneTransform[p_childIndex] = m_lastUpdatePos[p_childIndex] * parentMat;*/
+	}
+
+	void Ragdoll::SetVelocity( const btVector3& p_velocity )
+	{
+		m_bodies[13]->setLinearVelocity(p_velocity);
 	}
 
 }

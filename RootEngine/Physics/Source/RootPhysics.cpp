@@ -119,7 +119,6 @@ namespace Physics
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
-		
 		//m_dynamicWorld->getSolverInfo().m_numIterations = 4;
 		//btSetDebugDrawer(m_debugDrawer);
 
@@ -1282,6 +1281,7 @@ namespace Physics
 		{
 			//If ragdoll already exists just update positions and start ragdolling
 			m_ragdolls.at(index)->Activate(p_bones);
+			
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
 		}
 		else
@@ -1299,6 +1299,7 @@ namespace Physics
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+			m_ragdolls.at(m_userPointer.at(p_objectHandle)->m_ragdollIndex)->SetVelocity(btVector3(0,40,0));
 		}
 		
 	}
@@ -1314,7 +1315,7 @@ namespace Physics
 		}
 		else
 		{
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll", p_objectHandle);
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll %d", p_objectHandle);
 		}
 		return nullptr;
 	}

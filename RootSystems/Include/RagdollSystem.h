@@ -10,6 +10,10 @@ namespace RootForce
 	{
 		bool m_firstTime;
 		int padding;
+		Ragdoll()
+		{
+			m_firstTime = true;
+		}
 		//Empty for now, might need stuff later
 	};
 
