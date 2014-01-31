@@ -540,35 +540,35 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		//temp = RM.PpaintList[paintID]->textureRed;
+		temp = RM.PpaintList[paintID]->textureRed;
 
-		//if (fexists(g_textureLookPath + temp + "Normal.dds"))
-		//{
-		//	NormalName = temp + "Normal";
-		//	mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
-		//	mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//	mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//}
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+			NormalName = temp + "Normal";
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
 
-		//temp = RM.PpaintList[paintID]->textureGreen;
+		temp = RM.PpaintList[paintID]->textureGreen;
 
-		//if (fexists(g_textureLookPath + temp + "Normal.dds"))
-		//{
-		//NormalName = temp + "Normal";
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_GN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//}
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+			NormalName = temp + "Normal";
+			mat->m_textures[Render::TextureSemantic::TEXTURE_GN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
 
-		//temp = RM.PpaintList[paintID]->textureBlue;
+		temp = RM.PpaintList[paintID]->textureBlue;
 
-		//if (fexists(g_textureLookPath + temp + "Normal.dds"))
-		//{
-		//NormalName = temp + "Normal";
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_BN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//}
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+			NormalName = temp + "Normal";
+			mat->m_textures[Render::TextureSemantic::TEXTURE_BN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
 
 		if(glowMap != "" && glowMap != "NONE")
 		{
