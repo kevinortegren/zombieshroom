@@ -55,6 +55,13 @@ namespace RootForce
 		bool Client::Connect(const std::string& p_address, const std::string& p_password, unsigned short p_port, bool p_isRemote)
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
+			if(!clientEntity)
+			{
+				// Create a client entity
+				clientEntity = m_world->GetEntityManager()->CreateEntity();
+				m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
+				m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
+			}
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 			clientComponent->IsRemote = p_isRemote;
 			clientComponent->State = ClientState::UNCONNECTED;
