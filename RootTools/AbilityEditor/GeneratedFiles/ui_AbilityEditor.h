@@ -16,7 +16,6 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -26,6 +25,7 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "CustomCompListWidget.h"
 #include "CustomListWidget.h"
 #include "CustomTreeWidget.h"
 
@@ -53,7 +53,7 @@ public:
     QWidget *tabConditions;
     QVBoxLayout *verticalLayout_6;
     CustomListWidget *listConditions;
-    QListWidget *listAbilityComponents;
+    CustomCompListWidget *listAbilityComponents;
     QTabWidget *OnTabWidget;
     QWidget *tabOnCreate;
     QVBoxLayout *verticalLayout;
@@ -144,7 +144,7 @@ public:
 
         gridLayout->addWidget(toolBoxWidget, 1, 1, 1, 1);
 
-        listAbilityComponents = new QListWidget(centralWidget);
+        listAbilityComponents = new CustomCompListWidget(centralWidget);
         listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
 
         gridLayout->addWidget(listAbilityComponents, 1, 0, 1, 1);
@@ -220,7 +220,7 @@ public:
 
         retranslateUi(AbilityEditorClass);
 
-        toolBoxWidget->setCurrentIndex(1);
+        toolBoxWidget->setCurrentIndex(0);
         OnTabWidget->setCurrentIndex(0);
 
 

@@ -10,26 +10,30 @@ CustomTreeWidget::CustomTreeWidget( QWidget* parent /*= 0*/ ) : QTreeWidget(pare
 void CustomTreeWidget::dropEvent( QDropEvent* event )
 {
 	
-	if(event->mimeData()->objectName().compare("Condition") == 0) //Kanske S
+	if(event->mimeData()->objectName().compare("Conditions") == 0) 
 	{
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
-		item->setWhatsThis(0,"Condition");
+		item->setWhatsThis(0,"Conditions");
 
 		this->addTopLevelItem(item);
 		m_onEvent->AddCondition(item->text(0));
 
 	}
 
-	if(event->mimeData()->objectName().compare("Entity") == 0) //Entity eller Entities?
+	if(event->mimeData()->objectName().compare("Entity") == 0) //Detta bestäms i AbilityEditor.cpp
 	{
+		if (this->itemAt(event->pos()) == nullptr)
+		{
+			return;
+		}
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
 		item->setWhatsThis(0,"Entity");
 
 		
 		//När man släpper på en condition
-		if((this->itemAt(event->pos())->whatsThis(0).compare("Condition") ==0))
+		if((this->itemAt(event->pos())->whatsThis(0).compare("Conditions") == 0))
 			this->itemAt(event->pos())->addChild(item);
 		//När man släpper "inuti" en condition
 		else

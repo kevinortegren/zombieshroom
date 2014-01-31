@@ -16,6 +16,8 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 	{
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
+
+	m_testCond = new AbilityEditorNameSpace::Condition("if(BAJSBAJSBAJS)");
 }
 
 AbilityEditor::~AbilityEditor()
@@ -47,6 +49,7 @@ void AbilityEditor::Init()
 	m_entity = new AbilityEditorNameSpace::Entity("NewAbility");
 
 	ui.listComponents->addItems(m_compNames);
+	ui.listConditions->addItem(m_testCond->GetText());
 	//ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
 	m_propMan = new QtVariantPropertyManager;
@@ -72,6 +75,7 @@ void AbilityEditor::Init()
 	ui.treeOnCreate->SetOnEventClass(m_onCreate);
 	ui.treeOnCollide->SetOnEventClass(m_onCollide);
 	ui.treeOnDestroy->SetOnEventClass(m_onDestroy);
+	ui.listAbilityComponents->SetEntity(m_entity);
 	this->setFixedSize(this->size());
 	this->statusBar()->setSizeGripEnabled(false);
 	
@@ -79,6 +83,7 @@ void AbilityEditor::Init()
 	//connect(ui.treeOnCreate, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	//connect(ui.treeOnCollide, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
 	//connect(ui.treeOnDestroy, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePropertyBrowser()));
+
 	//connect(ui.OnTabWidget, SIGNAL(currentChanged(int)), this, SLOT(ChangedTab()));
 	//connect(m_propMan, SIGNAL(valueChanged(QtProperty*, const QVariant&)), this, SLOT(ChangedTab()));
 	connect(ui.actionGenerate_Script, SIGNAL(triggered()), this, SLOT(GenerateScript()));
@@ -91,8 +96,8 @@ void AbilityEditor::Init()
 	connect(ui.abilityNameEdit, SIGNAL(editingFinished()), this, SLOT(ChangeAbilityName()));
 	
 
-	//Fix Ability name edit thingy
 }
+
 /*
 void AbilityEditor::ChangedTab()
 {
@@ -111,13 +116,10 @@ void AbilityEditor::ChangedTab()
 	delete m_propBrows;
 	m_propBrows = nullptr;
 	//UpdatePropertyBrowser();
-}
-
+}*/
+/*
 void AbilityEditor::UpdatePropertyBrowser( )
 {
-	
-	
-	
 	//QTreeWidget* asdf = new QTreeWidget();
 	//asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
 	//int bajs = asdf->selectedItems().count();
@@ -183,6 +185,74 @@ void AbilityEditor::UpdatePropertyBrowser( )
 
 }
 */
+/*
+void AbilityEditor::UpdatePropertyBrowser( )
+{
+	//QTreeWidget* asdf = new QTreeWidget();
+	//asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
+	//int bajs = asdf->selectedItems().count();
+	if(m_propBrows != nullptr)
+	{
+		if(m_LastSelectedItem != nullptr)
+		{
+			ui.listAbilityComponents->
+			if(ui.abilityWidget->currentIndex() == 0 && ui.treeOnCreate->hasFocus()) //On Create list
+				ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+			else if(ui.abilityWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
+				ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+			else if(ui.abilityWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
+				ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
+		}
+		delete m_propBrows;
+		m_propBrows = nullptr;
+		m_LastSelectedItem = nullptr;
+	}
+
+	//QWidget* page = static_cast<QWidget*>(ui.abilityWidget->children().at(ui.abilityWidget->currentIndex()));
+	//QTreeWidget* tree = static_cast<QTreeWidget*>(page->children().at(0));
+	//QTreeWidgetItem* m_LastSelectedItem = tree->selectedItems().at(0);
+	m_propBrows = new QtTreePropertyBrowser(ui.propertyWidget);
+	m_propBrows->setGeometry(ui.propertyWidget->geometry());
+
+
+	if(ui.abilityWidget->currentIndex() == 0)// && ui.treeOnCreate->hasFocus()) //On Create list
+	{
+		if(ui.treeOnCreate->selectedItems().count() == 0)
+			return;
+		if(ui.treeOnCreate->selectedItems().at(0) != nullptr)
+		{
+			m_LastSelectedItem = ui.treeOnCreate->selectedItems().at(0);
+			ui.treeOnCreate->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
+		}
+	}
+	else if(ui.abilityWidget->currentIndex() == 1)// && ui.treeOnCollide->hasFocus()) //On Collide list
+	{
+		if(ui.treeOnCollide->selectedItems().count() == 0)
+			return;
+		if(ui.treeOnCollide->selectedItems().at(0) != nullptr)
+		{
+			m_LastSelectedItem = ui.treeOnCollide->selectedItems().at(0);
+			ui.treeOnCollide->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
+		}
+	}
+	else if(ui.abilityWidget->currentIndex() == 2)// && ui.treeOnDestroy->hasFocus()) //On Destroy list
+	{
+		if(ui.treeOnDestroy->selectedItems().count() == 0)
+			return;
+		if(ui.treeOnDestroy->selectedItems().at(0) != 0)
+		{
+			m_LastSelectedItem = ui.treeOnDestroy->selectedItems().at(0);
+			ui.treeOnDestroy->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
+		}
+	}
+
+	m_LastSelectedTab = ui.abilityWidget->currentIndex();
+
+	m_mainLayout->addWidget(m_propBrows);
+	ui.propertyWidget->setLayout(m_mainLayout);
+
+
+}*/
 
 bool AbilityEditor::event( QEvent* event )
 {
@@ -254,13 +324,13 @@ void AbilityEditor::SaveAs()
 	dial.setAcceptMode(QFileDialog::AcceptSave);
 	m_currentSavePath = dial.getSaveFileName();
 	if(m_currentSavePath.compare("") != 0)
-		m_exporter->Export(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+		m_exporter->Export(m_currentSavePath.toStdString(), m_entity, m_onCreate, m_onCollide, m_onDestroy);
 }
 
 void AbilityEditor::Save()
 {
 	if(m_currentSavePath.compare("") != 0)
-		m_exporter->Export(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+		m_exporter->Export(m_currentSavePath.toStdString(), m_entity, m_onCreate, m_onCollide, m_onDestroy);
 }
 
 void AbilityEditor::Load()
@@ -274,7 +344,7 @@ void AbilityEditor::Load()
 		ui.treeOnCreate->Clear();
 		ui.treeOnCollide->Clear();
 		ui.treeOnDestroy->Clear();
-		m_importer->Import(m_currentSavePath.toStdString(), m_onCreate, m_onCollide, m_onDestroy);
+		m_importer->Import(m_currentSavePath.toStdString(), m_entity, m_onCreate, m_onCollide, m_onDestroy);
 		ui.treeOnCreate->LoadData();
 		ui.treeOnCollide->LoadData();
 		ui.treeOnDestroy->LoadData();
@@ -283,13 +353,16 @@ void AbilityEditor::Load()
 
 void AbilityEditor::FileViewDrag( const QModelIndex& p_modelIndex )
 {
-	QString type = "Script";
+	QString type = "Entity";
 	QPixmap pixeimap(QSize(100,20));
+	QPainter painter(&pixeimap);
+	painter.setPen(QPen(QColor("blue")));
 	QDrag* drag = new QDrag(this);
 	QMimeData* data = new QMimeData;
 	data->setText(m_fileViewModel->fileInfo(p_modelIndex).fileName());
 	data->setObjectName(type);
 	drag->setMimeData(data);
+	painter.drawText(QRect(10, 0, 170, 20), data->text());
 	drag->setPixmap(pixeimap);
 	Qt::DropAction dropAction = drag->exec();
 }
@@ -331,7 +404,7 @@ void AbilityEditor::BrowseName()
 	dial.setFileMode(QFileDialog::AnyFile);
 	dial.setAcceptMode(QFileDialog::AcceptOpen);
 	QString asdf = dial.getOpenFileName();
-	if(asdf.compare("") == 0)
+	if(asdf.compare("") != 0)
 	{
 		QString name = &(asdf.toStdString().at(asdf.lastIndexOf("/")+1));
 		name.chop(name.size()-name.lastIndexOf("."));

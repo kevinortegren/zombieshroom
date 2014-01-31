@@ -28,14 +28,14 @@ public:
 
 
 private slots:
-		void UpdatePropertyBrowser();
-		void ChangedTab();
+		//void UpdatePropertyBrowser();
+		//void ChangedTab();
 		void GenerateScript();
 		void SaveAs();
 		void Save();
 		void Load();
 		void FileViewDrag(const QModelIndex& p_modelIndex);
-		void AddNewEntity();
+		//void AddNewEntity();
 		void BrowseName();
 		void ChangeAbilityName();
 private:
@@ -57,6 +57,9 @@ private:
 	bool event(QEvent* event);
 	QTreeWidgetItem* m_LastSelectedItem;
 	QFileSystemModel* m_fileViewModel;
+
+	AbilityEditorNameSpace::Condition* m_testCond;
+
 	//void mousePressEvent(QMouseEvent* event);
 
 };

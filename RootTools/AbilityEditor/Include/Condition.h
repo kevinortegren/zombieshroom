@@ -7,7 +7,7 @@ namespace AbilityEditorNameSpace
 	class Condition
 	{
 	public:
-		Condition();
+		Condition(QString p_text);
 		~Condition();
 
 		void ViewSelectedData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory);

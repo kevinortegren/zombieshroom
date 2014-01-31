@@ -14,7 +14,7 @@ namespace AbilityEditorNameSpace
 
 	}
 
-	void Importer::Import(const std::string &p_filename, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
+	void Importer::Import(const std::string &p_filename, Entity* p_entity, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
 		try
 		{
@@ -28,75 +28,75 @@ namespace AbilityEditorNameSpace
 			
 			YAML::Node doc;
 			parser.GetNextDocument(doc);
+
+			//Name
+			const YAML::Node& name = doc[0]["Name"];
+			std::string abilityName;
+			name[0]["EntityName"] >> abilityName;
+			Entity* entity = new Entity(abilityName.c_str());
+			
+			//Components
+			const YAML::Node& comps = doc[1]["Components"];
+			for(unsigned int i = 0; i < comps.size(); i++)
+			{
+				int type;
+				comps[i]["Type"] >> type;
+				const YAML::Node& data = comps[i]["Data"];
+				for(unsigned int j = 0; j < data.size(); j++)
+					entity->AddComponent(ImportComponents(data[j], type));
+			}
+
 			//OnCreate
-
-			const YAML::Node& onCreate = doc[0]["OnCreate"];
-			for(unsigned int i = 0; i < onCreate.size() ; i++)
+			const YAML::Node& onCreate = doc[2]["OnCreate"];
+			for(unsigned int i = 0; i < onCreate.size(); i++)
 			{
-				std::string entityName;
-				onCreate[i]["EntityName"] >> entityName;
-				QString temp;
-				temp.append(entityName.c_str());
-				Entity* entity = new Entity(temp);
-				const YAML::Node& comps = onCreate[i]["Components"];
-				for(unsigned int j = 0; j < comps.size(); j++)
+				std::string condName;
+				onCreate[i]["Condition"] >> condName;
+				Condition* cond = new Condition(condName.c_str());
+				const YAML::Node& entities = onCreate[i]["Entities"];
+				for(unsigned int j = 0; j < entities.size(); j++)
 				{
-					int type;
-					comps[j]["Type"] >> type;
-					const YAML::Node& data = comps[j]["Data"];
-					for(unsigned int k = 0; k < data.size(); k++)
-						entity->AddComponent(ImportComponents(data[k], type));
+					std::string entName;
+					entities[j]["Entity"] >> entName;
+					cond->AddEntity(entName.c_str());
 				}
-				p_onCreate->AddEntity(entity);
+				p_onCreate->AddCondition(cond);
 			}
 
-		//onCollide data
-			
-				
-			const YAML::Node& onCollide = doc[1]["OnCollide"];
-			for(unsigned int i = 0; i < onCollide.size() ; i++)
+			//OnCollide
+			const YAML::Node& onCollide = doc[3]["OnCollide"];
+			for(unsigned int i = 0; i < onCollide.size(); i++)
 			{
-				std::string entityName;
-				onCollide[i]["EntityName"] >> entityName;
-				QString temp;
-				temp.append(entityName.c_str());
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
-				const YAML::Node& comps = onCollide[i]["Components"];
-				for(unsigned int j = 0; j < comps.size(); j++)
+				std::string condName;
+				onCollide[i]["Condition"] >> condName;
+				Condition* cond = new Condition(condName.c_str());
+				const YAML::Node& entities = onCollide[i]["Entities"];
+				for(unsigned int j = 0; j < entities.size(); j++)
 				{
-					int type;
-					comps[j]["Type"] >> type;
-					const YAML::Node& data = comps[j]["Data"];
-					for(unsigned int k = 0; k < data.size(); k++)
-						entity->AddComponent(ImportComponents(data[k], type));
+					std::string entName;
+					entities[j]["Entity"] >> entName;
+					cond->AddEntity(entName.c_str());
 				}
-				p_onCreate->AddEntity(entity);
+				p_onCollide->AddCondition(cond);
 			}
+
 			
-		//OnDestroy data
-			
-			
-			
-			const YAML::Node& onDestroy = doc[2]["OnDestroy"];
-			for(unsigned int i = 0; i < onDestroy.size() ; i++)
+			//OnDestroy
+			const YAML::Node& onDestroy = doc[4]["OnDestroy"];
+			for(unsigned int i = 0; i < onDestroy.size(); i++)
 			{
-				std::string entityName;
-				onDestroy[i]["EntityName"] >> entityName;
-				QString temp;
-				temp.append(entityName.c_str());
-				AbilityEntity::Entity* entity = new AbilityEntity::Entity(temp);
-				const YAML::Node& comps = onDestroy[i]["Components"];
-				for(unsigned int j = 0; j < comps.size(); j++)
+				std::string condName;
+				onDestroy[i]["Condition"] >> condName;
+				Condition* cond = new Condition(condName.c_str());
+				const YAML::Node& entities = onDestroy[i]["Entities"];
+				for(unsigned int j = 0; j < entities.size(); j++)
 				{
-					int type;
-					comps[j]["Type"] >> type;
-					const YAML::Node& data = comps[j]["Data"];
-					for(unsigned int k = 0; k < data.size(); k++)
-						entity->AddComponent(ImportComponents(data[k], type));
+					std::string entName;
+					entities[j]["Entity"] >> entName;
+					cond->AddEntity(entName.c_str());
 				}
-				p_onCreate->AddEntity(entity);
+				p_onDestroy->AddCondition(cond);
 			}
-			
 			
 		}
 		catch(YAML::ParserException& e)

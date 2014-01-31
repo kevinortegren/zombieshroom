@@ -3,9 +3,9 @@
 namespace AbilityEditorNameSpace
 {
 
-	Condition::Condition()
+	Condition::Condition(QString p_text)
 	{
-
+		m_text = p_text;
 	}
 
 	Condition::~Condition()
@@ -30,7 +30,7 @@ namespace AbilityEditorNameSpace
 
 	void Condition::RemoveEntity( QString p_name )
 	{
-		for (int i = 0; i < m_entities.size(); i++)
+		for (unsigned int i = 0; i < m_entities.size(); i++)
 		{
 			if(m_entities.at(i).compare(p_name) == 0)
 			{

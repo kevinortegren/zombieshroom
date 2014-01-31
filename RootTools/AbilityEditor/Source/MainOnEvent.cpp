@@ -16,9 +16,8 @@ namespace AbilityEditorNameSpace
 	}
 	void MainOnEvent::AddCondition( QString p_name )
 	{
-		// TODO: Add condition by name maybe?
-		//AbilityEntity::Entity* entity = new AbilityEntity::Entity(p_name);
-		//m_entities.push_back(entity);
+		Condition* cond = new Condition(p_name);
+		m_conditions.push_back(cond);
 	}
 
 	void MainOnEvent::AddCondition( Condition* p_cond )

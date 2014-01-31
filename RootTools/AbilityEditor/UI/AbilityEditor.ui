@@ -27,7 +27,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="toolBoxWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabComponents">
        <attribute name="title">
@@ -62,7 +62,7 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QListWidget" name="listAbilityComponents"/>
+     <widget class="CustomCompListWidget" name="listAbilityComponents"/>
     </item>
     <item row="3" column="0">
      <widget class="QTabWidget" name="OnTabWidget">
@@ -199,6 +199,11 @@
    <class>CustomTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>CustomTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomCompListWidget</class>
+   <extends>QListWidget</extends>
+   <header>CustomCompListWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -17,21 +17,41 @@ namespace AbilityEditorNameSpace
 
 	}
 
-	void Exporter::Export(const std::string& p_filepath, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
+	void Exporter::Export(const std::string& p_filepath, Entity* p_entity, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
-		/*We have the classes onCreate, onCollide and onDestroy.
-		Each of these will hold the entitys and components used be them.
-		So we export them in the format:
-		-Class
-			--Entitys
-				---Components
-		-Class
-			--Entitys
-				---Components
+		
+		/*NEW FORMAT WOOOO!!
+		-Name
+		-Components
+			--Values
+		-OnClass
+			--Condition
+				---Entities
+		-OnClass
+			--Condition
+				---Entities
+		...
 		*/
 
 		YAML::Emitter out;
 		out << YAML::BeginSeq;
+
+		//Name
+		out << YAML::BeginMap;
+		out << YAML::Key << "Name" << YAML::Value << p_entity->GetName().toStdString(); 
+		out << YAML::EndMap;
+
+		//Components
+		out << YAML::BeginMap;
+		out << YAML::Key << "Components";
+		out << YAML::Value << YAML::BeginSeq;
+		for (unsigned int i = 0; i < p_entity->GetComponents()->size(); i++)
+		{
+			ExportComponent(out, p_entity->GetComponents()->at(i), p_entity->GetComponents()->at(i)->m_type);
+		}
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
 
 		//Oncreate class
 		out << YAML::BeginMap;
@@ -39,15 +59,16 @@ namespace AbilityEditorNameSpace
 		out << YAML::Value << YAML::BeginSeq; 
 		if(p_onCreate != nullptr)
 		{
-			for(unsigned int i = 0 ; i < p_onCreate->GetEntities()->size(); i++)
+			for(unsigned int i = 0 ; i < p_onCreate->GetConditions()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, p_onCreate->GetEntities()->at(i));
+				ExportCondition(out, p_onCreate->GetConditions()->at(i));
 				out << YAML::EndMap;
 			}
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
+
 		//OnCollide
 		out << YAML::BeginMap;
 		out << YAML::Key << "OnCollide";
@@ -55,26 +76,27 @@ namespace AbilityEditorNameSpace
 		if(p_onCollide != nullptr)
 		{
 			
-			for(unsigned int i = 0 ; i < p_onCollide->GetEntities()->size(); i++)
+			for(unsigned int i = 0 ; i < p_onCollide->GetConditions()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, p_onCollide->GetEntities()->at(i));
+				ExportCondition(out, p_onCollide->GetConditions()->at(i));
 				out << YAML::EndMap;
 			}
 			
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
+
 		//OnDestroy
 		out << YAML::BeginMap;
 		out << YAML::Key << "OnDestroy";
 		out << YAML::Value << YAML::BeginSeq; 
 		if(p_onDestroy != nullptr)
 		{
-			for(unsigned int i = 0 ; i < p_onDestroy->GetEntities()->size(); i++)
+			for(unsigned int i = 0 ; i < p_onDestroy->GetConditions()->size(); i++)
 			{
 				out << YAML::BeginMap;
-				ExportEntity(out, p_onDestroy->GetEntities()->at(i));
+				ExportCondition(out, p_onDestroy->GetConditions()->at(i));
 				out << YAML::EndMap;
 			}
 	
@@ -82,8 +104,8 @@ namespace AbilityEditorNameSpace
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 		//File done, prepare to write
-		out << YAML::EndSeq;
-		out << YAML::EndMap;
+		out << YAML::EndSeq; //Remove?
+		out << YAML::EndMap; //Remove?
 		out << YAML::EndSeq;
 
 		std::ofstream file;
@@ -92,24 +114,17 @@ namespace AbilityEditorNameSpace
 		file.close();
 	}
 
-	void Exporter::ExportEntity( YAML::Emitter& p_emitter, AbilityEntity::Entity* p_entity )
+	void Exporter::ExportCondition( YAML::Emitter& p_emitter, Condition* p_cond)
 	{
-		p_emitter << YAML::Key << "EntityName" << YAML::Value << p_entity->m_name.toStdString();
-		p_emitter << YAML::Key << "Components";
+		p_emitter << YAML::Key << "Condition" << YAML::Value << p_cond->GetText().toStdString();
+		p_emitter << YAML::Key << "Entities";
 		p_emitter << YAML::Value << YAML::BeginSeq;
-		
-		for (unsigned int j = 0; j < p_entity->m_components->size(); j++)
+		for (unsigned int i = 0; i < p_cond->GetEntities().size(); i++)
 		{
 			p_emitter << YAML::BeginMap;
-			p_emitter << YAML::Key << "Type" << YAML::Value << p_entity->m_components->at(j)->m_type;
-			p_emitter << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
-			p_emitter << YAML::BeginMap;
-			ExportComponent(p_emitter, p_entity->m_components->at(j), p_entity->m_components->at(j)->m_type );
-			p_emitter << YAML::EndMap;
-			p_emitter << YAML::EndSeq;
+			p_emitter << YAML::Key << "Entity" << YAML::Value << p_cond->GetEntities().at(i).toStdString();
 			p_emitter << YAML::EndMap;
 		}
-		
 		p_emitter << YAML::EndSeq;
 	}
 
