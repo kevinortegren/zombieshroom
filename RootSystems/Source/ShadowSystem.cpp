@@ -12,8 +12,6 @@ namespace RootForce
 	{
 		m_shadowcasters.Init(m_world->GetEntityManager());
 		m_transforms.Init(m_world->GetEntityManager());
-
-		m_shadowcasterCount = 0;
 	}
 
 	void ShadowSystem::SetAABB(const RootForce::AABB& p_worldAABB)
@@ -30,7 +28,7 @@ namespace RootForce
 
 	void ShadowSystem::Begin()
 	{
-		m_shadowcasterCount = 0;
+		
 	}
 
 	void ShadowSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -153,13 +151,12 @@ namespace RootForce
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
 		}
 
-		g_engineContext.m_renderer->AddShadowcaster(sc, m_shadowcasterCount);
-
-		m_shadowcasterCount++;
+		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
 	}
 
 	void ShadowSystem::End()
 	{
+
 	}
 
 	glm::mat4 ShadowSystem::OrthoProjectionFromFrustum(Frustum* p_frustum, glm::mat4 p_lightViewMatrix)

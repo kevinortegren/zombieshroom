@@ -149,7 +149,7 @@ namespace Render
 		m_vertexBuffer = p_buffer;
 	}
 
-	void Mesh::SetVertexAttribute(std::shared_ptr<VertexAttributesInterface> p_attribute)
+	void Mesh::SetVertexAttribute(VertexAttributesInterface* p_attribute)
 	{
 		m_vertexAttributes = p_attribute;
 	}
@@ -164,7 +164,7 @@ namespace Render
 		return m_elementBuffer;
 	}
 
-	std::shared_ptr<VertexAttributesInterface> Mesh::GetVertexAttribute()
+	VertexAttributesInterface* Mesh::GetVertexAttribute()
 	{
 		return m_vertexAttributes;
 	}

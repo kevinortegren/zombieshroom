@@ -130,6 +130,9 @@ namespace RootForce
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
+		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
+
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -442,6 +445,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
 		}

@@ -125,7 +125,7 @@ namespace RootEngine
 			m_effects[p_path] = m_effectImporter->m_effect;
 
 			if(m_effectImporter->m_effect)
-				return m_effects[p_path].get();
+				return m_effects[p_path];
 			else
 			{
 				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading effect '%s'", p_path.c_str());
@@ -135,7 +135,7 @@ namespace RootEngine
 		else
 		{
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
-			return m_effects[p_path].get();
+			return m_effects[p_path];
 		}
 
 		
@@ -206,7 +206,7 @@ namespace RootEngine
 		{
 			Model* model = new Model();
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
-			model->m_meshes[0] = m_meshes[p_path + "0"].get();
+			model->m_meshes[0] = m_meshes[p_path + "0"];
 			model->m_meshes[1] = nullptr;
 			
 			if(model)
@@ -277,7 +277,7 @@ namespace RootEngine
 	{
 		if(m_effects.find(p_handle) != m_effects.end())
 		{
-			return m_effects[p_handle].get();
+			return m_effects[p_handle];
 		}
 		else
 		{
@@ -299,25 +299,11 @@ namespace RootEngine
 		}
 	}
 
-	Render::Material* ResourceManager::GetMaterial( std::string p_handle )
-	{
-		if(m_materials.find(p_handle) != m_materials.end())
-		{
-			return m_materials[p_handle].get();
-		}
-		else
-		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Created new material: %s", p_handle.c_str());
-			m_materials[p_handle] = m_context->m_renderer->CreateMaterial();
-			return m_materials[p_handle].get();
-		}
-	}
-
 	Render::MeshInterface* ResourceManager::GetMesh( std::string p_handle )
 	{
 		if(m_meshes.find(p_handle) != m_meshes.end())
 		{
-			return m_meshes[p_handle].get();
+			return m_meshes[p_handle];
 		}
 		else
 		{
@@ -325,8 +311,6 @@ namespace RootEngine
 			return nullptr;
 		}
 	}
-
-	
 
 	const std::string& ResourceManager::ResolveStringFromTexture(Render::TextureInterface* p_texture)
 	{
@@ -375,7 +359,7 @@ namespace RootEngine
 	{
 		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
 		{
-			if((*itr).second.get() == p_effect)
+			if((*itr).second == p_effect)
 				return (*itr).first;
 		}
 		assert(false);
@@ -391,22 +375,8 @@ namespace RootEngine
 		assert(false);
 	}
 
-	const std::string& ResourceManager::ResolveStringFromMaterial(Render::Material* p_material)
-	{
-		for(auto itr = m_materials.begin(); itr != m_materials.end(); ++itr)
-		{
-			if((*itr).second.get() == p_material)
-				return (*itr).first;
-		}
-		assert(false);
-	}
-
 	const std::string& ResourceManager::GetWorkingDirectory()
 	{
 		return m_workingDirectory;
 	}
-
-	
-
-
 }

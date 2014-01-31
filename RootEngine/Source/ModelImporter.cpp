@@ -118,7 +118,7 @@ namespace RootEngine
 
 		//Load bones
 
-		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
+		Render::MeshInterface* mesh = m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
@@ -237,7 +237,7 @@ namespace RootEngine
 
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
-		m_model->m_meshes[0] = mesh.get();
+		m_model->m_meshes[0] = mesh;
 		m_model->m_meshes[1] = nullptr;
 	}
 

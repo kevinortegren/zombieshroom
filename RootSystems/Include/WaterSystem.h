@@ -23,7 +23,7 @@ namespace RootForce
 	private:
 		Render::Material*						m_material;				
 		Render::TextureInterface*				m_texture[2];
-		std::shared_ptr<Render::MeshInterface>	m_mesh;
+		Render::MeshInterface*					m_mesh;
 		Logging::LoggingInterface*				m_logger;
 		RootEngine::GameSharedContext*			m_context;
 		Render::ComputeJob						m_computeJob;

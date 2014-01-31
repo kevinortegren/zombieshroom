@@ -8,15 +8,16 @@ namespace RootForce
 	void WorldSystem::LoadWorld(const std::string& p_worldName)
 	{
 		// Import entities, groups, tags and storage.
-		//m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
+		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
-		glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
+		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
+		glm::vec3 ambient = glm::vec3(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
 		CreateSun();
-		CreateSkyBox();
+		//CreateSkyBox();
 		CreatePlayerCamera();
 
 		// Add collisions shapes for the group "Static".
@@ -29,7 +30,7 @@ namespace RootForce
 
 	void WorldSystem::SetAmbientLight(glm::vec3 p_ambient)
 	{
-		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 1.0f));
+		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 0.0f));
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
 	}
 
@@ -46,7 +47,7 @@ namespace RootForce
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
 		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		
-		sunShadowcaster->m_levels = 1;
+		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
@@ -107,7 +108,7 @@ namespace RootForce
 
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
+		r->m_material = m_engineContext->m_renderer->CreateMaterial();
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 

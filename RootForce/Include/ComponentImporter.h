@@ -30,13 +30,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				const YAML::Node* materialNode = p_node.FindValue("Material");
 				if(materialNode != nullptr)
 				{
-					const YAML::Node* materialNameNode = materialNode->FindValue("Name");
-					if(materialNameNode != nullptr)
-					{
-						std::string materialName;
-						p_node["Material"]["Name"] >> materialName;
-						renderable->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
-					}
+					renderable->m_material = g_engineContext.m_renderer->CreateMaterial();
 
 					const YAML::Node* effectNode = materialNode->FindValue("Effect");
 					if(effectNode != nullptr)
@@ -48,10 +42,6 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						if(renderable->m_material)
 						{
 							renderable->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect(effect);
-
-							// Allocate memory for this renderable's uniforms.
-							//renderable->m_material->m_params = g_engineContext.m_renderer->CreateEffectParams();
-							//renderable->m_material->m_params->AllocateParams(renderable->m_material->m_effect);
 						}
 						else
 						{

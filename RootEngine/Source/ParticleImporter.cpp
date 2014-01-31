@@ -42,7 +42,7 @@ namespace RootEngine
 			doc[i]["EFFECT"]		>> effectName;
 			doc[i]["TEXTURE"]		>> textureName;
 			
-			outStruct->at(i)->m_material					= m_context->m_resourceManager->GetMaterial(p_fileName + std::to_string(materialIndex++));
+			outStruct->at(i)->m_material					= m_context->m_renderer->CreateMaterial();
 			outStruct->at(i)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
 

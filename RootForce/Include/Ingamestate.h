@@ -55,6 +55,7 @@ namespace RootForce
 		RootForce::ShadowSystem* m_shadowSystem;
 		RootForce::RenderingSystem* m_renderingSystem;
 		RootForce::PointLightSystem* m_pointLightSystem;
+		RootForce::DirectionalLightSystem* m_directionlLightSystem;
 		RootForce::ParticleSystem* m_particleSystem;
 		RootForce::CameraSystem* m_cameraSystem;
 		RootForce::LookAtSystem* m_lookAtSystem;

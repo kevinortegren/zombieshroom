@@ -6,16 +6,13 @@ namespace Render
 {
 	LightingDevice::LightingDevice()
 	: m_numDirectionalLights(0),
-		m_numPointLights(0)
-	{
-
-	}
+		m_numPointLights(0) {}
 
 	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
 		// Load techniques.	
-		auto deferred = g_context.m_resourceManager->LoadEffect("Renderer/Deferred");
-		m_lightingTech = deferred->GetTechniques()[0];
+		Render::EffectInterface* lightingEffect = g_context.m_resourceManager->LoadEffect("Renderer/Lighting");
+		m_deferredTech = lightingEffect->GetTechniques()[0];
 
 		// Light uniforms.
 		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -74,9 +71,9 @@ namespace Render
 
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
-		auto ambient = m_lightingTech->GetPrograms()[0];
-		auto directional = m_lightingTech->GetPrograms()[1];
-		auto pointlight = m_lightingTech->GetPrograms()[2];
+		auto ambient = m_deferredTech->GetPrograms()[0];
+		auto directional = m_deferredTech->GetPrograms()[1];
+		auto pointlight = m_deferredTech->GetPrograms()[2];
 
 		p_fullscreenQuad.Bind();
 

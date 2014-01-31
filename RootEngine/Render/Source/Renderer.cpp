@@ -7,9 +7,6 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 
-#include <RootEngine/Render/Include/Math/Math.h>
-
-
 #if defined(_DEBUG) && defined(WIN32)
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
@@ -63,6 +60,11 @@ namespace Render
 	GLRenderer::GLRenderer()
 	{
 		
+	}
+
+	GLRenderer::~GLRenderer()
+	{
+		//TODO: Delete resources.
 	}
 
 	void GLRenderer::Startup()
@@ -149,7 +151,7 @@ namespace Render
 
 		CheckExtension("NV_texture_multisample");
 
-		// Setup GBuffer.
+		// Setup geometry buffer.
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
@@ -165,28 +167,10 @@ namespace Render
 		m_color0 = CreateTexture();
 		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
 
-		m_color1 = CreateTexture();
-		m_color1->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
-		m_color2 = CreateTexture();
-		m_color2->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_color1->GetHandle(), 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_color2->GetHandle(), 0);
 
 		// Share depth attachment between gbuffer and forward.
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		glGenFramebuffers(1, &m_glowFbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFbo);
-
-		m_glow = CreateTexture();
-		m_glow->CreateEmptyTexture(width / 2, height / 2, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glow->GetHandle(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -218,8 +202,11 @@ namespace Render
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
 		// Load default forward rendering effect.
-		auto renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Forward");
-		m_renderTech = renderEffect->GetTechniques()[0];
+		Render::EffectInterface* renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
+
+		m_fullscreenQuadTech = renderEffect->GetTechniques()[0];
+		m_earlyZTech = renderEffect->GetTechniques()[1];
+
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
@@ -249,7 +236,7 @@ namespace Render
 
 		InitialziePostProcesses();
 
-		PrintResourceUsage();
+		m_resources.PrintResourceUsage();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -279,24 +266,7 @@ namespace Render
 
 	void GLRenderer::InitialziePostProcesses()
 	{
-		// Setup glow.
-		EffectInterface* glowEffect = g_context.m_resourceManager->LoadEffect("PostProcess/Glow");
-
-		float weights[10];
-		float sum = 0;
-		for(int i = 0; i < 10; i++)
-		{
-			weights[i] = RootEngine::gauss(i, 9);
-			sum += 2 * weights[i];
-		}
-		for(int i = 0; i < 10; i++)
-		{
-			weights[i] = weights[i] / sum;
-		}
-
-		glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(10, sizeof(float), weights);
-
-		m_postProcessEffects.push_back(glowEffect);
+		m_glowDevice.Init(this, m_width, m_height);		
 	}
 
 	void GLRenderer::SetResolution(int p_width, int p_height)
@@ -343,6 +313,16 @@ namespace Render
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_cameraBuffer->GetBufferId());
 
 		{
+			PROFILE("Early-Z", g_context.m_profiler);
+			EarlyZ();
+		}
+
+		{
+			PROFILE("Sorting", g_context.m_profiler);
+			Sorting();
+		}
+
+		{
 			PROFILE("Shadow pass", g_context.m_profiler);
 			ShadowPass();
 		}
@@ -376,6 +356,8 @@ namespace Render
 			Output();
 		}
 
+		// Clear render jobs.
+		// TODO: Reset stack.
 		m_jobs.clear();
 	}
 
@@ -390,13 +372,43 @@ namespace Render
 		SDL_GL_SwapWindow(m_window);
 	}
 
+	static bool SortRenderJobs(RenderJob& a, RenderJob& b)
+	{
+		  if( a.m_renderPass < b.m_renderPass ) return true;
+		  //if( a.m_renderPass == b.m_renderPass ) return a.m_material->m_id < b.m_material->m_id;
+		  return false;
+	};
+
+	void GLRenderer::Sorting()
+	{	
+		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+	}
+
+	void GLRenderer::EarlyZ()
+	{
+		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+		{
+			(*job).m_mesh->Bind();
+			m_earlyZTech->Apply();
+
+			if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+			{
+				(*job).m_mesh->DrawTransformFeedback();
+			}
+			else
+			{
+				(*job).m_mesh->Draw();		
+			}
+	
+			(*job).m_mesh->Unbind();
+		}
+	}
+
 	void GLRenderer::GeometryPass()
 	{
 		m_gbuffer.UnbindTextures();
 		m_gbuffer.Enable();
 		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED;
-
-		std::sort(m_jobs.begin(), m_jobs.end(), [](RenderJob& a, RenderJob& b)->bool{ return a.m_renderPass < b.m_renderPass; });
 
 		ProcessRenderJobs();
 		
@@ -406,17 +418,14 @@ namespace Render
 
 	void GLRenderer::ProcessRenderJobs()
 	{
-		// Itterate jobs.
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
-			// Bind VAO.
 			(*job).m_mesh->Bind();
 
-			// Bind textures.
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
 			{
 				if((*texture).second != nullptr)
-				(*texture).second->Bind((*texture).first);
+					(*texture).second->Bind((*texture).first);
 			}
 
 			// Itterate techniques.
@@ -433,7 +442,6 @@ namespace Render
 					// Itterate programs.
 					for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 					{
-						// Apply program.
 						(*program)->Apply();
 
 						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
@@ -447,15 +455,13 @@ namespace Render
 					}
 				}
 			}
-			
-			// Unbind textures.
+		
 			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
 			{
 				if((*texture).second != nullptr)
-				(*texture).second->Unbind((*texture).first);
+					(*texture).second->Unbind((*texture).first);
 			}
 
-			// Unbind VAO.
 			(*job).m_mesh->Unbind();
 		}
 	}
@@ -463,76 +469,72 @@ namespace Render
 	void GLRenderer::ShadowPass()
 	{
 		m_shadowDevice.Process();
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-		glDrawBuffers(0, NULL);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-		// Buffer Per Frame data.
-		struct
-		{
-			glm::mat4 m_projection;
-			glm::mat4 m_view;
-			glm::mat4 m_invView;
-			glm::mat4 m_invProj;
-			glm::mat4 m_invViewProj;
-
-		} matrices;
-
-			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
-			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
-			matrices.m_invProj = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i]);
-		matrices.m_invViewProj = glm::inverse(matrices.m_projection * matrices.m_view);
-
-			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-
-		matrices.m_invViewProj = glm::inverse(viewProjection);
-		m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
 
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
-		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
-			if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-				continue;
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glDrawBuffers(0, NULL);
 
-			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+			// Buffer Per Frame data.
+			struct
 			{
-				if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
+				glm::mat4 m_projection;
+				glm::mat4 m_view;
+				glm::mat4 m_invView;
+				glm::mat4 m_invProj;
+				glm::mat4 m_invViewProj;
+
+			} matrices;
+
+			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
+			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
+			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+
+			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
+
+			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+			{
+				if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+					continue;
+
+				for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 				{
-					if((*job).m_shadowMesh != nullptr)
+					if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 					{
-						(*job).m_shadowMesh->Bind();
-
-						// Buffer uniforms.
-						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-						{	
-							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-						}
-
-						// Apply shadowing shader program.
-						(*tech)->GetPrograms()[0]->Apply();
-
-						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+						if((*job).m_shadowMesh != nullptr)
 						{
-							(*job).m_shadowMesh->DrawTransformFeedback();
-						}
-						else
-						{
-							(*job).m_shadowMesh->Draw();		
-						}
+							(*job).m_shadowMesh->Bind();
 
-						(*job).m_shadowMesh->Unbind();
+							for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+							{	
+								m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+							}
+
+							(*tech)->GetPrograms()[0]->Apply();
+
+							if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
+							{
+								(*job).m_shadowMesh->DrawTransformFeedback();
+							}
+							else
+							{
+								(*job).m_shadowMesh->Draw();		
+							}
+
+							(*job).m_shadowMesh->Unbind();
+						}
 					}
 				}
 			}
 		}
-		}
+
 		glCullFace(GL_BACK);
 		glViewport(0, 0, m_width, m_height);
 	}
@@ -542,8 +544,7 @@ namespace Render
 		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
 
-
-		glm::mat4 biasMatrix(
+		static glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 
 			0.0, 0.5, 0.0, 0.0,
 			0.0, 0.0, 0.5, 0.0,
@@ -552,31 +553,25 @@ namespace Render
 
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
-		// Buffer LightVP.
+			// Buffer LightVP.
 			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
-		// Apply lighting.
+
 		m_lighting.Process(m_fullscreenQuad);
 
-		// Bind forward target.
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2  };
-		glDrawBuffers(3, buffers);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		BindForwardFramebuffer();
 
 		// Bind la-texture.
 		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
 
-		// Output lighting to forward buffer.
-		m_renderTech->GetPrograms()[0]->Apply();
-
+		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
 	void GLRenderer::ForwardPass()
@@ -593,44 +588,22 @@ namespace Render
 
 	void GLRenderer::PostProcessPass()
 	{
-		// Bind gbuffer.
+		// Bind gbuffer for reading in post processes.
+		// 0 - Diffuse
+		// 1 - Normals
+		// 2 - Depths
+		// 3 - Scene
+		// 4 - Glow
+		// 5 - Input.
 		m_gbuffer.BindTextures();
 
-		// Bind scene.
+		// Set scene as input.
 		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, m_color0->GetHandle());
 
+		// Glow Pass.
 		m_fullscreenQuad.Bind();
-
-		m_postProcessEffects[0]->GetTechniques()[0]->Apply();
-
-		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFbo);
-
-		// Draw to blur.
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glViewport(0, 0, 640, 360);
-
-		m_postProcessEffects[0]->GetTechniques()[0]->GetPrograms()[0]->Apply();
-		m_fullscreenQuad.Draw();
-
-		glViewport(0, 0, 1280, 720);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		// Draw to forward.
-		GLenum buffers2[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers2);
-
-		glActiveTexture(GL_TEXTURE0 + 5);
-		glBindTexture(GL_TEXTURE_2D, m_glow->GetHandle());
-
-		m_postProcessEffects[0]->GetTechniques()[0]->GetPrograms()[1]->Apply();
-		m_fullscreenQuad.Draw();
-
+		m_glowDevice.Process(this, &m_fullscreenQuad);
 		m_fullscreenQuad.Unbind();
 	}
 
@@ -643,7 +616,7 @@ namespace Render
 		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, m_color0->GetHandle());
 
-		m_renderTech->GetPrograms()[0]->Apply();
+		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
@@ -652,6 +625,17 @@ namespace Render
 		// Unbind active target.
 		glActiveTexture(GL_TEXTURE0 + 5);
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void GLRenderer::BindForwardFramebuffer()
+	{
+		// Bind forward target.
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, buffers);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)
@@ -669,31 +653,6 @@ namespace Render
 		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &cur_avail_mem_kb);
 
 		return cur_avail_mem_kb;
-	}
-
-	void GLRenderer::PrintResourceUsage()
-	{
-		int bufferSize = 0;
-		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
-		{
-			bufferSize += (*itr)->GetBufferSize();
-		}
-
-		bufferSize /= 1000;
-
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Buffer memory usage: %d kb", bufferSize);
-
-		int textureSize = 0;
-		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
-		{
-			textureSize += ((*itr)->GetWidth() * (*itr)->GetHeight() * (*itr)->GetBytesPerPixel()) / (*itr)->GetCompressRatio();
-			
-		}
-
-		textureSize /= 1000;
-
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Texture memory usage: %d kb", textureSize);
-
 	}
 
 	int GLRenderer::GetWidth() const
@@ -720,55 +679,42 @@ namespace Render
 
 	BufferInterface* GLRenderer::CreateBuffer(GLenum p_type)
 	{ 
-		Buffer* buffer = new Buffer(p_type);
-
-		m_buffers.push_back(buffer);
-
-		return buffer;
+		return m_resources.CreateBuffer(p_type);
 	}
 
 	void GLRenderer::ReleaseBuffer(BufferInterface* p_buffer)
 	{
-		auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
-
-		m_buffers.erase(itr);
+		m_resources.ReleaseBuffer(p_buffer);
 	}
 
 	TextureInterface* GLRenderer::CreateTexture()
 	{
-		Texture* texture = new Texture();
-
-		m_textures.push_back(texture);
-
-		return texture;
+		return m_resources.CreateTexture();
 	}
 
 	void GLRenderer::ReleaseTexture(TextureInterface* p_texture)
 	{
-		auto itr = std::find(m_textures.begin(), m_textures.end(), p_texture);
-
-		m_textures.erase(itr);
+		m_resources.ReleaseTexture(p_texture);
 	}
 
-	std::shared_ptr<VertexAttributesInterface> GLRenderer::CreateVertexAttributes()
-	{ 
-		return std::shared_ptr<VertexAttributesInterface>(new VertexAttributes); 
-	}
-
-	std::shared_ptr<MeshInterface> GLRenderer::CreateMesh() 
-	{ 
-		return std::shared_ptr<MeshInterface>(new Mesh);
-	}
-		std::shared_ptr<EffectInterface> GLRenderer::CreateEffect() 
-	{ 
-		return std::shared_ptr<EffectInterface>(new Effect);
-	}
-
-	std::shared_ptr<Material> GLRenderer::CreateMaterial()
+	Material* GLRenderer::CreateMaterial()
 	{
-		Material* mat = new Material;
-		m_materialMeshMap[mat] = std::vector<MeshInterface*>(); //unknown if needed
-		return std::shared_ptr<Material>(mat); 
+		return m_resources.CreateMaterial();
+	}
+
+	VertexAttributesInterface* GLRenderer::CreateVertexAttributes()
+	{ 
+		return m_resources.CreateVertexAttributes();
+	}
+
+	MeshInterface* GLRenderer::CreateMesh() 
+	{ 
+		return m_resources.CreateMesh();
+	}
+
+	EffectInterface* GLRenderer::CreateEffect() 
+	{ 
+		return m_resources.CreateEffect();
 	}
 
 	ParticleSystem* GLRenderer::CreateParticleSystem()
@@ -816,7 +762,6 @@ namespace Render
 	{
 		m_particles.Free((ParticleSystem*)p_particleSys);
 	}
-
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

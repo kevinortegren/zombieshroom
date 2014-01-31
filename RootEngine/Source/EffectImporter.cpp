@@ -15,7 +15,7 @@ namespace RootEngine
 
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
-		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
+		Render::EffectInterface* effect = m_renderer->CreateEffect();
 
 		if(!p_node.FindValue("techniques"))
 		{

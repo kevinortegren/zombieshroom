@@ -38,8 +38,6 @@ namespace RootForce
 		float m_minWorldZ;
 		float m_maxWorldY;
 
-		int m_shadowcasterCount;
-
 		// World AABB points.
 		glm::vec3 worldCorners[8];
 	};

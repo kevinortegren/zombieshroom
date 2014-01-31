@@ -693,7 +693,7 @@ namespace RootForce
 			NumberOfArgs(2);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
 			std::string handle = luaL_checkstring(p_luaState, 2);
-			(*rtemp)->m_material = g_engineContext.m_resourceManager->GetMaterial(handle);
+			(*rtemp)->m_material = g_engineContext.m_renderer->CreateMaterial();
 			return 0;
 		}
 		static int RenderableSetPass(lua_State* p_luaState)
@@ -763,7 +763,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
-			lua_pushstring(p_luaState, g_engineContext.m_resourceManager->ResolveStringFromMaterial((*rtemp)->m_material).c_str());
+			lua_pushstring(p_luaState, "Material");
 			return 1;
 		}
 		static int RenderableGetModel(lua_State* p_luaState)

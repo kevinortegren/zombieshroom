@@ -56,7 +56,7 @@ namespace Render
 	class Texture : public TextureInterface
 	{
 	public:
-		friend class GLRenderer;
+		friend class RenderResourceManager;
 		
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);

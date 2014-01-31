@@ -38,7 +38,7 @@ namespace Render
 		size_t m_numDirectionalLights;
 		size_t m_numPointLights;
 
-		std::shared_ptr<TechniqueInterface> m_lightingTech;
+		std::shared_ptr<TechniqueInterface> m_deferredTech;
 
 		GLuint m_fbo;
 		GLuint m_laHandle;

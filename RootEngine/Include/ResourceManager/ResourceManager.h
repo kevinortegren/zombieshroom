@@ -50,12 +50,10 @@ namespace RootEngine
 
 		virtual const std::string& GetWorkingDirectory() = 0;
 		virtual const std::string& ResolveStringFromModel(Model* p_model) = 0;
-		virtual const std::string& ResolveStringFromMaterial(Render::Material* p_material) = 0;
 
 		virtual Model*								GetModel(std::string p_handle) = 0;
 		virtual Render::EffectInterface*			GetEffect(std::string p_handle) = 0;
 		virtual Render::TextureInterface*			GetTexture(std::string p_handle) = 0;
-		virtual Render::Material*					GetMaterial(std::string p_handle) = 0;
 	};
 
 	class ResourceManager : public ResourceManagerInterface
@@ -105,10 +103,9 @@ namespace RootEngine
 	private:
 		//Resources
 		std::map<std::string, Model*> m_models;
-		std::map<std::string, std::shared_ptr<Render::MeshInterface>> m_meshes;
-		std::map<std::string, std::shared_ptr<Render::EffectInterface>>	m_effects;
+		std::map<std::string, Render::MeshInterface*> m_meshes;
+		std::map<std::string, Render::EffectInterface*>	m_effects;
 		std::map<std::string, Render::TextureInterface*> m_textures;
-		std::map<std::string, std::shared_ptr<Render::Material>> m_materials;
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>> m_physicMeshes;
 		std::map<std::string, std::string> m_scripts;
 		std::map<std::string, std::vector<ParticleSystemStruct*>> m_particles;
