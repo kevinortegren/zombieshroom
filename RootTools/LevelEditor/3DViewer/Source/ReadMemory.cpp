@@ -26,6 +26,7 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
 	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(WorldData);
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -115,6 +116,10 @@ int ReadMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(PaintTexture) * g_maxPaintTextures);
 
 	NumberOfPaintTextures = (int*)(mem);
+
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	worldData = (WorldData*)mem;
 
 	if(first_process)
 	{

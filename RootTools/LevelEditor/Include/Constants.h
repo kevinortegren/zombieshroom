@@ -47,6 +47,7 @@ struct UpdateMessage
 	}
 };
 
+
 struct Transform
 {
 	int index;
@@ -116,6 +117,12 @@ struct Light
 	glm::vec4 color;
 	glm::vec3 direction;
 	float Intensity;
+};
+
+struct WorldData
+{
+	Light AmbientLight;
+	Light DirectionalSun;
 };
 
 struct Locator

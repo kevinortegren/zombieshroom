@@ -16,7 +16,10 @@ MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
 MSelectionList selected;
 
-MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators];
+MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], 
+		g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators],
+		g_mayaAmbientLight, g_mayaDirectionalLight;
+
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
@@ -55,6 +58,7 @@ int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
 MString cleanFullPathName(const char * str);
 std::string GetNameFromPath( std::string p_path );
+void UpdateTransformation(Transform destination, MObject transObject);
 
 PaintTexture myTextures[g_maxPaintTextures];
 MSpace::Space g_space_world = MSpace::kPostTransform;
@@ -369,13 +373,23 @@ void sortObjectList()
 			MayaCameraToList(g_mayaCameraList[currNrCameras], currNrCameras);	
 			currNrCameras++;
 		}
-		else if(g_objectList[i].hasFn(MFn::kLight))
+		else if(g_objectList[i].hasFn(MFn::kPointLight))
 		{
 			MFnLight tempLight = g_objectList[i];
 			g_mayaLightList[currNrLights] = g_objectList[i];
 			MayaLightToList(g_mayaLightList[currNrLights], currNrLights);		
 
 			currNrLights++;
+		}
+		else if(g_objectList[i].hasFn(MFn::kAmbientLight))
+		{
+			g_mayaAmbientLight = g_objectList[i];
+			MayaLightToList(g_mayaAmbientLight, currNrLights);
+		}
+		else if(g_objectList[i].hasFn(MFn::kDirectionalLight))
+		{
+			g_mayaDirectionalLight = g_objectList[i];
+			MayaLightToList(g_mayaDirectionalLight, currNrLights);
 		}
 		else if(g_objectList[i].hasFn(MFn::kLambert))
 		{
@@ -949,7 +963,7 @@ void checkForNewLights(MObject &node, void *clientData)
 
 	MStatus status;
 
-	if(node.hasFn(MFn::kLight))
+	if(node.hasFn(MFn::kPointLight))
 	{
 		//Print("New Light Added");
 		g_mayaLightList[currNrLights] = node;
@@ -958,7 +972,23 @@ void checkForNewLights(MObject &node, void *clientData)
 		AddCallbackID(status, id);
 		currNrLights++;
 	}
+
+	if(node.hasFn(MFn::kDirectionalLight))
+	{
+		g_mayaDirectionalLight = node;
+		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
 	
+	if(node.hasFn(MFn::kAmbientLight))
+	{
+		g_mayaAmbientLight = node;
+		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
 	if(light.parent(0,&status).hasFn(MFn::kTransform))
 	{
 		MObject transform = light.parent(0, &status);
@@ -1122,27 +1152,30 @@ void MayaLocatorToList(MObject object)
 		glm::vec3 position;
 
 		MFnTransform trans = locator.parent(0);
+		
+		MObject transObj = trans.object();
+		UpdateTransformation(SM.locatorList[index].transformation, transObj);
 
-		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
-		trans.getScale(scale);
-		trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
+		//memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
+		//trans.getScale(scale);
+		//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
 
-		position.x = trans.getTranslation(g_space_world).x;
-		position.y = trans.getTranslation(g_space_world).y;
-		position.z = trans.getTranslation(g_space_world).z;
+		//position.x = trans.getTranslation(g_space_world).x;
+		//position.y = trans.getTranslation(g_space_world).y;
+		//position.z = trans.getTranslation(g_space_world).z;
 
-		SM.locatorList[index].transformation.position.x = position.x;
-		SM.locatorList[index].transformation.position.y = position.y;
-		SM.locatorList[index].transformation.position.z = position.z;
+		//SM.locatorList[index].transformation.position.x = position.x;
+		//SM.locatorList[index].transformation.position.y = position.y;
+		//SM.locatorList[index].transformation.position.z = position.z;
 
-		SM.locatorList[index].transformation.scale.x = scale[0];
-		SM.locatorList[index].transformation.scale.y = scale[1];
-		SM.locatorList[index].transformation.scale.z = scale[2];
+		//SM.locatorList[index].transformation.scale.x = scale[0];
+		//SM.locatorList[index].transformation.scale.y = scale[1];
+		//SM.locatorList[index].transformation.scale.z = scale[2];
 
-		SM.locatorList[index].transformation.rotation.x = rotX;
-		SM.locatorList[index].transformation.rotation.y = rotY;
-		SM.locatorList[index].transformation.rotation.z = rotZ;
-		SM.locatorList[index].transformation.rotation.w = rotW;
+		//SM.locatorList[index].transformation.rotation.x = rotX;
+		//SM.locatorList[index].transformation.rotation.y = rotY;
+		//SM.locatorList[index].transformation.rotation.z = rotZ;
+		//SM.locatorList[index].transformation.rotation.w = rotW;
 
 		getLocatorFlags(locator.parent(0), index);
 
@@ -1446,6 +1479,31 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
 }
 
+void UpdateTransformation(Transform destination, MObject transObject)
+{
+	MFnTransform transform = transObject;
+
+	MStatus status;
+	double scale[3];
+	double rotX, rotY, rotZ, rotW;
+
+	transform.getScale(scale);
+	transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+	destination.position.x = transform.getTranslation(g_space_world).x;
+	destination.position.y = transform.getTranslation(g_space_world).y;
+	destination.position.z = transform.getTranslation(g_space_world).z;
+
+	destination.scale.x = scale[0];
+	destination.scale.y = scale[1];
+	destination.scale.z = scale[2];
+
+	destination.rotation.x = rotX;
+	destination.rotation.y = rotY;
+	destination.rotation.z = rotZ;
+	destination.rotation.w = rotW;
+}
+
 void MayaLightToList(MObject node, int lightIndex)
 {
 	MStatus status;
@@ -1459,57 +1517,121 @@ void MayaLightToList(MObject node, int lightIndex)
 	if(node.hasFn(MFn::kLight))
 	{
 		MFnLight light = node;
+		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 
 		if(node.hasFn(MFn::kPointLight))
 		{
 			memcpy(SM.lightList[lightIndex].LightType, PL.asChar(), PL.numChars());
+
+			SM.lightList[lightIndex].color.r = light.color(&status).r;
+			SM.lightList[lightIndex].color.g = light.color(&status).g;
+			SM.lightList[lightIndex].color.b = light.color(&status).b;
+			SM.lightList[lightIndex].color.a = light.color(&status).a;
+			SM.lightList[lightIndex].Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				transform.getScale(scale);
+				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+				SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+				SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				SM.lightList[lightIndex].transformation.scale.x = scale[0];
+				SM.lightList[lightIndex].transformation.scale.y = scale[1];
+				SM.lightList[lightIndex].transformation.scale.z = scale[2];
+
+				SM.lightList[lightIndex].transformation.rotation.x = rotX;
+				SM.lightList[lightIndex].transformation.rotation.y = rotY;
+				SM.lightList[lightIndex].transformation.rotation.z = rotZ;
+				SM.lightList[lightIndex].transformation.rotation.w = rotW;
+			}
+
+			SM.UpdateSharedLight(lightIndex, currNrLights);
 		}
 
 		if(node.hasFn(MFn::kDirectionalLight))
 		{
-			memcpy(SM.lightList[lightIndex].LightType, DL.asChar(), DL.numChars());
-			SM.lightList[lightIndex].direction.x = light.lightDirection().x;
-			SM.lightList[lightIndex].direction.y = light.lightDirection().y;
-			SM.lightList[lightIndex].direction.z = light.lightDirection().z;
+			SM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
+
+			memcpy(SM.worldData->DirectionalSun.LightType, DL.asChar(), DL.numChars());
+			SM.worldData->DirectionalSun.direction.x = light.lightDirection().x;
+			SM.worldData->DirectionalSun.direction.y = light.lightDirection().y;
+			SM.worldData->DirectionalSun.direction.z = light.lightDirection().z;
+
+			SM.worldData->DirectionalSun.color.r = light.color(&status).r;
+			SM.worldData->DirectionalSun.color.g = light.color(&status).g;
+			SM.worldData->DirectionalSun.color.b = light.color(&status).b;
+			SM.worldData->DirectionalSun.color.a = light.color(&status).a;
+			SM.worldData->DirectionalSun.Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				transform.getScale(scale);
+				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				SM.worldData->DirectionalSun.transformation.position.x = transform.getTranslation(g_space_world).x;
+				SM.worldData->DirectionalSun.transformation.position.y = transform.getTranslation(g_space_world).y;
+				SM.worldData->DirectionalSun.transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				SM.worldData->DirectionalSun.transformation.scale.x = scale[0];
+				SM.worldData->DirectionalSun.transformation.scale.y = scale[1];
+				SM.worldData->DirectionalSun.transformation.scale.z = scale[2];
+
+				SM.worldData->DirectionalSun.transformation.rotation.x = rotX;
+				SM.worldData->DirectionalSun.transformation.rotation.y = rotY;
+				SM.worldData->DirectionalSun.transformation.rotation.z = rotZ;
+				SM.worldData->DirectionalSun.transformation.rotation.w = rotW;
+			}
+			ReleaseMutex(SM.LightMutexHandle);
+			SM.AddUpdateMessage("DirectionalSun", 0, true, true, false);
 		}
 
 		if(node.hasFn(MFn::kAmbientLight))
 		{
-			memcpy(SM.lightList[lightIndex].LightType, AL.asChar(), AL.numChars());
+			SM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
+
+			memcpy(SM.worldData->AmbientLight.LightType, AL.asChar(), AL.numChars());
+			SM.worldData->AmbientLight.color.r = light.color(&status).r;
+			SM.worldData->AmbientLight.color.g = light.color(&status).g;
+			SM.worldData->AmbientLight.color.b = light.color(&status).b;
+			SM.worldData->AmbientLight.color.a = light.color(&status).a;
+			SM.worldData->AmbientLight.Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				transform.getScale(scale);
+				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				SM.worldData->AmbientLight.transformation.position.x = transform.getTranslation(g_space_world).x;
+				SM.worldData->AmbientLight.transformation.position.y = transform.getTranslation(g_space_world).y;
+				SM.worldData->AmbientLight.transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				SM.worldData->AmbientLight.transformation.scale.x = scale[0];
+				SM.worldData->AmbientLight.transformation.scale.y = scale[1];
+				SM.worldData->AmbientLight.transformation.scale.z = scale[2];
+
+				SM.worldData->AmbientLight.transformation.rotation.x = rotX;
+				SM.worldData->AmbientLight.transformation.rotation.y = rotY;
+				SM.worldData->AmbientLight.transformation.rotation.z = rotZ;
+				SM.worldData->AmbientLight.transformation.rotation.w = rotW;
+			}
+
+			SM.AddUpdateMessage("AmbientLight", 0, true, true, false);
+			ReleaseMutex(SM.LightMutexHandle);
 		}
-
-		SM.lightList[lightIndex].color.r = light.color(&status).r;
-		SM.lightList[lightIndex].color.g = light.color(&status).g;
-		SM.lightList[lightIndex].color.b = light.color(&status).b;
-		SM.lightList[lightIndex].color.a = light.color(&status).a;
-		SM.lightList[lightIndex].Intensity = light.intensity(&status);
-
-		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
-		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
-
-		///////////////////////	LIGHT TRANSFORM
-		if(light.parent(0, &status).hasFn(MFn::kTransform))
-		{
-			MFnTransform transform = light.parent(0, &status);
-
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
-
-			SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
-			SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
-			SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
-
-			SM.lightList[lightIndex].transformation.scale.x = scale[0];
-			SM.lightList[lightIndex].transformation.scale.y = scale[1];
-			SM.lightList[lightIndex].transformation.scale.z = scale[2];
-
-			SM.lightList[lightIndex].transformation.rotation.x = rotX;
-			SM.lightList[lightIndex].transformation.rotation.y = rotY;
-			SM.lightList[lightIndex].transformation.rotation.z = rotZ;
-			SM.lightList[lightIndex].transformation.rotation.w = rotW;
-		}
-
-		SM.UpdateSharedLight(lightIndex, currNrLights);
 	}
 }
 

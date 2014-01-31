@@ -558,7 +558,10 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		}
 
-
+		if(glowMap != "" && glowMap != "NONE")
+		{
+			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
+		}
 
 		//UPDATE TILEFACTOR
 		if(meshID != -1)

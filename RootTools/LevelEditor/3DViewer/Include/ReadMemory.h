@@ -40,6 +40,7 @@ public:
 	Material* PmaterialList[g_maxMeshes];
 	Locator* PlocatorList[g_maxLocators];
 	PaintTexture* PpaintList[g_maxPaintTextures];
+	WorldData* worldData;
 
 	int* export;
 
