@@ -31,6 +31,9 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
 	{
+		if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
+			continue;
+
 		if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
 			continue;
 
