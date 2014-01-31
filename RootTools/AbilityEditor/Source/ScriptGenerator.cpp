@@ -33,65 +33,6 @@ namespace AbilityEditorNameSpace
 		}*/
 		m_entity = p_entity;
 		p_filePath.chop(p_filePath.size() - p_filePath.lastIndexOf("/") - 1);
-/*
-		for (int i = 0; (unsigned int)i < p_onCreate->GetEntities()->size(); i++)
-		{
-			//Folder only
-			//m_name = p_onCreate->GetEntities()->at(i)->m_name.toStdString();
-			//m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
-			
-			//No folder
-			m_name = p_onCreate->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + m_name + ".lua");
-
-			//Begin writing in the file
-			m_file << m_name << " = {};\n";
-			m_file << "\n";
-
-			WriteOnCreate(p_onCreate, i);
-			m_file << "\n";
-			WriteOnCollide(p_onCreate, p_onCollide, i);
-			m_file << "\n";
-			WriteOnDestroy(p_onDestroy, i);
-
-			m_file.close();
-		}
-
-		for (int i = 0; (unsigned int)i < p_onCollide->GetEntities()->size(); i++)
-		{
-			m_name = p_onCollide->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
-
-			//Begin writing in the file
-			m_file << m_name << " = {};\n";
-			m_file << "\n";
-
-			WriteOnCreate(p_onCreate, i);
-			m_file << "\n";
-			WriteOnCollide(p_onCreate, p_onCollide, i);
-			m_file << "\n";
-			WriteOnDestroy(p_onDestroy, i);
-
-			m_file.close();
-		}
-
-		for (int i = 0; (unsigned int)i < p_onDestroy->GetEntities()->size(); i++)
-		{
-			m_name = p_onDestroy->GetEntities()->at(i)->m_name.toStdString();
-			m_file.open(p_filePath.toStdString() + p_name.toStdString() + "/" + m_name + ".lua");
-
-			//Begin writing in the file
-			m_file << m_name << " = {};\n";
-			m_file << "\n";
-
-			WriteOnCreate(p_onCreate, i);
-			m_file << "\n";
-			WriteOnCollide(p_onCreate, p_onCollide, i);
-			m_file << "\n";
-			WriteOnDestroy(p_onDestroy, i);
-
-			m_file.close();
-		}*/
 
 		m_name = p_name.toStdString();
 		m_file.open(p_filePath.toStdString() + m_name + ".lua");
@@ -245,7 +186,7 @@ namespace AbilityEditorNameSpace
 			std::vector<QString> scriptNames = p_onCreate->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
-				scriptNames.at(j).chop(4); //Needed?
+				scriptNames.at(j).chop(4);
 				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
 			}
 			m_file << "\tend\n";
@@ -255,12 +196,11 @@ namespace AbilityEditorNameSpace
 
 	void ScriptGenerator::WriteOnCollide( OnCreate* p_onCreate, OnCollide* p_onCollide)
 	{
-		//std::vector<AbilityEntity::Entity*>* OCEntities = p_onCreate->GetEntities();
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
 		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
 		{
-			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
+			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY) //Fix here
 			{
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
@@ -281,7 +221,7 @@ namespace AbilityEditorNameSpace
 			std::vector<QString> scriptNames = p_onCollide->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
-				scriptNames.at(j).chop(4); //Needed?
+				scriptNames.at(j).chop(4); 
 				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
 			}
 			m_file << "\tend\n";
@@ -299,13 +239,13 @@ namespace AbilityEditorNameSpace
 			std::vector<QString> scriptNames = p_onDestroy->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
-				scriptNames.at(j).chop(4); //Needed?
+				scriptNames.at(j).chop(4); 
 				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
 			}
 			m_file << "\tend\n";
 		}
 		m_file << "\tlocal collision = self:GetCollision();\n";
-		m_file << "\tCollision.RemoveObjectFromWorld(collision);\n";
+		m_file << "\tCollision.RemoveObjectFromWorld(collision);\n"; //Should this be here?
 		m_file << "end\n";
 	}
 }

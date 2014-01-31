@@ -17,22 +17,12 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
 	
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if(BAJSBAJSBAJS)"));
+	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if BAJSBAJSBAJS "));
 }
 
 AbilityEditor::~AbilityEditor()
 {
-	
-// 	if(m_LastSelectedItem != nullptr)
-// 	{
-// 
-// 		if(m_LastSelectedTab == 0) //On Create list
-// 			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-// 		else if(m_LastSelectedTab == 1) //On Collide list
-// 			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-// 		else if(m_LastSelectedTab == 2) //On Destroy list
-// 			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-// 	}
+
 }
 
 void AbilityEditor::Init()
