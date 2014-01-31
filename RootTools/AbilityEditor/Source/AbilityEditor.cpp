@@ -49,7 +49,11 @@ void AbilityEditor::Init()
 	m_entity = new AbilityEditorNameSpace::Entity("NewAbility");
 
 	ui.listComponents->addItems(m_compNames);
-	ui.listConditions->addItem(m_testCond->GetText());
+	for (unsigned int i = 0; i < m_conditions.size(); i++)
+	{
+		ui.listConditions->addItem(m_conditions.at(i)->GetText());
+	}
+	
 	//ui.listAbilities->addItem("Empty Entity");
 	m_propBrows = new QtTreePropertyBrowser;
 	m_propMan = new QtVariantPropertyManager;
