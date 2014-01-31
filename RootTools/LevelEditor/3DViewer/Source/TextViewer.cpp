@@ -428,6 +428,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 {
 	bool painted = false;
 	bool painting = false;
+	bool transparent = false;
 	int paintID;
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -443,6 +444,10 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		if(flag == "Painting")
 		{
 			painting = true;
+		}
+		if(flag == "Transparent")
+		{
+			transparent = true;
 		}
 	}
 
@@ -507,16 +512,20 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		if(specularMap != "" && specularMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
-
 		}
 		if(glowMap != "" && glowMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
 		}
-		if(normalMap != "" && normalMap != "NONE")
+		if(normalMap != "" && normalMap != "NONE" && !transparent)
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+		}
+		if(normalMap != "" && normalMap != "NONE" && transparent)
+		{
+			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
 		}
 		else
 		{
@@ -737,7 +746,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		}
 		else
 		{
-			cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
+			//cout << "Updating " << RM.PmeshList[MeshIndex]->transformation.name << " at index: " << MeshIndex << endl;
 		}
 
 		if(updateTransformation)
@@ -783,9 +792,9 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
 			transform->m_position += modifiedPos;
 
-			cout << "position x " << transform->m_position.x << endl;
-			cout << "position y " << transform->m_position.y << endl;
-			cout << "position z " << transform->m_position.z << endl;
+			//cout << "position x " << transform->m_position.x << endl;
+			//cout << "position y " << transform->m_position.y << endl;
+			//cout << "position z " << transform->m_position.z << endl;
 
 			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
 
@@ -795,9 +804,9 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			z = atan2(rotationTest[1][0], rotationTest[0][0]);
 
 				
-			cout << "rot x " << -glm::degrees(x) << endl;
-			cout << "rot y " << -glm::degrees(y) << endl;
-			cout << "rot z " << -glm::degrees(z) << endl;
+			//cout << "rot x " << -glm::degrees(x) << endl;
+			//cout << "rot y " << -glm::degrees(y) << endl;
+			//cout << "rot z " << -glm::degrees(z) << endl;
 
 			// Get material connected to mesh and set it from materiallist
 			
