@@ -471,6 +471,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
 			painter->BufferData(RM.PpaintList[paintID]->Pixels);
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+
 		}
 		else if(painted)
 		{
@@ -489,6 +490,11 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureBlue, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		if(glowMap != "" && glowMap != "NONE")
+		{
+			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
+		}
 
 		//UPDATE TILEFACTOR
 		if(meshID != -1)
