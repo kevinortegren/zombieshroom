@@ -17,12 +17,14 @@ namespace RootForce
 
 #ifndef COMPILE_LEVEL_EDITOR
 		void LoadWorld(const std::string& p_worldName);
+		void CreatePlayerCamera();
+		void CreateSkyBox();
 #endif
 
-		void SetAmbientLight(glm::vec3 p_ambient);
+		void SetAmbientLight(glm::vec4 p_ambient);
 		void CreateSun();
-		void CreateSkyBox();
-		void CreatePlayerCamera();
+		
+		
 		void AddStaticEntitiesToPhysics();
 
 		void Process();

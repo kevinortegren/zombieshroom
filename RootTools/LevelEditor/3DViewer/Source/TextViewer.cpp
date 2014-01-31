@@ -11,6 +11,8 @@
 #include <RootSystems\Include\RenderingSystem.h>
 #include <RootSystems\Include\LightSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
+#include <RootSystems\Include\WorldSystem.h>
+#include <RootSystems\Include\ShadowSystem.h>
 
 #include <Utility\ECS\Include\World.h>
 
@@ -38,7 +40,10 @@ ECS::World m_world;
 RootForce::RenderingSystem* renderingSystem;
 RootForce::CameraSystem* cameraSystem;
 RootForce::PointLightSystem* pointLightSystem;
+RootForce::DirectionalLightSystem* directionalLightSystem;
 RootForce::ParticleSystem* particleSystem;
+RootForce::WorldSystem* worldSystem;
+RootForce::ShadowSystem* shadowSystem;
 
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
@@ -236,8 +241,10 @@ int main(int argc, char* argv[])
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
 				cameraSystem->Process();
+				directionalLightSystem->Process();
 				pointLightSystem->Process();
 				particleSystem->Process();
+				shadowSystem->Process();
 				renderingSystem->Process();
 				g_engineContext.m_renderer->Render();
 
@@ -317,18 +324,23 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+	RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+	RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
 
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(100);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
+
 
 
 	// Initialize systems.
@@ -337,14 +349,23 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem);
 
-	pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+	pointLightSystem = new RootForce::PointLightSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem);
+
+	directionalLightSystem = new RootForce::DirectionalLightSystem(&m_world, &g_engineContext);
+	m_world.GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(directionalLightSystem);
 
 	cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem);
 
 	particleSystem = new RootForce::ParticleSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem);
+
+	shadowSystem = new RootForce::ShadowSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ShadowSystem>(shadowSystem);
+
+	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
+	worldSystem->CreateSun();
 }
 
 void LoadSceneFromMaya()
@@ -961,7 +982,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 
 		if(type == "AmbientLight")
 		{
-			g_engineContext.m_renderer->SetAmbientLight(RM.PlightList[LightIndex]->color);
+			worldSystem->SetAmbientLight(RM.PlightList[LightIndex]->color);
 			ambientInfoExists = true;
 		}
 

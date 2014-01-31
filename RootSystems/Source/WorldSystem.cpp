@@ -27,9 +27,9 @@ namespace RootForce
 	}
 #endif
 
-	void WorldSystem::SetAmbientLight(glm::vec3 p_ambient)
+	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
 	{
-		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 1.0f));
+		m_engineContext->m_renderer->SetAmbientLight(p_ambient);
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
 	}
 
@@ -51,7 +51,7 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
-
+#ifndef COMPILE_LEVEL_EDITOR
 	void WorldSystem::CreateSkyBox()
 	{
 		// Setup skybox entity.
@@ -74,7 +74,7 @@ namespace RootForce
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 	}
 
-#ifndef COMPILE_LEVEL_EDITOR
+
 	void WorldSystem::AddStaticEntitiesToPhysics()
 	{
 		// Add static entities to physics.
@@ -92,7 +92,7 @@ namespace RootForce
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
 	}
-#endif
+
 
 	void WorldSystem::CreatePlayerCamera()
 	{
@@ -132,7 +132,7 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
 	}
-
+#endif
 	void WorldSystem::Process()
 	{	
 		ECS::Entity* testCameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");
