@@ -21,6 +21,7 @@ namespace RootForce
 		void CreateWorld(const std::string& p_worldName);
 		void Process();
 		void ShowDebug(bool p_value);
+		RootForce::AABB GetWorldAABB(){return m_quadTree.GetRoot()->GetBounds();}
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;

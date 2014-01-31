@@ -7,6 +7,7 @@
 #include <memory>
 
 #define RENDER_MAX_SHADOWCASTERS 1
+#define RENDER_SHADOW_CASCADES 4
 
 namespace Render
 {
@@ -26,16 +27,16 @@ namespace Render
 		int GetWidth(){ return m_width; }
 		int GetHeight(){ return m_height; }
 
-		GLuint GetFramebuffer(){ return m_framebuffer; }
-
 		std::shared_ptr<Technique> m_technique;
 		Shadowcaster m_shadowcasters[RENDER_MAX_SHADOWCASTERS];
 		TextureInterface* m_depthTexture;
+		GLuint m_depthTextureArray;
+		GLuint m_framebuffers[RENDER_SHADOW_CASCADES];
 	private:
 		int m_width;
 		int m_height;
 		size_t m_numberOfShadowcasters;
 		
-		GLuint m_framebuffer;
+		
 	};
 }

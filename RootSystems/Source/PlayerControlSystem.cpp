@@ -200,8 +200,6 @@ namespace RootForce
 
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
-
-	
 }
 
 #endif

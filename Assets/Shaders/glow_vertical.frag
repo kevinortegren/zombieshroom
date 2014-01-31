@@ -26,8 +26,8 @@ float Gaussian (float x, float deviation)
 
 void main()
 {
-	float blurS = 1.2f;
-    float blurF = 5.0f;
+	float blurS = 2.2f;
+    float blurF = 2.0f;
 
     float deviation = blurF * 0.35;
 	deviation *= deviation;
@@ -48,5 +48,5 @@ void main()
 	}
     
     blur.w = 1.0;
-	frag_color = texture(g_Scene, TexelCoord) + clamp(blur, 0.0, 1.0);
+	frag_color = texture(g_Scene, TexelCoord) + glow + clamp(blur, 0.0, 1.0);
 }

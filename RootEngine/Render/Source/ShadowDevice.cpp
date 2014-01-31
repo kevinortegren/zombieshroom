@@ -17,42 +17,59 @@ namespace Render
 		{
 			delete m_depthTexture;
 		}
-		glDeleteFramebuffers(1, &m_framebuffer);
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			glDeleteFramebuffers(1, &m_framebuffers[i]);
+		}
 	}
 
 	void ShadowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
 		m_width = p_width;
 		m_height = p_height;
-		m_depthTexture = p_renderer->CreateTexture();
-		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
-		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		//m_depthTexture = p_renderer->CreateTexture();
+		//m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
+		//m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		//m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		//m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		//m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		////m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+		//m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		//m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		glGenFramebuffers(1, &m_framebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthTexture->GetHandle(), 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		switch (status)
+		glGenTextures(1, &m_depthTextureArray);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_depthTextureArray);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32F, m_width, m_height, RENDER_SHADOW_CASCADES);
+		
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
-		case GL_FRAMEBUFFER_COMPLETE:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
-			break;
-		default:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
-			break;
+			glGenFramebuffers(1, &m_framebuffers[i]);
+			glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers[i]);
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthTextureArray, 0, i);
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			switch (status)
+			{
+			case GL_FRAMEBUFFER_COMPLETE:
+				g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+				break;
+			default:
+				g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+				break;
+			}
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_BACK);
 		glReadBuffer(GL_BACK);
-		
+
 		auto effect = g_context.m_resourceManager->LoadEffect("Renderer/Shadow");
 		m_technique = effect->GetTechniques()[0];
 	}
