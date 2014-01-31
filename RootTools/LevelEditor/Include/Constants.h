@@ -16,6 +16,7 @@ const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 20;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
+const string g_textureLookPath = "C:/Users/BTH/Documents/zombieshroom/Assets/Textures/";
 
 const string g_levelName = "RootIslandV1";
 

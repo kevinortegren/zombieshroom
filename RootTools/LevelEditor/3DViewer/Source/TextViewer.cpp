@@ -32,6 +32,7 @@ ReadMemory RM;
 int numberMeshes;
 int numberLights;
 int numberCameras;
+
 // Setup world.
 ECS::World m_world;
 RootForce::RenderingSystem* renderingSystem;
@@ -424,12 +425,28 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
+bool fexists(const std::string& filename)
+{
+	bool Exists = false;
+
+	ifstream ifile(filename.c_str());
+	if (ifile)
+	{
+		Exists = true;
+	}
+
+  return Exists;
+}
+
 void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID)
 {
 	bool painted = false;
 	bool painting = false;
 	bool transparent = false;
 	int paintID;
+	string temp;
+	string NormalName;
+	ifstream ifile;
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	paintID = RM.PmeshList[meshID]->paintIndex;
@@ -489,6 +506,38 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureBlue, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		temp = RM.PpaintList[paintID]->textureRed;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+			NormalName = temp + "Normal";
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+		temp = RM.PpaintList[paintID]->textureGreen;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+		NormalName = temp + "Normal";
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+		temp = RM.PpaintList[paintID]->textureBlue;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+		NormalName = temp + "Normal";
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+
 
 		//UPDATE TILEFACTOR
 		if(meshID != -1)
