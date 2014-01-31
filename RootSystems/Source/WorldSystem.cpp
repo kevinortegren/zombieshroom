@@ -8,7 +8,7 @@ namespace RootForce
 	void WorldSystem::LoadWorld(const std::string& p_worldName)
 	{
 		// Import entities, groups, tags and storage.
-		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
+		//m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
 		glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
@@ -59,11 +59,52 @@ namespace RootForce
 
 		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
 		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
-	
-		t->m_scale = glm::vec3(-100, -100, -100);
+
+		t->m_scale = glm::vec3(-100);
 		t->m_orientation.Roll(180);
 
-		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
+		static glm::vec3 positions[12] = 
+		{
+			glm::vec3( -0.500000, -0.500000, 0.500000),
+			glm::vec3(0.500000, -0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, 0.500000),
+			glm::vec3(0.500000, 0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, -0.500000),
+			glm::vec3(0.500000, 0.500000, -0.500000),
+			glm::vec3(-0.500000, -0.500000, -0.500000),
+			glm::vec3(0.500000, -0.500000, -0.500000)
+		};
+
+		static unsigned int indices[12 * 3] =
+		{
+			1, 2, 3, 
+			3, 2, 4, 
+			3, 4, 5, 
+			5, 4, 6, 
+			5, 6, 7, 
+			7, 6, 8,
+			7, 8, 1, 
+			1, 8, 2, 
+			2, 8, 4, 
+			4, 8, 6, 
+			7, 1, 5, 
+			5, 1, 3
+		};
+
+		Render::Vertex1P vertices[12];
+		for(int i = 0; i < 12; ++i)
+		{
+			vertices[i].m_pos = positions[i];
+		}
+
+		r->m_model = m_engineContext->m_resourceManager->CreateModel("skybox");
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+
+		r->m_model->m_meshes[0]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
+		r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
+		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 12 * 3);
+
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");

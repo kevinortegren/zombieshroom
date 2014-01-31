@@ -1,7 +1,6 @@
 #version 400
 
 in vec3 vert_texcoord;
-in vec3 vert_normal;
 
 uniform samplerCube CubeMap;
 

@@ -375,13 +375,14 @@ namespace Render
 			PROFILE("Output", g_context.m_profiler);
 			Output();
 		}
+
+		m_jobs.clear();
 	}
 
 	void GLRenderer::Clear()
 	{
 		glDepthMask(GL_TRUE);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_jobs.clear();
 	}
 
 	void GLRenderer::Swap()
