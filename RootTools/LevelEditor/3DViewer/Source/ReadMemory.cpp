@@ -128,6 +128,16 @@ int ReadMemory::InitalizeSharedMemory()
 	return 0;
 }
 
+WorldData ReadMemory::getWorldData()
+{
+	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(LightMutexHandle, milliseconds);
+
+	return *worldData;
+
+	ReleaseMutex(LightMutexHandle);
+}
+
 void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape)
 {
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");

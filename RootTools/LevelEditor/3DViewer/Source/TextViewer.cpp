@@ -220,6 +220,11 @@ int main(int argc, char* argv[])
 							UpdateLight(removeID, true, false);
 					}
 
+					if(type == "AmbientLight" || type == "DirectionalLight")
+					{
+						UpdateLight(updateID, false, false);
+					}
+
 					if(type == "Camera")
 					{
 						UpdateCamera(updateID);
@@ -962,12 +967,11 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 
 	int size = LightEntities.size()-1;
 	string type = RM.PlightList[LightIndex]->LightType;
+	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 	if(LightIndex != -1)					
 	{		
-		RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-
 		if(type == "PointLight")
 		{
 			if(LightIndex > size)
@@ -984,28 +988,32 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
-		}
-
-		if(type == "DirectionalLight" && firstTimeLoad)
-		{
-			Render::DirectionalLight dl;
-			dl.m_direction = RM.PlightList[LightIndex]->direction;
-			dl.m_color = RM.PlightList[LightIndex]->color;
-
-			g_engineContext.m_renderer->AddDirectionalLight(dl, 0);
-		}
-
-		if(type == "AmbientLight")
-		{
-			worldSystem->SetAmbientLight(RM.PlightList[LightIndex]->color);
-			ambientInfoExists = true;
-		}
-
-		if(!ambientInfoExists)
-			g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-		ReleaseMutex(RM.LightMutexHandle);
+		}		
 	}
+
+	if(type == "DirectionalLight")
+	{
+		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_position = RM.worldData->DirectionalSun.transformation.position;
+		glm::quat rot;
+		rot.x = RM.worldData->DirectionalSun.transformation.rotation.x;
+		rot.y = RM.worldData->DirectionalSun.transformation.rotation.y;
+		rot.z = RM.worldData->DirectionalSun.transformation.rotation.z;
+		rot.w = RM.worldData->DirectionalSun.transformation.rotation.w;
+		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_orientation.SetOrientation(rot);
+		m_world.GetEntityManager()->GetComponent<RootForce::DirectionalLight>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_color = RM.worldData->DirectionalSun.color;
+
+	}
+
+	if(type == "AmbientLight")
+	{
+		worldSystem->SetAmbientLight(RM.worldData->AmbientLight.color);
+		ambientInfoExists = true;
+	}
+
+	if(!ambientInfoExists)
+		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+	ReleaseMutex(RM.LightMutexHandle);
 
 	if(RemoveLightIndex >= 0)	
 	{					

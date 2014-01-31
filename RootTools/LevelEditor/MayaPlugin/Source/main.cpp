@@ -491,6 +491,37 @@ void loadScene()
 		//SM.UpdateSharedLight(i, currNrLights);
 		//Done correct in ^^
 	}
+
+	MFnLight ambient = g_mayaAmbientLight;
+	if(g_mayaAmbientLight.hasFn(MFn::kAmbientLight))
+	{
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaAmbientLight, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
+	if(ambient.parent(0,&status).hasFn(MFn::kTransform))
+	{
+		MObject transform = ambient.parent(0, &status);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+	MayaLightToList(g_mayaAmbientLight, -1);
+
+	MFnLight directional = g_mayaDirectionalLight;
+	if(g_mayaAmbientLight.hasFn(MFn::kDirectionalLight))
+	{
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaDirectionalLight, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
+	if(directional.parent(0,&status).hasFn(MFn::kTransform))
+	{
+		MObject transform = directional.parent(0, &status);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+	MayaLightToList(g_mayaDirectionalLight, -1);
+
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
 	{
@@ -582,8 +613,11 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 	if(index != -1)
 	{
 		MayaLightToList(node, index);
-		SM.UpdateSharedLight(index, currNrLights);
+		//SM.UpdateSharedLight(index, currNrLights);
 	}
+
+	if(node.hasFn(MFn::kAmbientLight) || node.hasFn(MFn::kDirectionalLight))
+		MayaLightToList(node, index);
 }
 
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
@@ -692,12 +726,18 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 			MayaMeshToList(trans.child(0, &status), index, true, true, true);
 		}
 
-		if(trans.child(0, &status).hasFn(MFn::kLight))
+		if(trans.child(0, &status).hasFn(MFn::kPointLight))
 		{
 			MayaLightToList(trans.child(0, &status), index);
-			SM.UpdateSharedLight(index, currNrLights);
+			//SM.UpdateSharedLight(index, currNrLights);
 		}
 
+	}
+
+	if(trans.child(0, &status).hasFn(MFn::kAmbientLight) || trans.child(0, &status).hasFn(MFn::kDirectionalLight))
+	{
+		MayaLightToList(trans.child(0, &status), -1);
+		//SM.UpdateSharedLight(index, currNrLights);
 	}
 
 	if(trans.child(0, &status).hasFn(MFn::kLocator))
@@ -1592,7 +1632,7 @@ void MayaLightToList(MObject node, int lightIndex)
 				SM.worldData->DirectionalSun.transformation.rotation.w = rotW;
 			}
 			ReleaseMutex(SM.LightMutexHandle);
-			SM.AddUpdateMessage("DirectionalSun", 0, true, true, false);
+			SM.AddUpdateMessage("DirectionalLight", 0, true, true, false);
 		}
 
 		if(node.hasFn(MFn::kAmbientLight))
@@ -1601,6 +1641,7 @@ void MayaLightToList(MObject node, int lightIndex)
 			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
 
 			memcpy(SM.worldData->AmbientLight.LightType, AL.asChar(), AL.numChars());
+
 			SM.worldData->AmbientLight.color.r = light.color(&status).r;
 			SM.worldData->AmbientLight.color.g = light.color(&status).g;
 			SM.worldData->AmbientLight.color.b = light.color(&status).b;
