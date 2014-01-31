@@ -1,9 +1,8 @@
 
 #include <RootEngine/Physics/Include/Ragdoll.h>
 #include <glm/gtc/type_ptr.hpp>
-
 const float PI_2 = 1.57079632679489661923f;
-const float OFFSET = -0.8f;
+const float OFFSET = -0.75f;
 namespace Ragdoll
 {
 
@@ -44,45 +43,44 @@ namespace Ragdoll
 
 	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos, int p_massFactor )
 	{
-		btRigidBody* body;
+		
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
 		if(shape != nullptr)
 		{
+			btRigidBody* body;
 			float mass = 10.0f / p_massFactor;
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
 			int index = p_nameToIndex[p_rootNode->mName.data];
 			glm::mat4 toGlm = glm::mat4();
+			//body
 			aiMatrix4x4 test = p_rootNode->mTransformation; //this might be the thing that will solve everything, everyyythiiiinnnggg
 			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
 			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
-			bonePos = bonePos /** p_bones[index]*/;
-			glm::mat4 toTrans = /*bonePos **/ p_transform;
-			
+			m_lastUpdatePos[index] = bonePos;
+			m_boneTransform[index] = p_transform;
+			m_lastBoneMatrix[index] = p_bones[index];
+			glm::mat4 toTrans =  p_transform  * bonePos * p_bones[index];	
 			const float* data = glm::value_ptr(toTrans);
-// 			const float* data = glm::value_ptr(p_bones[index]);
  			trans.setFromOpenGLMatrix(data);
-			//m_lastUpdatePos[index] = p_bones[index];
-			trans.setOrigin(trans.getOrigin());
+			float x,y,z,w;
+			x = trans.getRotation().y();
+			y = trans.getRotation().z();
+			z = trans.getRotation().w();
+			w = trans.getRotation().x();
+			trans.setRotation(btQuaternion(x,y,z,w));
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(mass, motionstate, shape, inertia);
 			body->setDamping(0.05f,0.85f);
-			//body->setDeactivationTime(0.8f);
-			//body->setSleepingThresholds(1.6f, 2.5f);
-			
-		//	body->setCcdMotionThreshold(0.6f);
-		//	body->setCcdSweptSphereRadius(0.3f);
-
-#pragma warning	Okej, ide är att vi skapar ett ghostobject som har samma pos som bodyn fast utan offseten från benen, sen tar vi inversen på den o gångrar med body transen så kanske nåt kul händer, annars vetefan.
-			m_bodies[index] = body;
-			m_lastUpdatePos[index] = bonePos * p_bones[index];
 			m_dynamicWorld->addRigidBody(body);
-			//int index = p_rootNode->mName;
-
+			body->setCcdMotionThreshold(0.7f);
+			body->setCcdSweptSphereRadius(0.2f);
+			m_bodies[index] = body;
+			
+			
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
-				//float PI_2 = 1.57079632679489661923f;
 				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_nameToIndex, p_transform, p_pos, p_massFactor+1);
 				if(childbody != nullptr)
 				{
@@ -92,7 +90,7 @@ namespace Ragdoll
 						m_joints[m_constraintCounter] = temp;
 						m_constraintCounter++;
 					}
-					SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
+					SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data], p_bones[p_nameToIndex[p_rootNode->mChildren[i]->mName.data]]);
 					
 				}
 				
@@ -163,26 +161,36 @@ namespace Ragdoll
 	{
 		glm::mat4* retVal = new glm::mat4[20];
 		
-		for(int i = 0; i < 14; i++)
+		for(int i = 13; i >=0; i--)
 		{
 			float data[16];
 			btTransform trans = m_bodies[i]->getWorldTransform();
+			
+			float x,y,z,w;
+			x = trans.getRotation().w();
+			y = trans.getRotation().x();
+			z = trans.getRotation().y();
+			w = trans.getRotation().z();
+			trans.setRotation(btQuaternion(x,y,z,w));
 			trans.getOpenGLMatrix(data);
 			
-			//trans.getOrigin().normalize();
-			//trans.setRotation(btQuaternion(trans.getRotation().w(), trans.getRotation().x(), trans.getRotation().y(), trans.getRotation().z()));
-		
-		//	m_lastUpdatePos[i] = m_bodies[i]->getWorldTransform();
-			int index = m_boneToFollow[i];
-		//	trans.getOrigin() = trans.getOrigin() - m_bodies[index]->getWorldTransform().getOrigin();
-		//	trans.getRotation() = trans.getRotation() - m_bodies[index]->getWorldTransform().getRotation();
-
-		//	trans.setOrigin((trans.getOrigin() - m_bodies[index]->getWorldTransform().getOrigin()));
-			float test[16];
-			trans.inverse().getOpenGLMatrix(test);
-		
+			int index  = m_boneToFollow[i];
 			
-			retVal[i] = glm::make_mat4(data) * m_lastUpdatePos[i] * glm::make_mat4(test); /* * m_lastUpdatePos[i]*//* * m_boneTransform[i]*/;
+			float test[16];
+			btTransform worldTrans = m_bodies[13]->getWorldTransform();
+			x = worldTrans.getRotation().w();
+			y = worldTrans.getRotation().x();
+			z = worldTrans.getRotation().y();
+			w = worldTrans.getRotation().z();
+			worldTrans.setRotation(btQuaternion(x,y,z,w));
+			worldTrans.getOpenGLMatrix(test);
+
+
+			m_boneTransform[i] =  glm::make_mat4(test)  *  glm::inverse(m_lastUpdatePos[i]) ;
+			
+			//World to local space
+			retVal[i] = glm::inverse(m_boneTransform[i])  * glm::inverse(m_lastUpdatePos[i]) *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
+			
 			
 		}
 		return retVal;
@@ -238,8 +246,8 @@ namespace Ragdoll
 		////Hips - Right upper leg
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
 		{
-			localA.setOrigin(btVector3(0.30f, -0.3f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.3f + OFFSET, 0));
+			localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
+			localB.setOrigin(btVector3(0, 0.3f + 0, 0));
 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
 			//constraint->setLimit(PI_2, PI_2, PI_2);
 			m_dynamicWorld->addConstraint(constraint);
@@ -367,24 +375,28 @@ namespace Ragdoll
 		return nullptr;
 	}
 
-	void Ragdoll::SetBoneRelation( int p_parentIndex, int p_childIndex )
+	void Ragdoll::SetBoneRelation( int p_parentIndex, int p_childIndex, glm::mat4 p_pose )
 	{
 		m_boneToFollow[p_childIndex] = p_parentIndex;
-		/*btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
-		btTransform parentTrans = m_bodies[p_parentIndex]->getWorldTransform();
-		float data[16];
-		childTrans.getOpenGLMatrix(data);
-		glm::mat4 childMat = glm::make_mat4(data);
-		parentTrans.getOpenGLMatrix(data);
-		glm::mat4 parentMat = glm::make_mat4(data);
-		parentMat = parentMat._inverse();
-
-		m_boneTransform[p_childIndex] = m_lastUpdatePos[p_childIndex] * parentMat;*/
+	//	//btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
+	//	btTransform parentTrans = m_bodies[p_childIndex]->getWorldTransform();
+	//	float data[16];
+	//	//childTrans.getOpenGLMatrix(data);
+	////	glm::mat4 childMat = glm::make_mat4(data);
+	//	glm::mat4 childMat = m_lastUpdatePos[p_childIndex];
+	//	childMat = childMat * p_pose;
+	//	parentTrans.getOpenGLMatrix(data);
+	//	float data2[16];
+	//	parentTrans.getOpenGLMatrix(data2);
+	//	glm::mat4 parentMat = glm::make_mat4(data2);
+	//	parentMat =  glm::inverse(parentMat);
+		
+		//m_boneTransform[p_childIndex] = childMat * parentMat;
 	}
 
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
-		m_bodies[13]->setLinearVelocity(p_velocity);
+		m_bodies[6]->setLinearVelocity(p_velocity);
 	}
 
 }

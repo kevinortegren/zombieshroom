@@ -902,14 +902,18 @@ namespace Physics
 		}
 		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
-			temp = m_ragdolls[0]->GetPos();
+			unsigned int indexrag = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			temp = m_ragdolls[indexrag]->GetPos();
 			retVal[0] = temp.getX();
 			retVal[1] = temp.getY();
 			retVal[2] = temp.getZ();
+			 
 		}
 		else
 		{
 			retVal = m_externallyControlled.at(index)->GetPos();
+			
+			
 		}
 		
 		
@@ -992,11 +996,11 @@ namespace Physics
 		{
 			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 			btQuaternion temp = m_ragdolls.at(index)->GetOrientation();
-			retVal[0] = temp.x();
-			retVal[1] = temp.y();
-			retVal[2] = temp.z();
-			retVal[3] = temp.w();
-			return glm::quat(0,0,0,1);
+			retVal[0] = temp.w();
+			retVal[1] = temp.x();
+			retVal[2] = temp.y();
+			retVal[3] = temp.z();
+			//return glm::quat(0,0,0,1);
 		}
 		else //Todo: return externallycontrolled orientation if needed.
 		{
