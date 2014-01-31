@@ -22,14 +22,13 @@ namespace RootForce
 		void Disturb(int p_x, int p_z, float p_power);
 		
 	private:
-		Render::Material*						m_material;				
+		Render::EffectInterface*				m_effect;			
 		Render::TextureInterface*				m_texture[2];
 		Render::TextureInterface*				m_normalTexture;
 		Logging::LoggingInterface*				m_logger;
 		RootEngine::GameSharedContext*			m_context;
-		Render::ComputeJob						m_computeJob, m_computeNormalJob;
+		Render::ComputeJob						m_computeJob;
 		ECS::World*								m_world;
-		Render::EffectInterface*				m_normalEffect;
 		RootForce::Renderable*					m_renderable;
 
 		float m_mk1, m_mk2, m_mk3;

@@ -27,4 +27,13 @@ void main()
 	float d = imageLoad(currTex, storePos+ivec2(0,-1)).a;
 	
 	imageStore(prevTex, storePos, vec4(0.0f,0.0f,0.0f, mk1 * prev + mk2 * curr + mk3 * (a+b+c+d)));
+
+	vec3 n;
+	n.x = b-a;
+	n.y = 2;
+	n.z = d-c;
+
+	vec4 result = vec4(normalize(n), curr);
+	imageStore(currTex, storePos, result);
+
 }

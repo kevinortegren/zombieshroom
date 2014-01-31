@@ -7,7 +7,7 @@ namespace RootForce
 		
 		m_maxX = m_maxZ = 512;
 		
-		//Create empty texture for compute shader
+		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();
 		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA32F );
 		m_texture[0]->SetAccess(GL_READ_WRITE);
@@ -15,26 +15,16 @@ namespace RootForce
 		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA32F );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 
-	
+		//Create compute effect
+		m_effect	= m_context->m_resourceManager->LoadEffect("WaterCompute");
 
-		//Create render material
-		m_material				= m_context->m_resourceManager->GetMaterial("water");
-		m_material->m_effect	= m_context->m_resourceManager->LoadEffect("WaterCompute");
-
-		m_computeJob.m_effect		= m_material->m_effect;
+		m_computeJob.m_effect		= m_effect;
 		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
 		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
 		
-		m_normalEffect = m_context->m_resourceManager->LoadEffect("WaterComputeNormals");
-		m_computeNormalJob.m_effect = m_normalEffect;
-		m_computeNormalJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
-		m_computeNormalJob.m_textures[0]	= m_computeJob.m_textures[0];
-		m_computeNormalJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
-		m_computeNormalJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
-
 		float speed		= 60.0f;
-		float dx		= 5.0f;
+		float dx		= 10.0f;
 		m_timeStep		= 0.016f;
 		float damping	= 0.0f;
 
@@ -62,19 +52,17 @@ namespace RootForce
 	void WaterSystem::Process()
 	{
 		m_dt += m_world->GetDelta();
-		//float Pixels[64*64*4];
+		//Only simulate water 60 times per second
 		if(m_dt >= m_timeStep)
 		{
+			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
-			/*m_computeJob.m_textures[0]->Bind(0);
-			glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, Pixels);
-			m_computeJob.m_textures[0]->Unbind(0);*/
-
-			m_computeNormalJob.m_textures[0]	= m_computeJob.m_textures[0];
-			m_context->m_renderer->Compute(&m_computeNormalJob);
-			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
+			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
 			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
-			m_dt = 0;
+			//Swap the textures for next simulation step
+			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
+			//Reset timer and preserve non-exact time additions
+			m_dt -= m_timeStep;
 		}
 	}
 
@@ -89,17 +77,15 @@ namespace RootForce
 		m_renderable			= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
 		trans->m_position = glm::vec3(0,0,0);
-		trans->m_scale = glm::vec3(10,1,10);
+		trans->m_scale = glm::vec3(20,1,20);
 		m_renderable->m_model = m_context->m_resourceManager->LoadCollada("256planeUV");
 		m_renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
-		m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
 		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
-		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] =  m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS] = &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position;
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES);
 		m_renderable->m_model->m_meshes[0]->SetWireFrame(false);
-		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		//glPatchParameteri(GL_PATCH_VERTICES, 3);
 	}
 
 	void WaterSystem::Disturb( int p_x, int p_z, float p_power )
