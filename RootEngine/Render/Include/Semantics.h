@@ -43,12 +43,12 @@ namespace Render
 			TEXTURE_R,
 			TEXTURE_G,
 			TEXTURE_B,
-			TEXTURE_RN,
-			TEXTURE_GN,
-			TEXTURE_BN,
 			GLOW,
 			COMPUTEIN,
 			COMPUTEOUT,
+			TEXTURE_RN,
+			TEXTURE_GN,
+			TEXTURE_BN,
 		};
 	}
 }
