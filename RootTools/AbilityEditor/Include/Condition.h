@@ -10,8 +10,8 @@ namespace AbilityEditorNameSpace
 		Condition(QString p_text);
 		~Condition();
 
-		void ViewSelectedData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory);
-		void SaveSelectedData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory);
+		void ViewSelectedData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows);
+		void SaveSelectedData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows);
 		void AddEntity(QString p_name);
 		void RemoveEntity(QString p_name);
 		std::vector<QString> GetEntities() { return m_entities; }

@@ -28,7 +28,7 @@ public:
 
 
 private slots:
-		//void UpdatePropertyBrowser();
+		void UpdatePropertyBrowser();
 		//void ChangedTab();
 		void GenerateScript();
 		void SaveAs();
@@ -55,10 +55,10 @@ private:
 	unsigned int m_LastSelectedTab;
 	QString m_currentSavePath;
 	bool event(QEvent* event);
-	QTreeWidgetItem* m_LastSelectedItem;
+	QListWidgetItem* m_LastSelectedItem;
 	QFileSystemModel* m_fileViewModel;
 
-	AbilityEditorNameSpace::Condition* m_testCond;
+	std::vector<AbilityEditorNameSpace::Condition*> m_conditions;
 
 	//void mousePressEvent(QMouseEvent* event);
 

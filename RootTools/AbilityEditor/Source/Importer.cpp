@@ -30,10 +30,10 @@ namespace AbilityEditorNameSpace
 			parser.GetNextDocument(doc);
 
 			//Name
-			const YAML::Node& name = doc[0]["Name"];
+			//const YAML::Node& name = doc[0]["Name"];
 			std::string abilityName;
-			name[0]["EntityName"] >> abilityName;
-			Entity* entity = new Entity(abilityName.c_str());
+			doc[0]["Name"] >> abilityName;
+			//Entity* entity = new Entity(abilityName.c_str());
 			
 			//Components
 			const YAML::Node& comps = doc[1]["Components"];
@@ -43,7 +43,7 @@ namespace AbilityEditorNameSpace
 				comps[i]["Type"] >> type;
 				const YAML::Node& data = comps[i]["Data"];
 				for(unsigned int j = 0; j < data.size(); j++)
-					entity->AddComponent(ImportComponents(data[j], type));
+					p_entity->AddComponent(ImportComponents(data[j], type));
 			}
 
 			//OnCreate

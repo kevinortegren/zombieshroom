@@ -47,7 +47,14 @@ namespace AbilityEditorNameSpace
 		out << YAML::Value << YAML::BeginSeq;
 		for (unsigned int i = 0; i < p_entity->GetComponents()->size(); i++)
 		{
+			out << YAML::BeginMap;
+			out << YAML::Key << "Type" << YAML::Value << p_entity->GetComponents()->at(i)->m_type;
+			out << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
+			out << YAML::BeginMap;
 			ExportComponent(out, p_entity->GetComponents()->at(i), p_entity->GetComponents()->at(i)->m_type);
+			out << YAML::EndMap;
+			out << YAML::EndSeq;
+			out << YAML::EndMap;
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
@@ -103,9 +110,6 @@ namespace AbilityEditorNameSpace
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
-		//File done, prepare to write
-		out << YAML::EndSeq; //Remove?
-		out << YAML::EndMap; //Remove?
 		out << YAML::EndSeq;
 
 		std::ofstream file;

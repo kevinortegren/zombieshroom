@@ -70,7 +70,7 @@ void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 		return;
 	}
 	//Om Condition
-	if(p_item->whatsThis(0).compare("Condition") == 0)
+	if(p_item->whatsThis(0).compare("Conditions") == 0)
 	{
 		int test = this->indexOfTopLevelItem(p_item);
 		delete p_item;

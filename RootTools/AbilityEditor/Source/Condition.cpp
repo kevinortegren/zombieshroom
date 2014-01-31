@@ -13,12 +13,12 @@ namespace AbilityEditorNameSpace
 
 	}
 
-	void Condition::ViewSelectedData( QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory )
+	void Condition::ViewSelectedData( QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows)
 	{
 
 	}
 
-	void Condition::SaveSelectedData( QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory )
+	void Condition::SaveSelectedData( QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows)
 	{
 
 	}

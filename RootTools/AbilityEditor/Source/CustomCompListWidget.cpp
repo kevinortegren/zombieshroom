@@ -5,6 +5,9 @@
 CustomCompListWidget::CustomCompListWidget( QWidget* parent /*= 0*/ ) : QListWidget(parent)
 {
 	setAcceptDrops(true);
+
+	m_propFactory = new QtVariantEditorFactory;
+	m_propManager = new QtVariantPropertyManager;
 }
 
 void CustomCompListWidget::dropEvent( QDropEvent* event )
@@ -60,19 +63,19 @@ void CustomCompListWidget::RemoveSelected( QListWidgetItem* p_item )
 	}
 }
 
-void CustomCompListWidget::ViewSelectedData( QListWidgetItem* p_item, QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_propFact) 
+void CustomCompListWidget::ViewSelectedData( QListWidgetItem* p_item, QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows) 
 {	
-	if (p_item->whatsThis().compare("Component") == 0)
+	if (p_item->whatsThis().compare("Components") == 0)
 	{
-		m_entity->ViewComponentData(p_propMan, p_propBrows, p_propFact, p_item->text());
+		m_entity->ViewComponentData(p_propMan, p_propBrows, m_propFactory, p_item->text());
 	}
 }
 
-void CustomCompListWidget::SaveSelectedData( QListWidgetItem* p_item, QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_propFact )
+void CustomCompListWidget::SaveSelectedData( QListWidgetItem* p_item, QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows)
 {
-	if(p_item->whatsThis().compare("Component") == 0)
+	if(p_item->whatsThis().compare("Components") == 0)
 	{
-		m_entity->SaveComponentData(p_propMan, p_propBrows, p_propFact, p_item->text());
+		m_entity->SaveComponentData(p_propMan, p_propBrows, m_propFactory, p_item->text());
 	}
 }
 
