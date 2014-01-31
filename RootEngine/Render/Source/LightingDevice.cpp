@@ -13,7 +13,7 @@ namespace Render
 
 	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
-		// Load effects.	
+		// Load techniques.	
 		auto deferred = g_context.m_resourceManager->LoadEffect("Renderer/Deferred");
 		m_lightingTech = deferred->GetTechniques()[0];
 
@@ -98,6 +98,7 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		m_numPointLights = 0;
+		m_numDirectionalLights = 0;
 	}
 
 	void LightingDevice::Resize(int p_width, int p_height)

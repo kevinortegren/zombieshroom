@@ -22,15 +22,15 @@ namespace RootForce
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 
-		void SetAABB(const RootForce::AABB& p_worldAABB)
-		{
-			m_worldAABB = p_worldAABB;
-		}
+		void ShadowSystem::SetAABB(const RootForce::AABB& p_worldAABB);
 
 		ECS::ComponentMapper<Shadowcaster> m_shadowcasters;
 		ECS::ComponentMapper<Transform> m_transforms;
 
 	private:
+		
+		glm::mat4 OrthoProjectionFromFrustum(Frustum* p_frustum, glm::mat4 p_lightViewMatrix);
+		
 		float m_maxWorldX;
 		float m_minWorldX;
 		float m_minWorldY;
@@ -38,8 +38,9 @@ namespace RootForce
 		float m_minWorldZ;
 		float m_maxWorldY;
 
-		glm::mat4 OrthoProjectionFromFrustum(Frustum* p_frustum, glm::mat4 p_lightViewMatrix);
 		int m_shadowcasterCount;
-		RootForce::AABB m_worldAABB;
+
+		// World AABB points.
+		glm::vec3 worldCorners[8];
 	};
 }

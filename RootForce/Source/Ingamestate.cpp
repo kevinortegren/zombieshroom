@@ -127,7 +127,7 @@ namespace RootForce
 		m_shadowSystem = new RootForce::ShadowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
-		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
+		m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 		// Initialize anim system
@@ -212,7 +212,6 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)

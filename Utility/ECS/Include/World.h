@@ -6,6 +6,7 @@
 #include <Utility\ECS\Include\GroupManager.h>
 #include <Utility\ECS\Include\EntityImporter.h>
 #include <Utility\ECS\Include\EntityExporter.h>
+#include <Utility\ECS\Include\Storage.h>
 
 namespace ECS
 {
@@ -28,6 +29,7 @@ namespace ECS
 		GroupManager* GetGroupManager();
 		EntityImporter* GetEntityImporter();
 		EntityExporter* GetEntityExporter();
+		Storage* GetStorage();
 
 		void SetDelta(float p_dt);
 		float GetDelta();
@@ -39,6 +41,7 @@ namespace ECS
 		GroupManager m_groupManager;
 		EntityImporter m_importer;
 		EntityExporter m_exporter;
+		Storage m_storage;
 		float m_dt;
 	};
 }

@@ -16,6 +16,18 @@ namespace RootForce
 		m_shadowcasterCount = 0;
 	}
 
+	void ShadowSystem::SetAABB(const RootForce::AABB& p_worldAABB)
+	{
+		worldCorners[0] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_maxY, p_worldAABB.m_maxZ);
+		worldCorners[1] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_minY, p_worldAABB.m_maxZ);
+		worldCorners[2] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_maxY, p_worldAABB.m_minZ);
+		worldCorners[3] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_minY, p_worldAABB.m_minZ);
+		worldCorners[4] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_maxY, p_worldAABB.m_maxZ);
+		worldCorners[5] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_minY, p_worldAABB.m_maxZ);
+		worldCorners[6] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_maxY, p_worldAABB.m_minZ);
+		worldCorners[7] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_minY, p_worldAABB.m_minZ);
+	}
+
 	void ShadowSystem::Begin()
 	{
 		m_shadowcasterCount = 0;
@@ -36,16 +48,6 @@ namespace RootForce
 		tempWorldMatrix = glm::scale(tempWorldMatrix, transform->m_scale);
 
 		glm::mat4 lightSpace = glm::inverse(tempWorldMatrix);
-
-		glm::vec3 worldCorners[8];
-		worldCorners[0] = glm::vec3(m_worldAABB.m_maxX, m_worldAABB.m_maxY, m_worldAABB.m_maxZ);
-		worldCorners[1] = glm::vec3(m_worldAABB.m_maxX, m_worldAABB.m_minY, m_worldAABB.m_maxZ);
-		worldCorners[2] = glm::vec3(m_worldAABB.m_maxX, m_worldAABB.m_maxY, m_worldAABB.m_minZ);
-		worldCorners[3] = glm::vec3(m_worldAABB.m_maxX, m_worldAABB.m_minY, m_worldAABB.m_minZ);
-		worldCorners[4] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_maxY, m_worldAABB.m_maxZ);
-		worldCorners[5] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_minY, m_worldAABB.m_maxZ);
-		worldCorners[6] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_maxY, m_worldAABB.m_minZ);
-		worldCorners[7] = glm::vec3(m_worldAABB.m_minX, m_worldAABB.m_minY, m_worldAABB.m_minZ);
 
 		m_maxWorldX = -99999;
 		m_minWorldX = 99999;
@@ -82,10 +84,12 @@ namespace RootForce
 			}
 		}
 
+		// Get the eye camera.
 		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
+
 		Frustum frustum = camera->m_frustum;
-		//frustum.DrawLines(glm::mat4(1.0f), g_engineContext.m_renderer);
+
 		glm::vec4 frustumCorners[8];
 		frustumCorners[0] = glm::vec4(frustum.ntl, 1.0f);
 		frustumCorners[1] = glm::vec4(frustum.ntr, 1.0f);
@@ -95,10 +99,14 @@ namespace RootForce
 		frustumCorners[5] = glm::vec4(frustum.ftr, 1.0f);
 		frustumCorners[6] = glm::vec4(frustum.fbl, 1.0f);
 		frustumCorners[7] = glm::vec4(frustum.fbr, 1.0f);
+		
+		// Convert camera frustrum to view space.
 		for(int i = 0; i < 8; i++)
 		{
 			frustumCorners[i] = camera->m_viewMatrix * frustumCorners[i];
 		}
+
+		// Calculate directions.
 		glm::vec3 directions[4];
 		for(int i = 0; i < 4; i++)
 		{
@@ -106,16 +114,21 @@ namespace RootForce
 			directions[i].y = glm::normalize(frustumCorners[i+4].y - frustumCorners[i].y);
 			directions[i].z = glm::normalize(frustumCorners[i+4].z - frustumCorners[i].z);
 		}
+
+		// Define near/far planes for the sub frustrums.
 		float _near[RENDER_SHADOW_CASCADES];
 		_near[0] = camera->m_frustum.m_near;
 		_near[1] = 15.0f;
 		_near[2] = 60.0f;
 		_near[3] = 200.0f;
+		
 		float _far[RENDER_SHADOW_CASCADES];
 		_far[0] = _near[1];
 		_far[1] = _near[2];
 		_far[2] = _near[3];
 		_far[3] = camera->m_frustum.m_far;
+
+		// Create cascades.
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			AABB boundingbox;
@@ -126,14 +139,16 @@ namespace RootForce
 				boundingbox.Expand(nearCorner + directions[p] * _near[i]);
 				boundingbox.Expand(nearCorner + directions[p] * _far[i]);
 			}
-			boundingbox.DebugDraw(g_engineContext.m_renderer, glm::vec3(1.0f, 1.0f, 0.0f), glm::inverse(camera->m_viewMatrix));
+
 			glm::vec3 center = boundingbox.GetCenter();
 			glm::vec3 centerInWorldSpace = glm::swizzle<glm::X, glm::Y, glm::Z>(glm::inverse(camera->m_viewMatrix) * glm::vec4(center, 1.0f)); 
 			glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
+			
 			float nearPlane = 1.0f;
 			float lookAtDistance = glm::length(centerInViewSpace - m_maxWorldZ) + nearPlane;
 			float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
 			float farPlane = lookAtDistance + radius;
+			
 			sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
 		}
