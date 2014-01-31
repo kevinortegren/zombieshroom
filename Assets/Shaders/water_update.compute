@@ -1,8 +1,8 @@
 #version 430
 layout (local_size_x = 16, local_size_y = 16) in;
 
-layout(r32f, binding = 0) uniform image2D prevTex;
-layout(r32f, binding = 1) uniform image2D currTex;
+layout(rgba32f, binding = 0) uniform image2D prevTex;
+layout(rgba32f, binding = 1) uniform image2D currTex;
 
 layout(std140) uniform MK
 {
@@ -18,13 +18,13 @@ void main()
 	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
 	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == yMax)
 		return;
-
-	imageStore(prevTex, storePos,
-		mk1*imageLoad(prevTex, storePos) +
-		mk2*imageLoad(currTex, storePos) +
-		mk3*(imageLoad(currTex, storePos+ivec2(1,0)) + 
-			imageLoad(currTex, storePos+ivec2(-1,0)) + 
-			imageLoad(currTex, storePos+ivec2(0,1)) + 
-			imageLoad(currTex, storePos+ivec2(0,-1)))
-	);
+	
+	float prev = imageLoad(prevTex, storePos).a;
+	float curr = imageLoad(currTex, storePos).a;
+	float a = imageLoad(currTex, storePos+ivec2(1,0)).a;
+	float b = imageLoad(currTex, storePos+ivec2(-1,0)).a;
+	float c = imageLoad(currTex, storePos+ivec2(0,1)).a;
+	float d = imageLoad(currTex, storePos+ivec2(0,-1)).a;
+	
+	imageStore(prevTex, storePos, vec4(0.0f,0.0f,0.0f, mk1 * prev + mk2 * curr + mk3 * (a+b+c+d)));
 }

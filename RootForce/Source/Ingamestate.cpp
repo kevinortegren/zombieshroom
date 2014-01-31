@@ -312,7 +312,11 @@ namespace RootForce
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F3) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->Disturb(1000,1000, 20);
+		{
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+			m_waterSystem->Disturb((int)(trans->m_position.x+256), (int)(trans->m_position.z+256), 20);
+		}
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();

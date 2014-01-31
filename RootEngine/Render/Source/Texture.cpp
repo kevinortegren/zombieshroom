@@ -189,6 +189,7 @@ namespace Render
 		{
 			m_textureType = GL_FLOAT;
 			m_textureFormat = GL_RED;
+			m_internalFormat = GL_R32F;
 			m_bpp = 4;
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -196,7 +197,21 @@ namespace Render
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 			std::vector<float> emptyData(p_width * p_height, 0);
-			glTexImage2D(m_target, 0, GL_R32F, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGBA32F)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_RGBA;
+			m_internalFormat = GL_RGBA32F;
+			m_bpp = 16;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			std::vector<glm::vec4> emptyData(p_width * p_height, glm::vec4(0,0,0,0));
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
 		}
 		else
 		{
@@ -275,12 +290,11 @@ namespace Render
 
 	void Texture::BindImage( unsigned int p_slot )
 	{
-		glBindImageTexture(p_slot, m_textureHandle, 0, GL_FALSE, 0, m_access, GL_R32F);
+		glBindImageTexture(p_slot, m_textureHandle, 0, GL_FALSE, 0, m_access, m_internalFormat);
 	}
-
 	void Texture::UnBindImage( unsigned int p_slot )
 	{
-		glBindImageTexture(0, 0, 0, GL_FALSE, 0, m_access, GL_R32F);
+		glBindImageTexture(0, 0, 0, GL_FALSE, 0, m_access, m_internalFormat);
 	}
 
 	void Texture::SetAccess( GLenum p_access )

@@ -38,31 +38,11 @@ void main()
 {                                                                                               
     // Interpolate the attributes of the output vertex using the barycentric coordinates        
     TexCoord_FS_in = interpolate2D(TexCoord_ES_in[0], TexCoord_ES_in[1], TexCoord_ES_in[2]);  
-
-	//Calculate normal   
-	vec2 size		= vec2(2.0,0.0);
-	ivec3 off		= ivec3(-1,0,1);
-	float s01		= textureOffset(g_Diffuse, TexCoord_FS_in, off.xy).r;
-    float s21		= textureOffset(g_Diffuse, TexCoord_FS_in, off.zy).r;
-    float s10		= textureOffset(g_Diffuse, TexCoord_FS_in, off.yx).r;
-    float s12		= textureOffset(g_Diffuse, TexCoord_FS_in, off.yz).r;
-	vec3 va			= normalize(vec3(size.x,s21-s01, size.y));
-    vec3 vb			= normalize(vec3(size.y,s12-s10, -size.x));
-	/*vec3 norms = vec3(0,0,0);
-	ivec3 off  = ivec3(-1,0,1);
-	float l = textureOffset(g_Diffuse, TexCoord_FS_in, off.xy).r;
-	float r = textureOffset(g_Diffuse, TexCoord_FS_in, off.zy).r;
-	float t = textureOffset(g_Diffuse, TexCoord_FS_in, off.yx).r;
-	float b = textureOffset(g_Diffuse, TexCoord_FS_in, off.yz).r;
-	norms.x = -r+l;
-	norms.y = 2*5.0f;
-	norms.z = b-t;*/
-
-	Normal_FS_in = normalize( viewMatrix  *  vec4( cross(va,vb), 0.0f )).xyz;
+	vec4 heightNormal = texture(g_Diffuse, TexCoord_FS_in);
+	Normal_FS_in = normalize( viewMatrix  * normalMatrix * vec4( heightNormal.xyz, 0.0f)).xyz;
 	
-	//Calc new vertex position
-    float height	= texture(g_Diffuse, TexCoord_FS_in).r;                                   
-    WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0,height,0);    
+	//Calc new vertex position                             
+    WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0, heightNormal.w, 0);    
                                
     gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in, 1.0f);                                              
 }                                       

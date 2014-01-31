@@ -25,6 +25,7 @@ namespace Render
 			TEXTURE_BGR,
 			TEXTURE_DEPTH_COMPONENT,
 			TEXTURE_R32,
+			TEXTURE_RGBA32F,
 		};
 	}
 
@@ -99,10 +100,12 @@ namespace Render
 		int m_textureWidth;
 		int m_textureHeight;
 		GLenum m_textureFormat;
+		GLenum m_internalFormat;
 		GLenum m_textureType;
 		int m_compressRatio;
 		int m_bpp;
 		int m_levels;
+
 		GLenum m_access;
 	};
 }

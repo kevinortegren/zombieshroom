@@ -1,0 +1,31 @@
+#version 430
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout(rgba32f, binding = 0) uniform image2D g_currTex;
+
+layout(std140) uniform MK
+{
+	int xMax;
+	int yMax;
+};
+
+void main() 
+{   
+	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == yMax)
+		return;
+
+	ivec3 off = ivec3(-1,0,1);
+	vec4 h;
+	h.x = imageLoad(g_currTex, storePos+ivec2(0,-1)).a;
+	h.y = imageLoad(g_currTex, storePos+ivec2(-1,0)).a;
+	h.z = imageLoad(g_currTex, storePos+ivec2(1,0)).a;
+	h.w = imageLoad(g_currTex, storePos+ivec2(0,1)).a;
+	vec3 n;
+	n.x = h.y-h.z;
+	n.y = 2;
+	n.z = h.x-h.w;
+
+	vec4 result = vec4(normalize(n), imageLoad(g_currTex, storePos).a);
+	imageStore(g_currTex, storePos, result);
+}
