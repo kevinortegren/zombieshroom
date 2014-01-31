@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv5.mb</source_data>
     </contributor>
-    <created>2014-01-29T13:45:58</created>
-    <modified>2014-01-29T13:45:58</modified>
+    <created>2014-01-29T16:07:18</created>
+    <modified>2014-01-29T16:07:18</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -36,6 +36,16 @@
         <newparam sid="file5-sampler">
           <sampler2D>
             <source>file5-surface</source>
+          </sampler2D>
+        </newparam>
+        <newparam sid="file7-surface">
+          <surface type="2D">
+            <init_from>file7</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="file7-sampler">
+          <sampler2D>
+            <source>file7-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -80,11 +90,56 @@
               <float>1</float>
             </transparency>
           </lambert>
+          <extra>
+            <technique profile="OpenCOLLADAMaya">
+              <bump>
+                <texture texture="file7-sampler" texcoord="TEX1">
+                  <extra>
+                    <technique profile="OpenCOLLADA3dsMax">
+                      <amount>1</amount>
+                      <bumpInterp>1</bumpInterp>
+                    </technique>
+                    <technique profile="OpenCOLLADAMaya">
+                      <blend_mode>NONE</blend_mode>
+                      <coverageU>1</coverageU>
+                      <coverageV>1</coverageV>
+                      <fast>0</fast>
+                      <mirrorU>0</mirrorU>
+                      <mirrorV>0</mirrorV>
+                      <noiseU>0</noiseU>
+                      <noiseV>0</noiseV>
+                      <offsetU>0</offsetU>
+                      <offsetV>0</offsetV>
+                      <repeatU>1</repeatU>
+                      <repeatV>1</repeatV>
+                      <rotateFrame>0</rotateFrame>
+                      <rotateUV>0</rotateUV>
+                      <stagger>0</stagger>
+                      <translateFrameU>0</translateFrameU>
+                      <translateFrameV>0</translateFrameV>
+                      <wrapU>1</wrapU>
+                      <wrapV>1</wrapV>
+                    </technique>
+                  </extra>
+                </texture>
+              </bump>
+            </technique>
+          </extra>
         </technique>
       </profile_COMMON>
     </effect>
   </library_effects>
   <library_images>
+    <image id="file7" name="file7">
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/RockNormal.dds</init_from>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <dgnode_type>kFile</dgnode_type>
+          <image_sequence>0</image_sequence>
+          <originalMayaNodeId>file7</originalMayaNodeId>
+        </technique>
+      </extra>
+    </image>
     <image id="file5" name="file5">
       <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/RockTexture.dds</init_from>
       <extra>
@@ -181,6 +236,7 @@
             <technique_common>
               <instance_material symbol="lambert8SG" target="#Stone">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
+                <bind_vertex_input semantic="TEX1" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>
           </bind_material>

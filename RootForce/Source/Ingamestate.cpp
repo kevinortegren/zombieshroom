@@ -17,7 +17,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
@@ -50,8 +50,9 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
+		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
 		g_engineContext.m_resourceManager->LoadScript("Player");
-        
+
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
 		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
@@ -126,7 +127,7 @@ namespace RootForce
 		m_shadowSystem = new RootForce::ShadowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
-		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
+		m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 		// Initialize anim system
@@ -165,6 +166,8 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
+		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
 
@@ -209,7 +212,10 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-
+		m_networkContext.m_client = nullptr;
+		m_networkContext.m_clientMessageHandler = nullptr;
+		m_networkContext.m_server = nullptr;
+		m_networkContext.m_serverMessageHandler = nullptr;
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
@@ -236,16 +242,40 @@ namespace RootForce
 		
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
+		
+		if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() <= -10)
+		{
+			// Do a reconnect, this should force the server to rehost the game (thus starting a new one) and the clients should reconnect automagically
+			return GameStates::Connecting;
+		}
 
-		//Update all the data that is displayed in the HUD
+		// If game is over, set gameover to true and wait for the restart
+		bool isGameOver = false;
+		if(m_sharedSystems.m_matchStateSystem->IsMatchOver())
+		{
+			isGameOver = true;
+			m_hud->SetValue("EndGame", "true" );
+			// If kill victory, set the time to 0 so restart will activate correctly
+			if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() > 0)
+				g_world->GetEntityManager()->GetComponent<TDMRuleSet>( g_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft = 0;
+		}
+		if(isGameOver || g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::DOWN)
+		{
+			m_hud->SetValue("ShowScore", "true" );
+			m_hud->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
+		}
+		else if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
+			m_hud->SetValue("ShowScore", "false" );
 		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		if(!isGameOver)
+		{
 		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+			//Update all the data that is displayed in the HUD
 		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
 		m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 		m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
 		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
 		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
-		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
@@ -256,8 +286,9 @@ namespace RootForce
 		if(playerComponent->AbilityScripts[2].Cooldown > 0)
 			m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
 		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
-
-		m_hud->Update();
+		}
+		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
 		switch (event.EventType)
@@ -273,6 +304,7 @@ namespace RootForce
 		default:
 			break;
 		}
+
 #ifdef _DEBUG
 		
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
@@ -339,7 +371,7 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-
+		
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			m_actionSystem->Process();
@@ -348,19 +380,18 @@ namespace RootForce
 		
 
 		m_animationSystem->Run();
-
+		
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_respawnSystem->Process();
 		}
 
-
-        {
-            PROFILE("Physics", g_engineContext.m_profiler);
+		{
+			PROFILE("Physics", g_engineContext.m_profiler);
 			m_physicsTransformCorrectionSystem->Process();
-            g_engineContext.m_physics->Update(p_deltaTime);
-            m_physicsSystem->Process();
-        }
+			g_engineContext.m_physics->Update(p_deltaTime);
+			m_physicsSystem->Process();
+		}
 
 		
 		{
@@ -428,7 +459,8 @@ namespace RootForce
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
-	}
+		}
+
 		return GameStates::Ingame;
 	}
 }

@@ -7,7 +7,7 @@ using namespace std;
 const int g_maxSceneObjects = 1000;
 const int g_maxMeshes = 300;
 const int g_maxCameras = 15;
-const int g_maxLights = 10;
+const int g_maxLights = 40;
 
 const int g_maxVerticesPerMesh = 20000;
 const int g_maxNameLength = 30;
@@ -16,6 +16,7 @@ const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 20;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/";
+const string g_textureLookPath = "C:/Users/BTH/Documents/zombieshroom/Assets/Textures/";
 
 const string g_levelName = "RootIslandV1";
 

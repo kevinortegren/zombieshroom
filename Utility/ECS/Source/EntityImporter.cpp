@@ -74,6 +74,24 @@ void ECS::EntityImporter::Import(const std::string& p_filename)
 
 			m_world->GetGroupManager()->RegisterEntity(group, entitiesMap[id]);
 		}
+
+		if(doc.FindValue("Storage"))
+		{
+			if(doc[4].FindValue("Storage"))
+			{
+				const YAML::Node& storage = doc[4]["Storage"];
+				for(unsigned int j = 0; j < storage.size(); j++)
+				{
+					std::string key;
+					storage[j]["Key"] >> key;
+
+					std::string value;
+					storage[j]["Value"] >> value;
+
+					m_world->GetStorage()->SetStringValue(key, value);
+				}
+			}
+		}
 	}
 	
 	catch(YAML::ParserException& e) {

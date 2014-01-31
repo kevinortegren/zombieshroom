@@ -11,6 +11,8 @@
 #include <RootSystems\Include\RenderingSystem.h>
 #include <RootSystems\Include\LightSystem.h>
 #include <RootSystems\Include\CameraSystem.h>
+#include <RootSystems\Include\WorldSystem.h>
+#include <RootSystems\Include\ShadowSystem.h>
 
 #include <Utility\ECS\Include\World.h>
 
@@ -32,12 +34,16 @@ ReadMemory RM;
 int numberMeshes;
 int numberLights;
 int numberCameras;
+
 // Setup world.
 ECS::World m_world;
 RootForce::RenderingSystem* renderingSystem;
 RootForce::CameraSystem* cameraSystem;
 RootForce::PointLightSystem* pointLightSystem;
+RootForce::DirectionalLightSystem* directionalLightSystem;
 RootForce::ParticleSystem* particleSystem;
+RootForce::WorldSystem* worldSystem;
+RootForce::ShadowSystem* shadowSystem;
 
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
@@ -235,8 +241,10 @@ int main(int argc, char* argv[])
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
 				cameraSystem->Process();
+				directionalLightSystem->Process();
 				pointLightSystem->Process();
 				particleSystem->Process();
+				shadowSystem->Process();
 				renderingSystem->Process();
 				g_engineContext.m_renderer->Render();
 
@@ -316,18 +324,23 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
 	RootForce::PointLight::SetTypeId(RootForce::ComponentType::POINTLIGHT);
+	RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 	RootForce::Camera::SetTypeId(RootForce::ComponentType::CAMERA);
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
+	RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
 
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(100);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(10000);
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
+
 
 
 	// Initialize systems.
@@ -336,14 +349,23 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(renderingSystem);
 
-	pointLightSystem = new RootForce::PointLightSystem(&m_world, g_engineContext.m_renderer);
+	pointLightSystem = new RootForce::PointLightSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::PointLightSystem>(pointLightSystem);
+
+	directionalLightSystem = new RootForce::DirectionalLightSystem(&m_world, &g_engineContext);
+	m_world.GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(directionalLightSystem);
 
 	cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(cameraSystem);
 
 	particleSystem = new RootForce::ParticleSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::ParticleSystem>(particleSystem);
+
+	shadowSystem = new RootForce::ShadowSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ShadowSystem>(shadowSystem);
+
+	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
+	worldSystem->CreateSun();
 }
 
 void LoadSceneFromMaya()
@@ -424,12 +446,28 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	return lightEntity;
 }
 
+bool fexists(const std::string& filename)
+{
+	bool Exists = false;
+
+	ifstream ifile(filename.c_str());
+	if (ifile)
+	{
+		Exists = true;
+	}
+
+  return Exists;
+}
+
 void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID)
 {
 	bool painted = false;
 	bool painting = false;
 	bool transparent = false;
 	int paintID;
+	string temp;
+	string NormalName;
+	ifstream ifile;
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	paintID = RM.PmeshList[meshID]->paintIndex;
@@ -471,7 +509,6 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
 			painter->BufferData(RM.PpaintList[paintID]->Pixels);
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
-
 		}
 		else if(painted)
 		{
@@ -491,10 +528,37 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		if(glowMap != "" && glowMap != "NONE")
+		temp = RM.PpaintList[paintID]->textureRed;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
 		{
-			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
+			NormalName = temp + "Normal";
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		}
+
+		temp = RM.PpaintList[paintID]->textureGreen;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+		NormalName = temp + "Normal";
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_GN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+		temp = RM.PpaintList[paintID]->textureBlue;
+
+		if (fexists(g_textureLookPath + temp + "Normal.dds"))
+		{
+		NormalName = temp + "Normal";
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		mat->m_textures[Render::TextureSemantic::TEXTURE_BN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+
 
 		//UPDATE TILEFACTOR
 		if(meshID != -1)
@@ -918,7 +982,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 
 		if(type == "AmbientLight")
 		{
-			g_engineContext.m_renderer->SetAmbientLight(RM.PlightList[LightIndex]->color);
+			worldSystem->SetAmbientLight(RM.PlightList[LightIndex]->color);
 			ambientInfoExists = true;
 		}
 

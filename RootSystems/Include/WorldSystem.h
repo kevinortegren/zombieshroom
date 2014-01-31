@@ -1,14 +1,11 @@
 #pragma once
 
 #include <RootSystems/Include/DataStructures/Quad.h>
-
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Frustum.h>
 #include <array>
-
-#define PLAYER_NUM_ABILITIES 1
 
 namespace RootForce
 {
@@ -18,9 +15,21 @@ namespace RootForce
 		WorldSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_showDebug(false) {}
 
-		void CreateWorld(const std::string& p_worldName);
+#ifndef COMPILE_LEVEL_EDITOR
+		void LoadWorld(const std::string& p_worldName);
+		void CreatePlayerCamera();
+		void CreateSkyBox();
+#endif
+
+		void SetAmbientLight(glm::vec4 p_ambient);
+		void CreateSun();
+		
+		
+		void AddStaticEntitiesToPhysics();
+
 		void Process();
 		void ShowDebug(bool p_value);
+		RootForce::AABB GetWorldAABB(){return m_quadTree.GetRoot()->GetBounds();}
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;

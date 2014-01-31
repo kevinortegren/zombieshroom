@@ -8,7 +8,7 @@ namespace RootForce
 	struct AABB
 	{
 		AABB();
-		AABB(int p_minX, int p_maxX, int p_minY, int p_maxY, int p_minZ, int p_maxZ);
+		AABB(float p_minX, float p_maxX, float p_minY, float p_maxY, float p_minZ, float p_maxZ);
 
 		int GetLengthX( void ) const;
 		int GetLengthY( void ) const;
@@ -17,8 +17,10 @@ namespace RootForce
 		Rectangle GetXZRect( void ) const;
 		glm::vec3 GetCenter( void ) const;
 
-		void DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color) const;
+		void Expand(glm::vec3 p_expansion);
 
-		int m_minX, m_maxX, m_minY, m_maxY, m_minZ, m_maxZ;
+		void DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const;
+
+		float m_minX, m_maxX, m_minY, m_maxY, m_minZ, m_maxZ;
 	};
 }
