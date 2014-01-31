@@ -1,3 +1,5 @@
+# This variable could be used to check for x64: CMAKE_SIZEOF_VOID_P (4 if x32, 8 if x64)
+
 # CMake settings
 cmake_minimum_required(VERSION 2.8)
 
@@ -10,10 +12,12 @@ option(COMPILE_LEVEL_EDITOR "Should we compile level editor?" OFF)
 
 #Check if we want to compile release build
 option(COMPILE_RELEASE_BUILD "Release Build" OFF)
+
 # Find external libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
 if (NOT COMPILE_LEVEL_EDITOR)
+    # Find all x86 libraries
 	find_package(OpenGL REQUIRED)
 	find_package(SDL2 REQUIRED)
 	find_package(GTest REQUIRED)
@@ -27,8 +31,6 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	find_package(LUA REQUIRED)
 	find_package(Qt REQUIRED)
 
-
-
 	set(EXTERNAL_INCLUDE_DIRS 
 	    ${SDL2_INCLUDE_DIRS}
 	    ${GLEW_INCLUDE_DIRS}
@@ -41,7 +43,9 @@ if (NOT COMPILE_LEVEL_EDITOR)
 		${LUA_INCLUDE_DIRS}
 		${QT_INCLUDE_DIRS}
 	)
-	 if(NOT COMPILE_RELEASE_BUILD)   
+    
+	if(NOT COMPILE_RELEASE_BUILD)
+        # Link with debug libraries
 		set(EXTERNAL_LIBRARIES
 			${SDL2_LIBRARY_DEBUG}
 			${OPENGL_LIBRARIES}
@@ -60,7 +64,8 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${QTPROPWIDGET_LIBRARY}
 			${QTCOLORTRIANGLE_LIBRARY}
 		)
-		else()
+	else()
+        # Link with release libraries
 		set(EXTERNAL_LIBRARIES
 			${SDL2_LIBRARY}
 			${OPENGL_LIBRARIES}
@@ -74,8 +79,9 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${AWESOMIUM_LIBRARY}
 			${LUA_LIBRARY}
 		)
-		endif()
+	endif()
 else()
+    # Find all x64 libraries
 	find_package(OpenGL REQUIRED)
 	find_package(SDL2 REQUIRED)
 	find_package(GLEW REQUIRED)
@@ -99,8 +105,7 @@ else()
 	add_definitions(-DCOMPILE_LEVEL_EDITOR)
 endif()
 
-message("${EXTERNAL_LIBRARIES}")
-
+# message("${EXTERNAL_LIBRARIES}")
 
 # Set global compiler options
 add_definitions(-D_VARIADIC_MAX=10)
@@ -132,7 +137,6 @@ else()
 endif()
 
 # Copy the runtime dependencies to the output directory when dependency target is built
-# TODO: This is hardcoded to the Debug folder. We cannot use a Release build...
 if (NOT COMPILE_LEVEL_EDITOR)
 	if(NOT COMPILE_RELEASE_BUILD)
 		add_custom_target(_Dependencies ALL
@@ -142,7 +146,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 		add_custom_target(_Dependencies ALL
 			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
 		)
-	endif()	
+	endif()
 else()
 	if(NOT COMPILE_RELEASE_BUILD)
 		add_custom_target(_Dependencies ALL
@@ -152,6 +156,6 @@ else()
 		add_custom_target(_Dependencies ALL
 			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
 		)
-	endif()	
+	endif()
 endif()
  

@@ -26,7 +26,7 @@ struct DirectionalLight
 layout(std140) uniform Lights
 {
 	vec4 g_Ambient;
-	DirectionalLight lights[16];
+	DirectionalLight lights[5];
 };
 
 out vec2 ex_TexCoord;

@@ -25,6 +25,7 @@ namespace RootForce
 			, m_gameSharedContext(p_gameSharedContext) {}
 		void Process();
 		void UpdateDeltatime(float p_deltaTime);
+		static std::string GetScoreList();
 		bool IsMatchOver();
 		void SetLoggingInterface(Logging* p_logger);
 		void SetNetworkContext(NetworkContext* p_networkContext) { m_networkContext = p_networkContext; }

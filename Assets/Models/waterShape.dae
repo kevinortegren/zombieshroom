@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv5.mb</source_data>
     </contributor>
-    <created>2014-01-29T13:45:58</created>
-    <modified>2014-01-29T13:45:58</modified>
+    <created>2014-01-30T11:35:46</created>
+    <modified>2014-01-30T11:35:46</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -171,7 +171,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="RootIslandsv5">
       <node id="water" name="water" type="NODE">
-        <translate sid="translate">22.8808 -73.72823 34.32293</translate>
+        <translate sid="translate">22.8808 -60.4661 34.32293</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>

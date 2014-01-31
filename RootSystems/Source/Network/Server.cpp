@@ -21,7 +21,7 @@ namespace RootForce
 			, m_worldDeltaTimer(0)
 		{
 			// Load the map
-			p_worldSystem->CreateWorld(p_config.MapName);
+			p_worldSystem->LoadWorld(p_config.MapName);
 
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
