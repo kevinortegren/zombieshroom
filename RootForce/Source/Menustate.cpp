@@ -41,7 +41,7 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);

@@ -91,7 +91,7 @@ namespace RootForce
 
 		// Initialize GUI
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"), m_window.get());
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
@@ -109,6 +109,7 @@ namespace RootForce
 
 	Main::~Main() 
 	{
+		g_engineContext.m_gui->Shutdown();
 		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);

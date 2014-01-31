@@ -177,10 +177,10 @@ namespace RootForce
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		//Initialize the debug, setting the html view
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
 		//Set the network context to the matchstatesystem
@@ -450,10 +450,17 @@ namespace RootForce
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);
+			PROFILE("GUI Update", g_engineContext.m_profiler);
 
 			g_engineContext.m_gui->Update();
+		}
+		{
+			PROFILE("GUI HUD Render", g_engineContext.m_profiler);
+
 			g_engineContext.m_gui->Render(m_hud->GetView());
+		}
+		{
+			PROFILE("GUI Debug Render", g_engineContext.m_profiler);
 			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 		}
 		

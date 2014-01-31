@@ -90,11 +90,12 @@ void GLRAMTextureSurface::Scroll(int dx,
 }
 
 void GLRAMTextureSurface::UpdateTexture() {
-  if (needs_update_) {
+  if (needs_update_ && texture_id_) {
     glBindTexture(GL_TEXTURE_2D, texture_id_);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_,
                       bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE,
                       buffer_);
+    glBindTexture(GL_TEXTURE_2D, 0);
     needs_update_ = false;
   }
 }

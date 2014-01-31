@@ -25,14 +25,13 @@ namespace RootForce
 	void ConnectingState::Initialize()
 	{
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
-		m_loadingScreen = g_engineContext.m_gui->LoadURL("loading.html");
+		m_loadingScreen = g_engineContext.m_gui->LoadURL("Loading", "loading.html");
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
 		// Render a frame of loading screen to indicate the loading state
-		while(m_loadingScreen->IsLoading())
-			g_engineContext.m_gui->Update();
+		m_loadingScreen->WaitLoading();
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();

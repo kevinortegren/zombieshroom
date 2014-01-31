@@ -7,27 +7,19 @@
 namespace RootForce
 {
 
-	RootForce::Menu::Menu( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext p_context )
+	RootForce::Menu::Menu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context )
 	{
 		m_view = p_view;
 		m_context = p_context;
-		while(m_view->IsLoading())
-		{
-			m_context.m_gui->Update();
-		}
+		m_view->WaitLoading();
 
-		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("Menu"));
+		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &Menu::ExitEvent));
+		m_view->RegisterJSCallback("Host", JSDelegate1(this, &Menu::HostEvent));
+		m_view->RegisterJSCallback("Connect", JSDelegate1(this, &Menu::ConnectEvent));
+		m_view->RegisterJSCallback("Refresh", JSDelegate1(this, &Menu::RefreshEvent));
+		m_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &Menu::RequestSettingsEvent));
+		m_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &Menu::SaveSettingsEvent));
 
-		if(result.IsObject() && result.ToObject().type() != Awesomium::kJSObjectType_Local)
-		{
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Exit"), JSDelegate(this, &Menu::ExitEvent));
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Host"), JSDelegate(this, &Menu::HostEvent));
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Connect"), JSDelegate(this, &Menu::ConnectEvent));
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Refresh"), JSDelegate(this, &Menu::RefreshEvent));
-			p_dispatcher->BindWithRetVal(result.ToObject(), Awesomium::WSLit("RequestSettings"), JSDelegateWithRetval(this, &Menu::RequestSettingsEvent));
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("SaveSettings"), JSDelegate(this, &Menu::SaveSettingsEvent));
-		}
-		m_view->set_js_method_handler(p_dispatcher);
 		m_view->Focus();
 	}
 
@@ -35,7 +27,7 @@ namespace RootForce
 	{
 	}
 
-	Awesomium::WebView* RootForce::Menu::GetView()
+	RootEngine::GUISystem::WebView* RootForce::Menu::GetView()
 	{
 		return m_view;
 	}
@@ -50,7 +42,7 @@ namespace RootForce
 		command = command + std::to_string(p_serverInfo.first/1000) + ",";
 		command = command + "'" + (p_serverInfo.second.Information.PasswordProtected ? "Yes" : "No") + "');";
 
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
+		m_view->BufferJavascript(command);
 	}
 
 	void RootForce::Menu::LoadDefaults(RootEngine::ConfigManagerInterface* p_configMan, std::string p_workingDir)
@@ -69,7 +61,7 @@ namespace RootForce
 
 		command += ");";
 
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
+		m_view->BufferJavascript(command);
 	}
 	
     void Menu::ShowError(std::string p_errorMessage, std::string p_errorTitle)
@@ -79,7 +71,7 @@ namespace RootForce
 		command += "'" + p_errorTitle + "'";
 		command += ");";
 
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WebString());
+		m_view->BufferJavascript(command);
 	}
 
 	MenuEvent::MenuEvent RootForce::Menu::PollEvent()
@@ -96,7 +88,7 @@ namespace RootForce
 	}
 
 
-	void Menu::ExitEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void Menu::ExitEvent( const Awesomium::JSArray& p_array )
 	{
 		MenuEvent::MenuEvent event;
 		event.type = MenuEvent::EventType::Exit;
@@ -105,7 +97,7 @@ namespace RootForce
 	}
 
 
-	void RootForce::Menu::HostEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void RootForce::Menu::HostEvent( const Awesomium::JSArray& p_array )
 	{
 		MenuEvent::MenuEvent event;
 		event.type = MenuEvent::EventType::Host;
@@ -114,7 +106,7 @@ namespace RootForce
 		m_event.push_back(event);
 	}
 
-	void RootForce::Menu::ConnectEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void RootForce::Menu::ConnectEvent( const Awesomium::JSArray& p_array )
 	{
 		MenuEvent::MenuEvent event;
 		event.type = MenuEvent::EventType::Connect;
@@ -124,7 +116,7 @@ namespace RootForce
 	}
 
 
-	void Menu::RefreshEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void Menu::RefreshEvent( const Awesomium::JSArray& p_array )
 	{
 		MenuEvent::MenuEvent event;
 		event.type = MenuEvent::EventType::Refresh;
@@ -133,12 +125,12 @@ namespace RootForce
 		m_event.push_back(event);
 	}
 
-	Awesomium::JSValue Menu::GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	Awesomium::JSValue Menu::GetMapListEvent(const Awesomium::JSArray& p_array)
 	{
 		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
 	}
 	
-	Awesomium::JSValue Menu::RequestSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	Awesomium::JSValue Menu::RequestSettingsEvent(const Awesomium::JSArray& p_array)
 	{
 		// Get a list of options
 		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
@@ -149,7 +141,7 @@ namespace RootForce
 		return Awesomium::JSValue(jsArray);
 	}
 
-	void Menu::SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	void Menu::SaveSettingsEvent(const Awesomium::JSArray& p_array)
 	{
 		if(!p_array[0].IsObject())
 		{

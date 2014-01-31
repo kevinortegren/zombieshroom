@@ -1,42 +1,29 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
 #include "ChatSystem.h"
-#include <Awesomium/STLHelpers.h>
-#include <Awesomium/WebCore.h>
+//#include <Awesomium/STLHelpers.h>
+//#include <Awesomium/WebCore.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 #include <iostream>
 #include <RootEngine/GUI/Include/guiInstance.h>
+#include <Awesomium/STLHelpers.h>
 
 namespace RootForce
 {
 
-	void ChatSystem::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext)
+	void ChatSystem::Initialize( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext* p_engineContext)
 	{
 		m_view = p_view;
 		m_hasFocus = false;
 		m_engineContext = p_engineContext;
 		
-		while(m_view->IsLoading())
-		{
-			m_engineContext->m_gui->Update();
-		}
+		m_view->WaitLoading();
 		m_view->Focus(); // Give the view the focus, necessary for JavaScript to catch the input events
 
-		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("ChatSystem"));
 
-		if(result.IsObject())
-		{
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("Send"), JSDelegate(this, &ChatSystem::ProcessMessage));
-			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("SetFocus"), JSDelegate(this, &ChatSystem::SetFocus));
-		}
-		else
-		{
-			m_engineContext->m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Could not create ChatSystem object in Javascript");
-			return;
-		}
-		m_view->set_js_method_handler(p_dispatcher);
-		m_view->Focus();
+		m_view->RegisterJSCallback("Send", JSDelegate1(this, &ChatSystem::ProcessMessage));
+		m_view->RegisterJSCallback("SetFocus", JSDelegate1(this, &ChatSystem::SetFocus));
 	}
 
 	void RootForce::ChatSystem::JSAddMessage( std::string p_message )
@@ -50,15 +37,15 @@ namespace RootForce
 		command = "AddMessage(\"";
 		command += p_message;
 		command += "\");";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
+		m_view->BufferJavascript(command.c_str());
 	}
 
-	void RootForce::ChatSystem::SetFocus( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void RootForce::ChatSystem::SetFocus( const Awesomium::JSArray& p_array )
 	{
 		m_hasFocus = p_array[0].ToBoolean();
 	}
 
-	void RootForce::ChatSystem::ProcessMessage( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array)
+	void RootForce::ChatSystem::ProcessMessage( const Awesomium::JSArray& p_array)
 	{
 		//JSAddMessage(Awesomium::ToString(p_array[0].ToString()).c_str()); //This line of code sounds retardeded :/
 

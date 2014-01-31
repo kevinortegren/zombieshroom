@@ -12,10 +12,9 @@ TEST(GUITest, LoadURLTest)
 	g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
 		g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
 
-	Awesomium::WebView* temp = g_engineContext.m_gui->LoadURL("hud.html");
-	while(temp->IsLoading())
-		g_engineContext.m_gui->Update();
-	EXPECT_FALSE(temp->IsCrashed());
+	RootEngine::GUISystem::WebView* temp = g_engineContext.m_gui->LoadURL("HUD", "hud.html");
+	temp->WaitLoading();
+	EXPECT_FALSE(temp->GetView()->IsCrashed());
 }
 
 TEST(GUITest, EventTest) 
