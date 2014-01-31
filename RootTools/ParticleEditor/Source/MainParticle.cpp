@@ -140,7 +140,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 
-	m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
+	m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
 	m_particleSystem = new RootForce::ParticleSystem(g_world);

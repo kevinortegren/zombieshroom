@@ -37,6 +37,8 @@ namespace RootForce
 		float m_fov;
 		float m_aspectRatio;
 
+		glm::vec3 ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;
+
 	private:
 
 		enum 
@@ -49,6 +51,6 @@ namespace RootForce
 			FARP
 		};
 
-		glm::vec3 ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;
+		
 	};
 }

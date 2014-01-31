@@ -31,6 +31,7 @@ function Player.OnCreate(userId, actionId)
 
 	playerComponent:SetAbility(0, "AbilityBall");
 	playerComponent:SetAbility(1, "AbilityDash");
+	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(10);
@@ -64,11 +65,12 @@ function Player.OnCreate(userId, actionId)
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
 			renderable:SetMaterial("BlueSpirit");
-			renderable:SetMaterialDiffuse("TestBlue");
+			renderable:SetMaterialGlow("WSGlowBlue");
 		else
 			renderable:SetMaterial("RedSpirit");
-			renderable:SetMaterialDiffuse("TestRed");
+			renderable:SetMaterialGlow("WSGlowRed");
 		end
+		renderable:SetMaterialDiffuse("WStexture");
 		renderable:SetMaterialSpecular("WSSpecular");
 		renderable:SetMaterialNormal("WSNormal");
 		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");

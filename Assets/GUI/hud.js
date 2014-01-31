@@ -15,6 +15,45 @@ function SetDeathScreen(p_visible)
 {
 	$("#deathscreen").css("display", (p_visible?"block":"none"));
 }
+function SetScoreScreen(p_visible)
+{
+	$("#scorescreen").css("display", (p_visible?"table":"none"));
+}
+function UpdateScoreScreen(p_localTeam, p_localName, p_list)
+{
+	var blue, bluetitle;
+	var red, redtitle;
+	if(p_localTeam == 2) // Red
+	{
+		red = $("#TeamScoreTable tbody");
+		redtitle = $("#TeamTitle");
+		blue = $("#EnemyScoreTable tbody");
+		bluetitle = $("#EnemyTitle");
+	}
+	else // Blue or spectator
+	{
+		blue = $("#TeamScoreTable");
+		bluetitle = $("#TeamTitle");
+		red = $("#EnemyScoreTable");
+		redtitle = $("#EnemyTitle");
+	}
+	redtitle.removeClass("blue");
+	redtitle.addClass("red");
+	redtitle.html("Red");
+	bluetitle.removeClass("red");
+	bluetitle.addClass("blue");
+	bluetitle.html("Blue");
+	$("#TeamScoreTable tbody > tr").remove();
+	$("#EnemyScoreTable tbody > tr").remove();
+	
+	for(var player in p_list)
+	{
+		if(p_list[player][0] == 0 || !p_list[player])
+			continue; // Skip spectators
+		var team = (p_list[player][0]==1?blue:red);
+		team.append("<tr"+(p_list[player][1]==p_localName?" class='highlight'":"")+"><td class='textright'>"+p_list[player][1]+"</td><td class='textcenter'>"+p_list[player][2]+"</td><td class='textcenter'>"+p_list[player][3]+"</td></tr>");
+	}
+}
 
 $(document).keydown(function(event)
 {
@@ -49,14 +88,15 @@ function Set(p_id, p_value)
 	if(p_id == "TimeLeft")
 	{
 		var time = parseFloat(value);
-		var minutes = Math.floor(time / 60);
-		var seconds = time - (minutes * 60);
-		if(minutes < 10)
+		// If positive, use floor to get minutes, otherwise use ceil (to round down/up towards zero)
+		var minutes = time > 0 ? Math.floor(time / 60) : Math.ceil(time / 60);
+		var seconds = Math.abs(time - (minutes * 60));
+		if(minutes < 10 && minutes >= 0)
 			minutes = "0" + minutes;
 		if(seconds < 10)
 			seconds = "0" + seconds;
 		value = "" + minutes + ":" + seconds;
-		if( minutes < 2 )
+		if(minutes < 2 && minutes >= 0)
 			$("#"+p_id).addClass("blink");
 		else
 			$("#"+p_id).removeClass("blink");
@@ -64,6 +104,14 @@ function Set(p_id, p_value)
 	if(p_id == "Health")
 	{
 		SetDeathScreen(parseInt(value) <= 0);
+	}
+	if(p_id == "EndGame")
+	{
+		SetDeathScreen(p_value == "true");
+	}
+	if(p_id == "ShowScore")
+	{
+		SetScoreScreen(p_value == "true");
 	}
 	$("#"+p_id).html(value);
 }
@@ -88,8 +136,11 @@ function StartCooldown(p_slot, p_duration)
 	}
 }
 
-// $(document).ready(function(){
+$(document).ready(function(){
 	// SetAbilityFocus(0);
 	// SetAbility(1, "TestBall");
 	// StartCooldown(1, 3);
-// });
+	//UpdateScoreScreen(2, "doqunbop", [[2,"doqunbop",1,11],[1,"The Enemy",11,2],[1,"The Enemy2",0,2],[2,"The Ally",3,0]]);
+	Set("ShowScore", "true");
+	UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
+});

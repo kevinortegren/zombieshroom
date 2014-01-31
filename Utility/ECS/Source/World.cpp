@@ -35,4 +35,9 @@ ECS::EntityExporter* ECS::World::GetEntityExporter()
 	return &m_exporter;
 }
 
+ECS::Storage* ECS::World::GetStorage()
+{
+	return &m_storage;
+}
+
 

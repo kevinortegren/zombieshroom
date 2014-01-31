@@ -1,13 +1,15 @@
 #include <RootSystems/Include/Shapes/AABB.h>
 #include <cstdlib>
+#include <glm/gtc/swizzle.hpp>
+
 
 namespace RootForce
 {
 	AABB::AABB()
-		: m_minX(0), m_maxX(0), m_minY(0), m_maxY(0), m_minZ(0), m_maxZ(0)
+		: m_minX(999999), m_maxX(-999999), m_minY(999999), m_maxY(-999999), m_minZ(999999), m_maxZ(-999999)
 	{}
 
-	AABB::AABB(int p_minX, int p_maxX, int p_minY, int p_maxY, int p_minZ, int p_maxZ)
+	AABB::AABB(float p_minX, float p_maxX, float p_minY, float p_maxY, float p_minZ, float p_maxZ)
 		: m_minX(p_minX), m_maxX(p_maxX), m_minY(p_minY), m_maxY(p_maxY), m_minZ(p_minZ), m_maxZ(p_maxZ)
 	{}
 
@@ -36,18 +38,45 @@ namespace RootForce
 		return glm::vec3(m_minX + GetLengthX() / 2, m_minY + GetLengthY() / 2, m_minZ + GetLengthZ() / 2);
 	}
 
-	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color) const
+	void AABB::Expand(glm::vec3 p_expansion)
 	{
-		glm::vec3 positions[8];
-		positions[0] = glm::vec3(m_minX, m_minY, m_minZ);
-		positions[1] = glm::vec3(m_maxX, m_minY, m_minZ);
-		positions[2] = glm::vec3(m_minX, m_minY, m_maxZ);
-		positions[3] = glm::vec3(m_maxX, m_minY, m_maxZ);
+		if(p_expansion.x > m_maxX)
+		{
+			m_maxX = p_expansion.x;
+		}
+		if(p_expansion.x < m_minX)
+		{
+			m_minX = p_expansion.x;
+		}
+		if(p_expansion.y > m_maxY)
+		{
+			m_maxY = p_expansion.y;
+		}
+		if(p_expansion.y < m_minY)
+		{
+			m_minY = p_expansion.y;
+		}
+		if(p_expansion.z > m_maxZ)
+		{
+			m_maxZ = p_expansion.z;
+		}
+		if(p_expansion.z < m_minZ)
+		{
+			m_minZ = p_expansion.z;
+		}
+	}
 
-		positions[4] = glm::vec3(m_minX, m_maxY, m_minZ);
-		positions[5] = glm::vec3(m_maxX, m_maxY, m_minZ);
-		positions[6] = glm::vec3(m_minX, m_maxY, m_maxZ);
-		positions[7] = glm::vec3(m_maxX, m_maxY, m_maxZ);
+	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const
+	{
+		glm::vec4 positions[8];
+		positions[0] = p_space * glm::vec4(m_minX, m_minY, m_minZ, 1.0f);
+		positions[1] = p_space * glm::vec4(m_maxX, m_minY, m_minZ, 1.0f);
+		positions[2] = p_space * glm::vec4(m_minX, m_minY, m_maxZ, 1.0f);
+		positions[3] = p_space * glm::vec4(m_maxX, m_minY, m_maxZ, 1.0f);
+		positions[4] = p_space * glm::vec4(m_minX, m_maxY, m_minZ, 1.0f);
+		positions[5] = p_space * glm::vec4(m_maxX, m_maxY, m_minZ, 1.0f);
+		positions[6] = p_space * glm::vec4(m_minX, m_maxY, m_maxZ, 1.0f);
+		positions[7] = p_space * glm::vec4(m_maxX, m_maxY, m_maxZ, 1.0f);
 
 		unsigned int indices[] = 
 		{ 
@@ -58,7 +87,10 @@ namespace RootForce
 
 		for(int i = 0; i < 24; i += 2)
 		{
-			p_renderer->AddLine(positions[indices[i]], positions[indices[i+1]], glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
+			glm::vec3 pos1, pos2;
+			pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
+			pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
+			p_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
 		}
 	}
 }
