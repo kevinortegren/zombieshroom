@@ -18,6 +18,9 @@
 #include <RootEngine/Render/Include/LightingDevice.h>
 #include <RootEngine/Render/Include/Shadowcaster.h>
 #include <RootEngine/Render/Include/ShadowDevice.h>
+
+#include <RootEngine/Render/Include/LinearAllocator.h>
+
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
 #include <memory>
@@ -57,7 +60,7 @@ namespace Render
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
 		
 		// Rendering
-		virtual void AddRenderJob(const RenderJob& p_job) = 0;
+		virtual void AddRenderJob(RenderJob& p_job) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
@@ -113,7 +116,7 @@ namespace Render
 
 		// Rendering
 		void Clear();
-		void AddRenderJob(const RenderJob& p_job);
+		void AddRenderJob(RenderJob& p_job);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
 		void Swap();
@@ -159,7 +162,6 @@ namespace Render
 		void ProcessRenderJobs();
 
 		void Sorting();
-		void EarlyZ();
 		void GeometryPass();
 		void ShadowPass();
 		void LightingPass();
@@ -176,7 +178,8 @@ namespace Render
 		int m_height;
 
 		unsigned m_renderFlags;
-		std::vector<RenderJob> m_jobs;
+		std::vector<RenderJob*> m_jobs;
+		LinearAllocator m_allocator;
 
 		// Default framebuffer.
 		GLuint m_fbo;

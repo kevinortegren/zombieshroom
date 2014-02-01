@@ -59,6 +59,7 @@ namespace Render
 	RootEngine::SubsystemSharedContext g_context;
 
 	GLRenderer::GLRenderer()
+		: m_allocator(10000 * sizeof(RenderJob))
 	{
 		
 	}
@@ -297,9 +298,9 @@ namespace Render
 		m_height = p_height;
 	}
 
-	void GLRenderer::AddRenderJob(const RenderJob& p_job)
+	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
-		m_jobs.push_back(p_job);
+		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -326,11 +327,6 @@ namespace Render
 	{
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_cameraBuffer->GetBufferId());
-
-		{
-			PROFILE("Early-Z", g_context.m_profiler);
-			//EarlyZ();
-		}
 
 		{
 			PROFILE("Sorting", g_context.m_profiler);
@@ -376,8 +372,7 @@ namespace Render
 			Output();
 		}
 
-		// Clear render jobs.
-		// TODO: Reset stack.
+		m_allocator.Clear();
 		m_jobs.clear();
 	}
 
@@ -392,29 +387,16 @@ namespace Render
 		SDL_GL_SwapWindow(m_window);
 	}
 
-	static bool SortRenderJobs(RenderJob& a, RenderJob& b)
+	static bool SortRenderJobs(RenderJob* a, RenderJob* b)
 	{
-		  if( a.m_renderPass < b.m_renderPass ) return true;
-		  if( a.m_renderPass == b.m_renderPass ) return a.m_material->m_id < b.m_material->m_id;
+		  if( a->m_renderPass < b->m_renderPass ) return true;
+		  if( a->m_renderPass == b->m_renderPass ) return a->m_material->m_id < b->m_material->m_id;
 		  return false;
 	};
 
 	void GLRenderer::Sorting()
 	{	
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
-	}
-
-	void GLRenderer::EarlyZ()
-	{
-		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
-		{
-			(*job).m_mesh->Bind();
-
-			m_earlyZTech->Apply();
-
-			(*job).m_mesh->Draw();		
-			(*job).m_mesh->Unbind();
-		}
 	}
 
 	void GLRenderer::GeometryPass()
@@ -434,33 +416,31 @@ namespace Render
 		int currentMaterialID = -1;
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
-			if((*job).m_material->m_id != currentMaterialID)
+			if((*job)->m_material->m_id != currentMaterialID)
 			{
 				UnbindTexture(TextureSemantic::DIFFUSE);
 				UnbindTexture(TextureSemantic::SPECULAR);
 				UnbindTexture(TextureSemantic::NORMAL);
 				UnbindTexture(TextureSemantic::GLOW);
 
-				for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
+				for(auto texture = (*job)->m_material->m_textures.begin(); texture != (*job)->m_material->m_textures.end(); ++texture)
 				{
 					if((*texture).second != nullptr)
 						(*texture).second->Bind(s_textureSlots[(*texture).first]);
 				}
 
-
-
-				currentMaterialID = (*job).m_material->m_id;
+				currentMaterialID = (*job)->m_material->m_id;
 			}
 
-			(*job).m_mesh->Bind();
+			(*job)->m_mesh->Bind();
 
 			// Itterate techniques.
-			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
+			for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 			{
 				if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
 				{
 					// Buffer uniforms.
-					for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+					for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
 					{	
 						m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 					}
@@ -470,12 +450,12 @@ namespace Render
 					{
 						(*program)->Apply();
 
-						(*job).m_mesh->Draw();						
+						(*job)->m_mesh->Draw();						
 					}
 				}
 			}
 		
-			(*job).m_mesh->Unbind();
+			(*job)->m_mesh->Unbind();
 		}
 	}
 
@@ -514,27 +494,27 @@ namespace Render
 
 			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 			{
-				if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
 					continue;
 
-				(*job).m_shadowMesh->Bind();
+				(*job)->m_shadowMesh->Bind();
 
-				for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
+				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 				{
 					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 					{
-						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
 						{	
 							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 						}
 
 						(*tech)->GetPrograms()[0]->Apply();
 
-						(*job).m_shadowMesh->Draw();	
+						(*job)->m_shadowMesh->Draw();	
 					}
 				}
 
-				(*job).m_shadowMesh->Unbind();
+				(*job)->m_shadowMesh->Unbind();
 			}
 		}
 

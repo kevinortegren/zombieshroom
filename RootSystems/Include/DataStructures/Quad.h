@@ -11,7 +11,7 @@
 
 #define QUADTREE_POLYGONS_PER_NODE 10000
 #define QUAD_MAX_CHILDS 4
-//#define SUBDIVIDE
+#define SUBDIVIDE
 
 namespace RootForce
 {
