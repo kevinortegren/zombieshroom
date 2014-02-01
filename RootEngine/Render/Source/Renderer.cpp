@@ -54,6 +54,7 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 namespace Render
 {
 	std::map<Semantic::Semantic, unsigned> GLRenderer::s_sizes;
+	std::map<TextureSemantic::TextureSemantic, unsigned> GLRenderer::s_textureSlots;
 
 	RootEngine::SubsystemSharedContext g_context;
 
@@ -151,6 +152,8 @@ namespace Render
 
 		CheckExtension("NV_texture_multisample");
 
+		m_jobs.reserve(10000);
+
 		// Setup geometry buffer.
 		m_gbuffer.Init(this, width, height);
 
@@ -207,7 +210,6 @@ namespace Render
 		m_fullscreenQuadTech = renderEffect->GetTechniques()[0];
 		m_earlyZTech = renderEffect->GetTechniques()[1];
 
-
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
 
@@ -262,6 +264,19 @@ namespace Render
 		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
+
+		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
+		s_textureSlots[TextureSemantic::SPECULAR] = 1;
+		s_textureSlots[TextureSemantic::NORMAL] = 2;
+		s_textureSlots[TextureSemantic::GLOW] = 3;
+		s_textureSlots[TextureSemantic::DEPTH] = 4;
+		s_textureSlots[TextureSemantic::RANDOM] = 5;
+		s_textureSlots[TextureSemantic::TEXTUREMAP] = 6;
+		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
+		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
+		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
+		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -314,7 +329,7 @@ namespace Render
 
 		{
 			PROFILE("Early-Z", g_context.m_profiler);
-			EarlyZ();
+			//EarlyZ();
 		}
 
 		{
@@ -352,6 +367,11 @@ namespace Render
 		}
 
 		{
+			PROFILE("Render Lines", g_context.m_profiler);
+			m_lineRenderer.RenderLines();
+		}
+
+		{
 			PROFILE("Output", g_context.m_profiler);
 			Output();
 		}
@@ -375,7 +395,7 @@ namespace Render
 	static bool SortRenderJobs(RenderJob& a, RenderJob& b)
 	{
 		  if( a.m_renderPass < b.m_renderPass ) return true;
-		  //if( a.m_renderPass == b.m_renderPass ) return a.m_material->m_id < b.m_material->m_id;
+		  if( a.m_renderPass == b.m_renderPass ) return a.m_material->m_id < b.m_material->m_id;
 		  return false;
 	};
 
@@ -389,17 +409,10 @@ namespace Render
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
 			(*job).m_mesh->Bind();
+
 			m_earlyZTech->Apply();
 
-			if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
-			{
-				(*job).m_mesh->DrawTransformFeedback();
-			}
-			else
-			{
-				(*job).m_mesh->Draw();		
-			}
-	
+			(*job).m_mesh->Draw();		
 			(*job).m_mesh->Unbind();
 		}
 	}
@@ -418,15 +431,28 @@ namespace Render
 
 	void GLRenderer::ProcessRenderJobs()
 	{
+		int currentMaterialID = -1;
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
-			(*job).m_mesh->Bind();
-
-			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
+			if((*job).m_material->m_id != currentMaterialID)
 			{
-				if((*texture).second != nullptr)
-					(*texture).second->Bind((*texture).first);
+				UnbindTexture(TextureSemantic::DIFFUSE);
+				UnbindTexture(TextureSemantic::SPECULAR);
+				UnbindTexture(TextureSemantic::NORMAL);
+				UnbindTexture(TextureSemantic::GLOW);
+
+				for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
+				{
+					if((*texture).second != nullptr)
+						(*texture).second->Bind(s_textureSlots[(*texture).first]);
+				}
+
+
+
+				currentMaterialID = (*job).m_material->m_id;
 			}
+
+			(*job).m_mesh->Bind();
 
 			// Itterate techniques.
 			for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
@@ -444,24 +470,11 @@ namespace Render
 					{
 						(*program)->Apply();
 
-						if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
-						{
-							(*job).m_mesh->DrawTransformFeedback();
-						}
-						else
-						{
-							(*job).m_mesh->Draw();		
-						}
+						(*job).m_mesh->Draw();						
 					}
 				}
 			}
 		
-			for(auto texture = (*job).m_material->m_textures.begin(); texture != (*job).m_material->m_textures.end(); ++texture)
-			{
-				if((*texture).second != nullptr)
-					(*texture).second->Unbind((*texture).first);
-			}
-
 			(*job).m_mesh->Unbind();
 		}
 	}
@@ -504,34 +517,24 @@ namespace Render
 				if(((*job).m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
 					continue;
 
+				(*job).m_shadowMesh->Bind();
+
 				for(auto tech = (*job).m_material->m_effect->GetTechniques().begin(); tech != (*job).m_material->m_effect->GetTechniques().end(); ++tech)
 				{
-					if(((*tech)->m_flags &  Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
+					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 					{
-						if((*job).m_shadowMesh != nullptr)
-						{
-							(*job).m_shadowMesh->Bind();
-
-							for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
-							{	
-								m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-							}
-
-							(*tech)->GetPrograms()[0]->Apply();
-
-							if(((*job).m_flags & RenderFlags::RENDER_TRANSFORMFEEDBACK) == RenderFlags::RENDER_TRANSFORMFEEDBACK)
-							{
-								(*job).m_shadowMesh->DrawTransformFeedback();
-							}
-							else
-							{
-								(*job).m_shadowMesh->Draw();		
-							}
-
-							(*job).m_shadowMesh->Unbind();
+						for(auto param = (*job).m_params.begin(); param != (*job).m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
 						}
+
+						(*tech)->GetPrograms()[0]->Apply();
+
+						(*job).m_shadowMesh->Draw();	
 					}
 				}
+
+				(*job).m_shadowMesh->Unbind();
 			}
 		}
 
@@ -541,6 +544,7 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
+		// Bind cascade shadow map array.
 		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
 
@@ -561,10 +565,9 @@ namespace Render
 		m_lighting.Process(m_fullscreenQuad);
 
 		BindForwardFramebuffer();
+		ClearForwardFramebuffer();
 
-		// Bind la-texture.
-		glActiveTexture(GL_TEXTURE0 + 5);
-		glBindTexture(GL_TEXTURE_2D, m_lighting.m_laHandle);
+		m_lighting.m_la->Bind(5);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 		m_fullscreenQuad.Bind();
@@ -579,11 +582,6 @@ namespace Render
 		m_renderFlags = Render::TechniqueFlags::RENDER_FORWARD;
 
 		ProcessRenderJobs();
-
-		{
-			PROFILE("Render Lines", g_context.m_profiler);
-			m_lineRenderer.RenderLines();
-		}
 	}
 
 	void GLRenderer::PostProcessPass()
@@ -597,9 +595,7 @@ namespace Render
 		// 5 - Input.
 		m_gbuffer.BindTextures();
 
-		// Set scene as input.
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, m_color0->GetHandle());
+		m_color0->Bind(3);
 
 		// Glow Pass.
 		m_fullscreenQuad.Bind();
@@ -609,12 +605,10 @@ namespace Render
 
 	void GLRenderer::Output()
 	{
-		// Bind backbuffer.
+		// Restore backbuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		// Bind active target.
-		glActiveTexture(GL_TEXTURE0 + 5);
-		glBindTexture(GL_TEXTURE_2D, m_color0->GetHandle());
+		m_color0->Bind(5);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
@@ -622,20 +616,27 @@ namespace Render
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
-		// Unbind active target.
-		glActiveTexture(GL_TEXTURE0 + 5);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		m_color0->Unbind(5);
 	}
 
 	void GLRenderer::BindForwardFramebuffer()
 	{
 		// Bind forward target.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	}
 
+	void GLRenderer::ClearForwardFramebuffer()
+	{	
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, buffers);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void GLRenderer::UnbindTexture(TextureSemantic::TextureSemantic p_semantic)
+	{
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[p_semantic]);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	bool GLRenderer::CheckExtension(const char* p_extension)
@@ -697,9 +698,9 @@ namespace Render
 		m_resources.ReleaseTexture(p_texture);
 	}
 
-	Material* GLRenderer::CreateMaterial()
+	Material* GLRenderer::CreateMaterial(const std::string& p_name)
 	{
-		return m_resources.CreateMaterial();
+		return m_resources.CreateMaterial(p_name);
 	}
 
 	VertexAttributesInterface* GLRenderer::CreateVertexAttributes()

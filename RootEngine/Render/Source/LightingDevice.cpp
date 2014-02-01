@@ -23,16 +23,10 @@ namespace Render
 		glGenFramebuffers(1, &m_fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		glGenTextures(1, &m_laHandle);
-		glBindTexture(GL_TEXTURE_2D, m_laHandle);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		m_la = p_renderer->CreateTexture();
+		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_laHandle, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -67,6 +61,7 @@ namespace Render
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, buffers);
 
+		// Clear la-buffer.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);

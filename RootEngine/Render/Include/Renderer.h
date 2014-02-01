@@ -69,7 +69,7 @@ namespace Render
 		virtual void ReleaseBuffer(BufferInterface* p_buffer) = 0;
 		virtual TextureInterface* CreateTexture() = 0;
 		virtual void ReleaseTexture(TextureInterface* p_texture) = 0;
-		virtual Material* CreateMaterial() = 0;
+		virtual Material* CreateMaterial(const std::string& p_name) = 0;
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
@@ -124,7 +124,7 @@ namespace Render
 		void ReleaseBuffer(BufferInterface* p_buffer);
 		TextureInterface* CreateTexture();
 		void ReleaseTexture(TextureInterface* p_texture);
-		Material* CreateMaterial();
+		Material* CreateMaterial(const std::string& p_name);
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
@@ -144,9 +144,13 @@ namespace Render
 		void Compute(ComputeJob* p_job);
 
 		void BindForwardFramebuffer();
+		void ClearForwardFramebuffer();
+		void UnbindTexture(TextureSemantic::TextureSemantic p_semantic);
+
 		void InitialziePostProcesses();
 
 		static std::map<Semantic::Semantic, unsigned> s_sizes;
+		static std::map<TextureSemantic::TextureSemantic, unsigned> s_textureSlots;
 
 	private:
 

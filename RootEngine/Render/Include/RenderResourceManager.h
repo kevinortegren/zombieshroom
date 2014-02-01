@@ -26,12 +26,14 @@ namespace Render
 		void ReleaseTexture(TextureInterface* p_texture);
 
 		// Create state objects.
-		Material* CreateMaterial();
+		Material* CreateMaterial(const std::string& p_name);
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
 
 	private:
+
+		std::map<std::string, int> m_materialNameMap;
 
 		std::vector<Render::BufferInterface*> m_buffers;
 		std::vector<Render::TextureInterface*> m_textures;

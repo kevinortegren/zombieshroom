@@ -5,6 +5,11 @@
 
 namespace Render
 {
+	GlowDevice::~GlowDevice()
+	{
+		glDeleteFramebuffers(1, &m_glowFramebuffer);
+	}
+
 	void GlowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
 	{
 		m_width = p_width;
@@ -33,9 +38,9 @@ namespace Render
 
 		data.halfWidth = p_width / 2;
 		data.halfHeight = p_height / 2;
-		data.blurRadius = 2.2f;
-		data.blurFactor = 2.0f;
-		data.blurStrength = 0.3f;
+		data.blurRadius = 1.0f;
+		data.blurFactor = 9.0f;
+		data.blurStrength = 0.2f;
 
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
 	}
@@ -47,6 +52,7 @@ namespace Render
 
 		// Clear glow fbo.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
+
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, buffers);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -60,7 +66,8 @@ namespace Render
 		p_renderer->BindForwardFramebuffer();
 
 		// Bind glow as input.
-		m_glowTexture->Bind(5);
+		glActiveTexture(GL_TEXTURE0 + 5);
+		glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
 
 		// Vertical pass.
 		glViewport(0, 0, m_width, m_height);

@@ -3,6 +3,7 @@
 #include <RootEngine\Render\Include\Mesh.h>
 #include <RootEngine\Render\Include\Effect.h>
 #include <RootEngine\Render\Include\Light.h>
+#include <RootEngine\Render\Include\Texture.h>
 
 #define RENDER_MAX_DIRECTIONALLIGHTS 5
 #define RENDER_MAX_POINTLIGHTS 1000
@@ -41,6 +42,6 @@ namespace Render
 		std::shared_ptr<TechniqueInterface> m_deferredTech;
 
 		GLuint m_fbo;
-		GLuint m_laHandle;
+		TextureInterface* m_la;
 	};
 }

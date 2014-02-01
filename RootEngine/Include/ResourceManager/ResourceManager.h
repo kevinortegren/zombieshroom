@@ -90,13 +90,10 @@ namespace RootEngine
 		Model*							GetModel(std::string p_handle);
 		Render::EffectInterface*		GetEffect(std::string p_handle);
 		Render::TextureInterface*		GetTexture(std::string p_handle);
-		Render::Material*				GetMaterial(std::string p_handle);
-		
 
 		const std::string& ResolveStringFromTexture(Render::TextureInterface* p_texture);
 		const std::string& ResolveStringFromEffect(Render::EffectInterface* p_effect);
 		const std::string& ResolveStringFromModel(Model* p_model);
-		const std::string& ResolveStringFromMaterial(Render::Material* p_material);
 
 		const std::string& GetWorkingDirectory();
 

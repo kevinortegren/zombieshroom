@@ -17,7 +17,7 @@ namespace RootForce
 
 		// Create constant entities.
 		CreateSun();
-		//CreateSkyBox();
+		CreateSkyBox();
 		CreatePlayerCamera();
 
 		// Add collisions shapes for the group "Static".
@@ -64,7 +64,7 @@ namespace RootForce
 		t->m_scale = glm::vec3(-100);
 		t->m_orientation.Roll(180);
 
-		static glm::vec3 positions[12] = 
+		static glm::vec3 positions[8] = 
 		{
 			glm::vec3( -0.500000, -0.500000, 0.500000),
 			glm::vec3(0.500000, -0.500000, 0.500000),
@@ -76,24 +76,24 @@ namespace RootForce
 			glm::vec3(0.500000, -0.500000, -0.500000)
 		};
 
-		static unsigned int indices[12 * 3] =
+		static unsigned int indices[36] =
 		{
-			1, 2, 3, 
-			3, 2, 4, 
-			3, 4, 5, 
-			5, 4, 6, 
-			5, 6, 7, 
-			7, 6, 8,
-			7, 8, 1, 
-			1, 8, 2, 
-			2, 8, 4, 
-			4, 8, 6, 
-			7, 1, 5, 
-			5, 1, 3
+			0, 1, 2, 
+			2, 1, 3, 
+			2, 3, 4, 
+			4, 3, 5, 
+			4, 5, 6, 
+			6, 5, 7,
+			6, 7, 0, 
+			0, 7, 1, 
+			1, 7, 3, 
+			3, 7, 5, 
+			6, 0, 4, 
+			4, 0, 2
 		};
 
-		Render::Vertex1P vertices[12];
-		for(int i = 0; i < 12; ++i)
+		Render::Vertex1P vertices[8];
+		for(int i = 0; i < 8; ++i)
 		{
 			vertices[i].m_pos = positions[i];
 		}
@@ -101,14 +101,13 @@ namespace RootForce
 		r->m_model = m_engineContext->m_resourceManager->CreateModel("skybox");
 		r->m_model->m_meshes[0]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		r->m_model->m_meshes[0]->SetElementBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-
 		r->m_model->m_meshes[0]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
 		r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
-		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 12 * 3);
-
+		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
+	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-		r->m_material = m_engineContext->m_renderer->CreateMaterial();
+		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 

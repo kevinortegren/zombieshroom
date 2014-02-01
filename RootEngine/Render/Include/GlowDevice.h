@@ -11,6 +11,7 @@ namespace Render
 	class GlowDevice
 	{
 	public:
+		~GlowDevice();
 		void Init(GLRenderer* p_renderer, int p_width, int p_height);
 		void Process(GLRenderer* p_renderer, Mesh* m_mesh);
 		void Resize(int p_width, int p_height);

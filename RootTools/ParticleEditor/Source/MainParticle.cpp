@@ -161,7 +161,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
 	aimingDeviceTransform->m_scale = glm::vec3(0.01f);
 	RootForce::Renderable* aimingRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_aimingDevice);
-	aimingRenderable->m_material = g_engineContext.m_resourceManager->GetMaterial("AimingDeviceRenderable");
+	aimingRenderable->m_material = g_engineContext.m_renderer->CreateMaterial("AimingDeviceRenderable");
 	aimingRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
 	aimingRenderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");

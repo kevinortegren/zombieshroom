@@ -19,7 +19,7 @@
         - name: g_Normal
           slot: 2
         - name: g_Glow
-          slot: 9
+          slot: 3
       programs:
         - name: Mesh_Normal
           shaders:

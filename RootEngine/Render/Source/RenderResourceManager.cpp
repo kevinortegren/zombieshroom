@@ -72,11 +72,19 @@ namespace Render
 		m_textures.erase(itr);
 	}
 
-	Material* RenderResourceManager::CreateMaterial()
+	Material* RenderResourceManager::CreateMaterial(const std::string& p_name)
 	{
-		Material mat = Material(m_materials.size());
-		m_materials.push_back(std::move(mat));
-		return &m_materials[m_materials.size()-1];
+		auto itr = m_materialNameMap.find(p_name);
+		if(itr == m_materialNameMap.end())
+		{
+			m_materialNameMap[p_name] = m_materials.size();
+
+			Material mat = Material(m_materials.size());
+			m_materials.push_back(std::move(mat));
+			return &m_materials[m_materials.size()-1];
+		}
+
+		return &m_materials[(*itr).second];
 	}
 
 	VertexAttributesInterface* RenderResourceManager::CreateVertexAttributes()

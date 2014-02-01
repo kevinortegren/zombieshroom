@@ -15,7 +15,6 @@ namespace Render
 		virtual void Unbind() = 0;
 		virtual void Draw() = 0;
 		virtual void DrawInstanced(GLsizei p_instances) = 0;
-		virtual void DrawTransformFeedback() = 0;
 
 		//Get functions
 		virtual BufferInterface* GetVertexBuffer() = 0;
@@ -76,7 +75,6 @@ namespace Render
 		void Unbind();
 		void Draw();
 		void DrawInstanced(GLsizei p_instances);
-		void DrawTransformFeedback();
 
 	private:
 		BufferInterface* m_vertexBuffer;

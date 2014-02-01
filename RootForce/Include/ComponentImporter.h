@@ -30,7 +30,13 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				const YAML::Node* materialNode = p_node.FindValue("Material");
 				if(materialNode != nullptr)
 				{
-					renderable->m_material = g_engineContext.m_renderer->CreateMaterial();
+					const YAML::Node* materialNameNode = materialNode->FindValue("Name");
+					if(materialNameNode != nullptr)
+					{
+						std::string materialName;
+						p_node["Material"]["Name"] >> materialName;
+						renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+					}
 
 					const YAML::Node* effectNode = materialNode->FindValue("Effect");
 					if(effectNode != nullptr)

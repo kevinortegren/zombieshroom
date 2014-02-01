@@ -3,10 +3,11 @@
 namespace Render
 {
 	Mesh::Mesh()
-		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0) {}
+		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0),m_transformFeedback(0) {}
 
 	Mesh::~Mesh()
 	{
+		if(m_transformFeedback != 0)
 		glDeleteTransformFeedbacks(1, &m_transformFeedback);
 	}
 
@@ -100,6 +101,11 @@ namespace Render
 		{
 			glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
 		}
+		else if(m_transformFeedback != 0)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
+			glDrawTransformFeedback(m_primitive, m_transformFeedback);
+		}
 		else
 		{
 			glDrawArrays(m_primitive, 0, m_vertexBuffer->GetBufferSize());
@@ -109,14 +115,6 @@ namespace Render
 	void Mesh::DrawInstanced(GLsizei p_instances)
 	{
 		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
-	}
-
-	void Mesh::DrawTransformFeedback()
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
-
-
-		glDrawTransformFeedback(m_primitive, m_transformFeedback);
 	}
 
 	GLenum Mesh::GetPrimitiveType()
