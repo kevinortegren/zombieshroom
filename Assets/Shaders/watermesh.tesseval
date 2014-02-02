@@ -39,7 +39,7 @@ void main()
     // Interpolate the attributes of the output vertex using the barycentric coordinates        
     TexCoord_FS_in = interpolate2D(TexCoord_ES_in[0], TexCoord_ES_in[1], TexCoord_ES_in[2]);  
 	vec4 heightNormal = texture(g_Diffuse, TexCoord_FS_in);
-	Normal_FS_in = normalize( vec4( heightNormal.xyz, 0.0f)).xyz;
+	Normal_FS_in = heightNormal.xyz;
 	
 	//Calc new vertex position                             
     WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0, heightNormal.w, 0);    

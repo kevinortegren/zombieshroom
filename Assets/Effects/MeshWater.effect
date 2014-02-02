@@ -18,8 +18,6 @@
             slot: 0
           - name: g_Specular
             slot: 1
-      flags:
-          - name: Forward
       programs:
         - name: Mesh
           shaders:
@@ -35,7 +33,7 @@
           # None = 0
           # AlphaBlend = 1
           # Addative = 2
-          blend: 1
+         # blend: 1
           
           # Depth settings.
           depth:

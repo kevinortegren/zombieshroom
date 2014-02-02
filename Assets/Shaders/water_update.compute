@@ -36,7 +36,6 @@ void main()
 	//n.x = b-a;
 	//n.y = d-c;
 	//n.z = dx*2;
-	vec4 result = vec4(normalize(n), curr);
-	imageStore(currTex, storePos, result);
+	imageStore(currTex, storePos, vec4(n, curr));
 
 }
