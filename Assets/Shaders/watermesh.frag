@@ -32,6 +32,6 @@ void main()
 	vec3 frag_color = texture(g_Specular, refW).xyz;
 	//vec4 color = texture(g_Specular, TexCoord_FS_in);
 	vec4 finalcolor = vec4(frag_color.r, frag_color.g, frag_color.b, 1.0f);
-	diffuse = finalcolor*vec4(0.5f, 0.5f, 1.0f, 1.0f);
+	diffuse = finalcolor;
 	normals = vec3(viewNormal * 0.5 + 0.5);
 }

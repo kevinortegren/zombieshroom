@@ -28,7 +28,7 @@ namespace RootForce
 		//Set standard values
 		m_speed		= 60.0f;
 		m_dx		= 10.0f;
-		m_timeStep	= 0.016f;
+		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
 		//Calculate MK1, MK2 and MK3 with standard values

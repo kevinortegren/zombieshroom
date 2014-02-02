@@ -22,7 +22,7 @@ out vec2 TexCoord_ES_in[];
 float GetTessLevel(float Distance0, float Distance1)                                            
 {                                                                                               
     float AvgDistance = (Distance0 + Distance1) / 2.0;  
-	                                        
+	                                       
 	if (AvgDistance <= 120.0f)
 	{  
 		return 4.0f;
