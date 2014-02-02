@@ -85,12 +85,14 @@ namespace RootForce
 		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("256planeUV"); //Load a grid mesh, this could be done in code instead
 		m_renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D); //Diffuse texture(Will probably be removed)
+		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); //Diffuse texture(Will probably be removed)
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; //Camera position in world space
 
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); //Set primitive type to GL_PATCHES because we use tesselation
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
+
+		InitDisturb();
 	}
 
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
@@ -126,12 +128,12 @@ namespace RootForce
 
 	void WaterSystem::CalculateWaterConstants()
 	{
-		float d		= m_damping*m_timeStep+2.0f;
-		float e		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
+		float dts2		= m_damping*m_timeStep+2.0f;
+		float stsdx		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
 
-		m_mk1     = (m_damping*m_timeStep-2.0f)/ d;
-		m_mk2     = (4.0f-8.0f*e) / d;
-		m_mk3     = (2.0f*e) / d;
+		m_mk1     = (m_damping*m_timeStep-2.0f)/ dts2;
+		m_mk2     = (4.0f-8.0f*stsdx) / dts2;
+		m_mk3     = (2.0f*stsdx) / dts2;
 	}
 
 	void WaterSystem::SetDamping( float p_damping )
@@ -150,5 +152,16 @@ namespace RootForce
 	{
 		m_speed = p_speed;
 		CalculateWaterConstants();
+	}
+
+	void WaterSystem::InitDisturb()
+	{
+		for(int i = 0; i < 20; ++i)
+		{ 
+			int x = (10 + rand() % (120*(int)m_scale)) - 70*(int)m_scale;
+			int z = (10 + rand() % (120*(int)m_scale)) - 70*(int)m_scale;
+
+			Disturb((float)x, (float)z, 1.0f);
+		}
 	}
 }

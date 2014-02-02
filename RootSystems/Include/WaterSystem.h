@@ -21,6 +21,7 @@ namespace RootForce
 		void End();
 		void CreateRenderable();
 		void Disturb(float p_x, float p_z, float p_power);
+		void InitDisturb();
 		void ToggleWireFrame();
 		void CalculateWaterConstants();
 
