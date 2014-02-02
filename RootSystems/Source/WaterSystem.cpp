@@ -25,16 +25,14 @@ namespace RootForce
 		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
 		
-		float speed		= 60.0f;
-		float dx		= 10.0f;
-		m_timeStep		= 0.016f;
-		float damping	= 0.0f;
+		//Set standard values
+		m_speed		= 60.0f;
+		m_dx		= 10.0f;
+		m_timeStep	= 0.016f;
+		m_damping	= 0.0f;
 
-		float d		= damping*m_timeStep+2.0f;
-		float e		= (speed*speed)*(m_timeStep*m_timeStep)/(dx*dx);
-		m_mk1     = (damping*m_timeStep-2.0f)/ d;
-		m_mk2     = (4.0f-8.0f*e) / d;
-		m_mk3     = (2.0f*e) / d;
+		//Calculate MK1, MK2 and MK3 with standard values
+		CalculateWaterConstants();
 
 		m_computeJob.m_params[Render::Semantic::MK1]	= &m_mk1;
 		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
@@ -54,7 +52,7 @@ namespace RootForce
 	void WaterSystem::Process()
 	{
 		m_dt += m_world->GetDelta();
-		//Only simulate water 60 times per second
+		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
@@ -126,4 +124,31 @@ namespace RootForce
 		m_renderable->m_model->m_meshes[0]->SetWireFrame(m_wireFrame);
 	}
 
+	void WaterSystem::CalculateWaterConstants()
+	{
+		float d		= m_damping*m_timeStep+2.0f;
+		float e		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
+
+		m_mk1     = (m_damping*m_timeStep-2.0f)/ d;
+		m_mk2     = (4.0f-8.0f*e) / d;
+		m_mk3     = (2.0f*e) / d;
+	}
+
+	void WaterSystem::SetDamping( float p_damping )
+	{
+		m_damping = p_damping;
+		CalculateWaterConstants();
+	}
+
+	void WaterSystem::SetDx( float p_dx )
+	{
+		m_dx = p_dx;
+		CalculateWaterConstants();
+	}
+
+	void WaterSystem::SetSpeed( float p_speed )
+	{
+		m_speed = p_speed;
+		CalculateWaterConstants();
+	}
 }
