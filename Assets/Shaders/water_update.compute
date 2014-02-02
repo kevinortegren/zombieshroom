@@ -32,7 +32,10 @@ void main()
 	n.x = b-a;
 	n.y = 2;
 	n.z = d-c;
-
+	//Try this instead:
+	//n.x = b-a;
+	//n.y = d-c;
+	//n.z = dx*2;
 	vec4 result = vec4(normalize(n), curr);
 	imageStore(currTex, storePos, result);
 
