@@ -75,18 +75,23 @@ namespace RootForce
 
 	void WaterSystem::CreateRenderable()
 	{
+		m_scale = 20.0f;
 		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
-		m_renderable			= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
+
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
 		trans->m_position = glm::vec3(0,0,0);
-		m_scale = 20.0f;
 		trans->m_scale = glm::vec3(m_scale,1,m_scale);
-		m_renderable->m_model = m_context->m_resourceManager->LoadCollada("256planeUV");
+
+		//Create a renderable component for the water
+		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
+		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("256planeUV"); //Load a grid mesh, this could be done in code instead
 		m_renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
-		m_renderable->m_params[Render::Semantic::EYEWORLDPOS] = &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position;
+
+		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D); //Diffuse texture(Will probably be removed)
+		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; //Camera position in world space
+
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
-		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES);
+		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); //Set primitive type to GL_PATCHES because we use tesselation
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
 	}
 
