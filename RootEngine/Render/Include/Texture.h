@@ -25,6 +25,7 @@ namespace Render
 			TEXTURE_BGR,
 			TEXTURE_DEPTH_COMPONENT,
 			TEXTURE_R32,
+			TEXTURE_DEPTH_STENCIL
 		};
 	}
 

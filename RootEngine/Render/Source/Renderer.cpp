@@ -93,6 +93,7 @@ namespace Render
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
@@ -121,11 +122,14 @@ namespace Render
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,1);
+		
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glEnable(GL_DEPTH_TEST);
-		glFrontFace(GL_CCW);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glEnable(GL_DEPTH_TEST);
+		
+
+		glCullFace(GL_BACK);	
+		glFrontFace(GL_CCW);
 
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallbackARB)
@@ -162,7 +166,7 @@ namespace Render
 		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
-		m_lighting.Init(this, width, height);
+		m_lighting.Init(this, width, height, &m_gbuffer);
 	
 		// Setup render target for forward renderer and post processes to use.
 		glGenFramebuffers(1, &m_fbo);
@@ -174,7 +178,18 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
 
 		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+			break;
+		default:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+			break;
+		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -342,15 +357,29 @@ namespace Render
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer->BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
+		BindForwardFramebuffer();
+		ClearForwardFramebuffer();
+
+		glEnable(GL_STENCIL_TEST);
+		m_gbuffer.UnbindTextures();	
+		m_gbuffer.Enable();
+		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		for(int i = 0; i < 2; i++)
 		{
-			PROFILE("Geometry Pass", g_context.m_profiler);
-			GeometryPass();
+			{
+				PROFILE("Geometry Pass", g_context.m_profiler);
+				GeometryPass(i);
+			}
+
+			{
+				PROFILE("Lighting Pass", g_context.m_profiler);
+				LightingPass();	
+			}
 		}
 
-		{
-			PROFILE("Lighting Pass", g_context.m_profiler);
-			LightingPass();	
-		}
+		m_lighting.ClearLights();
+		glDisable(GL_STENCIL_TEST);
 
 		{
 			PROFILE("Forward Pass", g_context.m_profiler);
@@ -399,11 +428,87 @@ namespace Render
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
 	}
 
-	void GLRenderer::GeometryPass()
+	void GLRenderer::ShadowPass()
 	{
-		m_gbuffer.UnbindTextures();
+		m_shadowDevice.Process();
+
+		glCullFace(GL_FRONT);
+		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
+
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glDrawBuffers(0, NULL);
+
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+			// Buffer Per Frame data.
+			struct
+			{
+				glm::mat4 m_projection;
+				glm::mat4 m_view;
+				glm::mat4 m_invView;
+				glm::mat4 m_invProj;
+				glm::mat4 m_invViewProj;
+
+			} matrices;
+
+			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
+			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
+			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
+
+			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
+
+			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+			{
+				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+					continue;
+
+				if((*job)->m_shadowMesh == nullptr)
+					continue;
+
+				(*job)->m_shadowMesh->Bind();
+
+				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
+				{
+					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
+					{
+						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+						}
+
+						(*tech)->GetPrograms()[0]->Apply();
+
+						(*job)->m_shadowMesh->Draw();	
+					}
+				}
+
+				(*job)->m_shadowMesh->Unbind();
+			}
+		}
+
+		glCullFace(GL_BACK);
+		glViewport(0, 0, m_width, m_height);
+	}
+
+	void GLRenderer::GeometryPass(int p_layer)
+	{
+		m_gbuffer.UnbindTextures();	
+
+		// Bind lighting for blending.
+		m_lighting.m_la->Bind(5);
+
 		m_gbuffer.Enable();
-		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED;
+		m_gbuffer.Clear(GL_STENCIL_BUFFER_BIT);
+
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilMask(0xFF);
+
+		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
 		ProcessRenderJobs();
 		
@@ -459,69 +564,6 @@ namespace Render
 		}
 	}
 
-	void GLRenderer::ShadowPass()
-	{
-		m_shadowDevice.Process();
-
-		glCullFace(GL_FRONT);
-		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
-
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glDrawBuffers(0, NULL);
-
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-			// Buffer Per Frame data.
-			struct
-			{
-				glm::mat4 m_projection;
-				glm::mat4 m_view;
-				glm::mat4 m_invView;
-				glm::mat4 m_invProj;
-				glm::mat4 m_invViewProj;
-
-			} matrices;
-
-			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
-			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
-			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-
-			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
-
-			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
-			{
-				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-					continue;
-
-				(*job)->m_shadowMesh->Bind();
-
-				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
-				{
-					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
-					{
-						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
-						{	
-							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-						}
-
-						(*tech)->GetPrograms()[0]->Apply();
-
-						(*job)->m_shadowMesh->Draw();	
-					}
-				}
-
-				(*job)->m_shadowMesh->Unbind();
-			}
-		}
-
-		glCullFace(GL_BACK);
-		glViewport(0, 0, m_width, m_height);
-	}
-
 	void GLRenderer::LightingPass()
 	{
 		// Bind cascade shadow map array.
@@ -541,27 +583,28 @@ namespace Render
 			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
+		
+		// Bind background as Input.
+		m_gbuffer.m_backgroundTexture->Bind(5);
 
+		m_lighting.Clear();
 		m_lighting.Process(m_fullscreenQuad);
-
-		BindForwardFramebuffer();
-		ClearForwardFramebuffer();
-
-		m_lighting.m_la->Bind(5);
-
-		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
-		m_fullscreenQuad.Bind();
-		m_fullscreenQuad.Draw();
-		m_fullscreenQuad.Unbind();
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
 	void GLRenderer::ForwardPass()
 	{
-		m_renderFlags = Render::TechniqueFlags::RENDER_FORWARD;
+		BindForwardFramebuffer();
 
-		ProcessRenderJobs();
+		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+
+		// Bind la as Input.
+		m_lighting.m_la->Bind(5);
+
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
 	}
 
 	void GLRenderer::PostProcessPass()

@@ -291,11 +291,11 @@ namespace RootEngine
 					}
 					else if(name == "Forward")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED1;
 					}
 					else if(name == "Deferred")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED0;
 					}
 					else if(name == "Debug")
 					{
@@ -310,7 +310,7 @@ namespace RootEngine
 			else
 			{
 				// Assume deffered technique if no flags found.
-				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
+				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED0;
 			}
 		}
 

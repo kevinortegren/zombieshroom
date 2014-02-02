@@ -8,7 +8,7 @@ namespace Render
 	: m_numDirectionalLights(0),
 		m_numPointLights(0) {}
 
-	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
+	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height, GeometryBuffer* p_gbuffer)
 	{
 		// Load techniques.	
 		Render::EffectInterface* lightingEffect = g_context.m_resourceManager->LoadEffect("Renderer/Lighting");
@@ -27,6 +27,8 @@ namespace Render
 		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, p_gbuffer->m_depthTexture->GetHandle(), 0);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -53,7 +55,7 @@ namespace Render
 		m_numPointLights++;
 	}
 
-	void LightingDevice::Process(Mesh& p_fullscreenQuad)
+	void LightingDevice::Clear()
 	{
 		// Bind la-buffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
@@ -61,14 +63,22 @@ namespace Render
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, buffers);
 
-		// Clear la-buffer.
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilMask(0x00);
 
+		// Clear la-buffer.
+		glClear(GL_COLOR_BUFFER_BIT);
+
+	}
+
+	void LightingDevice::Process(Mesh& p_fullscreenQuad)
+	{
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
 		auto ambient = m_deferredTech->GetPrograms()[0];
 		auto directional = m_deferredTech->GetPrograms()[1];
 		auto pointlight = m_deferredTech->GetPrograms()[2];
+		auto background = m_deferredTech->GetPrograms()[4];
 
 		p_fullscreenQuad.Bind();
 
@@ -84,13 +94,20 @@ namespace Render
 		pointlight->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numPointLights);
 
+		// Background.
+		background->Apply();	
+		p_fullscreenQuad.Draw();
+	
 		p_fullscreenQuad.Unbind();
 
 		// Unbind.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 
-		m_numPointLights = 0;
+	void LightingDevice::ClearLights()
+	{
 		m_numDirectionalLights = 0;
+		m_numPointLights = 0;
 	}
 
 	void LightingDevice::Resize(int p_width, int p_height)
