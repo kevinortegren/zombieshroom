@@ -311,12 +311,18 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+		//Debug -> Disturb water with F3
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F3) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			m_waterSystem->Disturb((int)(trans->m_position.x+256), (int)(trans->m_position.z+256), 20);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 20);
 		}
+		//DEBUG -> toggle wireframe mode on water with F2
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F2) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ToggleWireFrame();
+
+
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();

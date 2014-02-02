@@ -1,5 +1,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <RootEngine/Include/Logging/Logging.h>
+extern RootEngine::GameSharedContext g_engineContext;
 namespace RootForce
 {
 	void WaterSystem::Init()
@@ -77,21 +79,26 @@ namespace RootForce
 		m_renderable			= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
 		trans->m_position = glm::vec3(0,0,0);
-		trans->m_scale = glm::vec3(20,1,20);
+		m_scale = 20.0f;
+		trans->m_scale = glm::vec3(m_scale,1,m_scale);
 		m_renderable->m_model = m_context->m_resourceManager->LoadCollada("256planeUV");
 		m_renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
 		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS] = &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position;
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES);
-		m_renderable->m_model->m_meshes[0]->SetWireFrame(false);
-		//glPatchParameteri(GL_PATCH_VERTICES, 3);
+		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
 	}
 
-	void WaterSystem::Disturb( int p_x, int p_z, float p_power )
+	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
 	{
+		
+		float scaleHalfWidth = 70.0f * m_scale;
+		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
+		g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+
 		//Return if out of bounds
-		if(p_x >= m_maxX || p_x <= 0 || p_z >= m_maxZ || p_z <= 0)
+		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
 			return;
 
 		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
@@ -99,12 +106,19 @@ namespace RootForce
 		std::vector<glm::vec4> emptyData(1, glm::vec4(0,0,0,p_power));
 		std::vector<glm::vec4> emptyDataHalf(1, glm::vec4(0,0,0,p_power/2.0f));
 		
-		glTexSubImage2D(GL_TEXTURE_2D, 0, p_x,		p_z,	1, 1, GL_RGBA, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, p_x+1,	p_z,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, p_x-1,	p_z,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, p_x,		p_z+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, p_x,		p_z+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyData[0]); 
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
 
 		m_computeJob.m_textures[1]->Unbind(0);
 	}
+
+	void WaterSystem::ToggleWireFrame()
+	{
+		m_wireFrame = m_wireFrame ? false : true;
+		m_renderable->m_model->m_meshes[0]->SetWireFrame(m_wireFrame);
+	}
+
 }
