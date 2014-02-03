@@ -34,11 +34,12 @@ namespace RootEngine
 			delete m_glTexSurfaceFactory;
 		}
 
-		void guiInstance::Initialize( int p_width, int p_height, SDL_Window* p_window )
+		void guiInstance::Initialize( int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext )
 		{
 			m_width = p_width;
 			m_height = p_height;
 			m_window = p_window;
+			m_glContext = p_glContext;
   
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
@@ -125,8 +126,10 @@ namespace RootEngine
 
 		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
 		{
+			SDL_GLContext tmp = SDL_GL_GetCurrentContext();
+			GLuint texture = p_surface->GetTexture();
 			if(p_surface)
-				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
+				glBindTexture(GL_TEXTURE_2D, texture);
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -241,8 +244,6 @@ namespace RootEngine
 
 		void guiInstance::RunThread()
 		{
-			SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-			m_glContext = SDL_GL_CreateContext(m_window);
 			SDL_GL_MakeCurrent(m_window, m_glContext);
 			// Initialize Awesomium
 			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
@@ -278,10 +279,18 @@ namespace RootEngine
 				for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 					if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
 					{
-						GLTextureSurface* surface = (GLTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+						GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
 						if(surface)
-							surface->GetTexture(); // Force a texture update
+							surface->UpdateTexture(); // Force a texture update
 					}
+				// Wait until texture updates are complete before releasing the lock
+				GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+				GLenum result; 
+				while(true) 
+				{ 
+					result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+					if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
+				} 
 				m_drawMutex.unlock();
 			}
 			SDL_GL_DeleteContext(m_glContext);

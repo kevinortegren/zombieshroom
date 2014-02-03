@@ -85,13 +85,17 @@ namespace RootForce
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
+		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
+		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
+		SDL_GL_MakeCurrent(m_window.get(), mainContext);
+
 		// Setup the importer and exporter
 		m_world.GetEntityImporter()->SetImporter(Importer);
 		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize GUI
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"), m_window.get());
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"), m_window.get(), guiContext);
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));

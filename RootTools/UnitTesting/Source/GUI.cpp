@@ -10,7 +10,7 @@ TEST(GUITest, LoadURLTest)
 {
 	// Initialize GUI
 	g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-		g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+		g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"), SDL_GL_GetCurrentWindow(), NULL);
 
 	RootEngine::GUISystem::WebView* temp = g_engineContext.m_gui->LoadURL("HUD", "hud.html");
 	temp->WaitLoading();

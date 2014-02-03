@@ -30,7 +30,7 @@ namespace RootEngine
 		{
 		public:
 			//Sets the window properties to the gui core
-			virtual void Initialize(int p_width, int p_height, SDL_Window* p_window) = 0;
+			virtual void Initialize(int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext) = 0;
 
 			virtual void Update() = 0;
 			virtual void Render(WebView* p_view) = 0;
@@ -57,7 +57,7 @@ namespace RootEngine
 			void Startup();
 			void Shutdown();
 
-			void Initialize(int p_width, int p_height, SDL_Window* p_window);
+			void Initialize(int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext);
 			void Update();
 			void Render(WebView* p_view);
 			WebView* LoadURL(std::string p_callbackObjectName, std::string p_path);
