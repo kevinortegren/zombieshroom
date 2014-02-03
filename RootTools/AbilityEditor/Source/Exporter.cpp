@@ -41,6 +41,11 @@ namespace AbilityEditorNameSpace
 		out << YAML::Key << "Name" << YAML::Value << p_entity->GetName().toStdString(); 
 		out << YAML::EndMap;
 
+		//Cooldown
+		out << YAML::BeginMap;
+		out << YAML::Key << "Cooldown" << YAML::Value << p_entity->GetCooldown(); 
+		out << YAML::EndMap;
+
 		//Components
 		out << YAML::BeginMap;
 		out << YAML::Key << "Components";

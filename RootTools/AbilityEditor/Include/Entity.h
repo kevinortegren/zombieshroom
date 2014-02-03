@@ -24,10 +24,13 @@ namespace AbilityEditorNameSpace
 		
 		void RemoveAllComponents();
 		void SetName(QString p_name) { m_name = p_name; }
+		void SetCooldown(float p_cooldown) { m_cooldown = p_cooldown; }
 		QString GetName() { return m_name; }
+		float GetCooldown() { return m_cooldown; }
 		std::vector<AbilityComponents::MainComponent*>* GetComponents() { return m_components; }
 	private:
 		QString m_name;
+		float m_cooldown;
 		std::vector<AbilityComponents::MainComponent*>* m_components;
 		std::map<QString, AbilityComponents::ComponentType::ComponentType> m_nameToEnumMapper;
 		

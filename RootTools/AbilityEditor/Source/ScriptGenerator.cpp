@@ -51,7 +51,8 @@ namespace AbilityEditorNameSpace
 			}
 			//TODO : Add cooldown stuff
 		}
-		
+		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
+
 		m_file << "\n";
 
 		WriteOnCreate(p_onCreate);

@@ -92,6 +92,7 @@ void AbilityEditor::Init()
 	connect(ui.buttonNameBrowser, SIGNAL(pressed()), this, SLOT(BrowseName()));
 	connect(ui.abilityNameEdit, SIGNAL(editingFinished()), this, SLOT(ChangeAbilityName()));
 	
+	connect(ui.cooldownSpinbox, SIGNAL(valueChanged(double)), this, SLOT(SetCooldown(double)));
 
 }
 
@@ -308,15 +309,22 @@ void AbilityEditor::Load()
 	m_currentSavePath = dial.getOpenFileName();
 	if(m_currentSavePath.compare("") != 0)
 	{
+		//Clear existing values
 		ui.listAbilityComponents->Clear();
 		ui.treeOnCreate->Clear();
 		ui.treeOnCollide->Clear();
 		ui.treeOnDestroy->Clear();
+		//Import new values
 		m_importer->Import(m_currentSavePath.toStdString(), m_entity, m_onCreate, m_onCollide, m_onDestroy);
+		//Set new values
 		ui.listAbilityComponents->LoadData();
 		ui.treeOnCreate->LoadData();
 		ui.treeOnCollide->LoadData();
 		ui.treeOnDestroy->LoadData();
+		//Set name in UI
+		ui.abilityNameEdit->setText(m_entity->GetName());
+		//Set cooldown in UI
+		ui.cooldownSpinbox->setValue(m_entity->GetCooldown());
 	}
 }
 
@@ -353,4 +361,9 @@ void AbilityEditor::BrowseName()
 void AbilityEditor::ChangeAbilityName()
 {
 	m_entity->SetName(ui.abilityNameEdit->text());
+}
+
+void AbilityEditor::SetCooldown( double p_cooldown )
+{
+	m_entity->SetCooldown(p_cooldown);
 }

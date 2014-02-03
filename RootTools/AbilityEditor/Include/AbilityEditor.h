@@ -38,6 +38,7 @@ private slots:
 		//void AddNewEntity();
 		void BrowseName();
 		void ChangeAbilityName();
+		void SetCooldown(double p_cooldown);
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;

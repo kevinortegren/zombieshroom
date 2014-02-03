@@ -29,14 +29,25 @@ namespace AbilityEditorNameSpace
 			YAML::Node doc;
 			parser.GetNextDocument(doc);
 
+			unsigned int counter = 0;
+
 			//Name
 			//const YAML::Node& name = doc[0]["Name"];
 			std::string abilityName;
-			doc[0]["Name"] >> abilityName;
+			doc[counter]["Name"] >> abilityName;
+			counter++;
+			p_entity->SetName(QString::fromStdString(abilityName));
 			//Entity* entity = new Entity(abilityName.c_str());
 			
+			//Cooldown
+			float cooldown;
+			doc[counter]["Cooldown"] >> cooldown;
+			counter++;
+			p_entity->SetCooldown(cooldown);
+
 			//Components
-			const YAML::Node& comps = doc[1]["Components"];
+			const YAML::Node& comps = doc[counter]["Components"];
+			counter++;
 			for(unsigned int i = 0; i < comps.size(); i++)
 			{
 				int type;
@@ -47,7 +58,8 @@ namespace AbilityEditorNameSpace
 			}
 
 			//OnCreate
-			const YAML::Node& onCreate = doc[2]["OnCreate"];
+			const YAML::Node& onCreate = doc[counter]["OnCreate"];
+			counter++;
 			for(unsigned int i = 0; i < onCreate.size(); i++)
 			{
 				std::string condName;
@@ -66,7 +78,8 @@ namespace AbilityEditorNameSpace
 			}
 
 			//OnCollide
-			const YAML::Node& onCollide = doc[3]["OnCollide"];
+			const YAML::Node& onCollide = doc[counter]["OnCollide"];
+			counter++;
 			for(unsigned int i = 0; i < onCollide.size(); i++)
 			{
 				std::string condName;
@@ -86,7 +99,8 @@ namespace AbilityEditorNameSpace
 
 			
 			//OnDestroy
-			const YAML::Node& onDestroy = doc[4]["OnDestroy"];
+			const YAML::Node& onDestroy = doc[counter]["OnDestroy"];
+			counter++;
 			for(unsigned int i = 0; i < onDestroy.size(); i++)
 			{
 				std::string condName;

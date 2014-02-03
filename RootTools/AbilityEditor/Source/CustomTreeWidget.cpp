@@ -91,7 +91,7 @@ void CustomTreeWidget::RemoveSelected( QTreeWidgetItem* p_item )
 
 void CustomTreeWidget::ViewSelectedData( QTreeWidgetItem* p_item, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan ) 
 {
-	if(p_item->whatsThis(0).compare("Condition") == 0)
+	if(p_item->whatsThis(0).compare("Conditions") == 0)
 	{
 		m_onEvent->ViewConditionData(this->indexOfTopLevelItem(p_item),p_propBrows, p_propMan );
 	}
@@ -105,7 +105,7 @@ void CustomTreeWidget::ViewSelectedData( QTreeWidgetItem* p_item, QtTreeProperty
 void CustomTreeWidget::SaveSelectedData( QTreeWidgetItem* p_item, QtTreePropertyBrowser* p_propBrows, QtVariantPropertyManager* p_propMan )
 {
 	
-	if(p_item->whatsThis(0).compare("Condition") == 0)
+	if(p_item->whatsThis(0).compare("Conditions") == 0)
 	{
 		m_onEvent->EditConditionData(this->indexOfTopLevelItem(p_item),p_propBrows, p_propMan);
 	}
@@ -117,7 +117,7 @@ void CustomTreeWidget::LoadData()
 	{
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,m_onEvent->GetConditions()->at(i)->GetName());
-		item->setWhatsThis(0,"Condition");
+		item->setWhatsThis(0,"Conditions");
 
 		this->addTopLevelItem(item);
 

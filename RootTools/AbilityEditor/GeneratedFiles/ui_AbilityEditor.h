@@ -13,13 +13,17 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTreeView>
@@ -41,8 +45,10 @@ public:
     QAction *actionGenerate_Script;
     QAction *actionEntity;
     QWidget *centralWidget;
+    QPushButton *buttonNameBrowser;
+    QWidget *widget;
     QGridLayout *gridLayout;
-    QWidget *propertyWidget;
+    CustomCompListWidget *listAbilityComponents;
     QTabWidget *toolBoxWidget;
     QWidget *tabComponents;
     QVBoxLayout *verticalLayout_5;
@@ -51,12 +57,11 @@ public:
     QVBoxLayout *verticalLayout_4;
     QTreeView *listEntities;
     QWidget *tabConditions;
-    QVBoxLayout *verticalLayout_6;
+    QVBoxLayout *verticalLayout;
     CustomListWidget *listConditions;
-    CustomCompListWidget *listAbilityComponents;
     QTabWidget *OnTabWidget;
     QWidget *tabOnCreate;
-    QVBoxLayout *verticalLayout;
+    QVBoxLayout *verticalLayout_6;
     CustomTreeWidget *treeOnCreate;
     QWidget *tabOnCollide;
     QVBoxLayout *verticalLayout_2;
@@ -64,8 +69,13 @@ public:
     QWidget *tabOnDestroy;
     QVBoxLayout *verticalLayout_3;
     CustomTreeWidget *treeOnDestroy;
-    QPushButton *buttonNameBrowser;
+    QWidget *propertyWidget;
+    QWidget *widget1;
+    QHBoxLayout *horizontalLayout;
     QLineEdit *abilityNameEdit;
+    QSpacerItem *horizontalSpacer;
+    QLabel *cooldownLabel;
+    QDoubleSpinBox *cooldownSpinbox;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QStatusBar *statusBar;
@@ -94,16 +104,23 @@ public:
         actionEntity->setObjectName(QStringLiteral("actionEntity"));
         centralWidget = new QWidget(AbilityEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        gridLayout = new QGridLayout(centralWidget);
+        buttonNameBrowser = new QPushButton(centralWidget);
+        buttonNameBrowser->setObjectName(QStringLiteral("buttonNameBrowser"));
+        buttonNameBrowser->setGeometry(QRect(585, 9, 189, 23));
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(10, 39, 771, 661));
+        gridLayout = new QGridLayout(widget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        propertyWidget = new QWidget(centralWidget);
-        propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
+        gridLayout->setContentsMargins(0, 0, 0, 0);
+        listAbilityComponents = new CustomCompListWidget(widget);
+        listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
 
-        gridLayout->addWidget(propertyWidget, 3, 1, 1, 1);
+        gridLayout->addWidget(listAbilityComponents, 0, 0, 1, 1);
 
-        toolBoxWidget = new QTabWidget(centralWidget);
+        toolBoxWidget = new QTabWidget(widget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
@@ -131,36 +148,31 @@ public:
         toolBoxWidget->addTab(tabEntities, QString());
         tabConditions = new QWidget();
         tabConditions->setObjectName(QStringLiteral("tabConditions"));
-        verticalLayout_6 = new QVBoxLayout(tabConditions);
-        verticalLayout_6->setSpacing(6);
-        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
-        listConditions = new CustomListWidget(tabConditions);
-        listConditions->setObjectName(QStringLiteral("listConditions"));
-
-        verticalLayout_6->addWidget(listConditions);
-
-        toolBoxWidget->addTab(tabConditions, QString());
-
-        gridLayout->addWidget(toolBoxWidget, 1, 1, 1, 1);
-
-        listAbilityComponents = new CustomCompListWidget(centralWidget);
-        listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
-
-        gridLayout->addWidget(listAbilityComponents, 1, 0, 1, 1);
-
-        OnTabWidget = new QTabWidget(centralWidget);
-        OnTabWidget->setObjectName(QStringLiteral("OnTabWidget"));
-        tabOnCreate = new QWidget();
-        tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
-        verticalLayout = new QVBoxLayout(tabOnCreate);
+        verticalLayout = new QVBoxLayout(tabConditions);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        listConditions = new CustomListWidget(tabConditions);
+        listConditions->setObjectName(QStringLiteral("listConditions"));
+
+        verticalLayout->addWidget(listConditions);
+
+        toolBoxWidget->addTab(tabConditions, QString());
+
+        gridLayout->addWidget(toolBoxWidget, 0, 1, 1, 1);
+
+        OnTabWidget = new QTabWidget(widget);
+        OnTabWidget->setObjectName(QStringLiteral("OnTabWidget"));
+        tabOnCreate = new QWidget();
+        tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
+        verticalLayout_6 = new QVBoxLayout(tabOnCreate);
+        verticalLayout_6->setSpacing(6);
+        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
         treeOnCreate = new CustomTreeWidget(tabOnCreate);
         treeOnCreate->setObjectName(QStringLiteral("treeOnCreate"));
 
-        verticalLayout->addWidget(treeOnCreate);
+        verticalLayout_6->addWidget(treeOnCreate);
 
         OnTabWidget->addTab(tabOnCreate, QString());
         tabOnCollide = new QWidget();
@@ -188,17 +200,39 @@ public:
 
         OnTabWidget->addTab(tabOnDestroy, QString());
 
-        gridLayout->addWidget(OnTabWidget, 3, 0, 1, 1);
+        gridLayout->addWidget(OnTabWidget, 1, 0, 1, 1);
 
-        buttonNameBrowser = new QPushButton(centralWidget);
-        buttonNameBrowser->setObjectName(QStringLiteral("buttonNameBrowser"));
+        propertyWidget = new QWidget(widget);
+        propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
 
-        gridLayout->addWidget(buttonNameBrowser, 0, 1, 1, 1, Qt::AlignRight);
+        gridLayout->addWidget(propertyWidget, 1, 1, 1, 1);
 
-        abilityNameEdit = new QLineEdit(centralWidget);
+        widget1 = new QWidget(centralWidget);
+        widget1->setObjectName(QStringLiteral("widget1"));
+        widget1->setGeometry(QRect(20, 10, 371, 22));
+        horizontalLayout = new QHBoxLayout(widget1);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        abilityNameEdit = new QLineEdit(widget1);
         abilityNameEdit->setObjectName(QStringLiteral("abilityNameEdit"));
 
-        gridLayout->addWidget(abilityNameEdit, 0, 0, 1, 1, Qt::AlignHCenter);
+        horizontalLayout->addWidget(abilityNameEdit);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
+        cooldownLabel = new QLabel(widget1);
+        cooldownLabel->setObjectName(QStringLiteral("cooldownLabel"));
+
+        horizontalLayout->addWidget(cooldownLabel);
+
+        cooldownSpinbox = new QDoubleSpinBox(widget1);
+        cooldownSpinbox->setObjectName(QStringLiteral("cooldownSpinbox"));
+
+        horizontalLayout->addWidget(cooldownSpinbox);
 
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
@@ -220,7 +254,7 @@ public:
 
         retranslateUi(AbilityEditorClass);
 
-        toolBoxWidget->setCurrentIndex(2);
+        toolBoxWidget->setCurrentIndex(0);
         OnTabWidget->setCurrentIndex(0);
 
 
@@ -236,6 +270,7 @@ public:
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
         actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
         actionEntity->setText(QApplication::translate("AbilityEditorClass", "Entity", 0));
+        buttonNameBrowser->setText(QApplication::translate("AbilityEditorClass", "Browse name for property manager...", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabEntities), QApplication::translate("AbilityEditorClass", "Entities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
@@ -248,8 +283,8 @@ public:
         QTreeWidgetItem *___qtreewidgetitem2 = treeOnDestroy->headerItem();
         ___qtreewidgetitem2->setText(0, QApplication::translate("AbilityEditorClass", "Conditions & Entities", 0));
         OnTabWidget->setTabText(OnTabWidget->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "OnDestroy", 0));
-        buttonNameBrowser->setText(QApplication::translate("AbilityEditorClass", "Browse name for property manager...", 0));
         abilityNameEdit->setText(QApplication::translate("AbilityEditorClass", "AbilityName", 0));
+        cooldownLabel->setText(QApplication::translate("AbilityEditorClass", "Cooldown", 0));
         menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
     } // retranslateUi
 

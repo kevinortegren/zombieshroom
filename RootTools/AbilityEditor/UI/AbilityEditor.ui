@@ -20,120 +20,171 @@
    <string>Ability Editor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1">
-     <widget class="QWidget" name="propertyWidget" native="true"/>
-    </item>
-    <item row="1" column="1">
-     <widget class="QTabWidget" name="toolBoxWidget">
-      <property name="currentIndex">
-       <number>2</number>
-      </property>
-      <widget class="QWidget" name="tabComponents">
-       <attribute name="title">
-        <string>Components</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="CustomListWidget" name="listComponents"/>
-        </item>
-       </layout>
+   <widget class="QPushButton" name="buttonNameBrowser">
+    <property name="geometry">
+     <rect>
+      <x>585</x>
+      <y>9</y>
+      <width>189</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Browse name for property manager...</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>39</y>
+      <width>771</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="CustomCompListWidget" name="listAbilityComponents"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QTabWidget" name="toolBoxWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabComponents">
+        <attribute name="title">
+         <string>Components</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="CustomListWidget" name="listComponents"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabEntities">
+        <attribute name="title">
+         <string>Entities</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QTreeView" name="listEntities"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabConditions">
+        <attribute name="title">
+         <string>Conditions</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="CustomListWidget" name="listConditions"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
-      <widget class="QWidget" name="tabEntities">
-       <attribute name="title">
-        <string>Entities</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QTreeView" name="listEntities"/>
-        </item>
-       </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QTabWidget" name="OnTabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabOnCreate">
+        <attribute name="title">
+         <string>OnCreate</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnCreate">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabOnCollide">
+        <attribute name="title">
+         <string>OnCollide</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnCollide">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabOnDestroy">
+        <attribute name="title">
+         <string>OnDestroy</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnDestroy">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
-      <widget class="QWidget" name="tabConditions">
-       <attribute name="title">
-        <string>Conditions</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <widget class="CustomListWidget" name="listConditions"/>
-        </item>
-       </layout>
+     </item>
+     <item row="1" column="1">
+      <widget class="QWidget" name="propertyWidget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>371</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="abilityNameEdit">
+       <property name="text">
+        <string>AbilityName</string>
+       </property>
       </widget>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="CustomCompListWidget" name="listAbilityComponents"/>
-    </item>
-    <item row="3" column="0">
-     <widget class="QTabWidget" name="OnTabWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="tabOnCreate">
-       <attribute name="title">
-        <string>OnCreate</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="CustomTreeWidget" name="treeOnCreate">
-          <column>
-           <property name="text">
-            <string>Conditions &amp; Entities</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="cooldownLabel">
+       <property name="text">
+        <string>Cooldown</string>
+       </property>
       </widget>
-      <widget class="QWidget" name="tabOnCollide">
-       <attribute name="title">
-        <string>OnCollide</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="CustomTreeWidget" name="treeOnCollide">
-          <column>
-           <property name="text">
-            <string>Conditions &amp; Entities</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabOnDestroy">
-       <attribute name="title">
-        <string>OnDestroy</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="CustomTreeWidget" name="treeOnDestroy">
-          <column>
-           <property name="text">
-            <string>Conditions &amp; Entities</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item row="0" column="1" alignment="Qt::AlignRight">
-     <widget class="QPushButton" name="buttonNameBrowser">
-      <property name="text">
-       <string>Browse name for property manager...</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" alignment="Qt::AlignHCenter">
-     <widget class="QLineEdit" name="abilityNameEdit">
-      <property name="text">
-       <string>AbilityName</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="cooldownSpinbox"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
