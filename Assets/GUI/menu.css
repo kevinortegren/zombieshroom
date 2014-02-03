@@ -10,7 +10,7 @@ body, input
   margin: 0;
   font-family: Sherwood;
 }
-body
+#main-body
 {
   background-image: url('menubackground.jpg');
   background-position: 50% 50%;
@@ -141,6 +141,7 @@ a
   background-size: 100% 100%;
   z-index: 100;
 }
+#ingame-wrapper,
 #main-wrapper,
 #options-wrapper
 {
