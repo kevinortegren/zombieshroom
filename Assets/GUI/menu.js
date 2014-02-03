@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // Splash skip
   $("#splash").click(function() {
-    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none");});
+    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none"); LoadSettings();});
   } );
   setTimeout(function(){$("#splash").click();}, 2000);
   // Main menu
@@ -37,10 +37,10 @@ $(document).ready(function() {
     $("#main-menu").css("display", "table");
   } );
   // Player settings
-  var LoadSettings = function () {
+  LoadSettings = function () {
     var settings = Menu.RequestSettings();
     for(var key in settings)
-      $("#settings-"+key).val(settings[key]);
+      $("#"+key).val(settings[key]);
   }
   $("#player-settings-back").click(function() {
     $("#player-settings-menu").css("display", "none");
@@ -49,7 +49,7 @@ $(document).ready(function() {
   } );
   $("#player-settings-save").click(function() {
     var settings = {};
-    settings["Name"] = $("#settings-Name").val();
+    settings["settings-player-name"] = $("#settings-player-name").val();
     Menu.SaveSettings(settings);
     $("#player-settings-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
@@ -113,6 +113,9 @@ $(document).ready(function() {
   } );
   $("#lan-direct-submit").click(function() {
     $("#lan-direct-close").click();
+    var settings = {};
+    settings["lan-direct-address"] = $("#lan-direct-address").val();
+    Menu.SaveSettings(settings);
     var input = $("#lan-direct-address").val().split(':');
     var password = $("#lan-direct-password").val();
     Menu.Connect(input[1], input[0], password);
@@ -135,6 +138,17 @@ $(document).ready(function() {
   } );
   $("#lan-host-submit").click(function() {
     var selectedIndex = $("#lan-host-map")[0].selectedIndex;
+		
+    var settings = {};
+    settings["ServerName"] = $("#lan-host-name").val();
+    settings["ServerMapfile"] = $("#lan-host-map")[0].options[selectedIndex].text;
+    settings["ServerPort"] = $("#lan-host-port").val();
+    settings["ServerPassword"] = $("#lan-host-password").val();
+    settings["ServerMaxPlayers"] = $("#lan-host-maxplayers").val();
+    settings["ServerMatchLength"] = $("#lan-host-matchlength").val();
+    settings["ServerKillVictory"] = $("#lan-host-killvictory").val();
+    Menu.SaveSettings(settings);
+		
     var map = $("#lan-host-map")[0].options[selectedIndex].text;
 
     $("#lan-host-close").click();

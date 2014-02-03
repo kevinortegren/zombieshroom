@@ -24,6 +24,7 @@ namespace RootForce
 
 			void SetMessageHandler(MessageHandler* p_messageHandler);
 			void Update();
+			//void Send(RakNet::BitStream* p_bs, PacketPriority p_priority, PacketReliability p_reliability, char p_orderingChannel, RakNet::AddressOrGUID p_systemIdentifier, bool p_broadcast, uint32_t p_forceReceiptNumber = 0U);
 
 			RakNet::RakPeerInterface* GetPeerInterface();
 		private:

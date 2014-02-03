@@ -19,7 +19,7 @@ namespace Render
 	class Buffer : public BufferInterface
 	{
 	public:
-		friend class GLRenderer;
+		friend class RenderResourceManager;
 
 		void BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data);
 		void BufferSubData(size_t p_offset, size_t p_length, void* p_data);

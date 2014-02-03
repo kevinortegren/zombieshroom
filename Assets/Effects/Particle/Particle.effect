@@ -76,7 +76,9 @@
         - name: g_Diffuse
           slot: 0
         - name: g_Depth
-          slot: 3
+          slot: 2
+        - name: g_LA
+          slot: 5
           
       flags:
         - name: Forward

@@ -26,6 +26,30 @@ img
 {
   -webkit-animation: blinker 1s linear infinite alternate;
 }
+.textcenter
+{
+	text-align: center;
+}
+.textleft
+{
+	text-align: left;
+}
+.textright
+{
+	text-align: right;
+}
+.red
+{
+	color: #FF9999;
+}
+.blue
+{
+	color: #9999FF;
+}
+.highlight
+{
+	background-color: rgba(255,255,255,0.5);
+}
 #score
 {
 	position: absolute;
@@ -86,7 +110,7 @@ img
 	margin-left: -200px;
 	top: 100%;
 	margin-top: -85px;
-	//background-color:rgba(50,45,255,0.5);
+	/*background-color:rgba(50,45,255,0.5);*/
 	color: rgba(255,90,114,0.7);
 	font-size: 50px;
 }
@@ -125,6 +149,23 @@ img
 	margin-top: -125px;
 	background: #000000;
 }
+.scorewrapper
+{
+	width: 400px;
+	height: 200px;
+	margin: auto;
+	background: rgba(0,0,0,0.5);
+	font-size: 24px;
+}
+.scoretable
+{
+	margin: auto;
+}
+.scoretable thead tr td
+{
+	height: 40px;
+	font-size: 24px;
+}
 .slot
 {
 	background-color:rgba(60,60,60,0.4);
@@ -150,9 +191,9 @@ img
 	height: 21px;
 	overflow: hidden;
 	background-image: url('cooldown.png');
-	background-size: 75px 75px;
+	background-size: 75px;
 	background-repeat: no-repeat;
-	background-position: 50% 75px;
+	background-position: 0% 75px;
 }
 
 .verticaltablehax

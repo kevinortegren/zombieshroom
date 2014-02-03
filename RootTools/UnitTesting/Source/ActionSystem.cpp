@@ -2,11 +2,13 @@
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 
 TEST(ActionSystem, ProcessEmptyEntity) 
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
@@ -24,6 +26,7 @@ TEST(ActionSystem, ProcessEntity)
 {
 	ECS::World* world = CreateWorld();
 	g_world = world;
+	g_networkEntityMap.clear();
 
 	RootSystems::ActionSystem* system = new RootSystems::ActionSystem(world, &g_engineContext);
 	RootForce::PhysicsSystem* pSystem = new RootForce::PhysicsSystem(world); 
@@ -40,7 +43,7 @@ TEST(ActionSystem, ProcessEntity)
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("Player"), "OnCreate");
 	//g_engineContext.m_script->AddParameterUserData(testity, sizeof(ECS::Entity*), "Entity");
 	g_engineContext.m_script->AddParameterNumber(0);
-	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(RootForce::Network::ReservedActionID::CONNECT);
 	g_engineContext.m_script->ExecuteScript();
 
 	ECS::Entity* testity = world->GetTagManager()->GetEntityByTag("Player");

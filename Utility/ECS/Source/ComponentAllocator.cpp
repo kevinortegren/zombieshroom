@@ -18,4 +18,9 @@ namespace ECS
 			}
 		}
 	}
+
+	void ComponentAllocator::FreePtrFromList(void* p_ptr, int p_id)
+	{
+		m_lists[p_id].first.Free(p_ptr);
+	}
 }

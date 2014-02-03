@@ -15,7 +15,7 @@ namespace RootEngine
 
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
-		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
+		Render::EffectInterface* effect = m_renderer->CreateEffect();
 
 		if(!p_node.FindValue("techniques"))
 		{
@@ -123,6 +123,26 @@ namespace RootEngine
 					int depthTest;
 					programs[j]["depth"]["test"] >> depthTest;		
 					program->m_depthState.depthTest = depthTest != 0;
+				}
+
+				if(programs[j].FindValue("viewport"))
+				{
+					int x;
+					programs[j]["viewport"]["x"] >> x;			
+					program->m_viewport.x = x;
+	
+					int y;
+					programs[j]["viewport"]["y"] >> y;		
+					program->m_viewport.y = y;
+
+					int w;
+					programs[j]["viewport"]["width"] >> w;			
+					program->m_viewport.z = w;
+
+					int h;
+					programs[j]["viewport"]["height"] >> h;		
+					program->m_viewport.w = h;
+
 				}
 
 				program->Compile();
@@ -313,11 +333,11 @@ namespace RootEngine
 					}
 					else if(name == "Forward")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED1;
 					}
 					else if(name == "Deferred")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED0;
 					}
 					else if(name == "Debug")
 					{
@@ -332,7 +352,7 @@ namespace RootEngine
 			else
 			{
 				// Assume deffered technique if no flags found.
-				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
+				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED0;
 			}
 		}
 

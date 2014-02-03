@@ -185,6 +185,14 @@ namespace Render
 
 			glTexImage2D(m_target, 0, GL_DEPTH_COMPONENT32, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
+		else if(p_format == TextureFormat::TEXTURE_DEPTH_STENCIL)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_DEPTH_COMPONENT;
+			m_bpp = 4;
+
+			glTexImage2D(m_target, 0, GL_DEPTH32F_STENCIL8, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+		}
 		else if(p_format == TextureFormat::TEXTURE_R32)
 		{
 			m_textureType = GL_FLOAT;

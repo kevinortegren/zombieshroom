@@ -26,6 +26,8 @@ namespace Render
 			TEXTURE_DEPTH_COMPONENT,
 			TEXTURE_R32,
 			TEXTURE_RGBA32F,
+			TEXTURE_DEPTH_STENCIL
+
 		};
 	}
 
@@ -62,7 +64,7 @@ namespace Render
 	class Texture : public TextureInterface
 	{
 	public:
-		friend class GLRenderer;
+		friend class RenderResourceManager;
 		
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);

@@ -16,10 +16,13 @@ namespace RootForce
 		//updates a single status value internally
 		void SetValue(std::string p_key, std::string p_value);
 
-		void StartCooldown(int p_slot, int p_duration);
+		void StartCooldown(int p_slot, float p_duration);
 		void SetSelectedAbility(int p_slot);
 		//Expects a slot and a name that corresponds with the filename of an ability icon(without .png)
 		void SetAbility(int p_slot, std::string p_ability);
+		
+		//Updates the score list (on TAB or match end)
+		void SetScoreList(std::string p_score);
 
 		//Does one javascript inject for all the values and updates the hud
 		void Update();

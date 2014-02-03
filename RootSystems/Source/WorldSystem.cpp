@@ -1,56 +1,123 @@
-#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
 
 namespace RootForce
 {
-	void WorldSystem::CreateWorld(const std::string& p_worldName)
+#ifndef COMPILE_LEVEL_EDITOR
+	void WorldSystem::LoadWorld(const std::string& p_worldName)
 	{
-		// Setup static lights.
-		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		// Import entities, groups, tags and storage.
+		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
+		
+		// Parse ambient data.
+		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
+		glm::vec3 ambient = glm::vec3(0.1f);
+		SetAmbientLight(ambient);
 
+		// Create constant entities.
+		CreateSun();
+		CreateSkyBox();
+		CreatePlayerCamera();
+
+		// Add collisions shapes for the group "Static".
+		AddStaticEntitiesToPhysics();
+
+		// Spatial divide world and split the meshes.
+		m_quadTree.Init(m_engineContext, m_world);
+	}
+#endif
+
+	void WorldSystem::SetAmbientLight(glm::vec3 p_ambient)
+	{
+		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 0.0f));
+		m_world->GetStorage()->SetValue("Ambient", p_ambient);
+	}
+
+	void WorldSystem::CreateSun()
+	{
+		// Setup sun entity.
 		ECS::Entity* sun = m_world->GetEntityManager()->CreateEntity();
+		
 		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
 		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
+		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
+
 		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
 		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
-		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
-		sunShadowcaster->m_resolution = 512;
-		sunShadowcaster->m_levels = 1;
+		
+		sunShadowcaster->m_directionalLightSlot = 0;
 
-		glm::vec3 fro = sunTransform->m_orientation.GetFront();
-		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Sun direction: %f, %f, %f", fro.x, fro.y, fro.z);
+		m_world->GetTagManager()->RegisterEntity("Sun", sun);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
+	}
 
-		Render::DirectionalLight directionalLight;
-		directionalLight.m_color = sunLight->m_color;
-		directionalLight.m_direction = sunTransform->m_orientation.GetFront();
-
-		m_engineContext->m_renderer->AddDirectionalLight(directionalLight, 0);
-
+	void WorldSystem::CreateSkyBox()
+	{
 		// Setup skybox entity.
 		ECS::Entity* skybox = m_world->GetEntityManager()->CreateEntity();
 
 		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
 		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
-	
-		t->m_scale = glm::vec3(-100, -100, -100);
+
+		t->m_scale = glm::vec3(-100);
 		t->m_orientation.Roll(180);
 
-		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
+		static glm::vec3 positions[8] = 
+		{
+			glm::vec3( -0.500000, -0.500000, 0.500000),
+			glm::vec3(0.500000, -0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, 0.500000),
+			glm::vec3(0.500000, 0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, -0.500000),
+			glm::vec3(0.500000, 0.500000, -0.500000),
+			glm::vec3(-0.500000, -0.500000, -0.500000),
+			glm::vec3(0.500000, -0.500000, -0.500000)
+		};
+
+		static unsigned int indices[36] =
+		{
+			0, 1, 2, 
+			2, 1, 3, 
+			2, 3, 4, 
+			4, 3, 5, 
+			4, 5, 6, 
+			6, 5, 7,
+			6, 7, 0, 
+			0, 7, 1, 
+			1, 7, 3, 
+			3, 7, 5, 
+			6, 0, 4, 
+			4, 0, 2
+		};
+
+		Render::Vertex1P vertices[8];
+		for(int i = 0; i < 8; ++i)
+		{
+			vertices[i].m_pos = positions[i];
+		}
+
+		r->m_model = m_engineContext->m_resourceManager->CreateModel("skybox");
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
+		r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
+		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
+	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
+		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+	}
 
-		// Import level entities.
-		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
-
+#ifndef COMPILE_LEVEL_EDITOR
+	void WorldSystem::AddStaticEntitiesToPhysics()
+	{
 		// Add static entities to physics.
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 		for(auto itr = range.first; itr != range.second; ++itr)
@@ -65,7 +132,11 @@ namespace RootForce
 			m_engineContext->m_physics->BindMeshShape(*(collision->m_handle), collision->m_meshHandle,
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
+	}
+#endif
 
+	void WorldSystem::CreatePlayerCamera()
+	{
 		// Add camera entity.	
 		ECS::Entity* cameraEntity = m_world->GetEntityManager()->CreateEntity();
 
@@ -77,27 +148,43 @@ namespace RootForce
 		
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustum = Frustum(45.0f, 1.0f, 10000.0f, aspectRatio);
+		camera->m_frustum = Frustum(45.0f, 1.0f, 5000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
 		
 		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, 4.0f, -8.0f);
+		cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
+		cameraThirdPerson->m_distance = 8.0f;
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);	
+		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);
 
-		//m_quadTree.Init(m_engineContext, m_world);
+		// Add testcamera entity.	
+		ECS::Entity* testCameraEntity = m_world->GetEntityManager()->CreateEntity();
+
+		RootForce::Camera* testCamera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(testCameraEntity);
+		RootForce::Transform* testCameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(testCameraEntity);
+		testCameraTransform->m_position = glm::vec3(0.0f, 30.0f, 0.0f);
+		aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
+
+		testCamera->m_frustum = Frustum(45.0f, 1.0f, 1000.0f, aspectRatio);
+
+		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
 	}
 
 	void WorldSystem::Process()
-	{
+	{	
+		ECS::Entity* testCameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");
+		Transform* testCameraTransform = m_world->GetEntityManager()->GetComponent<Transform>(testCameraEntity);
+		testCameraTransform->m_orientation.Yaw(45.0f * m_world->GetDelta());
+
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
 		
-		//m_quadTree.Render(frustrum, m_quadTree.GetRoot());
+		m_quadTree.Render(frustrum, m_quadTree.GetRoot());
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
@@ -105,4 +192,4 @@ namespace RootForce
 		m_showDebug = p_value;
 	}
 }
-#endif
+

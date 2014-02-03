@@ -25,10 +25,13 @@ namespace RootEngine
 			YAML::Node doc;
 			parser.GetNextDocument(doc);
 
-			for(auto itr = m_values.begin(); itr != m_values.end(); ++itr)
-				Parse(doc, itr->first);
-			/*Parse(doc, "ScreenWidth");
-			Parse(doc, "ScreenHeight");*/
+			for(auto itr = doc.begin(); itr != doc.end(); ++itr)
+			{
+				std::string key, val;
+				itr.first() >> key;
+				itr.second() >> val;
+				m_values[key] = val;
+			}
 		}
 		catch(YAML::ParserException& e) {
 			g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Config parser error: %s", e.what());
@@ -53,7 +56,7 @@ namespace RootEngine
 	void ConfigManager::CreateDefaultConfig()
 	{
 		// Default values.
-		m_values["Name"] = "Player";
+		m_values["settings-player-name"] = "Player";
 		m_values["ScreenWidth"] = "1280";
 		m_values["ScreenHeight"] = "720";
 		m_values["ServerName"] = "RootForce server";

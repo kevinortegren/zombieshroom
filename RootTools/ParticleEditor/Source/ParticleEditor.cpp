@@ -284,7 +284,7 @@ void ParticleEditor::NewEmitter()
 	e->m_systems.push_back(m_context->m_renderer->CreateParticleSystem());
 
 	//Set default data 
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_resourceManager->GetMaterial("particle" + std::to_string(m_materialIndex++));
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_renderer->CreateMaterial("particle" + std::to_string(m_materialIndex++));
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position		= glm::vec3(0.0f);

@@ -71,7 +71,7 @@ namespace RootEngine
 					
 					//int w, h;
 					//SDL_GetWindowSize(NULL, &w, &h);
-					SDL_WarpMouseInWindow(NULL, 100, 100);
+					SDL_WarpMouseInWindow(NULL, 500, 400);
 				}
 				break;
 			default:
@@ -132,8 +132,8 @@ namespace RootEngine
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{
 			m_lockMouseEnabled = p_enable;
-			SDL_SetRelativeMouseMode((SDL_bool) p_enable);
-			//SDL_ShowCursor(!p_enable);
+			//SDL_SetRelativeMouseMode((SDL_bool) p_enable);
+			SDL_ShowCursor(!p_enable);
 		}
 		//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)
 		int InputManager::GetScroll()
