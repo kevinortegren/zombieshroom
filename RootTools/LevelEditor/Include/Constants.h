@@ -32,7 +32,7 @@ const int g_maxPaintTextures = 10;
 
 struct UpdateMessage
 {
-	char name[g_shortMaxNameLength];
+	char name[g_maxNameLength];
 	int updateID, removeID;
 
 	bool updateTransform;

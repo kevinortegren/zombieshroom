@@ -736,7 +736,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	if(trans.child(0, &status).hasFn(MFn::kAmbientLight) || trans.child(0, &status).hasFn(MFn::kDirectionalLight))
 	{
-		MayaLightToList(trans.child(0, &status), -1);
+		MayaLightToList(trans.child(0, &status), 0);
 		//SM.UpdateSharedLight(index, currNrLights);
 	}
 

@@ -68,7 +68,7 @@ void CreateCameraEntity(int index);
 void UpdateCamera(int index);
 void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
-void UpdateLight(int index, bool remove, bool firstTimeLoad);
+void UpdateLight(int index, bool remove, bool firstTimeLoad, string type);
 
 
 void ExportToLevel();
@@ -215,14 +215,14 @@ int main(int argc, char* argv[])
 					if(type == "Light")
 					{
 						if(removeID == -1)
-							UpdateLight(updateID, false, false);
+							UpdateLight(updateID, false, false, RM.PlightList[updateID]->LightType);
 						else
-							UpdateLight(removeID, true, false);
+							UpdateLight(removeID, true, false, RM.PlightList[updateID]->LightType);
 					}
 
 					if(type == "AmbientLight" || type == "DirectionalLight")
 					{
-						UpdateLight(updateID, false, false);
+						UpdateLight(updateID, false, false, type);
 					}
 
 					if(type == "Camera")
@@ -440,7 +440,7 @@ void LoadSceneFromMaya()
 
 	for(int i = 0; i < numberLights; i++)
 	{
-		UpdateLight(i, false, true);
+		UpdateLight(i, false, true, RM.PlightList[i]->LightType);
 	}
 }
 
@@ -943,11 +943,11 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 	ReleaseMutex(RM.MeshMutexHandle);
 }
 
-void UpdateLight(int index, bool remove, bool firstTimeLoad)
+void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 {
 	int LightIndex = -1;
 	int RemoveLightIndex = -1;
-	bool ambientInfoExists = false;
+	//bool ambientInfoExists = false;
 
 	if(remove)
 	{
@@ -966,7 +966,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 	ReleaseMutex(RM.LightMutexHandle);
 
 	int size = LightEntities.size()-1;
-	string type = RM.PlightList[LightIndex]->LightType;
+	//string type = RM.PlightList[LightIndex]->LightType;
 	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
@@ -981,10 +981,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
-			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.r = RM.PlightList[LightIndex]->color.r;
-			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.g = RM.PlightList[LightIndex]->color.g;
-			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.b = RM.PlightList[LightIndex]->color.b;
-			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color.a = RM.PlightList[LightIndex]->color.a;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color = RM.PlightList[LightIndex]->color;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
@@ -1002,16 +999,18 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad)
 		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_orientation.SetOrientation(rot);
 		m_world.GetEntityManager()->GetComponent<RootForce::DirectionalLight>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_color = RM.worldData->DirectionalSun.color;
 
+		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_orientation.Yaw(180);
+
 	}
 
 	if(type == "AmbientLight")
 	{
 		worldSystem->SetAmbientLight(RM.worldData->AmbientLight.color);
-		ambientInfoExists = true;
+		//ambientInfoExists = true;
 	}
 
-	if(!ambientInfoExists)
-		g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	//if(!ambientInfoExists)
+		//g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 	ReleaseMutex(RM.LightMutexHandle);
 

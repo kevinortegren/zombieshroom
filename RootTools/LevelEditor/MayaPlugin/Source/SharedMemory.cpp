@@ -162,7 +162,7 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 			updateMessages[nrOfMessages]->updateShape = updateShape;
 			if(type != "")
 			{
-				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_shortMaxNameLength);
+				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
 				int minusOne = -1;
 				if(remove)
 				{
