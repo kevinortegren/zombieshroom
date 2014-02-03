@@ -207,6 +207,20 @@ namespace Render
 			std::vector<float> emptyData(p_width * p_height, 0);
 			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
 		}
+		else if(p_format == TextureFormat::TEXTURE_RG16)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_RG;
+			m_internalFormat = GL_RG16F;
+			m_bpp = 4;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, 0);
+		}
 		else if(p_format == TextureFormat::TEXTURE_RGBA32F)
 		{
 			m_textureType = GL_FLOAT;

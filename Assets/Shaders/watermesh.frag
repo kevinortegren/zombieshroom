@@ -5,7 +5,7 @@ in vec2 TexCoord_FS_in;
 in vec3 Normal_FS_in; 
 
 layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
+layout (location = 1) out vec2 normals;
 layout (location = 2) out vec4 glow;
 layout (location = 3) out vec4 background;
 
@@ -40,7 +40,7 @@ void main()
 	 
 	vec3 trans = la + frag_color.rgb*0.3f;
 	diffuse = vec4(vec3(0.0f, 0.0f, 0.1f), 0.6f);
-	normals = vec3(viewNormal * 0.5 + 0.5);
+	normals = vec2(viewNormal.xy);
 	glow = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	background = vec4(trans, 0.3f);
 }
