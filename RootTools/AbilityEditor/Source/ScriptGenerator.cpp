@@ -193,6 +193,11 @@ namespace AbilityEditorNameSpace
 		}
 
 		m_file << "\tend\n";
+
+		//Set cooldown
+		m_file << "\tlocal playerComponent = playerEnt:GetPlayerComponent();\n";
+		m_file << "\tplayerComponent:StartCooldown(playerComponent:GetSelectedAbility(), " << m_entity->GetCooldown() << ".cooldown);\n";
+
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onCreate->GetConditions()->size(); i++)
 		{
