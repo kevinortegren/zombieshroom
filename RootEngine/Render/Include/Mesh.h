@@ -15,19 +15,18 @@ namespace Render
 		virtual void Unbind() = 0;
 		virtual void Draw() = 0;
 		virtual void DrawInstanced(GLsizei p_instances) = 0;
-		virtual void DrawTransformFeedback() = 0;
 
 		//Get functions
 		virtual BufferInterface* GetVertexBuffer() = 0;
 		virtual BufferInterface* GetElementBuffer() = 0;
-		virtual std::shared_ptr<VertexAttributesInterface> GetVertexAttribute() = 0;
+		virtual VertexAttributesInterface* GetVertexAttribute() = 0;
 		virtual GLenum GetPrimitiveType() = 0;
 		virtual GLuint GetTransformFeedback() = 0;
 
 		//Init functions
 		virtual void SetVertexBuffer(BufferInterface* p_buffer) = 0;
 		virtual void SetElementBuffer(BufferInterface* p_buffer) = 0;
-		virtual void SetVertexAttribute(std::shared_ptr<VertexAttributesInterface> p_attribute) = 0;
+		virtual void SetVertexAttribute(VertexAttributesInterface* p_attribute) = 0;
 		virtual void SetTransformFeedback() = 0;
 		virtual void SetPrimitiveType(GLenum p_type) = 0;
 
@@ -51,14 +50,14 @@ namespace Render
 		//Get functions
 		BufferInterface* GetVertexBuffer();
 		BufferInterface* GetElementBuffer();
-		std::shared_ptr<VertexAttributesInterface> GetVertexAttribute();
+		VertexAttributesInterface* GetVertexAttribute();
 		GLenum GetPrimitiveType();
 		GLuint GetTransformFeedback();
 
 		//Set functions
 		void SetVertexBuffer(BufferInterface* p_buffer);
 		void SetElementBuffer(BufferInterface* p_buffer);
-		void SetVertexAttribute(std::shared_ptr<VertexAttributesInterface> p_attribute);
+		void SetVertexAttribute(VertexAttributesInterface* p_attribute);
 		void SetPrimitiveType(GLenum p_type);
 		void SetTransformFeedback();
 
@@ -76,13 +75,11 @@ namespace Render
 		void Unbind();
 		void Draw();
 		void DrawInstanced(GLsizei p_instances);
-		void DrawTransformFeedback();
 
 	private:
 		BufferInterface* m_vertexBuffer;
 		BufferInterface* m_elementBuffer;
-		std::shared_ptr<VertexAttributesInterface> m_vertexAttributes;
-		
+		VertexAttributesInterface* m_vertexAttributes;		
 		GLuint m_transformFeedback;
 		GLenum m_primitive;
 	};

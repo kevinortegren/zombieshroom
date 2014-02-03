@@ -130,6 +130,9 @@ namespace RootForce
 		m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
 
+		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
+
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -219,7 +222,25 @@ namespace RootForce
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
-	{
+	{				
+		g_world->SetDelta(p_deltaTime);
+		g_engineContext.m_renderer->Clear();
+
+		g_engineContext.m_renderer->Render();
+
+		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+		m_sharedSystems.m_matchStateSystem->Process();
+		
+		g_engineContext.m_profiler->Update(p_deltaTime);
+		g_engineContext.m_debugOverlay->RenderOverlay();
+
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);		
+			g_engineContext.m_gui->Update();
+			g_engineContext.m_gui->Render(m_hud->GetView());
+			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+		}
+
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
@@ -239,9 +260,6 @@ namespace RootForce
 		{
 			return GameStates::Menu;
 		}
-		
-		g_world->SetDelta(p_deltaTime);
-		g_engineContext.m_renderer->Clear();
 		
 		if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() <= -10)
 		{
@@ -377,8 +395,6 @@ namespace RootForce
 			m_actionSystem->Process();
 		}
 
-		
-
 		m_animationSystem->Run();
 		
 		{
@@ -403,9 +419,7 @@ namespace RootForce
 			PROFILE("StateSystem", g_engineContext.m_profiler);
 			m_stateSystem->Process();
 		}
-
-		
-		
+	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
 			m_actionSystem->UpdateAimingDevice();
@@ -431,30 +445,12 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
-
 		}
 
 		m_animationSystem->Synch();
-
-		{
-			PROFILE("Rendering", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->Render();
-		}
-
-		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
-		m_sharedSystems.m_matchStateSystem->Process();
-		
-		g_engineContext.m_profiler->Update(p_deltaTime);
-		g_engineContext.m_debugOverlay->RenderOverlay();
-		{
-			PROFILE("GUI", g_engineContext.m_profiler);
-
-			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render(m_hud->GetView());
-			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
-		}
 		
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);

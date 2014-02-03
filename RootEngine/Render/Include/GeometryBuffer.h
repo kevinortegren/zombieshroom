@@ -7,20 +7,20 @@ namespace Render
 {
 	class GLRenderer;
 
-	class GeometryBuffer
+	struct GeometryBuffer
 	{
-	friend class GLRenderer;
-	public:
 		~GeometryBuffer();
 
 		void Init(GLRenderer* p_renderer, int p_width, int p_height);
 		void CreateTextures(int p_width, int p_height);
+		
+		void Clear(GLbitfield p_mask);
+
 		void Enable();
 		
 		void BindTextures();
 		void UnbindTextures();
 		void Resize(int p_width, int p_height);
-	private:
 
 		GLuint m_fbo;
 
@@ -28,5 +28,7 @@ namespace Render
 		Render::TextureInterface* m_diffuseTexture; // 24bit Diffuse 8bit Specular;
 		Render::TextureInterface* m_normalsTexture; // 24bit ViewSpaceNormals 8bit Empty.
 		Render::TextureInterface* m_glowTexture; // 24bit Glow RGB 8bit Empty.
+		Render::TextureInterface* m_backgroundTexture; 
+
 	};
 }
