@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 
 namespace RootForce
 {
@@ -23,6 +24,7 @@ namespace RootForce
 			, m_gameSharedContext(p_gameSharedContext) {}
 		void Process();
 		void UpdateDeltatime(float p_deltaTime);
+		static std::string GetScoreList();
 		bool IsMatchOver();
 		void SetLoggingInterface(Logging* p_logger);
 		void SetNetworkContext(NetworkContext* p_networkContext) { m_networkContext = p_networkContext; }
@@ -30,7 +32,7 @@ namespace RootForce
 		float GetTimeLeft();
 		int GetTeamScore(int p_team);
 
-		void AwardPlayerKill(int p_killerID, int p_deadID); //Assign score and death after a kills has been made
+		static void AwardPlayerKill(Network::UserID_t p_killerID, Network::UserID_t p_deadID); //Assign score and death after a kills has been made
 	private:
 		NetworkContext* m_networkContext;
 		RootEngine::GameSharedContext* m_gameSharedContext;

@@ -145,6 +145,8 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Physics* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->m_mass);
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->m_velocity[i]);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Network::NetworkComponent* p_c)
@@ -201,13 +203,17 @@ namespace RootForce
 			{
 				if (p_writeToBitstream)
 				{
-					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->AbilityScripts[i].c_str()) );
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->AbilityScripts[i].Name.c_str()) );
+					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Cooldown );
+					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Charges );
 				}
 				else
 				{
 					RakNet::RakString s;
 					p_bs->Serialize(p_writeToBitstream, s);
-					p_c->AbilityScripts[i] = std::string(s.C_String());
+					p_c->AbilityScripts[i].Name = std::string(s.C_String());
+					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Cooldown);
+					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Charges);
 				}
 			}
 			p_bs->Serialize(p_writeToBitstream, p_c->SelectedAbility);

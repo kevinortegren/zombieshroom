@@ -1,4 +1,6 @@
 AbilityBall = {};
+AbilityBall.damage = 5;
+AbilityBall.pushback = 10;
 
 function AbilityBall.OnCreate (userId, actionId)
 	local self = Entity.New();
@@ -12,10 +14,9 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
-	--local particleComp = ParticleEmitter.New(self, "fireball");
 	local scriptComp = Script.New(self, "AbilityBall");
 	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
+	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
@@ -28,20 +29,28 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
-
-	if Global.UserID == userId then
-		Entity.RegisterTag("LatestBall", self);
-	end
 end
 
 function AbilityBall.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
-	if type == 3 then
+	local targetPlayerComponent = entity:GetPlayerComponent();
+	local abilityOwnerNetwork = self:GetNetwork();
+	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+		
 		local hitPos = entity:GetTransformation():GetPos();
 		local selfPos = self:GetTransformation():GetPos();
-		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20);
+		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
+		local health = entity:GetHealth();
+		if not health:IsDead() then
+			local network = entity:GetNetwork();
+			local receiverId = network:GetUserId();
+			health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+		end
 	end
 end
 

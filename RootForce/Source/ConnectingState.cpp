@@ -1,6 +1,9 @@
 #include <RootForce/Include/ConnectingState.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/ServerConfig.h>
+#include <RootSystems/Include/Script.h>
+#include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -38,6 +41,25 @@ namespace RootForce
 		g_world->GetEntityManager()->CreateComponent<Network::ServerInformationComponent>(serverInfoEntity);
 		g_world->GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
         
+
+		// Reset the network entity map
+		g_networkEntityMap.clear();
+
+		g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript("MatchState"), "OnCreate");
+		g_engineContext.m_script->AddParameterNumber(Network::ReservedUserID::NONE);
+		g_engineContext.m_script->AddParameterNumber(Network::ReservedActionID::NONE);
+		g_engineContext.m_script->ExecuteScript();
+
+		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
+
+		if(!m_networkContext.m_client)
+		{
+			m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+			m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
+			m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
+		}
+
 		// Host
 		if (p_playData.Host)
 		{
@@ -48,31 +70,14 @@ namespace RootForce
 			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 
 			// Setup the rules
-			ECS::Entity* entity = g_world->GetEntityManager()->CreateEntity();
-			g_world->GetTagManager()->RegisterEntity("MatchState", entity);
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(entity);
 			rules->ScoreLimit = p_playData.ServerInfo.KillCount;
 			rules->TimeLeft = (float)p_playData.ServerInfo.MatchTime;
-			rules->TeamScore[1] = 0;
-			rules->TeamScore[2] = 0;
 		}
 		else
 		{
 			// Connect the client
 			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port, true);
-
-			// Setup the rules
-			ECS::Entity* ruleEntity = g_world->GetEntityManager()->CreateEntity();
-			g_world->GetTagManager()->RegisterEntity("MatchState", ruleEntity);
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->CreateComponent<RootForce::TDMRuleSet>(ruleEntity);
-			rules->ScoreLimit = 20; //TODO: this will be sent through the  gameState snapshot once this has been implemented
-			rules->TimeLeft = 20;   // hardcoded for now so that the game does not crash
-			rules->TeamScore[1] = 0;
-			rules->TeamScore[2] = 0;
 		}
-
-		// Reset the network entity map
-		g_networkEntityMap.clear();
 
 		// Setup the client
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());

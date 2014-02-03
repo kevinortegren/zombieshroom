@@ -69,7 +69,6 @@ namespace RootForce
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
 		
 		void Process();
-		void UpdateAimingDevice();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
 		static Network::ActionID_t s_nextActionID;

@@ -1258,8 +1258,10 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
-		//	m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
-			//m_playerObjects.at(index)->SetPosition(temp);
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			m_playerObjects.at(index)->SetPosition(temp);
+			int indexRag = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			m_ragdolls.at(indexRag)->Deactivate();
 		}
 	}
 

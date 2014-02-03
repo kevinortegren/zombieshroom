@@ -1,5 +1,10 @@
 #include "HUD.h"
 #include <Awesomium/STLHelpers.h>
+#include <RootSystems/Include/PlayerSystem.h>
+#include <RootSystems/Include/WorldSystem.h>
+
+extern ECS::World* g_world;
+
 namespace RootForce
 {
 	HUD::HUD()
@@ -29,7 +34,7 @@ namespace RootForce
 		m_commandBuffer = m_commandBuffer + "Set('" + p_key + "','" + p_value + "');";
 	}
 
-	void HUD::StartCooldown( int p_slot, int p_duration )
+	void HUD::StartCooldown( int p_slot, float p_duration )
 	{
 		m_commandBuffer = m_commandBuffer + "StartCooldown('" + std::to_string(p_slot) + "'," + std::to_string(p_duration) + ");";
 	}
@@ -42,6 +47,13 @@ namespace RootForce
 	void HUD::SetAbility( int p_slot, std::string p_ability )
 	{
 		m_commandBuffer = m_commandBuffer + "SetAbility('" + std::to_string(p_slot) + "','" + p_ability + "');";
+	}
+	void HUD::SetScoreList(std::string p_score)
+	{
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+		m_commandBuffer = m_commandBuffer + "UpdateScoreScreen(" + std::to_string(playerComponent->TeamID) + ",'" + playerComponent->Name + "'," + p_score + ");";
 	}
 
 	void HUD::Update()

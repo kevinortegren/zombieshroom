@@ -31,6 +31,7 @@ function Player.OnCreate(userId, actionId)
 
 	playerComponent:SetAbility(0, "AbilityBall");
 	playerComponent:SetAbility(1, "AbilityDash");
+	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(10);
@@ -45,7 +46,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
 	-- ToDo: Get and set a correct team id
-	playerComponent:SetTeamId(0);
+	playerComponent:SetTeamId(1 + userId - math.floor(userId/2) * 2);
 
 	Entity.RegisterGroup("NonExport", player);
 
@@ -60,9 +61,15 @@ function Player.OnCreate(userId, actionId)
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
 		local ragdoll = Ragdoll.New(player);
-		renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
+		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
-		renderable:SetMaterial("testchar");
+		if playerComponent:GetTeamId() == 1 then
+			renderable:SetMaterial("BlueSpirit");
+			renderable:SetMaterialGlow("WSGlowBlue");
+		else
+			renderable:SetMaterial("RedSpirit");
+			renderable:SetMaterialGlow("WSGlowRed");
+		end
 		renderable:SetMaterialDiffuse("WStexture");
 		renderable:SetMaterialSpecular("WSSpecular");
 		renderable:SetMaterialNormal("WSNormal");
@@ -73,7 +80,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
-		playerControl:SetMouseSensitivity(0.3);
+		playerControl:SetMouseSensitivity(1.2);
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);

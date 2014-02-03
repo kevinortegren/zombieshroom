@@ -52,7 +52,7 @@ namespace Render
 		bool m_first;
 		int m_currentVB;
 		int m_currentTFB;
-		std::shared_ptr<Render::MeshInterface> m_meshes[2];
+		Render::MeshInterface* m_meshes[2];
 	};
 
 	class ParticleSystemHandler

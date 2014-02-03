@@ -82,6 +82,8 @@ namespace Render
 		m_blendState = BLEND_NONE;
 		m_depthState.depthTest = true;
 		m_depthState.depthWrite = true;
+		m_viewport = glm::ivec4(0, 0, 1280, 720);
+
 	}
 
 	Program::~Program(void)
@@ -159,7 +161,7 @@ namespace Render
 				break;
 			case BLEND_INV_ALPHA:
 				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
 				break;
 			default:
 				glDisable(GL_BLEND);
