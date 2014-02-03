@@ -56,6 +56,13 @@ public:
 	UpdateMessage PeekMessageAt(int index);
 	void ClearAllMessages();
 	WorldData getWorldData();
+	Mesh getMesh(int index);
+	Light getLight(int index);
+	Camera getCamera(int index);
+	Locator getLocator(int index);
+	Material getMaterial(int index);
+	Counters getCounters();
+	PaintTexture getPaintTexture(int index);
 	
 private:
 	//Functions

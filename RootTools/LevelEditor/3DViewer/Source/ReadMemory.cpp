@@ -138,6 +138,86 @@ WorldData ReadMemory::getWorldData()
 	ReleaseMutex(LightMutexHandle);
 }
 
+Mesh ReadMemory::getMesh(int index)
+{
+	Mesh mesh;
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
+	mesh = *PmeshList[index];
+	ReleaseMutex(MeshMutexHandle);
+	return mesh;
+}
+
+Counters ReadMemory::getCounters()
+{
+	Counters count;
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	count.NumberOfCameras = *NumberOfCameras;
+	count.NumberOfLights = *NumberOfLights;
+	count.NumberOfLocators = *NumberOfLocators;
+	count.NumberOfMaterials = *NumberOfMaterials;
+	count.NumberOfMeshes = *NumberOfMeshes;
+	count.NumberOfMessages = *NumberOfMessages;
+	count.NumberOfPaintTextures = *NumberOfPaintTextures;
+	count.export = *export;
+	ReleaseMutex(IdMutexHandle);
+
+	return count;
+}
+
+Camera ReadMemory::getCamera(int index)
+{
+	Camera cam;
+	CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+	WaitForSingleObject(CameraMutexHandle, milliseconds);
+	cam = *PcameraList[index];
+	ReleaseMutex(CameraMutexHandle);
+	return cam;
+}
+
+Light ReadMemory::getLight(int index)
+{
+	Light light;
+	LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+	WaitForSingleObject(LightMutexHandle, milliseconds);
+	light = *PlightList[index];
+	ReleaseMutex(CameraMutexHandle);
+	return light;
+}
+
+Locator ReadMemory::getLocator(int index)
+{
+	Locator loc;
+	LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
+	WaitForSingleObject(LocatorMutexHandle, milliseconds);
+	loc = *PlocatorList[index];
+	ReleaseMutex(LocatorMutexHandle);
+	return loc;
+}
+
+Material ReadMemory::getMaterial(int index)
+{
+	Material mat;
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
+	mat = *PmaterialList[index];
+	ReleaseMutex(LocatorMutexHandle);
+	return mat;
+}
+
+PaintTexture ReadMemory::getPaintTexture(int index)
+{
+	PaintTexture paint;
+	TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+	WaitForSingleObject(TextureMutexHandle, milliseconds);
+	cout << PpaintList[index]->heigth << endl;
+	cout << PpaintList[index]->width << endl;
+	paint = *PpaintList[index];
+	ReleaseMutex(TextureMutexHandle);
+	return paint;
+}
+
 void ReadMemory::ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape)
 {
 	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -185,7 +265,7 @@ void ReadMemory::ClearAllMessages()
 	WaitForSingleObject(IdMutexHandle, milliseconds);
 	UpdateMessage mess;
 	string nada = "";
-	memcpy(mess.name, nada.c_str(), g_shortMaxNameLength);
+	memcpy(mess.name, nada.c_str(), g_maxNameLength);
 
 	for(int i = 0; i < g_maxMessages; i++)
 	{		

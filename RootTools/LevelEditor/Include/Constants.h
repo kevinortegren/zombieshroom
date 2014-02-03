@@ -24,6 +24,8 @@ const string g_textureR = "RED";
 const string g_textureG = "GREEN";
 const string g_textureB = "BLUE";
 
+const string emptyString = "";
+
 const int g_maxMessages = g_maxMeshes;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
@@ -47,6 +49,22 @@ struct UpdateMessage
 	}
 };
 
+struct Flags
+{
+	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard;
+	int _PaintStatus; // -1: False, 0: Painting, 1: Painted
+
+	Flags()
+	{
+		_Transparent = false;
+		_Static = false;
+		_SpawnPoint = false;
+		_Particle = false;
+		_Water = false;
+		_Hazard = false;
+		_PaintStatus = -1;
+	}
+};
 
 struct Transform
 {
@@ -57,9 +75,22 @@ struct Transform
 	glm::vec3 scale;
 	glm::vec3 rotPivot;
 	glm::vec3 scalePivot;
-	glm::mat4x4 transform;
-	char flags[g_maxNrOfFlags][g_shortMaxNameLength];
-	int nrOfFlags;
+	//glm::mat4x4 transform;
+	//char flags[g_maxNrOfFlags][g_shortMaxNameLength];
+	//int nrOfFlags;
+	Flags flags;
+
+	Transform()
+	{
+		index = -1;
+		position = glm::vec3(0,0,0);
+		rotation = glm::vec4(0,0,0,0);
+		scale = glm::vec3(0,0,0);
+		rotPivot = glm::vec3(0,0,0);
+		scalePivot = glm::vec3(0,0,0);
+		//transform = glm::mat4x4;
+		//nrOfFlags = 0;
+	}
 };
 
 struct Mesh
@@ -115,8 +146,16 @@ struct Light
 	char LightType[g_maxNameLength];
 	Transform transformation;
 	glm::vec4 color;
-	glm::vec3 direction;
+	//glm::vec3 direction;
 	float Intensity;
+
+	Light()
+	{
+		memcpy(LightType, emptyString.c_str(), g_maxNameLength);
+		color = glm::vec4(0,0,0,0);
+		//glm::vec3 direction;
+		Intensity = 0.0f;
+	}
 };
 
 struct WorldData
@@ -146,5 +185,30 @@ struct PaintTexture
 		memcpy(textureRed, g_textureR.c_str(), g_maxNameLength);
 		memcpy(textureGreen, g_textureG.c_str(), g_maxNameLength);
 		memcpy(textureBlue, g_textureB.c_str(), g_maxNameLength);
+	}
+};
+
+struct Counters
+{
+	int NumberOfMeshes;
+	int NumberOfLights;
+	int NumberOfCameras;
+	int NumberOfMaterials;
+	int NumberOfLocators;
+
+	int NumberOfMessages;
+	int NumberOfPaintTextures;
+	int export;
+
+	Counters()
+	{
+		NumberOfMeshes = 0;
+		NumberOfLights = 0;
+		NumberOfCameras = 0;
+		NumberOfMaterials = 0;
+		NumberOfLocators = 0;
+		NumberOfMessages = 0;
+		NumberOfPaintTextures = 0;
+		export = 0;
 	}
 };

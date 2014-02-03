@@ -166,7 +166,10 @@ int main(int argc, char* argv[])
 
 				for(int i = 0; i < numberMessages; i ++)
 				{
-					localMessages.push_back(RM.PeekMessageAt(i));
+					UpdateMessage temp = RM.PeekMessageAt(i);
+					string name = temp.name;
+					if(name != "")
+						localMessages.push_back(temp);
 				}
 
 				RM.ClearAllMessages();
@@ -182,12 +185,15 @@ int main(int argc, char* argv[])
 				{
 					//cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
 
-					for(int i = 0; i < RM.PlocatorList[updateID]->transformation.nrOfFlags; i++)
-					{
-						string temp = RM.PlocatorList[updateID]->transformation.flags[i];
-						if(temp == "Particle")
-							UpdateParticle(updateID);
-					}
+					//for(int i = 0; i < RM.PlocatorList[updateID]->transformation.nrOfFlags; i++)
+					//{
+					//	string temp = RM.PlocatorList[updateID]->transformation.flags[i];
+					//	if(temp == "Particle")
+					//		UpdateParticle(updateID);
+					//}
+
+					if(RM.PlocatorList[updateID]->transformation.flags._Particle)
+						UpdateParticle(updateID);
 				}
 
 
@@ -264,7 +270,7 @@ int main(int argc, char* argv[])
 				g_engineContext.m_renderer->Swap();
 				timer.Stop();
 
-				std::cout << "Frame time ms " << timer.GetTime() << std::endl;
+				//std::cout << "Frame time ms " << timer.GetTime() << std::endl;
 
 			}
 
@@ -442,6 +448,9 @@ void LoadSceneFromMaya()
 	{
 		UpdateLight(i, false, true, RM.PlightList[i]->LightType);
 	}
+
+	UpdateLight(0, false, true, "AmbientLight");
+	UpdateLight(0, false, true, "DirectionalLight");
 }
 
 ECS::Entity* CreateLightEntity(ECS::World* p_world)	
@@ -489,22 +498,29 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	paintID = RM.PmeshList[meshID]->paintIndex;
 
-	for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
-	{
-		string flag = RM.PmeshList[meshID]->transformation.flags[i];
-		if(flag == "Painted")
-		{
-			painted = true;
-		}
-		if(flag == "Painting")
-		{
-			painting = true;
-		}
-		if(flag == "Transparent")
-		{
-			transparent = true;
-		}
-	}
+	transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
+
+	if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
+		painting = true;
+	else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
+		painted = true;
+
+	//for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
+	//{
+	//	string flag = RM.PmeshList[meshID]->transformation.flags[i];
+	//	if(flag == "Painted")
+	//	{
+	//		painted = true;
+	//	}
+	//	if(flag == "Painting")
+	//	{
+	//		painting = true;
+	//	}
+	//	if(flag == "Transparent")
+	//	{
+	//		transparent = true;
+	//	}
+	//}
 
 	ReleaseMutex(RM.MeshMutexHandle);
 
@@ -627,6 +643,32 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
 }
 
+void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::World* p_world)
+{
+	if(transformation.flags._Hazard)
+		p_world->GetGroupManager()->RegisterEntity("Hazard", entity);
+
+	if(transformation.flags._PaintStatus == 0)
+		p_world->GetGroupManager()->RegisterEntity("Painting", entity);
+	else if(transformation.flags._PaintStatus == 1)
+		p_world->GetGroupManager()->RegisterEntity("Painted", entity);
+
+	if(transformation.flags._Particle)
+		p_world->GetGroupManager()->RegisterEntity("Particle", entity);
+
+	if(transformation.flags._SpawnPoint)
+		p_world->GetGroupManager()->RegisterEntity("SpawnPoint", entity);
+
+	if(transformation.flags._Static)
+		p_world->GetGroupManager()->RegisterEntity("Static", entity);
+
+	if(transformation.flags._Transparent)
+		p_world->GetGroupManager()->RegisterEntity("Transparent", entity);
+
+	if(transformation.flags._Water)
+		p_world->GetGroupManager()->RegisterEntity("Water", entity);
+}
+
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
@@ -639,12 +681,17 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
-	for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
-	{
-		p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
-	}
+	RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
+
+	//for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
+	//{
+	//	p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
+	//}
 	//p_world->GetGroupManager()->RegisterEntity("Static", entity);
 	//p_world->GetGroupManager()->UnregisterEntity("Static", entity);
+
+
+
 
 	return entity;
 }
@@ -666,10 +713,12 @@ ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index)
 
 	transform->m_orientation.SetOrientation(rotation);
 
-	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
-	{
-		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
-	}
+	//for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
+	//{
+	//	p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
+	//}
+
+	RegisterEntityFlags(RM.PlocatorList[index]->transformation, entity, p_world);
 
 	return entity;
 }
@@ -687,10 +736,12 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
 		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 
-	for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
-	{
-		p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
-	}
+	//for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
+	//{
+	//	p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
+	//}
+
+	RegisterEntityFlags(RM.PlocatorList[index]->transformation, entity, p_world);
 
 	return entity;
 }
@@ -775,25 +826,31 @@ void LoadLocators()
 		cout << "Found locator " << i << " " << RM.PlocatorList[i]->transformation.name << endl;
 		cout << "POS X Y Z " << RM.PlocatorList[i]->transformation.position.x << RM.PlocatorList[i]->transformation.position.y << RM.PlocatorList[i]->transformation.position.z << endl;
 
-		for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		{
-			string flagName = "Particle";
-			if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
-			{
-				locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
-			}
-		}
+		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
+		//{
+		//	string flagName = "Particle";
+		//	if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
+		//	{
+		//		locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
+		//	}
+		//}
 
-		for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		{
-			string flagName = "SpawnPoint";
-			string flagName2 = RM.PlocatorList[i]->transformation.flags[j];
+		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
+		//{
+		//	string flagName = "SpawnPoint";
+		//	string flagName2 = RM.PlocatorList[i]->transformation.flags[j];
 
-			if(flagName == flagName2)
-			{
-				locatorEntities.push_back(CreateTransformEntity(&m_world, i));
-			}
-		}
+		//	if(flagName == flagName2)
+		//	{
+		//		locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+		//	}
+		//}
+
+		if(RM.PlocatorList[i]->transformation.flags._Particle)
+			locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
+
+		if(RM.PlocatorList[i]->transformation.flags._SpawnPoint)
+			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 
 	}
 

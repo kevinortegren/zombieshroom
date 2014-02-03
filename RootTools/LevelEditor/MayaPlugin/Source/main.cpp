@@ -58,7 +58,7 @@ int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
 MString cleanFullPathName(const char * str);
 std::string GetNameFromPath( std::string p_path );
-void UpdateTransformation(Transform destination, MObject transObject);
+void UpdateTransformation(Transform& destination, MObject transObject);
 
 PaintTexture myTextures[g_maxPaintTextures];
 MSpace::Space g_space_world = MSpace::kPostTransform;
@@ -115,18 +115,23 @@ void GivePaintId(int index, string filePath)
 {
 	bool painted = false;
 	bool painting = false;
-	for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
-	{
-		string flag = SM.meshList[index].transformation.flags[i];
-		if(flag == "Painted")
-		{
-			painted = true;
-		}
-		if(flag == "Painting")
-		{
-			painting = true;
-		}
-	}
+	//for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
+	//{
+	//	string flag = SM.meshList[index].transformation.flags[i];
+	//	if(flag == "Painted")
+	//	{
+	//		painted = true;
+	//	}
+	//	if(flag == "Painting")
+	//	{
+	//		painting = true;
+	//	}
+	//}
+
+	if(SM.meshList[index].transformation.flags._PaintStatus == 0)
+		painting = true;
+	else if(SM.meshList[index].transformation.flags._PaintStatus == 1)
+		painted = true;
 
 	if (filePath == "PaintTexture" || painted || painting)
 	{
@@ -638,27 +643,40 @@ void getMeshFlags(MObject object, int index)
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
 
-				for(int j = 0; j < g_maxNrOfFlags; j ++)
-				{
-					if(alreadyExists == false)
-					{					
-						if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
-						{
-							alreadyExists = true;
-							//Print("Flag exists skipping...");
-						}
-						else
-						{
-							if(SM.meshList[index].transformation.flags[j][0] == NULL)
-							{
-								memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								//Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
-								SM.meshList[index].transformation.nrOfFlags ++;
-								alreadyExists = true;
-							}
-						}
-					}
-				}
+				if(name == "Hazard")
+					SM.meshList[index].transformation.flags._Hazard = true;
+				if(name == "Painting")
+					SM.meshList[index].transformation.flags._PaintStatus = 0;
+				if(name == "Painted")
+					SM.meshList[index].transformation.flags._PaintStatus = 1;
+				if(name == "Static")
+					SM.meshList[index].transformation.flags._Static = true;
+				if(name == "Transparent")
+					SM.meshList[index].transformation.flags._Transparent = true;
+				if(name == "Water")
+					SM.meshList[index].transformation.flags._Water = true;
+
+				//for(int j = 0; j < g_maxNrOfFlags; j ++)
+				//{
+				//	if(alreadyExists == false)
+				//	{					
+				//		if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
+				//		{
+				//			alreadyExists = true;
+				//			//Print("Flag exists skipping...");
+				//		}
+				//		else
+				//		{
+				//			if(SM.meshList[index].transformation.flags[j][0] == NULL)
+				//			{
+				//				memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+				//				//Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
+				//				SM.meshList[index].transformation.nrOfFlags ++;
+				//				alreadyExists = true;
+				//			}
+				//		}
+				//	}
+				//}
 				getMeshFlags(trans.parent(i), index);
 			}
 		}
@@ -682,27 +700,33 @@ void getLocatorFlags(MObject object, int index)
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
 
-				for(int j = 0; j < g_maxNrOfFlags; j ++)
-				{
-					if(alreadyExists == false)
-					{					
-						if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
-						{
-							alreadyExists = true;
-							//Print("Flag exists skipping...");
-						}
-						else
-						{
-							if(SM.locatorList[index].transformation.flags[j][0] == NULL)
-							{
-								memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								//Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
-								SM.locatorList[index].transformation.nrOfFlags ++;
-								alreadyExists = true;
-							}
-						}
-					}
-				}
+				if(name == "Particle")
+					SM.locatorList[index].transformation.flags._Particle = true;
+				if(name == "SpawnPoint")
+					SM.locatorList[index].transformation.flags._SpawnPoint = true;
+
+				//for(int j = 0; j < g_maxNrOfFlags; j ++)
+				//{
+				//	if(alreadyExists == false)
+				//	{					
+				//		if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
+				//		{
+				//			alreadyExists = true;
+				//			//Print("Flag exists skipping...");
+				//		}
+				//		else
+				//		{
+				//			if(SM.locatorList[index].transformation.flags[j][0] == NULL)
+				//			{
+				//				memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+				//				//Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
+				//				SM.locatorList[index].transformation.nrOfFlags ++;
+				//				alreadyExists = true;
+				//			}
+				//		}
+				//	}
+				//}
+
 				getLocatorFlags(trans.parent(i), index);
 			}
 		}
@@ -1195,8 +1219,8 @@ void MayaLocatorToList(MObject object)
 		
 		MObject transObj = trans.object();
 		UpdateTransformation(SM.locatorList[index].transformation, transObj);
+		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
 
-		//memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
 		//trans.getScale(scale);
 		//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
 
@@ -1277,18 +1301,23 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		bool painted = false;
 		bool painting = false;
 
-		for(int i = 0; i < SM.meshList[meshIndex].transformation.nrOfFlags; i++)
-		{
-		string flag = SM.meshList[meshIndex].transformation.flags[i];
-		if(flag == "Painted")
-		{
-			painted = true;
-		}
-		if(flag == "Painting")
-		{
+		if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 0)
 			painting = true;
-		}
-		}
+		else if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 1)
+			painted = true;
+
+		//for(int i = 0; i < SM.meshList[meshIndex].transformation.nrOfFlags; i++)
+		//{
+		//string flag = SM.meshList[meshIndex].transformation.flags[i];
+		//if(flag == "Painted")
+		//{
+		//	painted = true;
+		//}
+		//if(flag == "Painting")
+		//{
+		//	painting = true;
+		//}
+		//}
 
 		//PAINT STUFF
 		GivePaintId(meshIndex, texPath);
@@ -1479,37 +1508,41 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		{///////////////////////	MESH TRANSFORM ////////////////////////////////////////
 		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
 		{
-			glm::vec3 position;
 			MFnTransform transform = mesh.parent(0, &status);
-			rotPivot = transform.rotatePivot(MSpace::kObject);
-			scalePivot = transform.scalePivot(MSpace::kObject);
+			MObject transObj = transform.object();
+			UpdateTransformation(SM.meshList[meshIndex].transformation, transObj);
 
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-			position.x = transform.getTranslation(g_space_world).x;
-			position.y = transform.getTranslation(g_space_world).y;
-			position.z = transform.getTranslation(g_space_world).z;
+			//glm::vec3 position;
+			//MFnTransform transform = mesh.parent(0, &status);
+			//rotPivot = transform.rotatePivot(MSpace::kObject);
+			//scalePivot = transform.scalePivot(MSpace::kObject);
 
-			SM.meshList[meshIndex].transformation.position.x = position.x;
-			SM.meshList[meshIndex].transformation.position.y = position.y;
-			SM.meshList[meshIndex].transformation.position.z = position.z;
+			//transform.getScale(scale);
+			//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
+			//position.x = transform.getTranslation(g_space_world).x;
+			//position.y = transform.getTranslation(g_space_world).y;
+			//position.z = transform.getTranslation(g_space_world).z;
 
-			SM.meshList[meshIndex].transformation.scale.x = scale[0];
-			SM.meshList[meshIndex].transformation.scale.y = scale[1];
-			SM.meshList[meshIndex].transformation.scale.z = scale[2];
+			//SM.meshList[meshIndex].transformation.position.x = position.x;
+			//SM.meshList[meshIndex].transformation.position.y = position.y;
+			//SM.meshList[meshIndex].transformation.position.z = position.z;
 
-			SM.meshList[meshIndex].transformation.rotation.x = rotX;
-			SM.meshList[meshIndex].transformation.rotation.y = rotY;
-			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
-			SM.meshList[meshIndex].transformation.rotation.w = rotW;
+			//SM.meshList[meshIndex].transformation.scale.x = scale[0];
+			//SM.meshList[meshIndex].transformation.scale.y = scale[1];
+			//SM.meshList[meshIndex].transformation.scale.z = scale[2];
 
-			SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
-			SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
-			SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
+			//SM.meshList[meshIndex].transformation.rotation.x = rotX;
+			//SM.meshList[meshIndex].transformation.rotation.y = rotY;
+			//SM.meshList[meshIndex].transformation.rotation.z = rotZ;
+			//SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
-			SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
-			SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
-			SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
+			//SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
+			//SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
+			//SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
+
+			//SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
+			//SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
+			//SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
 
 			getMeshFlags(mesh.parent(0,&status), meshIndex);
 		}
@@ -1519,7 +1552,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
 }
 
-void UpdateTransformation(Transform destination, MObject transObject)
+void UpdateTransformation(Transform& destination, MObject transObject)
 {
 	MFnTransform transform = transObject;
 
@@ -1574,7 +1607,10 @@ void MayaLightToList(MObject node, int lightIndex)
 			{
 				MFnTransform transform = light.parent(0, &status);
 
-				transform.getScale(scale);
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.lightList[lightIndex].transformation, transObj);
+
+				/*transform.getScale(scale);
 				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
 				SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
@@ -1588,7 +1624,7 @@ void MayaLightToList(MObject node, int lightIndex)
 				SM.lightList[lightIndex].transformation.rotation.x = rotX;
 				SM.lightList[lightIndex].transformation.rotation.y = rotY;
 				SM.lightList[lightIndex].transformation.rotation.z = rotZ;
-				SM.lightList[lightIndex].transformation.rotation.w = rotW;
+				SM.lightList[lightIndex].transformation.rotation.w = rotW;*/
 			}
 
 			SM.UpdateSharedLight(lightIndex, currNrLights);
@@ -1600,9 +1636,9 @@ void MayaLightToList(MObject node, int lightIndex)
 			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
 
 			memcpy(SM.worldData->DirectionalSun.LightType, DL.asChar(), DL.numChars());
-			SM.worldData->DirectionalSun.direction.x = light.lightDirection().x;
-			SM.worldData->DirectionalSun.direction.y = light.lightDirection().y;
-			SM.worldData->DirectionalSun.direction.z = light.lightDirection().z;
+			//SM.worldData->DirectionalSun.direction.x = light.lightDirection().x;
+			//SM.worldData->DirectionalSun.direction.y = light.lightDirection().y;
+			//SM.worldData->DirectionalSun.direction.z = light.lightDirection().z;
 
 			SM.worldData->DirectionalSun.color.r = light.color(&status).r;
 			SM.worldData->DirectionalSun.color.g = light.color(&status).g;
@@ -1615,21 +1651,23 @@ void MayaLightToList(MObject node, int lightIndex)
 			{
 				MFnTransform transform = light.parent(0, &status);
 
-				transform.getScale(scale);
-				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.worldData->DirectionalSun.transformation, transObj);
+				//transform.getScale(scale);
+				//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-				SM.worldData->DirectionalSun.transformation.position.x = transform.getTranslation(g_space_world).x;
-				SM.worldData->DirectionalSun.transformation.position.y = transform.getTranslation(g_space_world).y;
-				SM.worldData->DirectionalSun.transformation.position.z = transform.getTranslation(g_space_world).z;
+				//SM.worldData->DirectionalSun.transformation.position.x = transform.getTranslation(g_space_world).x;
+				//SM.worldData->DirectionalSun.transformation.position.y = transform.getTranslation(g_space_world).y;
+				//SM.worldData->DirectionalSun.transformation.position.z = transform.getTranslation(g_space_world).z;
 
-				SM.worldData->DirectionalSun.transformation.scale.x = scale[0];
-				SM.worldData->DirectionalSun.transformation.scale.y = scale[1];
-				SM.worldData->DirectionalSun.transformation.scale.z = scale[2];
+				//SM.worldData->DirectionalSun.transformation.scale.x = scale[0];
+				//SM.worldData->DirectionalSun.transformation.scale.y = scale[1];
+				//SM.worldData->DirectionalSun.transformation.scale.z = scale[2];
 
-				SM.worldData->DirectionalSun.transformation.rotation.x = rotX;
-				SM.worldData->DirectionalSun.transformation.rotation.y = rotY;
-				SM.worldData->DirectionalSun.transformation.rotation.z = rotZ;
-				SM.worldData->DirectionalSun.transformation.rotation.w = rotW;
+				//SM.worldData->DirectionalSun.transformation.rotation.x = rotX;
+				//SM.worldData->DirectionalSun.transformation.rotation.y = rotY;
+				//SM.worldData->DirectionalSun.transformation.rotation.z = rotZ;
+				//SM.worldData->DirectionalSun.transformation.rotation.w = rotW;
 			}
 			ReleaseMutex(SM.LightMutexHandle);
 			SM.AddUpdateMessage("DirectionalLight", 0, true, true, false);
@@ -1653,21 +1691,24 @@ void MayaLightToList(MObject node, int lightIndex)
 			{
 				MFnTransform transform = light.parent(0, &status);
 
-				transform.getScale(scale);
-				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.worldData->AmbientLight.transformation, transObj);
 
-				SM.worldData->AmbientLight.transformation.position.x = transform.getTranslation(g_space_world).x;
-				SM.worldData->AmbientLight.transformation.position.y = transform.getTranslation(g_space_world).y;
-				SM.worldData->AmbientLight.transformation.position.z = transform.getTranslation(g_space_world).z;
+				//transform.getScale(scale);
+				//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-				SM.worldData->AmbientLight.transformation.scale.x = scale[0];
-				SM.worldData->AmbientLight.transformation.scale.y = scale[1];
-				SM.worldData->AmbientLight.transformation.scale.z = scale[2];
+				//SM.worldData->AmbientLight.transformation.position.x = transform.getTranslation(g_space_world).x;
+				//SM.worldData->AmbientLight.transformation.position.y = transform.getTranslation(g_space_world).y;
+				//SM.worldData->AmbientLight.transformation.position.z = transform.getTranslation(g_space_world).z;
 
-				SM.worldData->AmbientLight.transformation.rotation.x = rotX;
-				SM.worldData->AmbientLight.transformation.rotation.y = rotY;
-				SM.worldData->AmbientLight.transformation.rotation.z = rotZ;
-				SM.worldData->AmbientLight.transformation.rotation.w = rotW;
+				//SM.worldData->AmbientLight.transformation.scale.x = scale[0];
+				//SM.worldData->AmbientLight.transformation.scale.y = scale[1];
+				//SM.worldData->AmbientLight.transformation.scale.z = scale[2];
+
+				//SM.worldData->AmbientLight.transformation.rotation.x = rotX;
+				//SM.worldData->AmbientLight.transformation.rotation.y = rotY;
+				//SM.worldData->AmbientLight.transformation.rotation.z = rotZ;
+				//SM.worldData->AmbientLight.transformation.rotation.w = rotW;
 			}
 
 			SM.AddUpdateMessage("AmbientLight", 0, true, true, false);
@@ -1718,21 +1759,23 @@ void MayaCameraToList(MObject node, int cameraIndex)
 		{
 			MFnTransform transform = camera.parent(0, &status);
 
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+			MObject transObj = transform.object();
+			UpdateTransformation(SM.cameraList[cameraIndex].transformation, transObj);
+			//transform.getScale(scale);
+			//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-			SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
-			SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
-			SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
+			//SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+			//SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+			//SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
 
-			SM.cameraList[cameraIndex].transformation.scale.x = scale[0];
-			SM.cameraList[cameraIndex].transformation.scale.y = scale[1];
-			SM.cameraList[cameraIndex].transformation.scale.z = scale[2];
+			//SM.cameraList[cameraIndex].transformation.scale.x = scale[0];
+			//SM.cameraList[cameraIndex].transformation.scale.y = scale[1];
+			//SM.cameraList[cameraIndex].transformation.scale.z = scale[2];
 
-			SM.cameraList[cameraIndex].transformation.rotation.x = rotX;
-			SM.cameraList[cameraIndex].transformation.rotation.y = rotY;
-			SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
-			SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
+			//SM.cameraList[cameraIndex].transformation.rotation.x = rotX;
+			//SM.cameraList[cameraIndex].transformation.rotation.y = rotY;
+			//SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
+			//SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
 		}
 		SM.UpdateSharedCamera(cameraIndex);
 	}
