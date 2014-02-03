@@ -26,11 +26,13 @@ namespace Ragdoll
 		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos, int p_massFactor );
 		btCollisionShape* CreateBone(std::string p_name);
 		void SetBoneRelation(int p_parentIndex, int p_childIndex, glm::mat4 p_pose);
+		void CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
+										float p_quatX, float p_quatY, float p_quatZ, float p_quatW, btTransform* p_transBodyA, btTransform* p_transBodyB );
 		btTypedConstraint* CreateConstraint(btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB);
 		btRigidBody* m_bodies[20];
 		btTypedConstraint* m_joints[20];
 		glm::mat4 m_boneTransform[20];
-		glm::mat4 m_lastUpdatePos[20];
+		glm::mat4 m_prevPos[20];
 		glm::mat4 m_lastBoneMatrix[20];
 		int m_boneToFollow[20];
 		

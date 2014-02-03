@@ -58,8 +58,8 @@ namespace Ragdoll
 			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
 			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
-			m_lastUpdatePos[index] = bonePos;
-			m_boneTransform[index] = p_transform;
+			m_boneTransform[index] = bonePos;
+			m_prevPos[index] = p_transform;
 			m_lastBoneMatrix[index] = p_bones[index];
 			glm::mat4 toTrans =  p_transform  * bonePos * p_bones[index];	
 			const float* data = glm::value_ptr(toTrans);
@@ -186,10 +186,10 @@ namespace Ragdoll
 			worldTrans.getOpenGLMatrix(test);
 
 
-			m_boneTransform[i] =  glm::make_mat4(test)  *  glm::inverse(m_lastUpdatePos[i]) ;
+			m_prevPos[i] =  glm::make_mat4(test)  *  glm::inverse(m_boneTransform[i]) ;
 			
 			//World to local space
-			retVal[i] = glm::inverse(m_boneTransform[i])  * glm::inverse(m_lastUpdatePos[i]) *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
+			retVal[i] = glm::inverse(m_prevPos[i])  * glm::inverse(m_boneTransform[i]) *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
 			
 			
 		}
@@ -214,16 +214,14 @@ namespace Ragdoll
 	btTypedConstraint* Ragdoll::CreateConstraint( btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB )
 	{
 		btTransform localA, localB;
-		localA.setIdentity(); localB.setIdentity();
-		localA.getBasis().setEulerZYX(0,0,0);
-		localB.getBasis().setEulerZYX(0,0,0); 
 		//Hips-spine
 		if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_Spine") == 0 )
 		{
-			localA.getBasis().setEulerZYX(0,PI_2,0);
-			localB.getBasis().setEulerZYX(0,PI_2,0); 
-			localA.setOrigin(btVector3(0, 0.25f + OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, -0.25f - OFFSET, 0));
+			CalculateConstraintTransform(p_bodyA, p_bodyB, 0 , 0.1f, 0, 0, -0.2f, 0, 0 , 0, 0, 1, &localA, &localB);
+		//	localA.getBasis().setEulerZYX(0,PI_2,0);
+			//localB.getBasis().setEulerZYX(0,PI_2,0); 
+			//localA.setOrigin(btVector3(0, 0.25f + OFFSET, 0)); 
+		//	localB.setOrigin(btVector3(0, -0.25f - OFFSET, 0));
 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
 			constraint->setLimit(0,0);
 				
@@ -235,143 +233,154 @@ namespace Ragdoll
 		//Hips - Left upper leg
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
 		{
-			localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
+			CalculateConstraintTransform(p_bodyA, p_bodyB,
+				 0.4f , -0.1f, 0,
+				0, 0.2f, 0,
+				0 , 0, 0, 1, &localA, &localB);
+		//	localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
+			//localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(0,PI_2);
+			m_dynamicWorld->addConstraint(constraint,true);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
 		////Hips - Right upper leg
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
 		{
-			localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
-			localB.setOrigin(btVector3(0, 0.3f + 0, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+			CalculateConstraintTransform(p_bodyA, p_bodyB, 
+				-0.4f , -0.1f, 0,
+				0, 0.2f, 0,
+				0 , 0, 0, 1, &localA, &localB);
+			//localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
+			//localB.setOrigin(btVector3(0, 0.3f + 0, 0));
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(0,PI_2);
+
+			//btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
 			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
+			m_dynamicWorld->addConstraint(constraint, true);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
 		//Left upper leg - Left lower leg
-		else if(p_nameA.compare("Character1_LeftUpLeg") == 0 && p_nameB.compare("Character1_LeftLeg") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.5f- OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Right upper leg - Right lower leg
-		else if(p_nameA.compare("Character1_RightUpLeg") == 0 && p_nameB.compare("Character1_RightLeg") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.25f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Left lower leg - Left foot
-		else if(p_nameA.compare("Character1_LeftLeg") == 0 && p_nameB.compare("Character1_LeftFoot") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.21f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.09f+ OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Right lower leg - Right foot
-		else if(p_nameA.compare("Character1_RightLeg") == 0 && p_nameB.compare("Character1_RightFoot") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		////Spine - Left upper arm
-		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
-		{
-			localA.getBasis().setEulerZYX(0,0,1);
-			localB.getBasis().setEulerZYX(0,0,1); 
-			localA.setOrigin(btVector3(-0.2f, 0.10f +  OFFSET, 0)); 
-			localB.setOrigin(btVector3(0.05f, 0.05f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(0, 0, 0);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		////Spine - Right upper arm
-		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
-		{
-			localA.getBasis().setEulerZYX(0,0,1);
-			localB.getBasis().setEulerZYX(0,0,1); 
-			localA.setOrigin(btVector3(0.2f, 0.10f +  OFFSET, 0)); 
-			localB.setOrigin(btVector3(-0.05f, 0.05f +  OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			//constraint->setLimit(0, 0, 0);
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		////Left upper arm - Left lower arm
-		else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
-		{
-			localA.getBasis().setEulerZYX(0,0,0);
-			localB.getBasis().setEulerZYX(0,0,0); 
-			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Right upper arm - Right lower arm
-		else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
-		{
-			localA.getBasis().setEulerZYX(0,0,0);
-			localB.getBasis().setEulerZYX(0,0,0); 
-			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-			
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Left lower arm - Left hand
-		else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
-		//Right lower arm - Right hand
-		else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
-		{
-			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
-			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
-			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
-
-			m_dynamicWorld->addConstraint(constraint);
-			constraint->setDbgDrawSize(0.5f);
-			return constraint;
-		}
+// 		else if(p_nameA.compare("Character1_LeftUpLeg") == 0 && p_nameB.compare("Character1_LeftLeg") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.5f- OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(PI_2, PI_2, PI_2);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Right upper leg - Right lower leg
+// 		else if(p_nameA.compare("Character1_RightUpLeg") == 0 && p_nameB.compare("Character1_RightLeg") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.25f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(PI_2, PI_2, PI_2);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Left lower leg - Left foot
+// 		else if(p_nameA.compare("Character1_LeftLeg") == 0 && p_nameB.compare("Character1_LeftFoot") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.21f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.09f+ OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(PI_2, PI_2, PI_2);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Right lower leg - Right foot
+// 		else if(p_nameA.compare("Character1_RightLeg") == 0 && p_nameB.compare("Character1_RightFoot") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(PI_2, PI_2, PI_2);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		////Spine - Left upper arm
+// 		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
+// 		{
+// 			localA.getBasis().setEulerZYX(0,0,1);
+// 			localB.getBasis().setEulerZYX(0,0,1); 
+// 			localA.setOrigin(btVector3(-0.2f, 0.10f +  OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0.05f, 0.05f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(0, 0, 0);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		////Spine - Right upper arm
+// 		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
+// 		{
+// 			localA.getBasis().setEulerZYX(0,0,1);
+// 			localB.getBasis().setEulerZYX(0,0,1); 
+// 			localA.setOrigin(btVector3(0.2f, 0.10f +  OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(-0.05f, 0.05f +  OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			//constraint->setLimit(0, 0, 0);
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		////Left upper arm - Left lower arm
+// 		else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
+// 		{
+// 			localA.getBasis().setEulerZYX(0,0,0);
+// 			localB.getBasis().setEulerZYX(0,0,0); 
+// 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Right upper arm - Right lower arm
+// 		else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
+// 		{
+// 			localA.getBasis().setEulerZYX(0,0,0);
+// 			localB.getBasis().setEulerZYX(0,0,0); 
+// 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 			
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Left lower arm - Left hand
+// 		else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
+// 		//Right lower arm - Right hand
+// 		else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
+// 		{
+// 			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
+// 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
+// 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+// 
+// 			m_dynamicWorld->addConstraint(constraint);
+// 			constraint->setDbgDrawSize(0.5f);
+// 			return constraint;
+// 		}
 		return nullptr;
 	}
 
@@ -396,7 +405,46 @@ namespace Ragdoll
 
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
-		m_bodies[6]->setLinearVelocity(p_velocity);
+		m_bodies[13]->setLinearVelocity(p_velocity);
+	}
+
+	//The magic function of constraint calculations,
+	void Ragdoll::CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , 
+		float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
+		float p_quatX, float p_quatY, float p_quatZ, float p_quatW, btTransform* p_transBodyA, btTransform* p_transBodyB  )
+	{
+		glm::mat4 bodyAGlm, bodyBGlm;
+		btTransform bodyTransformA = p_bodyA->getWorldTransform();
+		btTransform bodyTransformB = p_bodyB->getWorldTransform();
+		float toGlmA[16], toGlmB[16];
+		bodyTransformA.getOpenGLMatrix(toGlmA);
+		bodyAGlm = glm::make_mat4(toGlmA);
+		bodyTransformB.getOpenGLMatrix(toGlmB);
+		bodyBGlm = glm::make_mat4(toGlmB);
+		//Offset vector
+		glm::vec4 offsetA = glm::vec4(p_offsetXbodyA, p_offsetYbodyA, p_offsetZbodyA, 1);
+		glm::vec4 offsetB = glm::vec4(p_offsetXbodyB, p_offsetYbodyB, p_offsetZbodyB, 1);
+		//To world space
+		glm::vec3 offsetAWorld = glm::vec3(bodyAGlm * offsetA);
+		glm::vec3 offsetBWorld =  glm::vec3(bodyBGlm * offsetB) ;
+	
+		//And back to bullet vectors again
+		btVector3 pointA = btVector3(offsetAWorld.x, offsetAWorld.y, offsetAWorld.z);
+		btVector3 pointB = btVector3(offsetBWorld.x, offsetBWorld.y, offsetBWorld.z);
+
+		btVector3 constraintOrigin = btVector3(pointA.x() + ((pointB.x() - pointA.x()) / 2.0f),
+			pointA.y() + ((pointB.y() - pointA.y()) / 2.0f),
+			pointA.z() + ((pointB.z() - pointA.z()) / 2.0f));
+
+		btTransform constraintWorld ;
+		constraintWorld.setIdentity();
+		constraintWorld.setOrigin(constraintOrigin);
+		constraintWorld.setRotation(btQuaternion(p_quatX, p_quatY, p_quatZ, p_quatW));
+		p_transBodyA->setIdentity();
+		*p_transBodyA = bodyTransformA.inverse() * constraintWorld;
+
+		p_transBodyB->setIdentity();
+		*p_transBodyB = bodyTransformB.inverse() * constraintWorld;
 	}
 
 }
