@@ -388,6 +388,12 @@ namespace RootForce
 			m_waterSystem->ToggleWireFrame();
 
 
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->m_pause = true;
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_O) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->m_pause = false;
+
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();

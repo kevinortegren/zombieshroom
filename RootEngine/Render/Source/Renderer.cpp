@@ -395,7 +395,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			PostProcessPass();
+			//PostProcessPass();
 		}
 
 		{
@@ -506,6 +506,7 @@ namespace Render
 		m_gbuffer.UnbindTextures();	
 
 		// Bind lighting for blending.
+		
 		m_lighting.m_la->Bind(5);
 
 		m_gbuffer.Enable();

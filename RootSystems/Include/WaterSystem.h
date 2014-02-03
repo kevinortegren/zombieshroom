@@ -29,6 +29,8 @@ namespace RootForce
 		void SetDx(float p_dx);
 		void SetSpeed(float p_speed);
 		
+		bool m_pause;
+
 	private:
 
 		ECS::World*						m_world;
@@ -43,5 +45,7 @@ namespace RootForce
 		bool	m_wireFrame;
 		int		m_maxX, m_maxZ;	
 		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
+
+		
 	};
 }

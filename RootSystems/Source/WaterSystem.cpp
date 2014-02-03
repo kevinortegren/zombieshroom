@@ -6,8 +6,8 @@ namespace RootForce
 {
 	void WaterSystem::Init()
 	{
-		
-		m_maxX = m_maxZ = 512;
+		m_pause = false;
+		m_maxX = m_maxZ = 1024;
 		
 		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();
@@ -29,8 +29,8 @@ namespace RootForce
 		m_computeJob.m_textures[1]	= m_texture[1];
 		m_computeJob.m_textures[2]  = m_texture[2];
 		//Set standard values
-		m_speed		= 100.0f;
-		m_dx		= 50.0f;
+		m_speed		= 20.0f;
+		m_dx		= 2800.0f / m_maxZ;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -55,18 +55,21 @@ namespace RootForce
 
 	void WaterSystem::Process()
 	{
-		m_dt += m_world->GetDelta();
-		//Only simulate water every time step
-		if(m_dt >= m_timeStep)
+		if(!m_pause)
 		{
-			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
-			m_context->m_renderer->Compute(&m_computeJob);
-			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
-			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
-			//Swap the textures for next simulation step
-			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
-			//Reset timer and preserve non-exact time additions
-			m_dt -= m_timeStep;
+			m_dt += m_world->GetDelta();
+			//Only simulate water every time step
+			if(m_dt >= m_timeStep)
+			{
+				//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
+				m_context->m_renderer->Compute(&m_computeJob);
+				//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
+				m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
+				//Swap the textures for next simulation step
+				std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
+				//Reset timer and preserve non-exact time additions
+				m_dt -= m_timeStep;
+			}
 		}
 	}
 
