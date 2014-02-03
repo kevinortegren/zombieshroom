@@ -73,6 +73,11 @@ void main() {
 	for(cascade = 0; cascade < 4; cascade++)
 	{
 		shadowCoord = shadowCasterViewProjectionMatrix[cascade] * worldPosition;
+		if(cascade == 3)
+		{
+			useCascade = cascade;
+			break;
+		}
 		if(max(abs(shadowCoord.x - 0.5), abs(shadowCoord.y - 0.5)) < 0.48)
 		{
 			if(shadowCoord.z < 1)
