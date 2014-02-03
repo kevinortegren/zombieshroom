@@ -34,9 +34,10 @@ namespace RootForce
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
 				
+				//Starts the ragdoll in physics
 				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
-				//Start the ragdoll in Rootphysics;
-				//animation->m_bones <- send that to physics and it should do something that should work most likely
+				
+				
 				ragdoll->m_firstTime = false;
 				
 			}
@@ -44,6 +45,7 @@ namespace RootForce
 			{
 				
 				glm::mat4* bones = new glm::mat4[20];
+				//get the updated bonetransformations from the physics
 				bones = m_engineContext->m_physics->GetBones(*(collision->m_handle));
 				if(bones != nullptr)
 					for(int i = 0; i < 14; i++)

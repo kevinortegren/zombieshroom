@@ -1286,6 +1286,12 @@ namespace Physics
 		{
 			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			float x,y,z,w;
+			x = trans.getRotation().w();
+			y = trans.getRotation().x();
+			z = trans.getRotation().y();
+			w = trans.getRotation().z();
+			trans.setRotation(btQuaternion(x,y,z,w));
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
@@ -1301,6 +1307,12 @@ namespace Physics
 			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			float x,y,z,w;
+			x = trans.getRotation().w();
+			y = trans.getRotation().x();
+			z = trans.getRotation().y();
+			w = trans.getRotation().z();
+			trans.setRotation(btQuaternion(x,y,z,w));
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
