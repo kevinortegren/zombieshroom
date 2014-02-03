@@ -7,7 +7,7 @@ namespace RootForce
 	void WaterSystem::Init()
 	{
 		m_pause = false;
-		m_maxX = m_maxZ = 1024;
+		m_maxX = m_maxZ = 256;
 		
 		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();
@@ -30,7 +30,7 @@ namespace RootForce
 		m_computeJob.m_textures[2]  = m_texture[2];
 		//Set standard values
 		m_speed		= 20.0f;
-		m_dx		= 2800.0f / m_maxZ;
+		m_dx		= 1400.0f / m_maxZ;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -80,7 +80,7 @@ namespace RootForce
 
 	void WaterSystem::CreateRenderable()
 	{
-		m_scale = 20.0f;
+		m_scale = 10.0f;
 		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
 
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
