@@ -1258,10 +1258,9 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
-			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
-			m_playerObjects.at(index)->SetPosition(temp);
-			int indexRag = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-			m_ragdolls.at(indexRag)->Deactivate();
+			/*m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			m_playerObjects.at(index)->SetPosition(temp);*/
+			
 		}
 	}
 
@@ -1285,12 +1284,18 @@ namespace Physics
 		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 		if(index  != -1)
 		{
+			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			float data[16];
+			glm::mat4 matrix;
+			trans.getOpenGLMatrix(data);
+			matrix = glm::make_mat4(data);
 			//If ragdoll already exists just update positions and start ragdolling
-			m_ragdolls.at(index)->Activate(p_bones);
+			m_ragdolls.at(index)->Activate(p_bones, matrix);
 			
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
 		}
-		else
+		else //First time, build the shapes, bodies and constraints
 		{
 			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 			
@@ -1324,6 +1329,18 @@ namespace Physics
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll %d", p_objectHandle);
 		}
 		return nullptr;
+	}
+
+	void RootPhysics::DeactivateRagdoll( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		int index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		if(index != -1)
+		{
+			m_ragdolls.at(index)->Deactivate();
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+		}
 	}
 
 }

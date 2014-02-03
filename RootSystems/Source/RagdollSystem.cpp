@@ -20,10 +20,10 @@ namespace RootForce
 		Animation* animation = m_animations.Get(p_entity);
 		Renderable* renderable = m_renderables.Get(p_entity);
 		Collision* collision = m_collisions.Get(p_entity);
-		
+		Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
 		if(animation->m_animClip == AnimationClip::RAGDOLL)
 		{
-			Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
+			
 			if(ragdoll->m_firstTime)
 			{	
 				
@@ -55,6 +55,7 @@ namespace RootForce
 		}
 		else
 		{
+			ragdoll->m_firstTime = true;
 			return;
 		}
 		

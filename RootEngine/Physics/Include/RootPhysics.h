@@ -91,6 +91,7 @@ namespace RootEngine
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual void RemoveAll() = 0;
+			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
@@ -164,7 +165,7 @@ namespace RootEngine
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
-
+			void DeactivateRagdoll(int p_objectHandle);
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);

@@ -13,7 +13,7 @@ namespace Ragdoll
 	public:
 		Ragdoll(btDiscreteDynamicsWorld* p_dynamicWorld);
 		~Ragdoll();
-		void Activate(glm::mat4 p_bones[20]);
+		void Activate(glm::mat4 p_bones[20], glm::mat4 p_transform);
 		void Deactivate();
 		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos );
 		btVector3 GetPos();
