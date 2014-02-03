@@ -6,9 +6,12 @@ in vec3 Normal_FS_in;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec3 normals;
+layout (location = 2) out vec4 glow;
+layout (location = 3) out vec4 background;
 
 uniform samplerCube g_Specular;
 //uniform samplerCube CubeMap;
+uniform sampler2D g_LA;
 
 layout(std140) uniform PerFrame
 {
@@ -25,13 +28,19 @@ layout(std140) uniform PerObject
 
 void main()
 {
+	vec2 screenTexCoord = gl_FragCoord.xy / textureSize(g_LA, 0);
+    vec3 la = texture(g_LA, screenTexCoord).xyz;
+
 	vec3 viewNormal = normalize(viewMatrix*vec4(Normal_FS_in,0.0f)).xyz;
+
 	//Reflection calculations
 	vec3 incident	= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW		= reflect(incident, normalize(Normal_FS_in));
 	vec3 frag_color = texture(g_Specular, refW).xyz;
-	//vec4 color = texture(g_Specular, TexCoord_FS_in);
-	vec4 finalcolor = vec4(frag_color.r, frag_color.g, frag_color.b, 1.0f);
-	diffuse = finalcolor;
+	 
+	vec3 trans = la + frag_color.rgb*0.3f;
+	diffuse = vec4(vec3(0.0f, 0.0f, 0.1f), 0.6f);
 	normals = vec3(viewNormal * 0.5 + 0.5);
+	glow = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	background = vec4(trans, 0.3f);
 }

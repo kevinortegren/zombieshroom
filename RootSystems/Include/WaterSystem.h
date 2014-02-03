@@ -35,7 +35,7 @@ namespace RootForce
 		Render::ComputeJob				m_computeJob;
 		RootForce::Renderable*			m_renderable;
 		Render::EffectInterface*		m_effect;			
-		Render::TextureInterface*		m_texture[2];
+		Render::TextureInterface*		m_texture[3];
 		Render::TextureInterface*		m_normalTexture;
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;

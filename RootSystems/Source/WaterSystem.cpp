@@ -11,11 +11,14 @@ namespace RootForce
 		
 		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();
-		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA32F );
+		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[0]->SetAccess(GL_READ_WRITE);
 		m_texture[1] = m_context->m_renderer->CreateTexture();
-		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA32F );
+		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
+		m_texture[2] = m_context->m_renderer->CreateTexture();
+		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->SetAccess(GL_READ_WRITE);
 
 		//Create compute effect
 		m_effect	= m_context->m_resourceManager->LoadEffect("WaterCompute");
@@ -24,10 +27,10 @@ namespace RootForce
 		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
 		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
-		
+		m_computeJob.m_textures[2]  = m_texture[2];
 		//Set standard values
-		m_speed		= 60.0f;
-		m_dx		= 10.0f;
+		m_speed		= 100.0f;
+		m_dx		= 50.0f;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -37,6 +40,7 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::MK1]	= &m_mk1;
 		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
 		m_computeJob.m_params[Render::Semantic::MK3]	= &m_mk3;
+		m_computeJob.m_params[Render::Semantic::DX]		= &m_dx;
 		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
 		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
 		
@@ -83,11 +87,11 @@ namespace RootForce
 		//Create a renderable component for the water
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("256planeUV"); //Load a grid mesh, this could be done in code instead
-		m_renderable->m_material	= m_context->m_resourceManager->GetMaterial("waterrender");
+		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 
 		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); //Diffuse texture(Will probably be removed)
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; //Camera position in world space
-
+		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); //Set primitive type to GL_PATCHES because we use tesselation
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
@@ -108,14 +112,14 @@ namespace RootForce
 
 		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
 		m_computeJob.m_textures[1]->Bind(0);
-		std::vector<glm::vec4> emptyData(1, glm::vec4(0,0,0,p_power));
-		std::vector<glm::vec4> emptyDataHalf(1, glm::vec4(0,0,0,p_power/2.0f));
+		std::vector<float> emptyData(1, p_power);
+		std::vector<float> emptyDataHalf(1, p_power/2.0f);
 		
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RGBA, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
 
 		m_computeJob.m_textures[1]->Unbind(0);
 	}

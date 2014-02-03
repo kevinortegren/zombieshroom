@@ -14,6 +14,8 @@
           slot: 0
         - name: g_currTex
           slot: 1
+        - name: g_normalTex
+          slot: 2
       uniforms:
         - sem: MK1
           offset: 0
@@ -21,10 +23,12 @@
           offset: 4
         - sem: MK3
           offset: 8
-        - sem: XMAX
+        - sem: DX
           offset: 12
-        - sem: YMAX
+        - sem: XMAX
           offset: 16
+        - sem: YMAX
+          offset: 20
       flags:
         - name: RenderIgnore
 

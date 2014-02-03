@@ -221,7 +221,37 @@ namespace Render
 			std::vector<glm::vec4> emptyData(p_width * p_height, glm::vec4(0,0,0,0));
 			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
 		}
-		else
+		else if(p_format == TextureFormat::TEXTURE_RGB8)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+			m_textureFormat = GL_RGB;
+			m_internalFormat = GL_RGB8;
+			m_bpp = 3;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+			std::vector<glm::byte> emptyData(p_width * p_height*3, 0);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGBA8)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+			m_textureFormat = GL_RGBA;
+			m_internalFormat = GL_RGBA8;
+			m_bpp = 3;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+			std::vector<glm::byte> emptyData(p_width * p_height*4, 0);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+			else
 		{
 			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Tried to create empty texture with unsupported format!");
 		}

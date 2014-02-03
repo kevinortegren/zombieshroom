@@ -33,6 +33,7 @@ namespace Render
 			XMAX,
 			YMAX,
 			EYEWORLDPOS,
+			DX,
 		};
 	}
 
@@ -50,6 +51,9 @@ namespace Render
 			TEXTURE_G,
 			TEXTURE_B,
 			GLOW,
+			COMPUTEIN,
+			COMPUTEOUT,
+			COMPUTENORMAL,
 		};
 	}
 }

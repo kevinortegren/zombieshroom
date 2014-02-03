@@ -284,20 +284,22 @@ namespace Render
 		s_sizes[Semantic::MK2]			= sizeof(float);
 		s_sizes[Semantic::MK3]			= sizeof(float);
 		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
+		s_sizes[Semantic::DX]			= sizeof(float);
 
 
-		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
-		s_textureSlots[TextureSemantic::SPECULAR] = 1;
-		s_textureSlots[TextureSemantic::NORMAL] = 2;
-		s_textureSlots[TextureSemantic::GLOW] = 3;
-		s_textureSlots[TextureSemantic::DEPTH] = 4;
-		s_textureSlots[TextureSemantic::RANDOM] = 5;
-		s_textureSlots[TextureSemantic::TEXTUREMAP] = 6;
-		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
-		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
-		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
+		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
+		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::GLOW]			= 3;
+		s_textureSlots[TextureSemantic::DEPTH]			= 4;
+		s_textureSlots[TextureSemantic::RANDOM]			= 5;
+		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
+		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
+		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
+		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -610,17 +612,6 @@ namespace Render
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
-	}
-
-	void GLRenderer::ForwardPass()
-	{
-		m_renderFlags = Render::TechniqueFlags::RENDER_FORWARD;
-		
-		ProcessRenderJobs();
-		{
-			PROFILE("Render Lines", g_context.m_profiler);
-			m_lineRenderer.RenderLines();
-		}
 	}
 
 	void GLRenderer::PostProcessPass()

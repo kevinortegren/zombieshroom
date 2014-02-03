@@ -297,6 +297,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::EYEWORLDPOS, offset);
 						}
+						else if(sem == "DX")
+						{
+							technique->AddUniformParam(Render::Semantic::DX, offset);
+						}
 					}
 				}
 

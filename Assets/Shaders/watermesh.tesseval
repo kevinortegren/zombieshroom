@@ -23,6 +23,7 @@ out vec2 TexCoord_FS_in;
 out vec3 Normal_FS_in;                                                                          
       
 uniform sampler2D g_Diffuse;
+uniform sampler2D g_Normal;
       
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)                                                 
 {                                                                                             
@@ -38,11 +39,11 @@ void main()
 {                                                                                               
     // Interpolate the attributes of the output vertex using the barycentric coordinates        
     TexCoord_FS_in = interpolate2D(TexCoord_ES_in[0], TexCoord_ES_in[1], TexCoord_ES_in[2]);  
-	vec4 heightNormal = texture(g_Diffuse, TexCoord_FS_in);
-	Normal_FS_in = heightNormal.xyz;
-	
+	vec3 normalMap = texture(g_Normal, TexCoord_FS_in).xyz;
+	Normal_FS_in = normalMap;
+	float height = texture(g_Diffuse, TexCoord_FS_in).r; 
 	//Calc new vertex position                             
-    WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0, heightNormal.w, 0);    
+    WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0, height, 0);    
                                
     gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in, 1.0f);                                              
 }                                       
