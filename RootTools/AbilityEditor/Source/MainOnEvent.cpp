@@ -14,9 +14,9 @@ namespace AbilityEditorNameSpace
 	{
 
 	}
-	void MainOnEvent::AddCondition( QString p_name )
+	void MainOnEvent::AddCondition( QString p_name, QString p_code )
 	{
-		Condition* cond = new Condition(p_name);
+		Condition* cond = new Condition(p_name, p_code);
 		m_conditions.push_back(cond);
 	}
 

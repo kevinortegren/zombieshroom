@@ -220,7 +220,7 @@ public:
 
         retranslateUi(AbilityEditorClass);
 
-        toolBoxWidget->setCurrentIndex(0);
+        toolBoxWidget->setCurrentIndex(2);
         OnTabWidget->setCurrentIndex(0);
 
 
@@ -234,7 +234,7 @@ public:
         actionSave->setText(QApplication::translate("AbilityEditorClass", "Save", 0));
         actionLoad->setText(QApplication::translate("AbilityEditorClass", "Open...", 0));
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
-        actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script Folder...", 0));
+        actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
         actionEntity->setText(QApplication::translate("AbilityEditorClass", "Entity", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabEntities), QApplication::translate("AbilityEditorClass", "Entities", 0));

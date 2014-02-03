@@ -26,6 +26,7 @@ void CustomListWidget::mousePressEvent( QMouseEvent* event )
 			QDrag* drag = new QDrag(this);
 			QMimeData* data = new QMimeData;
 			data->setText(item->text());
+			data->setHtml(item->toolTip());
 
 			data->setObjectName(type);
 			drag->setMimeData(data);

@@ -39,6 +39,19 @@ namespace AbilityEditorNameSpace
 
 		//Begin writing in the file
 		m_file << m_name << " = {};\n";
+		
+		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
+		{
+			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
+			{
+				m_damage = ((AbilityComponents::OffensiveAbility*)m_entity->GetComponents()->at(j))->m_damage;
+				m_knockback = ((AbilityComponents::OffensiveAbility*)m_entity->GetComponents()->at(j))->m_knockbackPower;
+				m_file << m_name << ".damage = " << m_damage << ";\n";
+				m_file << m_name << ".pushback = " << m_knockback << ";\n";
+			}
+			//TODO : Add cooldown stuff
+		}
+		
 		m_file << "\n";
 
 		WriteOnCreate(p_onCreate);
@@ -155,7 +168,7 @@ namespace AbilityEditorNameSpace
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 		}
 		m_file << "\ttransformComp:SetPos(posVec);\n";
-		m_file << "\tif Global.IsClient then\n";
+		m_file << "\tif Global.IsClient then\n"; //Client-only components
 
 		if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
 			m_file << "\t\tlocal renderComp = Renderable.New(self);\n";
@@ -182,7 +195,7 @@ namespace AbilityEditorNameSpace
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onCreate->GetConditions()->size(); i++)
 		{
-			m_file << "\t" << p_onCreate->GetConditions()->at(i)->GetText().toStdString() << "\n";
+			m_file << "\t" << p_onCreate->GetConditions()->at(i)->GetCode().toStdString() << "\n";
 			std::vector<QString> scriptNames = p_onCreate->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
@@ -202,14 +215,37 @@ namespace AbilityEditorNameSpace
 		{
 			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY) //Fix here
 			{
+
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
 				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
-				m_file << "\tif type == 3 then\n";
-				m_file << "\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
-				m_file << "\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-				//The 2 in the following line is SuperMegaDunderUberHyper guessed, maybe think about it?
-				m_file << "\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << ((AbilityComponents::OffensiveAbility*)m_entity->GetComponents()->at(j))->m_knockbackPower << ");\n";
+
+				m_file << "\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
+				m_file << "\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
+				m_file << "\tlocal abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+				m_file << "\tlocal abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+				m_file << "\tlocal abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+
+				m_file << "\tif type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n"; 
+
+				if(m_knockback > 0.0f)
+				{
+							   
+					m_file << "\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
+					m_file << "\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
+					//The '2' in the following line is SuperMegaDunderUberHyper guessed, maybe think about it?
+					m_file << "\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".pushback);\n";
+					
+				}
+				if(m_damage > 0.0f)
+				{
+					m_file << "\t\tlocal health = entity:GetHealth();\n";
+					m_file << "\t\tif not health:IsDead() then\n";
+						m_file << "\t\t\tlocal network = entity:GetNetwork();\n";
+						m_file << "\t\t\tlocal receiverId = network:GetUserId();\n";
+						m_file << "\t\t\thealth:Damage(abilityOwnerId, " << m_name << ".damage, receiverId);\n";
+					m_file << "\t\tend\n";
+				}
 				m_file << "\tend\n";
 			}
 			
@@ -217,7 +253,7 @@ namespace AbilityEditorNameSpace
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onCollide->GetConditions()->size(); i++)
 		{
-			m_file << "\t" << p_onCollide->GetConditions()->at(i)->GetText().toStdString() << "\n";
+			m_file << "\t" << p_onCollide->GetConditions()->at(i)->GetCode().toStdString() << "\n";
 			std::vector<QString> scriptNames = p_onCollide->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
@@ -235,7 +271,7 @@ namespace AbilityEditorNameSpace
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onDestroy->GetConditions()->size(); i++)
 		{
-			m_file << "\t" << p_onDestroy->GetConditions()->at(i)->GetText().toStdString() << "\n";
+			m_file << "\t" << p_onDestroy->GetConditions()->at(i)->GetCode().toStdString() << "\n";
 			std::vector<QString> scriptNames = p_onDestroy->GetEntityNames(i);
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{

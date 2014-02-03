@@ -10,7 +10,7 @@ namespace AbilityEditorNameSpace
 		MainOnEvent();
 		~MainOnEvent();
 		virtual void AddEntity(unsigned int p_id, QString p_name); 
-		virtual void AddCondition(QString p_name); //Needed?
+		virtual void AddCondition(QString p_name, QString p_code); //Needed?
 		virtual void AddCondition(Condition* p_cond);
 
 		virtual void RemoveEntity(unsigned int p_id, QString p_name);

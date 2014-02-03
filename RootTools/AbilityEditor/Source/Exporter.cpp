@@ -120,7 +120,8 @@ namespace AbilityEditorNameSpace
 
 	void Exporter::ExportCondition( YAML::Emitter& p_emitter, Condition* p_cond)
 	{
-		p_emitter << YAML::Key << "Condition" << YAML::Value << p_cond->GetText().toStdString();
+		p_emitter << YAML::Key << "Condition" << YAML::Value << p_cond->GetName().toStdString();
+		p_emitter << YAML::Key << "Code" << YAML::Value << p_cond->GetCode().toStdString();
 		p_emitter << YAML::Key << "Entities";
 		p_emitter << YAML::Value << YAML::BeginSeq;
 		for (unsigned int i = 0; i < p_cond->GetEntities().size(); i++)

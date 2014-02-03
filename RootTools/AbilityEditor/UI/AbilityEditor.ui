@@ -27,7 +27,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="toolBoxWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabComponents">
        <attribute name="title">
@@ -179,7 +179,7 @@
   </action>
   <action name="actionGenerate_Script">
    <property name="text">
-    <string>Generate Script Folder...</string>
+    <string>Generate Script...</string>
    </property>
   </action>
   <action name="actionEntity">

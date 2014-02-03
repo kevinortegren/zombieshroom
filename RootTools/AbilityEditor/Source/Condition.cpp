@@ -3,9 +3,10 @@
 namespace AbilityEditorNameSpace
 {
 
-	Condition::Condition(QString p_text)
+	Condition::Condition(QString p_name, QString p_codeLine)
 	{
-		m_text = p_text;
+		m_name = p_name;
+		m_codeLine = p_codeLine;
 	}
 
 	Condition::~Condition()

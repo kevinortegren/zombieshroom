@@ -14,10 +14,11 @@ void CustomTreeWidget::dropEvent( QDropEvent* event )
 	{
 		QTreeWidgetItem* item = new QTreeWidgetItem;
 		item->setText(0,event->mimeData()->text());
+		item->setToolTip(0,event->mimeData()->html());
 		item->setWhatsThis(0,"Conditions");
 
 		this->addTopLevelItem(item);
-		m_onEvent->AddCondition(item->text(0));
+		m_onEvent->AddCondition(item->text(0), item->toolTip(0));
 
 	}
 
@@ -107,13 +108,7 @@ void CustomTreeWidget::SaveSelectedData( QTreeWidgetItem* p_item, QtTreeProperty
 	if(p_item->whatsThis(0).compare("Condition") == 0)
 	{
 		m_onEvent->EditConditionData(this->indexOfTopLevelItem(p_item),p_propBrows, p_propMan);
-		//p_item->setText(0, m_onEvent->GetEntityName(this->indexOfTopLevelItem(p_item))); //Nej, conditions, inte entity
 	}
-	//No need?
-// 	else if (p_item->whatsThis(0).compare("Entity") == 0)
-// 	{
-// 		m_onEvent->EditComponentData(this->indexOfTopLevelItem(p_item->parent()),p_propBrows ,p_item->text(0), p_propMan); //FELFELFEL
-// 	}
 }
 
 void CustomTreeWidget::LoadData()
@@ -121,12 +116,12 @@ void CustomTreeWidget::LoadData()
 	for (unsigned int i = 0; i < m_onEvent->GetConditions()->size(); i++)
 	{
 		QTreeWidgetItem* item = new QTreeWidgetItem;
-		item->setText(0,m_onEvent->GetConditions()->at(i)->GetText());
+		item->setText(0,m_onEvent->GetConditions()->at(i)->GetName());
 		item->setWhatsThis(0,"Condition");
 
 		this->addTopLevelItem(item);
 
-		for (unsigned int j = 0; j < m_onEvent->GetConditions()->at(i)->GetEntities().size(); j++) //ändra här för helvete
+		for (unsigned int j = 0; j < m_onEvent->GetConditions()->at(i)->GetEntities().size(); j++)
 		{
 			QTreeWidgetItem* itemComp = new QTreeWidgetItem;
 			itemComp->setText(0,m_onEvent->GetConditions()->at(i)->GetEntities().at(j));

@@ -17,7 +17,7 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
 	
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if BAJSBAJSBAJS "));
+	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if TESTESTOFTHETEST", "if somethingTest == 0 then"));
 }
 
 AbilityEditor::~AbilityEditor()
@@ -41,7 +41,10 @@ void AbilityEditor::Init()
 	ui.listComponents->addItems(m_compNames);
 	for (unsigned int i = 0; i < m_conditions.size(); i++)
 	{
-		ui.listConditions->addItem(m_conditions.at(i)->GetText());
+		QListWidgetItem* item = new QListWidgetItem();
+		item->setText(m_conditions.at(i)->GetName());
+		item->setToolTip(m_conditions.at(i)->GetCode());
+		ui.listConditions->addItem(item);
 	}
 	
 	//ui.listAbilities->addItem("Empty Entity");

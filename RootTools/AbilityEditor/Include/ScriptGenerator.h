@@ -26,6 +26,9 @@ namespace AbilityEditorNameSpace
 		std::string m_name;
 		std::ofstream m_file;
 
+		float m_damage;
+		float m_knockback;
+
 		Entity* m_entity;
 	};
 }

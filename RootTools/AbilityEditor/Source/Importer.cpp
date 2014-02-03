@@ -52,7 +52,9 @@ namespace AbilityEditorNameSpace
 			{
 				std::string condName;
 				onCreate[i]["Condition"] >> condName;
-				Condition* cond = new Condition(condName.c_str());
+				std::string condCode;
+				onCreate[i]["Code"] >> condCode;
+				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
 				const YAML::Node& entities = onCreate[i]["Entities"];
 				for(unsigned int j = 0; j < entities.size(); j++)
 				{
@@ -68,8 +70,10 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0; i < onCollide.size(); i++)
 			{
 				std::string condName;
-				onCollide[i]["Condition"] >> condName;
-				Condition* cond = new Condition(condName.c_str());
+				onCreate[i]["Condition"] >> condName;
+				std::string condCode;
+				onCreate[i]["Code"] >> condCode;
+				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
 				const YAML::Node& entities = onCollide[i]["Entities"];
 				for(unsigned int j = 0; j < entities.size(); j++)
 				{
@@ -86,8 +90,10 @@ namespace AbilityEditorNameSpace
 			for(unsigned int i = 0; i < onDestroy.size(); i++)
 			{
 				std::string condName;
-				onDestroy[i]["Condition"] >> condName;
-				Condition* cond = new Condition(condName.c_str());
+				onCreate[i]["Condition"] >> condName;
+				std::string condCode;
+				onCreate[i]["Code"] >> condCode;
+				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
 				const YAML::Node& entities = onDestroy[i]["Entities"];
 				for(unsigned int j = 0; j < entities.size(); j++)
 				{
