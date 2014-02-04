@@ -14,7 +14,7 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Server::Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated)
+		Server::Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config)
 			: m_logger(p_logger)
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
@@ -44,7 +44,7 @@ namespace RootForce
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
-		void Server::Initialize()
+		void Server::Initialize( const RootSystems::ServerConfig& p_config, bool p_isDedicated )
 		{
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
