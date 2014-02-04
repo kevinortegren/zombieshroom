@@ -691,6 +691,8 @@ namespace RootForce
 									}
 								}
 
+								clientComponent->State = ClientState::CONNECTED;
+
 								// Send a user connected message for all clients to the connectee.
 								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
@@ -704,7 +706,7 @@ namespace RootForce
 
 									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
 										continue;
-									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
+									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
 									if(clientComponent->State != ClientState::CONNECTED)
 										continue;
 
@@ -735,7 +737,6 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
-								clientComponent->State = ClientState::CONNECTED;
 							}
 						} break;
 
