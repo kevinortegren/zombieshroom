@@ -162,6 +162,9 @@ namespace RootForce
 						if (m.IsYou)
 						{
 							g_engineContext.m_script->SetGlobalNumber("UserID", m.User);
+
+							// Set the client state
+							clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
 						}
 
 						// Call the OnCreate script
@@ -180,9 +183,6 @@ namespace RootForce
 						ECS::Entity* playerEntity = g_networkEntityMap[id];
 						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 						playerComponent->Name = m.Name;
-
-						// Set the client state
-						clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
 					}
 					else
 					{
