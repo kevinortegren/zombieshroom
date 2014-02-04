@@ -207,6 +207,10 @@ namespace RootForce
 						id.UserID = m.User;
 						id.ActionID = ReservedActionID::CONNECT;
 						id.SequenceID = 0;
+
+						if(!g_networkEntityMap[id])
+							break;
+
 						PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
