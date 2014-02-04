@@ -179,23 +179,6 @@ int main(int argc, char* argv[])
 				{			
 					ExportToLevel();
 				}
-				/////////////////////// UPDATE LOCATORS //////////////////////////////
-
-				if(type == "Locator")
-				{
-					//cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
-
-					//for(int i = 0; i < RM.PlocatorList[updateID]->transformation.nrOfFlags; i++)
-					//{
-					//	string temp = RM.PlocatorList[updateID]->transformation.flags[i];
-					//	if(temp == "Particle")
-					//		UpdateParticle(updateID);
-					//}
-
-					if(RM.PlocatorList[updateID]->transformation.flags._Particle)
-						UpdateParticle(updateID);
-				}
-
 
 				//UPDATE
 				while(localMessages.size() > 0)
@@ -910,7 +893,8 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
+			if(RM.PmeshList[MeshIndex]->MaterialID >= 0)
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 

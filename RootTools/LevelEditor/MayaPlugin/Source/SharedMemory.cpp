@@ -286,6 +286,12 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.flags = meshList[index].transformation.flags;		
 	}
 
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	PmeshList[index]->MaterialID = meshList[index].MaterialID;
+	PmeshList[index]->paintIndex = meshList[index].paintIndex;
+	ReleaseMutex(IdMutexHandle);
+
 	ReleaseMutex(MeshMutexHandle);
 }
 
@@ -335,7 +341,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 
 		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 		WaitForSingleObject(IdMutexHandle, milliseconds);
-		AddUpdateMessage("Mesh", meshID, true, true, false);
+		//AddUpdateMessage("Mesh", meshID, true, true, false);
 		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
 		PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
 		ReleaseMutex(IdMutexHandle);

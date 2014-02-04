@@ -704,6 +704,8 @@ void getLocatorFlags(MObject object, int index)
 					SM.locatorList[index].transformation.flags._Particle = true;
 				if(name == "SpawnPoint")
 					SM.locatorList[index].transformation.flags._SpawnPoint = true;
+				if(name == "Water")
+					SM.locatorList[index].transformation.flags._Water = true;
 
 				//for(int j = 0; j < g_maxNrOfFlags; j ++)
 				//{
@@ -1320,22 +1322,25 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		//}
 
 		//PAINT STUFF
-		GivePaintId(meshIndex, texPath);
-		if(SM.meshList[meshIndex].paintIndex != -1)
-		{
-			MString Red, Green, Blue;
-			int tileFactor;
-
-			ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
-			
-			if(painting)
+		if(painted || painting)
+		{		
+			GivePaintId(meshIndex, texPath);
+			if(SM.meshList[meshIndex].paintIndex >= 0)
 			{
-				MObject temp = texture_node.object();
-				texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+				MString Red, Green, Blue;
+				int tileFactor;
+
+				ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
+
+				if(painting)
+				{
+					MObject temp = texture_node.object();
+					texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+				}
+
+				PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor, painting);
+
 			}
-			
-			PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor, painting);
-			
 		}
 
 		//Check if the material already exists.
