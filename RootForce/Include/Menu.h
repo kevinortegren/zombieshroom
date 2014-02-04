@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine\Include\GameSharedContext.h>
+#include <RootForce/Include/SettingsMenu.h>
 
 namespace RootForce
 {
@@ -49,6 +50,7 @@ namespace RootForce
 
 		std::string GetMapList();
 
+		SettingsMenu* m_settingsMenu;
 		Awesomium::WebView* m_view;
 		std::vector<MenuEvent::MenuEvent> m_event;
 		RootEngine::GameSharedContext m_context;

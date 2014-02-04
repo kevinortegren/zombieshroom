@@ -1,16 +1,16 @@
 $(document).ready(function() {
 
-	$("#ingame-return").click(function() {
+	$("#ingame-return").mouseup(function() {
 		IngameMenu.Return();
 	  } );
 	  
-	  $("#ingame-settings").click(function() {
+	  $("#ingame-settings").mouseup(function() {
 		$("#ingame-menu").css("display", "none");
 		$("#settings-menu").css("display", "table");
 		//LoadSettings();
 	  } );
 
-	$("#ingame-exit").click(function() {
+	$("#ingame-exit").mouseup(function() {
 		IngameMenu.Exit();
 	  } );
   

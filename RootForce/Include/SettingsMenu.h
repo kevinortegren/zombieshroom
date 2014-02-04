@@ -11,14 +11,14 @@ namespace RootForce
 	class SettingsMenu
 	{
 	public:
-		SettingsMenu(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext p_context);
+		SettingsMenu(RootEngine::GameSharedContext p_context);
 		~SettingsMenu();
-		Awesomium::WebView* GetView() { return m_view; }
+		void BindEvents(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher);
 	private:
 		Awesomium::JSValue RequestSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 
-		Awesomium::WebView* m_view;
+
 		RootEngine::GameSharedContext m_context;
 		std::string m_workingDir;
 

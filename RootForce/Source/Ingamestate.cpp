@@ -238,25 +238,6 @@ namespace RootForce
 		if (debugEntity != nullptr)
 			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
 
-		// Check for quitting condition
-		if (m_ingameMenu->GetExit())
-		{
-			return GameStates::Menu;
-		}
-
-		//Check status for the display of the ingame menu
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			m_displayIngameMenu = true;
-			g_engineContext.m_inputSys->LockMouseToCenter(false);
-		}
-		if (m_ingameMenu->GetReturn())
-		{
-			m_displayIngameMenu = false;
-			g_engineContext.m_inputSys->LockMouseToCenter(true);
-			m_ingameMenu->Reset();
-		}
-
 		// Check for disconnection from the server
 		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
 		{
@@ -494,6 +475,25 @@ namespace RootForce
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
+		}
+
+		// Check for quitting condition
+		if (m_ingameMenu->GetExit())
+		{
+			return GameStates::Menu;
+		}
+
+		//Check status for the display of the ingame menu
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_displayIngameMenu = true;
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
+		}
+		if (m_ingameMenu->GetReturn())
+		{
+			m_displayIngameMenu = false;
+			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_ingameMenu->Reset();
 		}
 
 		return GameStates::Ingame;

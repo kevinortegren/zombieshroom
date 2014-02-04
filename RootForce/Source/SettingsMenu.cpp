@@ -4,9 +4,8 @@ namespace RootForce
 {
 
 
-	SettingsMenu::SettingsMenu( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext p_context )
+	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context )
 	{
-		m_view = p_view;
 		m_context = p_context;
 	}
 
@@ -44,6 +43,17 @@ namespace RootForce
 			);
 
 		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
+	}
+
+	void SettingsMenu::BindEvents( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher)
+	{
+		Awesomium::JSValue result = p_view->CreateGlobalJavascriptObject(Awesomium::WSLit("Menu"));
+
+		if(result.IsObject() && result.ToObject().type() != Awesomium::kJSObjectType_Local)
+		{
+			p_dispatcher->BindWithRetVal(result.ToObject(), Awesomium::WSLit("RequestSettings"), JSDelegateWithRetval(this, &SettingsMenu::RequestSettingsEvent));
+			p_dispatcher->Bind(result.ToObject(), Awesomium::WSLit("SaveSettings"), JSDelegate(this, &SettingsMenu::SaveSettingsEvent));
+		}
 	}
 
 }

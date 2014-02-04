@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine\Include\GameSharedContext.h>
+#include <RootForce/Include/SettingsMenu.h>
 
 namespace RootForce
 {
@@ -21,6 +22,7 @@ namespace RootForce
 		void Return(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void Exit(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 
+		SettingsMenu* m_settingsMenu;
 		Awesomium::WebView* m_view;
 		RootEngine::GameSharedContext m_context;
 
