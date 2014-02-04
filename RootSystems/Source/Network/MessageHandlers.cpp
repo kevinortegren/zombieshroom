@@ -674,6 +674,13 @@ namespace RootForce
 										n.IsYou = false;
 										n.Name = RakNet::RakString(playerComponent->Name.c_str());
 
+										NetworkEntityID id(n.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY);
+										if(!g_networkEntityMap[id])
+											continue;
+										ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
+										if(clientComponent->State != ClientState::CONNECTED)
+											continue;
+
 										RakNet::BitStream bs;
 										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 										bs.Write(RakNet::GetTime());
@@ -694,6 +701,9 @@ namespace RootForce
 									id.SequenceID = 0;
 
 									if(!g_networkEntityMap[id])
+										continue;
+									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
+									if(clientComponent->State != ClientState::CONNECTED)
 										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
