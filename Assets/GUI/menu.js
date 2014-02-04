@@ -139,6 +139,13 @@ $(document).ready(function() {
   $("#lan-host-submit").click(function() {
     var selectedIndex = $("#lan-host-map")[0].selectedIndex;
 		
+		if(parseFloat($("#lan-host-maxplayers").val()) < parseFloat($("#lan-host-maxplayers").attr("min")))
+			$("#lan-host-maxplayers").val($("#lan-host-maxplayers").attr("min"));
+		if(parseFloat($("#lan-host-matchlength").val()) < parseFloat($("#lan-host-matchlength").attr("min")))
+			$("#lan-host-matchlength").val($("#lan-host-matchlength").attr("min"));
+		if(parseFloat($("#lan-host-killvictory").val()) < parseFloat($("#lan-host-killvictory").attr("min")))
+			$("#lan-host-killvictory").val($("#lan-host-killvictory").attr("min"));
+		
     var settings = {};
     settings["ServerName"] = $("#lan-host-name").val();
     settings["ServerMapfile"] = $("#lan-host-map")[0].options[selectedIndex].text;

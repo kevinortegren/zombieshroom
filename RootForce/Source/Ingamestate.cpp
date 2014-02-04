@@ -220,10 +220,11 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-		m_networkContext.m_client = nullptr;
-		m_networkContext.m_clientMessageHandler = nullptr;
-		m_networkContext.m_server = nullptr;
-		m_networkContext.m_serverMessageHandler = nullptr;
+
+		// Disable the message handlers while resetting the server (to avoid null entities etc.)
+		if(m_networkContext.m_server.get() != nullptr)
+			m_networkContext.m_server->SetMessageHandler(nullptr);
+		m_networkContext.m_client->SetMessageHandler(nullptr);
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
