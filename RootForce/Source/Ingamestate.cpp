@@ -213,6 +213,9 @@ namespace RootForce
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
 
+		// Disable message handler while resetting the server (to avoid null entities etc.)
+		m_networkContext.m_server->SetMessageHandler(nullptr);
+
 		/*m_networkContext.m_client = nullptr;
 		m_networkContext.m_clientMessageHandler = nullptr;
 		m_networkContext.m_server = nullptr;
