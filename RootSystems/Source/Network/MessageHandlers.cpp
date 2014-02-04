@@ -686,6 +686,9 @@ namespace RootForce
 									id.ActionID = ReservedActionID::CONNECT;
 									id.SequenceID = 0;
 
+									if(!g_networkEntityMap[id])
+										continue;
+
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 									// Craft message
