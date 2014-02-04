@@ -63,7 +63,7 @@ namespace RootForce
 		// Host
 		if (p_playData.Host)
 		{
-			if(!!m_networkContext.m_server)
+			if(!m_networkContext.m_server)
 			{
 				// Setup the server and connect a local client
 				m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false));
