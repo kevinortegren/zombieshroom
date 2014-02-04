@@ -689,7 +689,7 @@ namespace RootForce
 								{
 									// Get player information
 									NetworkEntityID id;
-									id.UserID = i;
+									id.UserID = m_peer->GetIndexFromSystemAddress(addresses[i]);
 									id.ActionID = ReservedActionID::CONNECT;
 									id.SequenceID = 0;
 
@@ -700,8 +700,8 @@ namespace RootForce
 
 									// Craft message
 									NetworkMessage::UserConnected n;
-									n.User = i;
-									n.IsYou = n.User == i;
+									n.User = id.UserID;
+									n.IsYou = n.User == m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
 									RakNet::BitStream bs;
