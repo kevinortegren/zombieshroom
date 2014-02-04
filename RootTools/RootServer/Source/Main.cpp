@@ -111,10 +111,10 @@ void Main::Start()
 	m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(&m_world, &g_engineContext));
 
 	// Initialize the server
-	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, m_worldSystem.get(), conf));
+	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf));
 	m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_server->GetPeerInterface(), &m_world));
 	m_server->SetMessageHandler(m_serverMessageHandler.get());
-	m_server->Initialize(conf, true);
+	m_server->Initialize(m_worldSystem.get(), conf, true);
 
 	// Start the main loop
 	uint64_t old = SDL_GetPerformanceCounter();
