@@ -40,7 +40,9 @@ namespace LogLevel
 		SUCCESS,
 		DEBUG_PRINT,
 		INIT_PRINT,
-		MASS_DATA_PRINT
+		START_PRINT,
+		PINK_PRINT,
+		MASS_DATA_PRINT,
 	};
 }
 
@@ -48,29 +50,12 @@ class LoggingInterface
 {
 public:
 
-		virtual void LTF(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LTF(std::string p_func, int p_line,const char* p_format, ...) = 0;
-		
-		virtual void LTC(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LTC(std::string p_func, int p_line,const char* p_format, ...) = 0;
-
 		virtual void LT(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
-		virtual void LT(std::string p_func, int p_line,const char* p_format, ...) = 0;
 
 		virtual void LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...) = 0;
 
-		virtual bool OpenLogStream() = 0;
-		virtual bool CloseLogStream() = 0;
-
-		virtual void SetVerboseLevel(LogLevel::LogLevel p_vLevel) = 0;
-
-		virtual void AddExclusiveTags(LogTag::LogTag p_tag) = 0;
-
 		//Dummy methods to identify functions from other parts of the system
-		void LogTextToFile(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...){};
-		void LogTextToConsole(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...){};
 		void LogText(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...){};
-
 };
 
 class Logging : public LoggingInterface
@@ -79,25 +64,14 @@ class Logging : public LoggingInterface
 		Logging();
 		~Logging();
 
-		
-		void LTF(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LTF(std::string p_func, int p_line,const char* p_format, ...);
-		
-		void LTC(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LTC(std::string p_func, int p_line,const char* p_format, ...);
-
 		void LT(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
-		void LT(std::string p_func, int p_line,const char* p_format, ...);
 
 		void LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...);
 
+	private:
+
 		bool OpenLogStream();
 		bool CloseLogStream();
-
-		void SetVerboseLevel(LogLevel::LogLevel p_vLevel);
-
-		void AddExclusiveTags(LogTag::LogTag p_tag);
-	private:
 
 		FILE* m_logFile;
 		FILE* m_commaFile;
@@ -127,5 +101,3 @@ class Logging : public LoggingInterface
 };
 //(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)
 #define LogText(...) LT(__FUNCTION__, __LINE__, ##__VA_ARGS__)
-#define LogTextToFile(...) LTF(__FUNCTION__,  __LINE__, ##__VA_ARGS__)
-#define LogTextToConsole(...) LTC(__FUNCTION__,  __LINE__, ##__VA_ARGS__)

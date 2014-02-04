@@ -44,6 +44,8 @@ namespace RootForce
 
 	void IngameState::Initialize()
 	{
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -197,7 +199,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateRenderable();
+		m_waterSystem->CreateWater(0.0f);
 	}
 
 	void IngameState::Exit()

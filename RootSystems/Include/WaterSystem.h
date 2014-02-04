@@ -12,14 +12,14 @@ namespace RootForce
 	struct WaterSystem : public ECS::VoidSystem
 	{
 		WaterSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_context)
-			: ECS::VoidSystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f)
+			: ECS::VoidSystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true)
 		{}
 
 		void Init();
 		void Begin();
 		void Process();
 		void End();
-		void CreateRenderable();
+		void CreateWater(float p_height);
 		void Disturb(float p_x, float p_z, float p_power);
 		void InitDisturb();
 		

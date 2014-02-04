@@ -11,41 +11,41 @@
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
 {
-	Render::g_context.m_logger->LogText("message: %s", message);
-	Render::g_context.m_logger->LogText("type: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "message: %s", message);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT,"type: ");
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR:
-		Render::g_context.m_logger->LogText("ERROR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("DEPRECATED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("UNDEFINED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		Render::g_context.m_logger->LogText("PORTABILITY");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		Render::g_context.m_logger->LogText("PERFORMANCE");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		Render::g_context.m_logger->LogText("OTHER");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "OTHER");
 		break;
 	}
 
-	Render::g_context.m_logger->LogText("id: %i", id);
-	Render::g_context.m_logger->LogText("severity: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "id: %i", id);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "severity: ");
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_LOW:
-		Render::g_context.m_logger->LogText("LOW");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "LOW");
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		Render::g_context.m_logger->LogText("MEDIUM");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "MEDIUM");
 		break;
 	case GL_DEBUG_SEVERITY_HIGH:
-		Render::g_context.m_logger->LogText("HIGH");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "HIGH");
 		break;
 	}
 }
@@ -97,7 +97,7 @@ namespace Render
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
-			g_context.m_logger->LogText("%s", SDL_GetError());
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "%s", SDL_GetError());
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -594,10 +594,10 @@ namespace Render
 		
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
-
+		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 		m_lighting.Clear();
 		m_lighting.Process(m_fullscreenQuad);
-
+		//m_gbuffer.m_depthTexture->Unbind(10);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 

@@ -6,47 +6,9 @@ namespace RootForce
 {
 	void WaterSystem::Init()
 	{
-		m_pause = false;
 		m_maxX = m_maxZ = 1024;
 		m_scale = 40.0f;
-
-		//Create empty textures for compute shader swap
-		m_texture[0] = m_context->m_renderer->CreateTexture();
-		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
-		m_texture[0]->SetAccess(GL_READ_WRITE);
-		m_texture[1] = m_context->m_renderer->CreateTexture();
-		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
-		m_texture[1]->SetAccess(GL_READ_WRITE);
-		m_texture[2] = m_context->m_renderer->CreateTexture();
-		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
-		m_texture[2]->SetAccess(GL_READ_WRITE);
-
-		//Create compute effect
-		m_effect	= m_context->m_resourceManager->LoadEffect("WaterCompute");
-
-		m_computeJob.m_effect		= m_effect;
-		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
-		m_computeJob.m_textures[0]	= m_texture[0];
-		m_computeJob.m_textures[1]	= m_texture[1];
-		m_computeJob.m_textures[2]  = m_texture[2];
-		//Set standard values
-		m_speed		= 10.0f;
-		m_dx		= (m_scale*64.0f) / m_maxZ;
-		m_timeStep	= 0.032f;
-		m_damping	= 0.0f;
-
-		//Calculate MK1, MK2 and MK3 with standard values
-		CalculateWaterConstants();
-
-		m_computeJob.m_params[Render::Semantic::MK1]	= &m_mk1;
-		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
-		m_computeJob.m_params[Render::Semantic::MK3]	= &m_mk3;
-		m_computeJob.m_params[Render::Semantic::DX]		= &m_dx;
-		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
-		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
-		
 		m_dt = 0;
-		
 	}
 
 	void WaterSystem::Begin()
@@ -79,12 +41,56 @@ namespace RootForce
 
 	}
 
-	void WaterSystem::CreateRenderable()
+	void WaterSystem::CreateWater(float p_height)
 	{
-		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
+		//Only one water entity can be created
+		if(m_renderable)
+		{
+			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water entity already created!");
+			return;
+		}
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");
 
+		//Create empty textures for compute shader swap. Texture 0 and 1 are used for height values and texture 2 is used for normals.
+		m_texture[0] = m_context->m_renderer->CreateTexture();
+		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[0]->SetAccess(GL_READ_WRITE);
+		m_texture[1] = m_context->m_renderer->CreateTexture();
+		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[1]->SetAccess(GL_READ_WRITE);
+		m_texture[2] = m_context->m_renderer->CreateTexture();
+		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->SetAccess(GL_READ_WRITE);
+
+		//Create compute effect
+		m_effect = m_context->m_resourceManager->LoadEffect("WaterCompute");
+
+		//Setup compute job
+		m_computeJob.m_effect		= m_effect;
+		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
+		m_computeJob.m_textures[0]	= m_texture[0];
+		m_computeJob.m_textures[1]	= m_texture[1];
+		m_computeJob.m_textures[2]  = m_texture[2];
+		m_computeJob.m_params[Render::Semantic::MK1]	= &m_mk1;
+		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
+		m_computeJob.m_params[Render::Semantic::MK3]	= &m_mk3;
+		m_computeJob.m_params[Render::Semantic::DX]		= &m_dx;
+		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
+		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
+
+		//Set standard values
+		m_speed		= 10.0f;
+		m_dx		= (m_scale*64.0f) / m_maxZ;
+		m_timeStep	= 0.032f;
+		m_damping	= 0.0f;
+
+		//Calculate MK1, MK2 and MK3 with standard values
+		CalculateWaterConstants();
+
+		//Create water entity
+		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
-		trans->m_position = glm::vec3(0,0,0);
+		trans->m_position = glm::vec3(0,p_height,0); //Set Y-position to in-parameter
 		trans->m_scale = glm::vec3(m_scale,1,m_scale);
 
 		//Create a renderable component for the water
@@ -92,15 +98,26 @@ namespace RootForce
 		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("64x64grid"); //Load a grid mesh, this could be done in code instead
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] =  m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
-		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; //Camera position in world space
+		//Set textures to renderable
+		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
+		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
-		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
-		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); //Set primitive type to GL_PATCHES because we use tesselation
+
+		//Camera position in world space
+		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
+		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
+
+		//Set primitive type to GL_PATCHES because we use tesselation
+		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); 
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
 
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
+
+		//Start with some init disturbs
 		InitDisturb();
+
+		//Run water simulation
+		m_pause = false;
 	}
 
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
@@ -108,7 +125,7 @@ namespace RootForce
 		
 		float scaleHalfWidth = 32.0f * m_scale;
 		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
 		//Return if out of bounds
 		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
@@ -181,12 +198,12 @@ namespace RootForce
 
 	void WaterSystem::InitDisturb()
 	{
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < 50; ++i)
 		{ 
 			int x = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
 			int z = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
 
-			Disturb((float)x, (float)z, 5.0f);
+			Disturb((float)x, (float)z, 10.0f);
 		}
 	}
 
