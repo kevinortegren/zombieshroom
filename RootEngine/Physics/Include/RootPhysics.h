@@ -112,7 +112,7 @@ namespace RootEngine
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
 
-			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform ) = 0;
+			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20] ) = 0;
 
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -172,7 +172,7 @@ namespace RootEngine
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
-			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform );
+			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex , glm::mat4 p_boneOffset[20] );
 
 			//Binds
 			void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);

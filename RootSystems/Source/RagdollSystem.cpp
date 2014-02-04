@@ -33,10 +33,17 @@ namespace RootForce
 				//renderable->m_model->m_animation->GetIndexFromBoneName()
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
+				glm::mat4 bones[20], boneOffset[20];
+				for(int i = 0; i < nameToIndex.size() ; i++ )
+				{
+					bones[i] = animation->m_bones[i];
+					boneOffset[i] = renderable->m_model->m_animation[0].GetBoneOffset(i);
+				}
 				
+					
 				//Starts the ragdoll in physics
-				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
-				
+				//m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
+				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset);
 				
 				ragdoll->m_firstTime = false;
 				
@@ -50,7 +57,7 @@ namespace RootForce
 				if(bones != nullptr)
 					for(int i = 0; i < 14; i++)
 					{
-						animation->m_bones[i] = bones[i] * renderable->m_model->m_animation[0].GetBoneOffset(i);
+						animation->m_bones[i] = bones[i] * (renderable->m_model->m_animation[0].GetBoneOffset(i));
 					}
 			}
 		

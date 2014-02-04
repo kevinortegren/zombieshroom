@@ -1,7 +1,7 @@
 AbilityBall = {};
-AbilityBall.damage = -1;
+AbilityBall.damage = 4;
 AbilityBall.pushback = 0;
-AbilityBall.cooldown = 0;
+AbilityBall.cooldown = 5;
 
 function AbilityBall.OnCreate (userId, actionId)
 	local self = Entity.New();

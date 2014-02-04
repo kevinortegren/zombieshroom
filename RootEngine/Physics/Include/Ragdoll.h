@@ -8,6 +8,27 @@
 #include <Bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 namespace Ragdoll
 {
+	namespace BodyPart
+	{
+		enum BodyPart
+		{
+			RIGHTHAND,
+			RIGHTFOREARM,
+			RIGHTARM,
+			LEFTHAND,
+			LEFTFOREARM,
+			LEFTARM,
+			SPINE,
+			RIGHTFOOT,
+			RIGHTLEG,
+			RIGHTUPLEG,
+			LEFTFOOT,
+			LEFTLEG,
+			LEFTUPLEG,
+			HIPS,
+			TOTAL_BONE_AMUNT
+		};
+	}
 	class Ragdoll
 	{
 	public:
@@ -15,7 +36,7 @@ namespace Ragdoll
 		~Ragdoll();
 		void Activate(glm::mat4 p_bones[20], glm::mat4 p_transform);
 		void Deactivate();
-		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos );
+		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20] );
 		btVector3 GetPos();
 		glm::mat4* GetBones();
 		btQuaternion GetOrientation();
@@ -23,7 +44,7 @@ namespace Ragdoll
 		void SetVelocity(const btVector3& p_velocity);
 	private:
 		btDiscreteDynamicsWorld* m_dynamicWorld;
-		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos, int p_massFactor );
+		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode,  glm::mat4 p_transform , int p_massFactor );
 		btCollisionShape* CreateBone(std::string p_name);
 		void SetBoneRelation(int p_parentIndex, int p_childIndex, glm::mat4 p_pose);
 		void CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
@@ -34,8 +55,10 @@ namespace Ragdoll
 		glm::mat4 m_boneTransform[20];
 		glm::mat4 m_prevPos[20];
 		glm::mat4 m_lastBoneMatrix[20];
+		glm::mat4 m_boneOffset[20];
 		int m_boneToFollow[20];
-		
+		btVector3 m_bodyPosOffset[20];
+		std::map<std::string, int> m_nameToIndex;
 		int m_constraintCounter;
 		bool m_firsttime;
 	};

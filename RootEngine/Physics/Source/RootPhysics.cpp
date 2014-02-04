@@ -1287,7 +1287,7 @@ namespace Physics
 		return false;
 	}
 
-	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform )
+	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20])
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -1328,7 +1328,7 @@ namespace Physics
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
 			matrix = glm::make_mat4(data);
-			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, matrix, m_playerObjects.at(indexplayer)->GetPosition());
+			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, matrix, p_boneOffset);
 			//skape ragdoll fanskapet
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
