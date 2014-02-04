@@ -20,6 +20,8 @@
             slot: 1
           - name: g_Normal
             slot: 2
+          - name: g_CubeMap
+            slot: 3
           - name: g_LA
             slot: 5
       flags:

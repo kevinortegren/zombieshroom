@@ -8,7 +8,6 @@
     - 8
     - 9
     - 10
-    - 11
     - 12
     - 13
     - 14
@@ -236,12 +235,6 @@
             TextureGreen: rock_clear
             TextureBlue: simpleRock
             TileFactor: 16
-        - Entity: 11
-          Model: GroundPlaneShape
-          Material:
-            Name: Water
-            Effect: Mesh
-            Diffuse: water
         - Entity: 12
           Model: Palm1MeshShape
           Material:
@@ -1601,10 +1594,6 @@
           Position: [41.7823, 79.1445, -315.696]
           Rotation: [-0.0251996, 0.98798, -0.0229701, 0.150774]
           Scale: [0.711459, 0.711459, 0.711459]
-        - Entity: 11
-          Position: [435.122, -4.87318, 8.77607]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
         - Entity: 12
           Position: [31.7926, -5.99671, -55.9494]
           Rotation: [0, 0, 0, 1]
@@ -2431,8 +2420,6 @@
           MeshHandle: GroundPlaneShape0
         - Entity: 10
           MeshHandle: MountainShape0
-        - Entity: 11
-          MeshHandle: GroundPlaneShape0
         - Entity: 12
           MeshHandle: Palm1MeshShape0
         - Entity: 13

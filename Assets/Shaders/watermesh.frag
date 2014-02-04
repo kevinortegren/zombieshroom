@@ -8,8 +8,8 @@ layout (location = 1) out vec2 normals;
 layout (location = 2) out vec4 glow;
 layout (location = 3) out vec4 background;
 
-uniform samplerCube g_Specular;
-//uniform samplerCube CubeMap;
+uniform sampler2D g_Specular;
+uniform samplerCube g_CubeMap;
 uniform sampler2D g_LA;
 uniform sampler2D g_Normal;
 
@@ -39,11 +39,11 @@ void main()
 	//Reflection calculations
 	vec3 incident	= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW		= reflect(incident, normalize(normalMap));
-	vec3 frag_color = texture(g_Specular, refW).xyz;
-	 
+	vec3 frag_color = texture(g_CubeMap, refW).xyz;
+	vec3 waterTexColor = texture(g_Specular, TexCoord_FS_in).rgb; 
 	vec3 trans = la + frag_color.rgb*0.3f;
-	diffuse = vec4(vec3(0.0f, 0.0f, 0.1f), 0.6f);
+	diffuse = vec4(waterTexColor, 0.6f);
 	normals = vec2(viewNormal.xy);
 	glow = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	background = vec4(trans, 0.3f);
+	background = vec4(trans, 0.4f);
 }

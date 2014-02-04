@@ -92,7 +92,8 @@ namespace RootForce
 		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("64x64grid"); //Load a grid mesh, this could be done in code instead
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); //Diffuse texture(Will probably be removed)
+		m_renderable->m_material->m_textures[Render::TextureSemantic::DEPTH] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
+		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] =  m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; //Camera position in world space
 		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
 		m_renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("MeshWater");
@@ -185,7 +186,7 @@ namespace RootForce
 			int x = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
 			int z = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
 
-			Disturb((float)x, (float)z, 20.0f);
+			Disturb((float)x, (float)z, 5.0f);
 		}
 	}
 
