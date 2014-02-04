@@ -34,7 +34,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(10);
+	playerPhysics:SetMovementSpeed(20);
 	playerPhysics:SetJumpForce(20);
 
 	collision:SetMeshHandle("testchar0");

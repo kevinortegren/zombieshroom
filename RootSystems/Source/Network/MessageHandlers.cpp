@@ -548,6 +548,10 @@ namespace RootForce
 					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
 					ECS::Entity* client = g_networkEntityMap[id];
+
+					if(!client) //Skip the message if the client does not exist
+						break;
+
 					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
 
 					id.SequenceID = 0;
