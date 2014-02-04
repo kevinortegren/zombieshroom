@@ -11,7 +11,7 @@
 
 #define QUADTREE_POLYGONS_PER_NODE 10000
 #define QUAD_MAX_CHILDS 4
-//#define SUBDIVIDE
+#define SUBDIVIDE
 
 namespace RootForce
 {
@@ -88,7 +88,9 @@ namespace RootForce
 		void Subdivide( QuadNode* p_node, std::vector<Polygon> p_polygons );	
 		PolygonSplit SplitPolygon(PlaneEx& p_divider, Polygon& p_polygon);
 		Side::Side ClassifyPoint(PlaneEx& p_divider, glm::vec3 p_position) const;
-		unsigned SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1);
+
+		unsigned SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV1T1BT& p_p0, Render::Vertex1P1N1UV1T1BT& p_p1);
+
 		glm::vec2 CalcXZCenter(const Polygon& p_polygon) const;
 		std::vector<Triangle> Trianglulate(const std::vector<Polygon>& p_polygons) const;
 		std::vector<unsigned> CreateEntities(std::vector<Triangle>& p_triangles);
@@ -98,8 +100,10 @@ namespace RootForce
 		ECS::World* m_world;
 
 		std::vector<ECS::Entity*> m_entities;
-		std::vector<Render::Vertex1P1N1UV> m_vertices;
+		std::vector<Render::Vertex1P1N1UV1T1BT> m_vertices;
+		
 		std::vector<Render::Material*> m_materials;
+		std::vector<int> m_sizes;
 
 		int m_minY, m_maxY;	
 	};

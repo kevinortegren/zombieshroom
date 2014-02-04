@@ -9,24 +9,26 @@
           slot: 0
         - name: g_Specular
           slot: 1
+        - name: g_Normal
+          slot: 2
         - name: g_Glow
           slot: 3
       programs:
         - name: staticmesh
           shaders:
-            - name: staticmesh
+            - name: staticmesh_normal
               type: vertex
-            - name: mesh
+            - name: mesh_normal
               type: fragment
               
-    -  name: StaticMeshShadow
+    -  name: Mesh_Normal_Shadow
        bindings:
          - name: PerFrame
            slot: 0
        flags:
          - name: Shadow
        programs:
-         - name: staticmesh_shadow
+         - name: Shadow
            shaders:
              - name: staticmesh_shadow
                type: vertex

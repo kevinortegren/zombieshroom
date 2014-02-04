@@ -32,6 +32,7 @@ namespace RootForce
 	{
 		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 0.0f));
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
+
 	}
 
 	void WorldSystem::CreateSun()
