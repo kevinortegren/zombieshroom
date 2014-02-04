@@ -22,14 +22,21 @@ namespace RootForce
 		void CreateRenderable();
 		void Disturb(float p_x, float p_z, float p_power);
 		void InitDisturb();
-		void ToggleWireFrame();
+		
 		void CalculateWaterConstants();
 
 		void SetDamping(float p_damping);
-		void SetDx(float p_dx);
 		void SetSpeed(float p_speed);
-		
-		bool m_pause;
+
+		void IncreaseDamping();
+		void IncreaseSpeed();
+
+		void DecreaseDamping();
+		void DecreaseSpeed();
+
+		void TogglePause();
+		void ToggleWireFrame();
+
 
 	private:
 
@@ -42,10 +49,10 @@ namespace RootForce
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;
 
-		bool	m_wireFrame;
+		bool	m_wireFrame, m_pause;
 		int		m_maxX, m_maxZ;	
 		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
 
-		
+		bool ValidValues();
 	};
 }

@@ -8,7 +8,8 @@ namespace RootForce
 	{
 		m_pause = false;
 		m_maxX = m_maxZ = 1024;
-		
+		m_scale = 40.0f;
+
 		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();
 		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
@@ -29,8 +30,8 @@ namespace RootForce
 		m_computeJob.m_textures[1]	= m_texture[1];
 		m_computeJob.m_textures[2]  = m_texture[2];
 		//Set standard values
-		m_speed		= 20.0f;
-		m_dx		= 1400.0f / m_maxZ;
+		m_speed		= 10.0f;
+		m_dx		= (m_scale*64.0f) / m_maxZ;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -55,21 +56,21 @@ namespace RootForce
 
 	void WaterSystem::Process()
 	{
-		if(!m_pause)
+		if(m_pause)//Don't calculate if paused
+			return;
+
+		m_dt += m_world->GetDelta();
+		//Only simulate water every time step
+		if(m_dt >= m_timeStep)
 		{
-			m_dt += m_world->GetDelta();
-			//Only simulate water every time step
-			if(m_dt >= m_timeStep)
-			{
-				//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
-				m_context->m_renderer->Compute(&m_computeJob);
-				//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
-				m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
-				//Swap the textures for next simulation step
-				std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
-				//Reset timer and preserve non-exact time additions
-				m_dt -= m_timeStep;
-			}
+			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
+			m_context->m_renderer->Compute(&m_computeJob);
+			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
+			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
+			//Swap the textures for next simulation step
+			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
+			//Reset timer and preserve non-exact time additions
+			m_dt -= m_timeStep;
 		}
 	}
 
@@ -80,7 +81,6 @@ namespace RootForce
 
 	void WaterSystem::CreateRenderable()
 	{
-		m_scale = 10.0f;
 		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
 
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
@@ -89,7 +89,7 @@ namespace RootForce
 
 		//Create a renderable component for the water
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
-		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("256planeUV"); //Load a grid mesh, this could be done in code instead
+		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("64x64grid"); //Load a grid mesh, this could be done in code instead
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 
 		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); //Diffuse texture(Will probably be removed)
@@ -105,9 +105,9 @@ namespace RootForce
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
 	{
 		
-		float scaleHalfWidth = 70.0f * m_scale;
+		float scaleHalfWidth = 32.0f * m_scale;
 		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
-		g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
 		//Return if out of bounds
 		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
@@ -115,26 +115,47 @@ namespace RootForce
 
 		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
 		m_computeJob.m_textures[1]->Bind(0);
-		std::vector<float> emptyData(1, p_power);
-		std::vector<float> emptyDataHalf(1, p_power/2.0f);
+		std::vector<float> emptyDataHalf(1, p_power/6.0f);
 		
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
+		//glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+
 
 		m_computeJob.m_textures[1]->Unbind(0);
 	}
 
 	void WaterSystem::ToggleWireFrame()
 	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water wireframe toggled!");
 		m_wireFrame = m_wireFrame ? false : true;
 		m_renderable->m_model->m_meshes[0]->SetWireFrame(m_wireFrame);
 	}
 
+	void WaterSystem::TogglePause()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water pause toggled!");
+		m_pause = m_pause ? false : true;
+	}
+
 	void WaterSystem::CalculateWaterConstants()
 	{
+		if(!ValidValues())
+		{
+			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Values are not valid!");
+			return;
+		}
+
 		float dts2		= m_damping*m_timeStep+2.0f;
 		float stsdx		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
 
@@ -146,18 +167,14 @@ namespace RootForce
 	void WaterSystem::SetDamping( float p_damping )
 	{
 		m_damping = p_damping;
-		CalculateWaterConstants();
-	}
-
-	void WaterSystem::SetDx( float p_dx )
-	{
-		m_dx = p_dx;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water damping set to: %f", p_damping);
 		CalculateWaterConstants();
 	}
 
 	void WaterSystem::SetSpeed( float p_speed )
 	{
 		m_speed = p_speed;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water speed set to: %f", p_speed);
 		CalculateWaterConstants();
 	}
 
@@ -165,10 +182,53 @@ namespace RootForce
 	{
 		for(int i = 0; i < 20; ++i)
 		{ 
-			int x = (10 + rand() % (120*(int)m_scale)) - 70*(int)m_scale;
-			int z = (10 + rand() % (120*(int)m_scale)) - 70*(int)m_scale;
+			int x = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
+			int z = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
 
-			Disturb((float)x, (float)z, 1.0f);
+			Disturb((float)x, (float)z, 20.0f);
 		}
 	}
+
+	void WaterSystem::IncreaseDamping()
+	{
+		m_damping += 0.1f;
+		if(m_damping > 1.0f)
+			m_damping = 1.0f;
+		SetDamping(m_damping);
+	}
+
+	void WaterSystem::IncreaseSpeed()
+	{
+		m_speed += 2.0f;
+		if(m_speed > 500.0f)
+			m_speed = 500.0f;
+		SetSpeed(m_speed);
+	}
+
+	void WaterSystem::DecreaseDamping()
+	{
+		m_damping -= 0.1f;
+		if(m_damping < 0.0f)
+			m_damping = 0.0f;
+		SetDamping(m_damping);
+	}
+
+	void WaterSystem::DecreaseSpeed()
+	{
+		m_speed -= 2.0f;
+		if(m_speed < 0.0f)
+			m_speed = 0.0f;
+		SetSpeed(m_speed);
+	}
+
+	bool WaterSystem::ValidValues()
+	{
+		float calc = (m_dx/(2*m_timeStep))*std::sqrtf(m_damping*m_timeStep+2);
+		if(m_speed > 0 && m_speed < calc)
+			return true;
+		else 
+			return false;
+	}
+
+
 }

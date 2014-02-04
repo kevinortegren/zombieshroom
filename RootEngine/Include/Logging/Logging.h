@@ -25,7 +25,8 @@ namespace LogTag
 		INPUT,
 		RESOURCE,
 		SCRIPT,
-		ANIMATION
+		ANIMATION,
+		WATER,
 	};
 }
 

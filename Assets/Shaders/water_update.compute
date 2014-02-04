@@ -30,18 +30,6 @@ void main()
 	
 	imageStore(prevTex, storePos, vec4(mk1 * prev + mk2 * curr + mk3 * (a+b+c+d), 0.0f, 0.0f, 0.0f));
 
-	/*vec3 n;
-	vec3 va = normalize(vec3(2*dx, a - b, 0));
-	vec3 vb = normalize(vec3(0, c - d, 2*dx));
-	n = cross(vb, va);*/
-
-	//vec3 n;
-	//n.x = b-a;
-	//n.y = 2;
-	//n.z = d-c;
-	//n = normalize(n);
-
-	//Try this instead:
 	vec3 n;
 	n.x = b-a; //dx
 	n.z = d-c; //dz

@@ -157,11 +157,11 @@ namespace RootEngine
 			std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
 
 			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
-				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
-				const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
-				const aiVector3D* pTangent   = &(p_aiMesh->mTangents[i]);
-				const aiVector3D* pBitangent   = &(p_aiMesh->mBitangents[i]);
-				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+				const aiVector3D* pPos			= &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pNormal		= p_aiMesh->HasNormals() ? &(p_aiMesh->mNormals[i]) : &Zero3D;
+				const aiVector3D* pTangent		= &(p_aiMesh->mTangents[i]);
+				const aiVector3D* pBitangent	= &(p_aiMesh->mBitangents[i]);
+				const aiVector3D* pTexCoord		= p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
 
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
@@ -176,7 +176,7 @@ namespace RootEngine
 
 			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
 		}
-		else 
+		else if(p_aiMesh->HasNormals())
 		{
 			std::vector<Render::Vertex1P1N1UV> vertices;
 
@@ -195,6 +195,24 @@ namespace RootEngine
 			}
 
 			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
+		}
+		else
+		{
+			std::vector<Render::Vertex1P1UV> vertices;
+
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
+				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+				Render::Vertex1P1UV v;
+				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
+				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
+
+				vertices.push_back(v);
+				positions.push_back(v.m_pos);
+			}
+
+			mesh->CreateVertexBuffer1P1UV(&vertices[0], vertices.size());	
 		}
 
 		

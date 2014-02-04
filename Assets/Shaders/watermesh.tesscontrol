@@ -41,7 +41,7 @@ float GetDynamicTessFactor(float distance0, float distance1)
 {
 	float AvgDistance = (distance0 + distance1) / 2.0; 
 
-	return 4.0f*(1/(0.016*AvgDistance));
+	return 16.0f*(1/(0.016*AvgDistance));
 }  
                                                                             
 void main()                                                                                     
