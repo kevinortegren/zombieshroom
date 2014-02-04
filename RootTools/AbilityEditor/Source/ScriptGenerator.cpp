@@ -82,17 +82,18 @@ namespace AbilityEditorNameSpace
 		{
 			m_file << "\tlocal collisionComp = Collision.New(self);\n";
 			m_file << "\tlocal colRespComp = CollisionResponder.New(self);\n";
+			m_file << "\tlocal physicsComp = Physics.New(self);\n";
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::COLLISIONSHAPE))
 			{
-				m_file << "\tlocal physicsComp = Physics.New(self);\n";
-				if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
+				if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED)) //Vadå bara physControlled?
 					m_file << "\tcollisionComp:CreateHandle(self, 1, false);\n";
 				else //The '1' is TYPE::ABILITY
 					m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
 			}
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::EXPLOSIVE))
 			{
-				// call physics explosion
+				//Explosive stuffs
+				//m_file << "\tphysicsComp:CheckRadius(hitCol:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), " << m_name << ".pushback);\n";
 			}
 		}
 		if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::TRANSFORM))
@@ -117,6 +118,8 @@ namespace AbilityEditorNameSpace
 		QVector3D scale = QVector3D(1.0f,1.0f,1.0f);
 		//Collision variable
 		bool colWithWorld = true;
+		//Explosion variable
+		float explosion_radius = 1.0f;
 
 		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
 		{
@@ -126,46 +129,57 @@ namespace AbilityEditorNameSpace
 				height = ((AbilityComponents::CollisionShape*)m_entity->GetComponents()->at(j))->m_height;
 				colShape = ((AbilityComponents::CollisionShape*)m_entity->GetComponents()->at(j))->m_CollisionShape;
 			}
-			if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::PHYSICSCONTROLLED)
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::PHYSICSCONTROLLED)
 			{
 				speed = ((AbilityComponents::PhysicsControlled*)m_entity->GetComponents()->at(j))->m_speed;
 				mass = ((AbilityComponents::PhysicsControlled*)m_entity->GetComponents()->at(j))->m_mass;
 				grav = ((AbilityComponents::PhysicsControlled*)m_entity->GetComponents()->at(j))->m_gravity;
 			}
-			if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::TRANSFORM)
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::TRANSFORM)
 			{
 				rotation = ((AbilityComponents::Transform*)m_entity->GetComponents()->at(j))->m_rotation;
 				scale = ((AbilityComponents::Transform*)m_entity->GetComponents()->at(j))->m_scale;
+				m_file << "\ttransformComp:SetPos(posVec);\n";
 			}
-			if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::COLLISION)
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::COLLISION)
 			{
 				colWithWorld = ((AbilityComponents::Collision*)m_entity->GetComponents()->at(j))->m_collidesWithWorld;
+			}
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::EXPLOSIVE)
+			{
+				explosion_radius = ((AbilityComponents::Explosive*)m_entity->GetComponents()->at(j))->m_radius;
 			}
 		}
 		if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
 		{
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
-			if (colShape == AbilityComponents::CollisionShape::CYLINDER)
+			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::COLLISIONSHAPE))
 			{
-				m_file << "\tphysicsComp:BindCylinderShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				if (colShape == AbilityComponents::CollisionShape::CYLINDER)
+				{
+					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				}
+				else if (colShape == AbilityComponents::CollisionShape::CONE)
+				{
+					m_file << "\tphysicsComp:BindConeShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				}
+				else if (colShape == AbilityComponents::CollisionShape::SPHERE)
+				{
+					m_file << "\tphysicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				}
+				else if (colShape == AbilityComponents::CollisionShape::RAY)
+				{
+					m_file << "\tphysicsComp:ShootRay(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), "<<height<<");\n";
+				}
+				else if (colShape == AbilityComponents::CollisionShape::MESH)
+				{
+					m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), Vec3.New(" << scale.x() << ", " << scale.y() << ", " << scale.z() << "), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				}
 			}
-			else if (colShape == AbilityComponents::CollisionShape::CONE)
+			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::EXPLOSIVE))
 			{
-				m_file << "\tphysicsComp:BindConeShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+				m_file << "\tphysicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), " << explosion_radius << ");\n";
 			}
-			else if (colShape == AbilityComponents::CollisionShape::SPHERE)
-			{
-				m_file << "\tphysicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
-			}
-			else if (colShape == AbilityComponents::CollisionShape::RAY)
-			{
-				m_file << "\tphysicsComp:ShootRay(collisionComp, Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), "<<height<<");\n";
-			}
-			else if (colShape == AbilityComponents::CollisionShape::MESH)
-			{
-				m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), Vec3.New(" << scale.x() << ", " << scale.y() << ", " << scale.z() << "), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
-			}
-			
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
 			{
 				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
@@ -173,7 +187,7 @@ namespace AbilityEditorNameSpace
 			}
 			
 		}
-		m_file << "\ttransformComp:SetPos(posVec);\n";
+		
 		m_file << "\tif Global.IsClient then\n"; //Client-only components
 
 		if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::ABILITYMODEL))
@@ -199,10 +213,12 @@ namespace AbilityEditorNameSpace
 
 		m_file << "\tend\n";
 
-		//Set cooldown
-		m_file << "\tlocal playerComponent = playerEnt:GetPlayerComponent();\n";
-		m_file << "\tplayerComponent:StartCooldown(playerComponent:GetSelectedAbility(), " << m_name << ".cooldown);\n";
-
+		//Set cooldown if any
+		if (m_entity->GetCooldown() > 0)
+		{
+			m_file << "\tlocal playerComponent = playerEnt:GetPlayerComponent();\n";
+			m_file << "\tplayerComponent:StartCooldown(playerComponent:GetSelectedAbility(), " << m_name << ".cooldown);\n";
+		}
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onCreate->GetConditions()->size(); i++)
 		{
@@ -230,7 +246,7 @@ namespace AbilityEditorNameSpace
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
 				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
-				m_file << "\tlocal network = entity:GetNetwork();\n";
+				m_file << "\tlocal network = self:GetNetwork();\n";
 
 				m_file << "\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
 				m_file << "\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
@@ -271,7 +287,8 @@ namespace AbilityEditorNameSpace
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
 				scriptNames.at(j).chop(4); 
-				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(network:GetUserId(), network:GetActionId);\n";
+				m_file << "\t\trequire(" << scriptNames.at(j).toStdString() << ");\n";
+				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(network:GetUserId(), network:GetActionId());\n";
 			}
 			m_file << "\tend\n";
 		}
@@ -282,7 +299,7 @@ namespace AbilityEditorNameSpace
 	{
 		m_file << "function " << m_name << ".OnDestroy (self)\n";
 
-		m_file << "\tlocal network = entity:GetNetwork();\n";
+		m_file << "\tlocal network = self:GetNetwork();\n";
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onDestroy->GetConditions()->size(); i++)
 		{

@@ -309,7 +309,6 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
-			
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
@@ -1295,6 +1294,18 @@ namespace Physics
 
 		glm::vec3 end = glm::normalize(p_direction) * p_length;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+	}
+
+	void RootPhysics::RadiusCheck( int p_objectHandle, glm::vec3 p_pos, float p_radius )
+	{
+		//if(!DoesObjectExist(p_objectHandle))
+			//return;
+		btVector3 pos = btVector3(p_pos[0], p_pos[1], p_pos[2]);
+		for (unsigned int i = 0; i < m_playerObjects.size(); i++)
+		{
+			if (m_playerObjects.at(i)->GetPosition().distance(pos) < p_radius)
+				m_userPointer.at(p_objectHandle)->m_collidedEntities->insert(((CustomUserPointer*)(m_playerObjects.at(i)->GetUserPointer()))->m_entity);
+		}
 	}
 
 }

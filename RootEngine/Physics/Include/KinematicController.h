@@ -30,6 +30,7 @@ public:
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}
 	float GetModelHeight() const {return m_heightOffset;}
+	void* GetUserPointer() const {return m_ghostObject->getUserPointer();}
 	void Move(glm::vec3 p_target, float p_dt);
 	bool IsOnGround();
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}

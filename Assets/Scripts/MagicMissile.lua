@@ -1,5 +1,5 @@
 MagicMissile = {};
-MagicMissile.damage = 50;
+MagicMissile.damage = 0;
 MagicMissile.pushback = 0;
 MagicMissile.cooldown = 1;
 
@@ -16,8 +16,8 @@ function MagicMissile.OnCreate (userId, actionId)
 	collisionComp:CreateHandle(self, 1, true);
 	local scriptComp = Script.New(self, "MagicMissile");
 	colRespComp:SetContainer(collisionComp);
-	physicsComp:ShootRay(collisionComp, Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 1000);
-	transformComp:SetPos(posVec);
+	physicsComp:ShootRay(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 1000);
+	--transformComp:SetPos(posVec);
 	if Global.IsClient then
 	end
 	local playerComponent = playerEnt:GetPlayerComponent();
@@ -28,26 +28,17 @@ function MagicMissile.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
-	local network = entity:GetNetwork();
-	local targetPlayerComponent = entity:GetPlayerComponent();
-	local abilityOwnerNetwork = self:GetNetwork();
-	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
-	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-		local health = entity:GetHealth();
-		if not health:IsDead() then
-			local receiverId = network:GetUserId();
-			health:Damage(abilityOwnerId, MagicMissile.damage, receiverId);
-		end
-	end
-	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-		AbilityBall.OnCreate(network:GetUserId(), network:GetActionId);
-	end
+	local network = self:GetNetwork();
+	--local targetPlayerComponent = entity:GetPlayerComponent();
+	--local abilityOwnerNetwork = self:GetNetwork();
+	--local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+	--local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+	--local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
 end
 
 function MagicMissile.OnDestroy (self)
-	local network = entity:GetNetwork();
+	--local network = self:GetNetwork();
 	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end
