@@ -7,9 +7,8 @@ namespace RootForce
 {
 	struct Shadowcaster : public ECS::Component<Shadowcaster>
 	{
-		Shadowcaster(){}
-		//Frustum m_frustum;
-		int m_levels; //For cascaded shadow-mapping
-		std::vector<glm::mat4> m_cascades;
+		Shadowcaster() : m_directionalLightSlot(0) {}
+
+		int m_directionalLightSlot;
 	};
 }

@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
 #include <Utility/ECS/Include/World.h>
@@ -14,6 +15,10 @@ namespace RootForce
 		float TimeLeft;
 		int ScoreLimit;
 		int TeamScore[3];
+		~TDMRuleSet()
+		{
+			int i = 0;
+		}
 	};
 
 	class MatchStateSystem : public ECS::VoidSystem
@@ -39,3 +44,5 @@ namespace RootForce
 		Logging* m_logger;
 	};
 }
+
+#endif

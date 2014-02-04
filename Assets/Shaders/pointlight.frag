@@ -51,9 +51,13 @@ void main() {
 
 	vec3 diffuse = rt0.xyz;
 	float specTerm = rt0.w;
-	vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
 
-	vec3 normal = normalize(vert_normal.xyz*2-1); 
+	vec2 vert_normal = texture(g_Normals, ex_TexCoord).xy;
+	
+	vec3 normal;
+	normal.xy = vert_normal.xy;
+    normal.z = sqrt(1-dot(normal.xy, normal.xy));
+
 	vec3 position = GetVSPositionFromDepth();
 
 	vec3 vert_lightVec = ex_Light.LightPosition - position;

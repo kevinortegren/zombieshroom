@@ -6,16 +6,13 @@ namespace Render
 {
 	LightingDevice::LightingDevice()
 	: m_numDirectionalLights(0),
-		m_numPointLights(0)
-	{
+		m_numPointLights(0) {}
 
-	}
-
-	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
+	void LightingDevice::Init(GLRenderer* p_renderer, int p_width, int p_height, GeometryBuffer* p_gbuffer)
 	{
-		// Load effects.	
-		auto deferred = g_context.m_resourceManager->LoadEffect("Renderer/Deferred");
-		m_lightingTech = deferred->GetTechniques()[0];
+		// Load techniques.	
+		Render::EffectInterface* lightingEffect = g_context.m_resourceManager->LoadEffect("Renderer/Lighting");
+		m_deferredTech = lightingEffect->GetTechniques()[0];
 
 		// Light uniforms.
 		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -26,16 +23,12 @@ namespace Render
 		glGenFramebuffers(1, &m_fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-		glGenTextures(1, &m_laHandle);
-		glBindTexture(GL_TEXTURE_2D, m_laHandle);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, p_width, p_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		m_la = p_renderer->CreateTexture();
+		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_laHandle, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, p_gbuffer->m_depthTexture->GetHandle(), 0);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -62,7 +55,7 @@ namespace Render
 		m_numPointLights++;
 	}
 
-	void LightingDevice::Process(Mesh& p_fullscreenQuad)
+	void LightingDevice::Clear()
 	{
 		// Bind la-buffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
@@ -70,16 +63,27 @@ namespace Render
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, buffers);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilMask(0x00);
 
+		// Clear la-buffer.
+		glClear(GL_COLOR_BUFFER_BIT);
+
+	}
+
+	void LightingDevice::Process(Mesh& p_fullscreenQuad)
+	{
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
-		auto ambient = m_lightingTech->GetPrograms()[0];
-		auto directional = m_lightingTech->GetPrograms()[1];
-		auto pointlight = m_lightingTech->GetPrograms()[2];
+		auto ambient = m_deferredTech->GetPrograms()[0];
+		auto directional = m_deferredTech->GetPrograms()[1];
+		auto pointlight = m_deferredTech->GetPrograms()[2];
+		auto background = m_deferredTech->GetPrograms()[4];
 
 		p_fullscreenQuad.Bind();
-
+		// Background.
+		background->Apply();	
+		p_fullscreenQuad.Draw();
 		// Ambient.
 		ambient->Apply();
 		p_fullscreenQuad.Draw();
@@ -92,11 +96,17 @@ namespace Render
 		pointlight->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numPointLights);
 
+		
+	
 		p_fullscreenQuad.Unbind();
 
 		// Unbind.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 
+	void LightingDevice::ClearLights()
+	{
+		m_numDirectionalLights = 0;
 		m_numPointLights = 0;
 	}
 

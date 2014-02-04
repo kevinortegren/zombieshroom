@@ -16,8 +16,12 @@ in vec4 gs_color;
 
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Depth;
+uniform sampler2D g_LA;
 
-out vec4 out_Color;
+layout (location = 0) out vec4 diffuse;
+layout (location = 1) out vec3 normals;
+layout (location = 2) out vec4 glow;
+layout (location = 3) out vec4 background;
 
 void main(void) {
 
@@ -37,6 +41,9 @@ void main(void) {
     float depthDiff = a - b;
     
 	depthDiff = clamp(depthDiff / 30.0f, 0.0f, 1.0f);
-
-    out_Color = vec4(frag_color.xyz, frag_color.a * depthDiff) * gs_color;
+    
+    diffuse = vec4(vec3(0), 0);
+	normals = vec3(0);
+	glow = vec4(vec3(0), 0.0f);
+	background = vec4(frag_color.xyz, frag_color.a) * gs_color;
 }

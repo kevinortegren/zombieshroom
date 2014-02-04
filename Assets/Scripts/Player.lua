@@ -34,7 +34,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(10);
+	playerPhysics:SetMovementSpeed(20);
 	playerPhysics:SetJumpForce(20);
 
 	collision:SetMeshHandle("testchar0");
@@ -61,7 +61,7 @@ function Player.OnCreate(userId, actionId)
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
 
-		renderable:SetPass(RenderPass.RENDERPASS_DYNAMIC);
+		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
 			renderable:SetMaterial("BlueSpirit");

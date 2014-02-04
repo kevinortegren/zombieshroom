@@ -31,7 +31,7 @@ namespace Render
 		m_meshes[1]->SetTransformFeedback();
 
 		BufferInterface* vertexBuffer[2];
-		std::shared_ptr<VertexAttributesInterface> attributes[2];
+		VertexAttributesInterface* attributes[2];
 
 		vertexBuffer[0] = p_renderer->CreateBuffer(GL_ARRAY_BUFFER);
 		vertexBuffer[1] = p_renderer->CreateBuffer(GL_ARRAY_BUFFER);
@@ -89,7 +89,7 @@ namespace Render
 
 	Render::MeshInterface* ParticleSystem::GetMesh()
 	{
-		return m_meshes[m_currentVB].get();
+		return m_meshes[m_currentVB];
 	}
 
 	ParticleSystemHandler::ParticleSystemHandler()
