@@ -87,7 +87,7 @@ namespace AbilityEditorNameSpace
 				m_file << "\tlocal physicsComp = Physics.New(self);\n";
 				if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICSCONTROLLED))
 					m_file << "\tcollisionComp:CreateHandle(self, 1, false);\n";
-				else
+				else //The '1' is TYPE::ABILITY
 					m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
 			}
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::EXPLOSIVE))
@@ -144,6 +144,7 @@ namespace AbilityEditorNameSpace
 		}
 		if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::COLLISION))
 		{
+			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 			if (colShape == AbilityComponents::CollisionShape::CYLINDER)
 			{
 				m_file << "\tphysicsComp:BindCylinderShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
@@ -156,6 +157,10 @@ namespace AbilityEditorNameSpace
 			{
 				m_file << "\tphysicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 			}
+			else if (colShape == AbilityComponents::CollisionShape::RAY)
+			{
+				m_file << "\tphysicsComp:ShootRay(collisionComp, Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), "<<height<<");\n";
+			}
 			else if (colShape == AbilityComponents::CollisionShape::MESH)
 			{
 				m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New("<<rotation.x()<<","<<rotation.y()<<","<<rotation.z()<<",1), Vec3.New(" << scale.x() << ", " << scale.y() << ", " << scale.z() << "), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
@@ -166,7 +171,7 @@ namespace AbilityEditorNameSpace
 				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * "<<speed<<", frontVec.y * "<<speed<<", frontVec.z * "<<speed<<"));\n";
 				m_file << "\tphysicsComp:SetGravity(collisionComp, Vec3.New(" << grav.x() << ", " << grav.y() << ", " << grav.z() << "));\n";
 			}
-			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
+			
 		}
 		m_file << "\ttransformComp:SetPos(posVec);\n";
 		m_file << "\tif Global.IsClient then\n"; //Client-only components
@@ -196,7 +201,7 @@ namespace AbilityEditorNameSpace
 
 		//Set cooldown
 		m_file << "\tlocal playerComponent = playerEnt:GetPlayerComponent();\n";
-		m_file << "\tplayerComponent:StartCooldown(playerComponent:GetSelectedAbility(), " << m_entity->GetCooldown() << ".cooldown);\n";
+		m_file << "\tplayerComponent:StartCooldown(playerComponent:GetSelectedAbility(), " << m_name << ".cooldown);\n";
 
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onCreate->GetConditions()->size(); i++)

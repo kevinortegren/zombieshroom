@@ -222,6 +222,7 @@ namespace AbilityEditorNameSpace
 				CONE,
 				CYLINDER,
 				SPHERE,
+				RAY,
 				MESH,
 				END_OF_ENUM
 			};
@@ -240,6 +241,7 @@ namespace AbilityEditorNameSpace
 				m_enumToText[CONE] = "Cone";
 				m_enumToText[CYLINDER] = "Cylinder";
 				m_enumToText[SPHERE] = "Sphere";
+				m_enumToText[RAY] = "Ray";
 				m_enumToText[MESH] = "Mesh";
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
@@ -258,10 +260,10 @@ namespace AbilityEditorNameSpace
 				enumMan->setValue(collisionShape, m_CollisionShape);
 				//collisionShape = p_propMan->addProperty(QVariant::String, "CollisionShape" );
 				//p_propMan->setValue(collisionShape, m_enumToText[m_CollisionShape] );
-				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere or Mesh");
+				collisionShape->setToolTip("Collision shape can be Cone, Cylinder, Sphere, Ray or Mesh");
 				radius = p_propMan->addProperty(QVariant::Double, "Radius");
 				p_propMan->setValue(radius, m_radius);
-				height = p_propMan->addProperty(QVariant::Double, "Height");
+				height = p_propMan->addProperty(QVariant::Double, "Height/Length");
 				p_propMan->setValue(height, m_height);
 				collisionModelname = p_propMan->addProperty(QVariant::String, "CollisionModel name");
 				p_propMan->setValue(collisionModelname, m_collisionModelShapeName.c_str());

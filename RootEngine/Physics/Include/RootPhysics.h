@@ -96,7 +96,7 @@ namespace RootEngine
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
-			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
+			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
@@ -161,6 +161,7 @@ namespace RootEngine
 			void EnableDebugDraw(bool p_enabled);
 
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
+			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
