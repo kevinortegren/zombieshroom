@@ -459,6 +459,9 @@ namespace RootForce
 				case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
+
+					if(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress) == -1)
+						break;
 					
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
@@ -689,6 +692,9 @@ namespace RootForce
 									id.UserID = i;
 									id.ActionID = ReservedActionID::CONNECT;
 									id.SequenceID = 0;
+
+									if(!g_networkEntityMap[id])
+										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
