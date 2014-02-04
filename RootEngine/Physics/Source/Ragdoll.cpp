@@ -2,15 +2,15 @@
 #include <RootEngine/Physics/Include/Ragdoll.h>
 #include <glm/gtc/type_ptr.hpp>
 const float PI_2 = 1.57079632679489661923f;
-const float OFFSET = 1.2f;
-const int NUM_BONES = 14;
+const float OFFSET = 1.0f;
 namespace Ragdoll
 {
 
 
 	Ragdoll::Ragdoll( btDiscreteDynamicsWorld* p_dynamicWorld ) : m_dynamicWorld(p_dynamicWorld), m_constraintCounter(0)
 	{
-		
+		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT; i++)
+			m_bodyPosOffset[i] = btVector3(0,0,0);
 	}
 
 	Ragdoll::~Ragdoll()
@@ -26,7 +26,7 @@ namespace Ragdoll
 	{
 		
 		//Update the posiitions of the bodies and add them to the world
-		for(int i = 0; i < NUM_BONES ; i++) //hardcoded for 14 bones, needs to change
+		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++) //hardcoded for 14 bones, needs to change
 		{
 			btTransform trans;
 			glm::mat4 toTrans =  p_transform  * p_bones[i];	
@@ -48,15 +48,18 @@ namespace Ragdoll
 	void Ragdoll::Deactivate()
 	{
 		//Remove bodies from world, i think this might be the way to doit, mayb not, we wäll cää in ffyradfas
-		for(int i = 0; i < NUM_BONES ; i++) //hardcoded for 14 bones, needs to change
+		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++) //hardcoded for 14 bones, needs to change
 			m_dynamicWorld->removeRigidBody(m_bodies[i]);
 		for(int i = 0; i < m_constraintCounter; i++)
 			m_dynamicWorld->removeConstraint(m_joints[i]);
 	}
 
-	void Ragdoll::BuildRagdoll( glm::mat4 p_bones[20], aiNode* p_rootNode , std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos )
+	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
 	{
-		CreateBody(p_bones, p_rootNode, p_nameToIndex, p_transform, p_pos, 1);
+		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.55f, 0);
+		m_nameToIndex = p_nameToIndex;
+		memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
+		CreateBody(p_bones, p_rootNode, p_transform, 1);
 		m_boneToFollow[13] = 13;
 		////here be dragons nu är det fel i min hjärna
 		
@@ -64,7 +67,7 @@ namespace Ragdoll
 
 	}
 
-	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, const btVector3& p_pos, int p_massFactor )
+	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor )
 	{
 		
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
@@ -74,7 +77,7 @@ namespace Ragdoll
 			float mass = 10.0f / p_massFactor;
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
-			int index = p_nameToIndex[p_rootNode->mName.data];
+			int index = m_nameToIndex[p_rootNode->mName.data];
 			glm::mat4 toGlm = glm::mat4();
 			//body
 			aiMatrix4x4 test = p_rootNode->mTransformation; 
@@ -83,8 +86,8 @@ namespace Ragdoll
 			btTransform trans;
 			m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
-			m_lastBoneMatrix[index] = p_bones[index];
-			glm::mat4 toTrans =  p_transform  /** bonePos*/ * p_bones[index];	
+			m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
+			glm::mat4 toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];	
 			const float* data = glm::value_ptr(toTrans);
  			trans.setFromOpenGLMatrix(data);
 			float x,y,z,w;
@@ -104,7 +107,7 @@ namespace Ragdoll
 			
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
-				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_nameToIndex, p_transform, p_pos, p_massFactor+1);
+				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1);
 				if(childbody != nullptr)
 				{
 					btTypedConstraint* temp = CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
@@ -113,7 +116,7 @@ namespace Ragdoll
 						m_joints[m_constraintCounter] = temp;
 						m_constraintCounter++;
 					}
-					SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data], p_bones[p_nameToIndex[p_rootNode->mChildren[i]->mName.data]]);
+				//	SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data], p_bones[p_nameToIndex[p_rootNode->mChildren[i]->mName.data]]);
 					
 				}
 				
@@ -121,7 +124,7 @@ namespace Ragdoll
 			return body;
 		}
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
-			CreateBody(p_bones, p_rootNode->mChildren[i], p_nameToIndex, p_transform, p_pos , p_massFactor);
+			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor);
 	
 		return nullptr;
 	}
@@ -219,7 +222,7 @@ namespace Ragdoll
 
 	btVector3 Ragdoll::GetPos()
 	{
-		return m_bodies[13]->getWorldTransform().getOrigin();
+		return m_bodies[BodyPart::HIPS]->getWorldTransform().getOrigin();
 	}
 
 	glm::mat4* Ragdoll::GetBones()
@@ -242,7 +245,7 @@ namespace Ragdoll
 			int index  = m_boneToFollow[i];
 			
 			float test[16];
-			btTransform worldTrans = m_bodies[13]->getWorldTransform();
+			btTransform worldTrans = m_bodies[BodyPart::HIPS]->getWorldTransform();
 			x = worldTrans.getRotation().w();
 			y = worldTrans.getRotation().x();
 			z = worldTrans.getRotation().y();
@@ -254,7 +257,7 @@ namespace Ragdoll
 			
 			m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(retVal[i]) */;
 			//World to local space
- 			retVal[i] = glm::inverse(m_prevPos[i])  * glm::inverse(retVal[i]) *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
+ 			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
 
 			
 			
@@ -264,7 +267,7 @@ namespace Ragdoll
 
 	btQuaternion Ragdoll::GetOrientation()
 	{
-		return m_bodies[13]->getWorldTransform().getRotation();
+		return m_bodies[BodyPart::HIPS]->getWorldTransform().getRotation();
 	}
 
 	void Ragdoll::SetOrientation( glm::quat p_orientation )
@@ -275,7 +278,7 @@ namespace Ragdoll
 		btquat.setY(p_orientation.z);
 		btquat.setZ(p_orientation.w);
 		btquat.setW(p_orientation.x);
-		m_bodies[13]->getWorldTransform().setRotation(btquat);
+		m_bodies[BodyPart::HIPS]->getWorldTransform().setRotation(btquat);
 	}
 
 	btTypedConstraint* Ragdoll::CreateConstraint( btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB )
