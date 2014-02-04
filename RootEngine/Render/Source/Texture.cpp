@@ -7,7 +7,7 @@ namespace Render
 {
 	Texture::Texture()
 		: m_textureHandle(0), m_target(0), m_textureWidth(0), m_textureHeight(0),
-		m_textureFormat(0), m_textureType(0), m_compressRatio(1), m_levels(0)
+		m_textureFormat(0), m_textureType(0), m_compressRatio(1), m_levels(0), m_bpp(0)
 	{
 		glGenTextures(1, &m_textureHandle);
 	}
@@ -53,6 +53,7 @@ namespace Render
 		{
 			// DXT3
 			m_compressRatio = 4;
+			m_bpp = 4;
 			
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)
 			{
@@ -109,6 +110,7 @@ namespace Render
 
 		// DXT3
 		m_compressRatio = 4;
+		m_bpp = 4;
 
 		for(gli::texture2D::size_type i = 0; i < cube.faces(); i++)  {
 
@@ -143,6 +145,7 @@ namespace Render
 		m_textureWidth = p_width;
 		m_textureHeight = p_height;
 		m_levels = 1;
+		m_compressRatio = 1;
 		
 		glBindTexture(m_target, m_textureHandle);
 		if(p_format == TextureFormat::TEXTURE_RGBA || p_format == TextureFormat::TEXTURE_BGRA)
@@ -189,7 +192,7 @@ namespace Render
 		{
 			m_textureType = GL_FLOAT;
 			m_textureFormat = GL_DEPTH_COMPONENT;
-			m_bpp = 4;
+			m_bpp = 5;
 
 			glTexImage2D(m_target, 0, GL_DEPTH32F_STENCIL8, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
@@ -197,6 +200,8 @@ namespace Render
 		{
 			m_textureType = GL_FLOAT;
 			m_textureFormat = GL_R32F;
+			m_bpp = 4;
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 

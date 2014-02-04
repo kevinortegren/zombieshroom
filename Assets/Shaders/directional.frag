@@ -94,7 +94,7 @@ void main() {
 	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-	out_Color = vec4(diffuse_color + spec_color + colors[useCascade], 1.0);
+	out_Color = vec4(diffuse_color + spec_color, 1.0);
 
 	float visibility = texture(g_ShadowDepth, vec4(shadowCoord.xy, useCascade, shadowCoord.z));
 

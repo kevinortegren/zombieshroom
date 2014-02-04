@@ -19,31 +19,32 @@ namespace Render
 	}
 
 
-	void RenderResourceManager::PrintResourceUsage()
+	void RenderResourceManager::PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
 	{
-		//TODO: Call this from profiler overlay.
-
-		int bufferSize = 0;
+		p_bufferUsage = 0;
 		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
 		{
-			bufferSize += (*itr)->GetBufferSize();
+			p_bufferUsage += (*itr)->GetBufferSize();
 		}
+		p_bufferUsage /= 1000;
 
-		bufferSize /= 1000;
-
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Buffer memory usage: %d kb", bufferSize);
-
-		int textureSize = 0;
+		p_textureUsage = 0;
 		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
 		{
-			// TODO: Add mipmaps to the calculation.
-			textureSize += ((*itr)->GetWidth() * (*itr)->GetHeight() * (*itr)->GetBytesPerPixel()) / (*itr)->GetCompressRatio();			
+			int w = (*itr)->GetWidth();
+			int h = (*itr)->GetHeight();
+
+			for(int i = 0; i < (*itr)->GetMipsLevels(); ++i)
+			{
+				p_textureUsage += (w * h * (*itr)->GetBytesPerPixel()) / (*itr)->GetCompressRatio();		
+				w /= 2;
+				h /= 2;
+			}
 		}
+		p_textureUsage /= 1000;
 
-		textureSize /= 1000;
-
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Texture memory usage: %d kb", textureSize);
-
+		p_numBuffers = m_buffers.size();
+		p_numTextures = m_textures.size();
 	}
 
 	BufferInterface* RenderResourceManager::CreateBuffer(GLenum p_type)

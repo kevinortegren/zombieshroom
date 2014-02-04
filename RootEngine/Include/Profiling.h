@@ -8,6 +8,11 @@
 #include <map>
 #include <windows.h>
 
+namespace Render
+{
+	class RendererInterface;
+}
+
 namespace RootEngine
 {
 	class ProfilingInterface abstract
@@ -16,6 +21,7 @@ namespace RootEngine
 		virtual void Update(float dt) = 0;
 		virtual void StoreSample(std::string p_name, __int64 p_elapsedTime) = 0;
 		virtual void SetMemoryTracker(MemoryTracker* p_memTracker) = 0;
+		virtual void SetRenderInterface(Render::RendererInterface* p_renderer) = 0;
 #ifndef COMPILE_LEVEL_EDITOR
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
 #endif
@@ -31,6 +37,7 @@ namespace RootEngine
 		void Update(float dt);
 		void StoreSample(std::string p_name, __int64 p_elapsedTime);
 		void SetMemoryTracker(MemoryTracker* p_memTracker);
+		void SetRenderInterface(Render::RendererInterface* p_renderer);
 #ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 #endif
@@ -42,6 +49,7 @@ namespace RootEngine
 		DebugOverlayInterface* m_debugOverlay;
 #endif
 		MemoryTracker* m_memTracker;
+		Render::RendererInterface* m_renderer;
 		float m_time;
 		int m_frames;
 	};

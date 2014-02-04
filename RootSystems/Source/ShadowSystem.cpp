@@ -4,6 +4,7 @@
 #include <RootSystems/Include/Camera.h>
 #include <glm/gtc/swizzle.hpp>
 #include <RootSystems/Include/Shapes/OBB.h>
+#include <RootSystems/Include/RenderingSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -168,24 +169,38 @@ namespace RootForce
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
 		}
 
-		for(int i = 0; i < 1; i++)
+		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
+
+		// Cull quad tree with orthographic projection obb.
+		std::vector<glm::vec4> points;
+		points.resize(8);
+
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glm::mat4 invViewProj = glm::inverse(sc.m_viewMatrices[i]) * glm::inverse(sc.m_projectionMatrices[i]);
 
 			OBB obb = OBB(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, invViewProj);
 			obb.DebugDraw(g_engineContext.m_renderer, glm::vec3(1,0,1), glm::mat4(1.0f));
 
-			std::vector<glm::vec4> points;
-			points.resize(8);
 			for(int j = 0; j < 8; ++j)
 			{
 				points[j] = invViewProj * localOBB[j];
 			}
 
+			m_quadTree->m_culledEntities.clear();
 			m_quadTree->CullShadows(points, m_quadTree->GetRoot());
-		}
 
-		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
+			std::vector<Render::ShadowJob> jobs;
+			for(auto itr = m_quadTree->m_culledEntities.begin(); itr != m_quadTree->m_culledEntities.end(); ++itr)
+			{
+				Render::ShadowJob job;
+				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_model->m_meshes[0];
+				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_material->m_effect;
+				jobs.push_back(std::move(job));
+			}
+
+			g_engineContext.m_renderer->AddShadowJob(jobs, i);
+		}
 	}
 
 	void ShadowSystem::End()

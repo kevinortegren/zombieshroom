@@ -253,8 +253,6 @@ namespace Render
 		m_lineRenderer.Init(this);
 
 		InitialziePostProcesses();
-
-		m_resources.PrintResourceUsage();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -316,6 +314,13 @@ namespace Render
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
 		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
+	}
+
+	void GLRenderer::AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade)
+	{
+		m_sjobCount[p_cascade] = p_jobs.size();
+		auto it = std::next(p_jobs.begin(), p_jobs.size());
+		std::move(p_jobs.begin(), it, std::back_inserter(m_sjobs));
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -403,6 +408,7 @@ namespace Render
 
 		m_allocator.Clear();
 		m_jobs.clear();
+		m_sjobs.clear();
 	}
 
 	void GLRenderer::Clear()
@@ -435,6 +441,7 @@ namespace Render
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
+		int shadowJobStart = 0;
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
@@ -443,51 +450,29 @@ namespace Render
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-			// Buffer Per Frame data.
 			struct
 			{
 				glm::mat4 m_projection;
 				glm::mat4 m_view;
 				glm::mat4 m_invView;
-				glm::mat4 m_invProj;
-				glm::mat4 m_invViewProj;
-
 			} matrices;
 
 			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
 			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
-			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 
 			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
 
-			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+			int j = 0;
+			for(j = shadowJobStart; j < shadowJobStart + m_sjobCount[i]; ++j)
 			{
-				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-					continue;
-
-				if((*job)->m_shadowMesh == nullptr)
-					continue;
-
-				(*job)->m_shadowMesh->Bind();
-
-				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
-				{
-					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
-					{
-						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
-						{	
-							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-						}
-
-						(*tech)->GetPrograms()[0]->Apply();
-
-						(*job)->m_shadowMesh->Draw();	
-					}
-				}
-
-				(*job)->m_shadowMesh->Unbind();
+				m_sjobs[j].m_mesh->Bind();
+				m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+				m_sjobs[j].m_mesh->Draw();
+				m_sjobs[j].m_mesh->Unbind();
 			}
+
+			shadowJobStart = j;
 		}
 
 		glCullFace(GL_BACK);
@@ -699,6 +684,11 @@ namespace Render
 	{
 		m_cameraVars.m_projection = p_projectionMatrix;
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
+	{
+		m_resources.PrintResourceUsage(p_bufferUsage, p_textureUsage, p_numBuffers, p_numTextures);
 	}
 
 	BufferInterface* GLRenderer::CreateBuffer(GLenum p_type)

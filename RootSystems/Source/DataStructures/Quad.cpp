@@ -118,25 +118,8 @@ namespace RootForce
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
-				ECS::Entity* entity;
-				RootForce::Renderable* renderable;
-
-				for(unsigned i = 0; i < p_node->m_indices.size(); ++i)
-				{
-					entity = m_entities[p_node->m_indices[i]];
-					renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-
-					Render::RenderJob job;
-					job.m_mesh = renderable->m_model->m_meshes[0];
-					job.m_shadowMesh = renderable->m_model->m_meshes[0];
-					job.m_flags = renderable->m_renderFlags;
-					job.m_material = renderable->m_material;
-					job.m_renderPass = renderable->m_pass;
-					job.m_params = renderable->m_params;
-
-					m_context->m_renderer->AddRenderJob(job);
-				}
-
+				// Insert range.
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
 			}
 			else
 			{
@@ -294,6 +277,8 @@ namespace RootForce
 		}
 
 		Subdivide(m_root, polygons);
+
+		m_culledEntities.reserve(m_entities.size() * 4);
 #endif
 
 	}

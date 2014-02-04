@@ -11,7 +11,7 @@
 
 #define QUADTREE_POLYGONS_PER_NODE 10000
 #define QUAD_MAX_CHILDS 4
-#define SUBDIVIDE
+//#define SUBDIVIDE
 
 namespace RootForce
 {
@@ -83,7 +83,8 @@ namespace RootForce
 
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
 
-		int test;
+		std::vector<ECS::Entity*> m_entities;
+		std::vector<int> m_culledEntities;
 
 	private:
 		
@@ -102,7 +103,6 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_context;
 		ECS::World* m_world;
 
-		std::vector<ECS::Entity*> m_entities;
 		std::vector<Render::Vertex1P1N1UV1T1BT> m_vertices;
 		
 		std::vector<Render::Material*> m_materials;
