@@ -1,6 +1,7 @@
 AbilityBall = {};
-AbilityBall.damage = 5;
-AbilityBall.pushback = 10;
+AbilityBall.damage = -1;
+AbilityBall.pushback = 0;
+AbilityBall.cooldown = 0;
 
 function AbilityBall.OnCreate (userId, actionId)
 	local self = Entity.New();
@@ -12,23 +13,16 @@ function AbilityBall.OnCreate (userId, actionId)
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
-	collisionComp:CreateHandle(self, 1, false);
-	local transformComp = Transformation.New(self);
+	collisionComp:CreateHandle(self, 1, true);
 	local scriptComp = Script.New(self, "AbilityBall");
-	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 20, frontVec.y * 20, frontVec.z * 20));
-	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
-	transformComp:SetPos(posVec);
+	local handle = collisionComp:GetHandle();
+	physicsComp:ShootRay(handle, Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 100);
+	
 	if Global.IsClient then
-		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("Fireball");
-		renderComp:SetMaterialDiffuse("fireballDiffuse");
-		renderComp:SetMaterialSpecular("fireballSpecular");
-		renderComp:SetMaterialNormal("fireballNormal");
-		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
+	local playerComponent = playerEnt:GetPlayerComponent();
+	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityBall.cooldown);
 end
 
 function AbilityBall.OnCollide (self, entity)
@@ -41,10 +35,6 @@ function AbilityBall.OnCollide (self, entity)
 	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-		
-		local hitPos = entity:GetTransformation():GetPos();
-		local selfPos = self:GetTransformation():GetPos();
-		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
 		local health = entity:GetHealth();
 		if not health:IsDead() then
 			local network = entity:GetNetwork();

@@ -1287,11 +1287,11 @@ namespace Physics
 			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
-			x = trans.getRotation().w();
+		/*	x = trans.getRotation().w();
 			y = trans.getRotation().x();
 			z = trans.getRotation().y();
 			w = trans.getRotation().z();
-			trans.setRotation(btQuaternion(x,y,z,w));
+			trans.setRotation(btQuaternion(x,y,z,w));*/
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
@@ -1313,6 +1313,7 @@ namespace Physics
 			z = trans.getRotation().y();
 			w = trans.getRotation().z();
 			trans.setRotation(btQuaternion(x,y,z,w));
+			
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
@@ -1322,7 +1323,7 @@ namespace Physics
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
-			m_ragdolls.at(m_userPointer.at(p_objectHandle)->m_ragdollIndex)->SetVelocity(btVector3(0,40,0));
+			
 		}
 		
 	}

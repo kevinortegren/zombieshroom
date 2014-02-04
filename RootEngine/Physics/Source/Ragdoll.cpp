@@ -2,7 +2,7 @@
 #include <RootEngine/Physics/Include/Ragdoll.h>
 #include <glm/gtc/type_ptr.hpp>
 const float PI_2 = 1.57079632679489661923f;
-const float OFFSET = -0.75f;
+const float OFFSET = 1.2f;
 const int NUM_BONES = 14;
 namespace Ragdoll
 {
@@ -77,7 +77,7 @@ namespace Ragdoll
 			int index = p_nameToIndex[p_rootNode->mName.data];
 			glm::mat4 toGlm = glm::mat4();
 			//body
-			aiMatrix4x4 test = p_rootNode->mTransformation; //this might be the thing that will solve everything, everyyythiiiinnnggg
+			aiMatrix4x4 test = p_rootNode->mTransformation; 
 			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
 			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
@@ -143,57 +143,68 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_LeftFoot") == 0)
 		{
-			return new btCapsuleShape(0.2f, 0.16f);
+			return new btBoxShape(btVector3(0.2f, 0.1f, 0.2f));
+			//return new btCapsuleShape(0.2f, 0.16f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftForeArm") == 0)
 		{
-			return new btCapsuleShape(0.28f, 0.30f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.28f, 0.30f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_LeftHand") == 0)
 		{
-			return new btCapsuleShape(0.2f, 0.08f);
+			return new btBoxShape(btVector3(0.2f, 0.2f, 0.2f));
+			//return new btCapsuleShape(0.2f, 0.08f);
 		//	return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftLeg") == 0)
 		{
-			return new btCapsuleShape(0.20f, 0.36f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
 		{
-			return new btCapsuleShape(0.2f, 0.36f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.2f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightArm") == 0)
 		{
-			return new btCapsuleShape(0.28f, 0.3f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightFoot") == 0)
 		{
-			return new btCapsuleShape(0.2f, 0.08f);
+			return new btBoxShape(btVector3(0.2f, 0.1f, 0.2f));
+		//	return new btCapsuleShape(0.2f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightForeArm") == 0)
 		{
-			return new btCapsuleShape(0.28f, 0.3f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightHand") == 0)
 		{
-			return new btCapsuleShape(0.28f, 0.08f);
+			return new btBoxShape(btVector3(0.2f, 0.2f, 0.2f));
+			//return new btCapsuleShape(0.28f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightLeg") == 0)
 		{
-			return new btCapsuleShape(0.20f, 0.26f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.20f, 0.26f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
 		{
-			return new btCapsuleShape(0.20f, 0.36f);
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_Spine") == 0)
@@ -240,11 +251,12 @@ namespace Ragdoll
 			worldTrans.getOpenGLMatrix(test);
 
 
-			m_prevPos[i] =  glm::make_mat4(test)  *  glm::inverse(retVal[i]) ;
 			
+			m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(retVal[i]) */;
 			//World to local space
  			retVal[i] = glm::inverse(m_prevPos[i])  * glm::inverse(retVal[i]) *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
-	
+
+			
 			
 		}
 		return retVal;
@@ -259,10 +271,10 @@ namespace Ragdoll
 	{
 		btQuaternion btquat;
 		
-		btquat.setX(p_orientation.w);
-		btquat.setY(p_orientation.x);
-		btquat.setZ(p_orientation.y);
-		btquat.setW(p_orientation.z);
+		btquat.setX(p_orientation.y);
+		btquat.setY(p_orientation.z);
+		btquat.setZ(p_orientation.w);
+		btquat.setW(p_orientation.x);
 		m_bodies[13]->getWorldTransform().setRotation(btquat);
 	}
 
@@ -272,16 +284,19 @@ namespace Ragdoll
 		//Hips-spine
 		if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_Spine") == 0 )
 		{
-			CalculateConstraintTransform(p_bodyA, p_bodyB, 0 , 0.15f, 0, 0, -0.5f, 0, 0 , 0, 0, 1, &localA, &localB);
+			CalculateConstraintTransform(p_bodyA, p_bodyB, 
+				0 , 0.15f * OFFSET, 0, 
+				0, -0.35f * OFFSET, 0, 
+				0 , 0, 0, 1, &localA, &localB);
 		//	localA.getBasis().setEulerZYX(0,PI_2,0);
 			//localB.getBasis().setEulerZYX(0,PI_2,0); 
 			//localA.setOrigin(btVector3(0, 0.25f + OFFSET, 0)); 
 		//	localB.setOrigin(btVector3(0, -0.25f - OFFSET, 0));
 			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
-			constraint->setLimit(0,0,0,0);
+			constraint->setLimit(0,PI_2,0);
 				
 			//constraint->setLimit(PI_2, PI_2, PI_2);
-			m_dynamicWorld->addConstraint(constraint, true);
+			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
@@ -289,13 +304,13 @@ namespace Ragdoll
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB,
-				 0.20f , -0.25f, 0,
-				0, 0.4f, 0,
+				 0.20f , -0.15f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 		//	localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
 			//localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
-			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(0,PI_2);
+			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+			//constraint->setLimit(0,PI_2);
 			m_dynamicWorld->addConstraint(constraint,true);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
@@ -304,13 +319,13 @@ namespace Ragdoll
 		else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				-0.20f , -0.25f, 0,
-				0, 0.4f, 0,
+				-0.20f , -0.15f * OFFSET, 0,
+				0, 0.2f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 			//localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
 			//localB.setOrigin(btVector3(0, 0.3f + 0, 0));
-			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(0,PI_2);
+			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+			//constraint->setLimit(0,PI_2);
 
 			//btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
 			//constraint->setLimit(PI_2, PI_2, PI_2);
@@ -322,8 +337,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_LeftUpLeg") == 0 && p_nameB.compare("Character1_LeftLeg") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.35f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
  			//localA.setOrigin(btVector3(0, -0.5f- OFFSET, 0)); 
  			//localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
@@ -337,8 +352,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_RightUpLeg") == 0 && p_nameB.compare("Character1_RightLeg") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.35f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
  			//localA.setOrigin(btVector3(0, -0.25f - OFFSET, 0)); 
  		//	localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
@@ -352,8 +367,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_LeftLeg") == 0 && p_nameB.compare("Character1_LeftFoot") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.24f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.15f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
  			//localA.setOrigin(btVector3(0, -0.21f - OFFSET, 0)); 
  		//	localB.setOrigin(btVector3(0, 0.09f+ OFFSET, 0));
@@ -367,8 +382,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_RightLeg") == 0 && p_nameB.compare("Character1_RightFoot") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.24f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.15f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 //  			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
 //  			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
@@ -382,9 +397,9 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				-0.35f , -0.35f, 0,
-				0, 0.24f, 0,
-				0 , 0, 0, 1, &localA, &localB);
+				-0.35f , -0.1f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
+				0 , 0, 1, 0, &localA, &localB);
 //  			localA.getBasis().setEulerZYX(0,0,1);
 //  			localB.getBasis().setEulerZYX(0,0,1); 
 //  			localA.setOrigin(btVector3(-0.2f, 0.10f +  OFFSET, 0)); 
@@ -399,9 +414,9 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.35f , -0.35f, 0,
-				0, 0.24f, 0,
-				0 , 0, 0, 1, &localA, &localB);
+				0.35f , -0.1f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
+				0 , 0, 1, 0, &localA, &localB);
 //  			localA.getBasis().setEulerZYX(0,0,1);
 //  			localB.getBasis().setEulerZYX(0,0,1); 
 //  			localA.setOrigin(btVector3(0.2f, 0.10f +  OFFSET, 0)); 
@@ -416,8 +431,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0 , -0.30f, 0,
-				0, 0.30f, 0,
+				0 , -0.20f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 //  			localA.getBasis().setEulerZYX(0,0,0);
 //  			localB.getBasis().setEulerZYX(0,0,0); 
@@ -433,8 +448,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0 , -0.30f, 0,
-				0, 0.30f, 0,
+				0 , -0.20f * OFFSET, 0,
+				0, 0.20f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 //  			localA.getBasis().setEulerZYX(0,0,0);
 //  			localB.getBasis().setEulerZYX(0,0,0); 
@@ -450,8 +465,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.24f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.15f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 //  			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
 //  			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
@@ -465,8 +480,8 @@ namespace Ragdoll
  		else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
  		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0.0f , -0.35f, 0,
-				0, 0.24f, 0,
+				0.0f , -0.20f * OFFSET, 0,
+				0, 0.15f * OFFSET, 0,
 				0 , 0, 0, 1, &localA, &localB);
 //  			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
 //  			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
