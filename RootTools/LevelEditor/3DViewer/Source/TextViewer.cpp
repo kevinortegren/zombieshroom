@@ -249,10 +249,13 @@ int main(int argc, char* argv[])
 							ReleaseMutex(RM.TextureMutexHandle);
 						}
 					}
-				}
-				
 
-				
+					if(type == "Locator")
+					{
+						if(RM.PlocatorList[updateID]->transformation.flags._Particle)
+							UpdateParticle(updateID);
+					}
+				}							
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
