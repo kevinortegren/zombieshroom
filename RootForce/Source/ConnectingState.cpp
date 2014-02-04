@@ -52,7 +52,8 @@ namespace RootForce
 
 		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
-
+		
+		m_networkContext.m_client = nullptr;
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
 		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
@@ -60,9 +61,10 @@ namespace RootForce
 		// Host
 		if (p_playData.Host)
 		{
-			if(m_networkContext.m_server.get() == nullptr)
+			//if(m_networkContext.m_server.get() == nullptr)
 			{
 				// Setup the server and connect a local client
+				m_networkContext.m_server = nullptr;
 				m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
 				m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 			}

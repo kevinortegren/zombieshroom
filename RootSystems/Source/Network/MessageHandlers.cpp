@@ -455,6 +455,9 @@ namespace RootForce
 				case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
+
+					if(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress) == -1)
+						break;
 					
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
