@@ -213,10 +213,10 @@ namespace RootForce
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
 
-		m_networkContext.m_client = nullptr;
+		/*m_networkContext.m_client = nullptr;
 		m_networkContext.m_clientMessageHandler = nullptr;
 		m_networkContext.m_server = nullptr;
-		m_networkContext.m_serverMessageHandler = nullptr;
+		m_networkContext.m_serverMessageHandler = nullptr;*/
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
