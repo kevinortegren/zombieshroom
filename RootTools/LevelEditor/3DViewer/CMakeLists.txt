@@ -10,6 +10,9 @@ file(GLOB_RECURSE SOURCES Source/*.cpp)
 file(GLOB_RECURSE HEADERS Include/*.h)
 set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 
+message("${SOURCES}")
+message("${HEADERS}")
+
 # Set search paths
 include_directories(Include)
 

@@ -7,7 +7,7 @@
 #include <sstream>;
 
 // Threshold for determining if two vertices are identical
-#define THRESHOLD 0.01f
+#define THRESHOLD 0.001f
 
 SharedMemory SM;
 
@@ -16,7 +16,10 @@ MCallbackIdArray g_callback_ids;
 MObject g_selectedObject;
 MSelectionList selected;
 
-MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators];
+MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], 
+		g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators],
+		g_mayaAmbientLight, g_mayaDirectionalLight;
+
 int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
@@ -45,16 +48,21 @@ void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
 void DuplicationCb(void *clientData);
 void checkForDuplicatedMeshes(MObject node);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
 
-void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor);
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting);
 int paintCount = 0;
 void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString &Green, MString &Blue, int &tileFactor);
+MString cleanFullPathName(const char * str);
+std::string GetNameFromPath( std::string p_path );
+void UpdateTransformation(Transform& destination, MObject transObject);
 
 PaintTexture myTextures[g_maxPaintTextures];
+MSpace::Space g_space_world = MSpace::kPostTransform;
+MSpace::Space g_space_local = MSpace::kPreTransform;
 
 // Lägger till ett callback-id i callback-arrayen.
 void AddCallbackID(MStatus status, MCallbackId id)
@@ -106,32 +114,42 @@ EXPORT MStatus initializePlugin(MObject obj)
 void GivePaintId(int index, string filePath)
 {
 	bool painted = false;
-	for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
-	{
-		string flag = SM.meshList[index].transformation.flags[i];
-		if(flag == "Painted")
-		{
-			painted = true;
-		}
-	}
+	bool painting = false;
+	//for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
+	//{
+	//	string flag = SM.meshList[index].transformation.flags[i];
+	//	if(flag == "Painted")
+	//	{
+	//		painted = true;
+	//	}
+	//	if(flag == "Painting")
+	//	{
+	//		painting = true;
+	//	}
+	//}
 
-	if (filePath == "PaintTexture" || painted)
+	if(SM.meshList[index].transformation.flags._PaintStatus == 0)
+		painting = true;
+	else if(SM.meshList[index].transformation.flags._PaintStatus == 1)
+		painted = true;
+
+	if (filePath == "PaintTexture" || painted || painting)
 	{
 		if(SM.meshList[index].paintIndex == -1)
 		{
-			Print(SM.meshList[index].modelName, " given paintID ", paintCount);
+			//Print(SM.meshList[index].modelName, " given paintID ", paintCount);
 			SM.meshList[index].paintIndex = paintCount;
 
 			paintCount++;
 		}
 		else
 		{
-			Print("Already has paintID!");
+			//Print("Already has paintID!");
 		}
 	}
 }
 
-void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor)
+void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting)
 {
 	HANDLE TextureMutexHandle;
 	DWORD milliseconds;
@@ -141,13 +159,8 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		//paintTexture.readFromTextureNode(
 		unsigned int x,y;
 		texture.getSize(x,y);
-		Print("Painting");
-		Print("SIZE X Y ", x, " ", y);
-
-		for(int i = 0; i < x*y*4; i++)
-		{
-			myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
-		}
+		//Print("Painting");
+		//Print("SIZE X Y ", x, " ", y);
 
 		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(TextureMutexHandle, SM.milliseconds);
@@ -155,7 +168,16 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 
 		SM.PpaintList[SM.meshList[index].paintIndex]->heigth = y;
 		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
-		memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
+
+		if(painting)
+		{
+			for(int i = 0; i < x*y*4; i++)
+			{
+				myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
+			}
+			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
+
+		}
 
 		if(Red != "")
 			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, Red.asChar(), g_maxNameLength);
@@ -188,13 +210,38 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		//texture.release();
 }
 
+std::wstring s2ws(const std::string& s)
+{
+	int len;
+	int slength = (int)s.length() + 1;
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0); 
+	wchar_t* buf = new wchar_t[len];
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
+
+void copyTexture(string saveToDir, string texturePath)
+{
+	string textureName = GetNameFromPath(texturePath) + ".dds";			
+	string newTexturePath = saveToDir + textureName;
+	//FALSE = overwrites
+	Print("Copying", s2ws(texturePath).c_str(), " to ", s2ws(newTexturePath).c_str());
+	CopyFile(s2ws(texturePath).c_str(), s2ws(newTexturePath).c_str(), FALSE);
+}
+
+float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
+{
+	return sqrt((myVector1.x - myVector2.x)*(myVector1.x - myVector2.x) + (myVector1.y - myVector2.y)*(myVector1.y - myVector2.y) + (myVector1.z - myVector2.z)*(myVector1.z - myVector2.z));
+}
+
 void Export()
 {	
 	for(int i = 0; i < currNrMeshes; i++)
 	{
-		Print("Index ", i, " ", SM.meshList[i].transformation.name);
+		//Print("Index ", i, " ", SM.meshList[i].transformation.name);
 		int count = 0;
-		int countVertex = 0;
 		bool exists = true;
 		int saveJ = 0;
 		if(i == 0)
@@ -205,13 +252,17 @@ void Export()
 		{
 			for(int j = 0; j < i; j++)
 			{
+				int countVertex = 0;
 				if(SM.meshList[i].nrOfVertices == SM.meshList[j].nrOfVertices)
 				{
 					for(int v = 0; v < SM.meshList[i].nrOfVertices; v++)
 					{
 						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
-						if ((SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length() <= THRESHOLD)
+						// (SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length();
+						float dist = getLengthOfVector(SM.meshList[i].vertex[v], SM.meshList[j].vertex[v]);
+						if (dist >= THRESHOLD)
 						{
+							//Om den är falsk hela vägen
 							exists = false;
 						}
 						else
@@ -243,7 +294,7 @@ void Export()
 		if(exists)
 		{
 			MFnMesh mesh = g_mayaMeshList[saveJ];
-			Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
+			//Print("Overwriting: ", SM.meshList[i].modelName, " index: ", i, " with ", SM.meshList[saveJ].modelName, " index: ", saveJ);
 			memset(SM.meshList[i].modelName, NULL, sizeof(SM.meshList[i].modelName));
 			memcpy(SM.meshList[i].modelName, SM.meshList[saveJ].modelName, mesh.name().numChars());
 			SM.UpdateSharedMesh(i, true, false, currNrMeshes);
@@ -260,9 +311,25 @@ void Export()
 
 			string outputDirectory = g_savepath + "Models/";
 			MString savepath = outputDirectory.c_str();
-			//ExportFunction = "file -force -options \"\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
-			ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=1;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
-			Print(name);
+
+			ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
+			
+			//Copy textures
+			string saveToDir = g_savepath + "Textures/";
+			//DIFFUSE
+			string texturePath = SM.materialList[SM.meshList[i].MaterialID].texturePath;
+
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].texturePath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].normalPath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].specularPath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].glowPath);
+
+			//MString textureName = cleanFullPathName(texturePath.c_str());			
+			//string newTexturePath = savToDir + textureName.asChar();
+			////FALSE = overwrites
+			//CopyFile(s2ws(texturePath).c_str(), s2ws(newTexturePath).c_str(), FALSE);
+
+
 			MGlobal::executeCommand(ExportFunction);
 			Print(ExportFunction);
 		}
@@ -275,6 +342,9 @@ void Export()
 	exportMaya = 0;
 
 	ReleaseMutex(SM.IdMutexHandle);
+
+	//GET BACCK OLD NAMES?
+	//loadScene();
 }
 
 void sortObjectList()
@@ -308,13 +378,23 @@ void sortObjectList()
 			MayaCameraToList(g_mayaCameraList[currNrCameras], currNrCameras);	
 			currNrCameras++;
 		}
-		else if(g_objectList[i].hasFn(MFn::kLight))
+		else if(g_objectList[i].hasFn(MFn::kPointLight))
 		{
 			MFnLight tempLight = g_objectList[i];
 			g_mayaLightList[currNrLights] = g_objectList[i];
 			MayaLightToList(g_mayaLightList[currNrLights], currNrLights);		
 
 			currNrLights++;
+		}
+		else if(g_objectList[i].hasFn(MFn::kAmbientLight))
+		{
+			g_mayaAmbientLight = g_objectList[i];
+			MayaLightToList(g_mayaAmbientLight, currNrLights);
+		}
+		else if(g_objectList[i].hasFn(MFn::kDirectionalLight))
+		{
+			g_mayaDirectionalLight = g_objectList[i];
+			MayaLightToList(g_mayaDirectionalLight, currNrLights);
 		}
 		else if(g_objectList[i].hasFn(MFn::kLambert))
 		{
@@ -416,6 +496,37 @@ void loadScene()
 		//SM.UpdateSharedLight(i, currNrLights);
 		//Done correct in ^^
 	}
+
+	MFnLight ambient = g_mayaAmbientLight;
+	if(g_mayaAmbientLight.hasFn(MFn::kAmbientLight))
+	{
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaAmbientLight, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
+	if(ambient.parent(0,&status).hasFn(MFn::kTransform))
+	{
+		MObject transform = ambient.parent(0, &status);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+	MayaLightToList(g_mayaAmbientLight, -1);
+
+	MFnLight directional = g_mayaDirectionalLight;
+	if(g_mayaAmbientLight.hasFn(MFn::kDirectionalLight))
+	{
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaDirectionalLight, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
+	if(directional.parent(0,&status).hasFn(MFn::kTransform))
+	{
+		MObject transform = directional.parent(0, &status);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+	MayaLightToList(g_mayaDirectionalLight, -1);
+
 	//Camera transformation CB
 	for(int i = 0; i < currNrCameras; i++)
 	{
@@ -474,7 +585,7 @@ void DuplicationCb(void* clientdata)
 		if(temp.hasFn(MFn::kTransform))
 		{
 		MFnTransform tempTrans = temp; 
-		Print (tempTrans.name());
+		//Print (tempTrans.name());
 		checkForDuplicatedMeshes(tempTrans.child(0));
 		checkForNewCameras(tempTrans.child(0), nullptr);
 		//checkForNewLights(tempTrans.child(0), nullptr);		// NO NEEEAAAAAAD FOOOUUUUL
@@ -486,20 +597,20 @@ void DuplicationCb(void* clientdata)
 ////////////////////////////	LOOK IF A MESH NODE IS DIRTY  //////////////////////////////////////////
 void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyMeshNodeCB");
+	//Print("dirtyMeshNodeCB");
 
 	int index = nodeExists(node);
 
 	if(index != -1)
 	{
 		MayaMeshToList(node, index, true, true, true);
-		SM.UpdateSharedMesh(index, true, true, currNrMeshes);
+		//SM.UpdateSharedMesh(index, true, true, currNrMeshes);
 	}
 }
 
 void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyLightNode");
+	//Print("dirtyLightNode");
 	MStatus status;
 	MFnLight Light = node;
 
@@ -507,8 +618,11 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 	if(index != -1)
 	{
 		MayaLightToList(node, index);
-		SM.UpdateSharedLight(index, currNrLights);
+		//SM.UpdateSharedLight(index, currNrLights);
 	}
+
+	if(node.hasFn(MFn::kAmbientLight) || node.hasFn(MFn::kDirectionalLight))
+		MayaLightToList(node, index);
 }
 
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
@@ -517,39 +631,52 @@ void getMeshFlags(MObject object, int index)
 	if(object.hasFn(MFn::kTransform))
 	{
 		MFnTransform trans = object;
-		Print("Getting flags for: ", SM.meshList[index].modelName);
+		//Print("Getting flags for: ", SM.meshList[index].modelName);
 
 		for(int i = 0; i < trans.parentCount(); i++)
 		{
 			if(trans.parent(i).hasFn(MFn::kTransform))
 			{
 				MFnTransform temp = trans.parent(i);
-				Print("Found parent: ", temp.name());
+				//Print("Found parent: ", temp.name());
 
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
 
-				for(int j = 0; j < g_maxNrOfFlags; j ++)
-				{
-					if(alreadyExists == false)
-					{					
-						if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
-						{
-							alreadyExists = true;
-							Print("Flag exists skipping...");
-						}
-						else
-						{
-							if(SM.meshList[index].transformation.flags[j][0] == NULL)
-							{
-								memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
-								SM.meshList[index].transformation.nrOfFlags ++;
-								alreadyExists = true;
-							}
-						}
-					}
-				}
+				if(name == "Hazard")
+					SM.meshList[index].transformation.flags._Hazard = true;
+				if(name == "Painting")
+					SM.meshList[index].transformation.flags._PaintStatus = 0;
+				if(name == "Painted")
+					SM.meshList[index].transformation.flags._PaintStatus = 1;
+				if(name == "Static")
+					SM.meshList[index].transformation.flags._Static = true;
+				if(name == "Transparent")
+					SM.meshList[index].transformation.flags._Transparent = true;
+				if(name == "Water")
+					SM.meshList[index].transformation.flags._Water = true;
+
+				//for(int j = 0; j < g_maxNrOfFlags; j ++)
+				//{
+				//	if(alreadyExists == false)
+				//	{					
+				//		if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
+				//		{
+				//			alreadyExists = true;
+				//			//Print("Flag exists skipping...");
+				//		}
+				//		else
+				//		{
+				//			if(SM.meshList[index].transformation.flags[j][0] == NULL)
+				//			{
+				//				memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+				//				//Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
+				//				SM.meshList[index].transformation.nrOfFlags ++;
+				//				alreadyExists = true;
+				//			}
+				//		}
+				//	}
+				//}
 				getMeshFlags(trans.parent(i), index);
 			}
 		}
@@ -561,39 +688,45 @@ void getLocatorFlags(MObject object, int index)
 	if(object.hasFn(MFn::kTransform))
 	{
 		MFnTransform trans = object;
-		Print("Getting flags for: ", SM.locatorList[index].transformation.name);
+		//Print("Getting flags for: ", SM.locatorList[index].transformation.name);
 
 		for(int i = 0; i < trans.parentCount(); i++)
 		{
 			if(trans.parent(i).hasFn(MFn::kTransform))
 			{
 				MFnTransform temp = trans.parent(i);
-				Print("Found parent: ", temp.name());
+				//Print("Found parent: ", temp.name());
 
 				bool alreadyExists = false;
 				string name = temp.name().asChar();
 
-				for(int j = 0; j < g_maxNrOfFlags; j ++)
-				{
-					if(alreadyExists == false)
-					{					
-						if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
-						{
-							alreadyExists = true;
-							Print("Flag exists skipping...");
-						}
-						else
-						{
-							if(SM.locatorList[index].transformation.flags[j][0] == NULL)
-							{
-								memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-								Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
-								SM.locatorList[index].transformation.nrOfFlags ++;
-								alreadyExists = true;
-							}
-						}
-					}
-				}
+				if(name == "Particle")
+					SM.locatorList[index].transformation.flags._Particle = true;
+				if(name == "SpawnPoint")
+					SM.locatorList[index].transformation.flags._SpawnPoint = true;
+
+				//for(int j = 0; j < g_maxNrOfFlags; j ++)
+				//{
+				//	if(alreadyExists == false)
+				//	{					
+				//		if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
+				//		{
+				//			alreadyExists = true;
+				//			//Print("Flag exists skipping...");
+				//		}
+				//		else
+				//		{
+				//			if(SM.locatorList[index].transformation.flags[j][0] == NULL)
+				//			{
+				//				memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
+				//				//Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
+				//				SM.locatorList[index].transformation.nrOfFlags ++;
+				//				alreadyExists = true;
+				//			}
+				//		}
+				//	}
+				//}
+
 				getLocatorFlags(trans.parent(i), index);
 			}
 		}
@@ -602,7 +735,7 @@ void getLocatorFlags(MObject object, int index)
 
 void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 {
-	Print("dirtyTransformNodeCB");
+	//Print("dirtyTransformNodeCB");
 	
 	MStatus status = MS::kSuccess;
 	MFnTransform trans = node;
@@ -617,17 +750,23 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 			MayaMeshToList(trans.child(0, &status), index, true, true, true);
 		}
 
-		if(trans.child(0, &status).hasFn(MFn::kLight))
+		if(trans.child(0, &status).hasFn(MFn::kPointLight))
 		{
 			MayaLightToList(trans.child(0, &status), index);
-			SM.UpdateSharedLight(index, currNrLights);
+			//SM.UpdateSharedLight(index, currNrLights);
 		}
 
 	}
 
+	if(trans.child(0, &status).hasFn(MFn::kAmbientLight) || trans.child(0, &status).hasFn(MFn::kDirectionalLight))
+	{
+		MayaLightToList(trans.child(0, &status), 0);
+		//SM.UpdateSharedLight(index, currNrLights);
+	}
+
 	if(trans.child(0, &status).hasFn(MFn::kLocator))
 	{		
-		Print("U moved a locator! Index ", nodeExists(trans.child(0)));
+		//Print("U moved a locator! Index ", nodeExists(trans.child(0)));
 		MayaLocatorToList(trans.child(0));
 	}
 }
@@ -636,7 +775,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 {// Reagerar precis INNAN man bytt textur!
-	Print("dirtyMaterialCB");
+	//Print("dirtyMaterialCB");
 
 	string materialName = "";
 	if(node.hasFn(MFn::kLambert))
@@ -650,12 +789,12 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 		for(int i = 0; i < currNrMeshes; i++)
 		{
 			string temp = SM.meshList[i].materialName;
-			Print("Comparing", temp.c_str(), " and ", materialName.c_str());
+		//	Print("Comparing", temp.c_str(), " and ", materialName.c_str());
 			if(SM.meshList[i].materialName == materialName)
 			{
 				MFnMesh mesh = g_mayaMeshList[i];
 
-				Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
+			//	Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
 				MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
 				SM.UpdateSharedMaterials(currNrMaterials, i);
 				SM.UpdateSharedMesh(i, true, true, currNrMeshes);
@@ -669,7 +808,7 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 ////////////////////////////	SORT OUT WHAT TYPE THE NEW NODE ARE //////////////////////////////////////////
 void NodeAddedCB(MObject &node, void *clientData)
 {
-	Print("NodeAddedCB");
+//	Print("NodeAddedCB");
 
 	//Callback when node is added.
 	checkForNewCameras(node, clientData);
@@ -691,14 +830,14 @@ void NodeAddedCB(MObject &node, void *clientData)
 
 void NodeRemovedCB(MObject &node, void *clientData)
 {
-	Print("NodeRemovedCB");
+//	Print("NodeRemovedCB");
 
 	//Callback when node is removed
 	int removeID = 0;
 
 	if(node.hasFn(MFn::kMesh))
 	{
-		Print("Removed a mesh!");
+	//	Print("Removed a mesh!");
 
 		MFnMesh mesh = node;
 
@@ -707,19 +846,20 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			MFnMesh listMesh = g_mayaMeshList[i];
 			if(listMesh.name() == mesh.name())
 			{
-				Print("Mesh ", mesh.name(), " at index ", i);
+			//	Print("Mesh ", mesh.name(), " at index ", i);
 				removeID = i;
+				currNrMeshes--;				
 
-				for(int j = i; j < currNrMeshes-1; j++)
+				for(int j = i; j < currNrMeshes; j++)
 				{
 					g_mayaMeshList[j] = g_mayaMeshList[j+1];
 					MayaMeshToList(g_mayaMeshList[j], j, true, true, true);
-					SM.UpdateSharedMesh(j, true, true, currNrMeshes-1);					
+					//SM.UpdateSharedMesh(j, true, true, currNrMeshes);					
 				}
 					
-				//g_mayaMeshList[currNrMeshes].~MObject();					//Will crash if it reaches g_maxMeshes
-				currNrMeshes--;
 				SM.RemoveMesh(removeID, currNrMeshes);
+				//g_mayaMeshList[currNrMeshes].~MObject();					//Will crash if it reaches g_maxMeshes
+
 			}
 		}	
 	}
@@ -733,13 +873,14 @@ void NodeRemovedCB(MObject &node, void *clientData)
 			if(listLight.name() == light.name())
 			{
 				removeID = i;
+				currNrLights--;
+
 				for(int j = i; j < currNrLights; j++)
 				{
 					g_mayaLightList[j] = g_mayaLightList[j+1];
-					MayaLightToList(g_mayaLightList[j], j);
-					SM.UpdateSharedLight(j,currNrLights-1);
+					MayaLightToList(g_mayaLightList[j], j);					
 				}
-				currNrLights--;
+				
 				SM.RemoveLight(removeID, currNrMeshes);
 			}
 		}
@@ -791,7 +932,7 @@ void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData)
 			int id = nodeExists(destination);
 			if(id == -1)
 			{
-				Print("Adding CB to ", lambert.name());
+				//Print("Adding CB to ", lambert.name());
 				MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(destination, dirtyMaterialCB, nullptr, &status);
 				AddCallbackID(status, id);
 				g_mayaMaterialList[currNrMaterialObjects] = destination;
@@ -865,7 +1006,7 @@ void checkForNewCameras(MObject &node, void *clientData)
 
 	if(node.hasFn(MFn::kCamera))
 	{
-		Print("New Camera Added!");
+		//Print("New Camera Added!");
 		g_mayaCameraList[currNrCameras] = node;
 		MayaCameraToList(node, currNrCameras);
 		currNrCameras++;
@@ -886,16 +1027,32 @@ void checkForNewLights(MObject &node, void *clientData)
 
 	MStatus status;
 
-	if(node.hasFn(MFn::kLight))
+	if(node.hasFn(MFn::kPointLight))
 	{
-		Print("New Light Added");
+		//Print("New Light Added");
 		g_mayaLightList[currNrLights] = node;
 		MayaLightToList(node, currNrLights);
 		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
 		AddCallbackID(status, id);
 		currNrLights++;
 	}
+
+	if(node.hasFn(MFn::kDirectionalLight))
+	{
+		g_mayaDirectionalLight = node;
+		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
 	
+	if(node.hasFn(MFn::kAmbientLight))
+	{
+		g_mayaAmbientLight = node;
+		MayaLightToList(node, currNrLights);
+		MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(node, dirtyLightNodeCB, nullptr, &status);
+		AddCallbackID(status, id);
+	}
+
 	if(light.parent(0,&status).hasFn(MFn::kTransform))
 	{
 		MObject transform = light.parent(0, &status);
@@ -985,7 +1142,7 @@ int nodeExists(MObject node)
 		for(int i = 0; i < currNrMaterialObjects; i++)
 		{
 			MFnLambertShader temp = g_mayaMaterialList[i];
-			Print("nodeExists() Comparing ", temp.name(), " and ", lambert.name());
+			//Print("nodeExists() Comparing ", temp.name(), " and ", lambert.name());
 			if(temp.name() == lambert.name())
 			{
 				answer = i;
@@ -998,10 +1155,13 @@ int nodeExists(MObject node)
 	{
 		MFnDagNode locator = node;
 
+		MFnTransform locTrans = locator.parent(0);
 		for(int i = 0; i < currNrLocators; i++)
 		{
 			MFnDagNode temp = g_mayaLocatorList[i];
-			if(temp.name() == locator.name())
+			MFnTransform tempTrans = temp.parent(0);
+
+			if(tempTrans.name() == locTrans.name())
 			{
 				answer = i;
 				break;
@@ -1026,12 +1186,28 @@ MString cleanFullPathName(const char * str)
 	return TEMP;
 }
 
+std::string GetNameFromPath( std::string p_path )
+{
+	std::string cutPath;
+	std::string::size_type slashIndex, dotIndex;
+
+	// Extract the file name
+	cutPath  = p_path;
+	slashIndex = cutPath.find_last_of("/")+1;
+	if(slashIndex == 0)
+		slashIndex = cutPath.find_last_of("\\")+1;
+	cutPath  = cutPath.substr(slashIndex, cutPath.size());
+	dotIndex = cutPath.find_last_of(".");
+	cutPath  = cutPath.substr(0, dotIndex);
+	return cutPath;
+} 
+
 ////////////////////////////	ADD THE NODES TO THE SHARED LIST	 //////////////////////////////////////////
 void MayaLocatorToList(MObject object)
 {
 	MFnDagNode locator = object;
 	int index = nodeExists(object);
-	Print("LOCATOR INDEX: ", nodeExists(object));
+//	Print("LOCATOR INDEX: ", nodeExists(object));
 
 	if(index != -1 && locator.parent(0).hasFn(MFn::kTransform))
 	{
@@ -1040,28 +1216,30 @@ void MayaLocatorToList(MObject object)
 		glm::vec3 position;
 
 		MFnTransform trans = locator.parent(0);
-		MSpace::Space space_transform = MSpace::kTransform;
-
+		
+		MObject transObj = trans.object();
+		UpdateTransformation(SM.locatorList[index].transformation, transObj);
 		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
-		trans.getScale(scale);
-		trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
 
-		position.x = trans.getTranslation(space_transform).x;
-		position.y = trans.getTranslation(space_transform).y;
-		position.z = trans.getTranslation(space_transform).z;
+		//trans.getScale(scale);
+		//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
 
-		SM.locatorList[index].transformation.position.x = position.x;
-		SM.locatorList[index].transformation.position.y = position.y;
-		SM.locatorList[index].transformation.position.z = position.z;
+		//position.x = trans.getTranslation(g_space_world).x;
+		//position.y = trans.getTranslation(g_space_world).y;
+		//position.z = trans.getTranslation(g_space_world).z;
 
-		SM.locatorList[index].transformation.scale.x = scale[0];
-		SM.locatorList[index].transformation.scale.y = scale[1];
-		SM.locatorList[index].transformation.scale.z = scale[2];
+		//SM.locatorList[index].transformation.position.x = position.x;
+		//SM.locatorList[index].transformation.position.y = position.y;
+		//SM.locatorList[index].transformation.position.z = position.z;
 
-		SM.locatorList[index].transformation.rotation.x = rotX;
-		SM.locatorList[index].transformation.rotation.y = rotY;
-		SM.locatorList[index].transformation.rotation.z = rotZ;
-		SM.locatorList[index].transformation.rotation.w = rotW;
+		//SM.locatorList[index].transformation.scale.x = scale[0];
+		//SM.locatorList[index].transformation.scale.y = scale[1];
+		//SM.locatorList[index].transformation.scale.z = scale[2];
+
+		//SM.locatorList[index].transformation.rotation.x = rotX;
+		//SM.locatorList[index].transformation.rotation.y = rotY;
+		//SM.locatorList[index].transformation.rotation.z = rotZ;
+		//SM.locatorList[index].transformation.rotation.w = rotW;
 
 		getLocatorFlags(locator.parent(0), index);
 
@@ -1077,8 +1255,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
 	MVector rotPivot, scalePivot;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
+
 
 	MIntArray triangleCounts, triangleVertices;
 
@@ -1099,6 +1276,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MString normalpath = "";
 		MString materialName = "";
 		MString specularName = "";
+		MString glowName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
 		MFnDependencyNode texture_node;
@@ -1114,11 +1292,32 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node, glowName);
 		materialName = material_node.name();
 		string texPath = texturepath.asChar();		
 
 		MImage texture;
+
+		bool painted = false;
+		bool painting = false;
+
+		if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 0)
+			painting = true;
+		else if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 1)
+			painted = true;
+
+		//for(int i = 0; i < SM.meshList[meshIndex].transformation.nrOfFlags; i++)
+		//{
+		//string flag = SM.meshList[meshIndex].transformation.flags[i];
+		//if(flag == "Painted")
+		//{
+		//	painted = true;
+		//}
+		//if(flag == "Painting")
+		//{
+		//	painting = true;
+		//}
+		//}
 
 		//PAINT STUFF
 		GivePaintId(meshIndex, texPath);
@@ -1128,18 +1327,15 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			int tileFactor;
 
 			ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
-			MObject temp = texture_node.object();
 			
-			MStatus hej = texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
-			if(hej)
+			if(painting)
 			{
-				Print("Success");
-				PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor);
+				MObject temp = texture_node.object();
+				texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
 			}
-			else
-			{
-				Print("FAIL!");
-			}			
+			
+			PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor, painting);
+			
 		}
 
 		//Check if the material already exists.
@@ -1165,6 +1361,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].normalPath, normalpath.asChar(),normalpath.numChars());
 			memset(SM.materialList[currNrMaterials].specularPath, NULL, sizeof(SM.materialList[currNrMaterials].specularPath));
 			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
+			memset(SM.materialList[currNrMaterials].glowPath, NULL, sizeof(SM.materialList[currNrMaterials].glowPath));
+			memcpy(SM.materialList[currNrMaterials].glowPath, glowName.asChar(),glowName.numChars());
 			SM.meshList[meshIndex].MaterialID = currNrMaterials;
 
 			currNrMaterials++;
@@ -1192,7 +1390,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		{///////////////////////////////// GET VERTEX AND UV CONVERTED TO TRIANGLES //////////////////////////////////
 
 		//Get points from mesh
-		mesh.getPoints(points_, space_local);
+		mesh.getPoints(points_, g_space_local);
 
 		//Convert points to float array
 		points_.get(floatPoints);
@@ -1200,6 +1398,12 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MIntArray polygonVertices;
 		MPoint UVpoint;
 		float2 UV;
+
+		MPoint TangentPoint;
+		MVector tempTangent;
+		MVector tempBiNormal;
+		MFloatVectorArray tangentsArray;
+
 		int triangleVertices[3];
 		MVector normal;
 		int count = 0;
@@ -1208,6 +1412,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		SM.meshList[meshIndex].nrOfVertices = 0;
 
 		int uvID;
+		//int tangentID;
+		//int biNormalID;
 		mesh.getNormals(normals);
 
 		//goes through the polygons extracting information. 
@@ -1226,6 +1432,9 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 				nrOfTriangles = 1;
 			
 			mesh.getPolygonVertices(i, polygonVertices);
+
+			//mesh.getTangents(tangentsArray, space_local);
+			//mesh.getBinormals(biNormalArray, space_local);
 
 			mesh.getFaceNormalIds(i, normalIDs);
 
@@ -1268,6 +1477,25 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 					SM.meshList[meshIndex].UV[count].x = U;
 					SM.meshList[meshIndex].UV[count].y = 1-V;
 
+					int herp = mesh.getTangentId(i, localIndex[j]);
+					mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, g_space_local);
+
+					//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
+					//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
+					//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
+
+					mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, g_space_local, 0);
+					
+					//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
+
+					SM.meshList[meshIndex].binormal[count].x = tempBiNormal.x;
+					SM.meshList[meshIndex].binormal[count].y = tempBiNormal.y;
+					SM.meshList[meshIndex].binormal[count].z = tempBiNormal.z;
+
+					SM.meshList[meshIndex].tangent[count].x = tempTangent.x;
+					SM.meshList[meshIndex].tangent[count].y = tempTangent.y;
+					SM.meshList[meshIndex].tangent[count].z = tempTangent.z;
+
 					count++;
 					SM.meshList[meshIndex].nrOfVertices ++;
 				}
@@ -1280,37 +1508,41 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		{///////////////////////	MESH TRANSFORM ////////////////////////////////////////
 		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
 		{
-			glm::vec3 position;
 			MFnTransform transform = mesh.parent(0, &status);
-			rotPivot = transform.rotatePivot(MSpace::kObject);
-			scalePivot = transform.scalePivot(MSpace::kObject);
+			MObject transObj = transform.object();
+			UpdateTransformation(SM.meshList[meshIndex].transformation, transObj);
 
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-			position.x = transform.getTranslation(space_transform).x;
-			position.y = transform.getTranslation(space_transform).y;
-			position.z = transform.getTranslation(space_transform).z;
+			//glm::vec3 position;
+			//MFnTransform transform = mesh.parent(0, &status);
+			//rotPivot = transform.rotatePivot(MSpace::kObject);
+			//scalePivot = transform.scalePivot(MSpace::kObject);
 
-			SM.meshList[meshIndex].transformation.position.x = position.x;
-			SM.meshList[meshIndex].transformation.position.y = position.y;
-			SM.meshList[meshIndex].transformation.position.z = position.z;
+			//transform.getScale(scale);
+			//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
+			//position.x = transform.getTranslation(g_space_world).x;
+			//position.y = transform.getTranslation(g_space_world).y;
+			//position.z = transform.getTranslation(g_space_world).z;
 
-			SM.meshList[meshIndex].transformation.scale.x = scale[0];
-			SM.meshList[meshIndex].transformation.scale.y = scale[1];
-			SM.meshList[meshIndex].transformation.scale.z = scale[2];
+			//SM.meshList[meshIndex].transformation.position.x = position.x;
+			//SM.meshList[meshIndex].transformation.position.y = position.y;
+			//SM.meshList[meshIndex].transformation.position.z = position.z;
 
-			SM.meshList[meshIndex].transformation.rotation.x = rotX;
-			SM.meshList[meshIndex].transformation.rotation.y = rotY;
-			SM.meshList[meshIndex].transformation.rotation.z = rotZ;
-			SM.meshList[meshIndex].transformation.rotation.w = rotW;
+			//SM.meshList[meshIndex].transformation.scale.x = scale[0];
+			//SM.meshList[meshIndex].transformation.scale.y = scale[1];
+			//SM.meshList[meshIndex].transformation.scale.z = scale[2];
 
-			SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
-			SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
-			SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
+			//SM.meshList[meshIndex].transformation.rotation.x = rotX;
+			//SM.meshList[meshIndex].transformation.rotation.y = rotY;
+			//SM.meshList[meshIndex].transformation.rotation.z = rotZ;
+			//SM.meshList[meshIndex].transformation.rotation.w = rotW;
 
-			SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
-			SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
-			SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
+			//SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
+			//SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
+			//SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
+
+			//SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
+			//SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
+			//SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
 
 			getMeshFlags(mesh.parent(0,&status), meshIndex);
 		}
@@ -1320,13 +1552,36 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
 }
 
+void UpdateTransformation(Transform& destination, MObject transObject)
+{
+	MFnTransform transform = transObject;
+
+	MStatus status;
+	double scale[3];
+	double rotX, rotY, rotZ, rotW;
+
+	transform.getScale(scale);
+	transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+	destination.position.x = transform.getTranslation(g_space_world).x;
+	destination.position.y = transform.getTranslation(g_space_world).y;
+	destination.position.z = transform.getTranslation(g_space_world).z;
+
+	destination.scale.x = scale[0];
+	destination.scale.y = scale[1];
+	destination.scale.z = scale[2];
+
+	destination.rotation.x = rotX;
+	destination.rotation.y = rotY;
+	destination.rotation.z = rotZ;
+	destination.rotation.w = rotW;
+}
+
 void MayaLightToList(MObject node, int lightIndex)
 {
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
 	const MString PL = "PointLight";
 	const MString DL = "DirectionalLight";
 	const MString AL = "AmbientLight";
@@ -1335,57 +1590,130 @@ void MayaLightToList(MObject node, int lightIndex)
 	if(node.hasFn(MFn::kLight))
 	{
 		MFnLight light = node;
+		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
 
 		if(node.hasFn(MFn::kPointLight))
 		{
 			memcpy(SM.lightList[lightIndex].LightType, PL.asChar(), PL.numChars());
+
+			SM.lightList[lightIndex].color.r = light.color(&status).r;
+			SM.lightList[lightIndex].color.g = light.color(&status).g;
+			SM.lightList[lightIndex].color.b = light.color(&status).b;
+			SM.lightList[lightIndex].color.a = light.color(&status).a;
+			SM.lightList[lightIndex].Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.lightList[lightIndex].transformation, transObj);
+
+				/*transform.getScale(scale);
+				transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+				SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+				SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				SM.lightList[lightIndex].transformation.scale.x = scale[0];
+				SM.lightList[lightIndex].transformation.scale.y = scale[1];
+				SM.lightList[lightIndex].transformation.scale.z = scale[2];
+
+				SM.lightList[lightIndex].transformation.rotation.x = rotX;
+				SM.lightList[lightIndex].transformation.rotation.y = rotY;
+				SM.lightList[lightIndex].transformation.rotation.z = rotZ;
+				SM.lightList[lightIndex].transformation.rotation.w = rotW;*/
+			}
+
+			SM.UpdateSharedLight(lightIndex, currNrLights);
 		}
 
 		if(node.hasFn(MFn::kDirectionalLight))
 		{
-			memcpy(SM.lightList[lightIndex].LightType, DL.asChar(), DL.numChars());
-			SM.lightList[lightIndex].direction.x = light.lightDirection().x;
-			SM.lightList[lightIndex].direction.y = light.lightDirection().y;
-			SM.lightList[lightIndex].direction.z = light.lightDirection().z;
+			SM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
+
+			memcpy(SM.worldData->DirectionalSun.LightType, DL.asChar(), DL.numChars());
+			//SM.worldData->DirectionalSun.direction.x = light.lightDirection().x;
+			//SM.worldData->DirectionalSun.direction.y = light.lightDirection().y;
+			//SM.worldData->DirectionalSun.direction.z = light.lightDirection().z;
+
+			SM.worldData->DirectionalSun.color.r = light.color(&status).r;
+			SM.worldData->DirectionalSun.color.g = light.color(&status).g;
+			SM.worldData->DirectionalSun.color.b = light.color(&status).b;
+			SM.worldData->DirectionalSun.color.a = light.color(&status).a;
+			SM.worldData->DirectionalSun.Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.worldData->DirectionalSun.transformation, transObj);
+				//transform.getScale(scale);
+				//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				//SM.worldData->DirectionalSun.transformation.position.x = transform.getTranslation(g_space_world).x;
+				//SM.worldData->DirectionalSun.transformation.position.y = transform.getTranslation(g_space_world).y;
+				//SM.worldData->DirectionalSun.transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				//SM.worldData->DirectionalSun.transformation.scale.x = scale[0];
+				//SM.worldData->DirectionalSun.transformation.scale.y = scale[1];
+				//SM.worldData->DirectionalSun.transformation.scale.z = scale[2];
+
+				//SM.worldData->DirectionalSun.transformation.rotation.x = rotX;
+				//SM.worldData->DirectionalSun.transformation.rotation.y = rotY;
+				//SM.worldData->DirectionalSun.transformation.rotation.z = rotZ;
+				//SM.worldData->DirectionalSun.transformation.rotation.w = rotW;
+			}
+			ReleaseMutex(SM.LightMutexHandle);
+			SM.AddUpdateMessage("DirectionalLight", 0, true, true, false);
 		}
 
 		if(node.hasFn(MFn::kAmbientLight))
 		{
-			memcpy(SM.lightList[lightIndex].LightType, AL.asChar(), AL.numChars());
+			SM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+			WaitForSingleObject(SM.LightMutexHandle, SM.milliseconds);
+
+			memcpy(SM.worldData->AmbientLight.LightType, AL.asChar(), AL.numChars());
+
+			SM.worldData->AmbientLight.color.r = light.color(&status).r;
+			SM.worldData->AmbientLight.color.g = light.color(&status).g;
+			SM.worldData->AmbientLight.color.b = light.color(&status).b;
+			SM.worldData->AmbientLight.color.a = light.color(&status).a;
+			SM.worldData->AmbientLight.Intensity = light.intensity(&status);
+
+			///////////////////////	LIGHT TRANSFORM
+			if(light.parent(0, &status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = light.parent(0, &status);
+
+				MObject transObj = transform.object();
+				UpdateTransformation(SM.worldData->AmbientLight.transformation, transObj);
+
+				//transform.getScale(scale);
+				//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+
+				//SM.worldData->AmbientLight.transformation.position.x = transform.getTranslation(g_space_world).x;
+				//SM.worldData->AmbientLight.transformation.position.y = transform.getTranslation(g_space_world).y;
+				//SM.worldData->AmbientLight.transformation.position.z = transform.getTranslation(g_space_world).z;
+
+				//SM.worldData->AmbientLight.transformation.scale.x = scale[0];
+				//SM.worldData->AmbientLight.transformation.scale.y = scale[1];
+				//SM.worldData->AmbientLight.transformation.scale.z = scale[2];
+
+				//SM.worldData->AmbientLight.transformation.rotation.x = rotX;
+				//SM.worldData->AmbientLight.transformation.rotation.y = rotY;
+				//SM.worldData->AmbientLight.transformation.rotation.z = rotZ;
+				//SM.worldData->AmbientLight.transformation.rotation.w = rotW;
+			}
+
+			SM.AddUpdateMessage("AmbientLight", 0, true, true, false);
+			ReleaseMutex(SM.LightMutexHandle);
 		}
-
-		SM.lightList[lightIndex].color.r = light.color(&status).r;
-		SM.lightList[lightIndex].color.g = light.color(&status).g;
-		SM.lightList[lightIndex].color.b = light.color(&status).b;
-		SM.lightList[lightIndex].color.a = light.color(&status).a;
-		SM.lightList[lightIndex].Intensity = light.intensity(&status);
-
-		memcpy(SM.lightList[lightIndex].transformation.name, light.fullPathName().asChar(), light.fullPathName().numChars());
-		//SM.lightList[lightIndex].transformation.name = light.fullPathName().asChar();
-
-		///////////////////////	LIGHT TRANSFORM
-		if(light.parent(0, &status).hasFn(MFn::kTransform))
-		{
-			MFnTransform transform = light.parent(0, &status);
-
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
-
-			SM.lightList[lightIndex].transformation.position.x = transform.getTranslation(space_transform).x;
-			SM.lightList[lightIndex].transformation.position.y = transform.getTranslation(space_transform).y;
-			SM.lightList[lightIndex].transformation.position.z = transform.getTranslation(space_transform).z;
-
-			SM.lightList[lightIndex].transformation.scale.x = scale[0];
-			SM.lightList[lightIndex].transformation.scale.y = scale[1];
-			SM.lightList[lightIndex].transformation.scale.z = scale[2];
-
-			SM.lightList[lightIndex].transformation.rotation.x = rotX;
-			SM.lightList[lightIndex].transformation.rotation.y = rotY;
-			SM.lightList[lightIndex].transformation.rotation.z = rotZ;
-			SM.lightList[lightIndex].transformation.rotation.w = rotW;
-		}
-
-		SM.UpdateSharedLight(lightIndex, currNrLights);
 	}
 }
 
@@ -1394,8 +1722,6 @@ void MayaCameraToList(MObject node, int cameraIndex)
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
-	MSpace::Space space_transform = MSpace::kTransform;
-	MSpace::Space space_local = MSpace::kObject;
 
 	///////////////////////	CAMERA
 	if(node.hasFn(MFn::kCamera))
@@ -1406,9 +1732,9 @@ void MayaCameraToList(MObject node, int cameraIndex)
 		//SM.cameraList[cameraIndex].transformation.name = camera.fullPathName().asChar();
 		SM.cameraList[cameraIndex].aspectRatio = camera.aspectRatio();
 
-		SM.cameraList[cameraIndex].eyePoint.x = camera.eyePoint(space_transform).x;
-		SM.cameraList[cameraIndex].eyePoint.y = camera.eyePoint(space_transform).y;
-		SM.cameraList[cameraIndex].eyePoint.z = camera.eyePoint(space_transform).z;
+		SM.cameraList[cameraIndex].eyePoint.x = camera.eyePoint(g_space_world).x;
+		SM.cameraList[cameraIndex].eyePoint.y = camera.eyePoint(g_space_world).y;
+		SM.cameraList[cameraIndex].eyePoint.z = camera.eyePoint(g_space_world).z;
 
 		SM.cameraList[cameraIndex].farClippingPlane = camera.farClippingPlane();
 		SM.cameraList[cameraIndex].horizontalFieldOfView = camera.horizontalFieldOfView();
@@ -1433,21 +1759,23 @@ void MayaCameraToList(MObject node, int cameraIndex)
 		{
 			MFnTransform transform = camera.parent(0, &status);
 
-			transform.getScale(scale);
-			transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+			MObject transObj = transform.object();
+			UpdateTransformation(SM.cameraList[cameraIndex].transformation, transObj);
+			//transform.getScale(scale);
+			//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
 
-			SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(space_transform).x;
-			SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(space_transform).y;
-			SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(space_transform).z;
+			//SM.cameraList[cameraIndex].transformation.position.x = transform.getTranslation(g_space_world).x;
+			//SM.cameraList[cameraIndex].transformation.position.y = transform.getTranslation(g_space_world).y;
+			//SM.cameraList[cameraIndex].transformation.position.z = transform.getTranslation(g_space_world).z;
 
-			SM.cameraList[cameraIndex].transformation.scale.x = scale[0];
-			SM.cameraList[cameraIndex].transformation.scale.y = scale[1];
-			SM.cameraList[cameraIndex].transformation.scale.z = scale[2];
+			//SM.cameraList[cameraIndex].transformation.scale.x = scale[0];
+			//SM.cameraList[cameraIndex].transformation.scale.y = scale[1];
+			//SM.cameraList[cameraIndex].transformation.scale.z = scale[2];
 
-			SM.cameraList[cameraIndex].transformation.rotation.x = rotX;
-			SM.cameraList[cameraIndex].transformation.rotation.y = rotY;
-			SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
-			SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
+			//SM.cameraList[cameraIndex].transformation.rotation.x = rotX;
+			//SM.cameraList[cameraIndex].transformation.rotation.y = rotY;
+			//SM.cameraList[cameraIndex].transformation.rotation.z = rotZ;
+			//SM.cameraList[cameraIndex].transformation.rotation.w = rotW;
 		}
 		SM.UpdateSharedCamera(cameraIndex);
 	}
@@ -1471,9 +1799,9 @@ void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString 
 	tileFactor = tile_plug.asInt();
 
 
-	Print("Value in plug Red: ",color_plugR.asString());
-	Print("Value in plug Green: ",color_plugG.asString());
-	Print("Value in plug Blue: ",color_plugB.asString());
+	//Print("Value in plug Red: ",color_plugR.asString());
+	//Print("Value in plug Green: ",color_plugG.asString());
+	//Print("Value in plug Blue: ",color_plugB.asString());
 }
 
 void GetMaterialNode(MObject &shading_engine, MFnDependencyNode &out_material_node)
@@ -1541,6 +1869,40 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 	if (!found_color)
 	{
 		out_color_path = "NONE";
+	}
+}
+
+void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
+{
+		MStatus status = MS::kSuccess;;
+	
+	MPlug normal_plug;
+	MPlugArray connections;
+	normal_plug = material_node.findPlug("glowIntensity", true, &status);
+	if(status == true)
+	Print("GLOW");
+
+	MPlugArray bv_connections;
+	normal_plug.connectedTo(bv_connections, true, false, &status);
+
+	bool found_glow = false;
+
+	for(unsigned int j=0; j<bv_connections.length(); ++j)
+	{
+		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
+		{
+			Print("FoundTexture!");
+			MFnDependencyNode test1(bv_connections[j].node(&status));
+			MPlug ftn = test1.findPlug("ftn", &status);
+			out_glow_path = ftn.asString(MDGContext::fsNormal);
+			Print(out_glow_path);
+			found_glow = true;
+		}
+	}
+
+	if (!found_glow)
+	{
+		out_glow_path = "NONE";
 	}
 }
 
@@ -1631,7 +1993,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	}
 
 }
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path)
 {
 	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
@@ -1652,6 +2014,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
+			ExtractGlow(material_node, out_glow_path);
 		}
 	}
 }

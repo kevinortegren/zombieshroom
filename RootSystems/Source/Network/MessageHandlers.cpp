@@ -298,7 +298,7 @@ namespace RootForce
 						serverInfo->Information.MapName = m.MapName;
 
 						// Load the map
-						m_worldSystem->CreateWorld(serverInfo->Information.MapName.C_String());
+						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
 					}
 
 					// Send load map status
@@ -400,7 +400,7 @@ namespace RootForce
 						}
 
 						// Load the map
-						m_worldSystem->CreateWorld(serverInfo->Information.MapName.C_String());
+						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
 					}
 
 					// Send load map status

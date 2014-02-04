@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
 #include <Utility/ECS/Include/World.h>
@@ -43,3 +44,5 @@ namespace RootForce
 		Logging* m_logger;
 	};
 }
+
+#endif

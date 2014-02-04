@@ -14,6 +14,7 @@ Render::Buffer::~Buffer()
 
 void Render::Buffer::BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data)
 {
+	//TODO: Pass dynamic draw as param.
 	glBindBuffer(m_type, m_id);
 	glBufferData(m_type, p_elementCount * p_elementSize, p_data, GL_DYNAMIC_DRAW);
 

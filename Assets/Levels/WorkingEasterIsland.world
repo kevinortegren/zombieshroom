@@ -1923,3 +1923,8 @@
       Group: Static
     - Id: 126
       Group: Static
+- Storage:
+    - Key: Ambient
+      Value: 0.1 0.1 0.1
+    - Key: AwesomeLevel
+      Value: false

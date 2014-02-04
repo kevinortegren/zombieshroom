@@ -1,23 +1,40 @@
 #version 430
 layout (local_size_x = 16, local_size_y = 16) in;
 
-layout(r32f) readonly uniform image2D prevTex;
-layout(r32f) restrict uniform image2D currTex;
+layout(r32f, binding = 0) uniform image2D prevTex;
+layout(r32f, binding = 1) uniform image2D currTex;
+layout(rgba8, binding = 2) uniform image2D normalTex;
 
-uniform float mk1;
-uniform float mk2;
-uniform float mk3;
+layout(std140) uniform MK
+{
+	float mk1;
+	float mk2;
+	float mk3;
+	float dx;
+	int xMax;
+	int yMax;
+};
 
 void main() 
 {   
 	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == yMax)
+		return;
+	
+	float prev = imageLoad(prevTex, storePos).r;
+	float curr = imageLoad(currTex, storePos).r;
+	float a = imageLoad(currTex, storePos+ivec2(1,0)).r;
+	float b = imageLoad(currTex, storePos+ivec2(-1,0)).r;
+	float c = imageLoad(currTex, storePos+ivec2(0, 1)).r;
+	float d = imageLoad(currTex, storePos+ivec2(0,-1)).r;
+	
+	imageStore(prevTex, storePos, vec4(mk1 * prev + mk2 * curr + mk3 * (a+b+c+d), 0.0f, 0.0f, 0.0f));
 
-	imageStore(currTex, storePos, 
-		mk1*imageLoad(currTex, storePos) +
-		mk2*imageLoad(prevTex, storePos) +
-		mk3*(imageLoad(prevTex, storePos+ivec2(1,0)) + 
-			imageLoad(prevTex, storePos+ivec2(-1,0)) + 
-			imageLoad(prevTex, storePos+ivec2(0,1)) + 
-			imageLoad(prevTex, storePos+ivec2(0,-1)))
-	);
+	vec3 n;
+	n.x = b-a; //dx
+	n.z = d-c; //dz
+	n.y = dx*2;
+	n = normalize(n);
+	imageStore(normalTex, storePos, vec4(n * 0.5 + 0.5, 0.0f));
+
 }

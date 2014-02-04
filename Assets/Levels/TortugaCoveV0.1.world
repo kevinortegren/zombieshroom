@@ -5,7 +5,6 @@
     - 3
     - 4
     - 6
-    - 7
     - 8
     - 9
     - 10
@@ -25,12 +24,6 @@
             TextureGreen: customGrass2
             TextureBlue: simpleRock
             TileFactor: 24
-        - Entity: 7
-          Model: waterPlaneShape
-          Material:
-            Name: Water
-            Effect: Mesh
-            Diffuse: water
         - Entity: 8
           Model: IslandTerrainMeshShape
           Material:
@@ -72,10 +65,6 @@
           Position: [-235.567, 70.4679, -303.851]
           Rotation: [177.73, 17.4024, 177.425]
           Scale: [0.711459, 0.711459, 0.711459]
-        - Entity: 7
-          Position: [-227.54, -10.1228, -67.8833]
-          Rotation: [-0, 0, -0]
-          Scale: [1.34951, 1.40818, 1.34951]
         - Entity: 8
           Position: [0, 0, 0]
           Rotation: [-0, 0, -0]
@@ -142,8 +131,6 @@
       Data:
         - Entity: 6
           MeshHandle: Mountain2MeshShape0
-        - Entity: 7
-          MeshHandle: waterPlaneShape0
         - Entity: 8
           MeshHandle: IslandTerrainMeshShape0
 - Tags:

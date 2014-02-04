@@ -2,7 +2,7 @@
 
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
-#include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/Include/GameSharedContext.h>
 
 namespace RootForce
 {
@@ -21,8 +21,8 @@ namespace RootForce
 	class PointLightSystem : public ECS::EntitySystem
 	{
 	public:
-		PointLightSystem(ECS::World* p_world, Render::RendererInterface* p_renderer)
-			: ECS::EntitySystem(p_world), m_renderer(p_renderer)
+		PointLightSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world), m_context(p_engineContext)
 		{
 			SetUsage<PointLight>();
 			SetUsage<Transform>();
@@ -36,7 +36,28 @@ namespace RootForce
 	private:	
 		ECS::ComponentMapper<PointLight> m_plights;
 		ECS::ComponentMapper<Transform> m_transforms;
-		Render::RendererInterface* m_renderer;
+		RootEngine::GameSharedContext* m_context;
+		int m_lightCount;
+	};
+
+	class DirectionalLightSystem : public ECS::EntitySystem
+	{
+	public:
+		DirectionalLightSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world), m_context(p_engineContext)
+		{
+			SetUsage<DirectionalLight>();
+			SetUsage<Transform>();
+		}
+
+		void Init();
+		void Begin();
+		void ProcessEntity(ECS::Entity* p_entity);
+		void End();
+	private:
+		ECS::ComponentMapper<DirectionalLight> m_dlights;
+		ECS::ComponentMapper<Transform> m_transforms;
+		RootEngine::GameSharedContext* m_context;
 		int m_lightCount;
 	};
 }

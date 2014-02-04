@@ -23,7 +23,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					p_node["Model"] >> model;
 					g_engineContext.m_resourceManager->LoadCollada(model);
 					renderable->m_model = g_engineContext.m_resourceManager->GetModel(model);
-					renderable->m_pass = RootForce::RenderPass::RENDERPASS_TERRAIN;
+					renderable->m_pass = RootForce::RenderPass::RENDERPASS_DEFAULT;
 
 				}
 
@@ -35,7 +35,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					{
 						std::string materialName;
 						p_node["Material"]["Name"] >> materialName;
-						renderable->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
+						renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
 					}
 
 					const YAML::Node* effectNode = materialNode->FindValue("Effect");
@@ -48,10 +48,6 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						if(renderable->m_material)
 						{
 							renderable->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect(effect);
-
-							// Allocate memory for this renderable's uniforms.
-							//renderable->m_material->m_params = g_engineContext.m_renderer->CreateEffectParams();
-							//renderable->m_material->m_params->AllocateParams(renderable->m_material->m_effect);
 						}
 						else
 						{

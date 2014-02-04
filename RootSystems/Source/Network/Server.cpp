@@ -44,7 +44,7 @@ namespace RootForce
 		void Server::Initialize( WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated )
 		{
 			// Load the map
-			p_worldSystem->CreateWorld(p_config.MapName);
+			p_worldSystem->LoadWorld(p_config.MapName);
 
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");

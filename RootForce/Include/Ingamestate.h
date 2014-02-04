@@ -18,6 +18,7 @@
 #include <RootForce/Include/ComponentImporter.h>
 #include <RootSystems/Include/Components.h>
 #include <RootSystems/Include/ConcurrentTest.h>
+#include <RootSystems/Include/WaterSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -49,20 +50,23 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
-		RootForce::PhysicsTransformCorrectionSystem* m_physicsTransformCorrectionSystem;
-		RootForce::PhysicsSystem* m_physicsSystem;
-		RootForce::CollisionSystem* m_collisionSystem;
-		RootForce::ShadowSystem* m_shadowSystem;
-		RootForce::RenderingSystem* m_renderingSystem;
-		RootForce::PointLightSystem* m_pointLightSystem;
-		RootForce::ParticleSystem* m_particleSystem;
-		RootForce::CameraSystem* m_cameraSystem;
-		RootForce::LookAtSystem* m_lookAtSystem;
-		RootForce::ThirdPersonBehaviorSystem* m_thirdPersonBehaviorSystem;
-		RootForce::AnimationSystem* m_animationSystem;
-		RootForce::MatchStateSystem* m_gameLogicSystem;
-		RootSystems::ActionSystem* m_actionSystem;
-		RootSystems::RespawnSystem* m_respawnSystem;
-		RootSystems::StateSystem* m_stateSystem;
+		RootForce::PhysicsTransformCorrectionSystem*	m_physicsTransformCorrectionSystem;
+		RootForce::PhysicsSystem*						m_physicsSystem;
+		RootForce::CollisionSystem*						m_collisionSystem;
+		RootForce::ShadowSystem*						m_shadowSystem;
+		RootForce::RenderingSystem*						m_renderingSystem;
+		RootForce::PointLightSystem*					m_pointLightSystem;
+		RootForce::ParticleSystem*						m_particleSystem;
+		RootForce::CameraSystem*						m_cameraSystem;
+		RootForce::LookAtSystem*						m_lookAtSystem;
+		RootForce::ThirdPersonBehaviorSystem*			m_thirdPersonBehaviorSystem;
+		RootForce::AnimationSystem*						m_animationSystem;
+		RootForce::MatchStateSystem*					m_gameLogicSystem;
+		RootForce::WaterSystem*							m_waterSystem;
+		RootSystems::ActionSystem*						m_actionSystem;
+		RootSystems::RespawnSystem*						m_respawnSystem;
+		RootSystems::StateSystem*						m_stateSystem;
+		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
+
 	};
 }
