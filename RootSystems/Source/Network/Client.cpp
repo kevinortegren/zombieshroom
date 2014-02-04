@@ -42,7 +42,8 @@ namespace RootForce
 
 		Client::~Client()
 		{
-			m_peer->Shutdown(1000);
+			m_peer->CloseConnection(m_peer->GetGUIDFromIndex(0), true);
+			m_peer->Shutdown(3000);
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
