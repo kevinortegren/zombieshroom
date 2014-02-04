@@ -67,6 +67,7 @@ namespace RootForce
 				m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 				m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 			}
+			m_networkContext.m_server->Initialize();
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 
 			// Setup the rules

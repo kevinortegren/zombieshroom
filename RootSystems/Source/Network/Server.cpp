@@ -34,6 +34,18 @@ namespace RootForce
 			m_peer->SetOccasionalPing(true);
 			m_peer->SetIncomingPassword(p_config.Password.c_str(), p_config.Password.size() + 1);
 
+			// Notify the user of the firepower of this fully armed and operational server!
+			m_logger->LogText(LogTag::SERVER, LogLevel::INIT_PRINT, "Server initialized successfully");
+		}
+
+		Server::~Server()
+		{
+			m_peer->Shutdown(1000);
+			RakNet::RakPeerInterface::DestroyInstance(m_peer);
+		}
+
+		void Server::Initialize()
+		{
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
@@ -50,15 +62,6 @@ namespace RootForce
 
 			// Setup the ping response (for network discovery)
 			UpdatePingResponse();
-
-			// Notify the user of the firepower of this fully armed and operational server!
-			m_logger->LogText(LogTag::SERVER, LogLevel::INIT_PRINT, "Server initialized successfully");
-		}
-
-		Server::~Server()
-		{
-			m_peer->Shutdown(1000);
-			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
 		const NetworkMessage::ServerInformation& Server::GetServerInformation() const
