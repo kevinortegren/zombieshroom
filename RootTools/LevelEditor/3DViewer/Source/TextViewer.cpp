@@ -392,6 +392,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
 	worldSystem->CreateSun();
+	worldSystem->CreateSkyBox();
 }
 
 void LoadSceneFromMaya()
@@ -529,7 +530,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 
 	if(textureName == "" || textureName == "NONE")
 	{
-		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("grayLambert" , Render::TextureType::TEXTURE_2D);
 		mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	}
@@ -538,7 +539,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
 		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
 
-		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 
 		if(textureName == "PaintTexture" || painting)
 		{			
@@ -616,7 +617,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	}
 	else
 	{
-		Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 		if(specularMap != "" && specularMap != "NONE")
 		{
@@ -736,6 +737,7 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
 	particle->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(p_name, false);
+	particle->m_name = p_name;
 	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
 		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 
@@ -912,7 +914,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
-			Render::Material* mat = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
+			Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
 			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
 			//{
 			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
@@ -960,7 +962,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 			// Get material connected to mesh and set it from materiallist
 			
-			rendy->m_material = g_engineContext.m_resourceManager->GetMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
+			rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
 
 			
 		}
@@ -1091,7 +1093,7 @@ void ExportToLevel()
 
 		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
 		string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
-		mesh->m_material = g_engineContext.m_resourceManager->GetMaterial(materialName);
+		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
 
 		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);

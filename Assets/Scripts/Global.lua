@@ -30,9 +30,8 @@ EntityState = {
 }
 
 RenderPass = {
-	RENDERPASS_SKYBOX = 0;
-	RENDERPASS_TERRAIN = 1;
-	RENDERPASS_DYNAMIC = 2;
+	RENDERPASS_DEFAULT = 0;
+	RENDERPASS_SKYBOX = 1;
 }
 
 LogLevel = {

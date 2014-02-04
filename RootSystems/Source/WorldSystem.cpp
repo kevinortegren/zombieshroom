@@ -11,7 +11,8 @@ namespace RootForce
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
-		glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
+		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
+		glm::vec3 ambient = glm::vec3(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
@@ -46,12 +47,13 @@ namespace RootForce
 		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
 		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		
-		sunShadowcaster->m_levels = 1;
+		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
-#ifndef COMPILE_LEVEL_EDITOR
+
+
 	void WorldSystem::CreateSkyBox()
 	{
 		// Setup skybox entity.
@@ -59,14 +61,54 @@ namespace RootForce
 
 		RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
 		RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
-	
-		t->m_scale = glm::vec3(-100, -100, -100);
+
+		t->m_scale = glm::vec3(-100);
 		t->m_orientation.Roll(180);
 
-		r->m_model = m_engineContext->m_resourceManager->LoadCollada("Primitives/box");
+		static glm::vec3 positions[8] = 
+		{
+			glm::vec3( -0.500000, -0.500000, 0.500000),
+			glm::vec3(0.500000, -0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, 0.500000),
+			glm::vec3(0.500000, 0.500000, 0.500000),
+			glm::vec3(-0.500000, 0.500000, -0.500000),
+			glm::vec3(0.500000, 0.500000, -0.500000),
+			glm::vec3(-0.500000, -0.500000, -0.500000),
+			glm::vec3(0.500000, -0.500000, -0.500000)
+		};
+
+		static unsigned int indices[36] =
+		{
+			0, 1, 2, 
+			2, 1, 3, 
+			2, 3, 4, 
+			4, 3, 5, 
+			4, 5, 6, 
+			6, 5, 7,
+			6, 7, 0, 
+			0, 7, 1, 
+			1, 7, 3, 
+			3, 7, 5, 
+			6, 0, 4, 
+			4, 0, 2
+		};
+
+		Render::Vertex1P vertices[8];
+		for(int i = 0; i < 8; ++i)
+		{
+			vertices[i].m_pos = positions[i];
+		}
+
+		r->m_model = m_engineContext->m_resourceManager->CreateModel("skybox");
+		r->m_model->m_meshes[0]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetElementBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		r->m_model->m_meshes[0]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
+		r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
+		r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
+	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-		r->m_material = m_engineContext->m_resourceManager->GetMaterial("Skybox");
+		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
@@ -74,7 +116,7 @@ namespace RootForce
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 	}
 
-
+#ifndef COMPILE_LEVEL_EDITOR
 	void WorldSystem::AddStaticEntitiesToPhysics()
 	{
 		// Add static entities to physics.
@@ -132,7 +174,9 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
 	}
+
 #endif
+
 	void WorldSystem::Process()
 	{	
 		ECS::Entity* testCameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");

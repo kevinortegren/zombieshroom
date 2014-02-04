@@ -34,7 +34,7 @@ namespace RootForce
 		m_currTex = 0;
 
 		//Create render material
-		m_material = m_context->m_resourceManager->GetMaterial("water");
+		m_material = m_context->m_renderer->CreateMaterial("water");
 		m_material->m_effect = m_context->m_resourceManager->LoadEffect("WaterCompute");
 
 		m_computeJob.m_effect = m_material->m_effect;

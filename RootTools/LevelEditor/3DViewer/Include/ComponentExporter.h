@@ -20,7 +20,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				}
 				if(renderable->m_material != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromMaterial(renderable->m_material);
+					std::string s = g_engineContext.m_renderer->GetStringFromMaterial(renderable->m_material);
 					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
 					p_emitter << YAML::Key << "Name" << YAML::Value << s;
 					if(renderable->m_material->m_effect != nullptr)
@@ -120,15 +120,31 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
 			}
 			break;
+		case RootForce::ComponentType::DIRECTIONALLIGHT:
+			{
+				RootForce::DirectionalLight* directionalLight = static_cast<RootForce::DirectionalLight*>(p_component);
+				glm::vec4 color = directionalLight->m_color;
+
+				p_emitter << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << color.x << color.y << color.z << color.w << YAML::EndSeq;
+			}
+			break;
 		case RootForce::ComponentType::PHYSICS:
 			{
 				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
 				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
 			}
+			break;
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
 				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+			}
+			break;
+		case RootForce::ComponentType::PARTICLE:
+			{
+				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
+
+				p_emitter << YAML::Key << "Name" << YAML::Value << particle->m_name;
 			}
 			break;
 		default:

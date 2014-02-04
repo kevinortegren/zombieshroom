@@ -8,9 +8,9 @@
     - name: Water_Compute       
       textures:
         - name: g_prevTex
-          slot: 10
+          slot: 0
         - name: g_currTex
-          slot: 11
+          slot: 1
       flags:
         - name: RenderIgnore
 
