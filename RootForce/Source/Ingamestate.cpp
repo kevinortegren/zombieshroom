@@ -214,7 +214,7 @@ namespace RootForce
 		g_engineContext.m_physics->RemoveAll();
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
-		if(!m_networkContext.m_server)
+		if(!m_networkContext.m_server.get())
 			m_networkContext.m_server->SetMessageHandler(nullptr);
 		m_networkContext.m_client->SetMessageHandler(nullptr);
 
