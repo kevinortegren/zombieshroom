@@ -64,7 +64,7 @@ namespace Ragdoll
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.55f, 0);
 		m_nameToIndex = p_nameToIndex;
 		memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
-		CreateBody(p_bones, p_rootNode, p_transform, 1);
+		CreateBody(p_bones, p_rootNode, p_transform, 1, btVector3(0,0,0));
 		m_boneToFollow[13] = 13;
 		////here be dragons nu är det fel i min hjärna
 		
@@ -72,13 +72,13 @@ namespace Ragdoll
 
 	}
 
-	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor )
+	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor, const btVector3& p_parentBodyOffset )
 	{
 		
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
 		if(shape != nullptr)
 		{
-			if(std::string(p_rootNode->mName.data).compare("Character1_Hips"))
+			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0)
 				m_hipsNode = p_rootNode;
 			btRigidBody* body;
 			float mass = 10.0f / p_massFactor;
@@ -92,6 +92,7 @@ namespace Ragdoll
 			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
 			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
+			m_bodyPosOffset[index] += p_parentBodyOffset;
 			m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
 			m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
@@ -116,7 +117,7 @@ namespace Ragdoll
 			
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
-				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1);
+				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1 , m_bodyPosOffset[index]);
 				if(childbody != nullptr)
 				{
 					btTypedConstraint* temp = CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
@@ -133,7 +134,7 @@ namespace Ragdoll
 			return body;
 		}
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
-			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor);
+			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor, p_parentBodyOffset);
 	
 		return nullptr;
 	}
@@ -268,9 +269,10 @@ namespace Ragdoll
 			//World to local space
  			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
 
-			FixPosition(&retVal, m_hipsNode);   // THIS - parent etc etc might fix everything?
+			
 			
 		}
+	//	retVal = FixPosition(retVal, m_hipsNode);   // THIS - parent etc etc might fix everything?
 		return retVal;
 	}
 
@@ -321,7 +323,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  				//	localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
  					//localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
- 					btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 					btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  					//constraint->setLimit(0,PI_2);
  					m_dynamicWorld->addConstraint(constraint);
  					constraint->setDbgDrawSize(0.5f);
@@ -336,10 +338,10 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  					//localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
  					//localB.setOrigin(btVector3(0, 0.3f + 0, 0));
- 					btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 					btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  					//constraint->setLimit(0,PI_2);
  		
- 					//btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 					//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  					//constraint->setLimit(PI_2, PI_2, PI_2);
  					m_dynamicWorld->addConstraint(constraint);
  					constraint->setDbgDrawSize(0.5f);
@@ -354,7 +356,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			//localA.setOrigin(btVector3(0, -0.5f- OFFSET, 0)); 
  		 			//localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(PI_2, PI_2, PI_2);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -369,7 +371,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			//localA.setOrigin(btVector3(0, -0.25f - OFFSET, 0)); 
  		 		//	localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(PI_2, PI_2, PI_2);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -384,7 +386,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			//localA.setOrigin(btVector3(0, -0.21f - OFFSET, 0)); 
  		 		//	localB.setOrigin(btVector3(0, 0.09f+ OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(PI_2, PI_2, PI_2);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -399,7 +401,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(PI_2, PI_2, PI_2);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -416,7 +418,7 @@ namespace Ragdoll
  		 			localB.getBasis().setEulerZYX(0,0,1); 
  		 			localA.setOrigin(btVector3(-0.2f, 0.10f +  OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0.05f, 0.05f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(0, 0, 0);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -433,7 +435,7 @@ namespace Ragdoll
  		 			localB.getBasis().setEulerZYX(0,0,1); 
  		 			localA.setOrigin(btVector3(0.2f, 0.10f +  OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(-0.05f, 0.05f +  OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			//constraint->setLimit(0, 0, 0);
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -450,7 +452,7 @@ namespace Ragdoll
  		 			localB.getBasis().setEulerZYX(0,0,0); 
  		 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -467,7 +469,7 @@ namespace Ragdoll
  		 			localB.getBasis().setEulerZYX(0,0,0); 
  		 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 			
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -482,7 +484,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -497,7 +499,7 @@ namespace Ragdoll
  						0 , 0, 0, 1, &localA, &localB);
  		 			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
  		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*p_bodyA, *p_bodyB, localA.getOrigin(), localB.getOrigin());
+ 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 
  		 			m_dynamicWorld->addConstraint(constraint);
  		 			constraint->setDbgDrawSize(0.5f);
@@ -569,9 +571,18 @@ namespace Ragdoll
 		*p_transBodyB = bodyTransformB.inverse() * constraintWorld;
 	}
 
-	void Ragdoll::FixPosition( glm::mat4* p_bones[20], aiNode* p_rootNode )
+	glm::mat4* Ragdoll::FixPosition( glm::mat4 p_bones[20], aiNode* p_rootNode )
 	{
-
+		int myIndex = m_nameToIndex[p_rootNode->mName.data];
+		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
+		{
+			int childIndex = m_nameToIndex[p_rootNode->mChildren[i]->mName.data];
+			(p_bones[childIndex]) = (p_bones[childIndex]) * glm::inverse((p_bones[myIndex]));
+			FixPosition(p_bones, p_rootNode->mChildren[i]);
+			
+			
+		}
+		return p_bones;
 	}
 
 }

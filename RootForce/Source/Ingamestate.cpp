@@ -57,6 +57,7 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
 		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
 		g_engineContext.m_resourceManager->LoadScript("Player");
+		g_engineContext.m_resourceManager->LoadScript("Explosion");
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);

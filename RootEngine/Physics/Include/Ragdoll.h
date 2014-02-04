@@ -44,9 +44,9 @@ namespace Ragdoll
 		void SetVelocity(const btVector3& p_velocity);
 	private:
 		btDiscreteDynamicsWorld* m_dynamicWorld;
-		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode,  glm::mat4 p_transform , int p_massFactor );
+		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode,  glm::mat4 p_transform , int p_massFactor, const btVector3& p_parentBodyOffset);
 		btCollisionShape* CreateBone(std::string p_name);
-		void FixPosition(glm::mat4* p_bones[20], aiNode* p_rootNode );
+		glm::mat4* FixPosition(glm::mat4 p_bones[20], aiNode* p_rootNode );
 		void SetBoneRelation(int p_parentIndex, int p_childIndex, glm::mat4 p_pose);
 		void CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
 										float p_quatX, float p_quatY, float p_quatZ, float p_quatW, btTransform* p_transBodyA, btTransform* p_transBodyB );
