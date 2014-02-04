@@ -46,6 +46,7 @@ namespace Ragdoll
 		btDiscreteDynamicsWorld* m_dynamicWorld;
 		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode,  glm::mat4 p_transform , int p_massFactor );
 		btCollisionShape* CreateBone(std::string p_name);
+		void FixPosition(glm::mat4* p_bones[20], aiNode* p_rootNode );
 		void SetBoneRelation(int p_parentIndex, int p_childIndex, glm::mat4 p_pose);
 		void CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
 										float p_quatX, float p_quatY, float p_quatZ, float p_quatW, btTransform* p_transBodyA, btTransform* p_transBodyB );
@@ -59,6 +60,7 @@ namespace Ragdoll
 		int m_boneToFollow[20];
 		btVector3 m_bodyPosOffset[20];
 		std::map<std::string, int> m_nameToIndex;
+		aiNode* m_hipsNode;
 		int m_constraintCounter;
 		bool m_firsttime;
 	};
