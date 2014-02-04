@@ -79,8 +79,11 @@ namespace RootForce
 		QuadNode* PickNode(QuadNode* p_node, glm::vec2 p_position);
 
 		void Render(RootForce::Frustum* p_frustrum, QuadNode* p_node) const;
+		void CullShadows(std::vector<glm::vec4>& p_points, QuadNode* p_node);
 
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
+
+		int test;
 
 	private:
 		
@@ -106,5 +109,7 @@ namespace RootForce
 		std::vector<int> m_sizes;
 
 		int m_minY, m_maxY;	
+
+		
 	};
 }

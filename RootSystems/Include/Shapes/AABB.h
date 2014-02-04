@@ -18,6 +18,8 @@ namespace RootForce
 		glm::vec3 GetCenter( void ) const;
 
 		void Expand(glm::vec3 p_expansion);
+		bool Collide(const AABB& p_aabb);
+
 
 		void DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const;
 

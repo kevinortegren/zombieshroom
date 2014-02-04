@@ -66,6 +66,11 @@ namespace RootForce
 		}
 	}
 
+	bool AABB::Collide(const AABB& p_aabb)
+	{
+		return false;
+	}
+
 	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const
 	{
 		glm::vec4 positions[8];

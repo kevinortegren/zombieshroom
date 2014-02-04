@@ -24,10 +24,12 @@ namespace RootForce
 		void CreateSkyBox();
 		void CreatePlayerCamera();
 		void AddStaticEntitiesToPhysics();
-
+		
 		void Process();
 		void ShowDebug(bool p_value);
-		RootForce::AABB GetWorldAABB(){return m_quadTree.GetRoot()->GetBounds();}
+
+		QuadTree* GetQuadTree();
+
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;

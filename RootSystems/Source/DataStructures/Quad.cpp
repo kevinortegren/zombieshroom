@@ -3,6 +3,7 @@
 #include <RootSystems/Include/Shapes/Plane.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <glm/gtx/transform.hpp>
+#include <RootSystems/Include/Shapes/OBB.h>
 
 namespace RootForce
 {
@@ -109,6 +110,43 @@ namespace RootForce
 				}
 			}
 		}
+	}
+
+	void QuadTree::CullShadows(std::vector<glm::vec4>& p_points, QuadNode* p_node)
+	{
+		if(Intersect(p_points, p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				ECS::Entity* entity;
+				RootForce::Renderable* renderable;
+
+				for(unsigned i = 0; i < p_node->m_indices.size(); ++i)
+				{
+					entity = m_entities[p_node->m_indices[i]];
+					renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+
+					Render::RenderJob job;
+					job.m_mesh = renderable->m_model->m_meshes[0];
+					job.m_shadowMesh = renderable->m_model->m_meshes[0];
+					job.m_flags = renderable->m_renderFlags;
+					job.m_material = renderable->m_material;
+					job.m_renderPass = renderable->m_pass;
+					job.m_params = renderable->m_params;
+
+					m_context->m_renderer->AddRenderJob(job);
+				}
+
+			}
+			else
+			{
+				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					CullShadows( p_points, p_node->GetChilds().at(i)); 
+				}
+			}
+		}
+
 	}
 
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)

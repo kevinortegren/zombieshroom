@@ -173,6 +173,7 @@ namespace RootForce
 
 		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
+
 	}
 
 	void WorldSystem::Process()
@@ -185,12 +186,17 @@ namespace RootForce
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
 		
-		m_quadTree.Render(frustrum, m_quadTree.GetRoot());
+		//m_quadTree.Render(frustrum, m_quadTree.GetRoot());
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
 	{
 		m_showDebug = p_value;
+	}
+
+	QuadTree* WorldSystem::GetQuadTree()
+	{
+		return &m_quadTree;
 	}
 }
 

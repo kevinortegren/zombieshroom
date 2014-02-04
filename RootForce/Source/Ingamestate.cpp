@@ -169,7 +169,7 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
