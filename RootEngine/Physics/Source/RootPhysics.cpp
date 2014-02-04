@@ -23,6 +23,7 @@ namespace Physics
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
 			CustomUserPointer* ptr = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
+
 			if(ptr != nullptr)
 				if (ptr->m_type == PhysicsType::TYPE_STATIC)
 				{
@@ -30,6 +31,23 @@ namespace Physics
 				}
 
 			return 1.0f;	
+
+		}
+	};
+
+	struct RayAbilityCast : public btCollisionWorld::ClosestRayResultCallback
+	{
+		CustomUserPointer* m_caster;
+		RayAbilityCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
+		{
+
+		}
+		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
+		{
+			CustomUserPointer* objectHit = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
+			m_caster->m_collidedEntities->insert(objectHit->m_entity);
+			return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+			//return 1.0f;
 		}
 	};
 
@@ -1234,14 +1252,6 @@ namespace Physics
 		m_userPointer.at(p_objectHandle)->m_collidedEntities = p_enityCollidedId;
 	}
 
-	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
-	{
-		RayAgainstStaticCast rayResult;
-		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_endPos[0], p_endPos[1], p_endPos[2]), rayResult);
-
-		return rayResult.m_closestHitFraction;
-	}
-
 	void RootPhysics::SetPosition( int p_objectHandle, glm::vec3 p_position )
 	{
 		if(!DoesObjectExist(p_objectHandle))
@@ -1354,6 +1364,24 @@ namespace Physics
 			m_ragdolls.at(index)->Deactivate();
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
 		}
+	}
+
+	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
+	{
+		RayAgainstStaticCast rayResult;
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_endPos[0], p_endPos[1], p_endPos[2]), rayResult);
+
+		return rayResult.m_closestHitFraction;
+	}
+
+	void RootPhysics::CastRay( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
+	{
+		RayAbilityCast rayResult;
+		rayResult.m_caster = m_userPointer.at(p_objectHandle);
+
+		glm::vec3 end = glm::normalize(p_direction) * p_length;
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+
 	}
 
 }

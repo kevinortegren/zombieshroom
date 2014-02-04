@@ -22,19 +22,18 @@ void CustomListWidget::mousePressEvent( QMouseEvent* event )
 			QPixmap	pixmap(QSize(100, 20));
 			QPainter painter(&pixmap);
 			painter.setPen(m_pen);
-			QListWidgetItem* item = currentItem();
+			QListWidgetItem* item = currentItem(); //FIX THIS!
 			QDrag* drag = new QDrag(this);
 			QMimeData* data = new QMimeData;
-			if(type.compare("Abilities"))
-				data->setText(item->text());
-			else
-				data->setText("Entity");
+			data->setText(item->text());
+			data->setHtml(item->toolTip());
+
 			data->setObjectName(type);
 			drag->setMimeData(data);
 		//	m_painter->fillRect(QRect(0,0,100,20), QBrush(QColor("orange")));
 			painter.drawText(QRect(10, 0, 170, 20), item->text() );
 			drag->setPixmap(pixmap);
-			Qt::DropAction dropAction = drag->exec();		
+			Qt::DropAction dropAction = drag->exec();
 		}
 
 	}

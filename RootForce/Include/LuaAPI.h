@@ -657,6 +657,13 @@ namespace RootForce
 			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
+		static int PhysicsShootRay(lua_State* p_luaState)
+		{
+			NumberOfArgs(5);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			g_engineContext.m_physics->CastRay((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
+			return 0;
+		}
 		static int PhysicsGetType(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -1954,6 +1961,7 @@ namespace RootForce
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
 			{"KnockBack", PhysicsKnockBack},
+			{"ShootRay", PhysicsShootRay},
 			{"GetType", PhysicsGetType},
 			{"SetGravity", PhysicsSetGravity},
 			{NULL, NULL}
