@@ -13,7 +13,7 @@ namespace RootForce
 	public:
 		SettingsMenu(RootEngine::GameSharedContext p_context);
 		~SettingsMenu();
-		void BindEvents(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher);
+		void BindEvents(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, Awesomium::JSValue p_result);
 	private:
 		Awesomium::JSValue RequestSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);

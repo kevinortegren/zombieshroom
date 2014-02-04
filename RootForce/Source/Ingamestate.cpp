@@ -215,7 +215,8 @@ namespace RootForce
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
-		m_ingameMenu.reset();
+
+		m_ingameMenu = nullptr;
 
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();

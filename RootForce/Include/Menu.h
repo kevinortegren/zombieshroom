@@ -45,8 +45,6 @@ namespace RootForce
 		void ConnectEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		void RefreshEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 		Awesomium::JSValue GetMapListEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
-		Awesomium::JSValue RequestSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
-		void SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
 
 		std::string GetMapList();
 
