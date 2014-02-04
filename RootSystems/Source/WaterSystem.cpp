@@ -7,7 +7,7 @@ namespace RootForce
 	void WaterSystem::Init()
 	{
 		m_pause = false;
-		m_maxX = m_maxZ = 256;
+		m_maxX = m_maxZ = 1024;
 		
 		//Create empty textures for compute shader swap
 		m_texture[0] = m_context->m_renderer->CreateTexture();

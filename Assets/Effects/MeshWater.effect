@@ -46,27 +46,6 @@
             write: 0
             test: 1
            
-        - name: Mesh_Normals
-          shaders:
-            - name: watermesh
-              type: vertex
-            - name: watermesh
-              type: tess_control
-            - name: watermesh
-              type: tess_evaluation
-            - name: normals
-              type: geometry
-            - name: color
-              type: fragment
-          # Blend Mode:
-          # None = 0
-          # AlphaBlend = 1
-          # Addative = 2
-          blend: 0
-          
-          # Depth settings.
-          depth:
-            write: 0
-            test: 1
+
               
 
