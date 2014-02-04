@@ -30,6 +30,7 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
 	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(WorldData);
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -120,6 +121,10 @@ int SharedMemory::InitalizeSharedMemory()
 
 	NumberOfPaintTextures = (int*)(mem);
 
+	mem = (unsigned char*)(mem + sizeof(int));
+
+	worldData = (WorldData*)mem;
+
 	//if(first_process)
 	//{
 		memset(raw_data,0,total_memory_size);
@@ -140,7 +145,7 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 	{
 		for(int i = 0; i < nrOfMessages; i++)
 		{
-			if(type == updateMessages[i]->name && (index == updateMessages[i]->updateID || index == updateMessages[i]->removeID))
+			if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
 			{
 				stop = true;
 				break;
@@ -148,37 +153,37 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 		}
 	}
 
-	if(!stop && index != -1)
+	if(!stop && index >= 0)
 	{
 		//Maybe check last message for duplicate aswell
-		if(*NumberOfMessages < g_maxMessages)
+		if(nrOfMessages < g_maxMessages)
 		{
-			updateMessages[*NumberOfMessages]->updateTransform = updateTransform;
-			updateMessages[*NumberOfMessages]->updateShape = updateShape;
+			updateMessages[nrOfMessages]->updateTransform = updateTransform;
+			updateMessages[nrOfMessages]->updateShape = updateShape;
 			if(type != "")
 			{
-				memcpy(updateMessages[*NumberOfMessages]->name, type.c_str(), g_shortMaxNameLength);
-
+				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
+				int minusOne = -1;
 				if(remove)
 				{
-					updateMessages[*NumberOfMessages]->updateID = -1;
-					updateMessages[*NumberOfMessages]->removeID = index;
+					updateMessages[nrOfMessages]->updateID = minusOne;
+					updateMessages[nrOfMessages]->removeID = index;
 				}
 				else
 				{
-					updateMessages[*NumberOfMessages]->updateID = index;
-					updateMessages[*NumberOfMessages]->removeID = -1;
+					updateMessages[nrOfMessages]->updateID = index;
+					updateMessages[nrOfMessages]->removeID = minusOne;
 				}
 			}
-
-			*NumberOfMessages = *NumberOfMessages + 1;
+			nrOfMessages++;
+			*NumberOfMessages = nrOfMessages;
 		}
-		else if(*NumberOfMessages > 0)
+		else if(nrOfMessages > 0)
 		{
 			//Remove oldest / first message and try again
 			//UpdateMessage tempCopy[g_maxMessages];
 
-			for(int i = 0; i < g_maxMessages-1; i++)
+			for(int i = 0; i < nrOfMessages-1; i++)
 			{
 				*updateMessages[i] = *updateMessages[i+1];
 			}
@@ -188,7 +193,8 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 			updateMessages[g_maxMessages]->updateShape = false;
 			updateMessages[g_maxMessages]->updateTransform = false;
 			//*updateMessages = tempCopy;
-			*NumberOfMessages = *NumberOfMessages - 1;
+			nrOfMessages--;
+			*NumberOfMessages = nrOfMessages;
 			AddUpdateMessage(type, index, updateTransform, updateShape, remove);
 		}
 	}
@@ -255,6 +261,8 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->vertex[i] = meshList[index].vertex[i];
 		PmeshList[index]->normal[i] = meshList[index].normal[i];
 		PmeshList[index]->UV[i] = meshList[index].UV[i];
+		PmeshList[index]->tangent[i] = meshList[index].tangent[i];
+		PmeshList[index]->binormal[i] = meshList[index].binormal[i];
 		}
 
 		PmeshList[index]->nrOfVertices = meshList[index].nrOfVertices;		
@@ -267,14 +275,15 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.rotation = meshList[index].transformation.rotation;
 		PmeshList[index]->transformation.rotPivot = meshList[index].transformation.rotPivot;
 		PmeshList[index]->transformation.scalePivot = meshList[index].transformation.scalePivot;
-		PmeshList[index]->transformation.nrOfFlags = meshList[index].transformation.nrOfFlags;
+		//PmeshList[index]->transformation.nrOfFlags = meshList[index].transformation.nrOfFlags;
 
-		for(int i = 0; i < g_maxNrOfFlags; i++)
-		{
-			memset(PmeshList[index]->transformation.flags[i], NULL, sizeof(PmeshList[index]->transformation.flags[i]));
-			memcpy(PmeshList[index]->transformation.flags[i], meshList[index].transformation.flags[i], g_shortMaxNameLength);
-		}
-		
+		//for(int i = 0; i < g_maxNrOfFlags; i++)
+		//{
+		//	memset(PmeshList[index]->transformation.flags[i], NULL, sizeof(PmeshList[index]->transformation.flags[i]));
+		//	memcpy(PmeshList[index]->transformation.flags[i], meshList[index].transformation.flags[i], g_shortMaxNameLength);
+		//}
+
+		PmeshList[index]->transformation.flags = meshList[index].transformation.flags;		
 	}
 
 	ReleaseMutex(MeshMutexHandle);
@@ -292,14 +301,15 @@ void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
 	PlocatorList[index]->transformation.position = locatorList[index].transformation.position;
 	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
 	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
-	PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
 
-	for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
-	{
-		memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
-		memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
-	}
+	//PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
+	//for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
+	//{
+	//	memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
+	//	memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
+	//}
 
+	PlocatorList[index]->transformation.flags = locatorList[index].transformation.flags;
 	ReleaseMutex(LocatorMutexHandle);
 }
 
@@ -314,6 +324,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		memcpy(PmaterialList[i]->texturePath, materialList[i].texturePath, g_maxPathLength);
 		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
 		memcpy(PmaterialList[i]->specularPath, materialList[i].specularPath, g_maxPathLength);
+		memcpy(PmaterialList[i]->glowPath, materialList[i].glowPath, g_maxPathLength);
 	}
 
 	*NumberOfMaterials = nrOfMaterials;		
@@ -326,6 +337,7 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		WaitForSingleObject(IdMutexHandle, milliseconds);
 		AddUpdateMessage("Mesh", meshID, true, true, false);
 		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
+		PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
 		ReleaseMutex(IdMutexHandle);
 
 		AddUpdateMessage("Mesh", meshID, true, true, false);

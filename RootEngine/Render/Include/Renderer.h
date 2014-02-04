@@ -76,6 +76,7 @@ namespace Render
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
+		virtual std::string GetStringFromMaterial(Material* p_material) = 0;
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
@@ -131,6 +132,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
+		std::string GetStringFromMaterial(Material* p_material);
 
 		// Particle systems.
 		ParticleSystem* CreateParticleSystem();

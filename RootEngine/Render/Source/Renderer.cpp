@@ -749,6 +749,11 @@ namespace Render
 		return m_resources.CreateEffect();
 	}
 
+	std::string GLRenderer::GetStringFromMaterial(Material* p_material)
+	{
+		return m_resources.GetStringFromMaterial(p_material);
+	}
+
 	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
 		return m_particles.Create(this);

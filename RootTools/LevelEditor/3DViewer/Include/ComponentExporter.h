@@ -20,7 +20,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				}
 				if(renderable->m_material != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromMaterial(renderable->m_material);
+					std::string s = g_engineContext.m_renderer->GetStringFromMaterial(renderable->m_material);
 					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
 					p_emitter << YAML::Key << "Name" << YAML::Value << s;
 					if(renderable->m_material->m_effect != nullptr)
@@ -43,6 +43,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]);
 						p_emitter << YAML::Key << "Normal" << YAML::Value << s;
 					}
+
+					if(renderable->m_material->m_textures[Render::TextureSemantic::GLOW] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::GLOW]);
+						p_emitter << YAML::Key << "Glow" << YAML::Value << s;
+					}
+
+					if(g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect) == "Mesh_Blend" )
+					{
 					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] != nullptr)
 					{
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]);
@@ -65,6 +74,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]);
 						p_emitter << YAML::Key << "TextureBlue" << YAML::Value << s;
 					}
+					if(renderable->m_material->m_tileFactor != 0)
+					{
+						std::ostringstream oss;
+						oss << renderable->m_material->m_tileFactor;
+						
+						std::string s = oss.str();
+						p_emitter << YAML::Key << "TileFactor" << YAML::Value << s;
+					}
+					}
 					p_emitter << YAML::EndMap;
 				}
 			}
@@ -74,15 +92,19 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				RootForce::Transform* transform = static_cast<RootForce::Transform*>(p_component);
 				glm::vec3 position = transform->m_position;
 				glm::vec3 scale = transform->m_scale;
-				glm::mat3 rotation = transform->m_orientation.GetMatrix();
+				
+				/*(*glm::mat3 rotation = transform->m_orientation.GetMatrix();
 
 				float x,y,z;
 				x = atan2(rotation[2][1], rotation[2][2]);
 				y = atan2(-rotation[2][0], sqrt(pow(rotation[2][1],2) + pow(rotation[2][2],2)));
-				z = atan2(rotation[1][0], rotation[0][0]);
+				z = atan2(rotation[1][0], rotation[0][0]);*/
+
+				glm::quat q = transform->m_orientation.GetQuaternion();
 
 				p_emitter << YAML::Key << "Position" << YAML::Value << YAML::Flow << YAML::BeginSeq << position.x << position.y << position.z << YAML::EndSeq;
-				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << -glm::degrees(x) << -glm::degrees(y) << -glm::degrees(z) << YAML::EndSeq;
+				//p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << -glm::degrees(x) << -glm::degrees(y) << -glm::degrees(z) << YAML::EndSeq;
+				p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << q.x << q.y << q.z << q.w << YAML::EndSeq;
 				p_emitter << YAML::Key << "Scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
 			}
 			break;
@@ -98,15 +120,31 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "Range" << YAML::Value << range;
 			}
 			break;
+		case RootForce::ComponentType::DIRECTIONALLIGHT:
+			{
+				RootForce::DirectionalLight* directionalLight = static_cast<RootForce::DirectionalLight*>(p_component);
+				glm::vec4 color = directionalLight->m_color;
+
+				p_emitter << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << color.x << color.y << color.z << color.w << YAML::EndSeq;
+			}
+			break;
 		case RootForce::ComponentType::PHYSICS:
 			{
 				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
 				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
 			}
+			break;
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
 				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+			}
+			break;
+		case RootForce::ComponentType::PARTICLE:
+			{
+				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
+
+				p_emitter << YAML::Key << "Name" << YAML::Value << particle->m_name;
 			}
 			break;
 		default:
