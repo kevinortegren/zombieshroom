@@ -29,7 +29,6 @@ namespace Physics
 			}
 			else
 			{
-				
 				return 1.0f;
 			}
 		}

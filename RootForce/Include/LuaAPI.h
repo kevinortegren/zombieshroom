@@ -1668,6 +1668,13 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.UserID);
 			return 1;
 		}
+		static int NetworkGetActionId(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.ActionID);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ANIMATION
 		//////////////////////////////////////////////////////////////////////////
@@ -2175,6 +2182,7 @@ namespace RootForce
 
 		static const struct luaL_Reg network_m [] = {
 			{"GetUserId", NetworkGetUserId},
+			{"GetActionId", NetworkGetActionId},
 			{NULL, NULL}
 		};
 

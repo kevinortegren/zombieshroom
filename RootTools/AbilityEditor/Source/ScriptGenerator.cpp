@@ -211,7 +211,7 @@ namespace AbilityEditorNameSpace
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
 				scriptNames.at(j).chop(4);
-				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
+				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(networkEnt:GetUserId(), networkEnt:GetActionId());\n";
 			}
 			m_file << "\tend\n";
 		}
@@ -224,21 +224,23 @@ namespace AbilityEditorNameSpace
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
 		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
 		{
-			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY) //Fix here
+			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY) //TODO Fix here
 			{
 
 				m_file << "\tlocal hitCol = entity:GetCollision();\n";
 				m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
 				m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
+				m_file << "\tlocal network = entity:GetNetwork();\n";
 
 				m_file << "\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
 				m_file << "\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
 				m_file << "\tlocal abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
 				m_file << "\tlocal abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
 				m_file << "\tlocal abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
-
-				m_file << "\tif type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n"; 
-
+				if(m_damage >= 0) // TODO Maybe change this to not hard coded
+					m_file << "\tif type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n"; 
+				else //If negative damage (healing) only heal friendly players
+					m_file << "\tif type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n"; 
 				if(m_knockback > 0.0f)
 				{
 							   
@@ -252,7 +254,7 @@ namespace AbilityEditorNameSpace
 				{
 					m_file << "\t\tlocal health = entity:GetHealth();\n";
 					m_file << "\t\tif not health:IsDead() then\n";
-						m_file << "\t\t\tlocal network = entity:GetNetwork();\n";
+						
 						m_file << "\t\t\tlocal receiverId = network:GetUserId();\n";
 						m_file << "\t\t\thealth:Damage(abilityOwnerId, " << m_name << ".damage, receiverId);\n";
 					m_file << "\t\tend\n";
@@ -269,7 +271,7 @@ namespace AbilityEditorNameSpace
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
 				scriptNames.at(j).chop(4); 
-				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
+				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(network:GetUserId(), network:GetActionId);\n";
 			}
 			m_file << "\tend\n";
 		}
@@ -279,6 +281,8 @@ namespace AbilityEditorNameSpace
 	void ScriptGenerator::WriteOnDestroy( OnDestroy* p_onDestroy)
 	{
 		m_file << "function " << m_name << ".OnDestroy (self)\n";
+
+		m_file << "\tlocal network = entity:GetNetwork();\n";
 		//Create new abilities
 		for (unsigned int i = 0; i < p_onDestroy->GetConditions()->size(); i++)
 		{
@@ -287,7 +291,7 @@ namespace AbilityEditorNameSpace
 			for (unsigned int j = 0; j < scriptNames.size(); j++)
 			{
 				scriptNames.at(j).chop(4); 
-				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate();\n";
+				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(network:GetUserId(), network:GetActionId());\n";
 			}
 			m_file << "\tend\n";
 		}
