@@ -125,7 +125,7 @@ namespace RootForce
 		
 		float scaleHalfWidth = 32.0f * m_scale;
 		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
-		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
 		//Return if out of bounds
 		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
@@ -246,6 +246,11 @@ namespace RootForce
 			return true;
 		else 
 			return false;
+	}
+
+	float WaterSystem::GetWaterHeight()
+	{
+		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
 	}
 
 

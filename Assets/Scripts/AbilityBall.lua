@@ -10,7 +10,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	local posVec = playerEnt:GetTransformation():GetPos();
 	local frontVec = playerAimingDeviceEnt:GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
-
+	local waterCollider = WaterCollider.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
@@ -24,7 +24,9 @@ function AbilityBall.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
-	
+	waterCollider:SetDisturbPower(0.1);
+	waterCollider:SetDisturbInterval(0.3);
+	waterCollider:SetRadius(2);
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");

@@ -31,6 +31,7 @@ namespace RootForce
 			RootForce::DirectionalLight::SetTypeId(RootForce::ComponentType::DIRECTIONALLIGHT);
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
 			RootForce::Network::ClientComponent::SetTypeId(RootForce::ComponentType::CLIENT);
+			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
 		}
 
 		void InitializeServerComponents()

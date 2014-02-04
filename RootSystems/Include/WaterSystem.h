@@ -37,6 +37,8 @@ namespace RootForce
 		void TogglePause();
 		void ToggleWireFrame();
 
+		float GetWaterHeight();
+
 
 	private:
 
