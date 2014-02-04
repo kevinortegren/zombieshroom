@@ -700,9 +700,11 @@ namespace RootForce
 									id.ActionID = ReservedActionID::CONNECT;
 									id.SequenceID = 0;
 
-									if(!g_networkEntityMap[id])
+									NetworkEntityID clientId(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY);
+
+									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
 										continue;
-									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
+									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
 									if(clientComponent->State != ClientState::CONNECTED)
 										continue;
 
