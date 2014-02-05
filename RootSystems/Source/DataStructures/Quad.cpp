@@ -12,7 +12,7 @@ namespace RootForce
 
 	void QuadNode::AddChild(QuadNode* p_child)
 	{
-		assert(m_childs.size() < QUAD_MAX_CHILDS);
+		assert(m_childs.size() < QUADTREE_MAX_CHILDS);
 		m_childs.push_back(p_child);
 	}
 
@@ -82,7 +82,9 @@ namespace RootForce
 			{
 				// Insert range.
 				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
+#ifdef QUADTREE_DRAWLINES
 				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
+#endif
 			}
 			else
 			{
@@ -248,7 +250,7 @@ namespace RootForce
 		m_root = new QuadNode(quadTreeBounds);
 
 
-#ifdef SUBDIVIDE
+#ifdef QUADTREE_SUBDIVIDE
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
 
 		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
@@ -278,8 +280,9 @@ namespace RootForce
 		}
 		else if(p_polygons.size() > QUADTREE_POLYGONS_PER_NODE)
 		{
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Polygons: %d", p_polygons.size());
-
+#endif
 			const AABB* aabb = &p_node->m_bounds;
 
 			// Calculate center of the aabb.
@@ -314,9 +317,9 @@ namespace RootForce
 				if(result.m_front.m_indices.size() > 0)
 					polygonsAfterZSplit.push_back(result.m_front);
 			}
-
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after ZSplit: %d", polygonsAfterZSplit.size());
-
+#endif
 			std::vector<Polygon> polygonsAfterXSplit;
 
 			// Split all polygons with the z-plane.
@@ -330,9 +333,9 @@ namespace RootForce
 				if(result.m_front.m_indices.size() > 0)
 					polygonsAfterXSplit.push_back(result.m_front);
 			}
-
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after XSplit: %d", polygonsAfterXSplit.size());
-
+#endif
 			int halfwidth = aabb->GetLengthX() / 2;
 			int halfheight = aabb->GetLengthZ() / 2;
 
@@ -373,11 +376,6 @@ namespace RootForce
 				}
 			}
 
-			int size = bl.size() + br.size() + tl.size() + tr.size();
-			int diff = polygonsAfterXSplit.size() - size;
-
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygon Diff: %d", diff);
-
 			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB);
 			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB);
 			QuadNode* topLeftChild = new QuadNode(topLeftAABB);
@@ -395,8 +393,9 @@ namespace RootForce
 		}
 		else
 		{
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Polygons: %d", p_polygons.size());
-
+#endif
 			std::vector<Triangle> triangles = Trianglulate(p_polygons);
 
 			p_node->m_indices = CreateEntities(triangles);
@@ -556,8 +555,9 @@ namespace RootForce
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
+#ifdef QUADTREE_VERBOSE
 				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-
+#endif
 				// Create entity.
 				ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
@@ -674,9 +674,9 @@ namespace RootForce
 				}
 			}
 		}
-
+#ifdef QUADTREE_VERBOSE
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-
+#endif
 		// Create entity.
 		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 

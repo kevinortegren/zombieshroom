@@ -170,7 +170,6 @@ namespace RootForce
 
 	bool Frustum::CheckBoxEx(const AABB& p_box)
 	{
-
 		for( unsigned i = 0; i < 6; i++ )
 		{
 			glm::vec4 plane = glm::vec4(m_planesEx[i].a, m_planesEx[i].b, m_planesEx[i].c, m_planesEx[i].d);
@@ -225,6 +224,28 @@ namespace RootForce
 		return true;
 	}
 
+	bool Frustum::CheckSphere(const glm::vec3& p_center, float radius)
+	{
+		float distance = 0.0f;
+
+		for( unsigned i = 0; i < 6; i++ )
+		{
+			glm::vec4 plane = glm::vec4(m_planesEx[i].a, m_planesEx[i].b, m_planesEx[i].c, m_planesEx[i].d);
+
+			distance = glm::dot(plane, glm::vec4(p_center.x, p_center.y, p_center.z, 1.0f));
+		
+			// Out.
+			if(distance < -radius)
+				return false;
+
+			// Intersect.
+			if(glm::abs(distance) < radius)
+				return true;
+		}
+
+		// In.
+		return true;
+	}
 
 	bool Frustum::CheckBox(const AABB& p_box)
 	{

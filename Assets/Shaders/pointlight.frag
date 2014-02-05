@@ -77,7 +77,7 @@ void main() {
 		light = diffuse_color + spec_color;
 		light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));
 	}
-    
-
+ 
+ 
 	out_Color = vec4(light, 1.0f);
 }

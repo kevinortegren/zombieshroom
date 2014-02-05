@@ -10,8 +10,10 @@
 #include <vector>
 
 #define QUADTREE_POLYGONS_PER_NODE 50000
-#define QUAD_MAX_CHILDS 4
-#define SUBDIVIDE
+#define QUADTREE_MAX_CHILDS 4
+#define QUADTREE_SUBDIVIDE
+//#define QUADTREE_VERBOSE
+//#define QUADTREE_DRAWLINES
 
 namespace RootForce
 {

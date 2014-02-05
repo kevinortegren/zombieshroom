@@ -2406,75 +2406,75 @@
         - Entity: 187
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 188
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 189
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 190
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 191
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 192
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 193
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 194
           Attenuation: [0, 0.01, 0]
           Color: [1, 1, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 195
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 196
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 197
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 198
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 199
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 200
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 201
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 202
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 203
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
         - Entity: 204
           Attenuation: [0, 0.0691489, 0]
           Color: [0, 0, 1, 1]
-          Range: 10
+          Range: 100
     - Type: 3
       Data:
         []
