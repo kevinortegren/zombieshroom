@@ -489,11 +489,13 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	paintID = RM.PmeshList[meshID]->paintIndex;
 
 	transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
-
+	if(meshID != -1)
+	{
 	if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
 		painting = true;
 	else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
 		painted = true;
+	}
 
 	//for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
 	//{
