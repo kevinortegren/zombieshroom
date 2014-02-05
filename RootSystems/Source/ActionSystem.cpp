@@ -85,7 +85,7 @@ namespace RootSystems
 				std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
 				if (abilityScript != "")
 				{
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Creating ability entity (User: %d, Action: %d) with script: %s", network->ID.UserID, network->ID.ActionID, abilityScript.c_str());
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Creating ability entity (User: %d, Action: %d) with script: %s", network->ID.UserID, action->ActionID, abilityScript.c_str());
 
 					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityScript), "OnCreate");
 					m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
