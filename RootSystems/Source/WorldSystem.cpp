@@ -32,7 +32,6 @@ namespace RootForce
 	{
 		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 0.0f));
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
-
 	}
 
 	void WorldSystem::CreateSun()
@@ -182,7 +181,22 @@ namespace RootForce
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
 		
 		// Cull static geometry.
-		m_quadTree.Render(frustrum, m_quadTree.GetRoot());
+		m_quadTree.m_culledEntities.clear();
+		m_quadTree.Cull(frustrum, m_quadTree.GetRoot());
+
+		for(auto itr = m_quadTree.m_culledEntities.begin(); itr != m_quadTree.m_culledEntities.end(); ++itr)
+		{
+			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*itr)]);
+
+			Render::RenderJob job;
+			job.m_mesh = renderable->m_model->m_meshes[0];
+			job.m_material = renderable->m_material;
+			job.m_flags = renderable->m_renderFlags;
+			job.m_renderPass = renderable->m_pass;
+			job.m_params = renderable->m_params;
+
+			m_engineContext->m_renderer->AddRenderJob(job);
+		}
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

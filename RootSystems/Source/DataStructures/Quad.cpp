@@ -13,7 +13,6 @@ namespace RootForce
 	void QuadNode::AddChild(QuadNode* p_child)
 	{
 		assert(m_childs.size() < QUAD_MAX_CHILDS);
-
 		m_childs.push_back(p_child);
 	}
 
@@ -75,44 +74,27 @@ namespace RootForce
 		return nullptr;
 	}
 
-	void QuadTree::Render(RootForce::Frustum* p_frustrum, QuadNode* p_node) const
+	void QuadTree::Cull(RootForce::Frustum* p_frustrum, QuadNode* p_node)
 	{
 		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
-				ECS::Entity* entity;
-				RootForce::Renderable* renderable;
-
-				for(unsigned i = 0; i < p_node->m_indices.size(); ++i)
-				{
-					entity = m_entities[p_node->m_indices[i]];
-					renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-
-					Render::RenderJob job;
-					job.m_mesh = renderable->m_model->m_meshes[0];
-					job.m_shadowMesh = renderable->m_model->m_meshes[0];
-					job.m_flags = renderable->m_renderFlags;
-					job.m_material = renderable->m_material;
-					job.m_renderPass = renderable->m_pass;
-					job.m_params = renderable->m_params;
-
-					m_context->m_renderer->AddRenderJob(job);
-				}
-
+				// Insert range.
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
 				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
 			}
 			else
 			{
 				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
 				{
-					Render( p_frustrum, p_node->GetChilds().at(i)); 
+					Cull( p_frustrum, p_node->GetChilds().at(i)); 
 				}
 			}
 		}
 	}
 
-	void QuadTree::CullShadows(std::vector<glm::vec4>& p_points, QuadNode* p_node)
+	void QuadTree::Cull(std::vector<glm::vec4>& p_points, QuadNode* p_node)
 	{
 		if(Intersect(p_points, p_node->GetBounds()))
 		{
@@ -125,7 +107,7 @@ namespace RootForce
 			{
 				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
 				{
-					CullShadows( p_points, p_node->GetChilds().at(i)); 
+					Cull( p_points, p_node->GetChilds().at(i)); 
 				}
 			}
 		}

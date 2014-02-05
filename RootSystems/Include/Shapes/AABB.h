@@ -10,9 +10,9 @@ namespace RootForce
 		AABB();
 		AABB(float p_minX, float p_maxX, float p_minY, float p_maxY, float p_minZ, float p_maxZ);
 
-		int GetLengthX( void ) const;
-		int GetLengthY( void ) const;
-		int GetLengthZ( void ) const;
+		float GetLengthX( void ) const;
+		float GetLengthY( void ) const;
+		float GetLengthZ( void ) const;
 
 		Rectangle GetXZRect( void ) const;
 		glm::vec3 GetCenter( void ) const;
