@@ -253,6 +253,12 @@ namespace Render
 		m_lineRenderer.Init(this);
 
 		InitialziePostProcesses();
+
+		m_sjobCount[0] = 0;
+		m_sjobCount[1] = 0;
+		m_sjobCount[2] = 0;
+		m_sjobCount[3] = 0;
+
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -441,38 +447,64 @@ namespace Render
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
-		int shadowJobStart = 0;
+		// Clear framebuffers.
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glDrawBuffers(0, NULL);
-
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		}
 
-			struct
-			{
-				glm::mat4 m_projection;
-				glm::mat4 m_view;
-				glm::mat4 m_invView;
-			} matrices;
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[0]);
+		glDrawBuffers(0, NULL);
+		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[0]);
 
-			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
-			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
+		// Cascade 1.
+		for(int j = 0; j < m_sjobCount[0]; ++j)
+		{
+			m_sjobs[j].m_mesh->Bind();
+			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+			m_sjobs[j].m_mesh->Draw();
+			m_sjobs[j].m_mesh->Unbind();
+		}
+	
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[1]);
+		glDrawBuffers(0, NULL);
+		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[1]);
 
-			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
+		// Cascade 2.
+		for(int j = m_sjobCount[0]; j < m_sjobCount[0] + m_sjobCount[1]; ++j)
+		{
+			m_sjobs[j].m_mesh->Bind();
+			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+			m_sjobs[j].m_mesh->Draw();
+			m_sjobs[j].m_mesh->Unbind();
+		}
 
-			int j = 0;
-			for(j = shadowJobStart; j < shadowJobStart + m_sjobCount[i]; ++j)
-			{
-				m_sjobs[j].m_mesh->Bind();
-				m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-				m_sjobs[j].m_mesh->Draw();
-				m_sjobs[j].m_mesh->Unbind();
-			}
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[2]);
+		glDrawBuffers(0, NULL);
+		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[2]);
 
-			shadowJobStart = j;
+		// Cascade 3.
+		for(int j = m_sjobCount[1]; j < m_sjobCount[1] + m_sjobCount[2]; ++j)
+		{
+			m_sjobs[j].m_mesh->Bind();
+			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+			m_sjobs[j].m_mesh->Draw();
+			m_sjobs[j].m_mesh->Unbind();
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[3]);
+		glDrawBuffers(0, NULL);
+		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[3]);
+
+		// Cascade 4.
+		for(int j = m_sjobCount[2]; j < m_sjobCount[2] + m_sjobCount[3]; ++j)
+		{
+			m_sjobs[j].m_mesh->Bind();
+			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+			m_sjobs[j].m_mesh->Draw();
+			m_sjobs[j].m_mesh->Unbind();
 		}
 
 		glCullFace(GL_BACK);

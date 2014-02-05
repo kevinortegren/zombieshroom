@@ -6,6 +6,8 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/DataStructures/Quad.h>
 
+#define SHADOWSYSTEM_CULL
+
 namespace RootForce
 {
 	class ShadowSystem : public ECS::EntitySystem

@@ -29,7 +29,6 @@ namespace RootForce
 		worldCorners[5] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_maxZ);
 		worldCorners[6] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_maxY, p_quadTree->GetRoot()->GetBounds().m_minZ);
 		worldCorners[7] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_minZ);
-
 	}
 
 	void ShadowSystem::Begin()
@@ -167,6 +166,7 @@ namespace RootForce
 			
 			sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
+			sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
 		}
 
 		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
@@ -175,12 +175,19 @@ namespace RootForce
 		std::vector<glm::vec4> points;
 		points.resize(8);
 
+		glm::vec3 colors[4];
+		colors[0] = glm::vec3(1,0,0);
+		colors[1] = glm::vec3(0,1,0);
+		colors[2] = glm::vec3(0,0,1);
+		colors[3] = glm::vec3(0,1,1);
+
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
+#ifdef SHADOWSYSTEM_CULL
 			glm::mat4 invViewProj = glm::inverse(sc.m_viewMatrices[i]) * glm::inverse(sc.m_projectionMatrices[i]);
 
 			OBB obb = OBB(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, invViewProj);
-			obb.DebugDraw(g_engineContext.m_renderer, glm::vec3(1,0,1), glm::mat4(1.0f));
+			obb.DebugDraw(g_engineContext.m_renderer, colors[i], glm::mat4(1.0f));
 
 			for(int j = 0; j < 8; ++j)
 			{
@@ -200,6 +207,18 @@ namespace RootForce
 			}
 
 			g_engineContext.m_renderer->AddShadowJob(jobs, i);
+#else
+			std::vector<Render::ShadowJob> jobs;
+			for(auto itr = m_quadTree->m_entities.begin(); itr != m_quadTree->m_entities.end(); ++itr)
+			{
+				Render::ShadowJob job;
+				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_model->m_meshes[0];
+				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_material->m_effect;
+				jobs.push_back(std::move(job));
+			}
+
+			g_engineContext.m_renderer->AddShadowJob(jobs, i);
+#endif
 		}
 	}
 

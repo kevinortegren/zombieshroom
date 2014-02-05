@@ -9,9 +9,9 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-#define QUADTREE_POLYGONS_PER_NODE 10000
+#define QUADTREE_POLYGONS_PER_NODE 50000
 #define QUAD_MAX_CHILDS 4
-//#define SUBDIVIDE
+#define SUBDIVIDE
 
 namespace RootForce
 {
@@ -25,6 +25,7 @@ namespace RootForce
 		const std::vector<QuadNode*>& GetChilds();
 		const AABB& GetBounds() const;
 
+		// Indices to entity vector.
 		std::vector<unsigned> m_indices;
 
 	private:

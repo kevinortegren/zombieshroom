@@ -34,7 +34,7 @@ namespace RootForce
 		}
 	};
 
-	static bool Overlaps(float p_min1, float p_max1, float p_min2, float p_max2)
+	inline bool Overlaps(float p_min1, float p_max1, float p_min2, float p_max2)
 	{
 		return (p_min1 <= p_min2 && p_min2 <= p_max1) || (p_min2 <= p_min1 && p_min1 <= p_max2);
 	}
