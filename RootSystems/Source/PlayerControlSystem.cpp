@@ -161,6 +161,7 @@ namespace RootForce
 			case PlayerAction::ACTIVATE_ABILITY:
 				{
 					action->ActivateAbility = true;
+					action->ActionID = s_nextActionID;
 					if (playerComponent->AbilityScripts[playerComponent->SelectedAbility].CooldownOff)
 					{
 						action->ActionID = s_nextActionID++;	
