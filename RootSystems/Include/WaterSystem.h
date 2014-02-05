@@ -40,6 +40,7 @@ namespace RootForce
 		void ToggleWireFrame();
 
 		float GetWaterHeight();
+		void SetWaterHeight(float p_height);
 
 
 	private:
