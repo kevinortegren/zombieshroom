@@ -234,16 +234,9 @@ namespace RootForce
 
 			distance = glm::dot(plane, glm::vec4(p_center.x, p_center.y, p_center.z, 1.0f));
 		
-			// Out.
 			if(distance < -radius)
 				return false;
-
-			// Intersect.
-			if(glm::abs(distance) < radius)
-				return true;
 		}
-
-		// In.
 		return true;
 	}
 
