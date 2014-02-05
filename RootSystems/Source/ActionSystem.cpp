@@ -127,7 +127,7 @@ namespace RootSystems
 					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::CooldownOff);
 					m.Serialize(true, &bs);
 
-					m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, m_serverPeer->GetSystemAddressFromIndex(network->ID.UserID), false);
+					m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
 			}
 			
