@@ -39,8 +39,7 @@ namespace RootForce
 		m_view->Focus();
 	}
 
-	void RootForce::ChatSystem::JS
-		( std::string p_message )
+	void RootForce::ChatSystem::JSAddMessage( std::string p_message )
 	{
 		JSAddMessage(p_message.c_str());
 	}

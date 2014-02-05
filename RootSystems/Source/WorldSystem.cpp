@@ -12,7 +12,7 @@ namespace RootForce
 		
 		// Parse ambient data.
 		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
-		glm::vec3 ambient = glm::vec3(0.1f);
+		glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
@@ -50,7 +50,7 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
+		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
 
 

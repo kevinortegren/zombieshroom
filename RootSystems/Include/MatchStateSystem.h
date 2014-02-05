@@ -15,6 +15,10 @@ namespace RootForce
 		float TimeLeft;
 		int ScoreLimit;
 		int TeamScore[3];
+		~TDMRuleSet()
+		{
+			int i = 0;
+		}
 	};
 
 	class MatchStateSystem : public ECS::VoidSystem

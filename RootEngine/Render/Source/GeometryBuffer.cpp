@@ -35,7 +35,7 @@ namespace Render
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		m_diffuseTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
-		m_normalsTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_normalsTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RG16);
 		m_glowTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 		m_backgroundTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
@@ -44,7 +44,6 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalsTexture->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, m_backgroundTexture->GetHandle(), 0);
-
 
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		switch (status)

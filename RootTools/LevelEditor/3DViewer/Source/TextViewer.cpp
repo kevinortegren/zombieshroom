@@ -13,7 +13,7 @@
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\WorldSystem.h>
 #include <RootSystems\Include\ShadowSystem.h>
-#include <RootSystems\Include\WaterSystem.h>
+//#include <RootSystems\Include\WaterSystem.h>
 
 #include <Utility\ECS\Include\World.h>
 
@@ -378,7 +378,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
 	worldSystem->CreateSun();
 	worldSystem->CreateSkyBox();
-	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
+	//waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
 }
 
 void LoadSceneFromMaya()

@@ -90,7 +90,6 @@
     - 89
     - 90
     - 91
-    - 92
     - 93
     - 94
     - 95
@@ -863,12 +862,6 @@
             Effect: Mesh_NormalMap
             Diffuse: Tree1GreenLeaf
             Normal: Tree1Normal
-        - Entity: 92
-          Model: waterShape
-          Material:
-            Name: Water
-            Effect: Mesh
-            Diffuse: water
         - Entity: 93
           Model: RuneGlowStone16Shape
           Material:
@@ -1949,10 +1942,6 @@
           Position: [-63.0398, -20.1302, 5.77093]
           Rotation: [0, -0.180629, 0, 0.983551]
           Scale: [2.0929, 2.0929, 2.0929]
-        - Entity: 92
-          Position: [22.8808, -60.4661, 34.3229]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1.37125, 1.37125, 1.37125]
         - Entity: 93
           Position: [-21.8842, -19.478, 1.94945]
           Rotation: [0, -0.859499, 0, 0.511137]
@@ -2683,8 +2672,6 @@
           MeshHandle: RootPlatformShape70
         - Entity: 91
           MeshHandle: LeafTree50Shape0
-        - Entity: 92
-          MeshHandle: waterShape0
         - Entity: 93
           MeshHandle: RuneGlowStone16Shape0
         - Entity: 94

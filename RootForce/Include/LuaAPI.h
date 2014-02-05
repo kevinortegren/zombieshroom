@@ -1829,6 +1829,40 @@ namespace RootForce
 			return 1;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//WaterCollider
+		//////////////////////////////////////////////////////////////////////////
+		static int WaterColliderCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::WaterCollider **s = (RootForce::WaterCollider**)lua_newuserdata(p_luaState, sizeof(RootForce::WaterCollider*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::WaterCollider>(*e);
+			luaL_setmetatable(p_luaState, "WaterCollider");
+			return 1;
+		}
+		static int WaterColliderSetDisturbPower(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::WaterCollider **s = (RootForce::WaterCollider**)luaL_checkudata(p_luaState, 1, "WaterCollider");
+			(*s)->m_disturbPower = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int WaterColliderSetDisturbInterval(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::WaterCollider **s = (RootForce::WaterCollider**)luaL_checkudata(p_luaState, 1, "WaterCollider");
+			(*s)->m_disturbInterval = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int WaterColliderSetRadius(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::WaterCollider **s = (RootForce::WaterCollider**)luaL_checkudata(p_luaState, 1, "WaterCollider");
+			(*s)->m_radius = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{NULL, NULL}
@@ -2228,6 +2262,18 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg watercollider_f [] = {
+			{"New", WaterColliderCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg watercollider_m [] = {
+			{"SetDisturbPower", WaterColliderSetDisturbPower},
+			{"SetDisturbInterval", WaterColliderSetDisturbInterval},
+			{"SetRadius", WaterColliderSetRadius},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2278,6 +2324,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
