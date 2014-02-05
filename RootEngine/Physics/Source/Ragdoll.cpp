@@ -44,6 +44,7 @@ namespace Ragdoll
 			trans.setRotation(btQuaternion(x,y,z,w));*/
 			trans.setOrigin(trans.getOrigin() + m_bodyPosOffset[i]);
 			m_bodies[i]->setWorldTransform(trans);
+			m_bodies[i]->activate(true);
 			m_dynamicWorld->addRigidBody(m_bodies[i]);
 		}
 		for(int i = 0; i < m_constraintCounter; i++)
@@ -67,8 +68,8 @@ namespace Ragdoll
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
 	{
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.67f, 0);
-		//m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(2.0f, 0, 0);
- 		//m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(-2.0f, 0, 0);
+		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(0, 0.3f, 0);
+ 		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f, 0.3f, 0);
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(0, -0.25f ,0);
 		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0, -0.25f ,0);
 		m_nameToIndex = p_nameToIndex;
@@ -109,8 +110,10 @@ namespace Ragdoll
 			m_bodyPosOffset[index] += p_parentBodyOffset;
 			m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
-			m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
-			
+		//	if( index > 5)
+				m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
+		//	else
+		//		m_lastBoneMatrix[index] = p_bones[index];
 			
 			glm::mat4 toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];	
 			const float* data = glm::value_ptr(toTrans);
@@ -124,7 +127,7 @@ namespace Ragdoll
 			trans.setOrigin(trans.getOrigin() + m_bodyPosOffset[index]);
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(mass, motionstate, shape, inertia);
-			//body->setDamping(0.05f,0.85f);
+			body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
 			body->setCcdMotionThreshold(0.7f);
 			body->setCcdSweptSphereRadius(0.3f);
@@ -162,84 +165,98 @@ namespace Ragdoll
 		//Nu ska vi göra allt till boxar för det är coolare
 		if(p_name.compare("Character1_Hips") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::HIPS] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.2f, 0.4f));
 			//return new btCapsuleShape(0.4f, 0.01f);
 			//return new btCylinderShape(btVector3(0.4f,0.2f,0.4f));
 		}
 		else if(p_name.compare("Character1_LeftArm") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTARM] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.28f, 0.30f);	
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_LeftFoot") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 			//return new btCapsuleShape(0.2f, 0.16f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftForeArm") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTFOREARM] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.28f, 0.30f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_LeftHand") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTHAND] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.2f, 0.2f));
 			//return new btCapsuleShape(0.2f, 0.08f);
 		//	return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftLeg") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::LEFTUPLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.2f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightArm") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTARM] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightFoot") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 		//	return new btCapsuleShape(0.2f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightForeArm") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTFOREARM] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.28f, 0.3f);
 			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightHand") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTHAND] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.2f, 0.2f));
 			//return new btCapsuleShape(0.28f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightLeg") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.20f, 0.26f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::RIGHTUPLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_Spine") == 0)
 		{
+			m_modelSpaceOffset[BodyPart::SPINE] = glm::vec3(0,0.3f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.6f, 0.4f));
 			//return new btCapsuleShape(0.4f,0.6f);
 			//return new btCylinderShape(btVector3(0.4f,0.4f,0.4f));
@@ -332,7 +349,7 @@ namespace Ragdoll
  			else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
  			{
  				CalculateConstraintTransform(p_bodyA, p_bodyB,
- 						0.20f , -0.0f * OFFSET, 0,
+ 						0.25f , -0.0f * OFFSET, 0,
  					0, 0.20f * OFFSET, 0,
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
 
@@ -346,7 +363,7 @@ namespace Ragdoll
  			else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
  			{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					-0.20f , -0.0f * OFFSET, 0,
+ 					-0.25f , -0.0f * OFFSET, 0,
  					0, 0.2f * OFFSET, 0,
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
@@ -571,11 +588,6 @@ namespace Ragdoll
 		float data[16];
 		btTransform trans = m_bodies[myIndex]->getWorldTransform();
 		float x,y,z,w;
-	/*	x = trans.getRotation().w();
-		y = trans.getRotation().x();
-		z = trans.getRotation().y();
-		w = trans.getRotation().z();
-		trans.setRotation(btQuaternion(x,y,z,w));*/
 		trans.getOpenGLMatrix(data);
 		int index  = m_boneToFollow[myIndex];
 		float test[16];
@@ -586,15 +598,28 @@ namespace Ragdoll
 		w = worldTrans.getRotation().z();
 		worldTrans.setRotation(btQuaternion(x,y,z,w));
 		worldTrans.getOpenGLMatrix(test);
+
+
+		//rotate the modelspace offset according to the shape rotation
+		btVector3 rot = trans.getRotation().getAxis();
+		float angle = trans.getRotation().getAngle();
+		glm::vec3 rotateByGlm = glm::vec3(rot.x(), rot.y(), rot.z());
+		glm::mat4 rotateMat = glm::mat4(1.0f);
+		rotateMat = glm::rotate(rotateMat, angle, rotateByGlm);
+		glm::vec3 offsetValue = glm::vec3(glm::vec4(m_modelSpaceOffset[myIndex], 0) * rotateMat);
 		/*btTransform testoi = worldTrans.inverse() * trans;
 		testoi.getOpenGLMatrix(test);
 		p_bones[myIndex] = glm::make_mat4(test);*/
 		m_prevPos[myIndex] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[myIndex]) */;
 		//World to local space
 		p_bones[myIndex] = /*glm::inverse(m_boneTransform[myIndex]) **/ (glm::inverse(m_prevPos[myIndex])  /** glm::inverse(retVal[myIndex])*/ *   glm::make_mat4(data)) /* * m_lastBoneMatrix[myIndex]*/; 
-		
 		p_bones[myIndex] = glm::rotate(p_bones[myIndex], 180.0f, glm::vec3(1,0,0));
+		p_bones[myIndex][3] -= glm::vec4(offsetValue,0);
 		p_bones[myIndex] *= m_boneOffset[myIndex];
+	
+		//p_bones[myIndex][3].y -= (m_modelSpaceOffset[myIndex] * 2); // Verkar bero på vilket håll man är vinklad om man ska ta - på x,y eller z. Måste komma på nån generell fix.
+		
+#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
 			FixPosition(p_bones, p_rootNode->mChildren[i]);

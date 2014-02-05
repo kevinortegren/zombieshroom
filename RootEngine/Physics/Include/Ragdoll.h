@@ -58,6 +58,7 @@ namespace Ragdoll
 		glm::mat4 m_lastBoneMatrix[20];
 		glm::mat4 m_boneOffset[20];
 		int m_boneToFollow[20];
+		glm::vec3 m_modelSpaceOffset[20];
 		btVector3 m_bodyPosOffset[20];
 		std::map<std::string, int> m_nameToIndex;
 		aiNode* m_hipsNode;
