@@ -30,9 +30,11 @@ namespace RootForce
 
 		void IncreaseDamping();
 		void IncreaseSpeed();
+		void IncreaseWaterHeight();
 
 		void DecreaseDamping();
 		void DecreaseSpeed();
+		void DecreaseWaterHeight();
 
 		void TogglePause();
 		void ToggleWireFrame();

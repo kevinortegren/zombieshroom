@@ -253,5 +253,14 @@ namespace RootForce
 		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
 	}
 
+	void WaterSystem::IncreaseWaterHeight()
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y++;
+	}
+
+	void WaterSystem::DecreaseWaterHeight()
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y--;
+	}
 
 }
