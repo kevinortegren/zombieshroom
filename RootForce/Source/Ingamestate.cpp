@@ -192,6 +192,9 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		// Set the server peer to the action system, if we are a server.
+		m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
 

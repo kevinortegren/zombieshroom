@@ -104,24 +104,30 @@ namespace RootSystems
 				if (player->AbilityScripts[i].Cooldown > 0)
 				{
 					player->AbilityScripts[i].Cooldown -= dt;
+				}
 
-					if (m_serverPeer != nullptr && player->AbilityScripts[i].Cooldown <= 0.0f)
-					{
-						// Send notification about finished cooldown to the client.
-						RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
+				if (m_serverPeer != nullptr && player->AbilityScripts[i].Cooldown <= 0.0f && !player->AbilityScripts[i].CooldownOff)
+				{
+					// Cooldown has finished on the server.
+					player->AbilityScripts[i].CooldownOff = true;
+					player->AbilityScripts[i].Cooldown = 0.0f;
+
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d is off", i);
+
+					// Send notification about finished cooldown to the client.
+					RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
 						
-						RootForce::NetworkMessage::CooldownOff m;
-						m.User = network->ID.UserID;
-						m.AbilityIndex = i;
+					RootForce::NetworkMessage::CooldownOff m;
+					m.User = network->ID.UserID;
+					m.AbilityIndex = i;
 
-						RakNet::BitStream bs;
-						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-						bs.Write(RakNet::GetTime());
-						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::CooldownOff);
-						m.Serialize(true, &bs);
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
+					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::CooldownOff);
+					m.Serialize(true, &bs);
 
-						m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, m_serverPeer->GetSystemAddressFromIndex(network->ID.UserID), false);
-					}
+					m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, m_serverPeer->GetSystemAddressFromIndex(network->ID.UserID), false);
 				}
 			}
 			
