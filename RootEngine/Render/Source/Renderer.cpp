@@ -396,7 +396,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			//PostProcessPass();
+			PostProcessPass();
 		}
 
 		{
