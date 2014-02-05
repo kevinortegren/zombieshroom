@@ -20,9 +20,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				}
 				if(renderable->m_material != nullptr)
 				{
-					std::string s = g_engineContext.m_resourceManager->ResolveStringFromMaterial(renderable->m_material);
 					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginSeq;
-					p_emitter << YAML::Key << "Name" << YAML::Value << s;
 					if(renderable->m_material->m_effect != nullptr)
 					{
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect);

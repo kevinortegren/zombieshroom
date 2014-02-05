@@ -29,32 +29,12 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Error parsing scene %s: %s", p_fileName, m_importer->GetErrorString());
 		}
 
-		if(aiscene->HasAnimations())
-		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
-			/*for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
-			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "animation name: '%s'", aiscene->mAnimations[i]->mName.C_Str());
-
-				for(unsigned int j = 0; j < aiscene->mAnimations[i]->mNumChannels; j++)
-				{
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
-				}
-			}*/	
-		}
-		
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
 		{
 			TraverseSceneHierarchy(aiscene, p_fileName);
-
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
 		{
@@ -65,6 +45,9 @@ namespace RootEngine
 		{
 			m_model->m_animation->SetAiImporter(m_importer);
 			m_model->m_animation->SplitAnimation();
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Model contains %d animations", aiscene->mNumAnimations);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation duration is %f",(float)aiscene->mAnimations[0]->mDuration);
 		}
 
 		return m_model;
@@ -116,9 +99,9 @@ namespace RootEngine
 			return;
 		}
 
-		//Load bones
+		
 
-		std::shared_ptr<Render::MeshInterface> mesh	= m_context->m_renderer->CreateMesh();
+		Render::MeshInterface* mesh = m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
@@ -157,11 +140,11 @@ namespace RootEngine
 			std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
 
 			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
-				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
-				const aiVector3D* pNormal   = &(p_aiMesh->mNormals[i]);
-				const aiVector3D* pTangent   = &(p_aiMesh->mTangents[i]);
-				const aiVector3D* pBitangent   = &(p_aiMesh->mBitangents[i]);
-				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+				const aiVector3D* pPos			= &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pNormal		= p_aiMesh->HasNormals() ? &(p_aiMesh->mNormals[i]) : &Zero3D;
+				const aiVector3D* pTangent		= &(p_aiMesh->mTangents[i]);
+				const aiVector3D* pBitangent	= &(p_aiMesh->mBitangents[i]);
+				const aiVector3D* pTexCoord		= p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
 
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
@@ -176,7 +159,7 @@ namespace RootEngine
 
 			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
 		}
-		else 
+		else if(p_aiMesh->HasNormals())
 		{
 			std::vector<Render::Vertex1P1N1UV> vertices;
 
@@ -195,6 +178,24 @@ namespace RootEngine
 			}
 
 			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
+		}
+		else
+		{
+			std::vector<Render::Vertex1P1UV> vertices;
+
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) {
+				const aiVector3D* pPos      = &(p_aiMesh->mVertices[i]);
+				const aiVector3D* pTexCoord = p_aiMesh->HasTextureCoords(0) ? &(p_aiMesh->mTextureCoords[0][i]) : &Zero3D;
+
+				Render::Vertex1P1UV v;
+				v.m_pos		= glm::vec3(pPos->x, pPos->y, pPos->z);
+				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
+
+				vertices.push_back(v);
+				positions.push_back(v.m_pos);
+			}
+
+			mesh->CreateVertexBuffer1P1UV(&vertices[0], vertices.size());	
 		}
 
 		
@@ -237,7 +238,7 @@ namespace RootEngine
 
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
-		m_model->m_meshes[0] = mesh.get();
+		m_model->m_meshes[0] = mesh;
 		m_model->m_meshes[1] = nullptr;
 	}
 
@@ -294,8 +295,6 @@ namespace RootEngine
 
 	void ModelImporter::LoadBones( const aiMesh* p_aiMesh )
 	{
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
-
 		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(m_context->m_logger);
 		m_boneData.resize(p_aiMesh->mNumVertices);
 		//Loop through all the bones in the mesh
@@ -338,7 +337,7 @@ namespace RootEngine
 		}
 
 		m_model->m_animation = animation;
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded animation data!");
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation contains %d bones", p_aiMesh->mNumBones);
 	}
 
 	std::string ModelImporter::GetNameFromPath( std::string p_path )

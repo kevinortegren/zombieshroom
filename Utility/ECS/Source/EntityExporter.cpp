@@ -18,6 +18,9 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	auto range = m_world->GetGroupManager()->GetEntitiesInGroup("NonExport");
 	for(auto itr = range.first; itr != range.second; ++itr)
 	{
+		if((*itr).second->GetId() == -1)
+			continue;
+
 		nonExportIds[itr->second->m_id] = true;
 	}
 
@@ -31,10 +34,29 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
 	{
+		if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
+			continue;
+
 		if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
 			continue;
 
 		out << m_world->GetEntityManager()->m_entities[i].m_id;
+	}
+
+	out << YAML::EndSeq;
+	out << YAML::EndMap;
+
+	// Export Storage.
+	out << YAML::BeginMap;
+	out << YAML::Key << "Storage";
+	out << YAML::Value << YAML::BeginSeq;
+	
+	for(auto itr = m_world->GetStorage()->m_values.begin(); itr != m_world->GetStorage()->m_values.end(); ++itr)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "Key" << YAML::Value << (*itr).first;
+		out << YAML::Key << "Value" << YAML::Value << (*itr).second;
+		out << YAML::EndMap;
 	}
 
 	out << YAML::EndSeq;
@@ -77,6 +99,9 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	
 	for(auto itr = m_world->GetTagManager()->m_tags.begin(); itr != m_world->GetTagManager()->m_tags.end(); ++itr)
 	{
+		if((*itr).second->GetId() == -1)
+			continue;
+
 		if(nonExportIds[(*itr).second->m_id])
 			continue;
 
@@ -104,6 +129,11 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 			out << YAML::EndMap;
 		}
 	}
+
+	out << YAML::EndSeq;
+	out << YAML::EndMap;
+
+	
 
 	out << YAML::EndSeq;
 

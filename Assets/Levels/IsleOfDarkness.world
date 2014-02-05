@@ -138,45 +138,45 @@
         - Entity: 13
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
             Glow: Leef
         - Entity: 14
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 15
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 16
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 17
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 18
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 19
           Model: Stone45Shape
           Material:
-            Name: StoneMaterial
-            Effect: Mesh
+            Name: StoneMaterial1
+            Effect: Mesh_Trans
             Diffuse: RockTexture
         - Entity: 20
           Model: Stone45Shape
@@ -757,25 +757,25 @@
           Model: Tree52Shape
           Material:
             Name: Treeyellow
-            Effect: Mesh
+            Effect: Mesh_Trans
             Diffuse: Tree1yellowLeaf
         - Entity: 116
           Model: Tree52Shape
           Material:
             Name: Treeyellow
-            Effect: Mesh
+            Effect: Mesh_Trans
             Diffuse: Tree1yellowLeaf
         - Entity: 117
           Model: Tree52Shape
           Material:
             Name: Treeyellow
-            Effect: Mesh
+            Effect: Mesh_Trans
             Diffuse: Tree1yellowLeaf
         - Entity: 118
           Model: Tree52Shape
           Material:
             Name: Treeyellow
-            Effect: Mesh
+            Effect: Mesh_Trans
             Diffuse: Tree1yellowLeaf
         - Entity: 119
           Model: Tree52Shape
@@ -829,7 +829,7 @@
           Model: WaterShape1
           Material:
             Name: Water
-            Effect: Mesh
+            Effect: Mesh_Trans
             Diffuse: water
         - Entity: 128
         - Entity: 129
@@ -1918,4 +1918,4 @@
     - Id: 125
       Group: Static
     - Id: 126
-      Group: Static
+      Group: Static 

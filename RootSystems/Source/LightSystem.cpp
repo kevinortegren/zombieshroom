@@ -1,4 +1,5 @@
 #include <LightSystem.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootForce
 {	
@@ -24,13 +25,37 @@ namespace RootForce
 		pl.m_attenuation = pointLight->m_attenuation;
 		pl.m_range = pointLight->m_range;
 
-		m_renderer->AddPointLight(pl, m_lightCount);
+		m_context->m_renderer->AddPointLight(pl, m_lightCount);
 
 		m_lightCount++;
 	}
 
-	void PointLightSystem::End()
+	void PointLightSystem::End() {}
+
+	void DirectionalLightSystem::Init()
 	{
-		
+		m_dlights.Init(m_world->GetEntityManager());
+		m_transforms.Init(m_world->GetEntityManager());
 	}
+
+	void DirectionalLightSystem::Begin() 
+	{ 
+		m_lightCount = 0; 
+	}
+
+	void DirectionalLightSystem::ProcessEntity(ECS::Entity* p_entity)
+	{
+		Transform* transform = m_transforms.Get(p_entity);
+		DirectionalLight* directionalLigt = m_dlights.Get(p_entity);
+
+		Render::DirectionalLight dl;
+		dl.m_color = directionalLigt->m_color;
+		dl.m_direction = transform->m_orientation.GetFront();
+
+		m_context->m_renderer->AddDirectionalLight(dl, m_lightCount);
+
+		m_lightCount++;
+	}
+
+	void DirectionalLightSystem::End() {}
 }

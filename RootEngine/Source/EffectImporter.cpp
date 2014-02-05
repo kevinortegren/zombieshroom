@@ -15,7 +15,7 @@ namespace RootEngine
 
 	void EffectImporter::Process(const YAML::Node& p_node)
 	{
-		std::shared_ptr<Render::EffectInterface> effect = m_renderer->CreateEffect();
+		Render::EffectInterface* effect = m_renderer->CreateEffect();
 
 		if(!p_node.FindValue("techniques"))
 		{
@@ -164,6 +164,24 @@ namespace RootEngine
 					}
 				}
 		
+				if(techniques[i].FindValue("images"))
+				{
+					const YAML::Node& images = techniques[i]["images"];
+					for(size_t j = 0; j < images.size(); ++j)
+					{
+						std::string name;
+						images[j]["name"] >> name;
+
+						int slot;
+						images[j]["slot"] >> slot;
+
+						// Bind shader name to slot.
+						//program->BindUniformBuffer(name, slot);
+
+						glUniform1i(glGetUniformLocation(program->GetHandle(), name.c_str()), slot);
+					}
+				}
+				
 				if(techniques[i].FindValue("uniforms"))
 				{
 					const YAML::Node& uniforms = techniques[i]["uniforms"];
@@ -255,6 +273,34 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::ORBITRADIUS, offset);
 						}
+						else if(sem == "MK1")
+						{
+							technique->AddUniformParam(Render::Semantic::MK1, offset);
+						}
+						else if(sem == "MK2")
+						{
+							technique->AddUniformParam(Render::Semantic::MK2, offset);
+						}
+						else if(sem == "MK3")
+						{
+							technique->AddUniformParam(Render::Semantic::MK3, offset);
+						}
+						else if(sem == "XMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::XMAX, offset);
+						}
+						else if(sem == "YMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::YMAX, offset);
+						}
+						else if(sem == "EYEWORLDPOS")
+						{
+							technique->AddUniformParam(Render::Semantic::EYEWORLDPOS, offset);
+						}
+						else if(sem == "DX")
+						{
+							technique->AddUniformParam(Render::Semantic::DX, offset);
+						}
 					}
 				}
 
@@ -291,11 +337,11 @@ namespace RootEngine
 					}
 					else if(name == "Forward")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_FORWARD;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED1;
 					}
 					else if(name == "Deferred")
 					{
-						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED;
+						technique->m_flags |= Render::TechniqueFlags::RENDER_DEFERRED0;
 					}
 					else if(name == "Debug")
 					{
@@ -310,7 +356,7 @@ namespace RootEngine
 			else
 			{
 				// Assume deffered technique if no flags found.
-				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED;
+				technique->m_flags = Render::TechniqueFlags::RENDER_DEFERRED0;
 			}
 		}
 

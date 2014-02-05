@@ -40,6 +40,7 @@ public:
 	Material* PmaterialList[g_maxMeshes];
 	Locator* PlocatorList[g_maxLocators];
 	PaintTexture* PpaintList[g_maxPaintTextures];
+	WorldData* worldData;
 
 	int* export;
 
@@ -52,6 +53,16 @@ public:
 	DWORD milliseconds;
 
 	void ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape);
+	UpdateMessage PeekMessageAt(int index);
+	void ClearAllMessages();
+	WorldData getWorldData();
+	Mesh getMesh(int index);
+	Light getLight(int index);
+	Camera getCamera(int index);
+	Locator getLocator(int index);
+	Material getMaterial(int index);
+	Counters getCounters();
+	PaintTexture getPaintTexture(int index);
 	
 private:
 	//Functions

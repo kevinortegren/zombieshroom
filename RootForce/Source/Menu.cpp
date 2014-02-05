@@ -63,7 +63,7 @@ namespace RootForce
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerPort")) + ",";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerPassword") + "',";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerMaxPlayers")) + ",";
-		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerMatchLength")) + ",";
+		command = command + std::to_string(p_configMan->GetConfigValueAsFloat("ServerMatchLength")) + ",";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerKillVictory")) + ",";
 
 		command += GetMapList();

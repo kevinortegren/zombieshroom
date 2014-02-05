@@ -14,15 +14,12 @@ namespace RootForce
 {
 	namespace Network
 	{
-		Server::Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated)
+		Server::Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config)
 			: m_logger(p_logger)
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
 			, m_worldDeltaTimer(0)
 		{
-			// Load the map
-			p_worldSystem->CreateWorld(p_config.MapName);
-
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
 
@@ -33,6 +30,21 @@ namespace RootForce
 			m_peer->SetMaximumIncomingConnections(p_config.MaxPlayers);
 			m_peer->SetOccasionalPing(true);
 			m_peer->SetIncomingPassword(p_config.Password.c_str(), p_config.Password.size() + 1);
+
+			// Notify the user of the firepower of this fully armed and operational server!
+			m_logger->LogText(LogTag::SERVER, LogLevel::INIT_PRINT, "Server initialized successfully");
+		}
+
+		Server::~Server()
+		{
+			m_peer->Shutdown(1000);
+			RakNet::RakPeerInterface::DestroyInstance(m_peer);
+		}
+
+		void Server::Initialize( WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated )
+		{
+			// Load the map
+			p_worldSystem->LoadWorld(p_config.MapName);
 
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
@@ -50,15 +62,6 @@ namespace RootForce
 
 			// Setup the ping response (for network discovery)
 			UpdatePingResponse();
-
-			// Notify the user of the firepower of this fully armed and operational server!
-			m_logger->LogText(LogTag::SERVER, LogLevel::INIT_PRINT, "Server initialized successfully");
-		}
-
-		Server::~Server()
-		{
-			m_peer->Shutdown(1000);
-			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
 		const NetworkMessage::ServerInformation& Server::GetServerInformation() const

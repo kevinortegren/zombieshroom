@@ -38,12 +38,15 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void IngameState::Initialize()
 	{
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -127,8 +130,11 @@ namespace RootForce
 		m_shadowSystem = new RootForce::ShadowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
-		m_pointLightSystem = new RootForce::PointLightSystem(g_world, g_engineContext.m_renderer);
+		m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
+
+		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
 		// Initialize anim system
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
@@ -158,6 +164,12 @@ namespace RootForce
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
+
+		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
+		m_waterSystem->Init();
+
+		m_waterCollisionSystem = new RootSystems::WaterCollsionSystem(g_world, &g_engineContext, m_waterSystem);
+		g_world->GetSystemManager()->AddSystem<RootSystems::WaterCollsionSystem>(m_waterCollisionSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -196,6 +208,8 @@ namespace RootForce
 		m_respawnSystem->LoadSpawnPoints();
 
 		m_animationSystem->Start();
+
+		m_waterSystem->CreateWater(0.0f);
 	}
 
 	void IngameState::Exit()
@@ -221,14 +235,32 @@ namespace RootForce
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
 
-		m_networkContext.m_client = nullptr;
-		m_networkContext.m_clientMessageHandler = nullptr;
-		m_networkContext.m_server = nullptr;
-		m_networkContext.m_serverMessageHandler = nullptr;
+		// Disable the message handlers while resetting the server (to avoid null entities etc.)
+		if(m_networkContext.m_server.get() != nullptr)
+			m_networkContext.m_server->SetMessageHandler(nullptr);
+		m_networkContext.m_client->SetMessageHandler(nullptr);
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
-	{
+	{				
+		g_world->SetDelta(p_deltaTime);
+		g_engineContext.m_renderer->Clear();
+
+		g_engineContext.m_renderer->Render();
+
+		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+		m_sharedSystems.m_matchStateSystem->Process();
+		
+		g_engineContext.m_profiler->Update(p_deltaTime);
+		g_engineContext.m_debugOverlay->RenderOverlay();
+
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);		
+			g_engineContext.m_gui->Update();
+			g_engineContext.m_gui->Render(m_hud->GetView());
+			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+		}
+
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
@@ -242,9 +274,6 @@ namespace RootForce
 		{
 			return GameStates::Menu;
 		}
-		
-		g_world->SetDelta(p_deltaTime);
-		g_engineContext.m_renderer->Clear();
 		
 		if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() <= -10)
 		{
@@ -272,23 +301,23 @@ namespace RootForce
 		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 		if(!isGameOver)
 		{
-			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 			//Update all the data that is displayed in the HUD
-			m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
-			m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
-			m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-			m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
-			m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
-			m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
-			m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
-			m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-			if(playerComponent->AbilityScripts[0].Cooldown > 0)
-				m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-			if(playerComponent->AbilityScripts[1].Cooldown > 0)
-				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-			if(playerComponent->AbilityScripts[2].Cooldown > 0)
-				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
+		m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
+		m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
+		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+		if(playerComponent->AbilityScripts[0].Cooldown > 0)
+			m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+		if(playerComponent->AbilityScripts[1].Cooldown > 0)
+			m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+		if(playerComponent->AbilityScripts[2].Cooldown > 0)
+			m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
 		}
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
@@ -356,7 +385,39 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+		//Debug -> Disturb water with O
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_O) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+		}
+		//DEBUG -> toggle wireframe mode on water with I
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ToggleWireFrame();
 
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->TogglePause();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseSpeed();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseSpeed();
+
+
+		{
+			PROFILE("Water collision system", g_engineContext.m_profiler);
+			m_waterCollisionSystem->Process();
+		}
+		{
+			PROFILE("Water system", g_engineContext.m_profiler);
+			m_waterSystem->Process();
+		}
+		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
@@ -380,8 +441,6 @@ namespace RootForce
 			if(!m_displayIngameMenu)
 				m_actionSystem->Process();
 		}
-
-		
 
 		m_animationSystem->Run();
 		
@@ -407,9 +466,7 @@ namespace RootForce
 			PROFILE("StateSystem", g_engineContext.m_profiler);
 			m_stateSystem->Process();
 		}
-
-		
-		
+	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
 			if(!m_displayIngameMenu)
@@ -436,9 +493,9 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
-
 		}
 
 		m_animationSystem->Synch();
@@ -468,8 +525,7 @@ namespace RootForce
 				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
-		
-		
+
 
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);

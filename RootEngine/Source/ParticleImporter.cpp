@@ -20,7 +20,7 @@ namespace RootEngine
 		std::ifstream file(p_fileName, std::ifstream::in);
 		if(!file.good())
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Failed to load particle file: %s", p_fileName.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Failed to open particle file: %s", p_fileName.c_str());
 			return outStruct;
 		}
 		YAML::Parser parser(file);
@@ -42,7 +42,7 @@ namespace RootEngine
 			doc[i]["EFFECT"]		>> effectName;
 			doc[i]["TEXTURE"]		>> textureName;
 			
-			outStruct->at(i)->m_material					= m_context->m_resourceManager->GetMaterial(p_fileName + std::to_string(materialIndex++));
+			outStruct->at(i)->m_material					= m_context->m_renderer->CreateMaterial(p_fileName + std::to_string(materialIndex++));
 			outStruct->at(i)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
 

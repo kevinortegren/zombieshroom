@@ -10,7 +10,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	local posVec = playerEnt:GetTransformation():GetPos();
 	local frontVec = playerAimingDeviceEnt:GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
-
+	local waterCollider = WaterCollider.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
@@ -18,13 +18,15 @@ function AbilityBall.OnCreate (userId, actionId)
 	local transformComp = Transformation.New(self);
 	--local particleComp = ParticleEmitter.New(self, "fireball");
 	local scriptComp = Script.New(self, "AbilityBall");
-	
-	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (4 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
+	posVec = Vec3.New((posVec.x + frontVec.x * 3), (2 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3));
+	physicsComp:BindSphereShape(collisionComp, posVec, Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
-	
+	waterCollider:SetDisturbPower(0.1);
+	waterCollider:SetDisturbInterval(0.3);
+	waterCollider:SetRadius(2);
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
