@@ -40,6 +40,7 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
+		RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
 		
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
@@ -85,6 +86,8 @@ namespace RootSystems
 				std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
 				if (abilityScript != "")
 				{
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Creating ability entity (User: %d, Action: %d) with script: %s", network->ID.UserID, network->ID.ActionID, abilityScript.c_str());
+
 					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityScript), "OnCreate");
 					m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
 					m_engineContext->m_script->AddParameterNumber(action->ActionID);
@@ -114,9 +117,7 @@ namespace RootSystems
 
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d is off", i);
 
-					// Send notification about finished cooldown to the client.
-					RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
-						
+					// Send notification about finished cooldown to the client.		
 					RootForce::NetworkMessage::CooldownOff m;
 					m.User = network->ID.UserID;
 					m.AbilityIndex = i;
