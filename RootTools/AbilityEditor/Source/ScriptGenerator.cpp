@@ -207,7 +207,7 @@ namespace AbilityEditorNameSpace
 			}
 			if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::ABILITYPARTICLE)
 			{
-				// TODO : Add stuff later
+				m_file << "\t\tlocal particleComp = ParticleEmitter.New(self, " << ((AbilityComponents::AbilityParticle*)m_entity->GetComponents()->at(j))->m_particleName << ");\n";
 			}
 		}
 

@@ -7,9 +7,9 @@ function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "0");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	Logging.Log(LogLevel.DEBUG_PRINT, "0");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "0");
 	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();
-	Logging.Log(LogLevel.DEBUG_PRINT, "1");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "1");
 	local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
 	--Logging.Log(LogLevel.DEBUG_PRINT, "1");
@@ -25,6 +25,8 @@ function Explosion.OnCreate (userId, actionId)
 	colRespComp:SetContainer(collisionComp);
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
 	if Global.IsClient then
+		--Logging.Log(LogLevel.DEBUG_PRINT, "PARTICLE WOO!");
+		local particleComp = ParticleEmitter.New(self, "fireball");
 	end
 	--local playerComponent = playerEnt:GetPlayerComponent();
 	--playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), Explosion.cooldown);

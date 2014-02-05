@@ -204,7 +204,7 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::EXPLOSIVE:
 				{
 					AbilityComponents::Explosive* explosive = static_cast<AbilityComponents::Explosive*>(p_component);
-					p_emitter << YAML::Key << "Radius" << explosive->m_radius;
+					p_emitter << YAML::Key << "Radius" << YAML::Value << explosive->m_radius;
 				}
 				break;
 			default:

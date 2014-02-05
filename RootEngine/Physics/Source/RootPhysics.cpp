@@ -43,6 +43,7 @@ namespace Physics
 		}
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
+			p_rayResult.m_hitFraction
 			CustomUserPointer* objectHit = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
 			m_caster->m_collidedEntities->insert(objectHit->m_entity);
 			return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
@@ -903,6 +904,16 @@ namespace Physics
 		return true;
 	}
 
+	bool RootPhysics::DoesUserPointerExist( int p_objectHandle )
+	{
+		if(m_userPointer.size() == 0 || (unsigned int)p_objectHandle >= m_userPointer.size() || p_objectHandle < 0)
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing user pointer at index %d", p_objectHandle);
+			return false;
+		}
+		return true;
+	}
+
 	void RootPhysics::EnableDebugDraw( bool p_enabled )
 	{
 		if(p_enabled == true)
@@ -977,7 +988,7 @@ namespace Physics
 	}
 	int RootPhysics::GetType(int p_objectHandle)
 	{
-		if(!DoesObjectExist(p_objectHandle))
+		if(!DoesUserPointerExist(p_objectHandle))
 			return -1;
 		return m_userPointer.at(p_objectHandle)->m_type;
 
@@ -1054,7 +1065,7 @@ namespace Physics
 
 	std::string RootPhysics::GetPhysicsModelHandle( int p_objectHandle )
 	{
-		if(!DoesObjectExist(p_objectHandle))
+		if(!DoesUserPointerExist(p_objectHandle))
 			return "";
 		return m_userPointer.at(p_objectHandle)->m_modelHandle;
 		

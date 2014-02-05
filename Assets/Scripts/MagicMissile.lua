@@ -34,7 +34,9 @@ function MagicMissile.OnCollide (self, entity)
 	--local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 	--local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 	--local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+	if self ~= entity then
+		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+	end
 end
 
 function MagicMissile.OnDestroy (self)

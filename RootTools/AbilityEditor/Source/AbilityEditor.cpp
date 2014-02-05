@@ -97,93 +97,6 @@ void AbilityEditor::Init()
 
 }
 
-/*
-void AbilityEditor::ChangedTab()
-{
-	//int test = ui.abilityWidget->currentIndex();
-	if(m_LastSelectedItem != nullptr)
-	{
-		
-		if(m_LastSelectedTab == 0) //On Create list
-			ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-		else if(m_LastSelectedTab == 1) //On Collide list
-			ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-		else if(m_LastSelectedTab == 2) //On Destroy list
-			ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-	}
-	m_LastSelectedItem = nullptr;
-	delete m_propBrows;
-	m_propBrows = nullptr;
-	//UpdatePropertyBrowser();
-}*/
-/*
-void AbilityEditor::UpdatePropertyBrowser( )
-{
-	//QTreeWidget* asdf = new QTreeWidget();
-	//asdf = ui.abilityWidget->widget(ui.abilityWidget->currentIndex());
-	//int bajs = asdf->selectedItems().count();
-	if(m_propBrows != nullptr)
-	{
-		if(m_LastSelectedItem != nullptr)
-		{
-			if(ui.abilityWidget->currentIndex() == 0 && ui.treeOnCreate->hasFocus()) //On Create list
-				ui.treeOnCreate->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-			else if(ui.abilityWidget->currentIndex() == 1 && ui.treeOnCollide->hasFocus()) //On Collide list
-				ui.treeOnCollide->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-			else if(ui.abilityWidget->currentIndex() == 2 && ui.treeOnDestroy->hasFocus()) //On Destroy list
-				ui.treeOnDestroy->SaveSelectedData(m_LastSelectedItem,m_propBrows, m_propMan);
-		}
-		delete m_propBrows;
-		m_propBrows = nullptr;
-		m_LastSelectedItem = nullptr;
-	}
-	
-	//QWidget* page = static_cast<QWidget*>(ui.abilityWidget->children().at(ui.abilityWidget->currentIndex()));
-	//QTreeWidget* tree = static_cast<QTreeWidget*>(page->children().at(0));
-	//QTreeWidgetItem* m_LastSelectedItem = tree->selectedItems().at(0);
-	m_propBrows = new QtTreePropertyBrowser(ui.propertyWidget);
-	m_propBrows->setGeometry(ui.propertyWidget->geometry());
-	
-	
-	if(ui.abilityWidget->currentIndex() == 0)// && ui.treeOnCreate->hasFocus()) //On Create list
-	{
-		if(ui.treeOnCreate->selectedItems().count() == 0)
-			return;
-		if(ui.treeOnCreate->selectedItems().at(0) != nullptr)
-		{
-			m_LastSelectedItem = ui.treeOnCreate->selectedItems().at(0);
-			ui.treeOnCreate->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
-		}
-	}
-	else if(ui.abilityWidget->currentIndex() == 1)// && ui.treeOnCollide->hasFocus()) //On Collide list
-	{
-		if(ui.treeOnCollide->selectedItems().count() == 0)
-			return;
-		if(ui.treeOnCollide->selectedItems().at(0) != nullptr)
-		{
-			m_LastSelectedItem = ui.treeOnCollide->selectedItems().at(0);
-			ui.treeOnCollide->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
-		}
-	}
-	else if(ui.abilityWidget->currentIndex() == 2)// && ui.treeOnDestroy->hasFocus()) //On Destroy list
-	{
-		if(ui.treeOnDestroy->selectedItems().count() == 0)
-			return;
-		if(ui.treeOnDestroy->selectedItems().at(0) != 0)
-		{
-			m_LastSelectedItem = ui.treeOnDestroy->selectedItems().at(0);
-			ui.treeOnDestroy->ViewSelectedData(m_LastSelectedItem, m_propBrows, m_propMan);
-		}
-	}
-	
-	m_LastSelectedTab = ui.abilityWidget->currentIndex();
-
-	m_mainLayout->addWidget(m_propBrows);
-	ui.propertyWidget->setLayout(m_mainLayout);
-
-
-}
-*/
 
 void AbilityEditor::UpdatePropertyBrowser( )
 {
@@ -366,5 +279,5 @@ void AbilityEditor::ChangeAbilityName()
 
 void AbilityEditor::SetCooldown( double p_cooldown )
 {
-	m_entity->SetCooldown(p_cooldown);
+	m_entity->SetCooldown((float)p_cooldown);
 }

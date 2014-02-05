@@ -215,6 +215,7 @@ namespace RootEngine
 			};
 			void Init();
 			bool DoesObjectExist(int p_objectHandle);
+			bool DoesUserPointerExist( int p_objectHandle );
 			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
 			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
@@ -222,6 +223,7 @@ namespace RootEngine
 			btCollisionShape* CreateShape(ShapeStruct p_shapeStruct);
 			RootPhysics();
 			~RootPhysics();
+			
 			DebugDrawer* m_debugDrawer;
 			btDiscreteDynamicsWorld* m_dynamicWorld;
 			btDefaultCollisionConfiguration* m_collisionConfig;
