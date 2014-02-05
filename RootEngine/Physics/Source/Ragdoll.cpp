@@ -61,7 +61,11 @@ namespace Ragdoll
 
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
 	{
-		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.55f, 0);
+		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.70f, 0);
+		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(4.4f, 0, 0);
+ 		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(-4.4f, 0, 0);
+		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(0, -0.2f ,0);
+		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0, -0.2f ,0);
 		m_nameToIndex = p_nameToIndex;
 	//	memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
 		CreateBody(p_bones, p_rootNode, p_transform, 1, btVector3(0,0,0), p_boneOffset);
@@ -78,10 +82,14 @@ namespace Ragdoll
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
 		if(shape != nullptr)
 		{
+			float mass;
 			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0)
 				m_hipsNode = p_rootNode;
 			btRigidBody* body;
-			float mass = 10.0f / p_massFactor;
+			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0 || std::string(p_rootNode->mName.data).compare("Character1_Spine") == 0)
+				mass = 10.0f;
+			else
+				mass = 10.0f /*/ p_massFactor*/;
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
 			
@@ -94,7 +102,7 @@ namespace Ragdoll
 			btTransform trans;
 			m_boneOffset[index] = p_boneOffset[index];
 			m_bodyPosOffset[index] += p_parentBodyOffset;
-			m_boneTransform[index] = bonePos;
+			m_boneTransform[index] = p_bones[index];
 			m_prevPos[index] = p_transform;
 			m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
 			glm::mat4 toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];	
@@ -113,6 +121,8 @@ namespace Ragdoll
 			m_dynamicWorld->addRigidBody(body);
 			//body->setCcdMotionThreshold(0.7f);
 			//body->setCcdSweptSphereRadius(0.2f);
+			body->setRestitution(1.3f);
+			body->setFriction(1.5f);
 			m_bodies[index] = body;
 			
 			
@@ -181,7 +191,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
 		{
-			return new btBoxShape(btVector3(0.15f, 0.3f, 0.15f));
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.2f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
@@ -217,7 +227,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
 		{
-			return new btBoxShape(btVector3(0.15f, 0.3f, 0.15f));
+			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
@@ -239,42 +249,40 @@ namespace Ragdoll
 	glm::mat4* Ragdoll::GetBones()
 	{
 		glm::mat4* retVal = new glm::mat4[20];
-		
-		for(int i = 13; i >=0; i--)
-		{
-			float data[16];
-			btTransform trans = m_bodies[i]->getWorldTransform();
-			
-			float x,y,z,w;
-			x = trans.getRotation().w();
-			y = trans.getRotation().x();
-			z = trans.getRotation().y();
-			w = trans.getRotation().z();
-			trans.setRotation(btQuaternion(x,y,z,w));
-			trans.getOpenGLMatrix(data);
-			
-			int index  = m_boneToFollow[i];
-			
-			float test[16];
-			btTransform worldTrans = m_bodies[BodyPart::HIPS]->getWorldTransform();
-			x = worldTrans.getRotation().w();
-			y = worldTrans.getRotation().x();
-			z = worldTrans.getRotation().y();
-			w = worldTrans.getRotation().z();
-			worldTrans.setRotation(btQuaternion(x,y,z,w));
-			worldTrans.getOpenGLMatrix(test);
-
-
-			
-			m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[i]) */;
-			//World to local space
- 			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data) /* * m_lastBoneMatrix[i]*/; 
-
-		
-			retVal[i] *= m_boneOffset[i];
-		}
-	//	retVal = FixPosition(retVal, m_hipsNode);   // THIS - parent etc etc might fix everything?
+		retVal = FixPosition(retVal, m_hipsNode); 
 		return retVal;
+	//	
+	//	for(int i = 13; i >=0; i--)
+	//	{
+	//		float data[16];
+	//		btTransform trans = m_bodies[i]->getWorldTransform();
+	//		
+	//		float x,y,z,w;
+	//		x = trans.getRotation().w();
+	//		y = trans.getRotation().x();
+	//		z = trans.getRotation().y();
+	//		w = trans.getRotation().z();
+	//		trans.setRotation(btQuaternion(x,y,z,w));
+	//		trans.getOpenGLMatrix(data);
+	//		
+	//		int index  = m_boneToFollow[i];
+	//		
+	//		float test[16];
+	//		btTransform worldTrans = m_bodies[BodyPart::HIPS]->getWorldTransform();
+	//		x = worldTrans.getRotation().w();
+	//		y = worldTrans.getRotation().x();
+	//		z = worldTrans.getRotation().y();
+	//		w = worldTrans.getRotation().z();
+	//		worldTrans.setRotation(btQuaternion(x,y,z,w));
+	//		worldTrans.getOpenGLMatrix(test);
+	//		
+	//		m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[i]) */;
+	//		//World to local space
+ //			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data) /* * m_lastBoneMatrix[i]*/; 
+
+	//	
+	//		retVal[i] *= m_boneOffset[i];
+	//	}
 	}
 
 	btQuaternion Ragdoll::GetOrientation()
@@ -300,8 +308,8 @@ namespace Ragdoll
 		if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_Spine") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0 , 0.04f * OFFSET, 0, 
-				0, -0.09f * OFFSET, 0, 
+				0 , 0.10f * OFFSET, 0, 
+				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
 			constraint->setLimit(0,0,0);
@@ -320,7 +328,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
 
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(- PI_2 , PI_2);
+				constraint->setLimit(- PI_2 , PI_2 /2);
  				m_dynamicWorld->addConstraint(constraint);
  				constraint->setDbgDrawSize(0.5f);
  				return constraint;
@@ -334,7 +342,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(0, PI_2);
+ 				constraint->setLimit(- PI_2 , PI_2 /2);
  				//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  				
  				m_dynamicWorld->addConstraint(constraint);
@@ -350,7 +358,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -364,7 +372,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -378,7 +386,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -392,7 +400,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -406,7 +414,7 @@ namespace Ragdoll
  					0 , 0, 1, 0, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -420,7 +428,7 @@ namespace Ragdoll
  					0 , 0, 1, 0, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -434,7 +442,7 @@ namespace Ragdoll
  					0 , 0, 0, 1, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -448,7 +456,7 @@ namespace Ragdoll
  					0 , 0, 0, 1, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(0, PI_2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -462,7 +470,7 @@ namespace Ragdoll
  					0 , 0, 0, 1, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					constraint->setLimit(0, PI_2);
+ 					constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -476,7 +484,7 @@ namespace Ragdoll
  					0 , 0, 0, 1, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(0, PI_2);
+ 				constraint->setLimit(- PI_2 , PI_2 /2);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -550,6 +558,39 @@ namespace Ragdoll
 	glm::mat4* Ragdoll::FixPosition( glm::mat4 p_bones[20], aiNode* p_rootNode )
 	{
 		int myIndex = m_nameToIndex[p_rootNode->mName.data];
+		float data[16];
+		btTransform trans = m_bodies[myIndex]->getWorldTransform();
+		float x,y,z,w;
+		x = trans.getRotation().w();
+		y = trans.getRotation().x();
+		z = trans.getRotation().y();
+		w = trans.getRotation().z();
+		trans.setRotation(btQuaternion(x,y,z,w));
+		trans.getOpenGLMatrix(data);
+		int index  = m_boneToFollow[myIndex];
+		float test[16];
+		btTransform worldTrans = m_bodies[BodyPart::HIPS]->getWorldTransform();
+		x = worldTrans.getRotation().w();
+		y = worldTrans.getRotation().x();
+		z = worldTrans.getRotation().y();
+		w = worldTrans.getRotation().z();
+		worldTrans.setRotation(btQuaternion(x,y,z,w));
+		worldTrans.getOpenGLMatrix(test);
+		m_prevPos[myIndex] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[myIndex]) */;
+		//World to local space
+		p_bones[myIndex] = glm::inverse(m_prevPos[myIndex])  /** glm::inverse(retVal[myIndex])*/ *   glm::make_mat4(data) /* * m_lastBoneMatrix[myIndex]*/; 
+		
+		p_bones[myIndex] *= m_boneOffset[myIndex];
+		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
+		{
+			FixPosition(p_bones, p_rootNode->mChildren[i]);
+		}
+				return p_bones;
+	}
+
+	/*glm::mat4* Ragdoll::FixPosition( glm::mat4 p_bones[20], aiNode* p_rootNode )
+	{
+		int myIndex = m_nameToIndex[p_rootNode->mName.data];
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
 			int childIndex = m_nameToIndex[p_rootNode->mChildren[i]->mName.data];
@@ -559,6 +600,6 @@ namespace Ragdoll
 			
 		}
 		return p_bones;
-	}
+	}*/
 
 }

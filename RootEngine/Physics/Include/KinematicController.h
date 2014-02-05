@@ -14,6 +14,8 @@ public:
 	void Init(btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices,
 		float* p_vertexBuffer, int p_vertexStride, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight,
 		float p_stepHeight );
+	void Deactivate();
+	void Activate();
 	//Assumes the float* is a float[3]
 	void Walk(glm::vec3 p_dir, float p_dt);
 	void Jump();
@@ -36,6 +38,7 @@ public:
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
 	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
 	btTransform GetTransform() const {return m_kinController->getGhostObject()->getWorldTransform();}
+	btVector3 GetKnockbackVector() const {return m_kinController->GetKnockbackVector();}
 
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;
@@ -49,6 +52,6 @@ private:
 	float m_heightOffset;
 	float m_mass;
 	bool m_hasBeenKnockbacked;
-
+	bool m_activated;
 };
 

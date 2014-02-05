@@ -90,7 +90,6 @@ namespace Physics
 
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
-		
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
@@ -137,6 +136,7 @@ namespace Physics
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+		m_dynamicWorld->getSolverInfo().m_numIterations = 20;
 		//m_dynamicWorld->getSolverInfo().m_numIterations = 4;
 		//btSetDebugDrawer(m_debugDrawer);
 
@@ -1292,9 +1292,11 @@ namespace Physics
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(indexplayer)->Deactivate();
 		if(index  != -1)
 		{
-			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
 		/*	x = trans.getRotation().w();
@@ -1313,7 +1315,7 @@ namespace Physics
 		}
 		else //First time, build the shapes, bodies and constraints
 		{
-			int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			
 			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
@@ -1336,6 +1338,8 @@ namespace Physics
 			
 		}
 		
+		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		//m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
 	}
 
 	glm::mat4* RootPhysics::GetBones( int p_objectHandle)
@@ -1363,6 +1367,8 @@ namespace Physics
 		{
 			m_ragdolls.at(index)->Deactivate();
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			int playerIndex = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			m_playerObjects.at(playerIndex)->Activate();
 		}
 	}
 
