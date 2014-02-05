@@ -26,7 +26,7 @@ namespace Ragdoll
 	{
 		
 		//Update the posiitions of the bodies and add them to the world
-		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++) //hardcoded for 14 bones, needs to change
+		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++) 
 		{
 			btTransform trans;
 			
@@ -63,8 +63,8 @@ namespace Ragdoll
 	{
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.55f, 0);
 		m_nameToIndex = p_nameToIndex;
-		memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
-		CreateBody(p_bones, p_rootNode, p_transform, 1, btVector3(0,0,0));
+	//	memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
+		CreateBody(p_bones, p_rootNode, p_transform, 1, btVector3(0,0,0), p_boneOffset);
 		m_boneToFollow[13] = 13;
 		////here be dragons nu är det fel i min hjärna
 		
@@ -72,7 +72,7 @@ namespace Ragdoll
 
 	}
 
-	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor, const btVector3& p_parentBodyOffset )
+	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor, const btVector3& p_parentBodyOffset, glm::mat4 p_boneOffset[20] )
 	{
 		
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
@@ -92,6 +92,7 @@ namespace Ragdoll
 			memcpy(&toGlm[0][0], &test[0][0], sizeof(aiMatrix4x4));
 			glm::mat4 bonePos =  glm::transpose(toGlm);
 			btTransform trans;
+			m_boneOffset[index] = p_boneOffset[index];
 			m_bodyPosOffset[index] += p_parentBodyOffset;
 			m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
@@ -99,8 +100,8 @@ namespace Ragdoll
 			glm::mat4 toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];	
 			const float* data = glm::value_ptr(toTrans);
  			trans.setFromOpenGLMatrix(data);
-			float x,y,z,w;
-			/*x = trans.getRotation().y();
+			/*float x,y,z,w;
+			x = trans.getRotation().y();
 			y = trans.getRotation().z();
 			z = trans.getRotation().w();
 			w = trans.getRotation().x();
@@ -117,7 +118,7 @@ namespace Ragdoll
 			
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
-				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1 , m_bodyPosOffset[index]);
+				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1 , m_bodyPosOffset[index], p_boneOffset);
 				if(childbody != nullptr)
 				{
 					btTypedConstraint* temp = CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
@@ -134,7 +135,7 @@ namespace Ragdoll
 			return body;
 		}
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
-			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor, p_parentBodyOffset);
+			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor, p_parentBodyOffset, p_boneOffset);
 	
 		return nullptr;
 	}
@@ -144,7 +145,7 @@ namespace Ragdoll
 		//Nu ska vi göra allt till boxar för det är coolare
 		if(p_name.compare("Character1_Hips") == 0)
 		{
-			return new btBoxShape(btVector3(0.3f, 0.2f, 0.3f));
+			return new btBoxShape(btVector3(0.4f, 0.2f, 0.4f));
 			//return new btCapsuleShape(0.4f, 0.01f);
 			//return new btCylinderShape(btVector3(0.4f,0.2f,0.4f));
 		}
@@ -156,7 +157,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_LeftFoot") == 0)
 		{
-			return new btBoxShape(btVector3(0.2f, 0.1f, 0.2f));
+			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 			//return new btCapsuleShape(0.2f, 0.16f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
@@ -180,7 +181,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
 		{
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			return new btBoxShape(btVector3(0.15f, 0.3f, 0.15f));
 			//return new btCapsuleShape(0.2f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
@@ -192,7 +193,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_RightFoot") == 0)
 		{
-			return new btBoxShape(btVector3(0.2f, 0.1f, 0.2f));
+			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 		//	return new btCapsuleShape(0.2f, 0.08f);
 			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
@@ -216,7 +217,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
 		{
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
+			return new btBoxShape(btVector3(0.15f, 0.3f, 0.15f));
 			//return new btCapsuleShape(0.20f, 0.36f);
 			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
@@ -265,12 +266,12 @@ namespace Ragdoll
 
 
 			
-			m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(retVal[i]) */;
+			m_prevPos[i] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[i]) */;
 			//World to local space
- 			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data)/* * m_lastBoneMatrix[i]*/; 
+ 			retVal[i] = glm::inverse(m_prevPos[i])  /** glm::inverse(retVal[i])*/ *   glm::make_mat4(data) /* * m_lastBoneMatrix[i]*/; 
 
-			
-			
+		
+			retVal[i] *= m_boneOffset[i];
 		}
 	//	retVal = FixPosition(retVal, m_hipsNode);   // THIS - parent etc etc might fix everything?
 		return retVal;
@@ -299,212 +300,187 @@ namespace Ragdoll
 		if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_Spine") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0 , 0.05f * OFFSET, 0, 
-				0, -0.10f * OFFSET, 0, 
+				0 , 0.04f * OFFSET, 0, 
+				0, -0.09f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
-		//	localA.getBasis().setEulerZYX(0,PI_2,0);
-			//localB.getBasis().setEulerZYX(0,PI_2,0); 
-			//localA.setOrigin(btVector3(0, 0.25f + OFFSET, 0)); 
-		//	localB.setOrigin(btVector3(0, -0.25f - OFFSET, 0));
-			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
 			constraint->setLimit(0,0,0);
 				
-			//constraint->setLimit(PI_2, PI_2, PI_2);
+			
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
 // 		//Hips - Left upper leg
- 				else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
- 				{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB,
- 						 0.20f , -0.15f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 				//	localA.setOrigin(btVector3(-0.1f, -0.24f- OFFSET, 0)); 
- 					//localB.setOrigin(btVector3(0, 0.24f + OFFSET, 0));
- 					btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					//constraint->setLimit(0,PI_2);
- 					m_dynamicWorld->addConstraint(constraint);
- 					constraint->setDbgDrawSize(0.5f);
- 					return constraint;
- 				}
- 				////Hips - Right upper leg
- 				else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
- 				{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						-0.20f , -0.15f * OFFSET, 0,
- 						0, 0.2f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 					//localA.setOrigin(btVector3(0.30f, -0.3f - 0, 0)); 
- 					//localB.setOrigin(btVector3(0, 0.3f + 0, 0));
- 					btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					//constraint->setLimit(0,PI_2);
- 		
- 					//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					//constraint->setLimit(PI_2, PI_2, PI_2);
- 					m_dynamicWorld->addConstraint(constraint);
- 					constraint->setDbgDrawSize(0.5f);
- 					return constraint;
- 				}
- 				//Left upper leg - Left lower leg
- 		 		else if(p_nameA.compare("Character1_LeftUpLeg") == 0 && p_nameB.compare("Character1_LeftLeg") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			//localA.setOrigin(btVector3(0, -0.5f- OFFSET, 0)); 
- 		 			//localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(PI_2, PI_2, PI_2);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Right upper leg - Right lower leg
- 		 		else if(p_nameA.compare("Character1_RightUpLeg") == 0 && p_nameB.compare("Character1_RightLeg") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			//localA.setOrigin(btVector3(0, -0.25f - OFFSET, 0)); 
- 		 		//	localB.setOrigin(btVector3(0, 0.2f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(PI_2, PI_2, PI_2);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Left lower leg - Left foot
- 		 		else if(p_nameA.compare("Character1_LeftLeg") == 0 && p_nameB.compare("Character1_LeftFoot") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.15f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			//localA.setOrigin(btVector3(0, -0.21f - OFFSET, 0)); 
- 		 		//	localB.setOrigin(btVector3(0, 0.09f+ OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(PI_2, PI_2, PI_2);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Right lower leg - Right foot
- 		 		else if(p_nameA.compare("Character1_RightLeg") == 0 && p_nameB.compare("Character1_RightFoot") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.15f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(PI_2, PI_2, PI_2);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Spine - Left upper arm
- 		 		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						-0.35f , -0.1f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 1, 0, &localA, &localB);
- 		 			localA.getBasis().setEulerZYX(0,0,1);
- 		 			localB.getBasis().setEulerZYX(0,0,1); 
- 		 			localA.setOrigin(btVector3(-0.2f, 0.10f +  OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0.05f, 0.05f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(0, 0, 0);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		////Spine - Right upper arm
- 		 		else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.35f , -0.1f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 1, 0, &localA, &localB);
- 		 			localA.getBasis().setEulerZYX(0,0,1);
- 		 			localB.getBasis().setEulerZYX(0,0,1); 
- 		 			localA.setOrigin(btVector3(0.2f, 0.10f +  OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(-0.05f, 0.05f +  OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			//constraint->setLimit(0, 0, 0);
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		////Left upper arm - Left lower arm
- 		 		else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0 , -0.20f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			localA.getBasis().setEulerZYX(0,0,0);
- 		 			localB.getBasis().setEulerZYX(0,0,0); 
- 		 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Right upper arm - Right lower arm
- 		 		else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0 , -0.20f * OFFSET, 0,
- 						0, 0.20f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			localA.getBasis().setEulerZYX(0,0,0);
- 		 			localB.getBasis().setEulerZYX(0,0,0); 
- 		 			localA.setOrigin(btVector3(0, -0.20f - OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0, 0.20f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 			
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Left lower arm - Left hand
- 		 		else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.15f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 			else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_LeftUpLeg") == 0 )
+ 			{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB,
+ 						0.20f , -0.0f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0, 0.92f, 0.38f, &localA, &localB);
+
+ 				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+				constraint->setLimit(- PI_2 , PI_2);
+ 				m_dynamicWorld->addConstraint(constraint);
+ 				constraint->setDbgDrawSize(0.5f);
+ 				return constraint;
+ 			}
+ 			////Hips - Right upper leg
+ 			else if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_RightUpLeg") == 0 )
+ 			{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					-0.20f , -0.0f * OFFSET, 0,
+ 					0, 0.2f * OFFSET, 0,
+ 					0 , 0, 0.92f, 0.38f, &localA, &localB);
+ 
+ 				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 				constraint->setLimit(0, PI_2);
+ 				//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 				
+ 				m_dynamicWorld->addConstraint(constraint);
+ 				constraint->setDbgDrawSize(0.5f);
+ 				return constraint;
+ 			}
+ 			//Left upper leg - Left lower leg
+ 		 	else if(p_nameA.compare("Character1_LeftUpLeg") == 0 && p_nameB.compare("Character1_LeftLeg") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
+ 	
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Right upper leg - Right lower leg
+ 		 	else if(p_nameA.compare("Character1_RightUpLeg") == 0 && p_nameB.compare("Character1_RightLeg") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
+ 		 	
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Left lower leg - Left foot
+ 		 	else if(p_nameA.compare("Character1_LeftLeg") == 0 && p_nameB.compare("Character1_LeftFoot") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
- 		 		//Right lower arm - Right hand
- 		 		else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
- 		 		{
- 					CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 						0.0f , -0.20f * OFFSET, 0,
- 						0, 0.15f * OFFSET, 0,
- 						0 , 0, 0, 1, &localA, &localB);
- 		 			//localA.setOrigin(btVector3(0, -0.2f - OFFSET, 0)); 
- 		 			localB.setOrigin(btVector3(0, 0.04f + OFFSET, 0));
- 		 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 
- 		 			m_dynamicWorld->addConstraint(constraint);
- 		 			constraint->setDbgDrawSize(0.5f);
- 		 			return constraint;
- 		 		}
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Right lower leg - Right foot
+ 		 	else if(p_nameA.compare("Character1_RightLeg") == 0 && p_nameB.compare("Character1_RightFoot") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
+ 		 		
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Spine - Left upper arm
+ 		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					-0.15f , 0.1f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0, 1, 0, &localA, &localB);
+ 		 	
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	////Spine - Right upper arm
+ 		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.15f , 0.1f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0, 1, 0, &localA, &localB);
+ 		 		
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	////Left upper arm - Left lower arm
+ 		 	else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0 , -0.20f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0, 0, 1, &localA, &localB);
+ 		 	
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Right upper arm - Right lower arm
+ 		 	else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0 , -0.20f * OFFSET, 0,
+ 					0, 0.20f * OFFSET, 0,
+ 					0 , 0, 0, 1, &localA, &localB);
+ 		 		
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 		constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Left lower arm - Left hand
+ 		 	else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
+ 					0 , 0, 0, 1, &localA, &localB);
+ 		 		
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 					constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
+ 		 	//Right lower arm - Right hand
+ 		 	else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
+ 		 	{
+ 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 					0.0f , -0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
+ 					0 , 0, 0, 1, &localA, &localB);
+ 		 		
+ 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 				constraint->setLimit(0, PI_2);
+ 		 		m_dynamicWorld->addConstraint(constraint);
+ 		 		constraint->setDbgDrawSize(0.5f);
+ 		 		return constraint;
+ 		 	}
 		return nullptr;
 	}
 
@@ -529,7 +505,7 @@ namespace Ragdoll
 
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
-		m_bodies[13]->setLinearVelocity(p_velocity);
+		m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
 	}
 
 	//The magic function of constraint calculations,

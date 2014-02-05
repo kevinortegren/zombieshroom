@@ -57,7 +57,7 @@ namespace RootForce
 				if(bones != nullptr)
 					for(int i = 0; i < 14; i++)
 					{
-						animation->m_bones[i] = bones[i] * (renderable->m_model->m_animation[0].GetBoneOffset(i));
+						animation->m_bones[i] = bones[i] /** (renderable->m_model->m_animation[0].GetBoneOffset(i))*/;
 					}
 			}
 		
