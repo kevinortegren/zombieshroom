@@ -1339,7 +1339,7 @@ namespace Physics
 		}
 		
 		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-		//m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
+		m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
 	}
 
 	glm::mat4* RootPhysics::GetBones( int p_objectHandle)

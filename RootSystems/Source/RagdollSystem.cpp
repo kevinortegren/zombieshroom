@@ -34,7 +34,7 @@ namespace RootForce
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
 				glm::mat4 bones[20], boneOffset[20];
-				for(int i = 0; i < nameToIndex.size() ; i++ )
+				for(unsigned int i = 0; i < nameToIndex.size() ; i++ )
 				{
 					bones[i] = animation->m_bones[i];
 					boneOffset[i] = renderable->m_model->m_animation[0].GetBoneOffset(i);
@@ -55,9 +55,9 @@ namespace RootForce
 				//get the updated bonetransformations from the physics
 				bones = m_engineContext->m_physics->GetBones(*(collision->m_handle));
 				if(bones != nullptr)
-					for(int i = 0; i < 14; i++)
+					for(int i = 0; i < 20; i++)
 					{
-						animation->m_bones[i] = bones[i] /** (renderable->m_model->m_animation[0].GetBoneOffset(i))*/;
+						animation->m_bones[i] = bones[i];/** (renderable->m_model->m_animation[0].GetBoneOffset(i))*/;
 					}
 			}
 		

@@ -54,9 +54,14 @@ namespace Ragdoll
 	{
 		//Remove bodies from world, i think this might be the way to doit, mayb not, we w‰ll c‰‰ in ffyradfas
 		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++) //hardcoded for 14 bones, needs to change
+		{
+			m_bodies[i]->clearForces();
 			m_dynamicWorld->removeRigidBody(m_bodies[i]);
+		}
 		for(int i = 0; i < m_constraintCounter; i++)
+		{
 			m_dynamicWorld->removeConstraint(m_joints[i]);
+		}
 	}
 
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
@@ -102,9 +107,11 @@ namespace Ragdoll
 			btTransform trans;
 			m_boneOffset[index] = p_boneOffset[index];
 			m_bodyPosOffset[index] += p_parentBodyOffset;
-			m_boneTransform[index] = p_bones[index];
+			m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
 			m_lastBoneMatrix[index] = p_bones[index] * m_boneOffset[index];
+			
+			
 			glm::mat4 toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];	
 			const float* data = glm::value_ptr(toTrans);
  			trans.setFromOpenGLMatrix(data);
@@ -117,12 +124,12 @@ namespace Ragdoll
 			trans.setOrigin(trans.getOrigin() + m_bodyPosOffset[index]);
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(mass, motionstate, shape, inertia);
-			body->setDamping(0.05f,0.85f);
+			//body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
 			body->setCcdMotionThreshold(0.7f);
 			body->setCcdSweptSphereRadius(0.3f);
 			body->setRestitution(1.3f);
-			body->setFriction(1.5f);
+			//body->setFriction(1.5f);
 			m_bodies[index] = body;
 			
 			
@@ -137,7 +144,7 @@ namespace Ragdoll
 						m_joints[m_constraintCounter] = temp;
 						m_constraintCounter++;
 					}
-				//	SetBoneRelation(index, p_nameToIndex[p_rootNode->mChildren[i]->mName.data], p_bones[p_nameToIndex[p_rootNode->mChildren[i]->mName.data]]);
+					SetBoneRelation(index, m_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
 					
 				}
 				
@@ -412,7 +419,7 @@ namespace Ragdoll
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					-0.0f , 0.1f * OFFSET, 0,
- 					0, -0.10f * OFFSET, 0,
+ 					0, -0.15f * OFFSET, 0,
  					0 , 0, 1, 0, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -494,7 +501,7 @@ namespace Ragdoll
 		return nullptr;
 	}
 
-	void Ragdoll::SetBoneRelation( int p_parentIndex, int p_childIndex, glm::mat4 p_pose )
+	void Ragdoll::SetBoneRelation( int p_parentIndex, int p_childIndex )
 	{
 		m_boneToFollow[p_childIndex] = p_parentIndex;
 	//	//btTransform childTrans = m_bodies[p_childIndex]->getWorldTransform();
@@ -515,7 +522,8 @@ namespace Ragdoll
 
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
-		m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
+		//for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT; i++)
+			m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
 	}
 
 	//The magic function of constraint calculations,
@@ -563,11 +571,11 @@ namespace Ragdoll
 		float data[16];
 		btTransform trans = m_bodies[myIndex]->getWorldTransform();
 		float x,y,z,w;
-		x = trans.getRotation().w();
+	/*	x = trans.getRotation().w();
 		y = trans.getRotation().x();
 		z = trans.getRotation().y();
 		w = trans.getRotation().z();
-		trans.setRotation(btQuaternion(x,y,z,w));
+		trans.setRotation(btQuaternion(x,y,z,w));*/
 		trans.getOpenGLMatrix(data);
 		int index  = m_boneToFollow[myIndex];
 		float test[16];
@@ -578,10 +586,14 @@ namespace Ragdoll
 		w = worldTrans.getRotation().z();
 		worldTrans.setRotation(btQuaternion(x,y,z,w));
 		worldTrans.getOpenGLMatrix(test);
+		/*btTransform testoi = worldTrans.inverse() * trans;
+		testoi.getOpenGLMatrix(test);
+		p_bones[myIndex] = glm::make_mat4(test);*/
 		m_prevPos[myIndex] =  glm::make_mat4(test) /* *  glm::inverse(m_lastBoneMatrix[myIndex]) */;
 		//World to local space
-		p_bones[myIndex] = glm::inverse(m_prevPos[myIndex])  /** glm::inverse(retVal[myIndex])*/ *   glm::make_mat4(data) /* * m_lastBoneMatrix[myIndex]*/; 
+		p_bones[myIndex] = /*glm::inverse(m_boneTransform[myIndex]) **/ (glm::inverse(m_prevPos[myIndex])  /** glm::inverse(retVal[myIndex])*/ *   glm::make_mat4(data)) /* * m_lastBoneMatrix[myIndex]*/; 
 		
+		p_bones[myIndex] = glm::rotate(p_bones[myIndex], 180.0f, glm::vec3(1,0,0));
 		p_bones[myIndex] *= m_boneOffset[myIndex];
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
