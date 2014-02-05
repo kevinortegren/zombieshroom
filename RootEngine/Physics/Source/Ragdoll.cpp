@@ -61,11 +61,11 @@ namespace Ragdoll
 
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
 	{
-		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.70f, 0);
-		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(4.4f, 0, 0);
- 		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(-4.4f, 0, 0);
-		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(0, -0.2f ,0);
-		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0, -0.2f ,0);
+		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.67f, 0);
+		//m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(2.0f, 0, 0);
+ 		//m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(-2.0f, 0, 0);
+		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(0, -0.25f ,0);
+		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0, -0.25f ,0);
 		m_nameToIndex = p_nameToIndex;
 	//	memcpy(m_boneOffset, p_boneOffset, sizeof(glm::mat4) * 20);
 		CreateBody(p_bones, p_rootNode, p_transform, 1, btVector3(0,0,0), p_boneOffset);
@@ -119,8 +119,8 @@ namespace Ragdoll
 			body = new btRigidBody(mass, motionstate, shape, inertia);
 			body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
-			//body->setCcdMotionThreshold(0.7f);
-			//body->setCcdSweptSphereRadius(0.2f);
+			body->setCcdMotionThreshold(0.7f);
+			body->setCcdSweptSphereRadius(0.3f);
 			body->setRestitution(1.3f);
 			body->setFriction(1.5f);
 			m_bodies[index] = body;
@@ -308,12 +308,14 @@ namespace Ragdoll
 		if(p_nameA.compare("Character1_Hips") == 0 && p_nameB.compare("Character1_Spine") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				0 , 0.10f * OFFSET, 0, 
+				0 , 0.20f * OFFSET, 0, 
 				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
-			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
-			constraint->setLimit(0,0,0);
-				
+			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
+			constraint->setLimit(0,0,PI_2,0,1,1);
+			//constraint->setDamping(0.85f);
+			
+
 			
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
@@ -409,8 +411,8 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					-0.15f , 0.1f * OFFSET, 0,
- 					0, 0.20f * OFFSET, 0,
+ 					-0.0f , 0.1f * OFFSET, 0,
+ 					0, -0.10f * OFFSET, 0,
  					0 , 0, 1, 0, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -423,8 +425,8 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0.15f , 0.1f * OFFSET, 0,
- 					0, 0.20f * OFFSET, 0,
+ 					0.0f , 0.1f * OFFSET, 0,
+ 					0, -0.10f * OFFSET, 0,
  					0 , 0, 1, 0, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -439,7 +441,7 @@ namespace Ragdoll
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0 , -0.20f * OFFSET, 0,
  					0, 0.20f * OFFSET, 0,
- 					0 , 0, 0, 1, &localA, &localB);
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 		constraint->setLimit(- PI_2 , PI_2 /2);
@@ -453,7 +455,7 @@ namespace Ragdoll
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0 , -0.20f * OFFSET, 0,
  					0, 0.20f * OFFSET, 0,
- 					0 , 0, 0, 1, &localA, &localB);
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  		 		constraint->setLimit(- PI_2 , PI_2 /2);
@@ -467,7 +469,7 @@ namespace Ragdoll
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0.0f , -0.20f * OFFSET, 0,
  					0, 0.15f * OFFSET, 0,
- 					0 , 0, 0, 1, &localA, &localB);
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  					constraint->setLimit(- PI_2 , PI_2 /2);
@@ -481,7 +483,7 @@ namespace Ragdoll
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0.0f , -0.20f * OFFSET, 0,
  					0, 0.15f * OFFSET, 0,
- 					0 , 0, 0, 1, &localA, &localB);
+ 					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  				constraint->setLimit(- PI_2 , PI_2 /2);
