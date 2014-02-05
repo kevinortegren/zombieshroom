@@ -496,7 +496,7 @@ namespace RootForce
 			RootForce::PlayerPhysics* playerPhysics = *(RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 4, "PlayerPhysics");
 			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 5, "CollisionResponder");
 			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
-				transform->m_position, transform->m_orientation.GetQuaternion(), 1, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collidedEntities);
+				transform->m_position, transform->m_orientation.GetQuaternion(), 1, playerPhysics->MovementSpeed, 0.0f, 0.1f, &collisionResponder->m_collisions);
 			return 0;
 		}
 
@@ -550,8 +550,19 @@ namespace RootForce
 			NumberOfArgs(2);
 			RootForce::CollisionResponder** rtemp = (RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 1, "CollisionResponder");
 			RootForce::Collision** ctemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			g_engineContext.m_physics->SetCollisionContainer(*(*ctemp)->m_handle, &(*rtemp)->m_collidedEntities);
+			g_engineContext.m_physics->SetCollisionContainer(*(*ctemp)->m_handle, &(*rtemp)->m_collisions);
 			return 0;
+		}
+
+		static int CollisionResponderGetCollisionPosition(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::CollisionResponder** ptemp = (RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 1, "CollisionResponder");
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_collisions[*e].m_collisionPosition);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//PHYSICS
@@ -2045,6 +2056,7 @@ namespace RootForce
 
 		static const struct luaL_Reg collisionresponder_m [] = {
 			{"SetContainer", CollisionResponderSetCollisionContainer},
+			{"GetCollisionPosition", CollisionResponderGetCollisionPosition},
 			{NULL, NULL}
 		};
 

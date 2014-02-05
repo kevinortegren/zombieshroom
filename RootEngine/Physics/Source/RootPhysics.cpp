@@ -37,15 +37,20 @@ namespace Physics
 	struct RayAbilityCast : public btCollisionWorld::ClosestRayResultCallback
 	{
 		CustomUserPointer* m_caster;
+		glm::vec3 from, to;
 		RayAbilityCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
 		{
 
 		}
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
-			p_rayResult.m_hitFraction
+			//p_rayResult.
+			glm::vec3 castVector = from - to;
+			glm::vec3 relativePosition = castVector * p_rayResult.m_hitFraction;
+			RootForce::CollisionInfo info;
+			info.m_collisionPosition = from + relativePosition;
 			CustomUserPointer* objectHit = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
-			m_caster->m_collidedEntities->insert(objectHit->m_entity);
+			m_caster->m_collisions->insert(std::make_pair(objectHit->m_entity, info));
 			return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
 			//return 1.0f;
 		}
@@ -128,16 +133,27 @@ namespace Physics
 		else if(pointer2->m_type == PhysicsType::TYPE_STATIC)
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
 
-		if(pointer1->m_collidedEntities != nullptr)
+		if(pointer1->m_collisions != nullptr)
 		{
 			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-				pointer1->m_collidedEntities->insert(pointer2->m_entity);
+			{
+				btVector3 temp = p_cp.getPositionWorldOnA();
+				RootForce::CollisionInfo info;
+				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
+				pointer1->m_collisions->insert(std::make_pair(pointer2->m_entity, info));
+			}
 		}
 			
-		if(pointer2->m_collidedEntities != nullptr)
+		if(pointer2->m_collisions != nullptr)
 		{
 			if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-				pointer2->m_collidedEntities->insert(pointer1->m_entity);
+			{
+				btVector3 temp = p_cp.getPositionWorldOnA();
+				RootForce::CollisionInfo info;
+				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
+				pointer2->m_collisions->insert(std::make_pair(pointer1->m_entity, info));
+			}
+				//pointer2->m_collidedEntities->insert(pointer1->m_entity);
 		}
 
 
@@ -728,7 +744,7 @@ namespace Physics
 		return userPointer->m_id;
 	}
 
-	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::set<void*>* p_enityCollided)
+	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions)
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
@@ -745,7 +761,7 @@ namespace Physics
 		userPointer->m_type = PhysicsType::TYPE_PLAYER;
 		userPointer->m_modelHandle = p_modelHandle;
 		userPointer->m_entity = p_entity;
-		userPointer->m_collidedEntities = p_enityCollided;
+		userPointer->m_collisions = p_collisions;
 		userPointer->m_externalControlled = true;
 		player->SetUserPointer((void*)userPointer);
 		player->SetDebugDrawer(m_debugDrawer);
@@ -1071,9 +1087,9 @@ namespace Physics
 		
 	}
 
-	std::set<void*>* RootPhysics::GetCollisionVector( int p_objectHandle )
+	std::map<void*, RootForce::CollisionInfo>* RootPhysics::GetCollisionVector( int p_objectHandle )
 	{
-		return (m_userPointer.at(p_objectHandle)->m_collidedEntities);
+		return (m_userPointer.at(p_objectHandle)->m_collisions);
 	}
 
 
@@ -1255,9 +1271,9 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::set<void*>* p_enityCollidedId )
+	void RootPhysics::SetCollisionContainer( int p_objectHandle ,std::map<void*, RootForce::CollisionInfo>* p_collisions )
 	{
-		m_userPointer.at(p_objectHandle)->m_collidedEntities = p_enityCollidedId;
+		m_userPointer.at(p_objectHandle)->m_collisions = p_collisions;
 	}
 
 	void RootPhysics::SetPosition( int p_objectHandle, glm::vec3 p_position )
@@ -1302,8 +1318,9 @@ namespace Physics
 	{
 		RayAbilityCast rayResult;
 		rayResult.m_caster = m_userPointer.at(p_objectHandle);
-
+		rayResult.from = p_startPos;
 		glm::vec3 end = glm::normalize(p_direction) * p_length;
+		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
 	}
 
@@ -1315,7 +1332,12 @@ namespace Physics
 		for (unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			if (m_playerObjects.at(i)->GetPosition().distance(pos) < p_radius)
-				m_userPointer.at(p_objectHandle)->m_collidedEntities->insert(((CustomUserPointer*)(m_playerObjects.at(i)->GetUserPointer()))->m_entity);
+			{
+				glm::vec3 pos(m_playerObjects.at(i)->GetPosition().x(), m_playerObjects.at(i)->GetPosition().y(), m_playerObjects.at(i)->GetPosition().z());
+				RootForce::CollisionInfo info;
+				info.m_collisionPosition = pos;
+				m_userPointer.at(p_objectHandle)->m_collisions->insert(std::make_pair(((CustomUserPointer*)(m_playerObjects.at(i)->GetUserPointer()))->m_entity, info));
+			}
 		}
 	}
 
