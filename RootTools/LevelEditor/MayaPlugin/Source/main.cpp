@@ -1564,9 +1564,12 @@ void UpdateTransformation(Transform& destination, MObject transObject)
 	MStatus status;
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
+	MVector rotPivot, scalePivot;
 
 	transform.getScale(scale);
 	transform.getRotationQuaternion(rotX, rotY, rotZ, rotW);
+	rotPivot = transform.rotatePivot(MSpace::kObject);
+	scalePivot = transform.scalePivot(MSpace::kObject);
 
 	destination.position.x = transform.getTranslation(g_space_world).x;
 	destination.position.y = transform.getTranslation(g_space_world).y;
@@ -1580,6 +1583,14 @@ void UpdateTransformation(Transform& destination, MObject transObject)
 	destination.rotation.y = rotY;
 	destination.rotation.z = rotZ;
 	destination.rotation.w = rotW;
+
+	destination.rotPivot.x = rotPivot.x;
+	destination.rotPivot.y = rotPivot.y;
+	destination.rotPivot.z = rotPivot.z;
+
+	destination.scalePivot.x = scalePivot.x;
+	destination.scalePivot.y = scalePivot.y;
+	destination.scalePivot.z = scalePivot.z;
 }
 
 void MayaLightToList(MObject node, int lightIndex)

@@ -13,6 +13,7 @@
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\WorldSystem.h>
 #include <RootSystems\Include\ShadowSystem.h>
+#include <RootSystems\Include\WaterSystem.h>
 
 #include <Utility\ECS\Include\World.h>
 
@@ -46,6 +47,7 @@ RootForce::DirectionalLightSystem* directionalLightSystem;
 RootForce::ParticleSystem* particleSystem;
 RootForce::WorldSystem* worldSystem;
 RootForce::ShadowSystem* shadowSystem;
+RootForce::WaterSystem* waterSystem;
 
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
@@ -376,6 +378,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
 	worldSystem->CreateSun();
 	worldSystem->CreateSkyBox();
+	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
 }
 
 void LoadSceneFromMaya()
@@ -839,6 +842,11 @@ void LoadLocators()
 
 		if(RM.PlocatorList[i]->transformation.flags._SpawnPoint)
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+
+		if(RM.PlocatorList[i]->transformation.flags._Water)
+		{
+			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+		}
 
 	}
 
