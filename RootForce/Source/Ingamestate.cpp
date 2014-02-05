@@ -378,7 +378,7 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-#endif
+
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
@@ -424,7 +424,7 @@ namespace RootForce
 		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		//	m_waterSystem->DecreaseWaterHeight();
 
-
+#endif
 		{
 			PROFILE("Water collision system", g_engineContext.m_profiler);
 			m_waterCollisionSystem->Process();
