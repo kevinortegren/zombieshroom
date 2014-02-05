@@ -64,6 +64,12 @@ namespace RootForce
 				p_bs->Serialize(p_writeToBitstream, AimingDeviceOrientation[i]);
 		}
 
+		void CooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, AbilityIndex);
+		}
+
 		void DestroyEntities::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);

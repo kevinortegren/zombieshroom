@@ -103,6 +103,7 @@ namespace RootForce
 
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(entity);
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
@@ -159,7 +160,10 @@ namespace RootForce
 				break;
 			case PlayerAction::ACTIVATE_ABILITY:
 				{
-					action->ActivateAbility = true;
+					//if (playerComponent->AbilityScripts[playerComponent->SelectedAbility].CooldownOff)
+					//{
+						action->ActivateAbility = true;
+					//}
 				}
 				break;
 			case PlayerAction::JUMP:

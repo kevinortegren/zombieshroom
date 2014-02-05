@@ -67,7 +67,15 @@ namespace RootForce
 	{
 		std::string Name;
 		float Cooldown;
+		bool CooldownOff;
 		int Charges;
+
+		AbilityInfo()
+		{
+			Cooldown = 0.0f;
+			CooldownOff = true;
+			Charges = -1;
+		}
 	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>

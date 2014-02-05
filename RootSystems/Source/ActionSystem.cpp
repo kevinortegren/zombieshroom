@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/MatchStateSystem.h>
+#include <RakNet/GetTime.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
@@ -79,7 +80,7 @@ namespace RootSystems
 		
 			// Activate ability! Pew pew!
 			player->SelectedAbility = action->SelectedAbility - 1;
-			if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].Cooldown <= 0)
+			if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].CooldownOff)
 			{
 				std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
 				if (abilityScript != "")
@@ -88,17 +89,42 @@ namespace RootSystems
 					m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
 					m_engineContext->m_script->AddParameterNumber(action->ActionID);
 					m_engineContext->m_script->ExecuteScript();
+
+					player->AbilityScripts[player->SelectedAbility].CooldownOff = false;
+
 					player->AbilityScripts[player->SelectedAbility].Charges --;
 					if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 						player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 				}
 			}
-			if(player->AbilityScripts[0].Cooldown > 0)
-				player->AbilityScripts[0].Cooldown -= dt;
-			if(player->AbilityScripts[1].Cooldown > 0)
-				player->AbilityScripts[1].Cooldown -= dt;
-			if(player->AbilityScripts[2].Cooldown > 0)
-				player->AbilityScripts[2].Cooldown -= dt;
+
+			// Count down cooldown
+			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
+			{
+				if (player->AbilityScripts[i].Cooldown > 0)
+				{
+					player->AbilityScripts[i].Cooldown -= dt;
+
+					if (m_serverPeer != nullptr && player->AbilityScripts[i].Cooldown <= 0.0f)
+					{
+						// Send notification about finished cooldown to the client.
+						RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
+						
+						RootForce::NetworkMessage::CooldownOff m;
+						m.User = network->ID.UserID;
+						m.AbilityIndex = i;
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::CooldownOff);
+						m.Serialize(true, &bs);
+
+						m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, m_serverPeer->GetSystemAddressFromIndex(network->ID.UserID), false);
+					}
+				}
+			}
+			
 			action->ActivateAbility = false;
 		}
 
@@ -176,7 +202,11 @@ namespace RootSystems
 
 			}
 		}
+	}
 
+	void ActionSystem::SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer)
+	{
+		m_serverPeer = p_serverPeer;
 	}
 
 }
