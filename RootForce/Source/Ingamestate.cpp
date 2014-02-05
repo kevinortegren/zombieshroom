@@ -526,7 +526,7 @@ namespace RootForce
 			else
 			{
 				g_engineContext.m_gui->Render(m_hud->GetView());
-				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
