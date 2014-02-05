@@ -11,12 +11,11 @@ namespace RootForce
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
-		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
-		glm::vec4 ambient = glm::vec4(0.1f);
+		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
+		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
-		CreateSun();
 		CreateSkyBox();
 		CreatePlayerCamera();
 
@@ -50,7 +49,7 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
+		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
 
 
