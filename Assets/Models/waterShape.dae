@@ -15,18 +15,18 @@
 		</comments>
       <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv5.mb</source_data>
     </contributor>
-    <created>2014-01-30T11:35:46</created>
-    <modified>2014-01-30T11:35:46</modified>
+    <created>2014-02-05T13:11:50</created>
+    <modified>2014-02-05T13:11:50</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="Water" name="Water">
-      <instance_effect url="#Water-fx"/>
+    <material id="OceanFloor" name="OceanFloor">
+      <instance_effect url="#OceanFloor-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="Water-fx">
+    <effect id="OceanFloor-fx">
       <profile_COMMON>
         <newparam sid="file2-surface">
           <surface type="2D">
@@ -171,7 +171,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="RootIslandsv5">
       <node id="water" name="water" type="NODE">
-        <translate sid="translate">22.8808 -60.4661 34.32293</translate>
+        <translate sid="translate">22.8808 -73.91561 34.32293</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
@@ -179,7 +179,7 @@
         <instance_geometry url="#waterShape">
           <bind_material>
             <technique_common>
-              <instance_material symbol="lambert4SG" target="#Water">
+              <instance_material symbol="lambert4SG" target="#OceanFloor">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>

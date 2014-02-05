@@ -82,11 +82,16 @@ void main()
 	float fresnel	= Fresnel(ndotl, 0.2f, 5.0f);
 
 	//Diffuse water color
-	vec3 diffuseWaterColor  = texture(g_Specular, TexCoord_FS_in).rgb; 
+	vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0f).rgb; 
 
 	//Lerp water color and refraction color
-	float distFac = clamp(0.01f*abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z), 0.0f, 1.0f);
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
+
+	//Water foam calculations
+	//float foamDistFac = clamp(0.05f*vdist, 0.0f, 1.0f);
+	//waterColor = mix(foamWaterColor, waterColor, foamDistFac);
 
 	//Calculate result color
 	vec4 result				= vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
