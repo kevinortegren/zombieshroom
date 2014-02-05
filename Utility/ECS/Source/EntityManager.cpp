@@ -66,7 +66,7 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	{
 		if(p_entity->m_id < (int)m_components[i].size())
 		{
-			if(m_components[i][p_entity->m_id] != nullptr)
+			if(p_entity->m_id > -1 && m_components[i][p_entity->m_id] != nullptr)
 			{
 				m_allocator.FreePtrFromList(m_components[i][p_entity->m_id], i);
 				m_components[i][p_entity->m_id] = nullptr;
