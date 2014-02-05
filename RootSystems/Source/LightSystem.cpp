@@ -40,7 +40,7 @@ namespace RootForce
 
 	void PointLightSystem::End() 
 	{
-		std::cout << m_lightCount << std::endl;
+		
 	}
 
 	void DirectionalLightSystem::Init()

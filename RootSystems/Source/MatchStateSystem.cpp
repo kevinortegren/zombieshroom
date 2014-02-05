@@ -59,7 +59,7 @@ namespace RootForce
 		std::string scoreString = "[";
 		for(auto pair : g_networkEntityMap)
 		{
-			if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != 0)
+			if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != 0 || !pair.second)
 				continue;
 
 			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);

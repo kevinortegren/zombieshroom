@@ -1,7 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 #include <string>
-#include <Awesomium/WebCore.h>
+#include <RootEngine/GUI/Include/WebView.h>
 #include "DebugOverlayInterface.h"
 
 namespace RootEngine
@@ -14,14 +14,14 @@ namespace RootEngine
 		DebugOverlay();
 		~DebugOverlay();
 
-		Awesomium::WebView* GetView();
-		void SetView(Awesomium::WebView* p_view);
+		RootEngine::GUISystem::WebView* GetView();
+		void SetView(RootEngine::GUISystem::WebView* p_view);
 
 		void AddHTMLToBuffer(const char* p_html, TextColor::TextColor p_color, bool p_leftSide = true);
 		void RenderOverlay();
 
 	private:
-		Awesomium::WebView* m_view;
+		RootEngine::GUISystem::WebView* m_view;
 		std::string m_leftOverlay;
 		std::string m_rightOverlay;
 	};

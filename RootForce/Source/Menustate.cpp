@@ -16,7 +16,6 @@ namespace RootForce
 	void MenuState::Initialize(const std::string& p_workingDir)
 	{
 		m_workingDir = p_workingDir;
-
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
@@ -41,17 +40,20 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
 		// Destroy any existing server/client and setup a new network client so we can search for LAN-servers
-		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+		if(!m_networkContext.m_client)
+		{
+			m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+			m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
+			m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
+		}
 		m_networkContext.m_server = nullptr;
-		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
 		m_networkContext.m_serverMessageHandler = nullptr;
-		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Set the LAN list on the message handler
 		m_networkContext.m_clientMessageHandler->SetLanList(m_lanList.get());

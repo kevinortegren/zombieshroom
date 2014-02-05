@@ -2105,14 +2105,17 @@ FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FA
 } // namespace fastdelegate
 
 #include <Awesomium/WebCore.h>
+#include <string>
 
 // Callbacks wrapped via JSDelegate should have the following function signature:
 //   void MyCallback(WebView* caller, const JSArray& args);
-typedef fastdelegate::FastDelegate2<Awesomium::WebView*, const Awesomium::JSArray&> JSDelegate;
+typedef fastdelegate::FastDelegate3<Awesomium::WebView*, std::string, const Awesomium::JSArray&> JSDelegate3;
+typedef fastdelegate::FastDelegate1<const Awesomium::JSArray&> JSDelegate1;
 
 // Callbacks wrapped via JSDelegateWithRetval should have the following function signature:
 //   JSValue MyCallback(WebView* caller, const JSArray& args);
-typedef fastdelegate::FastDelegate2<Awesomium::WebView*, const Awesomium::JSArray&, Awesomium::JSValue> JSDelegateWithRetval;
+typedef fastdelegate::FastDelegate3<Awesomium::WebView*, std::string, const Awesomium::JSArray&, Awesomium::JSValue> JSDelegate3WithRetval;
+typedef fastdelegate::FastDelegate1<const Awesomium::JSArray&, Awesomium::JSValue> JSDelegate1WithRetval;
 
 #endif // !defined(FASTDELEGATE_H)
 

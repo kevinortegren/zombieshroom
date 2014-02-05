@@ -50,6 +50,7 @@ namespace Render
 		virtual void SetResolution(int p_width, int p_height) = 0;
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
+		virtual SDL_Window* GetWindow() = 0;
 
 		// Camera
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
@@ -77,6 +78,7 @@ namespace Render
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
+		virtual std::string GetStringFromMaterial(Material* p_material) = 0;
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
@@ -107,6 +109,7 @@ namespace Render
 		void SetResolution(int p_width, int p_height);
 		int GetWidth() const;
 		int GetHeight() const;
+		SDL_Window* GetWindow() { return m_window; }
 
 		// Camera
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
@@ -134,6 +137,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
+		std::string GetStringFromMaterial(Material* p_material);
 
 		// Particle systems.
 		ParticleSystem* CreateParticleSystem();

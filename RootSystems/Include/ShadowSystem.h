@@ -7,6 +7,7 @@
 #include <RootSystems/Include/DataStructures/Quad.h>
 
 #define SHADOWSYSTEM_CULL
+//#define SHADOWSYSTEM_DEBUG
 
 namespace RootForce
 {

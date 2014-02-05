@@ -186,9 +186,10 @@ namespace RootForce
 #ifdef SHADOWSYSTEM_CULL
 			glm::mat4 invViewProj = glm::inverse(sc.m_viewMatrices[i]) * glm::inverse(sc.m_projectionMatrices[i]);
 
+#ifdef SHADOWSYSTEM_DEBUG
 			OBB obb = OBB(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, invViewProj);
 			obb.DebugDraw(g_engineContext.m_renderer, colors[i], glm::mat4(1.0f));
-
+#endif
 			for(int j = 0; j < 8; ++j)
 			{
 				points[j] = invViewProj * localOBB[j];

@@ -162,6 +162,9 @@ namespace RootForce
 						if (m.IsYou)
 						{
 							g_engineContext.m_script->SetGlobalNumber("UserID", m.User);
+
+							// Set the client state
+							clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
 						}
 
 						// Call the OnCreate script
@@ -180,9 +183,6 @@ namespace RootForce
 						ECS::Entity* playerEntity = g_networkEntityMap[id];
 						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 						playerComponent->Name = m.Name;
-
-						// Set the client state
-						clientComponent->State = ClientState::AWAITING_FIRST_GAMESTATE_DELTA;
 					}
 					else
 					{
@@ -207,6 +207,10 @@ namespace RootForce
 						id.UserID = m.User;
 						id.ActionID = ReservedActionID::CONNECT;
 						id.SequenceID = 0;
+
+						if(!g_networkEntityMap[id])
+							break;
+
 						PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User disconnected (%s): %s", p_packet->systemAddress.ToString(), player->Name.c_str());
@@ -455,6 +459,9 @@ namespace RootForce
 				case ID_CONNECTION_LOST:
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Client disconnected (%s)", p_packet->systemAddress.ToString());
+
+					if(m_peer->GetIndexFromSystemAddress(p_packet->systemAddress) == -1)
+						break;
 					
 					NetworkEntityID id;
 					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
@@ -548,6 +555,10 @@ namespace RootForce
 					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
 					ECS::Entity* client = g_networkEntityMap[id];
+
+					if(!client) //Skip the message if the client does not exist
+						break;
+
 					ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
 
 					id.SequenceID = 0;
@@ -663,6 +674,13 @@ namespace RootForce
 										n.IsYou = false;
 										n.Name = RakNet::RakString(playerComponent->Name.c_str());
 
+										NetworkEntityID id(n.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY);
+										if(!g_networkEntityMap[id])
+											continue;
+										ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[id]);
+										if(clientComponent->State != ClientState::CONNECTED)
+											continue;
+
 										RakNet::BitStream bs;
 										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 										bs.Write(RakNet::GetTime());
@@ -673,21 +691,31 @@ namespace RootForce
 									}
 								}
 
+								clientComponent->State = ClientState::CONNECTED;
+
 								// Send a user connected message for all clients to the connectee.
 								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
 									// Get player information
 									NetworkEntityID id;
-									id.UserID = i;
+									id.UserID = m_peer->GetIndexFromSystemAddress(addresses[i]);
 									id.ActionID = ReservedActionID::CONNECT;
 									id.SequenceID = 0;
+
+									NetworkEntityID clientId(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY);
+
+									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
+										continue;
+									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
+									if(clientComponent->State != ClientState::CONNECTED)
+										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
 
 									// Craft message
 									NetworkMessage::UserConnected n;
-									n.User = i;
-									n.IsYou = n.User == i;
+									n.User = id.UserID;
+									n.IsYou = n.User == m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 									n.Name = RakNet::RakString(peerPlayerComponent->Name.c_str());
 
 									RakNet::BitStream bs;
@@ -709,7 +737,6 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
-								clientComponent->State = ClientState::CONNECTED;
 							}
 						} break;
 

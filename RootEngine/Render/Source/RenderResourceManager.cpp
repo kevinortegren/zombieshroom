@@ -108,4 +108,16 @@ namespace Render
 		m_effects.push_back(effect);
 		return effect;
 	}
+
+	std::string RenderResourceManager::GetStringFromMaterial(Material* p_material)
+	{
+		for(auto itr = m_materialNameMap.begin(); itr != m_materialNameMap.end(); ++itr)
+		{
+			if((*itr).second == p_material->m_id)
+				return (*itr).first;
+		}
+		assert(false);
+		return std::string("");
+	}
+
 }

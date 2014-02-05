@@ -11,12 +11,11 @@ namespace RootForce
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
-		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
-		glm::vec3 ambient = glm::vec3(0.1f);
+		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
+		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
-		CreateSun();
 		CreateSkyBox();
 		CreatePlayerCamera();
 
@@ -28,9 +27,9 @@ namespace RootForce
 	}
 #endif
 
-	void WorldSystem::SetAmbientLight(glm::vec3 p_ambient)
+	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
 	{
-		m_engineContext->m_renderer->SetAmbientLight(glm::vec4(p_ambient, 0.0f));
+		m_engineContext->m_renderer->SetAmbientLight(p_ambient);
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
 	}
 
@@ -50,8 +49,9 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
+		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
+
 
 	void WorldSystem::CreateSkyBox()
 	{
@@ -133,7 +133,7 @@ namespace RootForce
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
 	}
-#endif
+
 
 	void WorldSystem::CreatePlayerCamera()
 	{
@@ -173,6 +173,8 @@ namespace RootForce
 		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
 	}
+
+#endif
 
 	void WorldSystem::Process()
 	{	

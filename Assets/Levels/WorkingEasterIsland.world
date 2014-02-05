@@ -125,7 +125,6 @@
     - 124
     - 125
     - 126
-    - 127
     - 128
     - 129
     - 130
@@ -825,12 +824,6 @@
             Name: StoneMaterial
             Effect: Mesh
             Diffuse: RockTexture
-        - Entity: 127
-          Model: WaterShape1
-          Material:
-            Name: Water
-            Effect: Mesh
-            Diffuse: water
         - Entity: 128
         - Entity: 129
         - Entity: 130
@@ -1343,10 +1336,6 @@
           Position: [-40.7718, -18.7195, 143.316]
           Rotation: [-95.9138, 0.190798, -95.2793]
           Scale: [2.53264, 4.65387, 5.01374]
-        - Entity: 127
-          Position: [65.0274, -56.1675, 65.1068]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
         - Entity: 128
           Position: [95.2214, 41.1025, 51.2682]
           Rotation: [-0, 0, -0]
@@ -1651,8 +1640,6 @@
           MeshHandle: FattWillowShape0
         - Entity: 126
           MeshHandle: Stone45Shape0
-        - Entity: 127
-          MeshHandle: WaterShape10
     - Type: 12
       Data:
         []

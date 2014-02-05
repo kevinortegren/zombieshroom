@@ -31,6 +31,8 @@ namespace Render
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
 
+		std::string GetStringFromMaterial(Material* p_material);
+
 	private:
 
 		std::map<std::string, int> m_materialNameMap;

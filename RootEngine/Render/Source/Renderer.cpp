@@ -11,41 +11,41 @@
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
 {
-	Render::g_context.m_logger->LogText("message: %s", message);
-	Render::g_context.m_logger->LogText("type: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "message: %s", message);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT,"type: ");
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR:
-		Render::g_context.m_logger->LogText("ERROR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("DEPRECATED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("UNDEFINED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		Render::g_context.m_logger->LogText("PORTABILITY");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		Render::g_context.m_logger->LogText("PERFORMANCE");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		Render::g_context.m_logger->LogText("OTHER");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "OTHER");
 		break;
 	}
 
-	Render::g_context.m_logger->LogText("id: %i", id);
-	Render::g_context.m_logger->LogText("severity: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "id: %i", id);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "severity: ");
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_LOW:
-		Render::g_context.m_logger->LogText("LOW");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "LOW");
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		Render::g_context.m_logger->LogText("MEDIUM");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "MEDIUM");
 		break;
 	case GL_DEBUG_SEVERITY_HIGH:
-		Render::g_context.m_logger->LogText("HIGH");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "HIGH");
 		break;
 	}
 }
@@ -89,15 +89,16 @@ namespace Render
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
-			g_context.m_logger->LogText("%s", SDL_GetError());
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "%s", SDL_GetError());
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -284,19 +285,26 @@ namespace Render
 		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
+		s_sizes[Semantic::MK1]			= sizeof(float);
+		s_sizes[Semantic::MK2]			= sizeof(float);
+		s_sizes[Semantic::MK3]			= sizeof(float);
+		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
+		s_sizes[Semantic::DX]			= sizeof(float);
 
-		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
-		s_textureSlots[TextureSemantic::SPECULAR] = 1;
-		s_textureSlots[TextureSemantic::NORMAL] = 2;
-		s_textureSlots[TextureSemantic::GLOW] = 3;
-		s_textureSlots[TextureSemantic::DEPTH] = 4;
-		s_textureSlots[TextureSemantic::RANDOM] = 5;
-		s_textureSlots[TextureSemantic::TEXTUREMAP] = 6;
-		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
-		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
-		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+
+		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
+		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
+		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::GLOW]			= 3;
+		s_textureSlots[TextureSemantic::DEPTH]			= 4;
+		s_textureSlots[TextureSemantic::RANDOM]			= 5;
+		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
+		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
+		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
+		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -516,6 +524,7 @@ namespace Render
 		m_gbuffer.UnbindTextures();	
 
 		// Bind lighting for blending.
+		
 		m_lighting.m_la->Bind(5);
 
 		m_gbuffer.Enable();
@@ -603,10 +612,10 @@ namespace Render
 		
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
-
+		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 		m_lighting.Clear();
 		m_lighting.Process(m_fullscreenQuad);
-
+		//m_gbuffer.m_depthTexture->Unbind(10);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
@@ -763,6 +772,11 @@ namespace Render
 		return m_resources.CreateEffect();
 	}
 
+	std::string GLRenderer::GetStringFromMaterial(Material* p_material)
+	{
+		return m_resources.GetStringFromMaterial(p_material);
+	}
+
 	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
 		return m_particles.Create(this);
@@ -793,14 +807,33 @@ namespace Render
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
+				{
 					(*texture).second->Bind((*texture).first);
+					(*texture).second->BindImage((*texture).first);
+				}
 		}
 
 		for(auto tech = p_job->m_effect->GetTechniques().begin(); tech != p_job->m_effect->GetTechniques().end(); ++tech)
 		{
+			for(auto param = p_job->m_params.begin(); param != p_job->m_params.end(); ++param)
+			{	
+				m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+			}
+
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
+		
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		}
+
+		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
+		{
+			if((*texture).second != nullptr)
+			{
+				(*texture).second->Unbind((*texture).first);
+				(*texture).second->UnBindImage((*texture).first);
+			}
 		}
 	}
 
