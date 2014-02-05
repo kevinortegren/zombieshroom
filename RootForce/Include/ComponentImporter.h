@@ -272,6 +272,14 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					particleEmitter->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 			}
 			break;
+		case RootForce::ComponentType::SHADOWCASTER:
+			{
+				RootForce::Shadowcaster* shadow = p_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(p_entity);
+
+				p_node["LightSlot"] >> shadow->m_directionalLightSlot;
+
+			}
+			break;
 		default:
 			break;
 	}
