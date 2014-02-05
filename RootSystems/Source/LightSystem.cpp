@@ -35,9 +35,7 @@ namespace RootForce
 			m_context->m_renderer->AddPointLight(pl, m_lightCount);
 
 			m_lightCount++;
-		}
-
-		
+		}	
 	}
 
 	void PointLightSystem::End() 
