@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	$("#ingame-return").mouseup(function() {
-		IngameMenu.Return();
+		Menu.Return();
 	  } );
 	  
 	  $("#ingame-settings").mouseup(function() {
@@ -11,7 +11,7 @@ $(document).ready(function() {
 	  } );
 
 	$("#ingame-exit").mouseup(function() {
-		IngameMenu.Exit();
+		Menu.Exit();
 	  } );
   
   // Settings menu
@@ -20,7 +20,8 @@ $(document).ready(function() {
     $("#player-settings-menu").css("display", "table");
   } );
   $("#settings-graphics").click(function() {
-    ShowError("Not yet implemented! D:");
+    $("#settings-menu").css("display", "none");
+    $("#graphics-settings-menu").css("display", "table");
   } );
   $("#settings-sound").click(function() {
     ShowError("Not yet implemented! D:");
@@ -32,28 +33,8 @@ $(document).ready(function() {
     $("#settings-menu").css("display", "none");
     $("#ingame-menu").css("display", "table");
   } );
-  // Player settings
-  LoadSettings = function () {
-    var settings = Menu.RequestSettings();
-    for(var key in settings)
-      $("#"+key).val(settings[key]);
-  }
-  $("#player-settings-back").click(function() {
-    $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
-    LoadSettings();
-  } );
-  $("#player-settings-save").click(function() {
-    var settings = {};
-    settings["settings-player-name"] = $("#settings-player-name").val();
-    Menu.SaveSettings(settings);
-    $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
-  } );
   
-  
-  
-  } );
+} );
   
   
   

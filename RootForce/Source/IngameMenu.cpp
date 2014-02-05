@@ -10,7 +10,7 @@ namespace RootForce
 
 		m_view = p_view;
 		m_settingsMenu = new SettingsMenu(p_context);
-		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("IngameMenu"));
+		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("Menu"));
 
 		if(result.IsObject() && result.ToObject().type() != Awesomium::kJSObjectType_Local)
 		{

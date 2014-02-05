@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <SDL2/SDL.h>
 
 namespace RootForce
 {
@@ -21,6 +22,7 @@ namespace RootForce
 
 		RootEngine::GameSharedContext m_context;
 		std::string m_workingDir;
+		SDL_Window* m_window;
 
 	};
 }

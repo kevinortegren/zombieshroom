@@ -178,13 +178,11 @@ a
   background-size: 250px 50px;
   background-position: 50% 50%;
 }
-#settings-menu,
-#player-settings-menu,
-#lan-menu
+.hiddenmenu
 {
   display: none;
 }
-#player-settings-wrapper
+.windowbackground
 {
   width: 400px;
   border: 0;

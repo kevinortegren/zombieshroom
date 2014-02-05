@@ -81,7 +81,7 @@ namespace RootForce
 		{
 			throw std::runtime_error("Failed to create window");
 		}
-
+		SDL_SetWindowFullscreen(m_window.get(), g_engineContext.m_configManager->GetConfigValueAsString("settings-fullscreen").compare("on") == 0 ? SDL_TRUE : SDL_FALSE);
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 

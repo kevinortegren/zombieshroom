@@ -5,6 +5,7 @@
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="menu.js"></script>
+	<script type="text/javascript" src="settings.js"></script>
   </head>
   <body id="main-body">
     <div id="splash">
@@ -18,7 +19,7 @@
       </div>
     </div></div>
     
-    <div id="lan-menu" class="verticaltablehax"><div class="verticalcenterhax">
+    <div id="lan-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
       <div id="lan-wrapper" >
         <div id="lan-list-wrapper">
           <table id="lan-list" class="tablesorter-green" >
@@ -34,7 +35,7 @@
       </div>
     </div></div>
     
-    <div id="settings-menu" class="verticaltablehax"><div class="verticalcenterhax">
+    <div id="settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
       <div id="settings-wrapper">
         <h1 class="textcenter">Settings</h1>
         <input id="settings-player" type="submit" class="main-button" value="Player" />
@@ -46,16 +47,32 @@
       </div>
     </div></div>
     
-    <div id="player-settings-menu" class="verticaltablehax"><div class="verticalcenterhax">
-      <div id="player-settings-wrapper">
+    <div id="player-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
+      <div id="player-settings-wrapper" class="windowbackground">
         <h1 class="textcenter">Player settings</h1>
         <div><div class="inline-150px">Name</div><input type="text" id="settings-player-name" /></div>
         <input id="player-settings-back" type="submit" class="button" value="Back" />
         <input id="player-settings-save" type="submit" class="button floatright" value="Save" /></div>
       </div>
     </div></div>
+	
+	<div id="graphics-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
+      <div id="graphics-settings-wrapper" class="windowbackground">
+        <h1 class="textcenter">Graphics settings</h1>
+        <div><div class="inline-150px">Fullscreen</div><div id="settings-fullscreen">On <input type="radio" name="settings-fullscreen" value="on" />&nbsp;&nbsp;&nbsp;&nbsp;Off <input type="radio" name="settings-fullscreen" value="off" /></div></div>
+        <div><div class="inline-150px">Resolution</div><select id="settings-resolution">
+			<option value="1920x1080">1920x1080</option>
+			<option value="1680x1080">1680x1080</option>
+			<option value="1600x900">1600x900</option>
+			<option value="1366x768">1366x768</option>
+			<option value="1024x768">1024x768</option>
+		</select></div>
+		<input id="graphics-settings-back" type="submit" class="button" value="Back" />
+        <input id="graphics-settings-save" type="submit" class="button floatright" value="Save" /></div>
+      </div>
+    </div></div>
     
-    <div id="overlay" class="verticaltablehax"><div class="verticalcenterhax">
+    <div id="overlay" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
       <div id="error-popup" class="popup">
         <div id="error-close" class="close">[Close]</div>
         <h3 id="error-title">Error</h3>
