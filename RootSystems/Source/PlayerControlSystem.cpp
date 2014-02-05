@@ -110,7 +110,7 @@ namespace RootForce
 
 		glm::vec3 movement(0.0f);
 
-		action->ActionID = s_nextActionID++;
+		action->ActionID = Network::ReservedActionID::NONE;
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
@@ -160,10 +160,11 @@ namespace RootForce
 				break;
 			case PlayerAction::ACTIVATE_ABILITY:
 				{
-					//if (playerComponent->AbilityScripts[playerComponent->SelectedAbility].CooldownOff)
-					//{
-						action->ActivateAbility = true;
-					//}
+					action->ActivateAbility = true;
+					if (playerComponent->AbilityScripts[playerComponent->SelectedAbility].CooldownOff)
+					{
+						action->ActionID = s_nextActionID++;	
+					}
 				}
 				break;
 			case PlayerAction::JUMP:
