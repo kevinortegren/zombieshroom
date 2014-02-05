@@ -61,7 +61,7 @@ void main()
 
 	//Calculate transparent color and refraction
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
-	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.15f, vec2(0.0f), vec2(1.0f));
+	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.08f, vec2(0.0f), vec2(1.0f));
 	float refractionDepth	= texture(g_Depth, refractedUV).r;
 	vec3 refractionColor;
 	if(refractionDepth > gl_FragCoord.z)

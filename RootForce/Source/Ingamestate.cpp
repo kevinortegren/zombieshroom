@@ -166,10 +166,7 @@ namespace RootForce
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
-		m_waterSystem->Init();
-
-		m_waterCollisionSystem = new RootSystems::WaterCollsionSystem(g_world, &g_engineContext, m_waterSystem);
-		g_world->GetSystemManager()->AddSystem<RootSystems::WaterCollsionSystem>(m_waterCollisionSystem);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -209,7 +206,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(0.0f);
+		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 	}
 
 	void IngameState::Exit()
@@ -425,10 +422,7 @@ namespace RootForce
 		//	m_waterSystem->DecreaseWaterHeight();
 
 #endif
-		{
-			PROFILE("Water collision system", g_engineContext.m_profiler);
-			m_waterCollisionSystem->Process();
-		}
+		
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();

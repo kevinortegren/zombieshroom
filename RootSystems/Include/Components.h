@@ -15,7 +15,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
-#include <RootSystems/Include/WaterCollisionSystem.h>
+#include <RootSystems/Include/WaterSystem.h>
 
 namespace RootForce
 {

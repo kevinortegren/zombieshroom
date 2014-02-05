@@ -3717,3 +3717,5 @@
 - Storage:
     - Key: Ambient
       Value: 0 0 0 1
+    - Key: WaterHeight
+      Value: 0.1
