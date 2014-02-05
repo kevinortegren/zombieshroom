@@ -82,6 +82,10 @@ namespace Render
 
 		p_fullscreenQuad.Bind();
 
+		// Background.
+		background->Apply();	
+		p_fullscreenQuad.Draw();
+
 		// Ambient.
 		ambient->Apply();
 		p_fullscreenQuad.Draw();
@@ -94,9 +98,7 @@ namespace Render
 		pointlight->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numPointLights);
 
-		// Background.
-		background->Apply();	
-		p_fullscreenQuad.Draw();
+		
 	
 		p_fullscreenQuad.Unbind();
 

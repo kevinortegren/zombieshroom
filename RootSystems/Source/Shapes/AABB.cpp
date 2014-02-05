@@ -15,22 +15,22 @@ namespace RootForce
 
 	int AABB::GetLengthX( void ) const
 	{
-		return abs( m_maxX -  m_minX ); 
+		return (int)abs( m_maxX -  m_minX ); 
 	}
 
 	int AABB::GetLengthY( void ) const
 	{
-		return abs(  m_maxY -  m_minY ); 
+		return (int)abs(  m_maxY -  m_minY ); 
 	}
 
 	int AABB::GetLengthZ( void ) const
 	{
-		return abs(  m_maxZ -  m_minZ ); 
+		return (int)abs(  m_maxZ -  m_minZ ); 
 	}
 
 	Rectangle AABB::GetXZRect( void ) const
 	{
-		return Rectangle(m_minX, m_minZ, GetLengthX(), GetLengthZ());
+		return Rectangle((int)m_minX, (int)m_minZ, GetLengthX(), GetLengthZ());
 	}
 
 	glm::vec3 AABB::GetCenter( void ) const

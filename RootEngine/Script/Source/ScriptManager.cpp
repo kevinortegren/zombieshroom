@@ -40,6 +40,8 @@ namespace RootEngine
 		void ScriptManager::SetFunction(std::string p_abilityName ,std::string p_functionName)
 		{
 			// Execute specific function
+			if(p_abilityName.compare("MatchState") == 0 && p_functionName.compare("OnDestroy") == 0)
+				int i = 0;
 			lua_getglobal(m_luaState, p_abilityName.c_str());
 			lua_getfield(m_luaState, -1, p_functionName.c_str());
 		}

@@ -38,12 +38,15 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void IngameState::Initialize()
 	{
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -162,6 +165,12 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
+		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
+		m_waterSystem->Init();
+
+		m_waterCollisionSystem = new RootSystems::WaterCollsionSystem(g_world, &g_engineContext, m_waterSystem);
+		g_world->GetSystemManager()->AddSystem<RootSystems::WaterCollsionSystem>(m_waterCollisionSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -193,6 +202,8 @@ namespace RootForce
 		m_respawnSystem->LoadSpawnPoints();
 
 		m_animationSystem->Start();
+
+		m_waterSystem->CreateWater(0.0f);
 	}
 
 	void IngameState::Exit()
@@ -215,10 +226,11 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-		m_networkContext.m_client = nullptr;
-		m_networkContext.m_clientMessageHandler = nullptr;
-		m_networkContext.m_server = nullptr;
-		m_networkContext.m_serverMessageHandler = nullptr;
+
+		// Disable the message handlers while resetting the server (to avoid null entities etc.)
+		if(m_networkContext.m_server.get() != nullptr)
+			m_networkContext.m_server->SetMessageHandler(nullptr);
+		m_networkContext.m_client->SetMessageHandler(nullptr);
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
@@ -371,7 +383,39 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+		//Debug -> Disturb water with O
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_O) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+		}
+		//DEBUG -> toggle wireframe mode on water with I
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ToggleWireFrame();
 
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->TogglePause();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseSpeed();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseSpeed();
+
+
+		{
+			PROFILE("Water collision system", g_engineContext.m_profiler);
+			m_waterCollisionSystem->Process();
+		}
+		{
+			PROFILE("Water system", g_engineContext.m_profiler);
+			m_waterSystem->Process();
+		}
+		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 

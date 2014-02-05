@@ -1,13 +1,13 @@
 - Entities:
-    - 1
     - 2
     - 3
     - 4
     - 5
     - 6
+    - 7
     - 8
-    - 9
     - 10
+    - 11
     - 12
     - 13
     - 14
@@ -201,20 +201,23 @@
     - 202
     - 203
     - 204
+    - 205
+    - 206
+    - 207
+    - 208
+    - 209
+    - 210
+    - 211
+    - 212
+    - 213
+    - 214
+- Storage:
+    - Key: Ambient
+      Value: 0.15758 0.15758 0.15758 1
 - Components:
     - Type: 0
       Data:
-        - Entity: 8
-          Model: IslandTerrainShape
-          Material:
-            Name: TerrainPaint
-            Effect: Mesh_Blend
-            TextureMap: RocksMeshShape_color
-            TextureRed: sandTiles
-            TextureGreen: customGrass2
-            TextureBlue: rock_clear
-            TileFactor: 48
-        - Entity: 9
+        - Entity: 10
           Model: GroundPlaneShape
           Material:
             Name: Ground
@@ -224,7 +227,7 @@
             TextureGreen: GREEN
             TextureBlue: BLUE
             TileFactor: 64
-        - Entity: 10
+        - Entity: 11
           Model: MountainShape
           Material:
             Name: MountainPaint
@@ -1552,46 +1555,118 @@
             Diffuse: Leef
             Normal: Leef_Normal
         - Entity: 200
+          Model: GroundPlaneShape
+          Material:
+            Name: WaterMaterial
+            Effect: Mesh
+            Diffuse: water
         - Entity: 201
+          Model: TerrainShape
+          Material:
+            Name: PaintTerrain
+            Effect: Mesh_Blend
+            TextureMap: RocksMeshShape_color
+            TextureRed: sandTiles
+            TextureGreen: customGrass2
+            TextureBlue: rock_clear
+            TileFactor: 48
         - Entity: 202
+          Model: Palm2MeshShape
+          Material:
+            Name: Palm
+            Effect: Mesh_NormalMap
+            Diffuse: PalmTreeTex
+            Normal: PalmTreeTex_normal
         - Entity: 203
+          Model: PalmCrownMeshShape
+          Material:
+            Name: lambert9
+            Effect: Mesh_Normal_Trans
+            Diffuse: Leef
+            Normal: Leef_Normal
         - Entity: 204
+          Model: Palm4MeshShape
+          Material:
+            Name: Palm
+            Effect: Mesh_NormalMap
+            Diffuse: PalmTreeTex
+            Normal: PalmTreeTex_normal
+        - Entity: 205
+          Model: PalmCrownMeshShape
+          Material:
+            Name: lambert9
+            Effect: Mesh_Normal_Trans
+            Diffuse: Leef
+            Normal: Leef_Normal
+        - Entity: 206
+          Model: Palm2MeshShape
+          Material:
+            Name: Palm
+            Effect: Mesh_NormalMap
+            Diffuse: PalmTreeTex
+            Normal: PalmTreeTex_normal
+        - Entity: 207
+          Model: PalmCrownMeshShape
+          Material:
+            Name: lambert9
+            Effect: Mesh_Normal_Trans
+            Diffuse: Leef
+            Normal: Leef_Normal
+        - Entity: 208
+          Model: Palm3MeshShape
+          Material:
+            Name: Palm
+            Effect: Mesh_NormalMap
+            Diffuse: PalmTreeTex
+            Normal: PalmTreeTex_normal
+        - Entity: 209
+          Model: PalmCrownMeshShape
+          Material:
+            Name: lambert9
+            Effect: Mesh_Normal_Trans
+            Diffuse: Leef
+            Normal: Leef_Normal
+        - Entity: 210
+        - Entity: 211
+        - Entity: 212
+        - Entity: 213
+        - Entity: 214
     - Type: 1
       Data:
-        - Entity: 1
+        - Entity: 2
           Position: [257.46, 18.1661, 172.039]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 2
+        - Entity: 3
           Position: [83.1545, 9.7944, 72.1111]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 3
+        - Entity: 4
           Position: [46.4796, 119.283, -247.326]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 4
+        - Entity: 5
           Position: [-231.777, 24.0789, -58.1302]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 5
+        - Entity: 6
           Position: [-363.294, 29.6747, -188.643]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 6
+        - Entity: 7
           Position: [193.302, 42.8599, -232.301]
           Rotation: [0, -0.207261, 0, 0.978286]
           Scale: [1, 1, 1]
         - Entity: 8
-          Position: [249.816, 2.48697, -1.77636e-014]
-          Rotation: [0, 0, 0, 1]
-          Scale: [0.711459, 0.711459, 0.711459]
-        - Entity: 9
-          Position: [435.122, -57.9255, 8.77607]
+          Position: [14.968, 175.698, -254.002]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 10
-          Position: [41.7823, 79.1445, -315.696]
+          Position: [435.122, -57.9255, 8.77607]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 11
+          Position: [41.7501, 79.2341, -315.697]
           Rotation: [-0.0251996, 0.98798, -0.0229701, 0.150774]
           Scale: [0.711459, 0.711459, 0.711459]
         - Entity: 12
@@ -1695,7 +1770,7 @@
           Rotation: [0, 0.590949, 0, 0.806709]
           Scale: [1.59064, 1.59064, 1.59064]
         - Entity: 37
-          Position: [41.9655, -3.68373, 50.8]
+          Position: [41.9655, -5.21783, 50.8]
           Rotation: [0, 0.880128, 0, 0.474737]
           Scale: [1.3752, 1.3752, 1.3752]
         - Entity: 38
@@ -1839,7 +1914,7 @@
           Rotation: [0, 0.782925, 0, 0.622116]
           Scale: [2.57999, 2.57999, 2.57999]
         - Entity: 73
-          Position: [-147.473, 12.565, 12.3193]
+          Position: [-159.382, 3.35655, -13.5561]
           Rotation: [0, 0.722775, 0, 0.691083]
           Scale: [3.01791, 3.01791, 3.01791]
         - Entity: 74
@@ -2075,7 +2150,7 @@
           Rotation: [0, 0.590949, 0, 0.806709]
           Scale: [1.59064, 1.59064, 1.59064]
         - Entity: 132
-          Position: [50.1705, 7.00003, 48.8889]
+          Position: [50.1705, 5.46593, 48.8889]
           Rotation: [0, 0.880128, 0, 0.474737]
           Scale: [1.3752, 1.3752, 1.3752]
         - Entity: 133
@@ -2203,7 +2278,7 @@
           Rotation: [0, -0.467715, 0, 0.883879]
           Scale: [2.10591, 2.10591, 2.10591]
         - Entity: 164
-          Position: [-145.128, 42.8902, -9.75177]
+          Position: [-157.037, 33.6817, -35.6272]
           Rotation: [0, 0.722775, 0, 0.691083]
           Scale: [3.01791, 3.01791, 3.01791]
         - Entity: 165
@@ -2347,44 +2422,84 @@
           Rotation: [0, 0.962896, 0, -0.269872]
           Scale: [2.66292, 2.66292, 2.66292]
         - Entity: 200
-          Position: [242.485, 174.425, 250.539]
+          Position: [435.122, -5.86515, 8.77607]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 201
-          Position: [302.264, 103.033, 6.93413]
+          Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 202
+          Position: [284.473, 0.821221, -13.2518]
+          Rotation: [0, 0.880128, 0, 0.474737]
+          Scale: [1.3752, 1.3752, 1.3752]
+        - Entity: 203
+          Position: [292.678, 11.505, -15.163]
+          Rotation: [0, 0.880128, 0, 0.474737]
+          Scale: [1.3752, 1.3752, 1.3752]
+        - Entity: 204
+          Position: [306.412, 0.948151, -5.82738]
+          Rotation: [0, 0.220143, 0, 0.975468]
+          Scale: [0.897817, 0.897817, 0.897817]
+        - Entity: 205
+          Position: [312.733, 9.96977, -7.73607]
+          Rotation: [0, 0.220143, 0, 0.975468]
+          Scale: [0.897817, 0.897817, 0.897817]
+        - Entity: 206
+          Position: [294.418, 2.34409, 7.70589]
+          Rotation: [0, 0.0794487, 0, 0.996839]
+          Scale: [1.3752, 1.3752, 1.3752]
+        - Entity: 207
+          Position: [292.935, 12.8692, 15.9965]
+          Rotation: [0, 0.109974, 0, 0.993934]
+          Scale: [1.3752, 1.3752, 1.3752]
+        - Entity: 208
+          Position: [273.442, 7.00433, 2.21653]
+          Rotation: [0, 0.160478, 0, 0.98704]
+          Scale: [0.947785, 0.947785, 0.947785]
+        - Entity: 209
+          Position: [271.701, 15.2327, 3.68166]
+          Rotation: [0, 0.160478, 0, 0.98704]
+          Scale: [0.947785, 0.947785, 0.947785]
+        - Entity: 210
+          Position: [242.485, 174.425, 250.539]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 211
+          Position: [302.264, 103.033, 6.93413]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 212
           Position: [71.6552, 77.2555, -4.73864]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 203
+        - Entity: 213
           Position: [387.204, 134.983, -306.936]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 204
+        - Entity: 214
           Position: [14.7137, 199.535, -255.65]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 200
+        - Entity: 210
           Attenuation: [0, 0.0150376, 0]
           Color: [1, 1, 0, 1]
           Range: 1000
-        - Entity: 201
+        - Entity: 211
           Attenuation: [0, 0.0150376, 0]
           Color: [0, 1, 1, 1]
           Range: 1000
-        - Entity: 202
+        - Entity: 212
           Attenuation: [0, 0.0150376, 0]
           Color: [1, 1, 0, 1]
           Range: 1000
-        - Entity: 203
+        - Entity: 213
           Attenuation: [0, 0.0150376, 0]
           Color: [1, 1, 0, 1]
           Range: 1000
-        - Entity: 204
+        - Entity: 214
           Attenuation: [0, 0.030303, 0]
           Color: [1, 0, 0, 1]
           Range: 1000
@@ -2414,11 +2529,9 @@
         []
     - Type: 11
       Data:
-        - Entity: 8
-          MeshHandle: IslandTerrainShape0
-        - Entity: 9
-          MeshHandle: GroundPlaneShape0
         - Entity: 10
+          MeshHandle: GroundPlaneShape0
+        - Entity: 11
           MeshHandle: MountainShape0
         - Entity: 12
           MeshHandle: Palm1MeshShape0
@@ -2796,6 +2909,26 @@
           MeshHandle: PalmCrownMeshShape0
         - Entity: 199
           MeshHandle: PalmCrownMeshShape0
+        - Entity: 200
+          MeshHandle: GroundPlaneShape0
+        - Entity: 201
+          MeshHandle: TerrainShape0
+        - Entity: 202
+          MeshHandle: Palm2MeshShape0
+        - Entity: 203
+          MeshHandle: PalmCrownMeshShape0
+        - Entity: 204
+          MeshHandle: Palm4MeshShape0
+        - Entity: 205
+          MeshHandle: PalmCrownMeshShape0
+        - Entity: 206
+          MeshHandle: Palm2MeshShape0
+        - Entity: 207
+          MeshHandle: PalmCrownMeshShape0
+        - Entity: 208
+          MeshHandle: Palm3MeshShape0
+        - Entity: 209
+          MeshHandle: PalmCrownMeshShape0
     - Type: 12
       Data:
         []
@@ -2807,7 +2940,8 @@
         []
     - Type: 15
       Data:
-        []
+        - Entity: 8
+          Name: SmokeAndSparks
     - Type: 16
       Data:
         []
@@ -2955,14 +3089,14 @@
 - Tags:
     []
 - Groups:
-    - Id: 8
-      Group: Painted
-    - Id: 9
-      Group: Painted
     - Id: 10
       Group: Painted
-    - Id: 1
-      Group: SpawnPoint
+    - Id: 11
+      Group: Painted
+    - Id: 201
+      Group: Painted
+    - Id: 8
+      Group: Particle
     - Id: 2
       Group: SpawnPoint
     - Id: 3
@@ -2973,11 +3107,11 @@
       Group: SpawnPoint
     - Id: 6
       Group: SpawnPoint
-    - Id: 8
-      Group: Static
-    - Id: 9
-      Group: Static
+    - Id: 7
+      Group: SpawnPoint
     - Id: 10
+      Group: Static
+    - Id: 11
       Group: Static
     - Id: 12
       Group: Static
@@ -3355,8 +3489,24 @@
       Group: Static
     - Id: 199
       Group: Static
-    - Id: 11
-      Group: Transparent
+    - Id: 201
+      Group: Static
+    - Id: 202
+      Group: Static
+    - Id: 203
+      Group: Static
+    - Id: 204
+      Group: Static
+    - Id: 205
+      Group: Static
+    - Id: 206
+      Group: Static
+    - Id: 207
+      Group: Static
+    - Id: 208
+      Group: Static
+    - Id: 209
+      Group: Static
     - Id: 106
       Group: Transparent
     - Id: 107
@@ -3544,4 +3694,14 @@
     - Id: 198
       Group: Transparent
     - Id: 199
+      Group: Transparent
+    - Id: 200
+      Group: Transparent
+    - Id: 203
+      Group: Transparent
+    - Id: 205
+      Group: Transparent
+    - Id: 207
+      Group: Transparent
+    - Id: 209
       Group: Transparent
