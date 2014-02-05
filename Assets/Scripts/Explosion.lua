@@ -9,7 +9,7 @@ function Explosion.OnCreate (userId, actionId)
 	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetCollisionResponder():GetCollisionPosition(playerEnt);
 	local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
-
+	--Logging.Log(LogLevel.DEBUG_PRINT, "ColPos: ");
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
