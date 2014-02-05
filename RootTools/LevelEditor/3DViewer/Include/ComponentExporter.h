@@ -144,7 +144,14 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			{
 				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
 
-				p_emitter << YAML::Key << "Name" << YAML::Value << particle->m_name;
+				p_emitter << YAML::Key << "File" << YAML::Value << particle->m_name;
+			}
+			break;
+		case RootForce::ComponentType::SHADOWCASTER:
+			{
+				RootForce::Shadowcaster* shadow = static_cast<RootForce::Shadowcaster*>(p_component);
+
+				p_emitter << YAML::Key << "LightSlot" << YAML::Value << shadow->m_directionalLightSlot;
 			}
 			break;
 		default:

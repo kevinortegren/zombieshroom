@@ -50,7 +50,7 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
+		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
 
 
