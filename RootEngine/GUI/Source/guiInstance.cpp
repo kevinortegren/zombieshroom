@@ -257,49 +257,52 @@ namespace RootEngine
 			while(!m_shouldTerminate)
 			{
 				m_loadListMutex.lock();
-				for(auto pair : m_loadList)
-				{
-					pair.first->m_webView = m_core->CreateWebView(m_width, m_height);
+					for(auto pair : m_loadList)
+					{
+						pair.first->m_webView = m_core->CreateWebView(m_width, m_height);
 
-					pair.first->m_webView->SetTransparent(true);
+						pair.first->m_webView->SetTransparent(true);
 
-					pair.first->m_webView->LoadURL(pair.second);
+						pair.first->m_webView->LoadURL(pair.second);
 					
-					m_viewBuffer.push_back(pair.first);
-				}
-				m_loadList.clear();
+						m_viewBuffer.push_back(pair.first);
+					}
+					m_loadList.clear();
 				m_loadListMutex.unlock();
 
 				m_viewBufferMutex.lock();
-				for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-					if(m_viewBuffer[i])
-						m_viewBuffer[i]->Update();
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						if(m_viewBuffer[i])
+							m_viewBuffer[i]->Update();
 				m_viewBufferMutex.unlock();
 
 				m_drawMutex.lock();
-				m_core->Update();
-				for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-					if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
-					{
-						GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
-						if(surface)
-							surface->UpdateTexture(); // Force a texture update
-					}
-				// Wait until texture updates are complete before releasing the lock
-				GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
-				GLenum result; 
-				while(true) 
-				{ 
-					result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
-					if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
-				} 
+					m_core->Update();
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
+						{
+							GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+							if(surface)
+								surface->UpdateTexture(); // Force a texture update
+						}
+					// Wait until texture updates are complete before releasing the lock
+					GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+					GLenum result; 
+					while(true) 
+					{ 
+						result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+						if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
+					} 
 				m_drawMutex.unlock();
 				
 				uint64_t newTime = SDL_GetPerformanceCounter();
 				float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
 				oldTime = newTime;
-				if(dt < 0.16f)
-					Sleep((DWORD)((0.016f-dt)*1000));
+				if(dt < 0.016f)
+				{
+					long time = (long)floorf((0.016f-dt)*1000);
+					Sleep(time);
+				}
 			}
 			SDL_GL_DeleteContext(m_glContext);
 		}
