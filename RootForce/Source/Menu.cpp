@@ -11,20 +11,22 @@ namespace RootForce
 	{
 		m_view = p_view;
 		m_context = p_context;
+		m_settingsMenu = new SettingsMenu(p_context);
 		m_view->WaitLoading();
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &Menu::ExitEvent));
 		m_view->RegisterJSCallback("Host", JSDelegate1(this, &Menu::HostEvent));
 		m_view->RegisterJSCallback("Connect", JSDelegate1(this, &Menu::ConnectEvent));
 		m_view->RegisterJSCallback("Refresh", JSDelegate1(this, &Menu::RefreshEvent));
-		m_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &Menu::RequestSettingsEvent));
-		m_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &Menu::SaveSettingsEvent));
+		
+		m_settingsMenu->BindEvents(p_view);
 
 		m_view->Focus();
 	}
 
 	Menu::~Menu()
 	{
+		delete m_settingsMenu;
 	}
 
 	RootEngine::GUISystem::WebView* RootForce::Menu::GetView()
@@ -128,37 +130,6 @@ namespace RootForce
 	Awesomium::JSValue Menu::GetMapListEvent(const Awesomium::JSArray& p_array)
 	{
 		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
-	}
-	
-	Awesomium::JSValue Menu::RequestSettingsEvent(const Awesomium::JSArray& p_array)
-	{
-		// Get a list of options
-		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
-		Awesomium::JSObject jsArray;
-		for(auto itr = valuePairs.begin(); itr != valuePairs.end(); ++itr)
-			jsArray.SetProperty(Awesomium::WSLit(itr->first.c_str()), Awesomium::WSLit(itr->second.c_str()));
-
-		return Awesomium::JSValue(jsArray);
-	}
-
-	void Menu::SaveSettingsEvent(const Awesomium::JSArray& p_array)
-	{
-		if(!p_array[0].IsObject())
-		{
-			m_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "JavaScript called SaveSettings with a non-object argument.");
-			return;
-		}
-
-		// Parse array, save all values
-		Awesomium::JSObject map = p_array[0].ToObject();
-		Awesomium::JSArray keys = map.GetPropertyNames();
-		for(unsigned i = 0; i < keys.size(); i++)
-			m_context.m_configManager->SetConfigValue(
-				Awesomium::ToString(keys[i].ToString()),
-				Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString())
-			);
-
-		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
 	}
 
 	std::string Menu::GetMapList()

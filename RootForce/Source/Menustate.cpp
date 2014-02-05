@@ -16,7 +16,6 @@ namespace RootForce
 	void MenuState::Initialize(const std::string& p_workingDir)
 	{
 		m_workingDir = p_workingDir;
-
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}

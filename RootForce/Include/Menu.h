@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootForce/Include/SettingsMenu.h>
 
 namespace RootForce
 {
@@ -44,10 +45,10 @@ namespace RootForce
 		void ConnectEvent(const Awesomium::JSArray& p_array);
 		void RefreshEvent(const Awesomium::JSArray& p_array);
 		Awesomium::JSValue GetMapListEvent(const Awesomium::JSArray& p_array);
-		Awesomium::JSValue RequestSettingsEvent(const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(const Awesomium::JSArray& p_array);
 
 		std::string GetMapList();
+		SettingsMenu* m_settingsMenu;
 
 		RootEngine::GUISystem::WebView* m_view;
 		std::vector<MenuEvent::MenuEvent> m_event;

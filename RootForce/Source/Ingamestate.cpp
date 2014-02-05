@@ -174,6 +174,8 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
+
+		
 	}
 
 	void IngameState::Enter()
@@ -194,6 +196,10 @@ namespace RootForce
 		//Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
+
+		//Reset the ingame menu before we start the match
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
+		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
@@ -221,6 +227,8 @@ namespace RootForce
 
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
+
+		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
 
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
@@ -263,12 +271,6 @@ namespace RootForce
 		Transform* debugTransform = nullptr;
 		if (debugEntity != nullptr)
 			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
-
-		// Check for quitting condition
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Menu;
-		}
 
 		// Check for disconnection from the server
 		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
@@ -443,7 +445,8 @@ namespace RootForce
 		
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
+			if(!m_displayIngameMenu)
+				m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -473,7 +476,8 @@ namespace RootForce
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			m_actionSystem->UpdateAimingDevice();
+			if(!m_displayIngameMenu)
+				m_actionSystem->UpdateAimingDevice();
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
@@ -502,10 +506,56 @@ namespace RootForce
 		}
 
 		m_animationSystem->Synch();
+
+		{
+			PROFILE("Rendering", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
+
+		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+		m_sharedSystems.m_matchStateSystem->Process();
 		
+		g_engineContext.m_profiler->Update(p_deltaTime);
+		g_engineContext.m_debugOverlay->RenderOverlay();
+		{
+			PROFILE("GUI", g_engineContext.m_profiler);
+
+			g_engineContext.m_gui->Update();
+			if (m_displayIngameMenu)
+			{
+				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
+				m_ingameMenu->GetView()->Focus();
+			}
+			else
+			{
+				g_engineContext.m_gui->Render(m_hud->GetView());
+				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			}
+		}
+
+
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
+		}
+
+		// Check for quitting condition
+		if (m_ingameMenu->GetExit())
+		{
+			return GameStates::Menu;
+		}
+
+		//Check status for the display of the ingame menu
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_displayIngameMenu = true;
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
+		}
+		if (m_ingameMenu->GetReturn())
+		{
+			m_displayIngameMenu = false;
+			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_ingameMenu->Reset();
 		}
 
 		return GameStates::Ingame;

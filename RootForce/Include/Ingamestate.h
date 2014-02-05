@@ -27,6 +27,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootForce/Include/HUD.h>
+#include <RootForce/Include/IngameMenu.h>
 #include <thread>
 namespace RootForce
 {
@@ -45,8 +46,10 @@ namespace RootForce
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug; 
 		bool m_displayWorldDebug;
+		bool m_displayIngameMenu;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
+		std::shared_ptr<RootForce::IngameMenu> m_ingameMenu;
 
 		// Game systems
 		SharedSystems& m_sharedSystems;
