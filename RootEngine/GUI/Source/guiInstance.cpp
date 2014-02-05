@@ -251,6 +251,8 @@ namespace RootEngine
 			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
 			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
 			m_core->set_surface_factory(m_glTexSurfaceFactory);
+			
+			uint64_t oldTime = SDL_GetPerformanceCounter();
 
 			while(!m_shouldTerminate)
 			{
@@ -292,6 +294,12 @@ namespace RootEngine
 					if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
 				} 
 				m_drawMutex.unlock();
+				
+				uint64_t newTime = SDL_GetPerformanceCounter();
+				float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
+				oldTime = newTime;
+				if(dt < 0.16f)
+					Sleep((DWORD)((0.016f-dt)*1000));
 			}
 			SDL_GL_DeleteContext(m_glContext);
 		}
