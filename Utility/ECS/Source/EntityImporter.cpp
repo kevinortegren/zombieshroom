@@ -75,7 +75,7 @@ void ECS::EntityImporter::Import(const std::string& p_filename)
 			m_world->GetGroupManager()->RegisterEntity(group, entitiesMap[id]);
 		}
 
-		if(doc[4].FindValue("Storage"))
+		if(doc.size() > 4 && doc[4].FindValue("Storage"))
 		{
 			const YAML::Node& storage = doc[4]["Storage"];
 			for(unsigned int j = 0; j < storage.size(); j++)
