@@ -245,11 +245,7 @@ namespace RootForce
 	{				
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
-		
-		{
-			PROFILE("Rendering", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->Render();
-		}
+		g_engineContext.m_renderer->Render();
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

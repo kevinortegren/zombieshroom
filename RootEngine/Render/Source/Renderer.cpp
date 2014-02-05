@@ -384,15 +384,11 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for(int i = 0; i < 2; i++)
+		PROFILE("Geometry Pass", g_context.m_profiler);
 		{
+			for(int i = 0; i < 2; i++)
 			{
-				PROFILE("Geometry Pass", g_context.m_profiler);
 				GeometryPass(i);
-			}
-
-			{
-				PROFILE("Lighting Pass", g_context.m_profiler);
 				LightingPass();	
 			}
 		}
@@ -463,56 +459,23 @@ namespace Render
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[0]);
-		glDrawBuffers(0, NULL);
-		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[0]);
-
-		// Cascade 1.
-		for(int j = 0; j < m_sjobCount[0]; ++j)
+		int offset = 0;
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
-			m_sjobs[j].m_mesh->Bind();
-			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-			m_sjobs[j].m_mesh->Draw();
-			m_sjobs[j].m_mesh->Unbind();
-		}
-	
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[1]);
-		glDrawBuffers(0, NULL);
-		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[1]);
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glDrawBuffers(0, NULL);
 
-		// Cascade 2.
-		for(int j = m_sjobCount[0]; j < m_sjobCount[0] + m_sjobCount[1]; ++j)
-		{
-			m_sjobs[j].m_mesh->Bind();
-			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-			m_sjobs[j].m_mesh->Draw();
-			m_sjobs[j].m_mesh->Unbind();
-		}
+			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[2]);
-		glDrawBuffers(0, NULL);
-		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[2]);
+			for(int j = offset; j < (m_sjobCount[i] + offset); ++j)
+			{
+				m_sjobs[j].m_mesh->Bind();
+				m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
+				m_sjobs[j].m_mesh->Draw();
+				m_sjobs[j].m_mesh->Unbind();
+			}
 
-		// Cascade 3.
-		for(int j = m_sjobCount[1]; j < m_sjobCount[1] + m_sjobCount[2]; ++j)
-		{
-			m_sjobs[j].m_mesh->Bind();
-			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-			m_sjobs[j].m_mesh->Draw();
-			m_sjobs[j].m_mesh->Unbind();
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[3]);
-		glDrawBuffers(0, NULL);
-		m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[3]);
-
-		// Cascade 4.
-		for(int j = m_sjobCount[2]; j < m_sjobCount[2] + m_sjobCount[3]; ++j)
-		{
-			m_sjobs[j].m_mesh->Bind();
-			m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-			m_sjobs[j].m_mesh->Draw();
-			m_sjobs[j].m_mesh->Unbind();
+			offset = m_sjobCount[i];
 		}
 
 		glCullFace(GL_BACK);
