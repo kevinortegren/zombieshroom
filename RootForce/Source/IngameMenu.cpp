@@ -9,7 +9,6 @@ namespace RootForce
 		m_exit = false;
 
 		m_view = p_view;
-		m_context = p_context;
 		m_settingsMenu = new SettingsMenu(p_context);
 		Awesomium::JSValue result = m_view->CreateGlobalJavascriptObject(Awesomium::WSLit("IngameMenu"));
 

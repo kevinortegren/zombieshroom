@@ -24,7 +24,6 @@ namespace RootForce
 
 		SettingsMenu* m_settingsMenu;
 		Awesomium::WebView* m_view;
-		RootEngine::GameSharedContext m_context;
 
 		bool m_return;
 		bool m_exit;
