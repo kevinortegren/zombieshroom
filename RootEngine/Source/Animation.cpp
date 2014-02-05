@@ -82,7 +82,7 @@ namespace RootEngine
 			unsigned int startFrame = 0;
 			double startTime = 0;
 			unsigned int numKeyFrames = m_aiImporter->GetScene()->mAnimations[0]->mChannels[0]->mNumPositionKeys;
-			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of key frames: %d", numKeyFrames);
+			m_logging->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation has %d key frames", numKeyFrames);
 			for (unsigned int keyFrame = 0; keyFrame < numKeyFrames; keyFrame++)
 			{
 				bool tPose = true;
@@ -108,7 +108,7 @@ namespace RootEngine
 				}
 				
 			}
-			m_logging->LogText(LogTag::ANIMATION, LogLevel::DEBUG_PRINT, "Number of animation clips: %d", m_animClips.size());
+			m_logging->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation has %d animation clips", m_animClips.size());
 		}
 
 		AnimClip* Animation::GetAnimClip(unsigned int p_index)

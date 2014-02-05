@@ -20,8 +20,8 @@ namespace RootEngine
 	void MemoryTracker::LogProcessMemoryInfo() 
 	{
 		UpdateMemory();
-		m_logger->LogText("Working set size: %d MiB, %d KiB, %d B", m_memInfo->m_workingSetMiB, m_memInfo->m_workingSetKiB, m_memInfo->m_workingSetB);
-		m_logger->LogText("Peak working set size: %d MiB, %d KiB, %d B", m_memInfo->m_peakSetMiB, m_memInfo->m_peakSetKiB, m_memInfo->m_peakSetB);
+		m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT,  "Working set size: %d MiB, %d KiB, %d B", m_memInfo->m_workingSetMiB, m_memInfo->m_workingSetKiB, m_memInfo->m_workingSetB);
+		m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Peak working set size: %d MiB, %d KiB, %d B", m_memInfo->m_peakSetMiB, m_memInfo->m_peakSetKiB, m_memInfo->m_peakSetB);
 	}
 	MemInfo* MemoryTracker::GetProcessMemInfo()
 	{

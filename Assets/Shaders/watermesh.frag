@@ -12,6 +12,7 @@ uniform sampler2D g_Specular;
 uniform samplerCube g_CubeMap;
 uniform sampler2D g_LA;
 uniform sampler2D g_Normal;
+uniform sampler2D g_Depth;
 
 layout(std140) uniform PerFrame
 {
@@ -41,7 +42,13 @@ void main()
 
 	//Calculate transparent color and refraction
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
-    vec3 refractionColor	= texture(g_LA, screenTexCoord + normalMap.xz * 0.2f).rgb;
+	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.15f, vec2(0.0f), vec2(1.0f));
+	float refractionDepth	= texture(g_Depth, refractedUV).r;
+	vec3 refractionColor;
+	if(refractionDepth > gl_FragCoord.z)
+		refractionColor	= texture(g_LA, refractedUV).rgb;
+	else
+		refractionColor	= texture(g_LA, screenTexCoord).rgb;
 
 	//Reflection calculations
 	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;

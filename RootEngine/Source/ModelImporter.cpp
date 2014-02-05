@@ -29,32 +29,12 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Error parsing scene %s: %s", p_fileName, m_importer->GetErrorString());
 		}
 
-		if(aiscene->HasAnimations())
-		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Scene contains %d animations", aiscene->mNumAnimations);
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Animation 0 duration is %f",(float)aiscene->mAnimations[0]->mDuration);
-			/*for(unsigned int i = 0; i < aiscene->mNumAnimations; i++)
-			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "animation name: '%s'", aiscene->mAnimations[i]->mName.C_Str());
-
-				for(unsigned int j = 0; j < aiscene->mAnimations[i]->mNumChannels; j++)
-				{
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel name: '%s'", aiscene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Channel number of key frames: %d", aiscene->mAnimations[i]->mChannels[j]->mNumPositionKeys);
-				}
-			}*/	
-		}
-		
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load mesh '%s'", fileName);
 		if (aiscene) 
 		{
 			TraverseSceneHierarchy(aiscene, p_fileName);
-
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Successfully loaded mesh '%s'", fileName);
 		}
 		else 
 		{
@@ -65,6 +45,9 @@ namespace RootEngine
 		{
 			m_model->m_animation->SetAiImporter(m_importer);
 			m_model->m_animation->SplitAnimation();
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Model contains %d animations", aiscene->mNumAnimations);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation duration is %f",(float)aiscene->mAnimations[0]->mDuration);
 		}
 
 		return m_model;
@@ -312,8 +295,6 @@ namespace RootEngine
 
 	void ModelImporter::LoadBones( const aiMesh* p_aiMesh )
 	{
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading animation data with %d bones", p_aiMesh->mNumBones);
-
 		RootEngine::RootAnimation::AnimationInterface* animation = new RootEngine::RootAnimation::Animation(m_context->m_logger);
 		m_boneData.resize(p_aiMesh->mNumVertices);
 		//Loop through all the bones in the mesh
@@ -356,7 +337,7 @@ namespace RootEngine
 		}
 
 		m_model->m_animation = animation;
-		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded animation data!");
+		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation contains %d bones", p_aiMesh->mNumBones);
 	}
 
 	std::string ModelImporter::GetNameFromPath( std::string p_path )
