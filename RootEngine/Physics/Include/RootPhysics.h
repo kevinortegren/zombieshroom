@@ -4,6 +4,7 @@
 #include <map>
 #include "KinematicController.h"
 #include "ObjectController.h"
+#include "ShapelessObject.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/Physics/Include/DebugDrawer.h>
@@ -62,7 +63,7 @@ namespace RootEngine
 		struct CustomUserPointer
 		{
 			PhysicsType::PhysicsType m_type;
-			int m_vectorIndex;
+			int m_vectorIndex; //Index in one of the different lists
 			void* m_entity; //My entity
 			std::map<void*, RootForce::CollisionInfo>* m_collisions; //List of all entities collided with since last update and data of the collisions
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
@@ -235,6 +236,7 @@ namespace RootEngine
 			std::vector<CustomUserPointer*> m_userPointer;
 			std::vector<btRigidBody*> m_dynamicObjects;
 			std::vector<ObjectController*> m_externallyControlled;
+			std::vector<ShapelessObject*> m_shapelessObjects;
 			std::vector<KinematicController*> m_playerObjects;
 			float m_dt;
 			bool m_debugDrawEnabled;
