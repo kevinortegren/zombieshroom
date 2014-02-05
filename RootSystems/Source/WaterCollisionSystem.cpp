@@ -40,7 +40,7 @@ namespace RootSystems
 		else //if by the edge of the water, start disturbing at given interval
 			waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
 
-		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
+		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 20.0f )
 		{	//Disturb
 			m_waterSystem->Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower);
 			waterCollider->m_prevPos = transform->m_position;
