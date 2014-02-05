@@ -22,6 +22,8 @@
             slot: 2
           - name: g_CubeMap
             slot: 3
+          - name: g_Depth
+            slot: 10
           - name: g_LA
             slot: 5
       flags:

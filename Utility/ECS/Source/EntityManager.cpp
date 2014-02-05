@@ -62,9 +62,9 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
-	for(int i = 0; i < m_components.size(); ++i)
+	for(unsigned i = 0; i < m_components.size(); ++i)
 	{
-		if(p_entity->m_id < m_components[i].size())
+		if(p_entity->m_id < (int)m_components[i].size())
 		{
 			if(m_components[i][p_entity->m_id] != nullptr)
 			{

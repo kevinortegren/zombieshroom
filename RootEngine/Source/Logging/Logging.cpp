@@ -4,7 +4,7 @@
 #include <iostream>
 
 Logging::Logging()
-	:m_verboseLevel(LogLevel::INIT_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
+	:m_verboseLevel(LogLevel::PINK_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
 	ColorCMD::ConsoleColorInit();
 	SetConsoleTitle(L"RootLog");
@@ -33,6 +33,8 @@ Logging::Logging()
 	m_stringLevelList.push_back("SUCCESS    ");
 	m_stringLevelList.push_back("DEBUG_PRINT");
 	m_stringLevelList.push_back("INIT_PRINT ");
+	m_stringLevelList.push_back("START_PRINT");
+	m_stringLevelList.push_back("PINK_PRINT ");
 	m_stringLevelList.push_back("DATA_PRINT ");
 
 	OpenLogStream();
@@ -87,48 +89,6 @@ std::string Logging::GetTimeString( int p_time )
 }
 
 //////////////////////////////////////////////////////////////////////////
-//FILE LOGGING
-//////////////////////////////////////////////////////////////////////////
-void Logging::LTF(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
-	va_end (args);
-}
-
-void Logging::LTF(std::string p_func, int p_line, const char * p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToFile(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
-	va_end (args);
-}
-
-//////////////////////////////////////////////////////////////////////////
-//CONSOLE LOGGING
-//////////////////////////////////////////////////////////////////////////
-void Logging::LTC(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
-		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
-	va_end (args);
-}
-
-void Logging::LTC(std::string p_func, int p_line,const char * p_format, ...)
-{
-	va_list args;
-	va_start (args, p_format);
-	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-		WriteToConsole(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
-	va_end (args);
-}
-
-//////////////////////////////////////////////////////////////////////////
 //FILE AND CONSOLE LOGGING
 //////////////////////////////////////////////////////////////////////////
 void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
@@ -139,18 +99,6 @@ void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel
 	{
 		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
 		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
-	}
-	va_end (args);
-}
-
-void Logging::LT(std::string p_func, int p_line,const char* p_format, ... )
-{
-	va_list args;
-	va_start (args, p_format);
-	if(m_defaultVerbose <= m_verboseLevel && CheckTag(LogTag::NOTAG))
-	{
-		WriteToConsole(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
-		WriteToFile(p_func, p_line, LogTag::NOTAG, m_defaultVerbose, p_format, args);
 	}
 	va_end (args);
 }
@@ -170,23 +118,6 @@ void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_t
 		WriteToFile(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args);
 	}
 	va_end (args);
-}
-
-//////////////////////////////////////////////////////////////////////////
-//Set verbose level ( defualt is LogLevel::DEBUG_PRINT)
-//////////////////////////////////////////////////////////////////////////
-void Logging::SetVerboseLevel( LogLevel::LogLevel p_vLevel )
-{
-	m_verboseLevel = p_vLevel;
-	LT(__FUNCTION__, __LINE__, LogTag::NOTAG, LogLevel::DEBUG_PRINT, "Verbose level set to %d", (int)p_vLevel);
-}
-
-//////////////////////////////////////////////////////////////////////////
-//Add filters for tags. Only displays those added. No filters as default(show all filters)
-//////////////////////////////////////////////////////////////////////////
-void Logging::AddExclusiveTags( LogTag::LogTag p_tag)
-{
-	m_exTagList.push_back(p_tag);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -247,6 +178,18 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 	case LogLevel::INIT_PRINT:
 		{
 			ColorCMD::SetColor(ColorCMD::ConsoleColor::BLUE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::START_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::AQUA, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::PINK_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::PINK, ColorCMD::defbackcol);
 			std::cout<<"";
 			break;
 		}
