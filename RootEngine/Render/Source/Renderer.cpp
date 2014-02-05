@@ -93,6 +93,7 @@ namespace Render
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 		m_glContext = SDL_GL_CreateContext(p_window);

@@ -191,14 +191,14 @@ namespace RootForce
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		//Initialize the debug, setting the html view
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
 		//Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("ingameMenu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
 		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
@@ -245,21 +245,33 @@ namespace RootForce
 	{				
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
-
-		g_engineContext.m_renderer->Render();
+		
+		{
+			PROFILE("Rendering", g_engineContext.m_profiler);
+			g_engineContext.m_renderer->Render();
+		}
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();
 		
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
-
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);		
+			PROFILE("GUI", g_engineContext.m_profiler);
+
 			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render(m_hud->GetView());
-			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			if (m_displayIngameMenu)
+			{
+				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
+				m_ingameMenu->GetView()->Focus();
+			}
+			else
+			{
+				g_engineContext.m_gui->Render(m_hud->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			}
 		}
+
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
@@ -503,32 +515,6 @@ namespace RootForce
 		}
 
 		m_animationSystem->Synch();
-
-		{
-			PROFILE("Rendering", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->Render();
-		}
-
-		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
-		m_sharedSystems.m_matchStateSystem->Process();
-		
-		g_engineContext.m_profiler->Update(p_deltaTime);
-		g_engineContext.m_debugOverlay->RenderOverlay();
-		{
-			PROFILE("GUI", g_engineContext.m_profiler);
-
-			g_engineContext.m_gui->Update();
-			if (m_displayIngameMenu)
-			{
-				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
-				m_ingameMenu->GetView()->Focus();
-			}
-			else
-			{
-				g_engineContext.m_gui->Render(m_hud->GetView());
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
-			}
-		}
 
 
 		{

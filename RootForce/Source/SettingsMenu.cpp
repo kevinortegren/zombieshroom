@@ -15,7 +15,7 @@ namespace RootForce
 
 	}
 
-	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
 		// Get a list of options
 		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
@@ -26,7 +26,7 @@ namespace RootForce
 		return Awesomium::JSValue(jsArray);
 	}
 
-	void SettingsMenu::SaveSettingsEvent( Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array )
+	void SettingsMenu::SaveSettingsEvent( const Awesomium::JSArray& p_array )
 	{
 		if(!p_array[0].IsObject())
 		{
@@ -52,13 +52,10 @@ namespace RootForce
 		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
 	}
 
-	void SettingsMenu::BindEvents( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, Awesomium::JSValue p_result)
+	void SettingsMenu::BindEvents( RootEngine::GUISystem::WebView* p_view )
 	{
-		if(p_result.IsObject() && p_result.ToObject().type() != Awesomium::kJSObjectType_Local)
-		{
-			p_dispatcher->BindWithRetVal(p_result.ToObject(), Awesomium::WSLit("RequestSettings"), JSDelegateWithRetval(this, &SettingsMenu::RequestSettingsEvent));
-			p_dispatcher->Bind(p_result.ToObject(), Awesomium::WSLit("SaveSettings"), JSDelegate(this, &SettingsMenu::SaveSettingsEvent));
-		}
+		p_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &SettingsMenu::RequestSettingsEvent));
+		p_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &SettingsMenu::SaveSettingsEvent));
 	}
 
 }
