@@ -40,7 +40,6 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
-		RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
 		
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
