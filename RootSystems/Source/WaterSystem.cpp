@@ -5,19 +5,25 @@
 extern RootEngine::GameSharedContext g_engineContext;
 namespace RootForce
 {
+
+	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true)
+	{
+		SetUsage<RootForce::Transform>();
+		SetUsage<RootForce::WaterCollider>();
+	}
+
 	void WaterSystem::Init()
 	{
+		m_transform.Init(m_world->GetEntityManager());
+		m_waterCollider.Init(m_world->GetEntityManager());
+		
 		m_maxX = m_maxZ = 1024;
 		m_scale = 40.0f;
 		m_dt = 0;
 	}
 
 	void WaterSystem::Begin()
-	{
-
-	}
-
-	void WaterSystem::Process()
 	{
 		if(m_pause)//Don't calculate if paused
 			return;
@@ -37,6 +43,42 @@ namespace RootForce
 		}
 	}
 
+	void WaterSystem::ProcessEntity(ECS::Entity* p_entity)
+	{
+		RootForce::Transform*		transform = m_transform.Get(p_entity);
+		RootForce::WaterCollider*	waterCollider = m_waterCollider.Get(p_entity);
+
+		if(m_pause)
+			return;
+
+		float waterHeight = GetWaterHeight();
+
+		//If over water, set edge time to 0 and return
+		if(transform->m_position.y > waterHeight + waterCollider->m_radius)
+		{
+			waterCollider->m_waterState = RootForce::WaterState::WaterState::OVER_WATER;
+			waterCollider->m_edgeWaterTime = 0.0f;
+			return;
+		} //if under water, set edge time to 0 and return
+		else if(transform->m_position.y < waterHeight - waterCollider->m_radius)
+		{
+			waterCollider->m_waterState = RootForce::WaterState::WaterState::UNDER_WATER;
+			waterCollider->m_edgeWaterTime = 0.0f;
+			return;
+		}
+		else //if by the edge of the water, start disturbing at given interval
+			waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
+
+		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 20.0f )
+		{	//Disturb
+			Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower);
+			waterCollider->m_prevPos = transform->m_position;
+			waterCollider->m_edgeWaterTime = waterCollider->m_disturbInterval;
+		}
+		//Decrease edge time
+		waterCollider->m_edgeWaterTime -= m_world->GetDelta();
+	}
+
 	void WaterSystem::End()
 	{
 
@@ -44,22 +86,20 @@ namespace RootForce
 
 	void WaterSystem::CreateWater(float p_height)
 	{
-		//Only one water entity can be created
-		if(m_renderable)
-		{
-			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water entity already created!");
+		//Don't create water if there is no water on the level
+		if(p_height == 0)
 			return;
-		}
+
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");
 
 		//Create empty textures for compute shader swap. Texture 0 and 1 are used for height values and texture 2 is used for normals.
-		m_texture[0] = m_context->m_renderer->CreateTexture();
+		m_texture[0] = m_context->m_resourceManager->CreateTexture("computeTex1");
 		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[0]->SetAccess(GL_READ_WRITE);
-		m_texture[1] = m_context->m_renderer->CreateTexture();
+		m_texture[1] = m_context->m_resourceManager->CreateTexture("computeTex2");
 		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
-		m_texture[2] = m_context->m_renderer->CreateTexture();
+		m_texture[2] = m_context->m_resourceManager->CreateTexture("computeTex3");
 		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
 		m_texture[2]->SetAccess(GL_READ_WRITE);
 
@@ -80,7 +120,7 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
 
 		//Set standard values
-		m_speed		= 10.0f;
+		m_speed		= 11.0f;
 		m_dx		= (m_scale*64.0f) / m_maxZ;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
@@ -101,7 +141,7 @@ namespace RootForce
 
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("water", Render::TextureType::TEXTURE_2D);
+		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
 
 		//Camera position in world space
@@ -134,21 +174,21 @@ namespace RootForce
 
 		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
 		m_computeJob.m_textures[1]->Bind(0);
-		std::vector<float> emptyDataHalf(1, p_power/6.0f);
+		float emptyDataHalf = p_power/6.0f;
 		
 		//glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
 
 
 		m_computeJob.m_textures[1]->Unbind(0);
@@ -254,6 +294,9 @@ namespace RootForce
 		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
 	}
 
-
+	void WaterSystem::SetWaterHeight( float p_height )
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
+	}
 }
 #endif

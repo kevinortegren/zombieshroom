@@ -15,6 +15,7 @@
 #include <RootSystems\Include\ShadowSystem.h>
 //#include <RootSystems\Include\WaterSystem.h>
 
+
 #include <Utility\ECS\Include\World.h>
 
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
@@ -71,11 +72,10 @@ void UpdateCamera(int index);
 void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 void UpdateLight(int index, bool remove, bool firstTimeLoad, string type);
-
+void UpdateLocator(int index);
 
 void ExportToLevel();
 void LoadSceneFromMaya();
-void UpdateParticle(int index);
 
 Render::TextureInterface* painter;
 
@@ -237,8 +237,7 @@ int main(int argc, char* argv[])
 
 					if(type == "Locator")
 					{
-						if(RM.PlocatorList[updateID]->transformation.flags._Particle)
-							UpdateParticle(updateID);
+						UpdateLocator(updateID);
 					}
 				}							
 
@@ -739,11 +738,14 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	return entity;
 }
 
-void UpdateParticle(int index)
+void UpdateLocator(int index)
 {
 	RootForce::Transform* transform =  m_world.GetEntityManager()->GetComponent<RootForce::Transform>(locatorEntities[index]);
-	
+
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
+
+	if(RM.PlocatorList[index]->transformation.flags._Water)
+		m_world.GetStorage()->SetValue("WaterHeight", transform->m_position.y);
 }
 
 void CreateCameraEntity(int index)
@@ -848,6 +850,7 @@ void LoadLocators()
 		if(RM.PlocatorList[i]->transformation.flags._Water)
 		{
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+			m_world.GetStorage()->SetValue("WaterHeight", RM.PlocatorList[i]->transformation.position.y);
 		}
 
 	}

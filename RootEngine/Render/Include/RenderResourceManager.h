@@ -15,7 +15,7 @@ namespace Render
 		RenderResourceManager();
 		~RenderResourceManager();
 
-		void PrintResourceUsage();
+		void PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures);
 
 		// Allocate GPU buffer.
 		BufferInterface* CreateBuffer(GLenum p_type);

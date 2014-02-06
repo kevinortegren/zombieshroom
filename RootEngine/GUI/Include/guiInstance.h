@@ -10,6 +10,10 @@
 #include <SDL2/SDL.h>
 #include "gl_texture_surface.h"
 #include "Dispatcher.h"
+#include "WebView.h"
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 
 #if defined(_WINDLL)
@@ -26,14 +30,14 @@ namespace RootEngine
 		{
 		public:
 			//Sets the window properties to the gui core
-			virtual void Initialize(int p_width, int p_height) = 0;
+			virtual void Initialize(int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext) = 0;
 
 			virtual void Update() = 0;
-			virtual void Render(Awesomium::WebView* p_view) = 0;
+			virtual void Render(WebView* p_view) = 0;
 
 			//loads a single .html file into the view new view and returns the view
-			virtual Awesomium::WebView* LoadURL(std::string p_path) = 0;
-			virtual void DestroyView(Awesomium::WebView* p_view) = 0;
+			virtual WebView* LoadURL(std::string p_callbackObjectName, std::string p_path) = 0;
+			virtual void DestroyView(WebView* p_view) = 0;
 
 			virtual void SetWorkingDir(std::string p_path) = 0;
 
@@ -46,24 +50,29 @@ namespace RootEngine
 		class guiInstance : public GUISystemInterface
 		{
 		public:
+			~guiInstance()
+			{
+				Shutdown();
+			}
 			void Startup();
 			void Shutdown();
 
-			void Initialize(int p_width, int p_height);
+			void Initialize(int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext);
 			void Update();
-			void Render(Awesomium::WebView* p_view);
-			Awesomium::WebView* LoadURL(std::string p_path);
-			void DestroyView(Awesomium::WebView* p_view);
+			void Render(WebView* p_view);
+			WebView* LoadURL(std::string p_callbackObjectName, std::string p_path);
+			void DestroyView(WebView* p_view);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 			void HandleEvents(SDL_Event p_event);
 
 			static guiInstance* GetInstance();
-			Dispatcher* GetDispatcher() { return m_dispatcher; } 
+			Dispatcher* GetDispatcher() { return m_dispatcher; }
 
 		private:
+			void RunThread();
+
 			static guiInstance* s_gui;
 			Awesomium::WebCore* m_core;
-			std::vector<Awesomium::WebView*> m_viewBuffer;
 
 			std::string m_workingDir;
 			int m_width, m_height;
@@ -77,6 +86,16 @@ namespace RootEngine
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
 			Dispatcher* m_dispatcher;
+			
+			std::mutex m_drawMutex;
+			std::mutex m_viewBufferMutex;
+			std::vector<WebViewImpl*> m_viewBuffer;
+			std::mutex m_loadListMutex;
+			std::vector<std::pair<WebViewImpl*,Awesomium::WebURL>> m_loadList;
+			std::atomic_bool m_shouldTerminate;
+			std::thread m_thread;
+			SDL_GLContext m_glContext;
+			SDL_Window* m_window;
 		};
 
 		//Classes used for testing the gui document load

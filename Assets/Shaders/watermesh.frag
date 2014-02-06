@@ -18,6 +18,9 @@ layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
+	mat4 invView;
+	mat4 invProj;
+	mat4 invViewProj;
 };  
 
 layout(std140) uniform PerObject
@@ -26,6 +29,22 @@ layout(std140) uniform PerObject
 	mat4 normalMatrix;
 	vec3 gEyeWorldPos;
 };    
+
+vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
+{
+	if(z == 1)
+	discard;
+  
+	z = z * 2 - 1;
+
+	float x = screenCoord.x * 2 - 1;
+	float y = screenCoord.y * 2 - 1;
+
+	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 sPos = invProj * vProjectedPos;
+
+	return (sPos.xyz / sPos.w);
+}
 
 float Fresnel(float p_dot, float p_fresnelBias, float p_fresnelPow)
 {
@@ -42,13 +61,16 @@ void main()
 
 	//Calculate transparent color and refraction
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
-	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.15f, vec2(0.0f), vec2(1.0f));
+	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.08f, vec2(0.0f), vec2(1.0f));
 	float refractionDepth	= texture(g_Depth, refractedUV).r;
 	vec3 refractionColor;
 	if(refractionDepth > gl_FragCoord.z)
 		refractionColor	= texture(g_LA, refractedUV).rgb;
 	else
+	{
 		refractionColor	= texture(g_LA, screenTexCoord).rgb;
+		refractionDepth = texture(g_Depth, screenTexCoord).r;
+	}
 
 	//Reflection calculations
 	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
@@ -60,16 +82,19 @@ void main()
 	float fresnel	= Fresnel(ndotl, 0.2f, 5.0f);
 
 	//Diffuse water color
-	vec3 diffuseWaterColor  = texture(g_Specular, TexCoord_FS_in).rgb; 
+	vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0f).rgb; 
 
-	//Lerp refraction and reflection color
-	vec3 refracReflect = mix(refractionColor, reflectionColor, fresnel);
+	//Lerp water color and refraction color
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
+	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
 
-	//Lerp water color and refraction+reflection color
-	vec3 finalColor	= mix(refracReflect, diffuseWaterColor, 0.3f);
+	//Water foam calculations
+	//float foamDistFac = clamp(0.05f*vdist, 0.0f, 1.0f);
+	//waterColor = mix(foamWaterColor, waterColor, foamDistFac);
 
 	//Calculate result color
-	vec4 result				= vec4(finalColor, 1.0f);
+	vec4 result				= vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
 
 	//Outputs
 	diffuse					= vec4(0.0f, 0.0f, 0.0f, 0.6f);

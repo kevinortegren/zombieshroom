@@ -19,7 +19,6 @@
 #include <RootSystems/Include/Components.h>
 #include <RootSystems/Include/ConcurrentTest.h>
 #include <RootSystems/Include/WaterSystem.h>
-#include <RootSystems/Include/WaterCollisionSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -27,6 +26,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootForce/Include/HUD.h>
+#include <RootForce/Include/IngameMenu.h>
 #include <thread>
 namespace RootForce
 {
@@ -45,8 +45,10 @@ namespace RootForce
 		bool m_displayNormals;
 		bool m_displayPhysicsDebug; 
 		bool m_displayWorldDebug;
+		bool m_displayIngameMenu;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
+		std::shared_ptr<RootForce::IngameMenu> m_ingameMenu;
 
 		// Game systems
 		SharedSystems& m_sharedSystems;
@@ -68,7 +70,6 @@ namespace RootForce
 		RootSystems::RespawnSystem*						m_respawnSystem;
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
-		RootSystems::WaterCollsionSystem*				m_waterCollisionSystem;
 
 	};
 }

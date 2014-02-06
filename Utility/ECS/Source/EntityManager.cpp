@@ -66,7 +66,7 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	{
 		for(unsigned i = 0; i < m_components.size(); ++i)
 		{
-			if(p_entity->m_id < (int)m_components[i].size())
+			if(p_entity->m_id > -1 && p_entity->m_id < (int)m_components[i].size())
 			{
 				if(m_components[i][p_entity->m_id] != nullptr)
 				{

@@ -11,12 +11,11 @@ namespace RootForce
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
 		// Parse ambient data.
-		//glm::vec3 ambient = m_world->GetStorage()->GetValueAsVec3("Ambient");
-		glm::vec4 ambient = glm::vec4(0.1f);
+		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
+		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
-		CreateSun();
 		CreateSkyBox();
 		CreatePlayerCamera();
 
@@ -179,20 +178,37 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{	
-		ECS::Entity* testCameraEntity = m_world->GetTagManager()->GetEntityByTag("TestCamera");
-		Transform* testCameraTransform = m_world->GetEntityManager()->GetComponent<Transform>(testCameraEntity);
-		testCameraTransform->m_orientation.Yaw(45.0f * m_world->GetDelta());
-
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
-		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_frustum;
+		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
 		
-		m_quadTree.Render(frustrum, m_quadTree.GetRoot());
+		// Cull static geometry.
+		m_quadTree.m_culledEntities.clear();
+		m_quadTree.Cull(frustrum, m_quadTree.GetRoot());
+
+		for(auto itr = m_quadTree.m_culledEntities.begin(); itr != m_quadTree.m_culledEntities.end(); ++itr)
+		{
+			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*itr)]);
+
+			Render::RenderJob job;
+			job.m_mesh = renderable->m_model->m_meshes[0];
+			job.m_material = renderable->m_material;
+			job.m_flags = renderable->m_renderFlags;
+			job.m_renderPass = renderable->m_pass;
+			job.m_params = renderable->m_params;
+
+			m_engineContext->m_renderer->AddRenderJob(job);
+		}
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
 	{
 		m_showDebug = p_value;
+	}
+
+	QuadTree* WorldSystem::GetQuadTree()
+	{
+		return &m_quadTree;
 	}
 }
 

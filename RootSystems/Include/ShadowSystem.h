@@ -4,6 +4,13 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Shadowcaster.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/DataStructures/Quad.h>
+
+#ifndef COMPILE_LEVEL_EDITOR
+
+#define SHADOWSYSTEM_CULL
+//#define SHADOWSYSTEM_DEBUG
+#endif
 
 namespace RootForce
 {
@@ -22,7 +29,7 @@ namespace RootForce
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 
-		void ShadowSystem::SetAABB(const RootForce::AABB& p_worldAABB);
+		void SetQuadTree(QuadTree* p_quadTree);
 
 		ECS::ComponentMapper<Shadowcaster> m_shadowcasters;
 		ECS::ComponentMapper<Transform> m_transforms;
@@ -40,5 +47,7 @@ namespace RootForce
 
 		// World AABB points.
 		glm::vec3 worldCorners[8];
+
+		QuadTree* m_quadTree;
 	};
 }

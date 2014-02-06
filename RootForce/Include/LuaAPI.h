@@ -1392,7 +1392,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
-			(*s)->Health = 0 != luaL_checknumber(p_luaState, 2);
+			(*s)->Health = (int)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int HealthSetIsDead(lua_State* p_luaState)

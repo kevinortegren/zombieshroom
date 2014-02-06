@@ -3,6 +3,8 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Camera.h>
 #include <glm/gtc/swizzle.hpp>
+#include <RootSystems/Include/Shapes/OBB.h>
+#include <RootSystems/Include/RenderingSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -14,16 +16,19 @@ namespace RootForce
 		m_transforms.Init(m_world->GetEntityManager());
 	}
 
-	void ShadowSystem::SetAABB(const RootForce::AABB& p_worldAABB)
+	void ShadowSystem::SetQuadTree(QuadTree* p_quadTree)
 	{
-		worldCorners[0] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_maxY, p_worldAABB.m_maxZ);
-		worldCorners[1] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_minY, p_worldAABB.m_maxZ);
-		worldCorners[2] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_maxY, p_worldAABB.m_minZ);
-		worldCorners[3] = glm::vec3(p_worldAABB.m_maxX, p_worldAABB.m_minY, p_worldAABB.m_minZ);
-		worldCorners[4] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_maxY, p_worldAABB.m_maxZ);
-		worldCorners[5] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_minY, p_worldAABB.m_maxZ);
-		worldCorners[6] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_maxY, p_worldAABB.m_minZ);
-		worldCorners[7] = glm::vec3(p_worldAABB.m_minX, p_worldAABB.m_minY, p_worldAABB.m_minZ);
+		m_quadTree = p_quadTree;
+
+		// Store world corners from root AABB.
+		worldCorners[0] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_maxX, p_quadTree->GetRoot()->GetBounds().m_maxY, p_quadTree->GetRoot()->GetBounds().m_maxZ);
+		worldCorners[1] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_maxX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_maxZ);
+		worldCorners[2] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_maxX, p_quadTree->GetRoot()->GetBounds().m_maxY, p_quadTree->GetRoot()->GetBounds().m_minZ);
+		worldCorners[3] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_maxX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_minZ);
+		worldCorners[4] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_maxY, p_quadTree->GetRoot()->GetBounds().m_maxZ);
+		worldCorners[5] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_maxZ);
+		worldCorners[6] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_maxY, p_quadTree->GetRoot()->GetBounds().m_minZ);
+		worldCorners[7] = glm::vec3(p_quadTree->GetRoot()->GetBounds().m_minX, p_quadTree->GetRoot()->GetBounds().m_minY, p_quadTree->GetRoot()->GetBounds().m_minZ);
 	}
 
 	void ShadowSystem::Begin()
@@ -126,6 +131,18 @@ namespace RootForce
 		_far[2] = _near[3];
 		_far[3] = camera->m_frustum.m_far;
 
+		static glm::vec4 localOBB[8] = 
+		{
+			glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f),
+			glm::vec4(1.0f, -1.0f, -1.0f, 1.0f),
+			glm::vec4(1.0f, 1.0f, -1.0f, 1.0f),
+			glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+			glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+			glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f),
+			glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f),
+			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f)
+		};
+
 		// Create cascades.
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
@@ -149,9 +166,63 @@ namespace RootForce
 			
 			sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
+			sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
 		}
 
 		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
+
+		// Cull quad tree with orthographic projection obb.
+		std::vector<glm::vec4> points;
+		points.resize(8);
+
+		glm::vec3 colors[4];
+		colors[0] = glm::vec3(1,0,0);
+		colors[1] = glm::vec3(0,1,0);
+		colors[2] = glm::vec3(0,0,1);
+		colors[3] = glm::vec3(0,1,1);
+
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+#ifdef SHADOWSYSTEM_CULL
+			glm::mat4 invViewProj = glm::inverse(sc.m_viewMatrices[i]) * glm::inverse(sc.m_projectionMatrices[i]);
+
+#ifdef SHADOWSYSTEM_DEBUG
+			OBB obb = OBB(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, invViewProj);
+			obb.DebugDraw(g_engineContext.m_renderer, colors[i], glm::mat4(1.0f));
+#endif
+			for(int j = 0; j < 8; ++j)
+			{
+				points[j] = invViewProj * localOBB[j];
+			}
+
+			m_quadTree->m_culledEntities.clear();
+			m_quadTree->Cull(points, m_quadTree->GetRoot());
+
+			std::vector<Render::ShadowJob> jobs;
+			for(auto itr = m_quadTree->m_culledEntities.begin(); itr != m_quadTree->m_culledEntities.end(); ++itr)
+			{
+				Render::ShadowJob job;
+				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_model->m_meshes[0];
+				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_material->m_effect;
+				jobs.push_back(std::move(job));
+			}
+
+			g_engineContext.m_renderer->AddShadowJob(jobs, i);
+#else
+#ifndef COMPILE_LEVEL_EDITOR
+			std::vector<Render::ShadowJob> jobs;
+			for(auto itr = m_quadTree->m_entities.begin(); itr != m_quadTree->m_entities.end(); ++itr)
+			{
+				Render::ShadowJob job;
+				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_model->m_meshes[0];
+				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_material->m_effect;
+				jobs.push_back(std::move(job));
+			}
+
+			g_engineContext.m_renderer->AddShadowJob(jobs, i);
+#endif
+#endif
+		}
 	}
 
 	void ShadowSystem::End()
