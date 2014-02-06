@@ -1,5 +1,6 @@
 #include "SettingsMenu.h"
 #include <SDL2/SDL.h>
+#include <RootEngine/Include/Logging/Logging.h>
 namespace RootForce
 {
 
@@ -30,7 +31,7 @@ namespace RootForce
 	{
 		if(!p_array[0].IsObject())
 		{
-			//m_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "JavaScript called SaveSettings with a non-object argument.");
+			m_context.m_logger->LogText(LogTag::GUI, LogLevel::WARNING, "JavaScript called SaveSettings with a non-object argument.");
 			return;
 		}
 
