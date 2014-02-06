@@ -21,7 +21,8 @@ KinematicController::~KinematicController( void )
 }
 void KinematicController::RemovePlayer()
 {
-	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+	if(m_activated)
+		m_dynamicWorld->removeCollisionObject(m_ghostObject);
 	delete m_motionState;
 	delete m_ghostObject->getCollisionShape();
 	delete m_ghostObject;

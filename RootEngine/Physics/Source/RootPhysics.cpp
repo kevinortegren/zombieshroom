@@ -149,6 +149,7 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
+		if(m_debugDrawEnabled == false)
 		m_dynamicWorld->stepSimulation(m_dt,4);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
@@ -165,25 +166,36 @@ namespace Physics
 			return;
 
 		CustomUserPointer* userPointer = m_userPointer.at(p_objectHandle);
-		if(userPointer->m_type == PhysicsType::TYPE_PLAYER)
+		if(userPointer->m_type == PhysicsType::TYPE_PLAYER || userPointer->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
+			//Player object
 			unsigned int removedIndex = userPointer->m_vectorIndex;
 			m_playerObjects.at(removedIndex)->RemovePlayer();
 			delete m_playerObjects.at(removedIndex);
 			m_playerObjects.erase(m_playerObjects.begin() + removedIndex);
-
+			//Ragdoll
+			removedIndex = userPointer->m_ragdollIndex;
+			if(removedIndex != -1)
+			{
+				m_ragdolls.at(removedIndex)->RemoveBodies();
+				delete m_ragdolls.at(removedIndex);
+				m_ragdolls.erase(m_ragdolls.begin() + removedIndex);
+			}
 			delete userPointer;
 			m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
 		
 			for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 			{
 				m_userPointer.at(i)->m_id[0] --;
-				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER)
+				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER ||m_userPointer.at(i)->m_type == PhysicsType::TYPE_RAGDOLL)
 				{
-					
 						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_ragdollIndex != -1)
+							m_userPointer.at(i)->m_ragdollIndex--;
 				}
+				
 			}
+			
 
 		}
 		else
@@ -1299,11 +1311,11 @@ namespace Physics
 			
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
-		/*	x = trans.getRotation().w();
+			x = trans.getRotation().w();
 			y = trans.getRotation().x();
 			z = trans.getRotation().y();
 			w = trans.getRotation().z();
-			trans.setRotation(btQuaternion(x,y,z,w));*/
+			trans.setRotation(btQuaternion(x,y,z,w));
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
