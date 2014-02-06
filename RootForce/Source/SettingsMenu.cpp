@@ -1,5 +1,5 @@
 #include "SettingsMenu.h"
-#include <RootEngine/Render/Include/Renderer.h>
+#include <SDL2/SDL.h>
 namespace RootForce
 {
 
@@ -7,7 +7,7 @@ namespace RootForce
 	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context )
 	{
 		m_context = p_context;
-		m_window = m_context.m_renderer->GetWindow();
+		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
 	}
 
 	SettingsMenu::~SettingsMenu()
@@ -41,7 +41,7 @@ namespace RootForce
 		{
 			if(Awesomium::ToString(keys[i].ToString()).compare("settings-fullscreen") == 0)
 			{
-				SDL_SetWindowFullscreen(m_window, Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()).compare("on") == 0 ? SDL_TRUE : SDL_FALSE);
+				m_fullscreen = Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()).compare("true") == 0 ? true : false;
 			}
 			m_context.m_configManager->SetConfigValue(
 				Awesomium::ToString(keys[i].ToString()),
@@ -56,6 +56,12 @@ namespace RootForce
 	{
 		p_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &SettingsMenu::RequestSettingsEvent));
 		p_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &SettingsMenu::SaveSettingsEvent));
+	}
+
+	void SettingsMenu::Update()
+	{
+		//Must be called from the main thread
+		SDL_SetWindowFullscreen(SDL_GL_GetCurrentWindow(), m_fullscreen);
 	}
 
 }

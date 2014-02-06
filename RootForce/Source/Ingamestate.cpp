@@ -257,6 +257,9 @@ namespace RootForce
 			{
 				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
 				m_ingameMenu->GetView()->Focus();
+
+				//Update Menu to make sure Setting changes are made in the main thread
+				m_ingameMenu->Update();
 			}
 			else
 			{
@@ -510,7 +513,7 @@ namespace RootForce
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
-		}
+		}	
 
 		// Check for quitting condition
 		if (m_ingameMenu->GetExit())
