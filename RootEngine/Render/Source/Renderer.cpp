@@ -416,6 +416,11 @@ namespace Render
 			Output();
 		}
 
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
+		}
+
 		m_allocator.Clear();
 		m_jobs.clear();
 		m_sjobs.clear();
