@@ -319,10 +319,12 @@ namespace RootEngine
 			m_width = p_width;
 			m_height = p_height;
 
-			m_viewBufferMutex.lock();
-			for(auto view : m_viewBuffer )
-				view->m_webView->Resize(p_width, p_height);
-			m_viewBufferMutex.unlock();
+			m_drawMutex.lock();
+				m_viewBufferMutex.lock();
+					for(auto view : m_viewBuffer )
+						view->m_webView->Resize(p_width, p_height);
+				m_viewBufferMutex.unlock();
+			m_drawMutex.unlock();
 		}
 
 		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)

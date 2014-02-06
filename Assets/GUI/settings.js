@@ -33,6 +33,7 @@ $(document).ready(function() {
         eval(settings[key]).forEach(function(resolution) {
           $("#settings-resolution").append("<option value='"+resolution+"'>"+resolution+"</option>");
         });
+        $("#settings-resolution").val(settings["settings-resolution"]);
       }
       else
         $("#"+key).val(settings[key]);

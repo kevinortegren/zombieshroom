@@ -85,9 +85,12 @@ namespace RootForce
 		{
 			throw std::runtime_error("Failed to create window");
 		}
-		SDL_SetWindowFullscreen(m_window.get(), g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"));
+		
+		
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);
 
 		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
 		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
@@ -98,7 +101,7 @@ namespace RootForce
 		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize GUI
-		g_engineContext.m_gui->Initialize(width, height, m_window.get(), guiContext);
+		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), m_window.get(), guiContext);
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));

@@ -15,7 +15,7 @@ namespace RootForce
 		int splitPos = resolutionString.find('x');
 		m_screenWidth = std::stoi(resolutionString.substr(0, splitPos));
 		m_screenHeight = std::stoi(resolutionString.substr(splitPos+1));
-		m_shouldUpdate = false;
+		m_shouldUpdate = true;
 	}
 
 	SettingsMenu::~SettingsMenu()
@@ -91,10 +91,9 @@ namespace RootForce
 		if(m_shouldUpdate)
 		{
 			//Must be called from the main thread
-			SDL_SetWindowFullscreen(SDL_GL_GetCurrentWindow(), false);  //Force disable fullscreen to get the correct resolution setting
-			m_context.m_renderer->SetResolution(m_screenWidth, m_screenHeight);
-			m_context.m_gui->ResizeAllViews(m_screenWidth, m_screenHeight);
-			SDL_SetWindowFullscreen(SDL_GL_GetCurrentWindow(), m_fullscreen);
+			//SDL_SetWindowFullscreen(SDL_GL_GetCurrentWindow(), false);  //Force disable fullscreen to get the correct resolution setting
+			m_context.m_renderer->SetResolution(m_fullscreen, m_screenWidth, m_screenHeight);
+			m_context.m_gui->ResizeAllViews(m_context.m_renderer->GetWidth(), m_context.m_renderer->GetHeight());
 			m_shouldUpdate = false;
 		}
 	}

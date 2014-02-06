@@ -120,5 +120,7 @@ namespace Render
 		CreateTextures(p_width, p_height);
 
 		UnbindTextures();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
