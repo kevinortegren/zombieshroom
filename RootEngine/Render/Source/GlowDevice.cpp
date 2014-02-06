@@ -5,6 +5,16 @@
 
 namespace Render
 {
+	struct BufferData
+		{
+			int halfWidth;
+			int halfHeight;
+			float blurFactor;
+			float blurStrength;
+			float blurRadius;
+
+		};
+
 	GlowDevice::~GlowDevice()
 	{
 		glDeleteFramebuffers(1, &m_glowFramebuffer);
@@ -26,16 +36,8 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		struct
-		{
-			int halfWidth;
-			int halfHeight;
-			float blurFactor;
-			float blurStrength;
-			float blurRadius;
-
-		} data;
-
+		
+		BufferData data;
 		data.halfWidth = p_width / 2;
 		data.halfHeight = p_height / 2;
 		data.blurRadius = 1.0f;
@@ -78,7 +80,24 @@ namespace Render
 
 	void GlowDevice::Resize(int p_width, int p_height)
 	{
-		//TODO: Resize.
+		m_width = p_width;
+		m_height = p_height;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
+
+		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		BufferData data;
+		data.halfWidth = p_width / 2;
+		data.halfHeight = p_height / 2;
+		data.blurRadius = 1.0f;
+		data.blurFactor = 9.0f;
+		data.blurStrength = 0.2f;
+
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
 	}
 
 	void SetGlowFactor(float p_factor)
