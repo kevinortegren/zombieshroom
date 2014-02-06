@@ -15,7 +15,7 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
-
+	
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
@@ -60,7 +60,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
-
+		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then

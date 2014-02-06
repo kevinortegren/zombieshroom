@@ -13,7 +13,10 @@ namespace RootForce
 		, m_sharedSystems(p_sharedSystems)
 	{	
 		ComponentType::Initialize();
-
+		
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
@@ -38,6 +41,8 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
+
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -54,6 +59,7 @@ namespace RootForce
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
+		g_engineContext.m_resourceManager->LoadScript("Explosion");
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
@@ -143,6 +149,10 @@ namespace RootForce
 
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
+
+		//Initialize Ragdoll system
+		m_ragdollSystem = new RootForce::RagdollSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::RagdollSystem>(m_ragdollSystem);
 
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
@@ -391,7 +401,7 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-		
+
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			m_actionSystem->Process();
@@ -404,8 +414,16 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
+
+
+		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
+
 			m_physicsTransformCorrectionSystem->Process();
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();

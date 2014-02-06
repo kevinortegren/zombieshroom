@@ -23,14 +23,17 @@ namespace Physics
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
 			CustomUserPointer* ptr = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
-			if (ptr->m_type == PhysicsType::TYPE_STATIC)
+			if (ptr != nullptr)
 			{
-				return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+				
+				if (ptr->m_type == PhysicsType::TYPE_STATIC)
+				{
+					return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
+				}
 			}
-			else
-			{
-				return 1.0f;
-			}
+				
+			return 1.0f;
+				
 		}
 	};
 
@@ -78,35 +81,7 @@ namespace Physics
 	void RootPhysics::Shutdown()
 	{
 		//Magic loop of deleting, might not work with ghostobjects(players). Check this before release.
-		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
-		{
-			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			if (body && body->getMotionState())
-			{
-				delete body->getMotionState();
-			}
-			if(body && body->getCollisionShape())
-			{
-				btCollisionShape* temp = body->getCollisionShape();
-				delete temp;
-			}
-			m_dynamicWorld->removeCollisionObject( obj );
-			delete obj;
-		}
-		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
-		{
-			KinematicController* temp = m_playerObjects[i];
-			delete temp;
-		}
-		for(unsigned int i = 0; i < m_userPointer.size(); i++)
-		{
-			CustomUserPointer* temp = m_userPointer[i];
-			delete temp;
-		}
-		m_dynamicObjects.clear();
-		m_playerObjects.clear();
-		m_userPointer.clear();
+		RemoveAll();
 		delete m_debugDrawer;
 		delete m_dynamicWorld;
 		delete m_solver;
@@ -123,7 +98,6 @@ namespace Physics
 
 		CustomUserPointer* pointer1 = (CustomUserPointer*)(p_obj1->getCollisionObject()->getUserPointer());
 		CustomUserPointer* pointer2 = (CustomUserPointer*)(p_obj2->getCollisionObject()->getUserPointer());
-		
 		if(pointer1 == nullptr|| pointer1->m_id == nullptr)
 			return false;
 		if(pointer2 == nullptr || pointer2->m_id == nullptr)
@@ -176,12 +150,12 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		
 		m_debugDrawer = new DebugDrawer();
-		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints | btIDebugDraw::DBG_DrawAabb);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints /*| btIDebugDraw::DBG_DrawAabb*/ |btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
 		m_dynamicWorld->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
-		
+		m_dynamicWorld->getSolverInfo().m_numIterations = 20;
 		//m_dynamicWorld->getSolverInfo().m_numIterations = 4;
 		//btSetDebugDrawer(m_debugDrawer);
 
@@ -257,6 +231,11 @@ namespace Physics
 
 	void RootPhysics::RemoveAll()
 	{
+		for(unsigned int i = 0; i < m_ragdolls.size(); i++)
+		{
+			Ragdoll::Ragdoll* temp = m_ragdolls[i];
+			delete temp;
+		}
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
 		{
 			btCollisionObject* obj = m_dynamicWorld->getCollisionObjectArray()[i];
@@ -283,6 +262,7 @@ namespace Physics
 			CustomUserPointer* temp = m_userPointer[i];
 			delete temp;
 		}
+		m_ragdolls.clear();
 		m_dynamicObjects.clear();
 		m_playerObjects.clear();
 		m_userPointer.clear();
@@ -493,7 +473,7 @@ namespace Physics
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 			m_dynamicWorld->addRigidBody(body);
@@ -536,6 +516,16 @@ namespace Physics
 		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
 	}
+	void RootPhysics::BindNoShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation )
+	{
+		ShapelessObject* object = new ShapelessObject();
+		object->SetPos(p_position);
+		object->SetOrientation(p_rotation);
+
+		m_shapelessObjects.push_back(object);
+		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_shapelessObjects.size()-1;
+	}
+
 	//Creates an impassable plane
 	void RootPhysics::CreatePlane(glm::vec3 p_normal, glm::vec3 p_position)
 	{
@@ -748,10 +738,8 @@ namespace Physics
 	{
 		PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_modelHandle);
 		KinematicController* player = new KinematicController();
-		
 		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
 			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
-
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex =  m_playerObjects.size()-1;
@@ -968,9 +956,20 @@ namespace Physics
 			retVal[1] = temp.getY();
 			retVal[2] = temp.getZ();		
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			unsigned int indexrag = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			temp = m_ragdolls[indexrag]->GetPos();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();
+			 
+		}
 		else
 		{
 			retVal = m_externallyControlled.at(index)->GetPos();
+			
+			
 		}
 		
 		
@@ -1049,6 +1048,16 @@ namespace Physics
 			retVal[2] = transform.getRotation().z();
 			retVal[3] = transform.getRotation().w();
 		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			btQuaternion temp = m_ragdolls.at(index)->GetOrientation();
+			retVal[0] = temp.w();
+			retVal[1] = temp.x();
+			retVal[2] = temp.y();
+			retVal[3] = temp.z();
+			//return glm::quat(0,0,0,1);
+		}
 		else //Todo: return externallycontrolled orientation if needed.
 		{
 			return glm::quat(0,0,0,1);
@@ -1111,7 +1120,7 @@ namespace Physics
 
 			return glm::vec3(temp[0], temp[1], temp[2]);
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
@@ -1142,7 +1151,7 @@ namespace Physics
 			
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->Move(p_velocity, m_dynamicWorld);
 		}
@@ -1171,9 +1180,14 @@ namespace Physics
 			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 			
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation);
+		}
+		else
+		{
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
 		}
 	}
 
@@ -1286,9 +1300,15 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetPosition(temp);
 		}
-		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			/*m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			m_playerObjects.at(index)->SetPosition(temp);*/
+			
 		}
 	}
 
@@ -1305,6 +1325,90 @@ namespace Physics
 		return false;
 	}
 
+	void RootPhysics::BuildRagdoll( int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20])
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(indexplayer)->Deactivate();
+		if(index  != -1)
+		{
+			
+			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			//float x,y,z,w;
+		/*	x = trans.getRotation().w();
+			y = trans.getRotation().x();
+			z = trans.getRotation().y();
+			w = trans.getRotation().z();
+			trans.setRotation(btQuaternion(x,y,z,w));*/
+			float data[16];
+			glm::mat4 matrix;
+			trans.getOpenGLMatrix(data);
+			matrix = glm::make_mat4(data);
+			//If ragdoll already exists just update positions and start ragdolling
+			m_ragdolls.at(index)->Activate(p_bones, matrix);
+			
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+		}
+		else //First time, build the shapes, bodies and constraints
+		{
+			
+			
+			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
+			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
+			float x,y,z,w;
+			x = trans.getRotation().w();
+			y = trans.getRotation().x();
+			z = trans.getRotation().y();
+			w = trans.getRotation().z();
+			trans.setRotation(btQuaternion(x,y,z,w));
+			
+			float data[16];
+			glm::mat4 matrix;
+			trans.getOpenGLMatrix(data);
+			matrix = glm::make_mat4(data);
+			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, matrix, p_boneOffset);
+			//skape ragdoll fanskapet
+			m_ragdolls.push_back(ragdoll);
+			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+			
+		}
+		
+		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
+	}
+
+	glm::mat4* RootPhysics::GetBones( int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return nullptr;
+		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		if(index  != -1)
+		{
+			return m_ragdolls.at(index)->GetBones();
+		}
+		else
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll %d", p_objectHandle);
+		}
+		return nullptr;
+	}
+
+	void RootPhysics::DeactivateRagdoll( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		int index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		if(index != -1)
+		{
+			m_ragdolls.at(index)->Deactivate();
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			int playerIndex = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			m_playerObjects.at(playerIndex)->Activate();
+		}
+	}
 
 	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
 	{
@@ -1322,6 +1426,7 @@ namespace Physics
 		glm::vec3 end = glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+
 	}
 
 	void RootPhysics::RadiusCheck( int p_objectHandle, glm::vec3 p_pos, float p_radius )
