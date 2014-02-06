@@ -13,17 +13,17 @@ namespace RootForce
 		: m_minX(p_minX), m_maxX(p_maxX), m_minY(p_minY), m_maxY(p_maxY), m_minZ(p_minZ), m_maxZ(p_maxZ)
 	{}
 
-	int AABB::GetLengthX( void ) const
+	float AABB::GetLengthX( void ) const
 	{
 		return (int)abs( m_maxX -  m_minX ); 
 	}
 
-	int AABB::GetLengthY( void ) const
+	float AABB::GetLengthY( void ) const
 	{
 		return (int)abs(  m_maxY -  m_minY ); 
 	}
 
-	int AABB::GetLengthZ( void ) const
+	float AABB::GetLengthZ( void ) const
 	{
 		return (int)abs(  m_maxZ -  m_minZ ); 
 	}
@@ -64,6 +64,11 @@ namespace RootForce
 		{
 			m_minZ = p_expansion.z;
 		}
+	}
+
+	bool AABB::Collide(const AABB& p_aabb)
+	{
+		return false;
 	}
 
 	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const

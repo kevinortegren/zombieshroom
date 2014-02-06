@@ -21,12 +21,13 @@ The above copyright notice and this permission notice shall be included in all
 
 #include "Dispatcher.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <Awesomium/STLHelpers.h>
 namespace RootEngine
 {
 	namespace GUISystem
 	{
 		extern RootEngine::SubsystemSharedContext g_context;
-		void RootEngine::GUISystem::Dispatcher::Bind( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegate p_callback )
+		void RootEngine::GUISystem::Dispatcher::Bind( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegate1 p_callback )
 		{
 			// We can't bind methods to local JSObjects
 			if (p_object.type() == Awesomium::kJSObjectType_Local)
@@ -41,7 +42,7 @@ namespace RootEngine
 			m_boundMethods[key] = p_callback;
 		}
 
-		void RootEngine::GUISystem::Dispatcher::BindWithRetVal( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegateWithRetval p_callback )
+		void RootEngine::GUISystem::Dispatcher::BindWithRetVal( Awesomium::JSObject& p_object, const Awesomium::WebString& p_name, JSDelegate1WithRetval p_callback )
 		{
 			// We can't bind methods to local JSObjects
 			if (p_object.type() == Awesomium::kJSObjectType_Local)
@@ -59,12 +60,12 @@ namespace RootEngine
 		void RootEngine::GUISystem::Dispatcher::OnMethodCall( Awesomium::WebView* caller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
 		{
 			// Find the method that matches the object id + method name
-			std::map<ObjectMethodKey, JSDelegate>::iterator i =
+			std::map<ObjectMethodKey, JSDelegate1>::iterator i =
 				m_boundMethods.find(ObjectMethodKey(remote_object_id, method_name));
 
 			// Call the method
 			if (i != m_boundMethods.end())
-				i->second(caller, args);
+				i->second(args);
 			else
 			{
 				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Callback method not found: %s", method_name);
@@ -76,12 +77,12 @@ namespace RootEngine
 		{
 
 			// Find the method that matches the object id + method name
-			std::map<ObjectMethodKey, JSDelegateWithRetval>::iterator i =
+			std::map<ObjectMethodKey, JSDelegate1WithRetval>::iterator i =
 				m_boundMethodsWithRetVal.find(ObjectMethodKey(remote_object_id, method_name));
 
 			// Call the method
 			if (i != m_boundMethodsWithRetVal.end())
-				return i->second(caller, args);
+				return i->second(args);
 			else
 			{
 				g_context.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Callback method not found: %s", method_name);

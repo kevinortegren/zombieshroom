@@ -1,4 +1,5 @@
 #include <RootEngine/Include/Profiling.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootEngine
 {
@@ -29,6 +30,14 @@ namespace RootEngine
 		m_ouputList.push_back("<div style='text-align: left; display: inline-block;'>");
 
 		std::string output	= "FPS: " + std::to_string(m_frames);
+		m_ouputList.push_back(output);
+
+		int bufferUsage, textureUsage, numBuffers, numTextures;
+		m_renderer->GetResourceUsage(bufferUsage, textureUsage, numBuffers, numTextures);
+
+		output = "Buffers (" + std::to_string(numBuffers) + ") : " + std::to_string(bufferUsage) + "Kb ";
+		m_ouputList.push_back(output);
+		output = "Textures (" + std::to_string(numTextures) + ") : " + std::to_string(textureUsage) + "Kb ";
 		m_ouputList.push_back(output);
 		output = "Working set memory: " + std::to_string(memInfo->m_workingSetMiB) + "MB  " + std::to_string(memInfo->m_workingSetKiB) + "KB  " + std::to_string(memInfo->m_workingSetB) + "B";
 		m_ouputList.push_back(output);
@@ -110,6 +119,10 @@ namespace RootEngine
 	void Profiling::SetMemoryTracker( MemoryTracker* p_memTracker )
 	{
 		m_memTracker = p_memTracker;
+	}
+	void Profiling::SetRenderInterface(Render::RendererInterface* p_renderer)
+	{
+		m_renderer = p_renderer;
 	}
 #ifndef COMPILE_LEVEL_EDITOR
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )

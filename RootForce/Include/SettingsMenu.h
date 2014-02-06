@@ -2,6 +2,7 @@
 #include <Awesomium/WebCore.h>
 #include <Awesomium/STLHelpers.h>
 #include <RootEngine/GUI/Include/Dispatcher.h>
+#include <RootEngine/GUI/Include/WebView.h>
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -14,10 +15,10 @@ namespace RootForce
 	public:
 		SettingsMenu(RootEngine::GameSharedContext p_context);
 		~SettingsMenu();
-		void BindEvents(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, Awesomium::JSValue p_result);
+		void BindEvents(RootEngine::GUISystem::WebView* p_view);
 	private:
-		Awesomium::JSValue RequestSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
-		void SaveSettingsEvent(Awesomium::WebView* p_caller, const Awesomium::JSArray& p_array);
+		Awesomium::JSValue RequestSettingsEvent(const Awesomium::JSArray& p_array);
+		void SaveSettingsEvent(const Awesomium::JSArray& p_array);
 
 
 		RootEngine::GameSharedContext m_context;

@@ -14,12 +14,12 @@ namespace RootEngine
 	{
 	}
 
-	Awesomium::WebView* DebugOverlay::GetView()
+	RootEngine::GUISystem::WebView* DebugOverlay::GetView()
 	{
 		return m_view;
 	}
 
-	void DebugOverlay::SetView(Awesomium::WebView* p_view)
+	void DebugOverlay::SetView(RootEngine::GUISystem::WebView* p_view)
 	{
 		m_view = p_view;
 	}
@@ -65,12 +65,12 @@ namespace RootEngine
 		command = "AddHTML(\"";
 		command += m_leftOverlay;
 		command += "\",true);";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
+		m_view->BufferJavascript(command);
 
 		command = "AddHTML(\"";
 		command += m_rightOverlay;
 		command += "\",false);";
-		m_view->ExecuteJavascript(Awesomium::WSLit(command.c_str()), Awesomium::WSLit(""));
+		m_view->BufferJavascript(command);
 
 		m_leftOverlay = "";
 		m_rightOverlay = "";
