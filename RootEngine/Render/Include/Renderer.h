@@ -67,7 +67,7 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void Swap() = 0;
 		virtual void DisplayNormals(bool p_display) = 0;
-		virtual void SetRenderToTexture(RenderToTexture* p_renderToTexture) = 0;
+		virtual void SetRenderToTexture(RenderToTextureInterface* p_renderToTexture) = 0;
 
 		// Resource Management.
 		virtual void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures) = 0;
@@ -79,7 +79,7 @@ namespace Render
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
-		virtual RenderToTexture* CreateRenderToTexture() = 0;
+		virtual RenderToTextureInterface* CreateRenderToTexture() = 0;
 		virtual std::string GetStringFromMaterial(Material* p_material) = 0;
 
 		// Particle systems.
@@ -127,8 +127,8 @@ namespace Render
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
 		void Swap();
-		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
-		void SetRenderToTexture(RenderToTexture* p_renderToTexture);
+		void DisplayNormals(bool p_display) { m_displayNormals = p_display;  }
+		void SetRenderToTexture(RenderToTextureInterface* p_renderToTexture);
 		
 		// Resource Management.
 		void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures);
@@ -140,7 +140,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
-		RenderToTexture* CreateRenderToTexture();
+		RenderToTextureInterface* CreateRenderToTexture();
 		std::string GetStringFromMaterial(Material* p_material);
 
 		// Particle systems.
@@ -196,7 +196,7 @@ namespace Render
 		int m_sjobCount[RENDER_SHADOW_CASCADES];
 		std::vector<ShadowJob> m_sjobs;
 
-		RenderToTexture* m_activeRTT;
+		RenderToTextureInterface* m_activeRTT;
 
 		// Default framebuffer.
 		GLuint m_fbo;

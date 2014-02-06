@@ -61,6 +61,7 @@ namespace Render
 		virtual int GetMipsLevels() const = 0;
 
 		virtual void SetAccess(GLenum p_access) = 0;
+		virtual void Store(const char* p_filename) = 0;
 	};
 
 
@@ -95,6 +96,8 @@ namespace Render
 		int GetMipsLevels() const;
 
 		void SetAccess(GLenum p_access);
+		void Store(const char* p_filename);
+
 		
 	private:
 		Texture();

@@ -60,6 +60,7 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_allocator(10000 * sizeof(RenderJob))
+		, m_activeRTT(nullptr)
 	{
 		
 	}
@@ -437,7 +438,7 @@ namespace Render
 		SDL_GL_SwapWindow(m_window);
 	}
 
-	void GLRenderer::SetRenderToTexture(RenderToTexture* p_renderToTexture)
+	void GLRenderer::SetRenderToTexture(RenderToTextureInterface* p_renderToTexture)
 	{
 		m_activeRTT = p_renderToTexture;
 	}
@@ -628,9 +629,21 @@ namespace Render
 	void GLRenderer::Output()
 	{
 		if(m_activeRTT == nullptr)
+		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		}
 		else
-			glBindFramebuffer(GL_FRAMEBUFFER, m_activeRTT->m_framebuffer);
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_activeRTT->GetFramebuffer());
+
+			GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+			glDrawBuffers(1, buffers);
+
+			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
+		}
 
 		// Bind result of render pipeline.
 		m_color0->Bind(5);
@@ -644,6 +657,8 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 
 		m_color0->Unbind(5);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderer::BindForwardFramebuffer()
@@ -750,7 +765,7 @@ namespace Render
 		return m_resources.CreateEffect();
 	}
 
-	RenderToTexture* GLRenderer::CreateRenderToTexture()
+	RenderToTextureInterface* GLRenderer::CreateRenderToTexture()
 	{
 		return m_resources.CreateRenderToTexture();
 	}

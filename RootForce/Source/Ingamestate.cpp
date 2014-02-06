@@ -207,6 +207,30 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
+		// Create RTT.
+		m_sharedSystems.m_worldSystem->m_rtt = g_engineContext.m_renderer->CreateRenderToTexture();
+		m_sharedSystems.m_worldSystem->m_rtt->SetTexture(g_engineContext.m_renderer->CreateTexture());
+		m_sharedSystems.m_worldSystem->m_rtt ->GetTexture()->CreateEmptyTexture(1280, 720, Render::TextureFormat::TEXTURE_DEPTH_COMPONENT);
+		m_sharedSystems.m_worldSystem->m_rtt->BindTextureAsDepth();
+
+		m_renderingSystem->Process();
+		m_pointLightSystem->Process();
+		m_directionlLightSystem->Process();
+
+		// Create camera.
+
+		// Render to texture.
+		g_engineContext.m_renderer->SetRenderToTexture(m_sharedSystems.m_worldSystem->m_rtt);
+		g_engineContext.m_renderer->Clear();
+		g_engineContext.m_renderer->Render();
+	
+		// Store texture.
+		m_sharedSystems.m_worldSystem->m_rtt->Store("rtt.tga");
+
+		// Restore backbuffer.
+		g_engineContext.m_renderer->SetRenderToTexture(nullptr);
+
 	}
 
 	void IngameState::Exit()
