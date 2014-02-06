@@ -166,5 +166,10 @@ namespace RootForce
 		return command;
 	}
 
+	void Menu::Update()
+	{
+		m_settingsMenu->Update();
+	}
+
 }
 

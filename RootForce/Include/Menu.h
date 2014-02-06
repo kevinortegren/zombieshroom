@@ -35,6 +35,7 @@ namespace RootForce
 		~Menu();
 		MenuEvent::MenuEvent PollEvent();
 		RootEngine::GUISystem::WebView* GetView();
+		void Update();
 
 		void AddServer(const std::pair<uint64_t,RootSystems::ServerInfoInternal>& p_serverInfo);
         void LoadDefaults(RootEngine::ConfigManagerInterface* p_configMan, std::string p_workingDir);
