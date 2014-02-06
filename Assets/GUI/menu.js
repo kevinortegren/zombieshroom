@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // Splash skip
   $("#splash").click(function() {
-    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none");});
+    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none"); JSGlobal.LoadSettings();});
   } );
   setTimeout(function(){$("#splash").click();}, 2000);
   // Main menu
@@ -13,7 +13,6 @@ $(document).ready(function() {
   $("#main-settings").click(function() {
     $("#main-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
-    JSGlobal.LoadSettings();
   } );
   $("#main-exit").click(function() {
     Menu.Exit();
