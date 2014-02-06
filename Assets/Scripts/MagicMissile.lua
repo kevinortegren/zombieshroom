@@ -1,10 +1,10 @@
 MagicMissile = {};
 MagicMissile.damage = 0;
 MagicMissile.pushback = 0;
-MagicMissile.cooldown = 3;
+MagicMissile.cooldown = 1;
 
 function MagicMissile.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();

@@ -4,7 +4,7 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 
 function Explosion.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
 	local prevHandle = fatherEntity:GetCollision():GetHandle();

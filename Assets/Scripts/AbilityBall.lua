@@ -4,7 +4,7 @@ AbilityBall.pushback = 20;
 AbilityBall.cooldown = 1;
 
 function AbilityBall.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating FireBall");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating FireBall");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local playerAimingDeviceEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1)

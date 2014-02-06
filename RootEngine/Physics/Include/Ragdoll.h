@@ -37,6 +37,7 @@ namespace Ragdoll
 		void Activate(glm::mat4 p_bones[20], glm::mat4 p_transform);
 		void Deactivate();
 		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20] );
+		void RemoveBodies();
 		btVector3 GetPos();
 		glm::mat4* GetBones();
 		btQuaternion GetOrientation();
