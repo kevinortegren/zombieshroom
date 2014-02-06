@@ -14,8 +14,6 @@ layout(std140) uniform PerFrame
 	mat4 invViewProj;
 };
 
-
-
 struct DirectionalLight
 {
 	vec3 LightDirection;

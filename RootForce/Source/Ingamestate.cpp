@@ -177,7 +177,7 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -242,11 +242,7 @@ namespace RootForce
 	{				
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
-		
-		{
-			PROFILE("Rendering", g_engineContext.m_profiler);
-			g_engineContext.m_renderer->Render();
-		}
+		g_engineContext.m_renderer->Render();
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
 		m_sharedSystems.m_matchStateSystem->Process();

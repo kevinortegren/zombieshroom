@@ -3,6 +3,7 @@
 #include <RootSystems/Include/Shapes/Plane.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <glm/gtx/transform.hpp>
+#include <RootSystems/Include/Shapes/OBB.h>
 
 namespace RootForce
 {
@@ -11,8 +12,7 @@ namespace RootForce
 
 	void QuadNode::AddChild(QuadNode* p_child)
 	{
-		assert(m_childs.size() < QUAD_MAX_CHILDS);
-
+		assert(m_childs.size() < QUADTREE_MAX_CHILDS);
 		m_childs.push_back(p_child);
 	}
 
@@ -74,40 +74,46 @@ namespace RootForce
 		return nullptr;
 	}
 
-	void QuadTree::Render(RootForce::Frustum* p_frustrum, QuadNode* p_node) const
+	void QuadTree::Cull(RootForce::Frustum* p_frustrum, QuadNode* p_node)
 	{
 		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
-				ECS::Entity* entity;
-				RootForce::Renderable* renderable;
-
-				for(unsigned i = 0; i < p_node->m_indices.size(); ++i)
-				{
-					entity = m_entities[p_node->m_indices[i]];
-					renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-
-					Render::RenderJob job;
-					job.m_mesh = renderable->m_model->m_meshes[0];
-					job.m_shadowMesh = renderable->m_model->m_meshes[0];
-					job.m_flags = renderable->m_renderFlags;
-					job.m_material = renderable->m_material;
-					job.m_renderPass = renderable->m_pass;
-
-					m_context->m_renderer->AddRenderJob(job);
-				}
-
+				// Insert range.
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
+#ifdef QUADTREE_DRAWLINES
 				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
+#endif
 			}
 			else
 			{
 				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
 				{
-					Render( p_frustrum, p_node->GetChilds().at(i)); 
+					Cull( p_frustrum, p_node->GetChilds().at(i)); 
 				}
 			}
 		}
+	}
+
+	void QuadTree::Cull(std::vector<glm::vec4>& p_points, QuadNode* p_node)
+	{
+		if(Intersect(p_points, p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				// Insert range.
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
+			}
+			else
+			{
+				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					Cull( p_points, p_node->GetChilds().at(i)); 
+				}
+			}
+		}
+
 	}
 
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
@@ -137,6 +143,7 @@ namespace RootForce
 			unsigned materialIndex = m_materials.size();
 
 			m_materials.push_back(material);
+			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
 
 			RootForce::Transform* transform = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 
@@ -152,8 +159,11 @@ namespace RootForce
 			int offset = 0;
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
-				Render::Vertex1P1N1UV v;
-				memcpy(&v, &data[i], sizeof(Render::Vertex1P1N1UV));
+				Render::Vertex1P1N1UV1T1BT v;
+				v.m_tangent = glm::vec3(0);
+				v.m_bitangent = glm::vec3(0);
+
+				memcpy(&v, &data[i], mesh->GetVertexBuffer()->GetElementSize());
 
 				// Transform vertex to world space.
 				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
@@ -202,7 +212,7 @@ namespace RootForce
 
 		for(auto itr = polygons.begin(); itr != polygons.end(); ++itr)
 		{
-			Render::Vertex1P1N1UV ps[3];
+			Render::Vertex1P1N1UV1T1BT ps[3];
 
 			ps[0] = m_vertices[(*itr).m_indices[0]];
 			ps[1] = m_vertices[(*itr).m_indices[1]];
@@ -240,7 +250,7 @@ namespace RootForce
 		m_root = new QuadNode(quadTreeBounds);
 
 
-#ifdef SUBDIVIDE
+#ifdef QUADTREE_SUBDIVIDE
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
 
 		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
@@ -251,6 +261,8 @@ namespace RootForce
 		}
 
 		Subdivide(m_root, polygons);
+
+		m_culledEntities.reserve(m_entities.size() * 4);
 #endif
 
 	}
@@ -268,8 +280,9 @@ namespace RootForce
 		}
 		else if(p_polygons.size() > QUADTREE_POLYGONS_PER_NODE)
 		{
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Polygons: %d", p_polygons.size());
-
+#endif
 			const AABB* aabb = &p_node->m_bounds;
 
 			// Calculate center of the aabb.
@@ -304,9 +317,9 @@ namespace RootForce
 				if(result.m_front.m_indices.size() > 0)
 					polygonsAfterZSplit.push_back(result.m_front);
 			}
-
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after ZSplit: %d", polygonsAfterZSplit.size());
-
+#endif
 			std::vector<Polygon> polygonsAfterXSplit;
 
 			// Split all polygons with the z-plane.
@@ -320,9 +333,9 @@ namespace RootForce
 				if(result.m_front.m_indices.size() > 0)
 					polygonsAfterXSplit.push_back(result.m_front);
 			}
-
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after XSplit: %d", polygonsAfterXSplit.size());
-
+#endif
 			int halfwidth = aabb->GetLengthX() / 2;
 			int halfheight = aabb->GetLengthZ() / 2;
 
@@ -363,11 +376,6 @@ namespace RootForce
 				}
 			}
 
-			int size = bl.size() + br.size() + tl.size() + tr.size();
-			int diff = polygonsAfterXSplit.size() - size;
-
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygon Diff: %d", diff);
-
 			QuadNode* bottomLeftChild = new QuadNode(bottomLeftAABB);
 			QuadNode* bottomRightChild = new QuadNode(bottomRightAABB);
 			QuadNode* topLeftChild = new QuadNode(topLeftAABB);
@@ -385,8 +393,9 @@ namespace RootForce
 		}
 		else
 		{
+#ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Polygons: %d", p_polygons.size());
-
+#endif
 			std::vector<Triangle> triangles = Trianglulate(p_polygons);
 
 			p_node->m_indices = CreateEntities(triangles);
@@ -400,13 +409,13 @@ namespace RootForce
 		split.m_back.m_materialIndex = p_polygon.m_materialIndex;
 		split.m_front.m_materialIndex = p_polygon.m_materialIndex;
 
-		Render::Vertex1P1N1UV vertexA = m_vertices[p_polygon.m_indices[p_polygon.m_indices.size()-1]];
+		Render::Vertex1P1N1UV1T1BT vertexA = m_vertices[p_polygon.m_indices[p_polygon.m_indices.size()-1]];
 
 		Side::Side sideA = ClassifyPoint(p_divider, vertexA.m_pos);
 
 		for(unsigned int i = 0; i < p_polygon.m_indices.size(); ++i)
 		{
-			Render::Vertex1P1N1UV vertexB = m_vertices[p_polygon.m_indices[i]];
+			Render::Vertex1P1N1UV1T1BT vertexB = m_vertices[p_polygon.m_indices[i]];
 
 			Side::Side sideB = ClassifyPoint(p_divider, vertexB.m_pos);
 
@@ -468,7 +477,7 @@ namespace RootForce
 		}
 	}
 
-	unsigned QuadTree::SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV& p_p0, Render::Vertex1P1N1UV& p_p1)
+	unsigned QuadTree::SplitVertex(PlaneEx& p_divider, Render::Vertex1P1N1UV1T1BT& p_p0, Render::Vertex1P1N1UV1T1BT& p_p1)
 	{
 		Line line;
 		line.m_origin = p_p0.m_pos;
@@ -477,10 +486,12 @@ namespace RootForce
 		float t = PlaneIntersectLine(p_divider, line);
 
 		// Create new vertex.
-		Render::Vertex1P1N1UV newVertex;
+		Render::Vertex1P1N1UV1T1BT newVertex;
 		newVertex.m_pos = line.m_origin + line.m_direction * t;
 		newVertex.m_normal = p_p0.m_normal + (p_p1.m_normal - p_p0.m_normal) * t;
 		newVertex.m_UV = p_p0.m_UV + (p_p1.m_UV - p_p0.m_UV) * t;
+		newVertex.m_bitangent = p_p0.m_bitangent + (p_p1.m_bitangent - p_p0.m_bitangent) * t;
+		newVertex.m_tangent = p_p0.m_tangent + (p_p1.m_tangent - p_p0.m_tangent) * t;
 
 		unsigned index = m_vertices.size();
 		m_vertices.push_back(newVertex);
@@ -532,9 +543,11 @@ namespace RootForce
 		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_materialIndex < b.m_materialIndex; });
 
 		std::vector<unsigned> indices;
-		std::vector<Render::Vertex1P1N1UV> vertices;
 		std::vector<unsigned> entitiesIds;
 
+		std::vector<Render::Vertex1P1N1UV> verticesPNUV;
+		std::vector<Render::Vertex1P1N1UV1T1BT> verticesPNUVTBT;
+		
 		unsigned currentMaterialIndex = p_triangles[0].m_materialIndex;
 		unsigned entityId = 0;
 
@@ -542,8 +555,9 @@ namespace RootForce
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
+#ifdef QUADTREE_VERBOSE
 				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-
+#endif
 				// Create entity.
 				ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
@@ -559,47 +573,110 @@ namespace RootForce
 				renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 				renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 				renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-				renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-				renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-				
+
 				renderable->m_material = m_materials[currentMaterialIndex];
+
+				// But at what type?? <=(*~*<=)
+
+				if(m_sizes[currentMaterialIndex] == 32)
+				{
+					renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&verticesPNUV[0], verticesPNUV.size());
+
+					if(renderable->m_material->m_tileFactor != 0)
+					{
+						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+					}
+					else
+					{
+						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
+					}
+	
+					verticesPNUV.clear();
+				}
+				else if(m_sizes[currentMaterialIndex] == 56)
+				{	
+					renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&verticesPNUVTBT[0], verticesPNUVTBT.size());
+
+					if(renderable->m_material->m_tileFactor != 0)
+					{
+						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+					}
+					else
+					{
+						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
+					}
+
+					verticesPNUVTBT.clear();
+				}
+
+				renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
 
 				currentMaterialIndex = p_triangles[i].m_materialIndex;
 
 				indices.clear();
-				vertices.clear();
-
 				entitiesIds.push_back(entityId);
 			}
 
-			Render::Vertex1P1N1UV vertex;
-			int index;
-			for(unsigned j = 0; j < 3; ++j)
+			if(m_sizes[currentMaterialIndex] == 32)
 			{
-				vertex = m_vertices[p_triangles[i].m_indices[j]];
-
-				index = -1;
-				for(auto itr = vertices.begin(); itr != vertices.end(); ++itr)
+				Render::Vertex1P1N1UV vertex;
+				int index;
+				for(unsigned j = 0; j < 3; ++j)
 				{
-					if((*itr).m_pos == vertex.m_pos && (*itr).m_UV == vertex.m_UV && (*itr).m_normal == vertex.m_normal)
+					vertex = m_vertices[p_triangles[i].m_indices[j]];
+
+					index = -1;
+					for(auto itr = verticesPNUV.begin(); itr != verticesPNUV.end(); ++itr)
 					{
-						index = itr - vertices.begin();
+						if((*itr).m_pos == vertex.m_pos && (*itr).m_UV == vertex.m_UV && (*itr).m_normal == vertex.m_normal)
+						{
+							index = itr - verticesPNUV.begin();
+						}
+					}
+					if(index == -1)
+					{
+						verticesPNUV.push_back(vertex);
+						indices.push_back(verticesPNUV.size()-1);
+					}
+					else
+					{
+						indices.push_back(index);
 					}
 				}
-				if(index == -1)
+			}
+			else if(m_sizes[currentMaterialIndex] == 56)
+			{
+				Render::Vertex1P1N1UV1T1BT vertex;
+				int index;
+				for(unsigned j = 0; j < 3; ++j)
 				{
-					vertices.push_back(vertex);
-					indices.push_back(vertices.size()-1);
-				}
-				else
-				{
-					indices.push_back(index);
+					vertex = m_vertices[p_triangles[i].m_indices[j]];
+
+					index = -1;
+					for(auto itr = verticesPNUVTBT.begin(); itr != verticesPNUVTBT.end(); ++itr)
+					{
+						if((*itr).m_pos == vertex.m_pos && (*itr).m_UV == vertex.m_UV && (*itr).m_normal == vertex.m_normal)
+						{
+							index = itr - verticesPNUVTBT.begin();
+						}
+					}
+					if(index == -1)
+					{
+						verticesPNUVTBT.push_back(vertex);
+						indices.push_back(verticesPNUVTBT.size()-1);
+					}
+					else
+					{
+						indices.push_back(index);
+					}
 				}
 			}
 		}
-
+#ifdef QUADTREE_VERBOSE
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-
+#endif
 		// Create entity.
 		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
@@ -615,14 +692,45 @@ namespace RootForce
 		renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-				
+		
 		renderable->m_material = m_materials[currentMaterialIndex];
 
+		// But at what type?? <=(*~*<=)
+
+		if(m_sizes[currentMaterialIndex] == 32)
+		{
+			renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&verticesPNUV[0], verticesPNUV.size());
+
+			if(renderable->m_material->m_tileFactor != 0)
+			{
+				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+			}
+			else
+			{
+				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
+			}
+	
+			verticesPNUV.clear();
+		}
+		else if(m_sizes[currentMaterialIndex] == 56)
+		{	
+			renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&verticesPNUVTBT[0], verticesPNUVTBT.size());
+
+			if(renderable->m_material->m_tileFactor != 0)
+			{
+				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+			}
+			else
+			{
+				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
+			}
+
+			verticesPNUVTBT.clear();
+		}
+
+		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+				
 		indices.clear();
-		vertices.clear();
-		
 		entitiesIds.push_back(entityId);
 
 		return entitiesIds;
