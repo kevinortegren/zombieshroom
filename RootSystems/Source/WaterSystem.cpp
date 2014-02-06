@@ -173,21 +173,21 @@ namespace RootForce
 
 		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
 		m_computeJob.m_textures[1]->Bind(0);
-		std::vector<float> emptyDataHalf(1, p_power/6.0f);
+		float emptyDataHalf = p_power/6.0f;
 		
 		//glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf[0]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
 
 
 		m_computeJob.m_textures[1]->Unbind(0);

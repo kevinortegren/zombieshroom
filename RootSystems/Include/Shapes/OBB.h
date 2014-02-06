@@ -21,7 +21,7 @@ namespace RootForce
 		p_min = glm::vec3(99999.0f);
 		p_max = glm::vec3(-99999.0f);
 
-		for(int i = 0; i < p_points.size(); ++i)
+		for(unsigned i = 0; i < p_points.size(); ++i)
 		{
 			if(p_points[i].x < p_min.x) p_min.x = p_points[i].x;
 			if(p_points[i].x > p_max.x) p_max.x = p_points[i].x;

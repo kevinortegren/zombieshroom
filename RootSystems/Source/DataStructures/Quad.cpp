@@ -336,18 +336,18 @@ namespace RootForce
 #ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after XSplit: %d", polygonsAfterXSplit.size());
 #endif
-			int halfwidth = aabb->GetLengthX() / 2;
-			int halfheight = aabb->GetLengthZ() / 2;
+			float halfwidth = aabb->GetLengthX() / 2;
+			float halfheight = aabb->GetLengthZ() / 2;
 
-			Rectangle bottomLeft = Rectangle((int)aabb->m_minX, (int)aabb->m_minZ, halfwidth, halfheight);
-			Rectangle bottomRight = Rectangle((int)aabb->m_minX + halfwidth, (int)aabb->m_minZ, halfwidth, halfheight);
-			Rectangle topLeft = Rectangle((int)aabb->m_minX, (int)aabb->m_minZ + halfheight, halfwidth, halfheight);
-			Rectangle topRight = Rectangle((int)aabb->m_minX + halfwidth, (int)aabb->m_minZ + halfheight, halfwidth, halfheight);
+			Rectangle bottomLeft = Rectangle(aabb->m_minX, aabb->m_minZ, halfwidth, halfheight);
+			Rectangle bottomRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ, halfwidth, halfheight);
+			Rectangle topLeft = Rectangle(aabb->m_minX, aabb->m_minZ + halfheight, halfwidth, halfheight);
+			Rectangle topRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ + halfheight, halfwidth, halfheight);
 
-			AABB bottomLeftAABB = AABB((float)bottomLeft.m_x, (float)bottomLeft.m_x + (float)halfwidth, (float)m_minY, (float)m_maxY, (float)bottomLeft.m_y, (float)bottomLeft.m_y + (float)halfheight);
-			AABB bottomRightAABB = AABB((float)bottomRight.m_x, (float)bottomRight.m_x + (float)halfwidth, (float)m_minY, (float)m_maxY, (float)bottomRight.m_y, (float)bottomRight.m_y + (float)halfheight);
-			AABB topLeftAABB = AABB((float)topLeft.m_x, (float)topLeft.m_x + (float)halfwidth, (float)m_minY, (float)m_maxY, (float)topLeft.m_y, (float)topLeft.m_y + (float)halfheight);
-			AABB topRightAABB = AABB((float)topRight.m_x, (float)topRight.m_x + (float)halfwidth, (float)m_minY, (float)m_maxY, (float)topRight.m_y, (float)topRight.m_y + (float)halfheight);
+			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomLeft.m_y, bottomLeft.m_y + halfheight);
+			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomRight.m_y, bottomRight.m_y + halfheight);
+			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
+			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
 			std::vector<Polygon> tr;
 			std::vector<Polygon> tl;
