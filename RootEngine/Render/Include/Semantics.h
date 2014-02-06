@@ -46,6 +46,8 @@ namespace Render
 			GLOW,
 			COMPUTEIN,
 			COMPUTEOUT,
+			SHADOWDEPTHPCF,
+			SHADOWDEPTH
 		};
 	}
 }

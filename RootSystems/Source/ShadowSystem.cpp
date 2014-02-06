@@ -117,8 +117,8 @@ namespace RootForce
 		float _near[RENDER_SHADOW_CASCADES];
 		_near[0] = camera->m_frustum.m_near;
 		_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
-		_near[2] = 30.0f;
-		_near[3] = 100.0f;
+		_near[2] = 40.0f;
+		_near[3] = 150.0f;
 		
 		float _far[RENDER_SHADOW_CASCADES];
 		_far[0] = _near[1];

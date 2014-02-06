@@ -282,17 +282,19 @@ namespace Render
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
 
 		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
 		s_textureSlots[TextureSemantic::SPECULAR] = 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
 		s_textureSlots[TextureSemantic::NORMAL] = 2;
 		s_textureSlots[TextureSemantic::GLOW] = 3;
+		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
 		s_textureSlots[TextureSemantic::DEPTH] = 4;
 		s_textureSlots[TextureSemantic::RANDOM] = 5;
 		s_textureSlots[TextureSemantic::TEXTUREMAP] = 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -567,7 +569,9 @@ namespace Render
 	void GLRenderer::LightingPass()
 	{
 		// Bind cascade shadow map array.
-		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTHPCF]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTH]);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
 
 		static glm::mat4 biasMatrix(

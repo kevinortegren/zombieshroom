@@ -27,7 +27,8 @@ in DirectionalLight ex_Light;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
-uniform sampler2DArrayShadow g_ShadowDepth;
+uniform sampler2DArrayShadow g_ShadowDepthPCF;
+uniform sampler2DArray g_ShadowDepth;
 
 out vec4 out_Color;
 
@@ -68,13 +69,17 @@ void main() {
 	colors[1] = vec3(0.0, 1.0, 0.0);
 	colors[2] = vec3(0.0, 0.0, 1.0);
 	colors[3] = vec3(0.0, 1.0, 1.0);
+	float offsets[4];
 	int cascade = 0;
+	float visibility = 0.0f;
 	int useCascade;
+
 	for(cascade = 0; cascade < 4; cascade++)
 	{
 		shadowCoord = shadowCasterViewProjectionMatrix[cascade] * worldPosition;
 		if(cascade == 3)
 		{
+
 			useCascade = cascade;
 			break;
 		}
@@ -88,6 +93,21 @@ void main() {
 		}
 	}
 
+	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
+	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
+	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
+	float offset = length(penumbraSize);
+	float x;
+	float y;
+	for(x = -1.5; x <= 1.5; x += 1.0)
+	{
+		for(y = -1.5; y <= 1.5; y += 1.0)
+		{
+			visibility += texture(g_ShadowDepthPCF, vec4(shadowCoord.x + (x * offset), shadowCoord.y + (y * offset), useCascade, shadowCoord.z));
+		}
+	}
+	visibility /= 16.0;
+
 	
 	//shadowCoord /= shadowCoord.w; //unnecessary because orthographic
 
@@ -99,9 +119,7 @@ void main() {
 	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-	out_Color = vec4(diffuse_color + spec_color, 1.0);
-
-	float visibility = texture(g_ShadowDepth, vec4(shadowCoord.xy, useCascade, shadowCoord.z));
+	out_Color = vec4(diffuse_color + spec_color + 0.5*colors[useCascade], 1.0);
 
 	if(shadowCoord.x <= 0 || shadowCoord.x >= 1 || shadowCoord.y <= 0 || shadowCoord.y >= 1)
 	{

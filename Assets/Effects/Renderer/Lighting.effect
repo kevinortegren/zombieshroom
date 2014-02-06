@@ -15,12 +15,14 @@
           slot: 1
         - name: g_Depth
           slot: 2
-        - name: g_ShadowDepth
+        - name: g_ShadowDepthPCF
           slot: 3
         - name: g_Glow
           slot: 4
         - name: g_Input
           slot: 5
+        - name: g_ShadowDepth
+          slot: 6
       programs:
         - name: ambient
           shaders:
