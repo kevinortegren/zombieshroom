@@ -200,6 +200,13 @@
     - 200
     - 201
     - 202
+    - 203
+    - 204
+    - 205
+    - 206
+    - 207
+    - 208
+    - 209
 - Components:
     - Type: 0
       Data:
@@ -596,14 +603,14 @@
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 60
-          Model: RootPlatformShape4
+          Model: RootPlatformShape7
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 61
-          Model: RootPlatformShape4
+          Model: RootPlatformShape7
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
@@ -617,14 +624,14 @@
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 63
-          Model: RootPlatformShape7
+          Model: RootPlatformShape4
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 64
-          Model: RootPlatformShape7
+          Model: RootPlatformShape4
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
@@ -708,76 +715,62 @@
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 76
-          Model: RootPlatformShape4
-          Material:
-            Name: RootPlatMaterial
-            Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
-        - Entity: 77
-          Model: RootPlatformShape4
-          Material:
-            Name: RootPlatMaterial
-            Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
-        - Entity: 78
           Model: RootPlatformShape33
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 79
+        - Entity: 77
           Model: LeafTree50Shape
           Material:
             Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
             Diffuse: Tree1GreenLeaf
             Normal: Tree1Normal
-        - Entity: 80
+        - Entity: 78
           Model: RootPlatformShape35
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 81
+        - Entity: 79
           Model: RootsShape
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 82
+        - Entity: 80
           Model: RootsShape1
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 83
+        - Entity: 81
           Model: RootsShape2
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 84
+        - Entity: 82
           Model: RootsShape3
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 85
+        - Entity: 83
           Model: RootsShape4
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
-        - Entity: 86
+        - Entity: 84
           Model: PaintedIslandShape
           Material:
             Name: PaintedTerrian
@@ -788,7 +781,7 @@
             TextureGreen: grass
             TextureBlue: RockWall
             TileFactor: 24
-        - Entity: 87
+        - Entity: 85
           Model: PaintedIslandShape1
           Material:
             Name: PaintedTerrian
@@ -799,7 +792,7 @@
             TextureGreen: grass
             TextureBlue: RockWall
             TileFactor: 24
-        - Entity: 88
+        - Entity: 86
           Model: PaintedIslandShape2
           Material:
             Name: PaintedTerrian
@@ -810,29 +803,29 @@
             TextureGreen: grass
             TextureBlue: RockWall
             TileFactor: 24
+        - Entity: 87
+          Model: PaintedIslandShape3
+          Material:
+            Name: PaintedTerrian
+            Effect: Mesh_Blend
+            Diffuse: RootIslandsPaint
+            TextureMap: RootIslandsPaint
+            TextureRed: RootDirt
+            TextureGreen: grass
+            TextureBlue: RockWall
+            TileFactor: 24
+        - Entity: 88
+          Model: PaintedIslandShape3
+          Material:
+            Name: PaintedTerrian
+            Effect: Mesh_Blend
+            Diffuse: RootIslandsPaint
+            TextureMap: RootIslandsPaint
+            TextureRed: RootDirt
+            TextureGreen: grass
+            TextureBlue: RockWall
+            TileFactor: 24
         - Entity: 89
-          Model: PaintedIslandShape3
-          Material:
-            Name: PaintedTerrian
-            Effect: Mesh_Blend
-            Diffuse: RootIslandsPaint
-            TextureMap: RootIslandsPaint
-            TextureRed: RootDirt
-            TextureGreen: grass
-            TextureBlue: RockWall
-            TileFactor: 24
-        - Entity: 90
-          Model: PaintedIslandShape3
-          Material:
-            Name: PaintedTerrian
-            Effect: Mesh_Blend
-            Diffuse: RootIslandsPaint
-            TextureMap: RootIslandsPaint
-            TextureRed: RootDirt
-            TextureGreen: grass
-            TextureBlue: RockWall
-            TileFactor: 24
-        - Entity: 91
           Model: PaintedIslandBigShape
           Material:
             Name: BigIslandPaint
@@ -843,7 +836,7 @@
             TextureGreen: grass
             TextureBlue: RockDirt
             TileFactor: 24
-        - Entity: 92
+        - Entity: 90
           Model: OceanFloorMeshShape
           Material:
             Name: OceanFloor
@@ -854,19 +847,40 @@
             TextureGreen: GREEN
             TextureBlue: BLUE
             TileFactor: 24
-        - Entity: 93
-          Model: polySurfaceShape1
-          Material:
-            Name: ""
-            Effect: Mesh
-            Diffuse: grayLambert
-        - Entity: 94
+        - Entity: 91
           Model: LeafTree50Shape
           Material:
             Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
             Diffuse: Tree1GreenLeaf
             Normal: Tree1Normal
+        - Entity: 92
+          Model: RuneGlowStoneShape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: GRSDiffuse
+            Specular: GRSSpecular
+            Normal: GRSNormal
+            Glow: GRSGlow
+        - Entity: 93
+          Model: RuneGlowStoneShape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: GRSDiffuse
+            Specular: GRSSpecular
+            Normal: GRSNormal
+            Glow: GRSGlow
+        - Entity: 94
+          Model: RuneGlowStone2Shape
+          Material:
+            Name: StoneMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: GRSDiffuse
+            Specular: GRSSpecular
+            Normal: GRSNormal
+            Glow: GRSGlow
         - Entity: 95
           Model: RuneGlowStoneShape
           Material:
@@ -904,7 +918,7 @@
             Normal: GRSNormal
             Glow: GRSGlow
         - Entity: 99
-          Model: RuneGlowStoneShape
+          Model: RuneGlowStone7Shape
           Material:
             Name: StoneMaterial
             Effect: Mesh_NormalMap
@@ -913,7 +927,7 @@
             Normal: GRSNormal
             Glow: GRSGlow
         - Entity: 100
-          Model: RuneGlowStone2Shape
+          Model: RuneGlowStoneShape
           Material:
             Name: StoneMaterial
             Effect: Mesh_NormalMap
@@ -967,33 +981,6 @@
             Normal: GRSNormal
             Glow: GRSGlow
         - Entity: 106
-          Model: RuneGlowStoneShape
-          Material:
-            Name: StoneMaterial
-            Effect: Mesh_NormalMap
-            Diffuse: GRSDiffuse
-            Specular: GRSSpecular
-            Normal: GRSNormal
-            Glow: GRSGlow
-        - Entity: 107
-          Model: RuneGlowStoneShape
-          Material:
-            Name: StoneMaterial
-            Effect: Mesh_NormalMap
-            Diffuse: GRSDiffuse
-            Specular: GRSSpecular
-            Normal: GRSNormal
-            Glow: GRSGlow
-        - Entity: 108
-          Model: RuneGlowStone7Shape
-          Material:
-            Name: StoneMaterial
-            Effect: Mesh_NormalMap
-            Diffuse: GRSDiffuse
-            Specular: GRSSpecular
-            Normal: GRSNormal
-            Glow: GRSGlow
-        - Entity: 109
           Model: RuneGlowStone2Shape
           Material:
             Name: StoneMaterial
@@ -1002,7 +989,7 @@
             Specular: GRSSpecular
             Normal: GRSNormal
             Glow: GRSGlow
-        - Entity: 110
+        - Entity: 107
           Model: RuneGlowStone7Shape
           Material:
             Name: StoneMaterial
@@ -1011,7 +998,7 @@
             Specular: GRSSpecular
             Normal: GRSNormal
             Glow: GRSGlow
-        - Entity: 111
+        - Entity: 108
           Model: RuneGlowStoneShape
           Material:
             Name: StoneMaterial
@@ -1020,15 +1007,36 @@
             Specular: GRSSpecular
             Normal: GRSNormal
             Glow: GRSGlow
-        - Entity: 112
+        - Entity: 109
           Model: RootPlatformShape36
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
+        - Entity: 110
+          Model: RootPlatformShape4
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
+        - Entity: 111
+          Model: RootPlatformShape4
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
+        - Entity: 112
+          Model: RootPlatformShape4
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 113
-          Model: RootPlatformShape7
+          Model: RootPlatformShape4
           Material:
             Name: RootPlatMaterial
             Effect: Mesh_NormalMap
@@ -1147,47 +1155,47 @@
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 130
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 131
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 132
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 133
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 134
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 135
-          Model: RootPlatformShape4
+          Model: LeafTree50Shape
           Material:
-            Name: RootPlatMaterial
+            Name: TreeGreenLeaf
             Effect: Mesh_NormalMap
-            Diffuse: RootPlatformDiffuse
-            Normal: RootPlatformNormal
+            Diffuse: Tree1GreenLeaf
+            Normal: Tree1Normal
         - Entity: 136
           Model: LeafTree50Shape
           Material:
@@ -1490,47 +1498,47 @@
             Diffuse: Tree1GreenLeaf
             Normal: Tree1Normal
         - Entity: 179
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 180
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 181
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 182
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 183
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 184
-          Model: LeafTree50Shape
+          Model: RootBridgeShape
           Material:
-            Name: TreeGreenLeaf
+            Name: RootPlatMaterial
             Effect: Mesh_NormalMap
-            Diffuse: Tree1GreenLeaf
-            Normal: Tree1Normal
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 185
           Model: RootBridgeShape
           Material:
@@ -1539,12 +1547,54 @@
             Diffuse: RootPlatformDiffuse
             Normal: RootPlatformNormal
         - Entity: 186
+          Model: RootBridge7Shape
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 187
+          Model: RootBridge7Shape
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 188
+          Model: RootBridgeShape
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 189
+          Model: RootPlatformShape36
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 190
+          Model: RootPlatformShape36
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 191
+          Model: RootBridgeShape
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 192
+          Model: RootBridgeShape
+          Material:
+            Name: RootPlatMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: RootPlatformDiffuse
+            Normal: RootPlatformNormal
         - Entity: 193
         - Entity: 194
         - Entity: 195
@@ -1555,6 +1605,13 @@
         - Entity: 200
         - Entity: 201
         - Entity: 202
+        - Entity: 203
+        - Entity: 204
+        - Entity: 205
+        - Entity: 206
+        - Entity: 207
+        - Entity: 208
+        - Entity: 209
     - Type: 1
       Data:
         - Entity: 0
@@ -1778,101 +1835,101 @@
           Rotation: [0.931002, 0.0598713, -0.359918, -0.0104618]
           Scale: [1.33192, 1.33192, 1.33192]
         - Entity: 57
-          Position: [15.1064, -21.3077, 122.441]
-          Rotation: [0.0296682, 0.563779, 0.00638593, 0.825368]
-          Scale: [3.16944, 1.87342, 3.16944]
-        - Entity: 58
-          Position: [-29.6092, -20.3239, 147.448]
-          Rotation: [-0.00483439, -0.276184, -0.00410784, 0.961084]
-          Scale: [3.16944, 1.87342, 3.16944]
-        - Entity: 59
           Position: [-61.2278, -18.1593, 60.3792]
           Rotation: [0.280025, -0.0642237, -0.957421, 0.0283952]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 60
+        - Entity: 58
           Position: [-75.3639, -30.0961, 52.1365]
           Rotation: [-0.0887144, 0.387053, -0.0339028, -0.917153]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 61
+        - Entity: 59
           Position: [6.99041, 23.0795, 57.1393]
           Rotation: [0.243918, 0.503095, 0.774373, -0.296218]
           Scale: [1.06612, 0.79764, 1.06612]
-        - Entity: 62
+        - Entity: 60
           Position: [22.8272, -9.01849, 52.9183]
           Rotation: [0.110635, 0.713745, 0.0317929, -0.690881]
           Scale: [1.10899, 0.80557, 1.10899]
-        - Entity: 63
+        - Entity: 61
           Position: [12.7284, -9.24281, 66.5623]
           Rotation: [0.000332819, 0.996191, 0.087117, -0.00380582]
           Scale: [1.52077, 1.10468, 1.52077]
-        - Entity: 64
+        - Entity: 62
           Position: [22.9621, -6.81151, 56.8114]
           Rotation: [0, 0.860328, 0, -0.509741]
           Scale: [1.52077, 1.52077, 1.52077]
-        - Entity: 65
+        - Entity: 63
           Position: [-95.1075, 27.2896, 70.5981]
           Rotation: [-0.73754, 0.0145552, 0.66218, 0.131681]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 66
+        - Entity: 64
           Position: [55.936, -15.0713, -15.0433]
           Rotation: [-0.0182574, -0.994328, 0.0890854, 0.0551477]
           Scale: [1.25347, 1.83081, 1.25347]
-        - Entity: 67
+        - Entity: 65
           Position: [-21.1628, -6.01593, 108.934]
           Rotation: [-0.470285, -0.0559432, 0.0156631, -0.8806]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 68
+        - Entity: 66
           Position: [-57.1485, -11.8322, 86.2228]
           Rotation: [-0.310715, 0.499997, -0.177057, -0.788739]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 69
+        - Entity: 67
           Position: [-65.7616, 1.67957, 55.2665]
           Rotation: [-0.0305022, 0.842328, -0.305497, -0.442973]
           Scale: [2.05145, 2.05145, 2.05145]
-        - Entity: 70
+        - Entity: 68
           Position: [-84.7758, -65.6328, 70.207]
           Rotation: [-0.289989, 0.638305, -0.279527, -0.656001]
           Scale: [6.39597, 6.39597, 6.39597]
-        - Entity: 71
+        - Entity: 69
           Position: [18.1741, -12.6363, 77.4381]
           Rotation: [-0.0462914, -0.997173, 0.00972481, -0.0583816]
           Scale: [1.32119, 0.780941, 1.32119]
-        - Entity: 72
+        - Entity: 70
           Position: [-23.7123, -23.0255, 62.6174]
           Rotation: [0.0315077, -0.943015, 0.116212, 0.3102]
           Scale: [3.16944, 1.87342, 3.16944]
-        - Entity: 73
+        - Entity: 71
           Position: [70.4273, -13.1482, -11.2166]
           Rotation: [0.00650203, 0.96261, -0.0593194, 0.264235]
           Scale: [1.25347, 1.25347, 1.25347]
-        - Entity: 74
+        - Entity: 72
           Position: [-55.5892, -30.6626, 31.1839]
           Rotation: [0.0677478, -0.789912, 0.0995398, 0.601282]
           Scale: [4.96846, 2.9368, 4.96846]
-        - Entity: 75
+        - Entity: 73
           Position: [-93.755, -47.2589, -10.1806]
           Rotation: [-0.186457, 0.746683, -0.197211, -0.607294]
           Scale: [2.834, 2.834, 2.834]
-        - Entity: 76
+        - Entity: 74
           Position: [2.22479, -39.0589, -50.1815]
           Rotation: [-0.0427251, -0.957017, 0.144876, -0.247595]
           Scale: [2.834, 2.834, 2.834]
-        - Entity: 77
+        - Entity: 75
           Position: [40.6295, -25.6102, -58.7379]
           Rotation: [-0.00340215, -0.997902, 0.0595777, 0.025115]
           Scale: [4.96846, 2.9368, 4.96846]
-        - Entity: 78
+        - Entity: 76
           Position: [26.7027, -25.9457, 15.1893]
           Rotation: [0.0196616, 0.735231, -0.0141197, 0.677384]
           Scale: [1.62901, 1.62901, 1.62901]
-        - Entity: 79
+        - Entity: 77
           Position: [-23.4936, 24.0274, 71.3494]
           Rotation: [-0.0107505, -0.00585604, 0.0040146, 0.999917]
           Scale: [10.7333, 10.7333, 10.7333]
-        - Entity: 80
+        - Entity: 78
           Position: [17.4568, 27.8618, 95.1532]
           Rotation: [0.212824, -0.506684, -0.822052, -0.149022]
           Scale: [2.95811, 2.32924, 2.95811]
+        - Entity: 79
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 80
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
         - Entity: 81
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
@@ -1886,511 +1943,511 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 84
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 85
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 86
           Position: [104.14, -102.493, 60.7533]
           Rotation: [0, 0.997663, 0, 0.0683201]
           Scale: [1.27865, 1.27865, 1.27865]
-        - Entity: 87
+        - Entity: 85
           Position: [1.56377, 31.2938, 7.73642]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 88
+        - Entity: 86
           Position: [-102.634, -71.226, 120.608]
           Rotation: [0, 0.878096, 0, 0.478484]
           Scale: [12.1154, 12.1154, 12.1154]
-        - Entity: 89
+        - Entity: 87
           Position: [22.4041, -75.5451, 98.1741]
           Rotation: [0, 0.943933, 0, -0.330138]
           Scale: [0.447661, 1.2475, 0.447661]
-        - Entity: 90
+        - Entity: 88
           Position: [-80.9264, -78.39, 96.6628]
           Rotation: [0, 0.0154057, 0, 0.999881]
           Scale: [0.769828, 1.21199, 0.769828]
-        - Entity: 91
+        - Entity: 89
           Position: [-124.531, -72.415, 57.7987]
           Rotation: [0, 0, 0, 1]
           Scale: [1.28274, 1.94557, 1.28274]
-        - Entity: 92
+        - Entity: 90
           Position: [43.6737, -73.9156, 34.3229]
           Rotation: [0, 0, 0, 1]
           Scale: [4.00416, 4.00416, 4.00416]
-        - Entity: 93
-          Position: [43.6737, -73.9156, 34.3229]
-          Rotation: [0, 0, 0, 1]
-          Scale: [4.00416, 4.00416, 4.00416]
-        - Entity: 94
+        - Entity: 91
           Position: [-63.0398, -20.1302, 5.77093]
           Rotation: [0, -0.180629, 0, 0.983551]
           Scale: [2.0929, 2.0929, 2.0929]
-        - Entity: 95
+        - Entity: 92
           Position: [-1.50035, 1.98191, 94.8526]
           Rotation: [0.0464989, -0.629719, -0.0292294, -0.774879]
           Scale: [1.79107, 1.79107, 1.79107]
-        - Entity: 96
+        - Entity: 93
           Position: [-5.25277, 6.56012, 72.4223]
           Rotation: [-0.00363962, -0.0481695, -0.191396, 0.980323]
           Scale: [1.79107, 1.79107, 1.79107]
-        - Entity: 97
+        - Entity: 94
           Position: [-72.7089, 6.13399, 71.9029]
           Rotation: [-0.972844, 0.0782043, 0.196141, 0.0947999]
           Scale: [2.55502, 2.55502, 2.55502]
-        - Entity: 98
+        - Entity: 95
           Position: [-64.4863, 22.6441, 60.3106]
           Rotation: [-0.529077, -0.503902, -0.636866, 0.246094]
           Scale: [1.70973, 1.70973, 1.70973]
-        - Entity: 99
+        - Entity: 96
           Position: [-39.5159, 10.5071, 81.2077]
           Rotation: [0.382768, 0.43844, 0.101729, 0.80679]
           Scale: [3.15397, 3.15397, 3.15397]
-        - Entity: 100
+        - Entity: 97
           Position: [94.3182, 10.3469, 48.01]
           Rotation: [-0.661071, 0.375662, 0.487439, 0.429263]
           Scale: [3.13382, 3.13382, 3.13382]
-        - Entity: 101
+        - Entity: 98
           Position: [41.0602, -5.78419, 37.5004]
           Rotation: [0.147221, 0.0950192, -0.658374, 0.732012]
           Scale: [1.79107, 1.79107, 1.79107]
-        - Entity: 102
+        - Entity: 99
           Position: [-47.675, -9.24124, 58.3737]
           Rotation: [-0.193002, -0.657491, 0.0935843, 0.722286]
           Scale: [2.15407, 2.15407, 2.15407]
-        - Entity: 103
+        - Entity: 100
           Position: [2.56671, -0.162507, 42.4451]
           Rotation: [0.117303, 0.263683, -0.352565, 0.890174]
           Scale: [1.79107, 1.79107, 1.79107]
-        - Entity: 104
+        - Entity: 101
           Position: [-23.4256, 7.37965, 51.1461]
           Rotation: [-0.156899, 0.703149, -0.204686, 0.662622]
           Scale: [3.15397, 3.15397, 3.15397]
-        - Entity: 105
+        - Entity: 102
           Position: [-36.6675, -19.5211, 1.78411]
           Rotation: [-0.039531, 0.998642, -0.00134262, 0.0339175]
-          Scale: [1.48763, 1.48763, 1.48763]
-        - Entity: 106
+          Scale: [2.2325, 2.2325, 2.2325]
+        - Entity: 103
           Position: [-22.0885, -19.478, 25.9993]
           Rotation: [0, 0.998224, 0, 0.0595674]
-          Scale: [1.70973, 1.70973, 1.70973]
-        - Entity: 107
+          Scale: [2.13052, 2.13052, 2.13052]
+        - Entity: 104
           Position: [-44.9481, -19.478, 12.8362]
           Rotation: [0, 0.772885, 0, 0.634547]
-          Scale: [1.70973, 1.70973, 1.70973]
-        - Entity: 108
+          Scale: [2.44339, 2.44339, 2.44339]
+        - Entity: 105
           Position: [-38.6374, -19.4293, 25.9379]
           Rotation: [0, -0.643297, 0, 0.765617]
-          Scale: [1.48763, 1.48763, 1.48763]
-        - Entity: 109
-          Position: [-29.0214, -18.3794, 13.6863]
+          Scale: [2.05444, 2.05444, 2.05444]
+        - Entity: 106
+          Position: [-29.0214, -18.9402, 13.6863]
           Rotation: [0, 0.45226, 0, 0.891886]
-          Scale: [2.55502, 2.55502, 2.55502]
-        - Entity: 110
+          Scale: [3.47833, 3.47833, 3.47833]
+        - Entity: 107
           Position: [-13.4603, -19.4293, 14.1899]
           Rotation: [0, 0, 0, 1]
-          Scale: [1.48763, 1.48763, 1.48763]
-        - Entity: 111
+          Scale: [2.11882, 2.11882, 2.11882]
+        - Entity: 108
           Position: [-21.8842, -19.478, 1.94945]
           Rotation: [0, -0.859499, 0, 0.511137]
-          Scale: [1.70973, 1.70973, 1.70973]
-        - Entity: 112
+          Scale: [2.416, 2.416, 2.416]
+        - Entity: 109
           Position: [-10.8863, -26.9262, 42.2096]
           Rotation: [0, 0.958088, 0, 0.286472]
           Scale: [2.46315, 2.46315, 2.46315]
-        - Entity: 113
-          Position: [6.65341, -38.2869, 11.9861]
-          Rotation: [-0.866827, -0.344866, 0.225046, 0.281128]
-          Scale: [3.9202, 3.9202, 3.9202]
-        - Entity: 114
-          Position: [6.32117, -38.3563, -12.9767]
-          Rotation: [0.0344838, -0.514993, 0.0987898, -0.850784]
-          Scale: [1.19218, 1.19218, 1.19218]
-        - Entity: 115
-          Position: [-15.4301, -35.5986, -34.3927]
-          Rotation: [-0.0633029, -0.984968, 0.0501222, 0.152705]
-          Scale: [1.2484, 1.2484, 1.2484]
-        - Entity: 116
+        - Entity: 110
           Position: [106.242, -12.4235, -19.372]
           Rotation: [-0.945963, -0.0264376, -0.322922, -0.0133131]
           Scale: [3.42621, 5.0043, 3.42621]
-        - Entity: 117
+        - Entity: 111
           Position: [54.349, -61.1268, 5.45184]
           Rotation: [0.00640806, 0.840025, -0.260594, -0.475823]
           Scale: [2.17928, 2.17928, 2.17928]
-        - Entity: 118
+        - Entity: 112
           Position: [-102.161, 10.9515, -1.30219]
           Rotation: [0.781004, -0.131859, -0.552256, -0.260114]
           Scale: [4.37502, 4.37502, 4.37502]
-        - Entity: 119
+        - Entity: 113
           Position: [-69.384, -43.1267, -13.9989]
           Rotation: [-0.0531576, 0.996639, -0.0546048, -0.0300517]
           Scale: [1.38384, 1.38384, 1.38384]
-        - Entity: 120
+        - Entity: 114
           Position: [-87.7262, -41.0648, 13.6525]
           Rotation: [-0.0487215, 0.638977, -0.105617, -0.760381]
           Scale: [1.38384, 1.38384, 1.38384]
-        - Entity: 121
+        - Entity: 115
           Position: [-74.1774, -45.9314, -19.3314]
           Rotation: [-0.0516138, 0.998119, -0.00547906, -0.032632]
           Scale: [1.25696, 1.25696, 1.25696]
-        - Entity: 122
+        - Entity: 116
           Position: [81.2114, -24.7845, -25.2281]
           Rotation: [-0.977003, -0.0101144, -0.179518, -0.114615]
           Scale: [3.18115, 3.18115, 3.18115]
-        - Entity: 123
+        - Entity: 117
           Position: [64.0132, -55.9603, 23.5815]
           Rotation: [-0.014044, 0.298163, -0.0601244, -0.952516]
           Scale: [1.89927, 1.89927, 1.89927]
-        - Entity: 124
+        - Entity: 118
           Position: [49.9248, -42.038, 3.41449]
           Rotation: [-0.000953688, 0.827881, -0.00151395, -0.5609]
           Scale: [2.17928, 2.17928, 2.17928]
-        - Entity: 125
+        - Entity: 119
           Position: [77.9709, 32.8626, 96.9613]
           Rotation: [-0.203601, -0.564044, -0.784918, 0.1559]
           Scale: [3.42621, 4.15533, 3.42621]
-        - Entity: 126
+        - Entity: 120
           Position: [118.957, -3.73625, 163.485]
           Rotation: [0.462597, -0.25891, -0.0795841, -0.844178]
           Scale: [4.15895, 5.044, 4.15895]
-        - Entity: 127
+        - Entity: 121
           Position: [100.335, -51.6979, 121.459]
           Rotation: [-0.0296446, -0.984686, 0.166068, 0.043993]
           Scale: [1.16745, 1.25359, 1.16745]
-        - Entity: 128
+        - Entity: 122
           Position: [114.167, -51.805, 122.803]
           Rotation: [-0.0210823, -0.939456, 0.0125684, -0.34179]
           Scale: [1.13349, 1.21713, 1.13349]
-        - Entity: 129
+        - Entity: 123
           Position: [97.9697, -34.4052, 136.644]
           Rotation: [-0.0129442, -0.273116, 0.0237281, -0.961601]
           Scale: [1.14175, 0.854566, 1.14175]
-        - Entity: 130
+        - Entity: 124
           Position: [93.3022, -30.5675, 131.46]
           Rotation: [-0.0642277, -0.260359, 0.0537737, -0.961871]
           Scale: [1.14175, 0.854566, 1.14175]
-        - Entity: 131
+        - Entity: 125
           Position: [95.366, -28.0901, 127.815]
           Rotation: [-0.11915, -0.21755, 0.0653725, -0.966541]
           Scale: [1.14175, 0.854566, 1.14175]
-        - Entity: 132
+        - Entity: 126
           Position: [66.2798, -21.2141, 144.754]
           Rotation: [0.303067, -0.0624419, -0.945128, -0.104805]
           Scale: [2.29977, 1.72131, 2.29977]
-        - Entity: 133
+        - Entity: 127
           Position: [75.026, -31.7136, -9.00442]
           Rotation: [0.00449985, 0.988512, -0.0746358, -0.131355]
           Scale: [1.4495, 0.999451, 1.4495]
-        - Entity: 134
+        - Entity: 128
           Position: [66.335, -27.4137, -0.41152]
           Rotation: [0.0305231, 0.905642, -0.0537277, -0.419517]
           Scale: [1.39803, 1.39803, 1.39803]
-        - Entity: 135
+        - Entity: 129
           Position: [100.765, -11.7432, -14.6299]
           Rotation: [0.605529, 0.621056, 0.357353, 0.346299]
           Scale: [2.03155, 2.03155, 2.99307]
-        - Entity: 136
+        - Entity: 130
           Position: [-128.498, -47.2399, 134.153]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 137
+        - Entity: 131
           Position: [-113.622, -45.929, 92.2775]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 138
+        - Entity: 132
           Position: [-153.624, -47.2093, 93.4798]
           Rotation: [0.0364458, -0.194911, 0.0154663, 0.980022]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 139
+        - Entity: 133
           Position: [-151.763, -48.6205, 120.85]
           Rotation: [0.0558534, -0.174071, 0.0316676, 0.982638]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 140
-          Position: [-128.498, -51.3629, 165.411]
-          Rotation: [0.11758, -0.200006, 0.0214407, 0.972478]
+        - Entity: 134
+          Position: [-128.498, -50.2709, 165.411]
+          Rotation: [0.0907379, -0.200521, 0.0159213, 0.975348]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 141
+        - Entity: 135
           Position: [-92.9607, -45.8261, 124.42]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 142
+        - Entity: 136
           Position: [-104.136, -46.1128, 150.313]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 143
-          Position: [-92.9607, -50.5438, 185.391]
+        - Entity: 137
+          Position: [-92.9607, -49.3486, 185.391]
           Rotation: [0.116278, -0.177062, 0.0231898, 0.977032]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 144
+        - Entity: 138
           Position: [-61.8612, -45.2339, 147.257]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 145
-          Position: [-61.8612, -51.0117, 206.247]
+        - Entity: 139
+          Position: [-61.8612, -50.1625, 206.247]
           Rotation: [0.0835651, -0.180605, 0.00297527, 0.979995]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 146
+        - Entity: 140
           Position: [-61.8612, -47.021, 176.809]
           Rotation: [0.00114298, -0.155835, -0.0426294, 0.986862]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 147
-          Position: [-187.921, -52.5047, 93.4798]
+        - Entity: 141
+          Position: [-187.921, -51.9718, 93.4798]
           Rotation: [0.0248561, -0.181957, 0.0418896, 0.982099]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 148
+        - Entity: 142
           Position: [-153.624, -46.8412, 37.4211]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 149
+        - Entity: 143
           Position: [-151.763, -46.4742, 64.7914]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 150
+        - Entity: 144
           Position: [-113.622, -44.2533, 36.2188]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 151
-          Position: [-184.279, -51.2495, 19.6892]
-          Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
+        - Entity: 145
+          Position: [-184.279, -50.9045, 19.6892]
+          Rotation: [0.0264353, -0.181734, 0.0333595, 0.982426]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 152
+        - Entity: 146
           Position: [-77.7819, -43.5544, -17.2313]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 153
+        - Entity: 147
           Position: [-117.784, -45.941, -16.029]
           Rotation: [-0.0449405, -0.179451, -0.0206012, 0.982524]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 154
-          Position: [-148.439, -51.0452, -33.7609]
+        - Entity: 148
+          Position: [-148.439, -50.6328, -33.7609]
           Rotation: [-0.0169086, -0.205425, 0.0432739, 0.977569]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 155
+        - Entity: 149
           Position: [-30.7515, -44.6562, -69.998]
           Rotation: [-0.0421877, -0.151751, 0.023493, 0.987239]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 156
+        - Entity: 150
           Position: [-69.6127, -45.8674, -68.7956]
           Rotation: [-0.0676796, -0.191296, 0.0904178, 0.975013]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 157
-          Position: [-101.408, -51.0859, -86.5276]
+        - Entity: 151
+          Position: [-101.408, -50.6336, -86.5276]
           Rotation: [-0.0180524, -0.184387, 0.0474813, 0.98154]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 158
+        - Entity: 152
           Position: [-117.784, -48.9573, -51.393]
           Rotation: [0.0185959, -0.182703, 0.0755752, 0.980083]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 159
+        - Entity: 153
           Position: [-87.023, -44.5611, -40.7931]
           Rotation: [-0.0341452, -0.179666, -0.0186287, 0.982958]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 160
+        - Entity: 154
           Position: [-30.7515, -43.1677, -31.163]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 161
-          Position: [-30.7515, -50.9151, -131.903]
-          Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
+        - Entity: 155
+          Position: [-30.7515, -50.5814, -131.903]
+          Rotation: [-0.0462196, -0.180693, 0.0214112, 0.98222]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 162
+        - Entity: 156
           Position: [-5.9717, -46.7949, -102.273]
           Rotation: [-0.0319904, 0.373819, -0.0225179, 0.926676]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 163
+        - Entity: 157
           Position: [58.4034, -45.5552, -63.9175]
           Rotation: [-0.0167355, -0.179968, -0.0154446, 0.983409]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 164
+        - Entity: 158
           Position: [58.4034, -49.123, -102.752]
           Rotation: [-0.0615627, -0.179076, -0.0236353, 0.981623]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 165
+        - Entity: 159
           Position: [19.5422, -50.1142, -132.323]
-          Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
+          Rotation: [-0.0398576, -0.179555, -0.0196726, 0.982743]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 166
+        - Entity: 160
           Position: [2.13184, -44.975, -73.5475]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 167
+        - Entity: 161
           Position: [29.0987, -43.6457, -25.6854]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 168
+        - Entity: 162
           Position: [82.4575, -43.1596, -31.3927]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 169
-          Position: [102.309, -49.6841, -77.6116]
+        - Entity: 163
+          Position: [102.309, -49.5172, -77.6116]
           Rotation: [-0.0406522, -0.179539, -0.0198178, 0.982711]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 170
+        - Entity: 164
           Position: [117.064, -46.2423, -31.3927]
           Rotation: [-0.038935, -0.18145, -0.0676938, 0.980295]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 171
+        - Entity: 165
           Position: [149.565, -48.3862, 0.47018]
           Rotation: [-0.0563373, -0.198858, -0.0621407, 0.976432]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 172
+        - Entity: 166
           Position: [114.959, -44.1407, 0.47018]
           Rotation: [0.0209731, -0.180428, -0.00853467, 0.983328]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 173
-          Position: [155.328, -50.2083, 44.0495]
+        - Entity: 167
+          Position: [155.328, -49.6812, 44.0495]
           Rotation: [-0.0318118, -0.181589, -0.0922938, 0.978517]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 174
+        - Entity: 168
           Position: [120.722, -44.7586, 44.0495]
           Rotation: [0.0337256, -0.180523, -0.00619372, 0.982973]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 175
+        - Entity: 169
           Position: [149.565, -48.6577, 83.2467]
           Rotation: [-0.0204231, -0.180858, -0.061263, 0.981387]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 176
+        - Entity: 170
           Position: [123.752, -47.1628, 116.999]
           Rotation: [-0.0284409, -0.179771, -0.0175859, 0.98314]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 177
+        - Entity: 171
           Position: [115.177, -46.0283, 77.802]
           Rotation: [-0.0284409, -0.179771, -0.0175859, 0.98314]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 178
+        - Entity: 172
           Position: [118.902, -50.3216, 179.044]
           Rotation: [-0.0284409, -0.179771, -0.0175859, 0.98314]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 179
+        - Entity: 173
           Position: [71.8498, -46.0696, 151.951]
           Rotation: [-0.0284409, -0.179771, -0.0175859, 0.98314]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 180
-          Position: [160.52, -51.664, 145.291]
+        - Entity: 174
+          Position: [160.52, -51.0862, 145.291]
           Rotation: [-0.0284409, -0.179771, -0.0175859, 0.98314]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 181
+        - Entity: 175
           Position: [102.192, -47.4869, 155.133]
           Rotation: [-0.00279664, -0.188139, -0.0415212, 0.98126]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 182
+        - Entity: 176
           Position: [72.3232, -47.8492, 185.735]
           Rotation: [0.027563, -0.18, -0.0251812, 0.982958]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 183
+        - Entity: 177
           Position: [41.9809, -47.021, 182.553]
           Rotation: [0.0493624, -0.206213, 0.00290849, 0.977257]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 184
-          Position: [39.5591, -50.3561, 214.802]
+        - Entity: 178
+          Position: [39.5591, -49.8507, 214.802]
           Rotation: [0.0485464, -0.180596, -0.00347048, 0.982352]
           Scale: [1.96652, 1.96652, 1.96652]
-        - Entity: 185
+        - Entity: 179
           Position: [292.979, 2.1161, -817.385]
           Rotation: [0.0726931, -0.0714241, -0.602637, 0.791482]
           Scale: [5.15344, 5.15344, 5.15344]
+        - Entity: 180
+          Position: [473.159, -842.77, -304.519]
+          Rotation: [0.247597, -0.442392, -0.857459, 0.0880286]
+          Scale: [5.15344, 5.15344, 5.15344]
+        - Entity: 181
+          Position: [424.382, -289.404, 100.355]
+          Rotation: [0.759861, -0.01056, -0.55129, -0.344353]
+          Scale: [2.09482, 2.09482, 2.09482]
+        - Entity: 182
+          Position: [583.377, -354.734, 989.095]
+          Rotation: [0.959302, -0.076585, -0.258565, -0.083782]
+          Scale: [5.31374, 5.31374, 5.31374]
+        - Entity: 183
+          Position: [-90.0659, 218.279, 424.355]
+          Rotation: [0.650114, -0.695613, 0.258996, 0.162466]
+          Scale: [1.95673, 1.95673, 1.95673]
+        - Entity: 184
+          Position: [589.673, -85.4865, 27.1628]
+          Rotation: [0.468949, -0.410124, -0.644406, 0.443426]
+          Scale: [2.52876, 2.52876, 2.52876]
+        - Entity: 185
+          Position: [294.129, -59.8394, -1068.07]
+          Rotation: [-0.0637851, -0.119483, 0.134513, 0.981612]
+          Scale: [5.43682, 5.43682, 5.43682]
         - Entity: 186
+          Position: [-659.705, -189.505, -469.876]
+          Rotation: [0.431536, 0.101286, 0.891628, 0.0922885]
+          Scale: [3.95341, 3.95341, 3.95341]
+        - Entity: 187
+          Position: [547.662, -379.776, 464.177]
+          Rotation: [-0.631623, -0.644987, 0.0735264, 0.423837]
+          Scale: [3.95341, 3.95341, 3.95341]
+        - Entity: 188
+          Position: [-395.095, 243.589, 220.844]
+          Rotation: [0.390763, -0.699214, 0.534692, -0.269275]
+          Scale: [2.60737, 3.29131, 2.60737]
+        - Entity: 189
+          Position: [2.19102, -80.3789, 120.208]
+          Rotation: [0, 0.903753, 0, 0.428055]
+          Scale: [4.46632, 4.46632, 4.46632]
+        - Entity: 190
+          Position: [47.0129, -80.3789, 32.5886]
+          Rotation: [0, -0.568412, 0, 0.822744]
+          Scale: [4.46632, 4.46632, 4.46632]
+        - Entity: 191
+          Position: [-403.844, 263.91, 129.593]
+          Rotation: [0.347317, -0.699586, 0.553897, -0.288355]
+          Scale: [2.60737, 3.61279, 2.60737]
+        - Entity: 192
+          Position: [-419.671, 265.515, 5.57913]
+          Rotation: [0.287107, -0.687882, 0.560666, -0.360613]
+          Scale: [2.60737, 4.17109, 2.60737]
+        - Entity: 193
           Position: [-37.0534, -14.9767, 1.56495]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 187
+        - Entity: 194
           Position: [-22.0085, -14.9767, 2.19706]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 188
+        - Entity: 195
           Position: [-29.2378, -18.1792, 13.6098]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 189
+        - Entity: 196
           Position: [-13.3781, -16.0503, 14.1792]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 190
+        - Entity: 197
           Position: [-22.1892, -16.0503, 25.8205]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 191
+        - Entity: 198
           Position: [-38.4808, -16.0503, 25.8582]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 192
+        - Entity: 199
           Position: [-44.7206, -16.0503, 12.4621]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 193
+        - Entity: 200
           Position: [-22.7327, 10.9286, 47.6673]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 194
+        - Entity: 201
           Position: [-47.0963, -4.83129, 56.2157]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 195
+        - Entity: 202
           Position: [-62.2444, 21.4226, 60.4319]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 196
+        - Entity: 203
           Position: [-72.3897, 4.99332, 71.4264]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 197
+        - Entity: 204
           Position: [-39.5738, 13.7482, 86.8826]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 198
+        - Entity: 205
           Position: [-1.94206, 5.26245, 94.9495]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 199
+        - Entity: 206
           Position: [-3.67418, 9.86382, 72.2848]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 200
+        - Entity: 207
           Position: [44.9126, -4.62222, 38.2944]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 201
+        - Entity: 208
           Position: [93.1489, 10.7654, 47.8485]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 202
+        - Entity: 209
           Position: [5.63716, 2.41268, 42.1155]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 186
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 187
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 188
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 189
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 190
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 191
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 192
-          Attenuation: [0, 0.145, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
         - Entity: 193
           Attenuation: [0, 0.145, 0]
           Color: [0, 0, 1, 1]
@@ -2428,6 +2485,34 @@
           Color: [0, 0, 1, 1]
           Range: 20
         - Entity: 202
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 203
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 204
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 205
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 206
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 207
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 208
+          Attenuation: [0, 0.145, 0]
+          Color: [0, 0, 1, 1]
+          Range: 20
+        - Entity: 209
           Attenuation: [0, 0.145, 0]
           Color: [0, 0, 1, 1]
           Range: 20
@@ -2570,15 +2655,15 @@
         - Entity: 59
           MeshHandle: RootPlatformShape40
         - Entity: 60
-          MeshHandle: RootPlatformShape40
+          MeshHandle: RootPlatformShape70
         - Entity: 61
-          MeshHandle: RootPlatformShape40
+          MeshHandle: RootPlatformShape70
         - Entity: 62
           MeshHandle: RootPlatformShape70
         - Entity: 63
-          MeshHandle: RootPlatformShape70
+          MeshHandle: RootPlatformShape40
         - Entity: 64
-          MeshHandle: RootPlatformShape70
+          MeshHandle: RootPlatformShape40
         - Entity: 65
           MeshHandle: RootPlatformShape40
         - Entity: 66
@@ -2602,43 +2687,43 @@
         - Entity: 75
           MeshHandle: RootPlatformShape40
         - Entity: 76
-          MeshHandle: RootPlatformShape40
-        - Entity: 77
-          MeshHandle: RootPlatformShape40
-        - Entity: 78
           MeshHandle: RootPlatformShape330
-        - Entity: 79
+        - Entity: 77
           MeshHandle: LeafTree50Shape0
-        - Entity: 80
+        - Entity: 78
           MeshHandle: RootPlatformShape350
-        - Entity: 81
+        - Entity: 79
           MeshHandle: RootsShape0
-        - Entity: 82
+        - Entity: 80
           MeshHandle: RootsShape10
-        - Entity: 83
+        - Entity: 81
           MeshHandle: RootsShape20
-        - Entity: 84
+        - Entity: 82
           MeshHandle: RootsShape30
-        - Entity: 85
+        - Entity: 83
           MeshHandle: RootsShape40
-        - Entity: 86
+        - Entity: 84
           MeshHandle: PaintedIslandShape0
-        - Entity: 87
+        - Entity: 85
           MeshHandle: PaintedIslandShape10
-        - Entity: 88
+        - Entity: 86
           MeshHandle: PaintedIslandShape20
+        - Entity: 87
+          MeshHandle: PaintedIslandShape30
+        - Entity: 88
+          MeshHandle: PaintedIslandShape30
         - Entity: 89
-          MeshHandle: PaintedIslandShape30
-        - Entity: 90
-          MeshHandle: PaintedIslandShape30
-        - Entity: 91
           MeshHandle: PaintedIslandBigShape0
-        - Entity: 92
+        - Entity: 90
           MeshHandle: OceanFloorMeshShape0
-        - Entity: 93
-          MeshHandle: polySurfaceShape10
-        - Entity: 94
+        - Entity: 91
           MeshHandle: LeafTree50Shape0
+        - Entity: 92
+          MeshHandle: RuneGlowStoneShape0
+        - Entity: 93
+          MeshHandle: RuneGlowStoneShape0
+        - Entity: 94
+          MeshHandle: RuneGlowStone2Shape0
         - Entity: 95
           MeshHandle: RuneGlowStoneShape0
         - Entity: 96
@@ -2648,9 +2733,9 @@
         - Entity: 98
           MeshHandle: RuneGlowStoneShape0
         - Entity: 99
-          MeshHandle: RuneGlowStoneShape0
+          MeshHandle: RuneGlowStone7Shape0
         - Entity: 100
-          MeshHandle: RuneGlowStone2Shape0
+          MeshHandle: RuneGlowStoneShape0
         - Entity: 101
           MeshHandle: RuneGlowStoneShape0
         - Entity: 102
@@ -2662,21 +2747,21 @@
         - Entity: 105
           MeshHandle: RuneGlowStone7Shape0
         - Entity: 106
-          MeshHandle: RuneGlowStoneShape0
-        - Entity: 107
-          MeshHandle: RuneGlowStoneShape0
-        - Entity: 108
-          MeshHandle: RuneGlowStone7Shape0
-        - Entity: 109
           MeshHandle: RuneGlowStone2Shape0
-        - Entity: 110
+        - Entity: 107
           MeshHandle: RuneGlowStone7Shape0
-        - Entity: 111
+        - Entity: 108
           MeshHandle: RuneGlowStoneShape0
-        - Entity: 112
+        - Entity: 109
           MeshHandle: RootPlatformShape360
+        - Entity: 110
+          MeshHandle: RootPlatformShape40
+        - Entity: 111
+          MeshHandle: RootPlatformShape40
+        - Entity: 112
+          MeshHandle: RootPlatformShape40
         - Entity: 113
-          MeshHandle: RootPlatformShape70
+          MeshHandle: RootPlatformShape40
         - Entity: 114
           MeshHandle: RootPlatformShape40
         - Entity: 115
@@ -2710,17 +2795,17 @@
         - Entity: 129
           MeshHandle: RootPlatformShape40
         - Entity: 130
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 131
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 132
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 133
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 134
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 135
-          MeshHandle: RootPlatformShape40
+          MeshHandle: LeafTree50Shape0
         - Entity: 136
           MeshHandle: LeafTree50Shape0
         - Entity: 137
@@ -2808,18 +2893,32 @@
         - Entity: 178
           MeshHandle: LeafTree50Shape0
         - Entity: 179
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 180
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 181
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 182
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 183
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 184
-          MeshHandle: LeafTree50Shape0
+          MeshHandle: RootBridgeShape0
         - Entity: 185
+          MeshHandle: RootBridgeShape0
+        - Entity: 186
+          MeshHandle: RootBridge7Shape0
+        - Entity: 187
+          MeshHandle: RootBridge7Shape0
+        - Entity: 188
+          MeshHandle: RootBridgeShape0
+        - Entity: 189
+          MeshHandle: RootPlatformShape360
+        - Entity: 190
+          MeshHandle: RootPlatformShape360
+        - Entity: 191
+          MeshHandle: RootBridgeShape0
+        - Entity: 192
           MeshHandle: RootBridgeShape0
     - Type: 12
       Data:
@@ -2983,6 +3082,10 @@
     - Id: 0
       Tag: Sun
 - Groups:
+    - Id: 84
+      Group: Painted
+    - Id: 85
+      Group: Painted
     - Id: 86
       Group: Painted
     - Id: 87
@@ -2992,12 +3095,6 @@
     - Id: 89
       Group: Painted
     - Id: 90
-      Group: Painted
-    - Id: 91
-      Group: Painted
-    - Id: 92
-      Group: Painted
-    - Id: 93
       Group: Painted
     - Id: 4
       Group: Static
@@ -3362,6 +3459,20 @@
     - Id: 184
       Group: Static
     - Id: 185
+      Group: Static
+    - Id: 186
+      Group: Static
+    - Id: 187
+      Group: Static
+    - Id: 188
+      Group: Static
+    - Id: 189
+      Group: Static
+    - Id: 190
+      Group: Static
+    - Id: 191
+      Group: Static
+    - Id: 192
       Group: Static
     - Id: 2
       Group: Water

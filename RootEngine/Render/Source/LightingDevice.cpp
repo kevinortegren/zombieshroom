@@ -114,6 +114,12 @@ namespace Render
 
 	void LightingDevice::Resize(int p_width, int p_height)
 	{
-		//TODO
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
