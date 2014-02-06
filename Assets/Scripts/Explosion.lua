@@ -4,10 +4,14 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 
 function Explosion.OnCreate (userId, actionId)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
 	local self = Entity.New();
-	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetCollisionResponder():GetCollisionPosition(playerEnt);
-	local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
+	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local prevHandle = fatherEntity:GetCollision():GetHandle();
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Handle in Expl: "..prevHandle);
+	local posVec = fatherEntity:GetTransformation():GetPos(); --playerEnt:GetCollisionResponder():GetCollisionPosition(playerEnt);
+	
+	--local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
 	--Logging.Log(LogLevel.DEBUG_PRINT, "ColPos: ");
 	local collisionComp = Collision.New(self);
@@ -18,13 +22,18 @@ function Explosion.OnCreate (userId, actionId)
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
 	colRespComp:SetContainer(collisionComp);
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Explosion handle: "..collisionComp:GetHandle());
+	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
+	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "fireball");
 	end
+	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end
 
 function Explosion.OnCollide (self, entity)
+	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
@@ -44,6 +53,7 @@ function Explosion.OnCollide (self, entity)
 			health:Damage(abilityOwnerId, Explosion.damage, receiverId);
 		end
 	end
+	--Logging.Log(LogLevel.DEBUG_PRINT, "End of OnCollide");
 end
 
 function Explosion.OnDestroy (self)

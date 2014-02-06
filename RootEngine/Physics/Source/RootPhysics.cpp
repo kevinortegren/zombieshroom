@@ -48,7 +48,7 @@ namespace Physics
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
 			//p_rayResult.
-			glm::vec3 castVector = from - to;
+			glm::vec3 castVector = to - from;
 			glm::vec3 relativePosition = castVector * p_rayResult.m_hitFraction;
 			RootForce::CollisionInfo info;
 			info.m_collisionPosition = from + relativePosition;
@@ -205,7 +205,7 @@ namespace Physics
 			}
 
 		}
-		else
+		else //TODO : Remove the shapeless ability!
 		{
 			unsigned int removedIndex = userPointer->m_vectorIndex;
 			m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
@@ -904,7 +904,7 @@ namespace Physics
 		{
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 			{
-				if(m_playerObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
+				if(m_playerObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_playerObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing player object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
@@ -912,7 +912,7 @@ namespace Physics
 			}
 			else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
 			{
-				if(m_shapelessObjects.size() == 0|| (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_shapelessObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
+				if(m_shapelessObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_shapelessObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing shapeless object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
@@ -922,7 +922,7 @@ namespace Physics
 			{
 				if(m_dynamicObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_dynamicObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
-					//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing dynamic object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
+					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing dynamic object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
 				}
 			}
@@ -987,13 +987,16 @@ namespace Physics
 			retVal[2] = temp.getZ();
 			 
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+		{
+			retVal = m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->GetPos();
+		}
 		else
 		{
 			retVal = m_externallyControlled.at(index)->GetPos();
 			
 			
 		}
-		
 		
 		return retVal;
 
@@ -1080,6 +1083,10 @@ namespace Physics
 			retVal[3] = temp.z();
 			//return glm::quat(0,0,0,1);
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+		{
+			retVal = m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->GetOrientation();
+		}
 		else //Todo: return externallycontrolled orientation if needed.
 		{
 			return glm::quat(0,0,0,1);
@@ -1142,12 +1149,12 @@ namespace Physics
 
 			return glm::vec3(temp[0], temp[1], temp[2]);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL && m_userPointer.at(p_objectHandle)->m_shape != PhysicsShape::SHAPE_NONE)
 		{
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
 		}
-		
+		//return glm::vec3(0,0,0);
 	}
 	RootPhysics* RootPhysics::GetInstance()
 	{
@@ -1173,7 +1180,7 @@ namespace Physics
 			
 			m_dynamicObjects.at(index)->setLinearVelocity(temp);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
+		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL && m_userPointer.at(p_objectHandle)->m_shape != PhysicsShape::SHAPE_NONE)
 		{
 			m_externallyControlled.at(index)->Move(p_velocity, m_dynamicWorld);
 		}
@@ -1201,6 +1208,10 @@ namespace Physics
 			w = p_objectOrientation[3];
 			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
 			
+		}
+		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+		{
+			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetOrientation(p_objectOrientation);
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
@@ -1321,6 +1332,10 @@ namespace Physics
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			m_playerObjects.at(index)->SetPosition(temp);
+		}
+		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+		{
+			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetPos(p_position);
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 		{
@@ -1445,7 +1460,7 @@ namespace Physics
 		RayAbilityCast rayResult;
 		rayResult.m_caster = m_userPointer.at(p_objectHandle);
 		rayResult.from = p_startPos;
-		glm::vec3 end = glm::normalize(p_direction) * p_length;
+		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
 

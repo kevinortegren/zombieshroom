@@ -651,6 +651,17 @@ namespace RootForce
 			return 0;
 		}
 
+		static int PhysicsBindShapeNone(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			glm::quat* q1 = (glm::quat*)luaL_checkudata(p_luaState, 4, "Quat");
+			g_engineContext.m_physics->BindNoShape((*(*rtemp)->m_handle), (*v1), (*q1));
+			return 0;
+		}
+
 		static int PhysicsSetVelocity(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
@@ -1983,6 +1994,7 @@ namespace RootForce
 			{"BindConeShape", PhysicsBindShapeCone},
 			{"BindCylinderShape", PhysicsBindShapeCylinder},
 			{"BindMeshShape", PhysicsBindShapeMesh},
+			{"BindNoShape", PhysicsBindShapeNone},
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
 			{"KnockBack", PhysicsKnockBack},

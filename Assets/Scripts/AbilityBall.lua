@@ -4,6 +4,7 @@ AbilityBall.pushback = 20;
 AbilityBall.cooldown = 1;
 
 function AbilityBall.OnCreate (userId, actionId)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating FireBall");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local playerAimingDeviceEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1)
@@ -26,6 +27,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	transformComp:SetPos(posVec);
 	
 	if Global.IsClient then
+		local particleComp = ParticleEmitter.New(self, "fireball");
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
@@ -43,7 +45,7 @@ function AbilityBall.OnCollide (self, entity)
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
 	
-	if type == PhysicsType.TYPE_PLAYER then
+	if type == PhysicsType.TYPE_PLAYER and self ~= entity then
 		local hitPos = entity:GetTransformation():GetPos();
 		local selfPos = self:GetTransformation():GetPos();
 		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
