@@ -177,7 +177,7 @@ namespace Physics
 			removedIndex = userPointer->m_ragdollIndex;
 			if(removedIndex != -1)
 			{
-				m_ragdolls.at(removedIndex)->RemoveBodies();
+				
 				delete m_ragdolls.at(removedIndex);
 				m_ragdolls.erase(m_ragdolls.begin() + removedIndex);
 			}
