@@ -240,6 +240,9 @@ namespace RootForce
 						id.SequenceID = 1;
 						ECS::Entity* aimingDevice = g_networkEntityMap[id];
 
+						if(!player)
+							break;
+
 						PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 						*playerAction = m.Action;
 

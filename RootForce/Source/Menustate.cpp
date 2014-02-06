@@ -81,6 +81,9 @@ namespace RootForce
 		for(unsigned int i = 0; i < lanList.size(); i++)
 			m_menu->AddServer(lanList.at(i));
 
+		//Update Menu to make sure Setting changes are made in the main thread
+		m_menu->Update();
+
 		// Handle GUI events
 		MenuEvent::MenuEvent event = m_menu->PollEvent();
 		GameStates::GameStates result = GameStates::Exit;

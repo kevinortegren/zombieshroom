@@ -39,5 +39,10 @@ namespace RootForce
 		m_exit = false;
 	}
 
+	void IngameMenu::Update()
+	{
+		m_settingsMenu->Update();
+	}
+
 }
 

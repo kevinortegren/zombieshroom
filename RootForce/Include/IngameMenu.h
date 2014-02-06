@@ -19,6 +19,7 @@ namespace RootForce
 		bool GetReturn() { return m_return; }
 		bool GetExit() { return m_exit; }
 		void Reset();
+		void Update();
 	private:
 		void Return(const Awesomium::JSArray& p_array);
 		void Exit(const Awesomium::JSArray& p_array);
