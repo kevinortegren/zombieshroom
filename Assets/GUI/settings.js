@@ -25,11 +25,18 @@ $(document).ready(function() {
   JSGlobal.LoadSettings = function () {
     var settings = Menu.RequestSettings();
     for(var key in settings) {
-	  if(key == "settings-fullscreen")
-	    $("input[name=settings-fullscreen]").filter("[value="+settings[key]+"]").prop("checked", true);
-	  else
+      if(key == "settings-fullscreen")
+        $("input[name=settings-fullscreen]").filter("[value="+settings[key]+"]").prop("checked", true);
+      else if(key == "settings-resolution-list")
+      {
+        $("#settings-resolution").empty();
+        eval(settings[key]).forEach(function(resolution) {
+          $("#settings-resolution").append("<option value='"+resolution+"'>"+resolution+"</option>");
+        });
+      }
+      else
         $("#"+key).val(settings[key]);
-	}
+    }
   }
   $("#player-settings-back").click(function() {
     $("#player-settings-menu").css("display", "none");
@@ -39,7 +46,7 @@ $(document).ready(function() {
   $("#player-settings-save").click(function() {
     var settings = {};
     settings["settings-player-name"] = $("#settings-player-name").val();
-	Menu.SaveSettings(settings);
+    Menu.SaveSettings(settings);
     $("#player-settings-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
   } );
@@ -52,7 +59,8 @@ $(document).ready(function() {
   $("#graphics-settings-save").click(function() {
     var settings = {};
     settings["settings-fullscreen"] = $("input[name=settings-fullscreen]:checked").val();
-	Menu.SaveSettings(settings);
+    settings["settings-resolution"] = $("#settings-resolution").val();
+    Menu.SaveSettings(settings);
     $("#graphics-settings-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
   } );

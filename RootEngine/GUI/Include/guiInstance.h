@@ -42,6 +42,7 @@ namespace RootEngine
 			virtual void SetWorkingDir(std::string p_path) = 0;
 
 			virtual void HandleEvents(SDL_Event p_event) = 0;
+			virtual void ResizeAllViews(int p_width, int p_height) = 0;
 
 
 			virtual Dispatcher* GetDispatcher() = 0; 
@@ -64,6 +65,7 @@ namespace RootEngine
 			void DestroyView(WebView* p_view);
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 			void HandleEvents(SDL_Event p_event);
+			void ResizeAllViews(int p_width, int p_height);
 
 			static guiInstance* GetInstance();
 			Dispatcher* GetDispatcher() { return m_dispatcher; }
