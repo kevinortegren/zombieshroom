@@ -66,7 +66,7 @@ namespace Render
 
 	GLRenderer::~GLRenderer()
 	{
-		//TODO: Delete resources.
+		
 	}
 
 	void GLRenderer::Startup()
@@ -437,6 +437,11 @@ namespace Render
 		SDL_GL_SwapWindow(m_window);
 	}
 
+	void GLRenderer::SetRenderToTexture(RenderToTexture* p_renderToTexture)
+	{
+		m_activeRTT = p_renderToTexture;
+	}
+
 	static bool SortRenderJobs(RenderJob* a, RenderJob* b)
 	{
 		  if( a->m_renderPass < b->m_renderPass ) return true;
@@ -622,13 +627,18 @@ namespace Render
 
 	void GLRenderer::Output()
 	{
-		// Restore backbuffer.
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if(m_activeRTT == nullptr)
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		else
+			glBindFramebuffer(GL_FRAMEBUFFER, m_activeRTT->m_framebuffer);
 
+		// Bind result of render pipeline.
 		m_color0->Bind(5);
 
+		// Apply output program.
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
+		// Draw result.
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
@@ -738,6 +748,11 @@ namespace Render
 	EffectInterface* GLRenderer::CreateEffect() 
 	{ 
 		return m_resources.CreateEffect();
+	}
+
+	RenderToTexture* GLRenderer::CreateRenderToTexture()
+	{
+		return m_resources.CreateRenderToTexture();
 	}
 
 	std::string GLRenderer::GetStringFromMaterial(Material* p_material)

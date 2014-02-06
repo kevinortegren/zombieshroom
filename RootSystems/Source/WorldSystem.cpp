@@ -24,6 +24,12 @@ namespace RootForce
 
 		// Spatial divide world and split the meshes.
 		m_quadTree.Init(m_engineContext, m_world);
+
+		// TEMP
+
+		m_rtt = m_engineContext->m_renderer->CreateRenderToTexture();
+
+		RTT();
 	}
 #endif
 
@@ -113,6 +119,11 @@ namespace RootForce
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+	}
+
+	void WorldSystem::RTT()
+	{
+
 	}
 
 #ifndef COMPILE_LEVEL_EDITOR

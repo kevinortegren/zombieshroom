@@ -24,6 +24,8 @@ namespace RootForce
 		void CreateSun();
 		void CreateSkyBox();
 		
+		void RTT();
+
 		void AddStaticEntitiesToPhysics();
 		
 		void Process();
@@ -36,5 +38,7 @@ namespace RootForce
 		QuadTree m_quadTree;
 		bool m_showDebug;
 		unsigned m_culledNodes;
+
+		Render::RenderToTexture* m_rtt;
 	};
 }

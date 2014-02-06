@@ -29,7 +29,7 @@ namespace Render
 	void GeometryBuffer::CreateTextures(int p_width, int p_height)
 	{
 		m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
-		m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
