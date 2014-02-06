@@ -16,7 +16,6 @@ namespace RootForce
 	void MenuState::Initialize(const std::string& p_workingDir)
 	{
 		m_workingDir = p_workingDir;
-
 		// Initialize the LAN-list
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
@@ -41,7 +40,7 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("menu.html"), g_engineContext.m_gui->GetDispatcher(), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);

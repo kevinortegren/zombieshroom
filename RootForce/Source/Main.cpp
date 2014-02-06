@@ -81,9 +81,13 @@ namespace RootForce
 		{
 			throw std::runtime_error("Failed to create window");
 		}
-
+		SDL_SetWindowFullscreen(m_window.get(), g_engineContext.m_configManager->GetConfigValueAsString("settings-fullscreen").compare("on") == 0 ? SDL_TRUE : SDL_FALSE);
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
+		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
+		SDL_GL_MakeCurrent(m_window.get(), mainContext);
 
 		// Setup the importer and exporter
 		m_world.GetEntityImporter()->SetImporter(Importer);
@@ -91,7 +95,7 @@ namespace RootForce
 
 		// Initialize GUI
 		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"), m_window.get(), guiContext);
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
@@ -109,6 +113,7 @@ namespace RootForce
 
 	Main::~Main() 
 	{
+		g_engineContext.m_gui->Shutdown();
 		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);

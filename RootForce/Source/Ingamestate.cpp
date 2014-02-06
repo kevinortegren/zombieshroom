@@ -166,19 +166,18 @@ namespace RootForce
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
-		m_waterSystem->Init();
-
-		m_waterCollisionSystem = new RootSystems::WaterCollsionSystem(g_world, &g_engineContext, m_waterSystem);
-		g_world->GetSystemManager()->AddSystem<RootSystems::WaterCollsionSystem>(m_waterCollisionSystem);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
+
+		
 	}
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -189,11 +188,15 @@ namespace RootForce
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		//Initialize the debug, setting the html view
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
+
+		//Reset the ingame menu before we start the match
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
+		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
@@ -207,7 +210,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(0.0f);
+		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 	}
 
 	void IngameState::Exit()
@@ -226,6 +229,8 @@ namespace RootForce
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
+		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
+
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
@@ -241,7 +246,6 @@ namespace RootForce
 	{				
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
-
 		g_engineContext.m_renderer->Render();
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
@@ -249,13 +253,22 @@ namespace RootForce
 		
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
-
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);		
+			PROFILE("GUI", g_engineContext.m_profiler);
+
 			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render(m_hud->GetView());
-			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			if (m_displayIngameMenu)
+			{
+				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
+				m_ingameMenu->GetView()->Focus();
+			}
+			else
+			{
+				g_engineContext.m_gui->Render(m_hud->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			}
 		}
+
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
@@ -264,12 +277,6 @@ namespace RootForce
 		Transform* debugTransform = nullptr;
 		if (debugEntity != nullptr)
 			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
-
-		// Check for quitting condition
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Menu;
-		}
 
 		// Check for disconnection from the server
 		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
@@ -368,7 +375,7 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-#endif
+
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
@@ -409,12 +416,13 @@ namespace RootForce
 			m_waterSystem->IncreaseSpeed();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->DecreaseSpeed();
+		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//	m_waterSystem->IncreaseWaterHeight();
+		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//	m_waterSystem->DecreaseWaterHeight();
 
-
-		{
-			PROFILE("Water collision system", g_engineContext.m_profiler);
-			m_waterCollisionSystem->Process();
-		}
+#endif
+		
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
@@ -440,7 +448,8 @@ namespace RootForce
 		
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
+			if(!m_displayIngameMenu)
+				m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -470,7 +479,8 @@ namespace RootForce
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			m_actionSystem->UpdateAimingDevice();
+			if(!m_displayIngameMenu)
+				m_actionSystem->UpdateAimingDevice();
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
@@ -499,10 +509,30 @@ namespace RootForce
 		}
 
 		m_animationSystem->Synch();
-		
+
+
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
+		}
+
+		// Check for quitting condition
+		if (m_ingameMenu->GetExit())
+		{
+			return GameStates::Menu;
+		}
+
+		//Check status for the display of the ingame menu
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_displayIngameMenu = true;
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
+		}
+		if (m_ingameMenu->GetReturn())
+		{
+			m_displayIngameMenu = false;
+			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_ingameMenu->Reset();
 		}
 
 		return GameStates::Ingame;
