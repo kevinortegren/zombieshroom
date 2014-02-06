@@ -93,9 +93,9 @@ namespace Ragdoll
 				m_hipsNode = p_rootNode;
 			btRigidBody* body;
 			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0 || std::string(p_rootNode->mName.data).compare("Character1_Spine") == 0)
-				mass = 8.0f;
+				mass = 5.0f;
 			else
-				mass = 8.0f /*/ p_massFactor*/;
+				mass = 5.0f /*/ p_massFactor*/;
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
 			
@@ -350,7 +350,7 @@ namespace Ragdoll
  			{
  				CalculateConstraintTransform(p_bodyA, p_bodyB,
  						0.25f , -0.0f * OFFSET, 0,
- 					0, 0.20f * OFFSET, 0,
+ 					0, 0.25f * OFFSET, 0,
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
 
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -364,7 +364,7 @@ namespace Ragdoll
  			{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					-0.25f , -0.0f * OFFSET, 0,
- 					0, 0.2f * OFFSET, 0,
+ 					0, 0.25f * OFFSET, 0,
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -432,39 +432,39 @@ namespace Ragdoll
  		 		return constraint;
  		 	}
  		 	//Spine - Left upper arm
- 		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
- 		 	{
- 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					-0.2f , 0.1f * OFFSET, 0,
- 					-0.0, -0.15f * OFFSET, 0,
- 					0 , 0, 1, 0, &localA, &localB);
- 		 	
- 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
- 		 		m_dynamicWorld->addConstraint(constraint);
- 		 		constraint->setDbgDrawSize(0.5f);
- 		 		return constraint;
- 		 	}
- 		 	////Spine - Right upper arm
- 		 	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
- 		 	{
- 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0.2f , 0.1f * OFFSET, 0,
- 					0, -0.10f * OFFSET, 0,
- 					0 , 0, 1, 0, &localA, &localB);
- 		 		
- 		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
- 		 		m_dynamicWorld->addConstraint(constraint);
- 		 		constraint->setDbgDrawSize(0.5f);
- 		 		return constraint;
- 		 	}
+ 		 	//else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
+ 		 	//{
+ 				//CalculateConstraintTransform(p_bodyA, p_bodyB, 
+ 				//	-0.2f , 0.1f * OFFSET, 0,
+ 				//	-0.0, -0.15f * OFFSET, 0,
+ 				//	0 , 0, 1, 0, &localA, &localB);
+ 		 	//
+ 		 	//	btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+ 		 	//	constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 	//	m_dynamicWorld->addConstraint(constraint);
+ 		 	//	constraint->setDbgDrawSize(0.5f);
+ 		 	//	return constraint;
+ 		 	//}
+ 		 	//////Spine - Right upper arm
+			/*else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
+			{
+			CalculateConstraintTransform(p_bodyA, p_bodyB, 
+			0.2f , 0.1f * OFFSET, 0,
+			0, -0.10f * OFFSET, 0,
+			0 , 0, 1, 0, &localA, &localB);
+
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(- PI_2 , PI_2 /2);
+			m_dynamicWorld->addConstraint(constraint);
+			constraint->setDbgDrawSize(0.5f);
+			return constraint;
+			}*/
  		 	////Left upper arm - Left lower arm
  		 	else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0 , -0.20f * OFFSET, 0,
- 					0, 0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -478,7 +478,7 @@ namespace Ragdoll
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0 , -0.20f * OFFSET, 0,
- 					0, 0.20f * OFFSET, 0,
+ 					0, 0.15f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
