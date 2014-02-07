@@ -134,7 +134,6 @@ namespace RootForce
 		}
 	}
 
-
 	void WorldSystem::CreatePlayerCamera()
 	{
 		// Add camera entity.	
@@ -181,7 +180,7 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
-		
+
 		// Cull static geometry.
 		m_quadTree.m_culledEntities.clear();
 		m_quadTree.Cull(frustrum, m_quadTree.GetRoot());

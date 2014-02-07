@@ -168,16 +168,22 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+	
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
-		m_displayWorldDebug = false;
-
-		
+		m_displayWorldDebug = false;	
 	}
 
 	void IngameState::Enter()
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+		m_directionlLightSystem->Process();
+		m_pointLightSystem->Process();
+		m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -207,30 +213,6 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
-
-		// Create RTT.
-		m_sharedSystems.m_worldSystem->m_rtt = g_engineContext.m_renderer->CreateRenderToTexture();
-		m_sharedSystems.m_worldSystem->m_rtt->SetTexture(g_engineContext.m_renderer->CreateTexture());
-		m_sharedSystems.m_worldSystem->m_rtt ->GetTexture()->CreateEmptyTexture(1280, 720, Render::TextureFormat::TEXTURE_DEPTH_COMPONENT);
-		m_sharedSystems.m_worldSystem->m_rtt->BindTextureAsDepth();
-
-		m_renderingSystem->Process();
-		m_pointLightSystem->Process();
-		m_directionlLightSystem->Process();
-
-		// Create camera.
-
-		// Render to texture.
-		g_engineContext.m_renderer->SetRenderToTexture(m_sharedSystems.m_worldSystem->m_rtt);
-		g_engineContext.m_renderer->Clear();
-		g_engineContext.m_renderer->Render();
-	
-		// Store texture.
-		m_sharedSystems.m_worldSystem->m_rtt->Store("rtt.tga");
-
-		// Restore backbuffer.
-		g_engineContext.m_renderer->SetRenderToTexture(nullptr);
-
 	}
 
 	void IngameState::Exit()
@@ -522,6 +504,7 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
+			m_botanySystem->Process();
 		}
 
 		{

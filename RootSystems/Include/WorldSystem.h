@@ -31,7 +31,7 @@ namespace RootForce
 
 		QuadTree* GetQuadTree();
 
-		Render::RenderToTextureInterface* m_rtt;
+		
 
 	private:
 		RootEngine::GameSharedContext* m_engineContext;

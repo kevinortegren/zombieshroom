@@ -654,6 +654,9 @@ namespace Render
 		}
 		else
 		{
+			// Render to texture.
+			glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
+
 			glBindFramebuffer(GL_FRAMEBUFFER, m_activeRTT->GetFramebuffer());
 
 			GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
@@ -678,6 +681,8 @@ namespace Render
 		m_color0->Unbind(5);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, m_width, m_height);
+
 	}
 
 	void GLRenderer::BindForwardFramebuffer()

@@ -1,0 +1,25 @@
+- name: Botany
+  techniques:
+    - name: Botany
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: g_BlendMap
+          slot: 6
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: SIZEMIN
+          offset: 128
+      programs:
+        - name: Botany
+          shaders:
+            - name: mesh_blend_alpha
+              type: vertex
+            - name: mesh_blend_alpha
+              type: fragment
