@@ -57,8 +57,7 @@ namespace RootEngine
 	{
 		// Default values.
 		m_values["settings-player-name"] = "Player";
-		m_values["ScreenWidth"] = "1280";
-		m_values["ScreenHeight"] = "720";
+		m_values["settings-resolution"] = "1280x720";
 		m_values["settings-fullscreen"] = "false";
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";

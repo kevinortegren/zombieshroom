@@ -3,6 +3,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Script.h>
+#include <RootSystems/Include/CollisionInfo.h>
 #include <set>
 
 namespace RootForce
@@ -15,7 +16,7 @@ namespace RootForce
 
 	struct CollisionResponder : public ECS::Component<CollisionResponder>
 	{
-		std::set<void*> m_collidedEntities;
+		std::map<void*, CollisionInfo> m_collisions;
 	};
 
 	class CollisionSystem : public ECS::EntitySystem
