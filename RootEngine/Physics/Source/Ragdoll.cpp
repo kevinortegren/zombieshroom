@@ -144,7 +144,7 @@ namespace Ragdoll
 				if(index < 3) 
 					toTrans = glm::rotate(p_transform, -90.0f, glm::vec3(0,0,1)) * /*test*/ m_lastBoneMatrix[index];
 				else
-					toTrans = glm::rotate(p_transform, 90.0f, glm::vec3(0,0,1)) */* test*/ m_lastBoneMatrix[index];
+					toTrans = glm::rotate(p_transform, 90.0f, glm::vec3(0,0,1)) * /* test*/ m_lastBoneMatrix[index];
 			}
 			else
 			{
@@ -399,7 +399,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
 
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(- PI_2 , PI_2 /2);
+				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  				m_dynamicWorld->addConstraint(constraint);
  				constraint->setDbgDrawSize(0.5f);
  				return constraint;
@@ -413,7 +413,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(- PI_2 , PI_2 /2);
+ 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  				//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
  				
  				m_dynamicWorld->addConstraint(constraint);
@@ -429,7 +429,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -443,7 +443,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -457,7 +457,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -471,7 +471,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(-PI_2, PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -485,7 +485,7 @@ namespace Ragdoll
  					0 , 0, 1, 0, &localA, &localB);
  		 	
  		 		btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(-PI_2, PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -499,7 +499,7 @@ namespace Ragdoll
 					0 , 0, 1, 0, &localA, &localB);
 
 				btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(- PI_2 , PI_2 /2);
+				constraint->setLimit(-PI_2, PI_2 / 2.0f);
 				m_dynamicWorld->addConstraint(constraint);
 				constraint->setDbgDrawSize(0.5f);
 				return constraint;
@@ -508,12 +508,12 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					-0.2 , -0.0f * OFFSET, 0,
+ 					-0.2f , -0.0f * OFFSET, 0,
  					0.15f, 0.0f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -527,7 +527,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 /2);
+ 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -537,11 +537,11 @@ namespace Ragdoll
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
  					0.1f , 0.00f * OFFSET, 0,
- 					-0.2, -0.0f * OFFSET, 0,
+ 					-0.2f, -0.0f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					constraint->setLimit(- PI_2 , PI_2 /2);
+ 					constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -555,7 +555,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(- PI_2 , PI_2 /2);
+ 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -669,7 +669,7 @@ namespace Ragdoll
 		//p_bones[myIndex][3] -= (glm::vec4(offsetValue,0) * 2); // this does'nt work SADFACE try different orderrs or something
 		//p_bones[myIndex][3].y -= (m_modelSpaceOffset[myIndex] * 2); // Verkar bero på vilket håll man är vinklad om man ska ta - på x,y eller z. Måste komma på nån generell fix.
 		
-#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
+//#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
 			FixPosition(p_bones, p_rootNode->mChildren[i]);
