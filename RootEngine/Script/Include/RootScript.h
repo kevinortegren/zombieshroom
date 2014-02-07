@@ -38,6 +38,9 @@ namespace RootEngine
 			virtual void SetGlobalString(const std::string& p_variableName, const std::string& p_string) = 0;
 			virtual void SetGlobalNumber(const std::string& p_variableName, double p_double) = 0;
 			virtual void SetGlobalBoolean(const std::string& p_variableName, bool p_bool) = 0;
+			virtual std::string GetGlobalString(const std::string& p_variableName, const std::string& p_globalName = "Global") = 0;
+			virtual double GetGlobalNumber(const std::string& p_variableName, const std::string& p_globalName = "Global") = 0;
+			virtual bool GetGlobalBoolean(const std::string& p_variableName, const std::string& p_globalName = "Global") = 0;
 			virtual void RegisterFunction(std::string p_funcName, lua_CFunction p_func) = 0;
 
 			virtual lua_State* GetLuaState() = 0;

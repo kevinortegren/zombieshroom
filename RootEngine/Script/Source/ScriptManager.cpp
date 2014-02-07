@@ -104,6 +104,28 @@ namespace RootEngine
 		}
 
 
+		std::string ScriptManager::GetGlobalString(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			return std::string(lua_tostring(m_luaState, -1));
+		}
+
+		double ScriptManager::GetGlobalNumber(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			return (double) lua_tonumber(m_luaState, -1);
+		}
+
+		bool ScriptManager::GetGlobalBoolean(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			return (bool) lua_toboolean(m_luaState, -1);
+		}
+
+
 		void ScriptManager::RegisterFunction(std::string p_funcName, lua_CFunction p_func)
 		{
 			lua_register(m_luaState, p_funcName.c_str(), p_func);

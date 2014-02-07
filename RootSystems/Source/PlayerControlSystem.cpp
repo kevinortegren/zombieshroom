@@ -107,6 +107,7 @@ namespace RootForce
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
+		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 
 		glm::vec3 movement(0.0f);
 
@@ -158,19 +159,33 @@ namespace RootForce
 			case PlayerAction::SELECT_ABILITY3:
 				action->SelectedAbility = 3;
 				break;
-			case PlayerAction::ACTIVATE_ABILITY:
+			case PlayerAction::ACTIVATE_ABILITY_PRESSED:
 				{
-					action->ActivateAbility = true;
-					action->ActionID = s_nextActionID;
-					if (playerComponent->AbilityScripts[playerComponent->SelectedAbility].CooldownOff)
+					if (playerComponent->AbilityState == AbilityState::OFF && !playerComponent->AbilityScripts[playerComponent->SelectedAbility].OnCooldown)
 					{
-						action->ActionID = s_nextActionID++;	
+						playerComponent->AbilityState = AbilityState::CHARGING;
+					}
+
+					action->AbilityTime += dt;
+				}
+				break;
+			case PlayerAction::ACTIVATE_ABILITY_RELEASED:
+				{
+					playerComponent->AbilityState = AbilityState::OFF;
+				}
+				break;
+			case PlayerAction::JUMP_PRESSED:
+				{
+					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
+					{
+						// Start/Keep jumping
+						action->JumpTime += dt;
 					}
 				}
 				break;
-			case PlayerAction::JUMP:
+			case PlayerAction::JUMP_RELEASED:
 				{
-					action->Jump = true;
+					action->JumpTime = 0.0f;
 				}
 				break;
 			default:

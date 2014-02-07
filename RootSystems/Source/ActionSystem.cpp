@@ -54,12 +54,14 @@ namespace RootSystems
 		{
 			if( health->IsDead )
 			{
-				if(action->ActivateAbility)
+				if(player->AbilityState == RootForce::AbilityState::CHARGING)
 				{
 					health->WantsRespawn = true;
-					action->ActivateAbility = false;
-					action->Jump = false;
+					action->JumpTime = 0.0f;
+					action->AbilityTime = 0.0f;
+					player->AbilityState = RootForce::AbilityState::OFF;
 				}
+
 				animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 				return;
 			}
@@ -78,6 +80,27 @@ namespace RootSystems
 
 			m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 
+
+			// Activate ability! Pew pew!
+			switch (player->AbilityState)
+			{
+				case RootForce::AbilityState::CHARGING:
+				{
+					
+				} break;
+
+				case RootForce::AbilityState::CHANNELING:
+				{
+
+				} break;
+
+				case RootForce::AbilityState::OFF:
+				{
+
+				} break;
+			}
+
+			/*
 			// Activate ability! Pew pew!
 			player->SelectedAbility = action->SelectedAbility - 1;
 			if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].CooldownOff)
@@ -99,6 +122,7 @@ namespace RootSystems
 						player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 				}
 			}
+			*/
 
 			// Count down cooldown
 			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)

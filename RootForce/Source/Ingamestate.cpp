@@ -90,20 +90,25 @@ namespace RootForce
 		//keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::JUMP;
+		keybindings[4].Action = RootForce::PlayerAction::JUMP_PRESSED;
+		keybindings[4].ActionUp = RootForce::PlayerAction::JUMP_RELEASED;
 		//keybindings[4].Edge = true;
 		
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY_PRESSED;
+		keybindings[5].ActionUp = RootForce::PlayerAction::ACTIVATE_ABILITY_RELEASED;
 		//keybindings[5].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
