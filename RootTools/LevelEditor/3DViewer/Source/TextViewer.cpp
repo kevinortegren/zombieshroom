@@ -13,7 +13,7 @@
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\WorldSystem.h>
 #include <RootSystems\Include\ShadowSystem.h>
-//#include <RootSystems\Include\WaterSystem.h>
+#include <RootSystems\Include\WaterSystem.h>
 
 
 #include <Utility\ECS\Include\World.h>
@@ -247,9 +247,11 @@ int main(int argc, char* argv[])
 				cameraSystem->Process();
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
-				particleSystem->Process();				
+				particleSystem->Process();	
+				waterSystem->Process();
 				shadowSystem->Process();			
-				renderingSystem->Process();	
+				renderingSystem->Process();
+
 
 				g_engineContext.m_renderer->Render();
 
@@ -309,6 +311,10 @@ void HandleEvents()
 
 					ReleaseMutex(RM.IdMutexHandle);
 				}
+				if(event.key.keysym.scancode == SDL_SCANCODE_T)
+				{
+					waterSystem->InitDisturb();
+				}
 			}
 			break;
 			//default:
@@ -339,6 +345,8 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 	RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
+	RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
+
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
 
@@ -350,7 +358,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
-
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100);
 
 
 	// Initialize systems.
@@ -377,14 +385,14 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
 	worldSystem->CreateSun();
 	worldSystem->CreateSkyBox();
-	//waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
+	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
+	waterSystem->Init();
 }
 
 void LoadSceneFromMaya()
 {
-	RM.ClearAllMessages();
-	//LOAD						
-	LoadLocators();
+	RM.ClearAllMessages();					
+
 
 	//LOAD CAMERAS
 	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
@@ -393,6 +401,7 @@ void LoadSceneFromMaya()
 	ReleaseMutex(RM.CameraMutexHandle);
 	CreateCameraEntity(0);
 
+	LoadLocators();
 	//LOAD MATERIALS
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -745,7 +754,10 @@ void UpdateLocator(int index)
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
 	if(RM.PlocatorList[index]->transformation.flags._Water)
+	{
 		m_world.GetStorage()->SetValue("WaterHeight", transform->m_position.y);
+		waterSystem->SetWaterHeight(transform->m_position.y);
+	}
 }
 
 void CreateCameraEntity(int index)
@@ -851,6 +863,8 @@ void LoadLocators()
 		{
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 			m_world.GetStorage()->SetValue("WaterHeight", RM.PlocatorList[i]->transformation.position.y);
+			waterSystem->CreateWater(RM.PlocatorList[i]->transformation.position.y);
+			waterSystem->ToggleWireFrame();
 		}
 
 	}
