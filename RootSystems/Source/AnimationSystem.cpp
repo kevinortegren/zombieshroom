@@ -15,11 +15,13 @@ namespace RootForce
 
 	void AnimationSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
+		
 		if(m_logger)
 		{
 			Renderable* renderable = m_renderables.Get(p_entity);
 			Animation* animation = m_animations.Get(p_entity);
-
+			if(animation->m_animClip == AnimationClip::RAGDOLL)
+				return;
 			if(animation->m_animClip != animation->m_prevAnimClip)
 			{
 				if(animation->m_locked == 2)

@@ -39,7 +39,7 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
-		
+
 		// Rotate the model and reset the angle
 		transform->m_orientation.YawGlobal(action->Angle.x);
 		action->Angle.x = 0;
@@ -59,7 +59,7 @@ namespace RootSystems
 					action->ActivateAbility = false;
 					action->Jump = false;
 				}
-
+				animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 				return;
 			}
 
@@ -76,7 +76,7 @@ namespace RootSystems
 			}
 
 			m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
-		
+
 			// Activate ability! Pew pew!
 			player->SelectedAbility = action->SelectedAbility - 1;
 			if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].Cooldown <= 0)
@@ -116,7 +116,7 @@ namespace RootSystems
 		{
 			//if(action->StrafePower == 0 && action->MovePower == 0)
 			animation->m_animClip = RootForce::AnimationClip::IDLE;
-			
+
 			if(!isGameOver)
 			{
 				if(action->MovePower < 0)
@@ -140,6 +140,9 @@ namespace RootSystems
 			}
 			action->Jump = false;
 		}
+
+
+
 
 		//action->MovePower = 0;
 		//action->StrafePower = 0;
@@ -176,6 +179,7 @@ namespace RootSystems
 
 			}
 		}
+
 
 	}
 

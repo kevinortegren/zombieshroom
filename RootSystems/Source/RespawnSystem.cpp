@@ -50,6 +50,8 @@ namespace RootSystems
 
 				health->Health = 100;
 				health->IsDead = false;
+				m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
+				
 			}
 			health->WantsRespawn = false;
 		}
