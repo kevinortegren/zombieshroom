@@ -542,8 +542,9 @@ namespace RootForce
 		//Check status for the display of the ingame menu
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayIngameMenu = true;
-			g_engineContext.m_inputSys->LockMouseToCenter(false);
+			m_displayIngameMenu = !m_displayIngameMenu;
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
 		{
