@@ -3,14 +3,15 @@
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
 
+// Test so that invalid bindings don't cause a crash
 TEST(Dispatcher, EmptyBind)
 {
 	RootEngine::GUISystem::Dispatcher* dispatcher = g_engineContext.m_gui->GetDispatcher();
 
 	Awesomium::JSObject fakeObject;
 	Awesomium::WebString fakeName;
-	dispatcher->Bind(fakeObject, fakeName, JSDelegate());
-	dispatcher->BindWithRetVal(fakeObject, fakeName, JSDelegateWithRetval());
+	dispatcher->Bind(fakeObject, fakeName, JSDelegate1());
+	dispatcher->BindWithRetVal(fakeObject, fakeName, JSDelegate1WithRetval());
 }
 
 TEST(Dispatcher, EmptyCall)

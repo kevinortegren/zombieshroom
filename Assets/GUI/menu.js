@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // Splash skip
   $("#splash").click(function() {
-    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none"); LoadSettings();});
+    $("#splash").animate({opacity: 0}, 500, "linear", function(){$("#splash").css("display","none"); JSGlobal.LoadSettings();});
   } );
   setTimeout(function(){$("#splash").click();}, 2000);
   // Main menu
@@ -13,7 +13,6 @@ $(document).ready(function() {
   $("#main-settings").click(function() {
     $("#main-menu").css("display", "none");
     $("#settings-menu").css("display", "table");
-    LoadSettings();
   } );
   $("#main-exit").click(function() {
     Menu.Exit();
@@ -24,7 +23,8 @@ $(document).ready(function() {
     $("#player-settings-menu").css("display", "table");
   } );
   $("#settings-graphics").click(function() {
-    ShowError("Not yet implemented! D:");
+    $("#settings-menu").css("display", "none");
+    $("#graphics-settings-menu").css("display", "table");
   } );
   $("#settings-sound").click(function() {
     ShowError("Not yet implemented! D:");
@@ -35,24 +35,6 @@ $(document).ready(function() {
   $("#settings-back").click(function() {
     $("#settings-menu").css("display", "none");
     $("#main-menu").css("display", "table");
-  } );
-  // Player settings
-  LoadSettings = function () {
-    var settings = Menu.RequestSettings();
-    for(var key in settings)
-      $("#"+key).val(settings[key]);
-  }
-  $("#player-settings-back").click(function() {
-    $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
-    LoadSettings();
-  } );
-  $("#player-settings-save").click(function() {
-    var settings = {};
-    settings["settings-player-name"] = $("#settings-player-name").val();
-    Menu.SaveSettings(settings);
-    $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
   } );
   // Lan menu
   var ClearTable = function ()
@@ -138,6 +120,13 @@ $(document).ready(function() {
   } );
   $("#lan-host-submit").click(function() {
     var selectedIndex = $("#lan-host-map")[0].selectedIndex;
+		
+		if(parseFloat($("#lan-host-maxplayers").val()) < parseFloat($("#lan-host-maxplayers").attr("min")))
+			$("#lan-host-maxplayers").val($("#lan-host-maxplayers").attr("min"));
+		if(parseFloat($("#lan-host-matchlength").val()) < parseFloat($("#lan-host-matchlength").attr("min")))
+			$("#lan-host-matchlength").val($("#lan-host-matchlength").attr("min"));
+		if(parseFloat($("#lan-host-killvictory").val()) < parseFloat($("#lan-host-killvictory").attr("min")))
+			$("#lan-host-killvictory").val($("#lan-host-killvictory").attr("min"));
 		
     var settings = {};
     settings["ServerName"] = $("#lan-host-name").val();

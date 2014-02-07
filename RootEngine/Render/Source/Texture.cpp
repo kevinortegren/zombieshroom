@@ -7,7 +7,7 @@ namespace Render
 {
 	Texture::Texture()
 		: m_textureHandle(0), m_target(0), m_textureWidth(0), m_textureHeight(0),
-		m_textureFormat(0), m_textureType(0), m_compressRatio(1), m_levels(0)
+		m_textureFormat(0), m_textureType(0), m_compressRatio(1), m_levels(0), m_bpp(0)
 	{
 		glGenTextures(1, &m_textureHandle);
 	}
@@ -53,6 +53,7 @@ namespace Render
 		{
 			// DXT3
 			m_compressRatio = 4;
+			m_bpp = 4;
 			
 			for(gli::texture2D::size_type Level = 0; Level < texture.levels(); ++Level)
 			{
@@ -109,6 +110,7 @@ namespace Render
 
 		// DXT3
 		m_compressRatio = 4;
+		m_bpp = 4;
 
 		for(gli::texture2D::size_type i = 0; i < cube.faces(); i++)  {
 
@@ -143,6 +145,7 @@ namespace Render
 		m_textureWidth = p_width;
 		m_textureHeight = p_height;
 		m_levels = 1;
+		m_compressRatio = 1;
 		
 		glBindTexture(m_target, m_textureHandle);
 		if(p_format == TextureFormat::TEXTURE_RGBA || p_format == TextureFormat::TEXTURE_BGRA)
@@ -189,19 +192,83 @@ namespace Render
 		{
 			m_textureType = GL_FLOAT;
 			m_textureFormat = GL_DEPTH_COMPONENT;
-			m_bpp = 4;
+			m_bpp = 5;
 
 			glTexImage2D(m_target, 0, GL_DEPTH32F_STENCIL8, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
 		else if(p_format == TextureFormat::TEXTURE_R32)
 		{
 			m_textureType = GL_FLOAT;
-			m_textureFormat = GL_R32F;
+			m_textureFormat = GL_RED;
+			m_internalFormat = GL_R32F;
+			m_bpp = 4;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			m_bpp = 4;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			std::vector<float> emptyData(p_width * p_height, 0);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RG16)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_RG;
+			m_internalFormat = GL_RG16F;
+			m_bpp = 4;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, 0);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGBA32F)
+		{
+			m_textureType = GL_FLOAT;
+			m_textureFormat = GL_RGBA;
+			m_internalFormat = GL_RGBA32F;
+			m_bpp = 16;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			std::vector<glm::vec4> emptyData(p_width * p_height, glm::vec4(0,0,0,0));
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGB8)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+			m_textureFormat = GL_RGB;
+			m_internalFormat = GL_RGB8;
+			m_bpp = 3;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-			glTexImage2D(m_target, 0, GL_R, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
-			glClearTexImage(m_target, 0, GL_R, GL_FLOAT, NULL);
+			std::vector<glm::byte> emptyData(p_width * p_height*3, 0);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
+		}
+		else if(p_format == TextureFormat::TEXTURE_RGBA8)
+		{
+			m_textureType = GL_UNSIGNED_BYTE;
+			m_textureFormat = GL_RGBA;
+			m_internalFormat = GL_RGBA8;
+			m_bpp = 3;
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+			std::vector<glm::byte> emptyData(p_width * p_height*4, 0);
+			glTexImage2D(m_target, 0, m_internalFormat, p_width, p_height, 0, m_textureFormat, m_textureType, &emptyData[0]);
 		}
 		else
 		{
@@ -277,5 +344,20 @@ namespace Render
 	{
 		return m_levels;
 	}
+
+	void Texture::BindImage( unsigned int p_slot )
+	{
+		glBindImageTexture(p_slot, m_textureHandle, 0, GL_FALSE, 0, m_access, m_internalFormat);
+	}
+	void Texture::UnBindImage( unsigned int p_slot )
+	{
+		glBindImageTexture(0, 0, 0, GL_FALSE, 0, m_access, m_internalFormat);
+	}
+
+	void Texture::SetAccess( GLenum p_access )
+	{
+		m_access = p_access;
+	}
+
 }
 

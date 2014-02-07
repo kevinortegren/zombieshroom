@@ -24,8 +24,13 @@ namespace Render
 			TEXTURE_RGB,
 			TEXTURE_BGR,
 			TEXTURE_DEPTH_COMPONENT,
+			TEXTURE_RG16,
 			TEXTURE_R32,
-			TEXTURE_DEPTH_STENCIL
+			TEXTURE_RGBA32F,
+			TEXTURE_DEPTH_STENCIL,
+			TEXTURE_RGBA8,
+			TEXTURE_RGB8,
+
 		};
 	}
 
@@ -37,6 +42,9 @@ namespace Render
 		virtual void Bind(unsigned int slot) = 0;
 		virtual void Unbind(unsigned int slot) = 0;
 		
+		virtual void BindImage(unsigned int p_slot) = 0;
+		virtual void UnBindImage(unsigned int p_slot) = 0;
+
 		virtual void CreateEmptyTexture(int p_width, int p_height, int p_format) = 0;
 		virtual void SetParameter(int p_name, int p_parameter) = 0;
 		virtual void BufferData(void* pixels) = 0;
@@ -51,6 +59,8 @@ namespace Render
 		virtual int GetCompressRatio() const = 0;
 		virtual int GetBytesPerPixel() const = 0;			
 		virtual int GetMipsLevels() const = 0;
+
+		virtual void SetAccess(GLenum p_access) = 0;
 	};
 
 
@@ -64,6 +74,9 @@ namespace Render
 
 		void Bind(unsigned int p_slot);
 		void Unbind(unsigned int slot);
+
+		void BindImage(unsigned int p_slot);
+		void UnBindImage(unsigned int p_slot);
 
 		void CreateEmptyTexture(int p_width, int p_height, int p_format);
 		void SetParameter(int p_name, int p_parameter);	
@@ -80,6 +93,8 @@ namespace Render
 		int GetCompressRatio() const;
 		int GetBytesPerPixel() const;
 		int GetMipsLevels() const;
+
+		void SetAccess(GLenum p_access);
 		
 	private:
 		Texture();
@@ -90,9 +105,12 @@ namespace Render
 		int m_textureWidth;
 		int m_textureHeight;
 		GLenum m_textureFormat;
+		GLenum m_internalFormat;
 		GLenum m_textureType;
 		int m_compressRatio;
 		int m_bpp;
 		int m_levels;
+
+		GLenum m_access;
 	};
 }

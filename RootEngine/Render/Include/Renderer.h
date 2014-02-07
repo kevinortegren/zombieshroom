@@ -5,21 +5,20 @@
 #include <RootEngine/Render/Include/Camera.h>
 
 #include <RootEngine/Render/Include/RenderJob.h>
+#include <RootEngine/Render/Include/ShadowJob.h>
 #include <RootEngine/Render/Include/ComputeJob.h>
 
 #include <RootEngine/Render/Include/RenderResourceManager.h>
+#include <RootEngine/Render/Include/LinearAllocator.h>
 
-#include <RootEngine/Render/Include/GlowDevice.h>
-
-#include <RootEngine/Render/Include/GeometryBuffer.h>
-#include <RootEngine/Render/Include/LineRenderer.h>
 #include <RootEngine/Render/Include/Light.h>
-#include <RootEngine/Render/Include/ParticleSystem.h>
-#include <RootEngine/Render/Include/LightingDevice.h>
 #include <RootEngine/Render/Include/Shadowcaster.h>
 #include <RootEngine/Render/Include/ShadowDevice.h>
-
-#include <RootEngine/Render/Include/LinearAllocator.h>
+#include <RootEngine/Render/Include/GeometryBuffer.h>
+#include <RootEngine/Render/Include/LightingDevice.h>
+#include <RootEngine/Render/Include/GlowDevice.h>
+#include <RootEngine/Render/Include/LineRenderer.h>
+#include <RootEngine/Render/Include/ParticleSystem.h>
 
 #include <WinSock2.h>
 #include <SDL2/SDL.h>
@@ -48,9 +47,10 @@ namespace Render
 
 		// Init
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
-		virtual void SetResolution(int p_width, int p_height) = 0;
+		virtual void SetResolution(bool p_fullscreen, int p_width, int p_height) = 0;
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
+		virtual SDL_Window* GetWindow() = 0;
 
 		// Camera
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
@@ -61,6 +61,7 @@ namespace Render
 		
 		// Rendering
 		virtual void AddRenderJob(RenderJob& p_job) = 0;
+		virtual void AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
@@ -68,6 +69,7 @@ namespace Render
 		virtual void DisplayNormals(bool p_display) = 0;
 
 		// Resource Management.
+		virtual void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures) = 0;
 		virtual BufferInterface* CreateBuffer(GLenum p_type) = 0;
 		virtual void ReleaseBuffer(BufferInterface* p_buffer) = 0;
 		virtual TextureInterface* CreateTexture() = 0;
@@ -76,6 +78,7 @@ namespace Render
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
+		virtual std::string GetStringFromMaterial(Material* p_material) = 0;
 
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
@@ -103,9 +106,10 @@ namespace Render
 
 		// Init
 		void SetupSDLContext(SDL_Window* p_window);
-		void SetResolution(int p_width, int p_height);
+		void SetResolution(bool p_fullscreen, int p_width, int p_height);
 		int GetWidth() const;
 		int GetHeight() const;
+		SDL_Window* GetWindow() { return m_window; }
 
 		// Camera
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
@@ -117,12 +121,14 @@ namespace Render
 		// Rendering
 		void Clear();
 		void AddRenderJob(RenderJob& p_job);
+		void AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
 		void Swap();
 		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
 		
 		// Resource Management.
+		void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures);
 		BufferInterface* CreateBuffer(GLenum p_type);
 		void ReleaseBuffer(BufferInterface* p_buffer);
 		TextureInterface* CreateTexture();
@@ -131,6 +137,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
+		std::string GetStringFromMaterial(Material* p_material);
 
 		// Particle systems.
 		ParticleSystem* CreateParticleSystem();
@@ -178,8 +185,12 @@ namespace Render
 		int m_height;
 
 		unsigned m_renderFlags;
+
 		std::vector<RenderJob*> m_jobs;
 		LinearAllocator m_allocator;
+
+		int m_sjobCount[RENDER_SHADOW_CASCADES];
+		std::vector<ShadowJob> m_sjobs;
 
 		// Default framebuffer.
 		GLuint m_fbo;

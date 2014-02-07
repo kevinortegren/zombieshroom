@@ -57,8 +57,8 @@ namespace RootEngine
 	{
 		// Default values.
 		m_values["settings-player-name"] = "Player";
-		m_values["ScreenWidth"] = "1280";
-		m_values["ScreenHeight"] = "720";
+		m_values["settings-resolution"] = "1280x720";
+		m_values["settings-fullscreen"] = "false";
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
 		m_values["ServerPort"] = "5567";
@@ -70,7 +70,7 @@ namespace RootEngine
 
 	bool ConfigManager::GetConfigValueAsBool(const std::string& p_key)
 	{
-		if(m_values.find(p_key) == m_values.end())
+		if(m_values.find(p_key) != m_values.end())
 			if( m_values[p_key] == "True" || m_values[p_key] == "true" || m_values[p_key] == "1" )
 			{
 				return true;

@@ -25,9 +25,9 @@ namespace RootEngine
 	{
 	public:
 		// Get the web view
-		virtual Awesomium::WebView* GetView() = 0;
+		virtual RootEngine::GUISystem::WebView* GetView() = 0;
 		// Initialize debug overlay to a loaded Awesomium view
-		virtual void SetView(Awesomium::WebView* p_view) = 0;
+		virtual void SetView(RootEngine::GUISystem::WebView* p_view) = 0;
 		// Javascript call: Add HTML code (or plain text) to left or right side of the debug overlay
 
 		virtual void AddHTMLToBuffer(const char* p_html, TextColor::TextColor p_color = TextColor::WHITE, bool p_leftSide = true) = 0;

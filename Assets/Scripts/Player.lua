@@ -15,9 +15,15 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
-	
+	local waterCollider = WaterCollider.New(player);
+
+
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
+
+	waterCollider:SetDisturbPower(0.1);
+	waterCollider:SetDisturbInterval(0.5);
+	waterCollider:SetRadius(2);
 
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
@@ -34,7 +40,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(10);
+	playerPhysics:SetMovementSpeed(20);
 	playerPhysics:SetJumpForce(20);
 
 	collision:SetMeshHandle("testchar0");
@@ -60,7 +66,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
-		local ragdoll = Ragdoll.New(player);
+		--local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then

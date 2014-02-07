@@ -20,7 +20,7 @@ namespace RootEngine
 		std::ifstream file(p_fileName, std::ifstream::in);
 		if(!file.good())
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Failed to load particle file: %s", p_fileName.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Failed to open particle file: %s", p_fileName.c_str());
 			return outStruct;
 		}
 		YAML::Parser parser(file);

@@ -47,32 +47,28 @@ vec3 GetVSPositionFromDepth()
 
 void main() {
 
-	vec4 rt0 = texture(g_Diffuse, ex_TexCoord);
-
-	vec3 diffuse = rt0.xyz;
-	float specTerm = rt0.w;
-	vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
-
-	vec3 normal = normalize(vert_normal.xyz*2-1); 
-	vec3 position = GetVSPositionFromDepth();
-
+    vec3 position = GetVSPositionFromDepth();
 	vec3 vert_lightVec = ex_Light.LightPosition - position;
 	float dist = length(vert_lightVec);
+    
+    vec4 rt0 = texture(g_Diffuse, ex_TexCoord);
 
-	vert_lightVec = normalize(vert_lightVec);
+    vec3 diffuse = rt0.xyz;
+    float specTerm = rt0.w;
+    vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
 
-	vec3 viewDir = -normalize(position);
-	vec3 halfVector = normalize(viewDir + vert_lightVec);
+    vec3 normal = normalize(vert_normal.xyz*2-1); 
+    
+    vert_lightVec = normalize(vert_lightVec);
 
-	vec3 light = vec3(0);
-	if(dist <= ex_Light.Range)
-	{
-		vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
-		vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
+    vec3 viewDir = -normalize(position);
+    vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-		light = diffuse_color + spec_color;
-		light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));
-	}
+    vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
+    vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
+
+    vec3 light = diffuse_color + spec_color;
+    light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));
 
 	out_Color = vec4(light, 1.0f);
 }

@@ -9,9 +9,9 @@ namespace RootForce
 	public:
 		HUD();
 		~HUD();
-		void Initialize(Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext);
+		void Initialize(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext* p_engineContext);
 		std::shared_ptr<ChatSystem> GetChatSystem() { return m_chatSystem; }
-		Awesomium::WebView* GetView() { return m_view; }
+		RootEngine::GUISystem::WebView* GetView() { return m_view; }
 
 		//updates a single status value internally
 		void SetValue(std::string p_key, std::string p_value);
@@ -27,7 +27,7 @@ namespace RootForce
 		//Does one javascript inject for all the values and updates the hud
 		void Update();
 	private:
-		Awesomium::WebView* m_view;
+		RootEngine::GUISystem::WebView* m_view;
 		std::shared_ptr<ChatSystem> m_chatSystem;
 		std::string m_commandBuffer;
 	};
