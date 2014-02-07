@@ -23,7 +23,9 @@ namespace RootForce
 
 		RootEngine::GameSharedContext m_context;
 		std::string m_workingDir;
+		bool m_shouldUpdate;
 		bool m_fullscreen;
-
+		int m_screenWidth;
+		int m_screenHeight;
 	};
 }

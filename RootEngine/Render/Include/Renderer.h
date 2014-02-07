@@ -47,7 +47,7 @@ namespace Render
 
 		// Init
 		virtual void SetupSDLContext(SDL_Window* p_window) = 0;
-		virtual void SetResolution(int p_width, int p_height) = 0;
+		virtual void SetResolution(bool p_fullscreen, int p_width, int p_height) = 0;
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
 		virtual SDL_Window* GetWindow() = 0;
@@ -108,7 +108,7 @@ namespace Render
 
 		// Init
 		void SetupSDLContext(SDL_Window* p_window);
-		void SetResolution(int p_width, int p_height);
+		void SetResolution(bool p_fullscreen, int p_width, int p_height);
 		int GetWidth() const;
 		int GetHeight() const;
 		SDL_Window* GetWindow() { return m_window; }
