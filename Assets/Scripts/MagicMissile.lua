@@ -1,7 +1,7 @@
 MagicMissile = {};
 MagicMissile.damage = 0;
 MagicMissile.pushback = 0;
-MagicMissile.cooldown = 1;
+MagicMissile.cooldown = 5;
 
 function MagicMissile.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");

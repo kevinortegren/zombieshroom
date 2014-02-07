@@ -44,22 +44,22 @@ function AbilityBall.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
-	
-	if type == PhysicsType.TYPE_PLAYER and self ~= entity then
+
+	local targetPlayerComponent = entity:GetPlayerComponent();
+	local abilityOwnerNetwork = self:GetNetwork();
+	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+
+	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 		local hitPos = entity:GetTransformation():GetPos();
 		local selfPos = self:GetTransformation():GetPos();
 		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
 		
 		-- Deal damage to the colliding player
 		local health = entity:GetHealth();
-		local targetPlayerComponent = entity:GetPlayerComponent();
 		
-		local abilityOwnerNetwork = self:GetNetwork();
-		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
-		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-		
-		if not health:IsDead() and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+		if not health:IsDead() then
 			local network = entity:GetNetwork();
 			local receiverId = network:GetUserId();
 			
