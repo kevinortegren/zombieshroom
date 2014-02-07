@@ -76,7 +76,8 @@ a
   width: 140px;
   height: 25px;
   border: 0;
-  margin: 2px;
+  margin: 2px 0 12px;
+  color: #FFFFFF;
   background: transparent url('Button.png');
   background-size: 100% 100%;
   background-position: 50% 50%;
@@ -159,6 +160,7 @@ a
   background: url('SmallWindow2.png');
    background-size: 100% 100%;
 }
+
 #settings-menu
 {
   display: none;
@@ -194,7 +196,7 @@ a
 }
 .main-button[disabled]
 {
-  color: #AAAAAA;
+  color: #777777;
 }
 .main-button:hover
 {
@@ -224,7 +226,7 @@ a
 }
 .ingame-button[disabled]
 {
-  color: #AAAAAA;
+  color: #777777;
 }
 .ingame-button:hover
 {
@@ -254,9 +256,9 @@ a
 }
 #lan-wrapper
 {
-  width: 1200px;
+  width: 1170px;
   border: 0;
-  padding: 14px 40px 44px 40px;
+  padding: 14px 55px 45px 55px;
   margin: auto;
   background: url('Ram.png') transparent;
 }
@@ -271,7 +273,7 @@ a
 }
 #lan-list-wrapper
 {
-  height: 633px;
+  height: 623px;
   overflow: auto;
 }
 #lan-direct-popup
