@@ -1,5 +1,6 @@
 #version 400
 
+in vec3 world_position;
 in vec3 vert_normal;
 in vec2 vert_texcoord;
 in vec4 view;
@@ -17,11 +18,16 @@ layout (location = 2) out vec4 glow;
 
 void main()
 {
+    
+    vec2 coord;
+
+    coord.x = 0.0;
+    coord.y = 0.0;
+    
 	float specTerm = texture(g_Specular, vert_texcoord).r;
-	vec3 frag_color = texture(g_Diffuse, vert_texcoord).xyz;
+	vec3 frag_color = texture(g_Diffuse, coord).xyz;
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
 	
-
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
 	normalT = normalT * 2.0f - 1.0f;
 

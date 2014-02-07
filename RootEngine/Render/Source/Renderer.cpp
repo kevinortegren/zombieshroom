@@ -698,6 +698,7 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 
 		m_color0->Unbind(5);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderer::BindForwardFramebuffer()

@@ -21,6 +21,7 @@ layout(std140) uniform PerObject
 	mat4 bones[20];
 };
 
+out vec3 world_position;
 out vec3 vert_normal;
 out vec2 vert_texcoord;
 out vec3 vert_tangent;
@@ -36,6 +37,8 @@ void main()
 
 	vec4 norm = boneTransform * vec4(in_normal, 0.0f);
 
+    world_position = vec3(modelMatrix * vec4( in_position, 1.0f )).xyz;
+    
 	vert_normal = normalize( viewMatrix * normalMatrix * norm).xyz;
 	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0f)).xyz;
 	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0f)).xyz;

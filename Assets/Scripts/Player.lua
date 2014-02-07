@@ -19,7 +19,7 @@ function Player.OnCreate(userId, actionId)
 
 
 	-- TODO: Decide where to put spawn logic
-	transform:SetPos(Vec3.New(100,10,0));
+	transform:SetPos(Vec3.New(0,100,0));
 
 	waterCollider:SetDisturbPower(0.1);
 	waterCollider:SetDisturbInterval(0.5);

@@ -14,7 +14,7 @@ namespace RootForce
 		BotanySystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
 
-		void SetQuadTree(QuadTree* p_quadTree);
+		void Initialize();
 
 		void CalculatePaintedAABB();
 		void DensityRenderToTexture(RootForce::RenderingSystem* m_renderingSystem);
@@ -26,7 +26,7 @@ namespace RootForce
 		Render::EffectInterface* m_effect;
 
 		Render::RenderToTextureInterface* m_density;
-		RootForce::QuadTree* m_quadTree;
+
 		
 		AABB m_aabb;
 

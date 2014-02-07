@@ -190,7 +190,7 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		m_botanySystem->Initialize();
 		m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse

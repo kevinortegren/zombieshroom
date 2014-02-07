@@ -4,12 +4,11 @@
 
 namespace RootForce
 {
-	void BotanySystem::SetQuadTree(QuadTree* p_quadTree)
+	void BotanySystem::Initialize()
 	{
-		m_quadTree = p_quadTree;
-
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
 
+		// Calculate AABB of painted entities.
 		CalculatePaintedAABB();
 
 		m_view = glm::lookAt(glm::vec3(0,1,0), glm::vec3(0,0,0), glm::vec3(0,0,1));
@@ -148,13 +147,15 @@ namespace RootForce
 		// Store texture.
 		m_density->Store("rtt.tga");
 
+
 		// Restore backbuffer.
 		m_engineContext->m_renderer->SetRenderToTexture(nullptr);
+
+		m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Player"))->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_density->GetTexture();
 	}
 
 	void BotanySystem::Process()
 	{
-		m_aabb.DebugDraw(m_engineContext->m_renderer, glm::vec3(1,0,0), glm::mat4(1.0f));
+		m_aabb.DebugDraw(m_engineContext->m_renderer, glm::vec3(1,1,0), glm::mat4(1.0f));
 	}
-
 }
