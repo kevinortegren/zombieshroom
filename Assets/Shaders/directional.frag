@@ -32,6 +32,26 @@ uniform sampler2DArray g_ShadowDepth;
 
 out vec4 out_Color;
 
+vec2 poissonDisk[16] = vec2[](
+	vec2( 0.2134463,	 0.4247225),
+	vec2( 0.4785358,	-0.3093533),
+	vec2( 0.6953664,	 0.6155604),
+	vec2(-0.3491541,	 0.7737809),
+	vec2(-0.3364094,	 0.110289f),
+	vec2(-0.2225659,	-0.6537814),
+	vec2( 0.1859272,	-0.9121895),
+	vec2( 0.6556994,	 0.1956618),
+	vec2( 0.3703193,	 0.8869988),
+	vec2( 0.1125489,	-0.09327701),
+	vec2( 0.9311103,	-0.348781),
+	vec2( 0.6107655,	-0.787773),
+	vec2(-0.8762138,	-0.2776574),
+	vec2(-0.6795356,	-0.6391076),
+	vec2(-0.5959228,	 0.4477699),
+	vec2(-0.4264759,	-0.2957492)
+
+);
+
 vec3 GetVSPositionFromDepth()
 {
 	float z = texture(g_Depth, ex_TexCoord).r;
@@ -48,6 +68,30 @@ vec3 GetVSPositionFromDepth()
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);
+}
+
+vec2 FindBlocker(vec3 coord, int useCascade)
+{
+	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
+	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
+	float offset = length(penumbraSize);
+	float searchWidth = coord.z * offset;
+	float blockersum = 0;
+	float numblockers = 0;
+
+	int i;
+	for(i = 0; i < 16; i++)
+	{
+		float shadowMapDepth = texture(g_ShadowDepth, vec3(coord.xy + poissonDisk[i] * searchWidth, useCascade));
+		if(shadowMapDepth < coord.z)
+		{
+			blockersum += shadowMapDepth;
+			numblockers += 1;
+		}
+	}
+
+	float avgBlockerDepth = blockersum / numblockers;
+	return vec2(avgBlockerDepth, numblockers);
 }
 
 void main() {
@@ -93,10 +137,11 @@ void main() {
 		}
 	}
 
-	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
-	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
+
 	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
-	float offset = length(penumbraSize);
+	occluderDepth = shadowCoord.z - occluderDepth;
+	
+	float offset = 0;
 	float x;
 	float y;
 	for(x = -1.5; x <= 1.5; x += 1.0)

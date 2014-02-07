@@ -571,8 +571,10 @@ namespace Render
 		// Bind cascade shadow map array.
 		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTHPCF]);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTHPCF], m_shadowDevice.m_samplerObjectPCF);
 		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTH]);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTH], m_shadowDevice.m_samplerObjectFloat);
 
 		static glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 
