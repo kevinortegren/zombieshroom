@@ -1,47 +1,51 @@
 MagicMissile = {};
+MagicMissile.damage = 0;
+MagicMissile.pushback = 0;
+MagicMissile.cooldown = 5;
 
 function MagicMissile.OnCreate (userId, actionId)
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetPos();
+	local posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();
 	local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
-
+	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
-	collisionComp:CreateHandle(self, 1, false);
-	local transformComp = Transformation.New(self);
+	collisionComp:CreateHandle(self, 1, true);
 	local scriptComp = Script.New(self, "MagicMissile");
-	physicsComp:BindSphereShape(collisionComp, Vec3.New((posVec.x + frontVec.x * 3), (posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3)), Quat.New(0,0,0,1), 1, 5, true);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
-	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
+	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Missile handle: "..collisionComp:GetHandle());
+	physicsComp:ShootRay(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 1000);
 	transformComp:SetPos(posVec);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self);
-		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("Fireball");
-		renderComp:SetMaterialDiffuse("fireballDiffuse");
-		renderComp:SetMaterialSpecular("fireballSpecular");
-		renderComp:SetMaterialNormal("fireballNormal");
-		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
+	local playerComponent = playerEnt:GetPlayerComponent();
+	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), MagicMissile.cooldown);
 end
 
 function MagicMissile.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
-	if type == 3 then
-		local hitPos = entity:GetTransformation():GetPos();
-		local selfPos = self:GetTransformation():GetPos();
-		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20);
+	local network = self:GetNetwork();
+	local transComp = self:GetTransformation();
+	transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));
+	--local targetPlayerComponent = entity:GetPlayerComponent();
+	--local abilityOwnerNetwork = self:GetNetwork();
+	--local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+	--local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+	--local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+	if self ~= entity then
+		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
 	end
 end
 
 function MagicMissile.OnDestroy (self)
+	--local network = self:GetNetwork();
 	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end
