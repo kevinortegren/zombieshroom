@@ -58,66 +58,73 @@ namespace AbilityEditorNameSpace
 			}
 
 			//OnCreate
-			const YAML::Node& onCreate = doc[counter]["OnCreate"];
-			counter++;
-			for(unsigned int i = 0; i < onCreate.size(); i++)
+			if(doc.FindValue("OnCreate"))
 			{
-				std::string condName;
-				onCreate[i]["Condition"] >> condName;
-				std::string condCode;
-				onCreate[i]["Code"] >> condCode;
-				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
-				const YAML::Node& entities = onCreate[i]["Entities"];
-				for(unsigned int j = 0; j < entities.size(); j++)
+				const YAML::Node& onCreate = doc[counter]["OnCreate"];
+				counter++;
+				for(unsigned int i = 0; i < onCreate.size(); i++)
 				{
-					std::string entName;
-					entities[j]["Entity"] >> entName;
-					cond->AddEntity(entName.c_str());
+					std::string condName;
+					onCreate[i]["Condition"] >> condName;
+					std::string condCode;
+					onCreate[i]["Code"] >> condCode;
+					Condition* cond = new Condition(condName.c_str(), condCode.c_str());
+					const YAML::Node& entities = onCreate[i]["Entities"];
+					for(unsigned int j = 0; j < entities.size(); j++)
+					{
+						std::string entName;
+						entities[j]["Entity"] >> entName;
+						cond->AddEntity(entName.c_str());
+					}
+					p_onCreate->AddCondition(cond);
 				}
-				p_onCreate->AddCondition(cond);
 			}
 
 			//OnCollide
-			const YAML::Node& onCollide = doc[counter]["OnCollide"];
-			counter++;
-			for(unsigned int i = 0; i < onCollide.size(); i++)
+			if(doc.FindValue("OnCollide"))
 			{
-				std::string condName;
-				onCreate[i]["Condition"] >> condName;
-				std::string condCode;
-				onCreate[i]["Code"] >> condCode;
-				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
-				const YAML::Node& entities = onCollide[i]["Entities"];
-				for(unsigned int j = 0; j < entities.size(); j++)
+				const YAML::Node& onCollide = doc[counter]["OnCollide"];
+				counter++;
+				for(unsigned int i = 0; i < onCollide.size(); i++)
 				{
-					std::string entName;
-					entities[j]["Entity"] >> entName;
-					cond->AddEntity(entName.c_str());
+					std::string condName;
+					onCollide[i]["Condition"] >> condName;
+					std::string condCode;
+					onCollide[i]["Code"] >> condCode;
+					Condition* cond = new Condition(condName.c_str(), condCode.c_str());
+					const YAML::Node& entities = onCollide[i]["Entities"];
+					for(unsigned int j = 0; j < entities.size(); j++)
+					{
+						std::string entName;
+						entities[j]["Entity"] >> entName;
+						cond->AddEntity(entName.c_str());
+					}
+					p_onCollide->AddCondition(cond);
 				}
-				p_onCollide->AddCondition(cond);
 			}
-
 			
 			//OnDestroy
-			const YAML::Node& onDestroy = doc[counter]["OnDestroy"];
-			counter++;
-			for(unsigned int i = 0; i < onDestroy.size(); i++)
+			if(doc.FindValue("OnDestroy"))
 			{
-				std::string condName;
-				onCreate[i]["Condition"] >> condName;
-				std::string condCode;
-				onCreate[i]["Code"] >> condCode;
-				Condition* cond = new Condition(condName.c_str(), condCode.c_str());
-				const YAML::Node& entities = onDestroy[i]["Entities"];
-				for(unsigned int j = 0; j < entities.size(); j++)
+				const YAML::Node& onDestroy = doc[counter]["OnDestroy"];
+				counter++;
+				for(unsigned int i = 0; i < onDestroy.size(); i++)
 				{
-					std::string entName;
-					entities[j]["Entity"] >> entName;
-					cond->AddEntity(entName.c_str());
+					std::string condName;
+					onDestroy[i]["Condition"] >> condName;
+					std::string condCode;
+					onDestroy[i]["Code"] >> condCode;
+					Condition* cond = new Condition(condName.c_str(), condCode.c_str());
+					const YAML::Node& entities = onDestroy[i]["Entities"];
+					for(unsigned int j = 0; j < entities.size(); j++)
+					{
+						std::string entName;
+						entities[j]["Entity"] >> entName;
+						cond->AddEntity(entName.c_str());
+					}
+					p_onDestroy->AddCondition(cond);
 				}
-				p_onDestroy->AddCondition(cond);
 			}
-			
 		}
 		catch(YAML::ParserException& e)
 		{

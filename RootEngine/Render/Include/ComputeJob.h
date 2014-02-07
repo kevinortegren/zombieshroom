@@ -13,7 +13,8 @@ namespace Render
 		ComputeJob()
 			: m_groupDim(1) {}
 		Render::EffectInterface* m_effect;	
-		std::map<TextureSemantic::TextureSemantic, Render::TextureInterface*> m_textures;
+		std::map<int, Render::TextureInterface*> m_textures;
+		std::map<Semantic::Semantic, void*> m_params;
 		glm::uvec3 m_groupDim;
 	};
 }

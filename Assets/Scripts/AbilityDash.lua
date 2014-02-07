@@ -3,7 +3,7 @@ ACTION_COLLIDE = 1;
 
 --Set table name
 AbilityDash = {};
-AbilityDash.cooldown = 3;
+AbilityDash.cooldown = 0;
 
 function AbilityDash.OnCreate(userId, actionId)
 	--local playerEnt = Entity.GetEntityByTag("Player");

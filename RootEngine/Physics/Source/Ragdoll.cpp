@@ -530,6 +530,7 @@ namespace Ragdoll
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
+
 		return nullptr;
 	}
 
@@ -629,7 +630,7 @@ namespace Ragdoll
 		p_bones[myIndex] *= m_boneOffset[myIndex];
 
 		
-#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
+//#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
 			FixPosition(p_bones, p_rootNode->mChildren[i]);

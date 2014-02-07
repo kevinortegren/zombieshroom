@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/Frustum.h>
 
 namespace RootForce
 {
@@ -37,6 +38,8 @@ namespace RootForce
 		ECS::ComponentMapper<PointLight> m_plights;
 		ECS::ComponentMapper<Transform> m_transforms;
 		RootEngine::GameSharedContext* m_context;
+
+		Frustum* m_frustum;
 		int m_lightCount;
 	};
 

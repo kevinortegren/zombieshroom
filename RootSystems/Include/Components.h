@@ -16,6 +16,8 @@
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/RagdollSystem.h>
+#include <RootSystems/Include/WaterSystem.h>
+
 namespace RootForce
 {
 	namespace ComponentType

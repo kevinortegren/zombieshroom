@@ -42,13 +42,15 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
-
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void IngameState::Initialize()
 	{
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -56,6 +58,8 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
 		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
+		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
+		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 
@@ -172,14 +176,19 @@ namespace RootForce
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
+		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
+
+		
 	}
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetAABB(m_sharedSystems.m_worldSystem->GetWorldAABB());
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -190,11 +199,15 @@ namespace RootForce
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		//Initialize the debug, setting the html view
-		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("debug.html"));
+		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
 
 		//Init the hud and set one test ability for now
-		m_hud->Initialize(g_engineContext.m_gui->LoadURL("hud.html"), g_engineContext.m_gui->GetDispatcher(), &g_engineContext);
+		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
+
+		//Reset the ingame menu before we start the match
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
+		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
@@ -203,6 +216,8 @@ namespace RootForce
 		m_respawnSystem->LoadSpawnPoints();
 
 		m_animationSystem->Start();
+
+		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 	}
 
 	void IngameState::Exit()
@@ -221,21 +236,23 @@ namespace RootForce
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 
+		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
+
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
-		m_networkContext.m_client = nullptr;
-		m_networkContext.m_clientMessageHandler = nullptr;
-		m_networkContext.m_server = nullptr;
-		m_networkContext.m_serverMessageHandler = nullptr;
+
+		// Disable the message handlers while resetting the server (to avoid null entities etc.)
+		if(m_networkContext.m_server.get() != nullptr)
+			m_networkContext.m_server->SetMessageHandler(nullptr);
+		m_networkContext.m_client->SetMessageHandler(nullptr);
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
 	{				
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
-
 		g_engineContext.m_renderer->Render();
 
 		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
@@ -243,13 +260,25 @@ namespace RootForce
 		
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
-
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);		
+			PROFILE("GUI", g_engineContext.m_profiler);
+
 			g_engineContext.m_gui->Update();
-			g_engineContext.m_gui->Render(m_hud->GetView());
-			g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			if (m_displayIngameMenu)
+			{
+				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
+				m_ingameMenu->GetView()->Focus();
+
+				//Update Menu to make sure Setting changes are made in the main thread
+				m_ingameMenu->Update();
+			}
+			else
+			{
+				g_engineContext.m_gui->Render(m_hud->GetView());
+				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+			}
 		}
+
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
@@ -258,12 +287,6 @@ namespace RootForce
 		Transform* debugTransform = nullptr;
 		if (debugEntity != nullptr)
 			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
-
-		// Check for quitting condition
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			return GameStates::Menu;
-		}
 
 		// Check for disconnection from the server
 		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
@@ -319,18 +342,13 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		switch (event.EventType)
-		{
-		case RootServer::UserCommands::CLIENT_RAGEQUIT:
+		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
 			return GameStates::Menu;
-		case RootServer::UserCommands::CLIENT_SUICIDE:
-			{
-				// ToDo: Send a network message to server to indicate a suicide
-				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-				MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
-			} break;
-		default:
-			break;
+		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
+		{
+			// ToDo: Send a network message to server to indicate a suicide
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
 		}
 
 #ifdef _DEBUG
@@ -362,7 +380,7 @@ namespace RootForce
 				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 			}
 		}
-#endif
+
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			if(m_displayNormals)
@@ -381,7 +399,40 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			g_engineContext.m_resourceManager->ReloadAllScripts();
 		
+		//Debug -> Disturb water with O
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_O) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+		}
+		//DEBUG -> toggle wireframe mode on water with I
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ToggleWireFrame();
 
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->TogglePause();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->IncreaseSpeed();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseSpeed();
+		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//	m_waterSystem->IncreaseWaterHeight();
+		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		//	m_waterSystem->DecreaseWaterHeight();
+
+#endif
+		
+		{
+			PROFILE("Water system", g_engineContext.m_profiler);
+			m_waterSystem->Process();
+		}
+		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
@@ -402,7 +453,8 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
+			if(!m_displayIngameMenu)
+				m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -440,7 +492,7 @@ namespace RootForce
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			m_actionSystem->UpdateAimingDevice();
+			m_actionSystem->UpdateAimingDevice(m_displayIngameMenu);
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
@@ -469,10 +521,31 @@ namespace RootForce
 		}
 
 		m_animationSystem->Synch();
-		
+
+
 		{
 			PROFILE("Swap", g_engineContext.m_profiler);
 			g_engineContext.m_renderer->Swap();
+		}	
+
+		// Check for quitting condition
+		if (m_ingameMenu->GetExit())
+		{
+			return GameStates::Menu;
+		}
+
+		//Check status for the display of the ingame menu
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_displayIngameMenu = !m_displayIngameMenu;
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
+		if (m_ingameMenu->GetReturn())
+		{
+			m_displayIngameMenu = false;
+			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_ingameMenu->Reset();
 		}
 
 		return GameStates::Ingame;

@@ -25,14 +25,13 @@ namespace RootForce
 	void ConnectingState::Initialize()
 	{
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
-		m_loadingScreen = g_engineContext.m_gui->LoadURL("loading.html");
+		m_loadingScreen = g_engineContext.m_gui->LoadURL("Loading", "loading.html");
 	}
 
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
 		// Render a frame of loading screen to indicate the loading state
-		while(m_loadingScreen->IsLoading())
-			g_engineContext.m_gui->Update();
+		m_loadingScreen->WaitLoading();
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();
@@ -52,20 +51,23 @@ namespace RootForce
 
 		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
-
-		if(!m_networkContext.m_client)
-		{
-			m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
-			m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
-			m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
-		}
+		
+		m_networkContext.m_client = nullptr;
+		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
+		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
 
 		// Host
 		if (p_playData.Host)
 		{
-			// Setup the server and connect a local client
-			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false));
-			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
+			//if(m_networkContext.m_server.get() == nullptr)
+			{
+				// Setup the server and connect a local client
+				m_networkContext.m_server = nullptr;
+				m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
+				m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
+			}
+			m_networkContext.m_server->Initialize(m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false);
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 

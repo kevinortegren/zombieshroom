@@ -6,6 +6,7 @@
 #include <Awesomium/Surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <mutex>
 
 class GLTextureSurface : public Awesomium::Surface {
 public:
@@ -29,6 +30,7 @@ class GLRAMTextureSurface : public GLTextureSurface {
   unsigned char* buffer_;
   int bpp_, rowspan_, width_, height_;
   bool needs_update_;
+  std::mutex m_needsUpdateMutex;
 
  public:
   GLRAMTextureSurface(int width, int height);
@@ -42,6 +44,8 @@ class GLRAMTextureSurface : public GLTextureSurface {
 
   int size() const { return rowspan_ * height_; }
 
+  void UpdateTexture();
+
  protected:
   virtual void Paint(unsigned char* src_buffer,
                      int src_row_span,
@@ -51,8 +55,6 @@ class GLRAMTextureSurface : public GLTextureSurface {
   virtual void Scroll(int dx,
                       int dy,
                       const Awesomium::Rect& clip_rect);
-
-  void UpdateTexture();
 };
 
 class GLTextureSurfaceFactory : public Awesomium::SurfaceFactory {

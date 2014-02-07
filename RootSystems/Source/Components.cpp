@@ -32,6 +32,7 @@ namespace RootForce
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
 			RootForce::Network::ClientComponent::SetTypeId(RootForce::ComponentType::CLIENT);
 			RootForce::Ragdoll::SetTypeId(RootForce::ComponentType::RAGDOLL);
+			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
 		}
 
 		void InitializeServerComponents()

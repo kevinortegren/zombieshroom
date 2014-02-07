@@ -42,12 +42,14 @@ public:
 	int* NumberOfPaintTextures;
 
 	UpdateMessage* updateMessages[g_maxMessages];
+	WorldData* worldData;
 
 	int* export;
 	
 	DWORD milliseconds;
 
 	HANDLE IdMutexHandle;
+	HANDLE LightMutexHandle;
 
 private:
 	//Functions
@@ -55,7 +57,7 @@ private:
 	int shutdown();
 	//Variables
 	HANDLE MeshMutexHandle;
-	HANDLE LightMutexHandle;
+
 	HANDLE CameraMutexHandle;
 	HANDLE shared_memory_handle;
 	HANDLE LocatorMutexHandle;

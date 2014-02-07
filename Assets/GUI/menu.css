@@ -10,7 +10,7 @@ body, input
   margin: 0;
   font-family: Sherwood;
 }
-body
+#main-body
 {
   background-image: url('menubackground.jpg');
   background-position: 50% 50%;
@@ -76,21 +76,22 @@ a
   width: 140px;
   height: 25px;
   border: 0;
-  margin: 2px;
-  background: transparent url('menubutton.png');
-  background-size: 160px 25px;
+  margin: 2px 0 12px;
+  color: #FFFFFF;
+  background: transparent url('Button.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
 .button:hover
 {
-  background: transparent url('menubutton_hover.png');
-  background-size: 160px 25px;
+  background: transparent url('ButtonHover.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
 .button:active
 {
-  background: transparent url('menubutton_active.png');
-  background-size: 160px 25px;
+  background: transparent url('ButtonClicked.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
 #overlay
@@ -141,49 +142,110 @@ a
   background-size: 100% 100%;
   z-index: 100;
 }
-#main-wrapper,
-#options-wrapper
+#ingame-wrapper
 {
   width: 300px;
   margin: auto;
+  padding: 30px 25px 40px;
   color: #FFFFFF;
+  background: url('SmallWindow2.png');
+   background-size: 100% 100%;
+}
+#settings-wrapper
+{
+  width: 300px;
+  margin: auto;
+  padding: 40px 25px 70px;
+  color: #FFFFFF;
+  background: url('SmallWindow2.png');
+   background-size: 100% 100%;
+}
+
+#settings-menu
+{
+  display: none;
+}
+#MainMenuBar
+{
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: -103px;
+  width: 100%;
+  padding-top: 35px;
+  height: 103px;
+  background: url('MainMenuBar.png');
+  text-align: justify;
+  background-size: 100% 100%;
+}
+#MainMenuBar tr td
+{
+  text-align: center;
 }
 .main-button
 {
   width: 200px;
   height: 50px;
-  display: block;
-  margin: 10px auto 10px auto;
+  display: inline-block;
   border: 0;
   color: #FFFFFF;
   font-size: 24px;
-  background: transparent url('menubutton.png');
-  background-size: 250px 50px;
+  background: transparent url('Button.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
 .main-button[disabled]
 {
-  color: #AAAAAA;
+  color: #777777;
 }
 .main-button:hover
 {
-  background: transparent url('menubutton_hover.png');
-  background-size: 250px 50px;
+  background: transparent url('ButtonHover.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
 .main-button:active
 {
-  background: transparent url('menubutton_active.png');
-  background-size: 250px 50px;
+  background: transparent url('ButtonClicked.png');
+  background-size: 100% 100%;
   background-position: 50% 50%;
 }
-#settings-menu,
-#player-settings-menu,
-#lan-menu
+
+.ingame-button
+{
+  width: 200px;
+  height: 50px;
+  display: block;
+  border: 0;
+  margin: auto;
+  color: #FFFFFF;
+  font-size: 24px;
+  background: transparent url('Button.png');
+  background-size: 100% 100%;
+  background-position: 50% 50%;
+}
+.ingame-button[disabled]
+{
+  color: #777777;
+}
+.ingame-button:hover
+{
+  background: transparent url('ButtonHover.png');
+  background-size: 100% 100%;
+  background-position: 50% 50%;
+}
+.ingame-button:active
+{
+  background: transparent url('ButtonClicked.png');
+  background-size: 100% 100%;
+  background-position: 50% 50%;
+}
+
+.hiddenmenu
 {
   display: none;
 }
-#player-settings-wrapper
+.windowbackground
 {
   width: 400px;
   border: 0;
@@ -194,9 +256,9 @@ a
 }
 #lan-wrapper
 {
-  width: 1200px;
+  width: 1170px;
   border: 0;
-  padding: 14px 40px 44px 40px;
+  padding: 14px 55px 45px 55px;
   margin: auto;
   background: url('Ram.png') transparent;
 }
@@ -211,7 +273,7 @@ a
 }
 #lan-list-wrapper
 {
-  height: 633px;
+  height: 623px;
   overflow: auto;
 }
 #lan-direct-popup

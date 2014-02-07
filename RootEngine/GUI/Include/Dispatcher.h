@@ -32,11 +32,11 @@ namespace RootEngine
 		public:
 			virtual void Bind(Awesomium::JSObject& p_object,
 				const Awesomium::WebString& p_name,
-				JSDelegate p_callback) = 0;
+				JSDelegate1 p_callback) = 0;
 
 			virtual void BindWithRetVal(Awesomium::JSObject& p_object,
 				const Awesomium::WebString& p_name,
-				JSDelegateWithRetval p_callback) = 0;
+				JSDelegate1WithRetval p_callback) = 0;
 
 			// Inherited from JSMethodHandler
 			virtual void OnMethodCall(Awesomium::WebView* caller,
@@ -57,11 +57,11 @@ namespace RootEngine
 		public:
 			void Bind(Awesomium::JSObject& p_object,
 				const Awesomium::WebString& p_name,
-				JSDelegate p_callback);
+				JSDelegate1 p_callback);
 
 			void BindWithRetVal(Awesomium::JSObject& p_object,
 				const Awesomium::WebString& p_name,
-				JSDelegateWithRetval p_callback);
+				JSDelegate1WithRetval p_callback);
 
 			// Inherited from JSMethodHandler
 			void OnMethodCall(Awesomium::WebView* caller,
@@ -76,8 +76,8 @@ namespace RootEngine
 				const Awesomium::JSArray& args);
 
 		private:
-			std::map<ObjectMethodKey, JSDelegate> m_boundMethods;
-			std::map<ObjectMethodKey, JSDelegateWithRetval> m_boundMethodsWithRetVal;
+			std::map<ObjectMethodKey, JSDelegate1> m_boundMethods;
+			std::map<ObjectMethodKey, JSDelegate1WithRetval> m_boundMethodsWithRetVal;
 		};
 	}
 }

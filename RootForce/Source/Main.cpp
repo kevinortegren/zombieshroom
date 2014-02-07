@@ -67,31 +67,41 @@ namespace RootForce
 			throw std::runtime_error("Failed to initialize SDL");
 		}
 
+		std::string resolutionString = g_engineContext.m_configManager->GetConfigValueAsString("settings-resolution");
+		int splitPos = resolutionString.find('x');
+		int width = std::stoi(resolutionString.substr(0, splitPos));
+		int height = std::stoi(resolutionString.substr(splitPos+1));
 
 		// TODO: Make these parameters (even?) more configurable.
 		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 				"Root Force",
 				SDL_WINDOWPOS_UNDEFINED,
 				SDL_WINDOWPOS_UNDEFINED,
-				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-				g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"),
+				width,
+				height,
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 			SDL_DestroyWindow);
 		if (m_window == nullptr) 
 		{
 			throw std::runtime_error("Failed to create window");
 		}
-
+		
+		
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
+		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);
+
+		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
+		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
+		SDL_GL_MakeCurrent(m_window.get(), mainContext);
 
 		// Setup the importer and exporter
 		m_world.GetEntityImporter()->SetImporter(Importer);
 		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize GUI
-		g_engineContext.m_gui->Initialize(g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"));
+		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), m_window.get(), guiContext);
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
@@ -109,6 +119,7 @@ namespace RootForce
 
 	Main::~Main() 
 	{
+		g_engineContext.m_gui->Shutdown();
 		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
