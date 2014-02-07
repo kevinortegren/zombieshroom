@@ -37,6 +37,7 @@ namespace RootForce
 				for(unsigned int i = 0; i < nameToIndex.size() ; i++ )
 				{
 					bones[i] = animation->m_bones[i];
+					
 					boneOffset[i] = renderable->m_model->m_animation[0].GetBoneOffset(i);
 				}
 				

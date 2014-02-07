@@ -90,7 +90,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	
 	m_hasBeenKnockbacked = false;
 	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter  ^btBroadphaseProxy::DebrisFilter);
 	//m_dynamicWorld->addAction(m_kinController);
 
 }

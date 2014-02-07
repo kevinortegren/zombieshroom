@@ -149,7 +149,7 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
-		if(m_debugDrawEnabled == false)
+		//if(m_debugDrawEnabled == false)
 		m_dynamicWorld->stepSimulation(m_dt,4);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
@@ -1306,28 +1306,8 @@ namespace Physics
 		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 		int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
 		m_playerObjects.at(indexplayer)->Deactivate();
-		if(index  != -1)
+		if(index  == -1)
 		{
-			
-			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
-			float x,y,z,w;
-			x = trans.getRotation().w();
-			y = trans.getRotation().x();
-			z = trans.getRotation().y();
-			w = trans.getRotation().z();
-			trans.setRotation(btQuaternion(x,y,z,w));
-			float data[16];
-			glm::mat4 matrix;
-			trans.getOpenGLMatrix(data);
-			matrix = glm::make_mat4(data);
-			//If ragdoll already exists just update positions and start ragdolling
-			m_ragdolls.at(index)->Activate(p_bones, matrix);
-			
-			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
-		}
-		else //First time, build the shapes, bodies and constraints
-		{
-			
 			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
@@ -1337,7 +1317,7 @@ namespace Physics
 			z = trans.getRotation().y();
 			w = trans.getRotation().z();
 			trans.setRotation(btQuaternion(x,y,z,w));
-			
+
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
@@ -1347,9 +1327,7 @@ namespace Physics
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
-			
-		}
-		
+		}	
 		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 		m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
 	}
@@ -1375,12 +1353,28 @@ namespace Physics
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		int index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+		//Ragdoll
+		
 		if(index != -1)
 		{
-			m_ragdolls.at(index)->Deactivate();
-			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
+			
+			delete m_ragdolls.at(index);
+			m_ragdolls.erase(m_ragdolls.begin() + index);
+			m_userPointer.at(p_objectHandle)->m_ragdollIndex = -1;
 			int playerIndex = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
 			m_playerObjects.at(playerIndex)->Activate();
+
+			for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
+			{
+				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER ||m_userPointer.at(i)->m_type == PhysicsType::TYPE_RAGDOLL)
+				{
+					
+					if(m_userPointer.at(i)->m_ragdollIndex != -1)
+						m_userPointer.at(i)->m_ragdollIndex--;
+				}
+
+			}
 		}
 	}
 
