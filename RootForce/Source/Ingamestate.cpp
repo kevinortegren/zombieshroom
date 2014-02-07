@@ -264,7 +264,7 @@ namespace RootForce
 			else
 			{
 				g_engineContext.m_gui->Render(m_hud->GetView());
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -478,8 +478,7 @@ namespace RootForce
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			if(!m_displayIngameMenu)
-				m_actionSystem->UpdateAimingDevice();
+			m_actionSystem->UpdateAimingDevice(m_displayIngameMenu);
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();

@@ -40,9 +40,7 @@ namespace RootSystems
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
 		
-		// Rotate the model and reset the angle
-		transform->m_orientation.YawGlobal(action->Angle.x);
-		action->Angle.x = 0;
+		
 
 		bool isGameOver = false;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
@@ -146,12 +144,13 @@ namespace RootSystems
 		//UpdateAimingDevice();
 	}
 
-	void ActionSystem::UpdateAimingDevice()
+	void ActionSystem::UpdateAimingDevice(bool m_inMenu)
 	{
 		for (RootForce::Network::NetworkEntityMap::iterator it = g_networkEntityMap.begin(); it != g_networkEntityMap.end(); it++)
 		{
 			if (it->first.ActionID == RootForce::Network::ReservedActionID::CONNECT)
 			{
+
 				RootForce::Network::NetworkEntityID id;
 				id.UserID = it->first.UserID;
 				id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
@@ -170,8 +169,15 @@ namespace RootSystems
 
 				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
 
-				aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-				aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+				if(!m_inMenu)
+				{
+					// Rotate the model and reset the angle
+					transform->m_orientation.YawGlobal(action->Angle.x);
+					action->Angle.x = 0;
+
+					aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+				}
 				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 
 			}
