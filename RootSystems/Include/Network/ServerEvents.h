@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <sstream>
 #include <string>
+#include <cstdarg>
 
 namespace RootServer
 {
@@ -28,4 +29,5 @@ namespace RootServer
 	};
 
 	EventData EventFromString(std::string p_string);
+	bool MatchAny(std::string p_input, unsigned p_numValues, ...);
 }

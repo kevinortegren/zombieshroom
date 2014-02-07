@@ -6,7 +6,7 @@ function AddMessage(p_message)
 function Send(event)
 {
 	$('#chatinput').blur();
-	ChatSystem.Send($("#chatinput").val());
+	HUD.Send($("#chatinput").val());
 	$("#chatinput").val("");
 	event.preventDefault();
 	event.stopPropagation();
@@ -71,8 +71,8 @@ $(document).keydown(function(event)
 
 function OnLoad()
 {
-	$('#chatinput').blur(function(){ ChatSystem.SetFocus(false); });
-	$('#chatinput').focus(function(){ ChatSystem.SetFocus(true); });
+	$('#chatinput').blur(function(){ HUD.SetFocus(false); });
+	$('#chatinput').focus(function(){ HUD.SetFocus(true); });
 	$('#chatinput').keydown(function()
 	{
 		if(event.keyCode == 13)

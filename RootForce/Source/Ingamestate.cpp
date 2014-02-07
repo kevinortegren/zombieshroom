@@ -331,9 +331,9 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		if(event.EventType.compare("CLIENT_RAGEQUIT") == 0)
+		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
 			return GameStates::Menu;
-		else if(event.EventType.compare("CLIENT_SUICIDE") == 0)
+		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// ToDo: Send a network message to server to indicate a suicide
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
