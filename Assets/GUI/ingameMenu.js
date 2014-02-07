@@ -7,7 +7,7 @@ $(document).ready(function() {
 	  $("#ingame-settings").mouseup(function() {
 		$("#ingame-menu").css("display", "none");
 		$("#settings-menu").css("display", "table");
-		//LoadSettings();
+		JSGlobal.LoadSettings();
 	  } );
 
 	$("#ingame-exit").mouseup(function() {

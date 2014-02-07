@@ -244,69 +244,88 @@ namespace RootEngine
 
 		void guiInstance::RunThread()
 		{
-			SDL_GL_MakeCurrent(m_window, m_glContext);
-			// Initialize Awesomium
-			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
-			m_dispatcher = new Dispatcher();
-			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
-			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
-			m_core->set_surface_factory(m_glTexSurfaceFactory);
-			
-			uint64_t oldTime = SDL_GetPerformanceCounter();
-
-			while(!m_shouldTerminate)
+			try
 			{
-				m_loadListMutex.lock();
-					for(auto pair : m_loadList)
-					{
-						pair.first->m_webView = m_core->CreateWebView(m_width, m_height);
+				SDL_GL_MakeCurrent(m_window, m_glContext);
+				// Initialize Awesomium
+				m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
+				m_dispatcher = new Dispatcher();
+				m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
+				m_core->set_surface_factory(m_glTexSurfaceFactory);
+			
+				uint64_t oldTime = SDL_GetPerformanceCounter();
 
-						pair.first->m_webView->SetTransparent(true);
-
-						pair.first->m_webView->LoadURL(pair.second);
-					
-						m_viewBuffer.push_back(pair.first);
-					}
-					m_loadList.clear();
-				m_loadListMutex.unlock();
-
-				m_viewBufferMutex.lock();
-					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						if(m_viewBuffer[i])
-							m_viewBuffer[i]->Update();
-				m_viewBufferMutex.unlock();
-
-				m_drawMutex.lock();
-					m_core->Update();
-					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
-						{
-							GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
-							if(surface)
-								surface->UpdateTexture(); // Force a texture update
-						}
-					// Wait until texture updates are complete before releasing the lock
-					GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
-					GLenum result; 
-					while(true) 
-					{ 
-						result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
-						if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
-					} 
-				m_drawMutex.unlock();
-				
-				uint64_t newTime = SDL_GetPerformanceCounter();
-				float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
-				oldTime = newTime;
-				if(dt < 0.032f)
+				while(!m_shouldTerminate)
 				{
-					long time = (long)floorf((0.032f-dt)*1000);
-					Sleep(time);
-				}
-			}
-			SDL_GL_DeleteContext(m_glContext);
-		}
+					m_loadListMutex.lock();
+						for(auto pair : m_loadList)
+						{
+							pair.first->m_webView = m_core->CreateWebView(m_width, m_height);
 
+							pair.first->m_webView->SetTransparent(true);
+
+							pair.first->m_webView->LoadURL(pair.second);
+					
+							m_viewBuffer.push_back(pair.first);
+						}
+						m_loadList.clear();
+					m_loadListMutex.unlock();
+
+					m_viewBufferMutex.lock();
+						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+							if(m_viewBuffer[i])
+								m_viewBuffer[i]->Update();
+					m_viewBufferMutex.unlock();
+
+					m_drawMutex.lock();
+						m_core->Update();
+						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
+							{
+								GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+								if(surface)
+									surface->UpdateTexture(); // Force a texture update
+							}
+						// Wait until texture updates are complete before releasing the lock
+						GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+						GLenum result; 
+						while(true) 
+						{ 
+							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
+						} 
+					m_drawMutex.unlock();
+				
+					uint64_t newTime = SDL_GetPerformanceCounter();
+					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
+					oldTime = newTime;
+					if(dt < 0.032f)
+					{
+						long time = (long)floorf((0.032f-dt)*1000);
+						Sleep(time);
+					}
+				}
+				SDL_GL_DeleteContext(m_glContext);
+			}
+			catch(...)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Awesomium update thread has crashed due to interference in the Force!");
+			}
+		}
+		
+		void guiInstance::ResizeAllViews(int p_width, int p_height)
+		{
+			m_width = p_width;
+			m_height = p_height;
+
+			m_drawMutex.lock();
+				m_viewBufferMutex.lock();
+					for(auto view : m_viewBuffer )
+						view->m_webView->Resize(p_width, p_height);
+				m_viewBufferMutex.unlock();
+			m_drawMutex.unlock();
+		}
 
 		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)
 		{

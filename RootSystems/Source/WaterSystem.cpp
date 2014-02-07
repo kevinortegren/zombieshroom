@@ -1,4 +1,3 @@
-#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
@@ -18,9 +17,10 @@ namespace RootForce
 		m_transform.Init(m_world->GetEntityManager());
 		m_waterCollider.Init(m_world->GetEntityManager());
 		
-		m_maxX = m_maxZ = 1024;
+		m_maxX = m_maxZ = 64;
 		m_scale = 40.0f;
 		m_dt = 0;
+		m_gridSize = 64;
 	}
 
 	void WaterSystem::Begin()
@@ -32,8 +32,13 @@ namespace RootForce
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{
+			float Pixels[64*64];
+			m_computeJob.m_textures[0]->Bind(0);
+			glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &Pixels);
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
+			glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &Pixels);
+			m_computeJob.m_textures[0]->Unbind(0);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
 			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
 			//Swap the textures for next simulation step
@@ -136,7 +141,7 @@ namespace RootForce
 
 		//Create a renderable component for the water
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
-		m_renderable->m_model		= m_context->m_resourceManager->LoadCollada("64x64grid"); //Load a grid mesh, this could be done in code instead
+		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 
 		//Set textures to renderable
@@ -148,8 +153,6 @@ namespace RootForce
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
 
-		//Set primitive type to GL_PATCHES because we use tesselation
-		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); 
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
@@ -164,7 +167,7 @@ namespace RootForce
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
 	{
 		
-		float scaleHalfWidth = 32.0f * m_scale;
+		float scaleHalfWidth = ((float)m_gridSize/2.0f) * m_scale;
 		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
@@ -241,8 +244,8 @@ namespace RootForce
 	{
 		for(int i = 0; i < 50; ++i)
 		{ 
-			int x = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
-			int z = (3 + rand() % (60*(int)m_scale)) - 32*(int)m_scale;
+			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
+			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 
 			Disturb((float)x, (float)z, 10.0f);
 		}
@@ -298,5 +301,49 @@ namespace RootForce
 	{
 		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
 	}
+
+	void WaterSystem::CreateWaterMesh()
+	{
+		std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
+		std::vector<unsigned int> indices;
+
+		for (float x = 0.0f; x < (float)m_gridSize; ++x)
+		{
+			for (float z = 0.0f; z < (float)m_gridSize; ++z)
+			{
+				Render::Vertex1P1N1UV1T1BT v;
+				v.m_pos		= glm::vec3(x-(float)m_gridSize/2.0f, 0.0f, z-(float)m_gridSize/2.0f);
+				v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
+				v.m_UV		= glm::vec2(x/(float)m_gridSize, 1.0f - z/(float)m_gridSize);
+				v.m_tangent = glm::vec3(0.0f);//TODO
+				v.m_bitangent = glm::vec3(0.0f);//TODO
+				vertices.push_back(v);
+			}
+		}
+
+		for (unsigned int x = 0; x < (unsigned int)(m_gridSize-1); ++x)
+		{
+			for (unsigned int z = 0; z < (unsigned int)(m_gridSize-1); ++z)
+			{
+				unsigned int  start = x * m_gridSize + z;
+				indices.push_back(start);
+				indices.push_back(start + 1);
+				indices.push_back(start + m_gridSize + 1);
+				indices.push_back(start + m_gridSize + 1);
+				indices.push_back(start + m_gridSize);
+				indices.push_back(start);
+			}
+		}
+		
+		m_renderable->m_model = m_context->m_resourceManager->CreateModel("WaterModel");
+		m_renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		m_renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		m_renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
+		m_renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());
+		m_renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+
+		//Set primitive type to GL_PATCHES because we use tesselation
+		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); 
+	}
+
 }
-#endif

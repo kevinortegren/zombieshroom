@@ -82,9 +82,10 @@ namespace RootForce
 		RootEngine::GameSharedContext*	m_context;
 
 		bool	m_wireFrame, m_pause;
-		int		m_maxX, m_maxZ;	
+		int		m_maxX, m_maxZ, m_gridSize;	
 		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
 
 		bool ValidValues();
+		void CreateWaterMesh();
 	};
 }

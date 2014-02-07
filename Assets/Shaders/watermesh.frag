@@ -59,17 +59,20 @@ void main()
 	normalMap				= normalize(normalMap.xyz*2-1); 
 	vec3 viewNormal			= normalize(viewMatrix*vec4(normalMap,0.0f)).rgb;
 
+
+
 	//Calculate transparent color and refraction
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
-	vec2 refractedUV		= clamp(screenTexCoord + normalMap.xz * 0.08f, vec2(0.0f), vec2(1.0f));
-	float refractionDepth	= texture(g_Depth, refractedUV).r;
+	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 100.0f), ivec2(0), textureSize(g_LA, 0));
+	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 	vec3 refractionColor;
 	if(refractionDepth > gl_FragCoord.z)
-		refractionColor	= texture(g_LA, refractedUV).rgb;
+		refractionColor	= texelFetch(g_LA, refractedUV, 0).rgb;
 	else
 	{
-		refractionColor	= texture(g_LA, screenTexCoord).rgb;
-		refractionDepth = texture(g_Depth, screenTexCoord).r;
+		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
+		refractionDepth = texelFetch(g_Depth, ivec2(gl_FragCoord.xy), 0).r;
 	}
 
 	//Reflection calculations

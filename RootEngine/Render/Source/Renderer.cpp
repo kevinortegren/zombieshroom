@@ -312,17 +312,36 @@ namespace Render
 		m_glowDevice.Init(this, m_width, m_height);		
 	}
 
-	void GLRenderer::SetResolution(int p_width, int p_height)
+	void GLRenderer::SetResolution(bool p_fullscreen, int p_width, int p_height)
 	{
-		SDL_SetWindowSize(m_window, p_width, p_height);	
-
-		m_gbuffer.Resize(p_width, p_height);
-		m_lighting.Resize(p_width, p_height);
-
-		glViewport(0, 0, p_width, p_height);
-
 		m_width = p_width;
 		m_height = p_height;
+
+		if(p_fullscreen)
+		{
+			SDL_DisplayMode nativeMode;
+			SDL_GetDesktopDisplayMode(0, &nativeMode);
+
+			m_width = nativeMode.w;
+			m_height = nativeMode.h;
+
+			SDL_SetWindowDisplayMode(m_window, &nativeMode);
+		}
+
+		SDL_SetWindowSize(m_window, m_width, m_height);
+		SDL_SetWindowFullscreen(m_window, p_fullscreen);
+		SDL_SetWindowSize(m_window, m_width, m_height);
+
+		glViewport(0, 0, m_width, m_height);
+
+		m_gbuffer.Resize(m_width, m_height);
+		m_lighting.Resize(m_width, m_height);
+		m_glowDevice.Resize(m_width, m_height);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		m_color0->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
@@ -414,6 +433,11 @@ namespace Render
 		{
 			PROFILE("Output", g_context.m_profiler);
 			Output();
+		}
+
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
 		}
 
 		m_allocator.Clear();
