@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>682</height>
+    <width>783</width>
+    <height>738</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,198 +20,170 @@
    <string>Ability Editor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTabWidget" name="abilityWidget">
+   <widget class="QPushButton" name="buttonNameBrowser">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>271</width>
-      <height>381</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tabOnCreate">
-     <attribute name="title">
-      <string>On Create</string>
-     </attribute>
-     <widget class="CustomTreeWidget" name="treeOnCreate">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>261</width>
-        <height>351</height>
-       </rect>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::DropOnly</enum>
-      </property>
-      <property name="defaultDropAction">
-       <enum>Qt::MoveAction</enum>
-      </property>
-      <column>
-       <property name="text">
-        <string>Entities</string>
-       </property>
-      </column>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabOnCollide">
-     <attribute name="title">
-      <string>On Collide</string>
-     </attribute>
-     <widget class="CustomTreeWidget" name="treeOnCollide">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>261</width>
-        <height>351</height>
-       </rect>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropOverwriteMode">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::DropOnly</enum>
-      </property>
-      <property name="defaultDropAction">
-       <enum>Qt::IgnoreAction</enum>
-      </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <column>
-       <property name="text">
-        <string>Entities</string>
-       </property>
-      </column>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabOnDestroy">
-     <attribute name="title">
-      <string>On Destroy</string>
-     </attribute>
-     <widget class="CustomTreeWidget" name="treeOnDestroy">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>261</width>
-        <height>351</height>
-       </rect>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::DropOnly</enum>
-      </property>
-      <property name="defaultDropAction">
-       <enum>Qt::MoveAction</enum>
-      </property>
-      <column>
-       <property name="text">
-        <string>Entities</string>
-       </property>
-      </column>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QTabWidget" name="toolBoxWidget">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>10</y>
-      <width>261</width>
-      <height>381</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tabAbilities">
-     <attribute name="title">
-      <string>Existing Abilities</string>
-     </attribute>
-     <widget class="QTreeView" name="treeView">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>251</width>
-        <height>351</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabComponents">
-     <attribute name="title">
-      <string>Components</string>
-     </attribute>
-     <widget class="CustomListWidget" name="listComponents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>251</width>
-        <height>351</height>
-       </rect>
-      </property>
-      <property name="dragEnabled">
-       <bool>true</bool>
-      </property>
-      <property name="dragDropMode">
-       <enum>QAbstractItemView::NoDragDrop</enum>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabConditions">
-     <attribute name="title">
-      <string>Conditions</string>
-     </attribute>
-     <widget class="CustomListWidget" name="listWidget">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>251</width>
-        <height>351</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="propertyWidget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>410</y>
-      <width>571</width>
-      <height>231</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>380</y>
-      <width>21</width>
+      <x>585</x>
+      <y>9</y>
+      <width>189</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>Browse name for property manager...</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>39</y>
+      <width>771</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="CustomCompListWidget" name="listAbilityComponents"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QTabWidget" name="toolBoxWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabComponents">
+        <attribute name="title">
+         <string>Components</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="CustomListWidget" name="listComponents"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabEntities">
+        <attribute name="title">
+         <string>Entities</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QTreeView" name="listEntities"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabConditions">
+        <attribute name="title">
+         <string>Conditions</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="CustomListWidget" name="listConditions"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QTabWidget" name="OnTabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabOnCreate">
+        <attribute name="title">
+         <string>OnCreate</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnCreate">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabOnCollide">
+        <attribute name="title">
+         <string>OnCollide</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnCollide">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabOnDestroy">
+        <attribute name="title">
+         <string>OnDestroy</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="CustomTreeWidget" name="treeOnDestroy">
+           <column>
+            <property name="text">
+             <string>Conditions &amp; Entities</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QWidget" name="propertyWidget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>371</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="abilityNameEdit">
+       <property name="text">
+        <string>AbilityName</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="cooldownLabel">
+       <property name="text">
+        <string>Cooldown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="cooldownSpinbox"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -219,7 +191,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>592</width>
+     <width>783</width>
      <height>21</height>
     </rect>
    </property>
@@ -233,14 +205,7 @@
     <addaction name="actionGenerate_Script"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuNew">
-    <property name="title">
-     <string>New</string>
-    </property>
-    <addaction name="actionEntity"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuNew"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionSave_As">
@@ -265,7 +230,7 @@
   </action>
   <action name="actionGenerate_Script">
    <property name="text">
-    <string>Generate Script Folder...</string>
+    <string>Generate Script...</string>
    </property>
   </action>
   <action name="actionEntity">
@@ -277,14 +242,19 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>CustomListWidget</class>
+   <extends>QListWidget</extends>
+   <header>CustomListWidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>CustomTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>CustomTreeWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>CustomListWidget</class>
+   <class>CustomCompListWidget</class>
    <extends>QListWidget</extends>
-   <header>CustomListWidget.h</header>
+   <header>CustomCompListWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
