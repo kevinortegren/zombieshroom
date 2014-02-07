@@ -52,14 +52,18 @@ namespace RootForce
 			else
 			{
 				
-				glm::mat4* bones = new glm::mat4[20];
+				glm::mat4* bones;
 				//get the updated bonetransformations from the physics
 				bones = m_engineContext->m_physics->GetBones(*(collision->m_handle));
 				if(bones != nullptr)
+				{
 					for(int i = 0; i < 20; i++)
 					{
 						animation->m_bones[i] = bones[i];/** (renderable->m_model->m_animation[0].GetBoneOffset(i))*/;
 					}
+					delete[] bones;
+				}
+				
 			}
 		
 		}
