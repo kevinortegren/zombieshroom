@@ -389,7 +389,7 @@ namespace Render
 
 		{
 			PROFILE("Shadow pass", g_context.m_profiler);
-			ShadowPass();
+			//ShadowPass();
 		}
 
 		// Buffer Per Frame data.
@@ -423,7 +423,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			PostProcessPass();
+			//PostProcessPass();
 		}
 
 		{
@@ -537,6 +537,13 @@ namespace Render
 
 	void GLRenderer::ProcessRenderJobs()
 	{
+		if(m_activeRTT != nullptr)
+		{
+			// Render to texture.
+			//glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
+
+		}
+
 		int currentMaterialID = -1;
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{

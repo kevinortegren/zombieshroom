@@ -181,8 +181,8 @@ namespace RootForce
 
 		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-		m_directionlLightSystem->Process();
-		m_pointLightSystem->Process();
+		//m_directionlLightSystem->Process();
+		//m_pointLightSystem->Process();
 		m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse

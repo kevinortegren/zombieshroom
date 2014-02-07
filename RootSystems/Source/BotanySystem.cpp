@@ -103,7 +103,7 @@ namespace RootForce
 		// Create RTT.
 		m_density = m_engineContext->m_renderer->CreateRenderToTexture();
 		m_density->SetTexture(m_engineContext->m_renderer->CreateTexture());
-		m_density ->GetTexture()->CreateEmptyTexture(512, 512, Render::TextureFormat::TEXTURE_RGB);
+		m_density ->GetTexture()->CreateEmptyTexture(1024, 1024, Render::TextureFormat::TEXTURE_RGB);
 		m_density->BindTexture();
 
 		// Set Camera.
@@ -146,7 +146,7 @@ namespace RootForce
 		}
 
 		m_engineContext->m_renderer->SetRenderToTexture(m_density);
-		m_engineContext->m_renderer->Clear();
+		//m_engineContext->m_renderer->Clear();
 		m_engineContext->m_renderer->Render();
 
 		// Store texture.
