@@ -11,13 +11,24 @@
     <div id="splash">
     </div>
     
-    <div id="main-menu" class="verticaltablehax"><div class="verticalcenterhax">
-      <div id="main-wrapper">
-        <input id="main-play" type="submit" class="main-button" value="Play" />
-        <input id="main-settings" type="submit" class="main-button" value="Settings" />
-        <input id="main-exit" type="submit" class="main-button" value="Exit" />
-      </div>
-    </div></div>
+    <table id="MainMenuBar">
+      <tr id="main-menu">
+        <td><input id="main-play" type="submit" class="main-button" value="Play" /></td>
+        <td><input id="main-settings" type="submit" class="main-button" value="Settings" /></td>
+        <td><input id="main-exit" type="submit" class="main-button" value="Exit" /></td>
+      </tr>
+      <tr id="settings-menu">
+        <td><input id="settings-player" type="submit" class="main-button" value="Player" /></td>
+        <td><input id="settings-graphics" type="submit" class="main-button" value="Graphics" /></td>
+        <td><input disabled id="settings-sound" type="submit" class="main-button" value="Sound" /></td>
+        <td><input disabled id="settings-controls" type="submit" class="main-button" value="Controls" /></td>
+        <td><input disabled id="settings-reset" type="submit" class="main-button" value="Reset settings" /></td>
+        <td><input id="settings-back" type="submit" class="main-button" value="Back" /></td>
+      </tr>
+      <tr>
+        <td></td>
+      </tr>
+    </table>
     
     <div id="lan-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
       <div id="lan-wrapper" >
@@ -35,22 +46,11 @@
       </div>
     </div></div>
     
-    <div id="settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
-      <div id="settings-wrapper">
-        <h1 class="textcenter">Settings</h1>
-        <input id="settings-player" type="submit" class="main-button" value="Player" />
-        <input id="settings-graphics" type="submit" class="main-button" value="Graphics" />
-        <input disabled id="settings-sound" type="submit" class="main-button" value="Sound" />
-        <input disabled id="settings-controls" type="submit" class="main-button" value="Controls" />
-        <input disabled id="settings-reset" type="submit" class="main-button" value="Reset settings" />
-        <input id="settings-back" type="submit" class="main-button" value="Back" />
-      </div>
-    </div></div>
-    
     <div id="player-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
       <div id="player-settings-wrapper" class="windowbackground">
         <h1 class="textcenter">Player settings</h1>
         <div><div class="inline-150px">Name</div><input type="text" id="settings-player-name" /></div>
+        <div>&nbsp;</div>
         <input id="player-settings-back" type="submit" class="button" value="Back" />
         <input id="player-settings-save" type="submit" class="button floatright" value="Save" /></div>
       </div>

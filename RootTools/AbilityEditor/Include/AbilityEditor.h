@@ -11,6 +11,7 @@
 #include "ScriptGenerator.h"
 #include "Exporter.h"
 #include "Importer.h"
+//#include "Entity.h"
 
 #include "GeneratedFiles/ui_AbilityEditor.h"
 
@@ -28,14 +29,16 @@ public:
 
 private slots:
 		void UpdatePropertyBrowser();
-		void ChangedTab();
+		//void ChangedTab();
 		void GenerateScript();
 		void SaveAs();
 		void Save();
 		void Load();
 		void FileViewDrag(const QModelIndex& p_modelIndex);
-		void AddNewEntity();
+		//void AddNewEntity();
 		void BrowseName();
+		void ChangeAbilityName();
+		void SetCooldown(double p_cooldown);
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;
@@ -43,6 +46,7 @@ private:
 	QLayout* m_mainLayout;
 	QPainter* m_painter;
 	QPixmap* m_pixmap;
+	AbilityEditorNameSpace::Entity* m_entity;
 	AbilityEditorNameSpace::OnCreate* m_onCreate;
 	AbilityEditorNameSpace::OnCollide* m_onCollide;
 	AbilityEditorNameSpace::OnDestroy* m_onDestroy;
@@ -52,8 +56,11 @@ private:
 	unsigned int m_LastSelectedTab;
 	QString m_currentSavePath;
 	bool event(QEvent* event);
-	QTreeWidgetItem* m_LastSelectedItem;
+	QListWidgetItem* m_LastSelectedItem;
 	QFileSystemModel* m_fileViewModel;
+
+	std::vector<AbilityEditorNameSpace::Condition*> m_conditions;
+
 	//void mousePressEvent(QMouseEvent* event);
 
 };

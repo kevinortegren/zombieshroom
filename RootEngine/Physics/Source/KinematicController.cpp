@@ -21,7 +21,8 @@ KinematicController::~KinematicController( void )
 }
 void KinematicController::RemovePlayer()
 {
-	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+	if(m_activated)
+		m_dynamicWorld->removeCollisionObject(m_ghostObject);
 	delete m_motionState;
 	delete m_ghostObject->getCollisionShape();
 	delete m_ghostObject;
@@ -35,7 +36,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_stepHeight = p_stepHeight;
 	m_maxSpeed = p_maxSpeed; //cleanup
 	m_mass = p_mass;
-
+	m_activated = true;
 	//Shape
 	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
 	btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
@@ -97,6 +98,8 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 
 void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 {
+	if(!m_activated)
+		return;
 	btVector3 temp = btVector3(p_dir[0], p_dir[1], p_dir[2]);
 	if (!temp.fuzzyZero())
 		temp.normalize();
@@ -112,6 +115,8 @@ void KinematicController::Walk(glm::vec3 p_dir, float p_dt)
 
 void KinematicController::Move( glm::vec3 p_target, float p_dt )
 {
+	if(!m_activated)
+		return;
 	btVector3 from,to,traveldist;
 	from = m_ghostObject->getWorldTransform().getOrigin();
 	to = btVector3(p_target[0], p_target[1], p_target[2]);
@@ -131,7 +136,8 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 
 void KinematicController::Update(float p_dt)
 {
-	
+	if(!m_activated)
+		return;
 	//m_hasStepped = false;
 	m_kinController->updateAction(m_dynamicWorld, p_dt);
 	m_kinController->setWalkDirection(btVector3(0,0,0));
@@ -148,13 +154,16 @@ void KinematicController::Jump()
 
 void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
 {
-
+	if(!m_activated)
+		return;
 	m_kinController->Knockback(p_velocity, p_power);
 	
 }
 
 void KinematicController::SetOrientation( glm::quat p_orientation )
 {
+	if(!m_activated)
+		return;
 	btQuaternion btquat;
 	btquat.setW(p_orientation.w);
 	btquat.setX(p_orientation.x);
@@ -166,30 +175,55 @@ void KinematicController::SetOrientation( glm::quat p_orientation )
 
 void KinematicController::SetUserPointer( void* p_userPointer )
 {
+	if(!m_activated)
+		return;
 	m_ghostObject->setUserPointer(p_userPointer);
 }
 
 void KinematicController::SetMass( float p_mass )
 {
+	if(!m_activated)
+		return;
 	m_mass = p_mass;
 }
 
 void KinematicController::SetGravity( float p_gravity )
 {
+	if(!m_activated)
+		return;
 	m_kinController->setGravity(p_gravity);
 }
 
 void KinematicController::SetPosition(const btVector3& p_position)
 {
+	if(!m_activated)
+		return;
 	m_kinController->warp(p_position);
 }
 
 void KinematicController::SetJumpForce( float p_jumpForce )
 {
+	if(!m_activated)
+		return;
 	m_kinController->setJumpSpeed(p_jumpForce);
 }
 
 bool KinematicController::IsOnGround()
 {
+	if(!m_activated)
+		return false;
 	return m_kinController->onGround();
+}
+
+void KinematicController::Deactivate()
+{
+	m_activated = false;
+	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+}
+
+void KinematicController::Activate()
+{
+	m_activated = true;
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	m_kinController->Knockback(btVector3(1,1,1),0);
 }

@@ -309,7 +309,7 @@ namespace RootForce
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(x-(float)m_gridSize/2.0f, 0.0f, z-(float)m_gridSize/2.0f);
 				v.m_normal	= glm::vec3(0.0f);
-				v.m_UV		= glm::vec2(x/(float)m_gridSize, 1.0f - z/(float)m_gridSize);
+				v.m_UV		= glm::vec2(x/(float)m_gridSize, z/(float)m_gridSize);
 				v.m_tangent = glm::vec3(0.0f);//TODO
 				v.m_bitangent = glm::vec3(0.0f);//TODO
 				vertices.push_back(v);

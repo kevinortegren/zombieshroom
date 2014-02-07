@@ -13,7 +13,10 @@ namespace RootForce
 		, m_sharedSystems(p_sharedSystems)
 	{	
 		ComponentType::Initialize();
-
+		
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
@@ -38,6 +41,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
@@ -54,7 +58,10 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
 		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
+		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
+		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
+		g_engineContext.m_resourceManager->LoadScript("Explosion");
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
@@ -145,6 +152,10 @@ namespace RootForce
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
+		//Initialize Ragdoll system
+		m_ragdollSystem = new RootForce::RagdollSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::RagdollSystem>(m_ragdollSystem);
+
 		// Initialize camera systems.
 		m_cameraSystem = new RootForce::CameraSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
@@ -180,9 +191,6 @@ namespace RootForce
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
-
-		//m_directionlLightSystem->Process();
-		//m_pointLightSystem->Process();
 		m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse
@@ -337,18 +345,13 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		switch (event.EventType)
-		{
-		case RootServer::UserCommands::CLIENT_RAGEQUIT:
+		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
 			return GameStates::Menu;
-		case RootServer::UserCommands::CLIENT_SUICIDE:
-			{
-				// ToDo: Send a network message to server to indicate a suicide
-				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-				MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
-			} break;
-		default:
-			break;
+		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
+		{
+			// ToDo: Send a network message to server to indicate a suicide
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
 		}
 
 #ifdef _DEBUG
@@ -450,7 +453,7 @@ namespace RootForce
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
 		}
-		
+
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
 			if(!m_displayIngameMenu)
@@ -464,8 +467,16 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
+
+
+		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
+
 			m_physicsTransformCorrectionSystem->Process();
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
@@ -484,8 +495,7 @@ namespace RootForce
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
-			if(!m_displayIngameMenu)
-				m_actionSystem->UpdateAimingDevice();
+			m_actionSystem->UpdateAimingDevice(m_displayIngameMenu);
 			m_thirdPersonBehaviorSystem->Process();
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
@@ -531,8 +541,9 @@ namespace RootForce
 		//Check status for the display of the ingame menu
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayIngameMenu = true;
-			g_engineContext.m_inputSys->LockMouseToCenter(false);
+			m_displayIngameMenu = !m_displayIngameMenu;
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
 		{

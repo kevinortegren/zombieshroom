@@ -12,7 +12,7 @@ $(document).ready(function() {
   } );
   $("#main-settings").click(function() {
     $("#main-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
+    $("#settings-menu").css("display", "table-row");
   } );
   $("#main-exit").click(function() {
     Menu.Exit();
@@ -34,7 +34,7 @@ $(document).ready(function() {
   } );
   $("#settings-back").click(function() {
     $("#settings-menu").css("display", "none");
-    $("#main-menu").css("display", "table");
+    $("#main-menu").css("display", "table-row");
   } );
   // Lan menu
   var ClearTable = function ()
@@ -44,7 +44,7 @@ $(document).ready(function() {
     $("#lan-list").tablesorter();
   };
   $("#lan-back").click(function() {
-    $("#main-menu").css("display", "table");
+    $("#main-menu").css("display", "table-row");
     $("#lan-menu").css("display", "none");
     $("#selected").attr("id", "");
   } );

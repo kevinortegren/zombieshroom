@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.12.mb</source_data>
     </contributor>
-    <created>2014-02-06T16:16:08</created>
-    <modified>2014-02-06T16:16:08</modified>
+    <created>2014-02-07T11:38:41</created>
+    <modified>2014-02-07T11:38:41</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -86,7 +86,7 @@
   </library_effects>
   <library_images>
     <image id="file9" name="file9">
-      <init_from>file:///C:/ZombieShroom/LevelEditor/Assets/Textures/RED.dds</init_from>
+      <init_from>file:///C:/ZombieShroom/LevelEditor/Assets/Textures/sandColor.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -175,7 +175,7 @@
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">1 1 1</scale>
+        <scale sid="scale">100 100 100</scale>
         <instance_geometry url="#GroundPlaneShape">
           <bind_material>
             <technique_common>

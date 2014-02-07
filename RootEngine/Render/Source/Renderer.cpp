@@ -261,6 +261,7 @@ namespace Render
 		m_sjobCount[2] = 0;
 		m_sjobCount[3] = 0;
 
+		m_renderFlags = 0;
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -389,7 +390,7 @@ namespace Render
 
 		{
 			PROFILE("Shadow pass", g_context.m_profiler);
-			//ShadowPass();
+			ShadowPass();
 		}
 
 		// Buffer Per Frame data.
@@ -423,7 +424,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			//PostProcessPass();
+			PostProcessPass();
 		}
 
 		{
@@ -460,6 +461,15 @@ namespace Render
 	void GLRenderer::SetRenderToTexture(RenderToTextureInterface* p_renderToTexture)
 	{
 		m_activeRTT = p_renderToTexture;
+
+		if(p_renderToTexture != nullptr)
+		{
+			m_renderFlags |= TechniqueFlags::RENDER_RTT;
+		}
+		else
+		{
+			m_renderFlags ^= TechniqueFlags::RENDER_RTT;
+		}
 	}
 
 	static bool SortRenderJobs(RenderJob* a, RenderJob* b)
@@ -527,10 +537,12 @@ namespace Render
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
-		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+		m_renderFlags |= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
 		ProcessRenderJobs();
 		
+		m_renderFlags ^= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+
 		// Bind textures for read.
 		m_gbuffer.BindTextures();
 	}
@@ -654,12 +666,7 @@ namespace Render
 
 	void GLRenderer::Output()
 	{
-		if(m_activeRTT == nullptr)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		}
-		else
+		if((m_renderFlags & TechniqueFlags::RENDER_RTT) == TechniqueFlags::RENDER_RTT)
 		{
 			// Render to texture.
 			glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
@@ -669,9 +676,14 @@ namespace Render
 			GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
 			glDrawBuffers(1, buffers);
 
-			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
+
+		}
+		else
+		{
+			// Bind backbuffer.
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
 		// Bind result of render pipeline.
@@ -686,10 +698,6 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 
 		m_color0->Unbind(5);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, m_width, m_height);
-
 	}
 
 	void GLRenderer::BindForwardFramebuffer()
@@ -833,6 +841,7 @@ namespace Render
 
 	void GLRenderer::Compute( ComputeJob* p_job )
 	{
+#ifdef RENDER_USE_COMPUTE
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
@@ -864,6 +873,7 @@ namespace Render
 				(*texture).second->UnBindImage((*texture).first);
 			}
 		}
+#endif
 	}
 
 	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )

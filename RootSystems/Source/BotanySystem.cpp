@@ -110,7 +110,7 @@ namespace RootForce
 		m_engineContext->m_renderer->SetViewMatrix(m_view);
 		m_engineContext->m_renderer->SetProjectionMatrix(m_proj);
 
-		// Test Draw.
+		// Draw painted geometry.
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Painted");
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
@@ -122,10 +122,10 @@ namespace RootForce
 
 			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 
+			// Calculate model/normal.
 			m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_position);
 			m_matrices[entity].m_model = glm::rotate(m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 			m_matrices[entity].m_model = glm::scale(m_matrices[entity].m_model, transform->m_scale);
-
 			m_matrices[entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[entity].m_model))));
 			m_matrices[entity].m_model = m_matrices[entity].m_model;
 
@@ -133,20 +133,16 @@ namespace RootForce
 			job.m_flags = renderable->m_renderFlags;
 			job.m_mesh = renderable->m_model->m_meshes[0];
 			job.m_shadowMesh = renderable->m_model->m_meshes[0];
-
 			job.m_params = renderable->m_params;
 			job.m_params[Render::Semantic::MODEL] = &m_matrices[entity].m_model;
 			job.m_params[Render::Semantic::NORMAL] = &m_matrices[entity].m_normal;
-
 			job.m_material = renderable->m_material;
-			job.m_material->m_effect = m_effect;
 			job.m_renderPass = renderable->m_pass;
 
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
 
 		m_engineContext->m_renderer->SetRenderToTexture(m_density);
-		//m_engineContext->m_renderer->Clear();
 		m_engineContext->m_renderer->Render();
 
 		// Store texture.

@@ -10,6 +10,7 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
+#include <RootSystems/Include/RagdollSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/ActionSystem.h>
 #include <RootSystems/Include/RespawnSystem.h>
@@ -65,6 +66,7 @@ namespace RootForce
 		RootForce::LookAtSystem*						m_lookAtSystem;
 		RootForce::ThirdPersonBehaviorSystem*			m_thirdPersonBehaviorSystem;
 		RootForce::AnimationSystem*						m_animationSystem;
+		RootForce::RagdollSystem*						m_ragdollSystem;
 		RootForce::MatchStateSystem*					m_gameLogicSystem;
 		RootForce::WaterSystem*							m_waterSystem;
 		RootSystems::ActionSystem*						m_actionSystem;

@@ -24,6 +24,7 @@ namespace RootForce
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		Render::EffectInterface* m_effect;
+
 		Render::RenderToTextureInterface* m_density;
 		RootForce::QuadTree* m_quadTree;
 		
