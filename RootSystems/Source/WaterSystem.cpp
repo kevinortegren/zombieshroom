@@ -237,13 +237,15 @@ namespace RootForce
 
 	void WaterSystem::InitDisturb()
 	{
-		for(int i = 0; i < 50; ++i)
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Starting earthquake to create water movement");
+		for(int i = 0; i < 500; ++i)
 		{ 
 			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 
-			Disturb((float)x, (float)z, 10.0f);
+			Disturb((float)x, (float)z, 2.0f);
 		}
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is now moving");
 	}
 
 	void WaterSystem::IncreaseDamping()
