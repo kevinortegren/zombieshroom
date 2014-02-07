@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_AbilityEditor_t {
-    QByteArrayData data[12];
-    char stringdata[131];
+    QByteArrayData data[13];
+    char stringdata[148];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,20 +32,21 @@ static const qt_meta_stringdata_AbilityEditor_t qt_meta_stringdata_AbilityEditor
 QT_MOC_LITERAL(0, 0, 13),
 QT_MOC_LITERAL(1, 14, 21),
 QT_MOC_LITERAL(2, 36, 0),
-QT_MOC_LITERAL(3, 37, 10),
-QT_MOC_LITERAL(4, 48, 14),
-QT_MOC_LITERAL(5, 63, 6),
-QT_MOC_LITERAL(6, 70, 4),
-QT_MOC_LITERAL(7, 75, 4),
-QT_MOC_LITERAL(8, 80, 12),
-QT_MOC_LITERAL(9, 93, 12),
-QT_MOC_LITERAL(10, 106, 12),
-QT_MOC_LITERAL(11, 119, 10)
+QT_MOC_LITERAL(3, 37, 14),
+QT_MOC_LITERAL(4, 52, 6),
+QT_MOC_LITERAL(5, 59, 4),
+QT_MOC_LITERAL(6, 64, 4),
+QT_MOC_LITERAL(7, 69, 12),
+QT_MOC_LITERAL(8, 82, 12),
+QT_MOC_LITERAL(9, 95, 10),
+QT_MOC_LITERAL(10, 106, 17),
+QT_MOC_LITERAL(11, 124, 11),
+QT_MOC_LITERAL(12, 136, 10)
     },
     "AbilityEditor\0UpdatePropertyBrowser\0"
-    "\0ChangedTab\0GenerateScript\0SaveAs\0"
-    "Save\0Load\0FileViewDrag\0p_modelIndex\0"
-    "AddNewEntity\0BrowseName\0"
+    "\0GenerateScript\0SaveAs\0Save\0Load\0"
+    "FileViewDrag\0p_modelIndex\0BrowseName\0"
+    "ChangeAbilityName\0SetCooldown\0p_cooldown\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -68,10 +69,10 @@ static const uint qt_meta_data_AbilityEditor[] = {
        4,    0,   61,    2, 0x08,
        5,    0,   62,    2, 0x08,
        6,    0,   63,    2, 0x08,
-       7,    0,   64,    2, 0x08,
-       8,    1,   65,    2, 0x08,
+       7,    1,   64,    2, 0x08,
+       9,    0,   67,    2, 0x08,
       10,    0,   68,    2, 0x08,
-      11,    0,   69,    2, 0x08,
+      11,    1,   69,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -79,10 +80,10 @@ static const uint qt_meta_data_AbilityEditor[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QModelIndex,    8,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QModelIndex,    9,
     QMetaType::Void,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,   12,
 
        0        // eod
 };
@@ -93,14 +94,14 @@ void AbilityEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         AbilityEditor *_t = static_cast<AbilityEditor *>(_o);
         switch (_id) {
         case 0: _t->UpdatePropertyBrowser(); break;
-        case 1: _t->ChangedTab(); break;
-        case 2: _t->GenerateScript(); break;
-        case 3: _t->SaveAs(); break;
-        case 4: _t->Save(); break;
-        case 5: _t->Load(); break;
-        case 6: _t->FileViewDrag((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
-        case 7: _t->AddNewEntity(); break;
-        case 8: _t->BrowseName(); break;
+        case 1: _t->GenerateScript(); break;
+        case 2: _t->SaveAs(); break;
+        case 3: _t->Save(); break;
+        case 4: _t->Load(); break;
+        case 5: _t->FileViewDrag((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 6: _t->BrowseName(); break;
+        case 7: _t->ChangeAbilityName(); break;
+        case 8: _t->SetCooldown((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }

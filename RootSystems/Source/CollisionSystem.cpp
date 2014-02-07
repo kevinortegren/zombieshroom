@@ -20,17 +20,17 @@ namespace RootForce
 	{
 		CollisionResponder* cr = m_responders.Get(p_entity);
 
-		for(auto itr = cr->m_collidedEntities.begin(); itr != cr->m_collidedEntities.end(); ++itr)
+		for(auto itr = cr->m_collisions.begin(); itr != cr->m_collisions.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
 			
 			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
 			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-			m_engineContext->m_script->AddParameterUserData((*itr), sizeof(ECS::Entity*), "Entity");
+			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->ExecuteScript();
 		}
 
-		cr->m_collidedEntities.clear();
+		cr->m_collisions.clear();
 	}
 
 	void CollisionSystem::End()
