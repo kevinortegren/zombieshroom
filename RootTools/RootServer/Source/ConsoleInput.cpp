@@ -39,7 +39,7 @@ namespace RootServer
 
 			m_eventBuffer.push_back( ev );
 			
-			if(ev.EventType == UserCommands::SHUTDOWN)
+			if(ev.EventType.compare("SHUTDOWN") == 0)
 			{
 				m_shouldExit = true;
 			}

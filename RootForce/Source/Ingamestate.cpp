@@ -331,18 +331,13 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
-		switch (event.EventType)
-		{
-		case RootServer::UserCommands::CLIENT_RAGEQUIT:
+		if(event.EventType.compare("CLIENT_RAGEQUIT") == 0)
 			return GameStates::Menu;
-		case RootServer::UserCommands::CLIENT_SUICIDE:
-			{
-				// ToDo: Send a network message to server to indicate a suicide
-				g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-				MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
-			} break;
-		default:
-			break;
+		else if(event.EventType.compare("CLIENT_SUICIDE") == 0)
+		{
+			// ToDo: Send a network message to server to indicate a suicide
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
 		}
 
 #ifdef _DEBUG

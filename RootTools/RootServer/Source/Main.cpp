@@ -132,16 +132,16 @@ void Main::Start()
 
 		// ToDo: Move event handling to shared server-logic class
 		RootServer::EventData consoleEvent = m_console.PollEvent();
-		switch(consoleEvent.EventType)
+		
+		if(consoleEvent.EventType.compare("KICK_PLAYER") == 0)
 		{
-		case RootServer::UserCommands::KICK_PLAYER:
 			// TODO
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "KICK_PLAYER not yet implemented.");
-			break;
-		case RootServer::UserCommands::BROADCAST_MESSAGE:
-			{
+		}
+		else if(consoleEvent.EventType.compare("BROADCAST_MESSAGE") == 0)
+		{
 			RootForce::NetworkMessage::Chat c;
-			c.Message = std::string((char*)consoleEvent.Data, consoleEvent.DataSize).c_str();
+			c.Message = consoleEvent.Data.str().c_str();
 			c.Sender = 0;
 			c.Type = RootForce::NetworkMessage::Chat::TYPE_SERVER_MESSAGE;
 
@@ -150,49 +150,49 @@ void Main::Start()
 			c.Serialize(true, &bs);
 
 			m_server->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-			break;
-			}
-		case RootServer::UserCommands::RESET_SERVER:
+		}
+		else if(consoleEvent.EventType.compare("RESET_SERVER") == 0)
+		{
 			// TODO: How to handle server reset?
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "reset not yet implemented.");
-			break;
-		case RootServer::UserCommands::SET_MAXPLAYERS:
-			if(consoleEvent.DataSize == sizeof(uint8_t))
-				conf.MaxPlayers = *consoleEvent.Data;
+		}
+		else if(consoleEvent.EventType.compare("SET_MAXPLAYERS") == 0)
+		{
+			consoleEvent.Data >> conf.MaxPlayers;
 			// TODO: Call the network to change limit of accepted connections
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_maxplayers not yet implemented.");
-			break;
-		case RootServer::UserCommands::SET_PASSWORD:
-			if(consoleEvent.DataSize > 0)
-				conf.Password = std::string((char*)consoleEvent.Data, consoleEvent.DataSize);
+		}
+		else if(consoleEvent.EventType.compare("SET_PASSWORD") == 0)
+		{
+			conf.Password = consoleEvent.Data.str().c_str();
 			// TODO: Call the network to change the password required for the connection
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_password not yet implemented.");
-			break;
-		case RootServer::UserCommands::SET_MAP:
-			if(consoleEvent.DataSize > 0)
-				conf.MapName = std::string((const char*)consoleEvent.Data, consoleEvent.DataSize);
+		}
+		else if(consoleEvent.EventType.compare("SET_MAP") == 0)
+		{
+			consoleEvent.Data >> conf.MapName;
 			// TODO: Reset the server with a new map loaded
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_map not yet implemented.");
-			break;
-		case RootServer::UserCommands::SET_GAMEMODE:
-			if(consoleEvent.DataSize == sizeof(uint8_t))
-				conf.GameMode = (RootSystems::GameMode::GameMode)*consoleEvent.Data;
+		}
+		else if(consoleEvent.EventType.compare("SET_GAMEMODE") == 0)
+		{
+			uint8_t tmp;
+			consoleEvent.Data >> tmp;
+			conf.GameMode = (RootSystems::GameMode::GameMode)tmp;
 			// TODO: Reset the server with a different gamemode
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::NON_FATAL_ERROR, "set_gamemode not yet implemented.");
-			break;
-		case RootServer::UserCommands::SET_MATCHTIME:
-			if(consoleEvent.DataSize == sizeof(uint32_t))
-				conf.MatchTime = *(uint32_t*)consoleEvent.Data;
-			break;
-		case RootServer::UserCommands::SET_KILLCOUNT:
-			if(consoleEvent.DataSize == sizeof(uint32_t))
-				conf.MatchTime = *(uint32_t*)consoleEvent.Data;
-			break;
-		case RootServer::UserCommands::SHUTDOWN:
+		}
+		else if(consoleEvent.EventType.compare("SET_MATCHTIME") == 0)
+		{
+			consoleEvent.Data >> conf.MatchTime;
+		}
+		else if(consoleEvent.EventType.compare("SET_KILLCOUNT") == 0)
+		{
+			consoleEvent.Data >> conf.KillCount;
+		}
+		else if(consoleEvent.EventType.compare("SHUTDOWN") == 0)
+		{
 			m_running = false;
-			break;
-		default:
-			break;
 		}
 	}
 
