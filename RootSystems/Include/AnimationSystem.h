@@ -23,7 +23,8 @@ namespace RootForce
 			ASCEND,
 			DESCEND,
 			LANDING,
-			SHOOT
+			SHOOT,
+			RAGDOLL
 		};
 	}
 

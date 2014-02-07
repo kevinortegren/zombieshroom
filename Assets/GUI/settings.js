@@ -41,7 +41,8 @@ $(document).ready(function() {
   }
   $("#player-settings-back").click(function() {
     $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
+    $("div#settings-menu").css("display", "table");
+    $("tr#settings-menu").css("display", "table-row");
     JSGlobal.LoadSettings();
   } );
   $("#player-settings-save").click(function() {
@@ -49,12 +50,14 @@ $(document).ready(function() {
     settings["settings-player-name"] = $("#settings-player-name").val();
     Menu.SaveSettings(settings);
     $("#player-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
+    $("div#settings-menu").css("display", "table");
+    $("tr#settings-menu").css("display", "table-row");
   } );
   
   $("#graphics-settings-back").click(function() {
     $("#graphics-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
+    $("div#settings-menu").css("display", "table");
+    $("tr#settings-menu").css("display", "table-row");
     JSGlobal.LoadSettings();
   } );
   $("#graphics-settings-save").click(function() {
@@ -63,7 +66,8 @@ $(document).ready(function() {
     settings["settings-resolution"] = $("#settings-resolution").val();
     Menu.SaveSettings(settings);
     $("#graphics-settings-menu").css("display", "none");
-    $("#settings-menu").css("display", "table");
+    $("div#settings-menu").css("display", "table");
+    $("tr#settings-menu").css("display", "table-row");
   } );
   
   

@@ -19,6 +19,7 @@ public:
 	void stepDown ( btCollisionWorld* collisionWorld, btScalar dt);
 	void stepUp ( btCollisionWorld* world);
 	float test(const btVector3& start,const btVector3& end, btCollisionWorld* world );
+	btVector3 GetKnockbackVector() const {return m_knockbackVelocity;}
 private:
 	bool m_hasBeenKnockbacked;
 	btVector3 m_knockbackVelocity;
