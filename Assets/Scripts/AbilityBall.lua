@@ -25,9 +25,9 @@ function AbilityBall.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
-	waterCollider:SetDisturbPower(0.5);
+	waterCollider:SetDisturbPower(1.0);
 	waterCollider:SetDisturbInterval(0.3);
-	waterCollider:SetRadius(2);
+	waterCollider:SetRadius(4);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "fireball");
 		local renderComp = Renderable.New(self);

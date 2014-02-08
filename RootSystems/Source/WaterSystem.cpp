@@ -14,6 +14,7 @@ namespace RootForce
 
 	WaterSystem::~WaterSystem()
 	{
+		delete m_textureData;
 	}
 
 	void WaterSystem::Init()
@@ -21,10 +22,12 @@ namespace RootForce
 		m_transform.Init(m_world->GetEntityManager());
 		m_waterCollider.Init(m_world->GetEntityManager());
 		
-		m_maxX = m_maxZ = 1024;
+		m_texSize = 1024;
 		m_scale = 40.0f;
 		m_dt = 0;
 		m_gridSize = 64;
+
+		m_textureData = new float[m_texSize*m_texSize];
 	}
 
 	void WaterSystem::Begin()
@@ -58,27 +61,32 @@ namespace RootForce
 		float waterHeight = GetWaterHeight();
 
 		//If over water, set edge time to 0 and return
-		if(transform->m_position.y > waterHeight + waterCollider->m_radius)
+		if(transform->m_position.y > waterHeight + waterCollider->m_radius/2.0f)
 		{
 			waterCollider->m_waterState = RootForce::WaterState::WaterState::OVER_WATER;
 			waterCollider->m_edgeWaterTime = 0.0f;
 			return;
 		} //if under water, set edge time to 0 and return
-		else if(transform->m_position.y < waterHeight - waterCollider->m_radius)
+		else if(transform->m_position.y < waterHeight - waterCollider->m_radius/2.0f)
 		{
 			waterCollider->m_waterState = RootForce::WaterState::WaterState::UNDER_WATER;
 			waterCollider->m_edgeWaterTime = 0.0f;
 			return;
 		}
 		else //if by the edge of the water, start disturbing at given interval
-			waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
-
-		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 20.0f )
+			
+		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
 		{	//Disturb
-			Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower);
+			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
+				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
+			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
+				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower, waterCollider->m_radius);
+			else
+				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower/3.0f, waterCollider->m_radius);
 			waterCollider->m_prevPos = transform->m_position;
 			waterCollider->m_edgeWaterTime = waterCollider->m_disturbInterval;
 		}
+		waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
 		//Decrease edge time
 		waterCollider->m_edgeWaterTime -= m_world->GetDelta();
 	}
@@ -98,13 +106,13 @@ namespace RootForce
 
 		//Create empty textures for compute shader swap. Texture 0 and 1 are used for height values and texture 2 is used for normals.
 		m_texture[0] = m_context->m_resourceManager->CreateTexture("computeTex1");
-		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[0]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[0]->SetAccess(GL_READ_WRITE);
 		m_texture[1] = m_context->m_resourceManager->CreateTexture("computeTex2");
-		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[1]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 		m_texture[2] = m_context->m_resourceManager->CreateTexture("computeTex3");
-		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
 		m_texture[2]->SetAccess(GL_READ_WRITE);
 
 		//Create compute effect
@@ -112,7 +120,7 @@ namespace RootForce
 
 		//Setup compute job
 		m_computeJob.m_effect		= m_effect;
-		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
+		m_computeJob.m_groupDim		= glm::uvec3(m_texSize/16, m_texSize/16, 1);
 		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
 		m_computeJob.m_textures[2]  = m_texture[2];
@@ -120,12 +128,11 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
 		m_computeJob.m_params[Render::Semantic::MK3]	= &m_mk3;
 		m_computeJob.m_params[Render::Semantic::DX]		= &m_dx;
-		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
-		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
+		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_texSize;
 
 		//Set standard values
 		m_speed		= 11.0f;
-		m_dx		= (m_scale*64.0f) / m_maxZ;
+		m_dx		= (m_scale*64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -157,55 +164,55 @@ namespace RootForce
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
 		//Start with some init disturbs
-		//InitDisturb();
+		InitDisturb();
 
 		//Run water simulation
 		m_pause = false;
 	}
 
-	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
+	void WaterSystem::Disturb( float p_x, float p_z, float p_power, int p_radius )
 	{
 		
 		float scaleHalfWidth = ((float)m_gridSize/2.0f) * m_scale;
-		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_texSize, (p_z + scaleHalfWidth) * m_texSize) / (scaleHalfWidth*2.0f);
+		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
 		//Return if out of bounds
-		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
+		if(waterPos.x >= m_texSize || waterPos.x <= 0 || waterPos.y >= m_texSize || waterPos.y <= 0)
 			return;
 
 		//Calculate disturb texels with a radius-to-pixelcircle algorithm
 		m_computeJob.m_textures[1]->Bind(0);
-		int brushSize = 20;
 		std::vector<glm::vec3> plumsPos;
-		for(int i = brushSize; abs(i) <= brushSize; i--)
+		for(int i = p_radius; abs(i) <= p_radius; i--)
 		{
-			if(i != 0)
-			plumsPos.push_back(glm::vec3(waterPos.x, waterPos.y + (float)i, (( abs(i)/(float)brushSize)-0.5f)*p_power));
+			plumsPos.push_back(glm::vec3(waterPos.x, waterPos.y + (float)i, (( abs(i)/(float)p_radius)-0.5f)*p_power));
 
-			for (int j = 1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j++)
+			for (int j = 1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)p_radius; j++)
 			{
-				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)p_radius)-0.5f)*p_power)));
 			}
 
-			for (int j = -1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j--)
+			for (int j = -1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)p_radius; j--)
 			{
-				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)p_radius)-0.5f)*p_power)));
 			}
 		}
 
-		float* test = new float[m_maxZ*m_maxX];
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, test);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, m_textureData);
 		
 		for(unsigned i = 0; i < plumsPos.size(); ++i)
 		{
-			plumsPos[i].z += test[(int)plumsPos[i].x + m_maxX * (int)plumsPos[i].y];
+			//Check out of range
+			if((int)plumsPos[i].x <= 0 || (int)plumsPos[i].y <= 0 || (int)plumsPos[i].x >= m_texSize || (int)plumsPos[i].y >= m_texSize)
+				continue;
+			plumsPos[i].z += m_textureData[(int)plumsPos[i].x + m_texSize * (int)plumsPos[i].y];
 			glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)plumsPos[i].x, (GLint)plumsPos[i].y, 1, 1, GL_RED, GL_FLOAT, &plumsPos[i].z);
 		}
 
 		m_computeJob.m_textures[1]->Unbind(0);
-		delete test;
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
+
+		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
 	}
 
 	void WaterSystem::ToggleWireFrame()
@@ -254,12 +261,12 @@ namespace RootForce
 	void WaterSystem::InitDisturb()
 	{
 		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Starting earthquake to create water movement");
-		for(int i = 0; i < 500; ++i)
+		for(int i = 0; i < 100; ++i)
 		{ 
 			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 
-			Disturb((float)x, (float)z, 0.001f);
+			Disturb((float)x, (float)z, 0.5f, 20);
 		}
 		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is now moving");
 	}
@@ -368,12 +375,12 @@ namespace RootForce
 
 	void WaterSystem::ResetWater()
 	{
-		float* nada = new float[m_maxX*m_maxZ]();
+		float* nada = new float[m_texSize*m_texSize]();
 		m_computeJob.m_textures[1]->Bind(0);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_maxX, m_maxZ, GL_RED, GL_FLOAT, nada);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_texSize, m_texSize, GL_RED, GL_FLOAT, nada);
 		m_computeJob.m_textures[1]->Unbind(0);
 		m_computeJob.m_textures[0]->Bind(0);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_maxX, m_maxZ, GL_RED, GL_FLOAT, nada);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_texSize, m_texSize, GL_RED, GL_FLOAT, nada);
 		m_computeJob.m_textures[0]->Unbind(0);
 		delete nada;
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water has been reset!");

@@ -25,9 +25,9 @@ namespace RootForce
 
 	struct WaterCollider : public ECS::Component<WaterCollider>
 	{
-		WaterCollider(): m_edgeWaterTime(0.0f), m_radius(0.0f), m_disturbPower(1.0f), m_disturbInterval(0.3f){}
+		WaterCollider(): m_edgeWaterTime(0.0f), m_radius(1), m_disturbPower(0.5f), m_disturbInterval(0.3f){}
 
-		float					m_radius;
+		int						m_radius;
 		float					m_disturbPower;
 		float					m_edgeWaterTime;
 		float					m_disturbInterval;
@@ -44,7 +44,7 @@ namespace RootForce
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
 		void CreateWater(float p_height);
-		void Disturb(float p_x, float p_z, float p_power);
+		void Disturb(float p_x, float p_z, float p_power, int p_radius );
 		void InitDisturb();
 		
 		void CalculateWaterConstants();
@@ -82,8 +82,9 @@ namespace RootForce
 		RootEngine::GameSharedContext*	m_context;
 
 		bool	m_wireFrame, m_pause;
-		int		m_maxX, m_maxZ, m_gridSize;	
+		int		m_texSize, m_gridSize;	
 		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
+		float*	m_textureData;
 
 		bool ValidValues();
 		void CreateWaterMesh();

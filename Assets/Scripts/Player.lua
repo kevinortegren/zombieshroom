@@ -18,7 +18,7 @@ function Player.OnCreate(userId, actionId)
 	--local waterCollider = WaterCollider.New(player);
 	--waterCollider:SetDisturbPower(0.0);
 	--waterCollider:SetDisturbInterval(0.5);
-	--waterCollider:SetRadius(2);
+	--waterCollider:SetRadius(5);
 
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
