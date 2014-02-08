@@ -82,13 +82,9 @@ namespace Render
 		auto directional = m_deferredTech->GetPrograms()[1];
 		auto pointlight = m_deferredTech->GetPrograms()[2];
 		auto pointlight_stencil = m_deferredTech->GetPrograms()[3];
-		auto background = m_deferredTech->GetPrograms()[5];
+		auto background = m_deferredTech->GetPrograms()[4];
 
 		p_fullscreenQuad.Bind();
-
-		// Background.
-		background->Apply();	
-		p_fullscreenQuad.Draw();
 
 		// Ambient.
 		ambient->Apply();
@@ -131,6 +127,16 @@ namespace Render
 		m_unitSphere->Unbind();
 
 		glCullFace(GL_BACK);
+
+		p_fullscreenQuad.Bind();
+
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+		// Background.
+		background->Apply();	
+		p_fullscreenQuad.Draw();
+
+		p_fullscreenQuad.Unbind();
 
 		// Unbind.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

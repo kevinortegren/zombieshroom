@@ -80,9 +80,6 @@
         - name: g_LA
           slot: 5
           
-      flags:
-        - name: Forward
-          
       programs:
         - name: particle_render
           shaders:
