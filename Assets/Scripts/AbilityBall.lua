@@ -25,7 +25,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	colRespComp:SetContainer(collisionComp);
 	transformComp:SetPos(posVec);
-	waterCollider:SetDisturbPower(0.1);
+	waterCollider:SetDisturbPower(0.5);
 	waterCollider:SetDisturbInterval(0.3);
 	waterCollider:SetRadius(2);
 	if Global.IsClient then

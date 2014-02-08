@@ -176,7 +176,7 @@ namespace RootForce
 
 		//Calculate disturb texels with a radius-to-pixelcircle algorithm
 		m_computeJob.m_textures[1]->Bind(0);
-		int brushSize = 4;
+		int brushSize = 20;
 		std::vector<glm::vec3> plumsPos;
 		for(int i = brushSize; abs(i) <= brushSize; i--)
 		{
@@ -185,22 +185,27 @@ namespace RootForce
 
 			for (int j = 1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j++)
 			{
-				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,( (((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
 			}
 
 			for (int j = -1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j--)
 			{
-				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ( (((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
 			}
 		}
 
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
+		float* test = new float[m_maxZ*m_maxX];
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, test);
+		
 		for(unsigned i = 0; i < plumsPos.size(); ++i)
 		{
+			plumsPos[i].z += test[(int)plumsPos[i].x + m_maxX * (int)plumsPos[i].y];
 			glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)plumsPos[i].x, (GLint)plumsPos[i].y, 1, 1, GL_RED, GL_FLOAT, &plumsPos[i].z);
 		}
 
 		m_computeJob.m_textures[1]->Unbind(0);
+		delete test;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
 	}
 
 	void WaterSystem::ToggleWireFrame()
