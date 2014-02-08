@@ -122,7 +122,7 @@ namespace Render
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
-		glClearColor(0,0,0,1);
+		glClearColor(0,0,0,0);
 		
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -480,7 +480,6 @@ namespace Render
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 

@@ -90,10 +90,6 @@ namespace Render
 		background->Apply();	
 		p_fullscreenQuad.Draw();
 
-		// Background.
-		background->Apply();	
-		p_fullscreenQuad.Draw();
-
 		// Ambient.
 		ambient->Apply();
 		p_fullscreenQuad.Draw();
