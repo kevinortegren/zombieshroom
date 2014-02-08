@@ -15,15 +15,15 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
-	local waterCollider = WaterCollider.New(player);
-
+	--local waterCollider = WaterCollider.New(player);
+	--waterCollider:SetDisturbPower(0.0);
+	--waterCollider:SetDisturbInterval(0.5);
+	--waterCollider:SetRadius(2);
 
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
-	waterCollider:SetDisturbPower(0.1);
-	waterCollider:SetDisturbInterval(0.5);
-	waterCollider:SetRadius(2);
+	
 
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);

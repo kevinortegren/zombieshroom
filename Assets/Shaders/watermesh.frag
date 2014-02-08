@@ -78,6 +78,7 @@ void main()
 	//Reflection calculations
 	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW				= reflect(incidentW, normalMap);
+	refW.z = -refW.z;
 	vec3 reflectionColor	= texture(g_CubeMap, refW).rgb;
 
 	//Calculate fresnel factor

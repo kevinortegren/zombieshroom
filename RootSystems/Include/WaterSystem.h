@@ -38,7 +38,7 @@ namespace RootForce
 	struct WaterSystem : public ECS::EntitySystem
 	{
 		WaterSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_context);
-
+		~WaterSystem();
 		void Init();
 		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
@@ -54,17 +54,17 @@ namespace RootForce
 
 		void IncreaseDamping();
 		void IncreaseSpeed();
-		void IncreaseWaterHeight();
 
 		void DecreaseDamping();
 		void DecreaseSpeed();
-		void DecreaseWaterHeight();
 
 		void TogglePause();
 		void ToggleWireFrame();
 
 		float GetWaterHeight();
 		void SetWaterHeight(float p_height);
+
+		void ResetWater();
 
 
 	private:

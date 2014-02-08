@@ -12,6 +12,10 @@ namespace RootForce
 		SetUsage<RootForce::WaterCollider>();
 	}
 
+	WaterSystem::~WaterSystem()
+	{
+	}
+
 	void WaterSystem::Init()
 	{
 		m_transform.Init(m_world->GetEntityManager());
@@ -153,7 +157,7 @@ namespace RootForce
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
 		//Start with some init disturbs
-		InitDisturb();
+		//InitDisturb();
 
 		//Run water simulation
 		m_pause = false;
@@ -170,24 +174,31 @@ namespace RootForce
 		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
 			return;
 
-		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
+		//Calculate disturb texels with a radius-to-pixelcircle algorithm
 		m_computeJob.m_textures[1]->Bind(0);
-		float emptyDataHalf = p_power/6.0f;
-		
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
+		int brushSize = 4;
+		std::vector<glm::vec3> plumsPos;
+		for(int i = brushSize; abs(i) <= brushSize; i--)
+		{
+			if(i != 0)
+			plumsPos.push_back(glm::vec3(waterPos.x, waterPos.y + (float)i, (( abs(i)/(float)brushSize)-0.5f)*p_power));
 
+			for (int j = 1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j++)
+			{
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,( (((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+			}
+
+			for (int j = -1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)brushSize; j--)
+			{
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ( (((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)brushSize)-0.5f)*p_power)));
+			}
+		}
+
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
+		for(unsigned i = 0; i < plumsPos.size(); ++i)
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)plumsPos[i].x, (GLint)plumsPos[i].y, 1, 1, GL_RED, GL_FLOAT, &plumsPos[i].z);
+		}
 
 		m_computeJob.m_textures[1]->Unbind(0);
 	}
@@ -243,7 +254,7 @@ namespace RootForce
 			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
 
-			Disturb((float)x, (float)z, 2.0f);
+			Disturb((float)x, (float)z, 0.001f);
 		}
 		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is now moving");
 	}
@@ -301,6 +312,12 @@ namespace RootForce
 
 	void WaterSystem::CreateWaterMesh()
 	{
+		if(m_context->m_resourceManager->GetModel("WaterModel"))
+		{
+			m_renderable->m_model = m_context->m_resourceManager->GetModel("WaterModel");
+			return;
+		}
+
 		std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
 		std::vector<unsigned int> indices;
 
@@ -310,7 +327,7 @@ namespace RootForce
 			{
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(x-(float)m_gridSize/2.0f, 0.0f, z-(float)m_gridSize/2.0f);
-				v.m_normal	= glm::vec3(0.0f);
+				v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
 				v.m_UV		= glm::vec2(x/(float)m_gridSize, z/(float)m_gridSize);
 				v.m_tangent = glm::vec3(0.0f);//TODO
 				v.m_bitangent = glm::vec3(0.0f);//TODO
@@ -341,6 +358,20 @@ namespace RootForce
 
 		//Set primitive type to GL_PATCHES because we use tesselation
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); 
+		//m_renderable->m_model->m_meshes[0]->SetNoCulling(true); 
+	}
+
+	void WaterSystem::ResetWater()
+	{
+		float* nada = new float[m_maxX*m_maxZ]();
+		m_computeJob.m_textures[1]->Bind(0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_maxX, m_maxZ, GL_RED, GL_FLOAT, nada);
+		m_computeJob.m_textures[1]->Unbind(0);
+		m_computeJob.m_textures[0]->Bind(0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_maxX, m_maxZ, GL_RED, GL_FLOAT, nada);
+		m_computeJob.m_textures[0]->Unbind(0);
+		delete nada;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water has been reset!");
 	}
 
 }

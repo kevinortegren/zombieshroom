@@ -421,10 +421,8 @@ namespace RootForce
 			m_waterSystem->IncreaseSpeed();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->DecreaseSpeed();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->IncreaseWaterHeight();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->DecreaseWaterHeight();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_R) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ResetWater();
 
 #endif
 		
