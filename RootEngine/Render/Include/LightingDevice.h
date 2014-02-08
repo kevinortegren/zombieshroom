@@ -7,7 +7,7 @@
 #include <RootEngine\Render\Include\GeometryBuffer.h>
 
 #define RENDER_MAX_DIRECTIONALLIGHTS 5
-#define RENDER_MAX_POINTLIGHTS 1000
+#define RENDER_MAX_POINTLIGHTS 500
 
 namespace Render
 {
@@ -46,5 +46,7 @@ namespace Render
 
 		GLuint m_fbo;
 		TextureInterface* m_la;
+
+		MeshInterface* m_unitSphere;
 	};
 }

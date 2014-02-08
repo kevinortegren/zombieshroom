@@ -13,6 +13,9 @@ namespace Render
 		// Load techniques.	
 		Render::EffectInterface* lightingEffect = g_context.m_resourceManager->LoadEffect("Renderer/Lighting");
 		m_deferredTech = lightingEffect->GetTechniques()[0];
+		
+		// Load Unit sphere.
+		m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
 
 		// Light uniforms.
 		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -63,7 +66,7 @@ namespace Render
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, buffers);
 
-		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilMask(0x00);
 
 		// Clear la-buffer.
@@ -78,9 +81,14 @@ namespace Render
 		auto ambient = m_deferredTech->GetPrograms()[0];
 		auto directional = m_deferredTech->GetPrograms()[1];
 		auto pointlight = m_deferredTech->GetPrograms()[2];
-		auto background = m_deferredTech->GetPrograms()[4];
+		auto pointlight_stencil = m_deferredTech->GetPrograms()[3];
+		auto background = m_deferredTech->GetPrograms()[5];
 
 		p_fullscreenQuad.Bind();
+
+		// Background.
+		background->Apply();	
+		p_fullscreenQuad.Draw();
 
 		// Background.
 		background->Apply();	
@@ -94,13 +102,39 @@ namespace Render
 		directional->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
 
-		// Pointlights.
-		pointlight->Apply();
-		p_fullscreenQuad.DrawInstanced(m_numPointLights);
-
-		
-	
 		p_fullscreenQuad.Unbind();
+
+		m_unitSphere->Bind();
+
+		// Stencil Pass.
+
+		// Disable cull face so we process both front/back polygons.
+		glDisable(GL_CULL_FACE);
+
+		// Enable writing.
+		glStencilMask(0xFF);
+
+		// If we fail depth test increase value.
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+		
+		// If we fail depth test decrease value.
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+		
+		pointlight_stencil->Apply();
+		m_unitSphere->DrawInstanced(m_numPointLights);
+
+		glStencilFunc(GL_NOTEQUAL, 127, 0xFF);
+		glStencilMask(0x00);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+		pointlight->Apply();
+		m_unitSphere->DrawInstanced(m_numPointLights);
+
+		m_unitSphere->Unbind();
+
+		glCullFace(GL_BACK);
 
 		// Unbind.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

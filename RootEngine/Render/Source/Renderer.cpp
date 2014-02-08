@@ -164,7 +164,7 @@ namespace Render
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 2048, 2048);
+		m_shadowDevice.Init(this, 1024, 1024);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height, &m_gbuffer);
@@ -435,6 +435,7 @@ namespace Render
 			Output();
 		}
 
+		// Deconstruct the job batch.
 		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
 		{
 			(*itr)->~RenderJob();
@@ -517,16 +518,13 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_STENCIL_BUFFER_BIT);
 
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilFunc(GL_ALWAYS, 127, 0xFF);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
 		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
 		ProcessRenderJobs();
-		
-		// Bind textures for read.
-		m_gbuffer.BindTextures();
 	}
 
 	void GLRenderer::ProcessRenderJobs()
@@ -579,8 +577,11 @@ namespace Render
 
 	void GLRenderer::LightingPass()
 	{
+		// Bind textures for read.
+		m_gbuffer.BindTextures();
+
 		// Bind cascade shadow map array.
-		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
+		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
 
 		static glm::mat4 biasMatrix(
@@ -596,13 +597,14 @@ namespace Render
 			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
-		
-		// Bind background as Input.
-		m_gbuffer.m_backgroundTexture->Bind(5);
+
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
+
 		m_lighting.Clear();
 		m_lighting.Process(m_fullscreenQuad);
+
 		//m_gbuffer.m_depthTexture->Unbind(10);
+		
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 

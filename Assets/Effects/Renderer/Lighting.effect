@@ -52,6 +52,14 @@
             write: 0
             test: 0
           blend: 2
+        - name: pointlight_stencil
+          shaders:
+            - name: pointlight
+              type: vertex
+          depth:
+            write: 0
+            test: 1
+          blend: 2
         - name: background-addative
           shaders:
             - name: output
