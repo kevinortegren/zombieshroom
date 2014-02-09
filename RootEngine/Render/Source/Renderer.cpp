@@ -160,40 +160,6 @@ namespace Render
 
 		m_jobs.reserve(10000);
 
-		// Setup geometry buffer.
-		m_gbuffer.Init(this, width, height);
-
-		// Setup shadow device.
-		m_shadowDevice.Init(this, 1024, 1024);
-
-		// Setup lighting device.
-		m_lighting.Init(this, width, height, &m_gbuffer);
-	
-		// Setup render target for forward renderer and post processes to use.
-		glGenFramebuffers(1, &m_fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		m_color0 = CreateTexture();
-		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
-
-		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
-
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		switch (status)
-		{
-		case GL_FRAMEBUFFER_COMPLETE:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
-			break;
-		default:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
-			break;
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		// Setup fullscreen quad.
 		Render::Vertex1P1UV verts[4];
 		verts[0].m_pos = glm::vec3(-1.0f, -1.0f, 0.0f);
@@ -221,11 +187,33 @@ namespace Render
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
+
+		// Setup geometry buffer.
+		m_gbuffer.Init(this, width, height);
+
+		// Setup shadow device.
+		m_shadowDevice.Init(this, 1024, 1024);
+
+		// Setup lighting device.
+		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
+	
+		// Setup render target for forward renderer and post processes to use.
+		glGenFramebuffers(1, &m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		m_color0 = CreateTexture();
+		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+
+		// Share depth attachment between gbuffer and forward.
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		// Load default forward rendering effect.
 		Render::EffectInterface* renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
 
 		m_fullscreenQuadTech = renderEffect->GetTechniques()[0];
-		m_earlyZTech = renderEffect->GetTechniques()[1];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
@@ -395,6 +383,9 @@ namespace Render
 		m_cameraVars.m_invViewProj = glm::inverse(m_cameraVars.m_projection * m_cameraVars.m_view);
 		m_cameraBuffer->BufferSubData(0, sizeof(m_cameraVars), &m_cameraVars);
 
+		// Buffer Lights data.
+		m_lighting.BufferLights();
+
 		BindForwardFramebuffer();
 		ClearForwardFramebuffer();
 
@@ -403,8 +394,9 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		PROFILE("Geometry Pass", g_context.m_profiler);
+		PROFILE("Deffered Pass", g_context.m_profiler);
 		{
+			// Loop through layers.
 			for(int i = 0; i < 2; i++)
 			{
 				GeometryPass(i);
@@ -412,13 +404,8 @@ namespace Render
 			}
 		}
 
-		m_lighting.ClearLights();
+		m_lighting.ResetLights();
 		glDisable(GL_STENCIL_TEST);
-
-		{
-			PROFILE("Forward Pass", g_context.m_profiler);
-			ForwardPass();
-		}
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
@@ -483,7 +470,6 @@ namespace Render
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 
-		int offset = 0;
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
@@ -491,15 +477,33 @@ namespace Render
 
 			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
 
-			for(int j = offset; j < (m_sjobCount[i] + offset); ++j)
+			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 			{
-				m_sjobs[j].m_mesh->Bind();
-				m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-				m_sjobs[j].m_mesh->Draw();
-				m_sjobs[j].m_mesh->Unbind();
-			}
+				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+					continue;
 
-			offset = m_sjobCount[i];
+				if((*job)->m_shadowMesh == nullptr)
+					continue;
+
+				(*job)->m_shadowMesh->Bind();
+
+				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
+				{
+					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) == Render::TechniqueFlags::RENDER_SHADOW)
+					{
+						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+						}
+
+						(*tech)->GetPrograms()[0]->Apply();
+
+						(*job)->m_shadowMesh->Draw();	
+					}
+				}
+
+				(*job)->m_shadowMesh->Unbind();
+			}
 		}
 
 		glCullFace(GL_BACK);
@@ -510,8 +514,7 @@ namespace Render
 	{
 		m_gbuffer.UnbindTextures();	
 
-		// Bind lighting for blending.
-		
+		// Bind lighting for blending.	
 		m_lighting.m_la->Bind(5);
 
 		m_gbuffer.Enable();
@@ -599,26 +602,17 @@ namespace Render
 
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 
+		// Clear previous la result.
 		m_lighting.Clear();
-		m_lighting.Process(m_fullscreenQuad, p_layer);
 
-		//m_gbuffer.m_depthTexture->Unbind(10);
-		
+		// Apply lighting.
+		m_lighting.Ambient();
+		m_lighting.Directional();
+		m_lighting.PointLightStencil();
+		m_lighting.PointLightRender();
+		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-	}
-
-	void GLRenderer::ForwardPass()
-	{
-		BindForwardFramebuffer();
-
-		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
-
-		// Bind la as Input.
-		m_lighting.m_la->Bind(5);
-
-		m_fullscreenQuad.Bind();
-		m_fullscreenQuad.Draw();
-		m_fullscreenQuad.Unbind();
 	}
 
 	void GLRenderer::PostProcessPass()
@@ -632,7 +626,7 @@ namespace Render
 		// 5 - Input.
 		m_gbuffer.BindTextures();
 
-		m_color0->Bind(3);
+		m_lighting.m_la->Bind(3);
 
 		// Glow Pass.
 		m_fullscreenQuad.Bind();
