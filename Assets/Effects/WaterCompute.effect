@@ -27,8 +27,6 @@
           offset: 12
         - sem: XMAX
           offset: 16
-        - sem: YMAX
-          offset: 20
       flags:
         - name: RenderIgnore
 

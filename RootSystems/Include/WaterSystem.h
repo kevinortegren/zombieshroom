@@ -88,5 +88,6 @@ namespace RootForce
 
 		bool ValidValues();
 		void CreateWaterMesh();
+		glm::vec2 WorldSpaceToWaterSpace(glm::vec2 p_worldSpace);
 	};
 }
