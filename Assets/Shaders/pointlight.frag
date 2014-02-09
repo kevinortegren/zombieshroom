@@ -57,30 +57,28 @@ void main() {
     float dist = length(vert_lightVec);
 
 	vec3 light = vec3(0.0);
-	if(dist <= ex_Light.Range)
-	{
-		// Normal.
-		vec2 vert_normal = texture(g_Normals, TexCoord).xy;	
-		vec3 normal;
-		normal.xy = vert_normal.xy;
-		normal.z = sqrt(1-dot(normal.xy, normal.xy));
+	
+	// Normal.
+	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	
+	vec3 normal;
+	normal.xy = vert_normal.xy;
+	normal.z = sqrt(1-dot(normal.xy, normal.xy));
   
-		 // Materials.
-		vec4 rt0 = texture(g_Diffuse, TexCoord);
-		vec3 diffuse = rt0.xyz;
-		float specTerm = rt0.w;
+	// Materials.
+	vec4 rt0 = texture(g_Diffuse, TexCoord);
+	vec3 diffuse = rt0.xyz;
+	float specTerm = rt0.w;
 
-		vert_lightVec = normalize(vert_lightVec);
+	vert_lightVec = normalize(vert_lightVec);
 
-		vec3 viewDir = -normalize(position);
-		vec3 halfVector = normalize(viewDir + vert_lightVec);
+	vec3 viewDir = -normalize(position);
+	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-		vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
-		vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
+	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
+	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-		light = diffuse_color + spec_color;
-		light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));     
-	}
-
+	light = diffuse_color + spec_color;
+	light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));     
+	
     out_Color = vec4(light, 1.0f);
 }

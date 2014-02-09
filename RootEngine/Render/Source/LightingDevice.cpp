@@ -102,7 +102,6 @@ namespace Render
 		// Directional.
 		directional->Apply();
 		p_fullscreenQuad.DrawInstanced(m_numDirectionalLights);
-
 		p_fullscreenQuad.Unbind();
 
 		GLuint64 startTime, stopTime;
@@ -110,9 +109,6 @@ namespace Render
 
 		glGenQueries(2, queryID);
 		glQueryCounter(queryID[0], GL_TIMESTAMP);
-
-		/*
-		// Stencil Pass.
 
 		// Disable cull face so we process both front/back polygons.
 		glDisable(GL_CULL_FACE);
@@ -145,13 +141,6 @@ namespace Render
 
 		m_unitSphere->Unbind();
 		glCullFace(GL_BACK);
-		*/
-		p_fullscreenQuad.Bind();
-
-		pointlight->Apply();
-		p_fullscreenQuad.DrawInstanced(m_numPointLights);
-
-		p_fullscreenQuad.Unbind();
 
 		glQueryCounter(queryID[1], GL_TIMESTAMP);
 
@@ -171,7 +160,6 @@ namespace Render
 	
 		background->Apply();	
 		p_fullscreenQuad.Draw();
-
 		p_fullscreenQuad.Unbind();
 
 		// Unbind.
