@@ -23,7 +23,7 @@ namespace Render
 		void AddPointLight(const PointLight& p_light, int index);
 
 		void Clear();
-		void Process(Mesh& p_fullscreenQuad);
+		void Process(Mesh& p_fullscreenQuad, int p_backgroundEffect);
 		void Resize(int p_width, int p_height);
 		void ClearLights();
 

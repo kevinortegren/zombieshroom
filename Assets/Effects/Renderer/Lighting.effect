@@ -60,16 +60,6 @@
             write: 0
             test: 1
           blend: 2
-        - name: background-addative
-          shaders:
-            - name: output
-              type: vertex
-            - name: output
-              type: fragment
-          depth:
-            write: 0
-            test: 0
-          blend: 2
         - name: background-alphablend
           shaders:
             - name: output
@@ -80,4 +70,15 @@
             write: 0
             test: 0
           blend: 1
+        - name: background-addative
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2
+
           

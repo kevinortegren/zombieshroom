@@ -1,45 +1,10 @@
 - Entities:
     - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
 - Components:
     - Type: 0
       Data:
         - Entity: 1
           Model: colorCubeShape1
-          Material:
-            Name: lambert1
-            Effect: Mesh
-            Diffuse: ColorGrid
-        - Entity: 2
-          Model: Primitives/sphere
-          Material:
-            Name: lambert1
-            Effect: Mesh
-            Diffuse: ColorGrid
-        - Entity: 3
-          Model: Primitives/sphere
-          Material:
-            Name: lambert1
-            Effect: Mesh
-            Diffuse: ColorGrid
-        - Entity: 4
-          Model: Primitives/sphere
-          Material:
-            Name: lambert1
-            Effect: Mesh
-            Diffuse: ColorGrid
-        - Entity: 5
-          Model: Primitives/sphere
-          Material:
-            Name: lambert1
-            Effect: Mesh
-            Diffuse: ColorGrid
-        - Entity: 6
-          Model: Primitives/sphere
           Material:
             Name: lambert1
             Effect: Mesh
@@ -50,48 +15,8 @@
           Position: [0, 0, 0]
           Rotation: [-0, 0, -0]
           Scale: [1, 1, 1]
-        - Entity: 2
-          Position: [20, 5, 0]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
-        - Entity: 3
-          Position: [-20, 5, 0]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
-        - Entity: 4
-          Position: [0, 5, 20]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
-        - Entity: 5
-          Position: [0, 5, -20]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
-        - Entity: 6
-          Position: [0, 20, 0]
-          Rotation: [-0, 0, -0]
-          Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 2
-          Attenuation: [0, 0.02, 0]
-          Color: [1, 0, 1, 1]
-          Range: 20
-        - Entity: 3
-          Attenuation: [0, 0.02, 0]
-          Color: [0, 0, 1, 1]
-          Range: 20
-        - Entity: 4
-          Attenuation: [0, 0.02, 0]
-          Color: [1, 0, 1, 1]
-          Range: 20
-        - Entity: 5
-          Attenuation: [0, 0.02, 0]
-          Color: [0, 1, 1, 1]
-          Range: 20
-        - Entity: 6
-          Attenuation: [0, 0.02, 0]
-          Color: [1, 0, 0, 1]
-          Range: 20
     - Type: 3
       Data:
         []
@@ -128,5 +53,3 @@
 - Storage:
     - Key: Ambient
       Value: 0 0 0 1
-    - Key: WaterHeight
-      Value: 0.2

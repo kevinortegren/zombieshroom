@@ -15,7 +15,7 @@ namespace RootForce
 
 	void PointLightSystem::Begin()
 	{
-		//LightStressTest();
+		LightStressTest();
 
 		m_lightCount = 0;
 		
@@ -42,7 +42,7 @@ namespace RootForce
 			pl.m_position = transform->m_position;
 			pl.m_color = pointLight->m_color;
 			pl.m_attenuation = pointLight->m_attenuation;
-			pl.m_range = pointLight->m_range;
+			pl.m_range = range;
 			pl.m_transform = mt;
 
 			m_context->m_renderer->AddPointLight(pl, m_lightCount);
@@ -53,7 +53,7 @@ namespace RootForce
 
 	float PointLightSystem::CalculateScale(PointLight* p_pl)
 	{
-		float sigma = 0.01f;
+		float sigma = 0.05f;
 		float L = glm::max(glm::max(p_pl->m_color.x, p_pl->m_color.y), p_pl->m_color.z);
 		
 		return (L/p_pl->m_attenuation.y)/sigma;
@@ -65,22 +65,17 @@ namespace RootForce
 		{
 			for (int i = 0; i < 64; i++) {
 
-				float x = -sinf((float)i * ((2.0f * 3.14f) / 64.0f));
-				float z = cosf((float)i * ((2.0f * 3.14f) / 64.0f));
-				float y = 5.0f;
+				float x = -sinf((float)i * ((8.0f * 3.14f) / 64.0f));
+				float z = cosf((float)i * ((8.0f * 3.14f) / 64.0f));
+				float y = 10.0f;
 			  
 				ECS::Entity* e = m_world->GetEntityManager()->CreateEntity();
 				PointLight* pl = m_world->GetEntityManager()->CreateComponent<PointLight>(e);
 				Transform* t = m_world->GetEntityManager()->CreateComponent<Transform>(e);
 
-				Renderable* r = m_world->GetEntityManager()->CreateComponent<Renderable>(e);
-				r->m_model = m_context->m_resourceManager->LoadCollada("Primitives/sphere");
-				r->m_material = m_context->m_renderer->CreateMaterial("lambert1");
-
-
 				pl->m_color = glm::vec4((i % 1 == 0) ? 1.0f : 0.0f, (i % 2 == 0) ? 1.0f : 0.0f, (i % 3 == 0) ? 1.0f : 0.0f, 1.0f);
-				pl->m_attenuation = glm::vec3(0.0f, 0.1f, 0.0f);
-				t->m_position = glm::vec3(x * 100.0f, y, z * 100.0f);
+				pl->m_attenuation = glm::vec3(0.0f, 0.15f, 0.1f);
+				t->m_position = glm::vec3(x * i * 15.0f, y, z * i * 20.0f);
 
 				m_world->GetEntityExporter()->Export("LightTest");
 			}

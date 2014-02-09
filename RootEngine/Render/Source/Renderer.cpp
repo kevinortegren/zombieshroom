@@ -408,7 +408,7 @@ namespace Render
 			for(int i = 0; i < 2; i++)
 			{
 				GeometryPass(i);
-				LightingPass();	
+				LightingPass(i);	
 			}
 		}
 
@@ -574,7 +574,7 @@ namespace Render
 		}
 	}
 
-	void GLRenderer::LightingPass()
+	void GLRenderer::LightingPass(int p_layer)
 	{
 		// Bind textures for read.
 		m_gbuffer.BindTextures();
@@ -600,7 +600,7 @@ namespace Render
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 
 		m_lighting.Clear();
-		m_lighting.Process(m_fullscreenQuad);
+		m_lighting.Process(m_fullscreenQuad, p_layer);
 
 		//m_gbuffer.m_depthTexture->Unbind(10);
 		

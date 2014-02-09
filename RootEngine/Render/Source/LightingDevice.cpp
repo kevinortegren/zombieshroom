@@ -66,23 +66,32 @@ namespace Render
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, buffers);
 
+		// Only work with fragments modified by geometry pass.
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilMask(0x00);
 
 		// Clear la-buffer.
 		glClear(GL_COLOR_BUFFER_BIT);
-
 	}
 
-	void LightingDevice::Process(Mesh& p_fullscreenQuad)
+	void LightingDevice::Process(Mesh& p_fullscreenQuad, int p_backgroundEffect)
 	{
+		// TODO: Do this once per frame.
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
+		//TODO: Set the programs in initialize.
 		auto ambient = m_deferredTech->GetPrograms()[0];
 		auto directional = m_deferredTech->GetPrograms()[1];
 		auto pointlight = m_deferredTech->GetPrograms()[2];
 		auto pointlight_stencil = m_deferredTech->GetPrograms()[3];
-		auto background = m_deferredTech->GetPrograms()[4];
+
+		/*
+			Defferedpass: Will probely use alpha blending since it's more flexible.
+			Waterpass: Will need addative blending since simular to glass.
+		*/
+
+		// TODO: Read flag from pass.
+		auto background = m_deferredTech->GetPrograms()[4 + p_backgroundEffect];
 
 		p_fullscreenQuad.Bind();
 
@@ -96,8 +105,13 @@ namespace Render
 
 		p_fullscreenQuad.Unbind();
 
-		m_unitSphere->Bind();
+		GLuint64 startTime, stopTime;
+		unsigned int queryID[2];
 
+		glGenQueries(2, queryID);
+		glQueryCounter(queryID[0], GL_TIMESTAMP);
+
+		/*
 		// Stencil Pass.
 
 		// Disable cull face so we process both front/back polygons.
@@ -112,12 +126,17 @@ namespace Render
 		// If we fail depth test decrease value.
 		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 		
+		m_unitSphere->Bind();
 		pointlight_stencil->Apply();
+
+		// Fragments inside the point light range will have its stencil value differ from 127.
 		m_unitSphere->DrawInstanced(m_numPointLights);
 
+		// Render fragments of object inside the point light range.
 		glStencilFunc(GL_NOTEQUAL, 127, 0xFF);
 		glStencilMask(0x00);
 
+		// Enable front face culling incase the camera is inside the pointlight.
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 
@@ -125,14 +144,31 @@ namespace Render
 		m_unitSphere->DrawInstanced(m_numPointLights);
 
 		m_unitSphere->Unbind();
-
 		glCullFace(GL_BACK);
-
+		*/
 		p_fullscreenQuad.Bind();
 
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		pointlight->Apply();
+		p_fullscreenQuad.DrawInstanced(m_numPointLights);
 
-		// Background.
+		p_fullscreenQuad.Unbind();
+
+		glQueryCounter(queryID[1], GL_TIMESTAMP);
+
+		GLint stopTimerAvailable = 0;
+		while (!stopTimerAvailable) {
+			glGetQueryObjectiv(queryID[1], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable);
+		}
+
+		glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
+		glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
+
+		printf("Time spent on the GPU: %f ms\n", (stopTime - startTime) / 1000000.0);
+
+		// Blend background pixels with lighting accumulation.
+		p_fullscreenQuad.Bind();
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+	
 		background->Apply();	
 		p_fullscreenQuad.Draw();
 
