@@ -68,6 +68,13 @@ namespace RootForce
 		std::string Name;
 		float Cooldown;
 		int Charges;
+
+		AbilityInfo()
+		{
+			Name = "";
+			Cooldown = -1;
+			Charges = -1;
+		}
 	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>

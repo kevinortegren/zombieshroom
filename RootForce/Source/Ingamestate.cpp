@@ -345,8 +345,14 @@ namespace RootForce
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// ToDo: Send a network message to server to indicate a suicide
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			if(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health != 0)
+			{
+				if(!g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->IsDead)
+				{
+					g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+					MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+				}
+			}
 		}
 
 #ifdef _DEBUG

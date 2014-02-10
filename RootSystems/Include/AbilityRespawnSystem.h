@@ -1,0 +1,37 @@
+#pragma once
+
+#include <RootEngine/Include/GameSharedContext.h>
+#include <Utility/ECS/Include/Component.h>
+#include <Utility/ECS/Include/EntitySystem.h>
+#include <RootSystems/Include/PlayerSystem.h>
+#include <RootSystems/Include/CollisionSystem.h>
+#include <RootSystems/Include/Transform.h>
+
+namespace RootForce
+{
+	struct AbilityRespawnComponent : public ECS::Component<AbilityRespawnComponent>
+	{
+		float Timer;
+		AbilityInfo CurrentAbility;
+		bool Claimed;
+	};
+
+	class AbilityRespawnSystem : public ECS::EntitySystem
+	{
+	public:
+		AbilityRespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+			: ECS::EntitySystem(p_world)
+			, m_engineContext(p_engineContext)
+		{ 
+			SetUsage<RootForce::AbilityRespawnComponent>();
+		}
+		void Init();
+		void ProcessEntity(ECS::Entity* p_entity);
+		void LoadAbilities(std::string p_abilityPack);
+	private:
+		RootEngine::GameSharedContext* m_engineContext;
+
+		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
+		std::vector<std::string> m_levelAbilities;
+	};
+}
