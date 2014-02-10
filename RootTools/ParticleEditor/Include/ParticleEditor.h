@@ -51,6 +51,7 @@ private:
 	bool IsSaved();
 	void Changed();
 	void Saved();
+	void ResetTemplates();
 
 	QMessageBox::StandardButton SaveWarningDialog();
 
@@ -61,6 +62,7 @@ private:
 	ParticleTab* m_particleTab;
 	QFileSystemModel* m_fileSystemModel;
 	QFileSystemModel* m_fileSystemModelModel;
+	QFileSystemModel* m_fileSystemModelModelTex;
 	QtColorTriangle* m_colorTriangle;
 	QtColorTriangle* m_colorEndTriangle;
 	std::string m_workingDirectory;
@@ -130,5 +132,7 @@ private slots:
 	void OrbitSpeedChanged(double p_val);
 	void SpreadSliderChanged(int p_val);
 	void ModelDoubleClicked(const QModelIndex& p_index);
+	void ModelTexDoubleClicked(const QModelIndex& p_index);
+	void BackgroundColorChanged(int p_value);
 };
 

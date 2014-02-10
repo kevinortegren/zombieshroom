@@ -15,6 +15,7 @@ ParticleEditor::~ParticleEditor()
 	delete m_colorEndTriangle;
 	delete m_fileSystemModel;
 	delete m_fileSystemModelModel;
+	delete m_fileSystemModelModelTex;
 }
 
 void ParticleEditor::ConnectSignalsAndSlots()
@@ -52,6 +53,7 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.spawnTimeSpinBox,	SIGNAL(valueChanged(double)),				this, SLOT(SpawnTimeChanged(double)));
 	connect(ui.textureTreeView,		SIGNAL(doubleClicked(const QModelIndex&)),	this, SLOT(TextureDoubleClicked(const QModelIndex&)));
 	connect(ui.modelTreeView,		SIGNAL(doubleClicked(const QModelIndex&)),	this, SLOT(ModelDoubleClicked(const QModelIndex&)));
+	connect(ui.modeltexTreeView,	SIGNAL(doubleClicked(const QModelIndex&)),	this, SLOT(ModelTexDoubleClicked(const QModelIndex&)));
 	connect(m_colorTriangle,		SIGNAL(colorChanged(const QColor&)),		this, SLOT(ColorChanged(const QColor&)));
 	connect(m_colorEndTriangle,		SIGNAL(colorChanged(const QColor&)),		this, SLOT(ColorEndChanged(const QColor&)));
 	connect(ui.actionColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorTriangle()));
@@ -60,10 +62,11 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.focusButton,			SIGNAL(clicked()),							this, SLOT(FocusButtonClicked()));
 	connect(ui.colorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(colorAlphaSliderChanged(int)));
 	connect(ui.endcolorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(endColorAlphaSliderChanged(int)));
-	//connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
-	//connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
-	//connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
+	connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
+	connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
+	connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
 	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
+	connect(ui.bgColorComboBox,		SIGNAL(currentIndexChanged(int)),			this, SLOT(BackgroundColorChanged(int)));
 }
 
 void ParticleEditor::Init()
@@ -89,7 +92,9 @@ void ParticleEditor::Init()
 	m_fileSystemModelModel->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Models/"));
 	m_fileSystemModel = new QFileSystemModel;
 	m_fileSystemModel->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Textures/"));
-
+	m_fileSystemModelModelTex = new QFileSystemModel;
+	m_fileSystemModelModelTex->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Textures/"));
+	//Texture browser
 	QStringList filters;
 	filters << "*.dds";
 	m_fileSystemModel->setNameFilters(filters);
@@ -98,7 +103,14 @@ void ParticleEditor::Init()
 	ui.textureTreeView->setColumnWidth(0, 200);
 	ui.textureTreeView->hideColumn(2);
 	ui.textureTreeView->setRootIndex(m_fileSystemModel->index(QString::fromStdString(m_workingDirectory + "Assets/Textures/")));
-
+	//Model texture browser
+	m_fileSystemModelModelTex->setNameFilters(filters);
+	m_fileSystemModelModelTex->setNameFilterDisables(false);
+	ui.modeltexTreeView->setModel(m_fileSystemModelModelTex);
+	ui.modeltexTreeView->setColumnWidth(0, 200);
+	ui.modeltexTreeView->hideColumn(2);
+	ui.modeltexTreeView->setRootIndex(m_fileSystemModelModelTex->index(QString::fromStdString(m_workingDirectory + "Assets/Textures/")));
+	//Model browser
 	QStringList filtersModel;
 	filtersModel << "*.dae";
 	m_fileSystemModelModel->setNameFilters(filtersModel);
@@ -328,6 +340,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius	= 0.5f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.05f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_name			= ui.nameEmitterLineEdit->text().toStdString();
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_template		= 0;
 
 	//Map data to params list for buffering
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_position;
@@ -484,6 +497,11 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	ui.spreadSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spread*(180.0f/glm::pi<double>()));
 	//Spawntime
 	ui.spawnTimeSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime);
+	//Orbit
+	ui.orbitRadiusSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitRadius);
+	ui.orbitSpeedSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed);
+	TemplateChanged(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
+	ui.templateComboBox->setCurrentIndex(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
 }
 #pragma endregion
 
@@ -694,6 +712,33 @@ void ParticleEditor::SpreadSliderChanged( int p_val )
 	Changed();
 }
 
+void ParticleEditor::BackgroundColorChanged( int p_value )
+{
+	switch (p_value)
+	{
+	case 0:
+		glClearColor(0,0,0,1);
+		break;
+	case 1:
+		glClearColor(0.5,0.5,0.5,1);
+		break;
+	case 2:
+		glClearColor(1,1,1,1);
+		break;
+	case 3:
+		glClearColor(1,0,0,1);
+		break;
+	case 4:
+		glClearColor(0,1,0,1);
+		break;
+	case 5:
+		glClearColor(0,0,1,1);
+		break;
+	default:
+		break;
+	}
+}
+
 #pragma endregion
 
 void ParticleEditor::MenuViewColorTriangle()
@@ -776,8 +821,25 @@ void ParticleEditor::ModelDoubleClicked( const QModelIndex& p_index )
 	}
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new model: %s", fileInfo.fileName().toStdString().c_str());
 	m_model->m_model = g_engineContext.m_resourceManager->LoadCollada(fileInfo.baseName().toStdString().c_str());
-	m_modelTrans->m_scale = glm::vec3(1.0f);;
-	Changed();
+	m_modelTrans->m_scale = glm::vec3(1.0f);
+}
+
+void ParticleEditor::ModelTexDoubleClicked( const QModelIndex& p_index )
+{
+	//If no emitter selected, abort
+	if(m_selectedEmitterIndex == -1)
+		return;
+
+	//Read file info of double clicked file and determine if valid
+	QFileInfo fileInfo = m_fileSystemModelModelTex->fileInfo(p_index);
+	if(fileInfo.suffix().compare("dds") != 0)
+	{
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Texture must be .dds! Tried to select %s", fileInfo.fileName().toStdString().c_str() );
+		//ShowMessageBox("Texture must be .dds!");
+		return;
+	}
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
+	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
 }
 
 void ParticleEditor::FocusButtonClicked()
@@ -887,6 +949,9 @@ void ParticleEditor::ExportParticle( QString p_fullFilePath )
 		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_direction.x << (*itr)->m_direction.y	<< (*itr)->m_direction.z	<< YAML::EndSeq; 
 		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr)->m_spread;
 		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr)->m_spawnTime;
+		emitter << YAML::Key << "ORBITSPEED"	<< YAML::Value << (*itr)->m_orbitSpeed;
+		emitter << YAML::Key << "ORBITRADIUS"	<< YAML::Value << (*itr)->m_orbitRadius;
+		emitter << YAML::Key << "TEMPLATE"		<< YAML::Value << (*itr)->m_template;
 		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
 		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr)->m_material->m_effect);
 		emitter << YAML::Key << "NAME"			<< YAML::Value << (*itr)->m_name;
@@ -979,21 +1044,28 @@ void ParticleEditor::TemplateChanged( int p_val )
 
 	if(p_val == 0)
 	{
-		if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITSPEED) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
-			pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITSPEED);
-		if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITRADIUS) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
-			pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITRADIUS);
-		
+		ResetTemplates();
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
 	}
 	else if(p_val == 1)
 	{
+		ResetTemplates();
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITSPEED]  = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed;
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITRADIUS] = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitRadius;
-
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleOrbit");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
 	}
 	Changed();
+}
+
+void ParticleEditor::ResetTemplates()
+{
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITSPEED) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITSPEED);
+	if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITRADIUS) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITRADIUS);
 }
 
 
