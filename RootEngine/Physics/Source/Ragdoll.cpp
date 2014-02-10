@@ -485,7 +485,7 @@ namespace Ragdoll
  					0 , 0, 1, 0, &localA, &localB);
  		 	
  		 		btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(-PI_2, PI_2 / 2.0f);
+ 		 		constraint->setLimit((int)-PI_2, PI_2 / 2.0f);
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -499,7 +499,7 @@ namespace Ragdoll
 					0 , 0, 1, 0, &localA, &localB);
 
 				btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(-PI_2, PI_2 / 2.0f);
+				constraint->setLimit((int)-PI_2, PI_2 / 2.0f);
 				m_dynamicWorld->addConstraint(constraint);
 				constraint->setDbgDrawSize(0.5f);
 				return constraint;

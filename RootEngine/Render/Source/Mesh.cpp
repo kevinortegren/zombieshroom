@@ -3,7 +3,7 @@
 namespace Render
 {
 	Mesh::Mesh()
-		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0),m_transformFeedback(0),m_wireFrame(false) {}
+		: m_primitive(GL_TRIANGLES), m_vertexBuffer(0), m_elementBuffer(0),m_transformFeedback(0),m_wireFrame(false), m_noCulling(false) {}
 
 
 	Mesh::~Mesh()
@@ -106,6 +106,12 @@ namespace Render
 				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
+			else if(m_noCulling)
+			{
+				glDisable(GL_CULL_FACE);
+				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+				glEnable(GL_CULL_FACE);
+			}
 			else
 			{
 				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
@@ -180,6 +186,11 @@ namespace Render
 	void Mesh::SetWireFrame( bool p_wireFrame )
 	{
 		m_wireFrame = p_wireFrame;
+	}
+
+	void Mesh::SetNoCulling( bool p_noCulling )
+	{
+		m_noCulling = p_noCulling;
 	}
 
 }
