@@ -74,7 +74,7 @@ void main()
 		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
 		refractionDepth = texelFetch(g_Depth, ivec2(gl_FragCoord.xy), 0).r;
 	}
-
+/*
 	//Reflection calculations
 	vec3 posV				= (viewMatrix * vec4(gEyeWorldPos, 1.0f)).xyz;
 	vec3 refV				= normalize(reflect(normalize(posV), viewNormal));
@@ -90,12 +90,12 @@ void main()
    	refS 					= vec3(refS.x * 0.5 , refS.y * 0.5, refS.z);
    	int numSamples			= 1000;
    	int ncurrSample			= 0;
-
+*/
    	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW				= reflect(incidentW, normalMap);
 	refW.z = -refW.z;
    	vec3 finalResult 		= texture(g_CubeMap, refW).rgb;
-
+/*
    	float currSample;
 
    	while(ncurrSample < numSamples)
@@ -112,7 +112,7 @@ void main()
    			currOffsetS += refS;
    		}
    	}
-
+*/
 	vec3 reflectionColor = finalResult;
 
 	//Calculate fresnel factor
