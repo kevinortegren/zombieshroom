@@ -77,50 +77,95 @@ namespace RootSystems
 			m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 
 
+
+
 			// Activate ability! Pew pew!
-			switch (player->AbilityState)
+			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
+			if (abilityName != "")
 			{
-				case RootForce::AbilityState::CHARGING:
+				float abilityChargeTime = g_engineContext.m_script->GetGlobalNumber("ChargeTime", abilityName);
+				float abilityChannelingTime = g_engineContext.m_script->GetGlobalNumber("ChannelingTime", abilityName);
+				float abilityCooldownTime = g_engineContext.m_script->GetGlobalNumber("Cooldown", abilityName);
+				switch (player->AbilityState)
 				{
-					
-				} break;
+					case RootForce::AbilityState::CHARGING:
+					{
+						if (action->AbilityTime >= abilityChargeTime)
+						{
+							// We have been holding the button until charge time is up.
+							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+							g_engineContext.m_script->AddParameterNumber(action->ActionID);
+							g_engineContext.m_script->ExecuteScript();
 
-				case RootForce::AbilityState::CHANNELING:
-				{
+							player->AbilityState = RootForce::AbilityState::CHANNELING;
 
-				} break;
+							// TODO: Consider temporarily setting cooldown here to prevent double-action-per-frame cheese.
+						}
+					} break;
 
-				case RootForce::AbilityState::OFF:
-				{
+					case RootForce::AbilityState::CHANNELING:
+					{
+						if (action->AbilityTime >= abilityChargeTime + abilityChannelingTime)
+						{
+							// We have been holding the button until channeling time is up.
+							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+							g_engineContext.m_script->AddParameterNumber(action->ActionID);
+							g_engineContext.m_script->ExecuteScript();
 
-				} break;
-			}
+							action->AbilityTime = 0.0f;
+							player->AbilityState = RootForce::AbilityState::OFF;
 
-			/*
-			// Activate ability! Pew pew!
-			player->SelectedAbility = action->SelectedAbility - 1;
-			if(action->ActivateAbility && player->AbilityScripts[player->SelectedAbility].CooldownOff)
-			{
-				std::string abilityScript = player->AbilityScripts[player->SelectedAbility].Name;
-				if (abilityScript != "")
-				{
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Creating ability entity (User: %d, Action: %d) with script: %s", network->ID.UserID, action->ActionID, abilityScript.c_str());
+							// Put ability on cooldown and decrease charges.
+							player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
+							player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
 
-					m_engineContext->m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityScript), "OnCreate");
-					m_engineContext->m_script->AddParameterNumber(network->ID.UserID);
-					m_engineContext->m_script->AddParameterNumber(action->ActionID);
-					m_engineContext->m_script->ExecuteScript();
+							player->AbilityScripts[player->SelectedAbility].Charges--;
+							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
+								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+						}
+					} break;
 
-					player->AbilityScripts[player->SelectedAbility].CooldownOff = false;
+					case RootForce::AbilityState::OFF:
+					{
+						if (action->AbilityTime > 0.0f)
+						{
+							// If ability time is more than 0.0f, then we have just released the button.
+							if (action->AbilityTime < abilityChargeTime)
+							{
+								// We have released the button before the charge time was up, so call on ChargeDone.
+								g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+								g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+								g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+								g_engineContext.m_script->AddParameterNumber(action->ActionID);
+								g_engineContext.m_script->ExecuteScript();
+							}
 
-					player->AbilityScripts[player->SelectedAbility].Charges --;
-					if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
-						player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+							// Call on channeling done since the ability is up.
+							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+							g_engineContext.m_script->AddParameterNumber(action->ActionID);
+							g_engineContext.m_script->ExecuteScript();
+
+							action->AbilityTime = 0.0f;
+
+							// Put ability on cooldown and decrease charges.
+							player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
+							player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
+
+							player->AbilityScripts[player->SelectedAbility].Charges--;
+							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
+								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+						}
+					} break;
 				}
 			}
-			*/
 
-			// Count down cooldown
+			// Count down cooldown on all abilities.
 			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
 			{
 				if (player->AbilityScripts[i].Cooldown > 0)
@@ -128,13 +173,13 @@ namespace RootSystems
 					player->AbilityScripts[i].Cooldown -= dt;
 				}
 
-				if (m_serverPeer != nullptr && player->AbilityScripts[i].Cooldown <= 0.0f && !player->AbilityScripts[i].CooldownOff)
+				if (m_serverPeer != nullptr && player->AbilityScripts[i].OnCooldown && player->AbilityScripts[i].Cooldown <= 0.0f)
 				{
 					// Cooldown has finished on the server.
-					player->AbilityScripts[i].CooldownOff = true;
+					player->AbilityScripts[i].OnCooldown = false;
 					player->AbilityScripts[i].Cooldown = 0.0f;
 
-					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d is off", i);
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d for player %d is off", i, network->ID.UserID);
 
 					// Send notification about finished cooldown to the client.		
 					RootForce::NetworkMessage::CooldownOff m;
@@ -150,8 +195,6 @@ namespace RootSystems
 					m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
 			}
-			
-			action->ActivateAbility = false;
 		}
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)
