@@ -674,12 +674,90 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 		p_world->GetGroupManager()->RegisterEntity("Water", entity);
 }
 
+float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
+{
+	return sqrt((myVector1.x - myVector2.x)*(myVector1.x - myVector2.x) + (myVector1.y - myVector2.y)*(myVector1.y - myVector2.y) + (myVector1.z - myVector2.z)*(myVector1.z - myVector2.z));
+}
+
+string modelExists(int meshIndex)
+{	
+		float THRESHOLD = 0.01;
+		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		//Print("Index ", i, " ", SM.meshList[i].transformation.name);
+		int count = 0;
+		bool exists = true;
+		int saveJ = 0;
+
+		if(meshIndex == 0)
+		{
+			exists = false;
+		}
+		else
+		{
+			for(int j = 0; j < meshIndex; j++)
+			{
+				int countVertex = 0;
+				if(RM.PmeshList[meshIndex]->nrOfVertices == RM.PmeshList[j]->nrOfVertices)
+				{
+					for(int v = 0; v < RM.PmeshList[meshIndex]->nrOfVertices; v++)
+					{
+						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
+						// (SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length();
+						float dist = getLengthOfVector(RM.PmeshList[meshIndex]->vertex[v], RM.PmeshList[j]->vertex[v]);
+						if (dist >= THRESHOLD)
+						{
+							//Om den är falsk hela vägen
+							exists = false;
+						}
+						else
+						{
+							countVertex++;
+							if(countVertex == RM.PmeshList[meshIndex]->nrOfVertices)
+							{
+								exists = true;
+								saveJ = j;
+								break;
+							}
+						}
+
+					}
+					if(exists)
+						break;
+				}
+				else
+				{
+					count++;
+					if(count == meshIndex)
+						exists = false;
+				}
+
+			}
+
+		}
+
+		if(exists)
+		{
+			return RM.PmeshList[saveJ]->modelName;
+		}
+		else
+		{
+			return RM.PmeshList[meshIndex]->modelName;
+		}
+
+		ReleaseMutex(RM.MeshMutexHandle);
+}
+
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+
+	p_name = modelExists(index);
+
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
+
 	renderable->m_model->m_transform = glm::mat4x4(1);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
@@ -830,7 +908,7 @@ void UpdateCamera(int index)
 void LoadLocators()
 {
 	RM.LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	WaitForSingleObject(RM.LocatorMutexHandle, RM.milliseconds);
 	int nrLoc = *RM.NumberOfLocators;
 
 	for(int i = 0; i < nrLoc; i++)
