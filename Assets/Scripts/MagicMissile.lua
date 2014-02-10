@@ -2,6 +2,15 @@ MagicMissile = {};
 MagicMissile.damage = 0;
 MagicMissile.pushback = 0;
 MagicMissile.cooldown = 5;
+MagicMissile.chargeTime = 0.0;
+MagicMissile.channelingTime = 0.0;
+
+function MagicMissile.ChargeDone(time, userId, actionId)
+end
+
+function MagicMissile.ChannelingDone(time, userId, actionId)
+	MagicMissile.OnCreate(userId, actionId);
+end
 
 function MagicMissile.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");

@@ -23,9 +23,9 @@ namespace RootEngine
 			void AddParameterString(std::string p_string);
 			void AddParameterNumber(double p_double);
 			void AddParameterBoolean(bool p_bool);
-			void SetGlobalString(const std::string& p_variableName, const std::string& p_string);
-			void SetGlobalNumber(const std::string& p_variableName, double p_double);
-			void SetGlobalBoolean(const std::string& p_variableName, bool p_bool);
+			void SetGlobalString(const std::string& p_variableName, const std::string& p_string, const std::string& p_globalName = "Global");
+			void SetGlobalNumber(const std::string& p_variableName, double p_double, const std::string& p_globalName = "Global");
+			void SetGlobalBoolean(const std::string& p_variableName, bool p_bool, const std::string& p_globalName = "Global");
 			std::string GetGlobalString(const std::string& p_variableName, const std::string& p_globalName = "Global");
 			double GetGlobalNumber(const std::string& p_variableName, const std::string& p_globalName = "Global");
 			bool GetGlobalBoolean(const std::string& p_variableName, const std::string& p_globalName = "Global");

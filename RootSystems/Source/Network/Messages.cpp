@@ -50,10 +50,10 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, Action.ActionID);
 			p_bs->Serialize(p_writeToBitstream, Action.MovePower);
 			p_bs->Serialize(p_writeToBitstream, Action.StrafePower);
-			p_bs->Serialize(p_writeToBitstream, Action.Jump);
 			for (int i = 0; i < 2; ++i)
 				p_bs->Serialize(p_writeToBitstream, Action.Angle[i]);
-			p_bs->Serialize(p_writeToBitstream, Action.ActivateAbility);
+			p_bs->Serialize(p_writeToBitstream, Action.JumpTime);
+			p_bs->Serialize(p_writeToBitstream, Action.AbilityTime);
 			p_bs->Serialize(p_writeToBitstream, Action.SelectedAbility);
 
 			for (int i = 0; i < 3; ++i)

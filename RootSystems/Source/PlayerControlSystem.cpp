@@ -166,7 +166,8 @@ namespace RootForce
 						playerComponent->AbilityState = AbilityState::CHARGING;
 					}
 
-					action->AbilityTime += dt;
+					if (playerComponent->AbilityState != AbilityState::OFF)
+						action->AbilityTime += dt;
 				}
 				break;
 			case PlayerAction::ACTIVATE_ABILITY_RELEASED:

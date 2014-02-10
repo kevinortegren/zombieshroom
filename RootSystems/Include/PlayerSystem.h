@@ -103,5 +103,14 @@ namespace RootForce
 
 		int Score;
 		int Deaths;
+
+		PlayerComponent()
+		{
+			TeamID = 0;
+			SelectedAbility = 0;
+			AbilityState = AbilityState::OFF;
+			Score = 0;
+			Deaths = 0;
+		}
 	};
 }

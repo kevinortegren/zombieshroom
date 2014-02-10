@@ -1,7 +1,16 @@
 AbilityBall = {};
 AbilityBall.damage = 20;
 AbilityBall.pushback = 20;
-AbilityBall.cooldown = 1;
+AbilityBall.cooldown = 1.0;
+AbilityBall.chargeTime = 0.0;
+AbilityBall.channelingTime = 0.0;
+
+function AbilityBall.ChargeDone(time, userId, actionId)
+end
+
+function AbilityBall.ChannelingDone(time, userId, actionId)
+	AbilityBall.OnCreate(userId, actionId);
+end
 
 function AbilityBall.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating FireBall");
@@ -15,10 +24,12 @@ function AbilityBall.OnCreate (userId, actionId)
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
+
 	collisionComp:CreateHandle(self, 1, false);
 	local transformComp = Transformation.New(self);
 	--local particleComp = ParticleEmitter.New(self, "fireball");
 	local scriptComp = Script.New(self, "AbilityBall");
+
 	posVec = Vec3.New((posVec.x + frontVec.x * 3), (2 + posVec.y + frontVec.y * 3), (posVec.z + frontVec.z * 3));
 	physicsComp:BindSphereShape(collisionComp, posVec, Quat.New(0,0,0,1), 1, 5, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
@@ -38,8 +49,6 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
-	local playerComponent = playerEnt:GetPlayerComponent();
-	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityBall.cooldown);
 end
 
 function AbilityBall.OnCollide (self, entity)

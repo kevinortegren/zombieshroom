@@ -116,7 +116,7 @@ TEST(PlayerControlSystem, Process)
 
 		system->Process();
 
-		EXPECT_TRUE(action->Jump);
+		EXPECT_TRUE(action->JumpTime > 0.0f);
 	}
 
 	//Orientation test

@@ -276,7 +276,7 @@ namespace RootForce
 						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 
 						playerComponent->AbilityScripts[m.AbilityIndex].Cooldown = 0.0f;
-						playerComponent->AbilityScripts[m.AbilityIndex].CooldownOff = true;
+						playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
 					}

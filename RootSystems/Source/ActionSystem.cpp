@@ -80,12 +80,13 @@ namespace RootSystems
 
 
 			// Activate ability! Pew pew!
+			player->SelectedAbility = action->SelectedAbility - 1;
 			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
 			if (abilityName != "")
 			{
-				float abilityChargeTime = g_engineContext.m_script->GetGlobalNumber("ChargeTime", abilityName);
-				float abilityChannelingTime = g_engineContext.m_script->GetGlobalNumber("ChannelingTime", abilityName);
-				float abilityCooldownTime = g_engineContext.m_script->GetGlobalNumber("Cooldown", abilityName);
+				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
+				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
+				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
 				switch (player->AbilityState)
 				{
 					case RootForce::AbilityState::CHARGING:
@@ -100,6 +101,8 @@ namespace RootSystems
 							g_engineContext.m_script->ExecuteScript();
 
 							player->AbilityState = RootForce::AbilityState::CHANNELING;
+
+							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 
 							// TODO: Consider temporarily setting cooldown here to prevent double-action-per-frame cheese.
 						}
@@ -126,6 +129,8 @@ namespace RootSystems
 							player->AbilityScripts[player->SelectedAbility].Charges--;
 							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+
+							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 						}
 					} break;
 
@@ -142,6 +147,8 @@ namespace RootSystems
 								g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
 								g_engineContext.m_script->AddParameterNumber(action->ActionID);
 								g_engineContext.m_script->ExecuteScript();
+
+								g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 							}
 
 							// Call on channeling done since the ability is up.
@@ -160,6 +167,8 @@ namespace RootSystems
 							player->AbilityScripts[player->SelectedAbility].Charges--;
 							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+
+							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 						}
 					} break;
 				}
@@ -179,7 +188,7 @@ namespace RootSystems
 					player->AbilityScripts[i].OnCooldown = false;
 					player->AbilityScripts[i].Cooldown = 0.0f;
 
-					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d for player %d is off", i, network->ID.UserID);
+					//g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d for player %d is off", i, network->ID.UserID);
 
 					// Send notification about finished cooldown to the client.		
 					RootForce::NetworkMessage::CooldownOff m;
@@ -205,7 +214,10 @@ namespace RootSystems
 		{
 			animation->m_animClip = RootForce::AnimationClip::LANDING;
 			animation->m_locked = 1;
+
 			state->CurrentState = RootForce::EntityState::GROUNDED;
+
+			action->JumpTime = 0.0f;
 		}
 		else
 		{
@@ -224,20 +236,35 @@ namespace RootSystems
 					animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
 			}
 		}
+
 		// Issue a jump if applicable
-		if(!isGameOver && action->Jump)
+		if(!isGameOver)
 		{
-			m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
-			if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+			if (action->JumpTime > 0.0f)
 			{
-				animation->m_animClip = RootForce::AnimationClip::JUMP_START;
-				animation->m_locked = 1;
+				if (action->JumpTime >= RootForce::JUMP_TIME_LIMIT)
+				{
+					action->JumpTime = 0.0f;
+				}
+				else
+				{
+					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
+					{
+						// Apply jump force and go into jump animation
+						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+						{
+							animation->m_animClip = RootForce::AnimationClip::JUMP_START;
+							animation->m_locked = 1;
+						}
+					}
+					else
+					{
+						// TODO: Apply booster jump force
+					}
+				}
 			}
-			action->Jump = false;
 		}
-
-
-
 
 		//action->MovePower = 0;
 		//action->StrafePower = 0;
