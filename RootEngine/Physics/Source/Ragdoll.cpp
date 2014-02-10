@@ -181,7 +181,7 @@ namespace Ragdoll
 			body->setCcdSweptSphereRadius(0.4f);
 			body->setRestitution(1.3f);
 			//body->setFriction(1.5f);
-			body->setCollisionFlags(body->getFlags() | btBroadphaseProxy::DebrisFilter);
+			body->setCollisionFlags(btBroadphaseProxy::DebrisFilter);
 			m_bodies[index] = body;
 			
 			//create children and constraints
