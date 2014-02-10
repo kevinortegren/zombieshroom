@@ -1914,7 +1914,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::WaterCollider **s = (RootForce::WaterCollider**)luaL_checkudata(p_luaState, 1, "WaterCollider");
-			(*s)->m_radius = (float)luaL_checknumber(p_luaState, 2);
+			(*s)->m_radius = (int)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 

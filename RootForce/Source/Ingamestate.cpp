@@ -49,8 +49,6 @@ namespace RootForce
 
 	void IngameState::Initialize()
 	{
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -275,7 +273,7 @@ namespace RootForce
 			else
 			{
 				g_engineContext.m_gui->Render(m_hud->GetView());
-				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -404,27 +402,23 @@ namespace RootForce
 		{
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
 		}
 		//DEBUG -> toggle wireframe mode on water with I
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->ToggleWireFrame();
-
-
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->TogglePause();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->DecreaseDamping();
+			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->IncreaseSpeed();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->DecreaseSpeed();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->IncreaseWaterHeight();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->DecreaseWaterHeight();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_R) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ResetWater();
 
 #endif
 		

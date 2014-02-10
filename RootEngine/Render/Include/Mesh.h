@@ -41,6 +41,7 @@ namespace Render
 		virtual void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices) = 0;
 
 		virtual void SetWireFrame(bool p_wireFrame) = 0;
+		virtual void SetNoCulling(bool p_noCulling) = 0;
 	};
 
 	class Mesh : public MeshInterface
@@ -79,6 +80,7 @@ namespace Render
 		void DrawInstanced(GLsizei p_instances);
 
 		void SetWireFrame(bool p_wireFrame);
+		void SetNoCulling(bool p_noCulling);
 
 	private:
 		BufferInterface* m_vertexBuffer;
@@ -86,7 +88,7 @@ namespace Render
 		VertexAttributesInterface* m_vertexAttributes;		
 		GLuint m_transformFeedback;
 		GLenum m_primitive;
-		bool m_wireFrame;
+		bool m_wireFrame, m_noCulling;
 	};
 
 }

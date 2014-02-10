@@ -18,19 +18,19 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "DEPRECATED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "UNDEFINED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PORTABILITY");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PERFORMANCE");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "OTHER");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "OTHER");
 		break;
 	}
 
@@ -83,18 +83,19 @@ namespace Render
 	{
 		m_window = p_window;
 
-		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
+		int flags = 0;
 #if defined (_DEBUG)
-		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
+		flags = SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, flags);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
@@ -260,6 +261,8 @@ namespace Render
 		m_sjobCount[2] = 0;
 		m_sjobCount[3] = 0;
 
+		//Generate query for gpu timer
+		g_context.m_profiler->InitQuery();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -809,9 +812,11 @@ namespace Render
 
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
-		
+			//g_context.m_profiler->BeginGPUTimer();
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			//double time = g_context.m_profiler->EndGPUTimer();
+			//g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Compute time: %f ms", time);
 		}
 
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
