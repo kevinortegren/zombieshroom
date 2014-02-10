@@ -13,6 +13,8 @@ ParticleEditor::~ParticleEditor()
 	delete m_particleTab;
 	delete m_colorTriangle;
 	delete m_colorEndTriangle;
+	delete m_fileSystemModel;
+	delete m_fileSystemModelModel;
 }
 
 void ParticleEditor::ConnectSignalsAndSlots()
@@ -49,6 +51,7 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.spreadSpinBox,		SIGNAL(valueChanged(double)),				this, SLOT(SpreadChanged(double)));
 	connect(ui.spawnTimeSpinBox,	SIGNAL(valueChanged(double)),				this, SLOT(SpawnTimeChanged(double)));
 	connect(ui.textureTreeView,		SIGNAL(doubleClicked(const QModelIndex&)),	this, SLOT(TextureDoubleClicked(const QModelIndex&)));
+	connect(ui.modelTreeView,		SIGNAL(doubleClicked(const QModelIndex&)),	this, SLOT(ModelDoubleClicked(const QModelIndex&)));
 	connect(m_colorTriangle,		SIGNAL(colorChanged(const QColor&)),		this, SLOT(ColorChanged(const QColor&)));
 	connect(m_colorEndTriangle,		SIGNAL(colorChanged(const QColor&)),		this, SLOT(ColorEndChanged(const QColor&)));
 	connect(ui.actionColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorTriangle()));
@@ -60,6 +63,7 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	//connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
 	//connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
 	//connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
+	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
 }
 
 void ParticleEditor::Init()
@@ -81,6 +85,8 @@ void ParticleEditor::Init()
 	m_samples				= 0;
 	m_collectedTime			= 0.0f;
 
+	m_fileSystemModelModel = new QFileSystemModel;
+	m_fileSystemModelModel->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Models/"));
 	m_fileSystemModel = new QFileSystemModel;
 	m_fileSystemModel->setRootPath(QString::fromStdString(m_workingDirectory + "Assets/Textures/"));
 
@@ -92,6 +98,15 @@ void ParticleEditor::Init()
 	ui.textureTreeView->setColumnWidth(0, 200);
 	ui.textureTreeView->hideColumn(2);
 	ui.textureTreeView->setRootIndex(m_fileSystemModel->index(QString::fromStdString(m_workingDirectory + "Assets/Textures/")));
+
+	QStringList filtersModel;
+	filtersModel << "*.dae";
+	m_fileSystemModelModel->setNameFilters(filtersModel);
+	m_fileSystemModelModel->setNameFilterDisables(false);
+	ui.modelTreeView->setModel(m_fileSystemModelModel);
+	ui.modelTreeView->setColumnWidth(0, 200);
+	ui.modelTreeView->hideColumn(2);
+	ui.modelTreeView->setRootIndex(m_fileSystemModelModel->index(QString::fromStdString(m_workingDirectory + "Assets/Models/")));
 	
 	m_colorTriangle = new QtColorTriangle(ui.colorDockWidget);
 	m_colorTriangle->show();
@@ -108,6 +123,15 @@ void ParticleEditor::Init()
 	m_particleTab->AddTab();
 
 	m_savePath = "";
+
+	ECS::Entity* renderModel = m_world->GetEntityManager()->CreateEntity();
+	m_modelTrans = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(renderModel);
+	m_modelTrans->m_scale = glm::vec3(0.0f);
+	m_model = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(renderModel);
+	m_model->m_material = g_engineContext.m_renderer->CreateMaterial("ModelMaterial");
+	m_model->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
+	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
+	m_model->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 
 	Saved();
 
@@ -299,7 +323,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd		= glm::vec4(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity		= glm::vec3(0.0f, 0.0f, 0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction	= glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread		= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread		= 0.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed	= 1.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius	= 0.5f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.05f;
@@ -437,7 +461,7 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	QColor col(red, green, blue, alpha);
 	m_colorTriangle->setColor(col);
 	ui.colorAlphaSlider->setValue(alpha);
-
+	ui.colorSpinBoxA->setValue(alpha);
 	//End color
 	red		= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.r*255.0f;
 	green	= pe->m_particleSystems[m_selectedEmitterIndex]->m_colorEnd.g*255.0f;
@@ -447,6 +471,7 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	QColor colEnd(red, green, blue, alpha);
 	m_colorEndTriangle->setColor(colEnd);
 	ui.endcolorAlphaSlider->setValue(alpha);
+	ui.endcolorSpinBoxA->setValue(alpha);
 	//Gravity
 	ui.gravitySpinBoxX->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.x);
 	ui.gravitySpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_gravity.y);
@@ -456,7 +481,7 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	ui.directionSpinBoxY->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.y);
 	ui.directionSpinBoxZ->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_direction.z);
 	//Spread
-	ui.spreadSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spread);
+	ui.spreadSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spread*(180.0f/glm::pi<double>()));
 	//Spawntime
 	ui.spawnTimeSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime);
 }
@@ -582,7 +607,8 @@ void ParticleEditor::SpeedMaxChanged( double p_val )
 void ParticleEditor::SpreadChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex]->m_spread = (float)p_val;
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_spread = (float)p_val*(glm::pi<float>()/180.0f);
+	ui.spreadSlider->setValue((int)p_val);
 	Changed();
 }
 
@@ -661,6 +687,13 @@ void ParticleEditor::OrbitSpeedChanged( double p_val )
 	Changed();
 }
 
+
+void ParticleEditor::SpreadSliderChanged( int p_val )
+{
+	ui.spreadSpinBox->setValue((double)p_val);
+	Changed();
+}
+
 #pragma endregion
 
 void ParticleEditor::MenuViewColorTriangle()
@@ -724,6 +757,26 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+	Changed();
+}
+
+void ParticleEditor::ModelDoubleClicked( const QModelIndex& p_index )
+{
+	//If no emitter selected, abort
+	if(m_selectedEmitterIndex == -1)
+		return;
+
+	//Read file info of double clicked file and determine if valid
+	QFileInfo fileInfo = m_fileSystemModelModel->fileInfo(p_index);
+	if(fileInfo.suffix().compare("dae") != 0)
+	{
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Model must be .dae! Tried to select %s", fileInfo.fileName().toStdString().c_str() );
+		//ShowMessageBox("Texture must be .dds!");
+		return;
+	}
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new model: %s", fileInfo.fileName().toStdString().c_str());
+	m_model->m_model = g_engineContext.m_resourceManager->LoadCollada(fileInfo.baseName().toStdString().c_str());
+	m_modelTrans->m_scale = glm::vec3(1.0f);;
 	Changed();
 }
 
@@ -942,6 +995,7 @@ void ParticleEditor::TemplateChanged( int p_val )
 	}
 	Changed();
 }
+
 
 
 
