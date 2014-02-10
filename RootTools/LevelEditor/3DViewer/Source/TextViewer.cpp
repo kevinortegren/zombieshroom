@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
 				string type;
 				int updateID = -1;
 				int	removeID = -1;
-				bool updateTransform, updateShape;
+				bool updateTransform = false, updateShape = false;
 				std::deque<UpdateMessage> localMessages;
 				int numberMessages = 0;
 
@@ -431,9 +431,9 @@ void LoadSceneFromMaya()
 
 		Entities.push_back(CreateMeshEntity(&m_world, name, i));
 		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
-		auto mesh = model->m_meshes[0];
-		auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
-		mesh->SetVertexBuffer(buffer);
+		//auto mesh = model->m_meshes[0];
+		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
+		//mesh->SetVertexBuffer(buffer);
 
 		UpdateMesh(i, true, true, false);
 	}			
@@ -1078,11 +1078,13 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 		}
 
+		
 		// SET INFORMATION TO GAME
+		
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-
+		delete m_vertices;
 		}
 
 		

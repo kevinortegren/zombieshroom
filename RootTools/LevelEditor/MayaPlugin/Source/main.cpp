@@ -603,7 +603,7 @@ void dirtyMeshNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 	if(index != -1)
 	{
-		MayaMeshToList(node, index, true, true, true);
+		MayaMeshToList(node, index, false, true, true);
 		//SM.UpdateSharedMesh(index, true, true, currNrMeshes);
 	}
 }
@@ -749,7 +749,7 @@ void dirtyTransformNodeCB(MObject &node, MPlug &plug, void *clientData)
 
 		if(trans.child(0, &status).hasFn(MFn::kMesh))
 		{
-			MayaMeshToList(trans.child(0, &status), index, true, true, true);
+			MayaMeshToList(trans.child(0, &status), index, true, true, false);
 		}
 
 		if(trans.child(0, &status).hasFn(MFn::kPointLight))
@@ -797,9 +797,9 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 				MFnMesh mesh = g_mayaMeshList[i];
 
 			//	Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
-				MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
+				MayaMeshToList(g_mayaMeshList[i], i, true, true, false);
 				SM.UpdateSharedMaterials(currNrMaterials, i);
-				SM.UpdateSharedMesh(i, true, true, currNrMeshes);
+				//SM.UpdateSharedMesh(i, true, false, currNrMeshes);
 			}
 		}
 	}

@@ -266,6 +266,7 @@ void ReadMemory::ClearAllMessages()
 	UpdateMessage mess;
 	string nada = "";
 	memcpy(mess.name, nada.c_str(), g_maxNameLength);
+	*NumberOfMessages = 0;
 
 	for(int i = 0; i < g_maxMessages; i++)
 	{		

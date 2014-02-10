@@ -134,71 +134,101 @@ int SharedMemory::InitalizeSharedMemory()
 
 void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove) //Valid types are "Mesh", "Camera", "Light", "Locator"
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-
-	int nrOfMessages = *NumberOfMessages;
-	bool stop = false;
-
-	//Check if last message is of same type and don't add new if true
-	if(nrOfMessages > 0)
+	if(type != "")
 	{
-		for(int i = 0; i < nrOfMessages; i++)
+
+		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+		WaitForSingleObject(IdMutexHandle, milliseconds);
+
+		int nrOfMessages = *NumberOfMessages;
+		bool stop = false;
+		int overwrite = -1;
+
+		//Check if last message is of same type and don't add new if true
+		if(nrOfMessages > 0)
 		{
-			if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
+			for(int i = 0; i < nrOfMessages; i++)
 			{
-				stop = true;
-				break;
+				if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
+					//&& updateShape == updateMessages[i]->updateShape && updateTransform == updateMessages[i]->updateTransform)
+				{
+					stop = true;
+					overwrite = i;
+					break;
+				}
 			}
 		}
-	}
 
-	if(!stop && index >= 0)
-	{
-		//Maybe check last message for duplicate aswell
-		if(nrOfMessages < g_maxMessages)
+		if(overwrite != -1)
 		{
-			updateMessages[nrOfMessages]->updateTransform = updateTransform;
-			updateMessages[nrOfMessages]->updateShape = updateShape;
+			updateMessages[overwrite]->updateTransform = updateTransform;
+			updateMessages[overwrite]->updateShape = updateShape;
 			if(type != "")
 			{
-				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
+				memcpy(updateMessages[overwrite]->name, type.c_str(), g_maxNameLength);
 				int minusOne = -1;
 				if(remove)
 				{
-					updateMessages[nrOfMessages]->updateID = minusOne;
-					updateMessages[nrOfMessages]->removeID = index;
+					updateMessages[overwrite]->updateID = minusOne;
+					updateMessages[overwrite]->removeID = index;
 				}
 				else
 				{
-					updateMessages[nrOfMessages]->updateID = index;
-					updateMessages[nrOfMessages]->removeID = minusOne;
+					updateMessages[overwrite]->updateID = index;
+					updateMessages[overwrite]->removeID = minusOne;
 				}
 			}
 			nrOfMessages++;
 			*NumberOfMessages = nrOfMessages;
 		}
-		else if(nrOfMessages > 0)
+
+		if(!stop && index >= 0)
 		{
-			//Remove oldest / first message and try again
-			//UpdateMessage tempCopy[g_maxMessages];
-
-			for(int i = 0; i < nrOfMessages-1; i++)
+			//Maybe check last message for duplicate aswell
+			if(nrOfMessages < g_maxMessages)
 			{
-				*updateMessages[i] = *updateMessages[i+1];
+				updateMessages[nrOfMessages]->updateTransform = updateTransform;
+				updateMessages[nrOfMessages]->updateShape = updateShape;
+				if(type != "")
+				{
+					memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
+					int minusOne = -1;
+					if(remove)
+					{
+						updateMessages[nrOfMessages]->updateID = minusOne;
+						updateMessages[nrOfMessages]->removeID = index;
+					}
+					else
+					{
+						updateMessages[nrOfMessages]->updateID = index;
+						updateMessages[nrOfMessages]->removeID = minusOne;
+					}
+				}
+				nrOfMessages++;
+				*NumberOfMessages = nrOfMessages;
 			}
+			else if(nrOfMessages > 0)
+			{
+				//Remove oldest / first message and try again
+				//UpdateMessage tempCopy[g_maxMessages];
 
-			updateMessages[g_maxMessages]->removeID = -1;
-			updateMessages[g_maxMessages]->updateID = -1;
-			updateMessages[g_maxMessages]->updateShape = false;
-			updateMessages[g_maxMessages]->updateTransform = false;
-			//*updateMessages = tempCopy;
-			nrOfMessages--;
-			*NumberOfMessages = nrOfMessages;
-			AddUpdateMessage(type, index, updateTransform, updateShape, remove);
+				for(int i = 0; i < nrOfMessages-1; i++)
+				{
+					*updateMessages[i] = *updateMessages[i+1];
+				}
+
+				updateMessages[g_maxMessages]->removeID = -1;
+				updateMessages[g_maxMessages]->updateID = -1;
+				updateMessages[g_maxMessages]->updateShape = false;
+				updateMessages[g_maxMessages]->updateTransform = false;
+				//*updateMessages = tempCopy;
+				nrOfMessages--;
+				*NumberOfMessages = nrOfMessages;
+				AddUpdateMessage(type, index, updateTransform, updateShape, remove);
+			}
 		}
+		ReleaseMutex(IdMutexHandle);
 	}
-	ReleaseMutex(IdMutexHandle);
 }
 
 void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
