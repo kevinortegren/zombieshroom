@@ -31,10 +31,7 @@ layout(std140) uniform PerObject
 };    
 
 vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
-{
-	if(z == 1)
-	discard;
-  
+{ 
 	z = z * 2 - 1;
 
 	float x = screenCoord.x * 2 - 1;
