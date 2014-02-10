@@ -32,6 +32,8 @@ uniform sampler2DArray g_ShadowDepth;
 
 out vec4 out_Color;
 
+const int PCF_NUM_SAMPLES = 16;
+
 vec2 poissonDisk[16] = vec2[](
 	vec2( 0.2134463,	 0.4247225),
 	vec2( 0.4785358,	-0.3093533),
@@ -75,7 +77,8 @@ vec2 FindBlocker(vec3 coord, int useCascade)
 	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
 	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
 	float offset = length(penumbraSize);
-	float searchWidth = coord.z * offset;
+	float searchWidth = (5*coord.z)*(5*coord.z) * offset;
+	//float searchWidth = 
 	float blockersum = 0;
 	float numblockers = 0;
 
@@ -92,6 +95,39 @@ vec2 FindBlocker(vec3 coord, int useCascade)
 
 	float avgBlockerDepth = blockersum / numblockers;
 	return vec2(avgBlockerDepth, numblockers);
+}
+
+float PenumbraSize(float lightspaceFragDepth, float blockerDepth)
+{
+	return (lightspaceFragDepth - blockerDepth) / blockerDepth;
+}
+
+float PCF_Filter(vec3 coord, int useCascade, float filterRadiusUV)
+{
+	float sum = 0.0;
+	int i;
+	for(i = 0; i < PCF_NUM_SAMPLES; ++i)
+	{
+		vec2 offset = poissonDisk[i] * filterRadiusUV;
+		sum += texture(g_ShadowDepthPCF, vec4(coord.xy + offset, useCascade, coord.z));
+	}
+	return sum / PCF_NUM_SAMPLES;
+}
+
+float PCSS(vec3 coord, int useCascade)
+{
+	vec2 blockerData = FindBlocker(coord, useCascade); //x is avgBlockerDepth, y is numblockers
+	if(blockerData.y < 1)
+	{
+		//return 1.0; //Early out since no blockers
+	}
+
+	float penumbraRatio = PenumbraSize(coord.z, blockerData.x);
+	float filterRadiusUV = penumbraRatio * 1.27 / coord.z; //Constant should be tweaked
+
+
+	return blockerData.y / 16;
+	return PCF_Filter(coord, useCascade, filterRadiusUV);
 }
 
 void main() {
@@ -141,17 +177,9 @@ void main() {
 	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
 	occluderDepth = shadowCoord.z - occluderDepth;
 	
-	float offset = 0;
-	float x;
-	float y;
-	for(x = -1.5; x <= 1.5; x += 1.0)
-	{
-		for(y = -1.5; y <= 1.5; y += 1.0)
-		{
-			visibility += texture(g_ShadowDepthPCF, vec4(shadowCoord.x + (x * offset), shadowCoord.y + (y * offset), useCascade, shadowCoord.z));
-		}
-	}
-	visibility /= 16.0;
+	float distanceFromFragmentToLight = length(position - (-1)*ex_Light.LightDirection) / 200;
+
+	visibility = PCSS(shadowCoord.xyz, useCascade);
 
 	
 	//shadowCoord /= shadowCoord.w; //unnecessary because orthographic
@@ -172,4 +200,5 @@ void main() {
 	}
 
 	out_Color *= visibility;
+	out_Color = vec4(1.0) * distanceFromFragmentToLight;
 }
