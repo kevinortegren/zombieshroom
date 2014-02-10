@@ -89,7 +89,7 @@ namespace Ragdoll
 
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20])
 	{
-		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.67f, 0);
+		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
 		/*m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(0, 0.2f, 0);
 		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f, 0.2f, 0);*/
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
@@ -146,10 +146,11 @@ namespace Ragdoll
 		
 			if(index < 6)
 			{
+
 				if(index < 3) 
-					toTrans = glm::rotate(p_transform, -90.0f, glm::vec3(0,0,1)) * /*test*/ m_lastBoneMatrix[index];
+					toTrans = glm::rotate(p_transform, -90.0f, glm::vec3(0,0,1)) * m_lastBoneMatrix[index];
 				else
-					toTrans = glm::rotate(p_transform, 90.0f, glm::vec3(0,0,1)) * /* test*/ m_lastBoneMatrix[index];
+					toTrans = glm::rotate(p_transform, 90.0f, glm::vec3(0,0,1)) * m_lastBoneMatrix[index];
 			}
 			else
 			{
@@ -159,7 +160,7 @@ namespace Ragdoll
 			const float* data = glm::value_ptr(toTrans);
  			trans.setFromOpenGLMatrix(data);
 			
-			//if( index != BodyPart::HIPS)
+		//	if( index > 5)
 			{
 				float x,y,z,w;
 				x = trans.getRotation().y();
@@ -186,7 +187,7 @@ namespace Ragdoll
 			//create children and constraints
 			for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			{
-				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i],  p_transform,  p_massFactor+1 , m_bodyPosOffset[index], p_boneOffset);
+				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor+1 , m_bodyPosOffset[index], p_boneOffset);
 				if(childbody != nullptr)
 				{
 					SetBoneRelation(index, m_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
@@ -356,7 +357,7 @@ namespace Ragdoll
 
 
 
-			m_dynamicWorld->addConstraint(constraint);
+			m_dynamicWorld->addConstraint(constraint,true);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
 		}
@@ -454,8 +455,8 @@ namespace Ragdoll
 				0.2f, -0.0f * OFFSET, 0,
 				0 , 0, 1, 0, &localA, &localB);
 
-			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(- PI_2 , PI_2 /2);
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(- PI_2 , PI_2 / 2.0f );
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
@@ -468,8 +469,8 @@ namespace Ragdoll
 				-0.2f, -0.00f * OFFSET, 0,
 				0 , 0, 1, 0, &localA, &localB);
 
-			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(- PI_2 , PI_2 /2);
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(- PI_2 , PI_2 / 2.0f );
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
@@ -478,7 +479,7 @@ namespace Ragdoll
 		else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
-				-0.2 , -0.0f * OFFSET, 0,
+				-0.2f , -0.0f * OFFSET, 0,
 				0.15f, 0.0f * OFFSET, 0,
 				0 , 0.7f, 0, 0.7f, &localA, &localB);
 
@@ -507,7 +508,7 @@ namespace Ragdoll
 		{
 			CalculateConstraintTransform(p_bodyA, p_bodyB, 
 				0.1f , 0.00f * OFFSET, 0,
-				-0.2, -0.0f * OFFSET, 0,
+				-0.2f, -0.0f * OFFSET, 0,
 				0 , 0.7f, 0, 0.7f, &localA, &localB);
 
 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -624,13 +625,13 @@ namespace Ragdoll
 
 
 		//Bullet world space to model space
-		m_prevPos[myIndex] =  glm::make_mat4(rootData) ;
+		m_prevPos[myIndex] =  glm::make_mat4(rootData);
 		//World to local space
 		p_bones[myIndex] = (glm::inverse(m_prevPos[myIndex]) *   glm::make_mat4(data)) ; 	
 		p_bones[myIndex] *= m_boneOffset[myIndex];
 
-		
-//#pragma warning	NOTE TO SELF: Borde gå att lösa att modellens start punkt är i kubernas mitt genom att offsetta p_bones y värde med halva boxens höjd, kanske eventuellt, men nu, mot arm helveterna och vidare!
+	
+
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
 			FixPosition(p_bones, p_rootNode->mChildren[i]);

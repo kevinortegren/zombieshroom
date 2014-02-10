@@ -1445,7 +1445,7 @@ namespace Physics
 		}
 		else
 		{
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll %d", p_objectHandle);
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attempting to get bones from nonexisting ragdoll %d with objecthandle: %d", index, p_objectHandle);
 		}
 		return nullptr;
 	}
