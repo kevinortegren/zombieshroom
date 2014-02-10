@@ -17,6 +17,7 @@ layout(std140) uniform PerObject
     float tileFactor;
 };
 
+out vec3 world_position;
 out vec3 vert_normal;
 out vec2 vert_texcoord;
 out vec2 vert_texcoord_scaled;
@@ -29,6 +30,9 @@ void main()
     vert_texcoord_scaled = in_texcoord * tileFactor;
 	view = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 
+    world_position = vec3(modelMatrix * vec4( in_position, 1.0f )).xyz;
+    
+    
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 
 }

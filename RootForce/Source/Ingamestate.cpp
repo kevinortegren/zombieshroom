@@ -220,7 +220,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		//m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 	}
 
 	void IngameState::Exit()

@@ -16,6 +16,12 @@ namespace RootForce
 		glm::vec4 min = glm::vec4(m_aabb.m_minX, m_aabb.m_minY, m_aabb.m_minZ, 1.0f);
 		glm::vec4 max = glm::vec4(m_aabb.m_maxX, m_aabb.m_maxY, m_aabb.m_maxZ, 1.0f);
 
+		min.x = -(int)pow(2, ceil(log(glm::abs(min.x))/log(2)));
+		min.z = -(int)pow(2, ceil(log(glm::abs(min.z))/log(2)));
+
+		max.x = (int)pow(2, ceil(log(max.x)/log(2)));
+		max.z = (int)pow(2, ceil(log(max.z)/log(2)));
+
 		m_proj = glm::ortho(min.x, max.x, min.z, max.z, -max.y, -min.y);
 	}
 
@@ -75,14 +81,14 @@ namespace RootForce
 				float ty = pos.y;
 				float tz = pos.z;
 
-				if(tx > maxX) maxX = (int)tx;
-				if(tx < minX) minX = (int)tx;
+				if(tx > maxX) maxX = tx;
+				if(tx < minX) minX = tx;
 				
-				if(ty > maxY) maxY = (int)ty;
-				if(ty < minY) minY = (int)ty;
+				if(ty > maxY) maxY = ty;
+				if(ty < minY) minY = ty;
 
-				if(tz > maxZ) maxZ = (int)tz;
-				if(tz < minZ) minZ = (int)tz;	
+				if(tz > maxZ) maxZ = tz;
+				if(tz < minZ) minZ = tz;	
 			}
 		}
 
@@ -147,9 +153,20 @@ namespace RootForce
 		// Store texture.
 		m_density->Store("rtt.tga");
 
-
 		// Restore backbuffer.
 		m_engineContext->m_renderer->SetRenderToTexture(nullptr);
+
+		range = m_world->GetGroupManager()->GetEntitiesInGroup("Painted");
+		for(auto itr = range.first; itr != range.second; ++itr)
+		{
+			ECS::Entity* entity = (*itr).second;
+
+			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+			auto material = renderable->m_material;
+			auto mesh = renderable->m_model->m_meshes[0];
+
+			material->m_textures[Render::TextureSemantic::TEXTUREMAP] = m_density->GetTexture();
+		}
 
 		m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Player"))->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_density->GetTexture();
 	}
@@ -157,5 +174,12 @@ namespace RootForce
 	void BotanySystem::Process()
 	{
 		m_aabb.DebugDraw(m_engineContext->m_renderer, glm::vec3(1,1,0), glm::mat4(1.0f));
+
+		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
+
+		float u = (transform->m_position.x - m_aabb.m_minX) / m_width;
+		float v = (transform->m_position.z - m_aabb.m_minZ) / m_height;
+		
+		std::cout << "U: " << 1 - u << "V: " << v << std::endl;
 	}
 }
