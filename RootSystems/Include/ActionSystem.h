@@ -47,7 +47,7 @@ namespace RootSystems
 		void Init();
 
 		void ProcessEntity(ECS::Entity* p_entity);
-		void UpdateAimingDevice();
+		void UpdateAimingDevice(bool m_inMenu);
 	private:
 
 		RootEngine::GameSharedContext* m_engineContext;

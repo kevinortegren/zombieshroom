@@ -17,7 +17,7 @@ namespace RootForce
 		m_transform.Init(m_world->GetEntityManager());
 		m_waterCollider.Init(m_world->GetEntityManager());
 		
-		m_maxX = m_maxZ = 64;
+		m_maxX = m_maxZ = 1024;
 		m_scale = 40.0f;
 		m_dt = 0;
 		m_gridSize = 64;
@@ -32,13 +32,8 @@ namespace RootForce
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{
-			float Pixels[64*64];
-			m_computeJob.m_textures[0]->Bind(0);
-			glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &Pixels);
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
-			glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &Pixels);
-			m_computeJob.m_textures[0]->Unbind(0);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
 			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
 			//Swap the textures for next simulation step
@@ -313,8 +308,8 @@ namespace RootForce
 			{
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(x-(float)m_gridSize/2.0f, 0.0f, z-(float)m_gridSize/2.0f);
-				v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
-				v.m_UV		= glm::vec2(x/(float)m_gridSize, 1.0f - z/(float)m_gridSize);
+				v.m_normal	= glm::vec3(0.0f);
+				v.m_UV		= glm::vec2(x/(float)m_gridSize, z/(float)m_gridSize);
 				v.m_tangent = glm::vec3(0.0f);//TODO
 				v.m_bitangent = glm::vec3(0.0f);//TODO
 				vertices.push_back(v);

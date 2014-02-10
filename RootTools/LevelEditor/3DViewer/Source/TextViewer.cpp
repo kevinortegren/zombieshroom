@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+			
 			uint64_t old = SDL_GetPerformanceCounter();
 			while (g_running)
 			{
@@ -419,11 +419,16 @@ void LoadSceneFromMaya()
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	numberMeshes = *RM.NumberOfMeshes;
-	
+	ReleaseMutex(RM.MeshMutexHandle);
 
 	for(int i = 0; i < numberMeshes; i++)
 	{				
+		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		//string name = RM.getMesh(i).modelName; 
 		string name = RM.PmeshList[i]->modelName;
+		ReleaseMutex(RM.MeshMutexHandle);
+
 		Entities.push_back(CreateMeshEntity(&m_world, name, i));
 		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
 		auto mesh = model->m_meshes[0];
@@ -433,7 +438,7 @@ void LoadSceneFromMaya()
 		UpdateMesh(i, true, true, false);
 	}			
 
-	ReleaseMutex(RM.MeshMutexHandle);
+
 
 	///////////////////////// Load Lights ////////////////////////////////
 
@@ -920,7 +925,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			if(RM.PmeshList[MeshIndex]->MaterialID >= 0)
+			if(RM.PmeshList[MeshIndex]->MaterialID >= 0 && RM.PmeshList[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
 				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);

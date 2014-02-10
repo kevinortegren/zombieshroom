@@ -21,7 +21,6 @@ namespace RootForce
 		m_view->WaitLoading();
 		m_view->Focus(); // Give the view the focus, necessary for JavaScript to catch the input events
 
-
 		m_view->RegisterJSCallback("Send", JSDelegate1(this, &ChatSystem::ProcessMessage));
 		m_view->RegisterJSCallback("SetFocus", JSDelegate1(this, &ChatSystem::SetFocus));
 	}

@@ -4,6 +4,7 @@ AbilityBall.pushback = 20;
 AbilityBall.cooldown = 1;
 
 function AbilityBall.OnCreate (userId, actionId)
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating FireBall");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local playerAimingDeviceEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1)
@@ -28,6 +29,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	waterCollider:SetDisturbInterval(0.3);
 	waterCollider:SetRadius(2);
 	if Global.IsClient then
+		local particleComp = ParticleEmitter.New(self, "fireball");
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
@@ -44,22 +46,22 @@ function AbilityBall.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
-	
-	if type == PhysicsType.TYPE_PLAYER then
+
+	local targetPlayerComponent = entity:GetPlayerComponent();
+	local abilityOwnerNetwork = self:GetNetwork();
+	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+
+	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 		local hitPos = entity:GetTransformation():GetPos();
 		local selfPos = self:GetTransformation():GetPos();
 		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.pushback);
 		
 		-- Deal damage to the colliding player
 		local health = entity:GetHealth();
-		local targetPlayerComponent = entity:GetPlayerComponent();
 		
-		local abilityOwnerNetwork = self:GetNetwork();
-		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
-		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-		
-		if not health:IsDead() and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+		if not health:IsDead() then
 			local network = entity:GetNetwork();
 			local receiverId = network:GetUserId();
 			
