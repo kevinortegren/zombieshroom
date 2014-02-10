@@ -33,7 +33,7 @@ namespace RootForce
 
 		std::string displayModes = "[";
 		SDL_DisplayMode displayMode;
-		for(unsigned i = 0; i < SDL_GetNumDisplayModes(0); i++)
+		for(int i = 0; i < SDL_GetNumDisplayModes(0); i++)
 		{
 			SDL_GetDisplayMode(0, i, &displayMode);
 			if(displayMode.format == SDL_PIXELFORMAT_RGB888 && displayMode.refresh_rate == 60)

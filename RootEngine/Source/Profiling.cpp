@@ -6,7 +6,6 @@ namespace RootEngine
 	Profiling::Profiling()
 		: m_time(0.0f), m_frames(0)
 	{
-		
 	}
 
 	Profiling::~Profiling()
@@ -128,6 +127,29 @@ namespace RootEngine
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
 	{
 		m_debugOverlay = p_debugOverlay;
+	}
+
+	void Profiling::BeginGPUTimer()
+	{
+		glBeginQuery(GL_TIME_ELAPSED, m_queryID);
+	}
+
+	double Profiling::EndGPUTimer()
+	{
+		glEndQuery(GL_TIME_ELAPSED);
+		GLint done = 0;
+		while(!done)
+		{
+			glGetQueryObjectiv(m_queryID, GL_QUERY_RESULT_AVAILABLE, &done);
+		}
+		GLuint64 elapsedTime;
+		glGetQueryObjectui64v(m_queryID, GL_QUERY_RESULT, &elapsedTime);
+		return elapsedTime/1000000.0;
+	}
+
+	void Profiling::InitQuery()
+	{
+		glGenQueries(1, &m_queryID);
 	}
 
 #endif

@@ -74,18 +74,53 @@ void main()
 		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
 		refractionDepth = texelFetch(g_Depth, ivec2(gl_FragCoord.xy), 0).r;
 	}
-
+/*
 	//Reflection calculations
-	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
+	vec3 posV				= (viewMatrix * vec4(gEyeWorldPos, 1.0f)).xyz;
+	vec3 refV				= normalize(reflect(normalize(posV), viewNormal));
+	vec3 posRefV			= posV + refV;
+	vec3 posRefS			= (projectionMatrix * vec4(posRefV, 1.0f)).xyz / posRefV.z;
+	vec3 refS 				= posRefS - vec3(screenTexCoord, (gl_FragCoord.z*2-1)/gl_FragCoord.w;
+	float scalefactor		= 0.00139f / length(refS.xy);
+	refS					*= scalefactor;
+	vec3 currOffsetS		= vec3(screenTexCoord, (gl_FragCoord.z*2-1)/gl_FragCoord.w) + refS;
+	currOffsetS.xy 			= vec2(currOffsetS.x * 0.5 + 0.5, currOffsetS.y * 0.5 + 0.5);
+   	vec3 lastOffsetS 		= vec3(screenTexCoord, (gl_FragCoord.z*2-1)/gl_FragCoord.w);
+   	lastOffsetS.xy 			= vec2(lastOffsetS.x * 0.5 + 0.5, lastOffsetS.y * 0.5 + 0.5);
+   	refS 					= vec3(refS.x * 0.5 , refS.y * 0.5, refS.z);
+   	int numSamples			= 1000;
+   	int ncurrSample			= 0;
+*/
+   	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW				= reflect(incidentW, normalMap);
-	vec3 reflectionColor	= texture(g_CubeMap, refW).rgb;
+	refW.z = -refW.z;
+   	vec3 finalResult 		= texture(g_CubeMap, refW).rgb;
+/*
+   	float currSample;
+
+   	while(ncurrSample < numSamples)
+   	{
+   		currSample = texture(g_Depth, currOffsetS.xy).r;
+   		if(currSample < currOffsetS.z)
+   		{
+   			finalResult = texture(g_LA, currOffsetS.xy).rgb;
+   			ncurrSample = numSamples + 1;
+   		}
+   		else
+   		{
+   			++ncurrSample;
+   			currOffsetS += refS;
+   		}
+   	}
+*/
+	vec3 reflectionColor = finalResult;
 
 	//Calculate fresnel factor
 	float ndotl		= max(dot(normalize(gEyeWorldPos - WorldPos_FS_in), normalMap), 0.0f);
 	float fresnel	= Fresnel(ndotl, 0.2f, 5.0f);
 
 	//Diffuse water color
-	vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0f).rgb; 
+	//vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0f).rgb; 
 
 	//Lerp water color and refraction color
 	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
