@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
 				particleSystem->Process();	
-				waterSystem->Process();
+				//waterSystem->Process();
 				shadowSystem->Process();			
 				renderingSystem->Process();
 
