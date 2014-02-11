@@ -143,7 +143,7 @@ namespace RootForce
 			glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
 			
 			float nearPlane = 1.0f;
-			float lookAtDistance = glm::length(centerInViewSpace - m_maxWorldZ) + nearPlane;
+			float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
 			float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
 			float farPlane = lookAtDistance + radius;
 			

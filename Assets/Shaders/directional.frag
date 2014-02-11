@@ -22,6 +22,7 @@ struct DirectionalLight
 
 in vec2 ex_TexCoord;
 in DirectionalLight ex_Light;
+in vec3 sunPosition;
 
 // GBuffer.
 uniform sampler2D g_Diffuse;
@@ -72,12 +73,9 @@ vec3 GetVSPositionFromDepth()
 	return (sPos.xyz / sPos.w);
 }
 
-vec2 FindBlocker(vec3 coord, int useCascade)
+vec3 FindBlocker(vec3 coord, int useCascade, float offset)
 {
-	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
-	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
-	float offset = length(penumbraSize);
-	float searchWidth = (5*coord.z)*(5*coord.z) * offset;
+	float searchWidth = 2 * offset;
 	//float searchWidth = 
 	float blockersum = 0;
 	float numblockers = 0;
@@ -94,7 +92,7 @@ vec2 FindBlocker(vec3 coord, int useCascade)
 	}
 
 	float avgBlockerDepth = blockersum / numblockers;
-	return vec2(avgBlockerDepth, numblockers);
+	return vec3(avgBlockerDepth, numblockers, searchWidth);
 }
 
 float PenumbraSize(float lightspaceFragDepth, float blockerDepth)
@@ -114,19 +112,22 @@ float PCF_Filter(vec3 coord, int useCascade, float filterRadiusUV)
 	return sum / PCF_NUM_SAMPLES;
 }
 
-float PCSS(vec3 coord, int useCascade)
+float PCSS(vec3 coord, float fragmentZLightSpace, int useCascade)
 {
-	vec2 blockerData = FindBlocker(coord, useCascade); //x is avgBlockerDepth, y is numblockers
+	vec4 penumbraSize = vec4(0.1, 0.0, 0.0, 0.0);
+	penumbraSize = shadowCasterViewProjectionMatrix[useCascade] * penumbraSize;
+	float offset = length(penumbraSize);
+	vec3 blockerData = FindBlocker(vec3(coord.xy, coord.z + 0.0001), useCascade, offset); //x is avgBlockerDepth, y is numblockers
 	if(blockerData.y < 1)
 	{
-		//return 1.0; //Early out since no blockers
+		return 1.0; //Early out since no blockers
 	}
 
 	float penumbraRatio = PenumbraSize(coord.z, blockerData.x);
-	float filterRadiusUV = penumbraRatio * 1.27 / coord.z; //Constant should be tweaked
+	float filterRadiusUV = min(blockerData.z, offset*0.2 + (penumbraRatio * 700000 * offset / fragmentZLightSpace)); //Constant should be tweaked
 
 
-	return blockerData.y / 16;
+	//return blockerData.y / 16;
 	return PCF_Filter(coord, useCascade, filterRadiusUV);
 }
 
@@ -177,9 +178,10 @@ void main() {
 	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
 	occluderDepth = shadowCoord.z - occluderDepth;
 	
-	float distanceFromFragmentToLight = length(position - (-1)*ex_Light.LightDirection) / 200;
 
-	visibility = PCSS(shadowCoord.xyz, useCascade);
+	float distanceFromFragmentToLight = length(position - sunPosition);
+
+	visibility = PCSS(shadowCoord.xyz, distanceFromFragmentToLight, useCascade);
 
 	
 	//shadowCoord /= shadowCoord.w; //unnecessary because orthographic
@@ -192,7 +194,7 @@ void main() {
 	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
-	out_Color = vec4(diffuse_color + spec_color + 0.5*colors[useCascade], 1.0);
+	out_Color = vec4(diffuse_color + spec_color, 1.0);
 
 	if(shadowCoord.x <= 0 || shadowCoord.x >= 1 || shadowCoord.y <= 0 || shadowCoord.y >= 1)
 	{
@@ -200,5 +202,4 @@ void main() {
 	}
 
 	out_Color *= visibility;
-	out_Color = vec4(1.0) * distanceFromFragmentToLight;
 }

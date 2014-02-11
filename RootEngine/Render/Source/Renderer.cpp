@@ -163,7 +163,7 @@ namespace Render
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 1024, 1024);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height, &m_gbuffer);
@@ -589,7 +589,7 @@ namespace Render
 			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
-		
+
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
 
