@@ -183,7 +183,7 @@ namespace RootForce
 
 		// Cull static geometry.
 		m_quadTree.m_culledEntities.clear();
-		m_quadTree.Cull(frustrum, m_quadTree.GetRoot());
+		m_quadTree.CullEntities(frustrum, m_quadTree.GetRoot());
 
 		for(auto itr = m_quadTree.m_culledEntities.begin(); itr != m_quadTree.m_culledEntities.end(); ++itr)
 		{
@@ -196,7 +196,7 @@ namespace RootForce
 			job.m_renderPass = renderable->m_pass;
 			job.m_params = renderable->m_params;
 
-			m_engineContext->m_renderer->AddRenderJob(job);
+			//m_engineContext->m_renderer->AddRenderJob(job);
 		}
 	}
 

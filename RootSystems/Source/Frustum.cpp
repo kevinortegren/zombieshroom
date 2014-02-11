@@ -179,17 +179,12 @@ namespace RootForce
 				continue;
 			}
 
-			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
-			{
-				continue;
-			}
-
 			if(glm::dot(plane, glm::vec4(p_box.m_maxX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
 			{
 				continue;
 			}
 
-			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
+			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_maxZ, 1.0f)) >= 0.0f)
 			{
 				continue;
 			}

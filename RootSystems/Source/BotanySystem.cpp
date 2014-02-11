@@ -6,10 +6,15 @@ namespace RootForce
 {
 	void BotanySystem::Initialize()
 	{
+		// Load rendering effects.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
 
 		// Calculate AABB of painted entities.
-		CalculatePaintedAABB();
+		// TODO: Export bounds.
+		/*CalculatePaintedAABB();
+
+		m_width = m_aabb.m_maxX - m_aabb.m_minX;
+		m_height = m_aabb.m_maxZ - m_aabb.m_minZ;
 
 		m_view = glm::lookAt(glm::vec3(0,1,0), glm::vec3(0,0,0), glm::vec3(0,0,1));
 
@@ -23,7 +28,18 @@ namespace RootForce
 		max.z = (int)pow(2, ceil(log(max.z)/log(2)));
 
 		m_proj = glm::ortho(min.x, max.x, min.z, max.z, -max.y, -min.y);
+
+		int plantGridWidth = m_width / BOTANY_CELL_SIZE;
+		int plantGridHeight = m_height / BOTANY_CELL_SIZE;
+
+		m_floatDistrubution = std::uniform_real_distribution<float>(0.0f, 1.0f);*/
 	}
+
+	void BotanySystem::SetQuadTree(QuadTree* p_quadTree)
+	{
+		m_quadTree = p_quadTree;
+	}
+
 
 	void BotanySystem::CalculatePaintedAABB()
 	{
@@ -98,9 +114,6 @@ namespace RootForce
 		m_aabb.m_minY = minY;
 		m_aabb.m_maxZ = maxZ;
 		m_aabb.m_minZ = minZ;
-
-		m_width = m_aabb.m_maxX - m_aabb.m_minX;
-		m_height = m_aabb.m_maxZ - m_aabb.m_minZ;
 	}
 
 	void BotanySystem::DensityRenderToTexture(RootForce::RenderingSystem* m_renderingSystem)
@@ -156,7 +169,7 @@ namespace RootForce
 		// Restore backbuffer.
 		m_engineContext->m_renderer->SetRenderToTexture(nullptr);
 
-		range = m_world->GetGroupManager()->GetEntitiesInGroup("Painted");
+		/*range = m_world->GetGroupManager()->GetEntitiesInGroup("Painted");
 		for(auto itr = range.first; itr != range.second; ++itr)
 		{
 			ECS::Entity* entity = (*itr).second;
@@ -168,18 +181,53 @@ namespace RootForce
 			material->m_textures[Render::TextureSemantic::TEXTUREMAP] = m_density->GetTexture();
 		}
 
-		m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Player"))->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_density->GetTexture();
+		m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Player"))->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_density->GetTexture();*/
 	}
 
 	void BotanySystem::Process()
 	{
 		m_aabb.DebugDraw(m_engineContext->m_renderer, glm::vec3(1,1,0), glm::mat4(1.0f));
 
+		// Get eye camera.
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
+		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+
+		m_quadTree->m_culledNodes.clear();
+
+		// Cull terrain chunks.
+		m_quadTree->CullNodes(frustrum, m_quadTree->GetRoot());
+
+		for(auto itr = m_quadTree->m_culledNodes.begin(); itr != m_quadTree->m_culledNodes.end(); ++itr)
+		{
+			AABB bounds = (*itr)->GetBounds();
+			glm::vec3 center = bounds.GetCenter();
+			float d = glm::distance(transform->m_position, center);
+			
+			for(auto entity = (*itr)->m_terrainEntityIndices.begin(); entity != (*itr)->m_terrainEntityIndices.end(); ++entity)
+			{
+				RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*entity)]);
+
+				Render::RenderJob job;
+				job.m_mesh = renderable->m_model->m_meshes[0];
+				
+				job.m_material = renderable->m_material;
+				job.m_flags = renderable->m_renderFlags;
+				job.m_renderPass = renderable->m_pass;
+				job.m_params = renderable->m_params;
+
+				m_engineContext->m_renderer->AddRenderJob(job);
+			}
+		}
+
+
+		/*
 		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Player"));
 
 		float u = (transform->m_position.x - m_aabb.m_minX) / m_width;
 		float v = (transform->m_position.z - m_aabb.m_minZ) / m_height;
 		
 		std::cout << "U: " << 1 - u << "V: " << v << std::endl;
+		*/
 	}
 }
