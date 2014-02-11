@@ -53,6 +53,7 @@ namespace RootForce
 				AbilityChargeStart,
 				AbilityChargeDone,
 				AbilityChannelingDone,
+				AbilityChargeAndChannelingDone,
 				AbilityCooldownOff,
 				DestroyEntities,
 				SpawnUser,
@@ -184,6 +185,19 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
+		/*
+			Sent by a client when the ability charging is interrupted. Forwarded by the server.
+		*/
+		struct AbilityChargeAndChannelingDone
+		{
+			Network::UserID_t User;
+			Network::ActionID_t Action;
+			float Time;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
 
 		/*
 			Sent to the client whenever the cooldown for a certain ability on the server reaches zero.

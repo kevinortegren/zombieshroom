@@ -649,6 +649,11 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
+					if (m.Action.SelectedAbility < 0 || m.Action.SelectedAbility > 3)
+					{
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::FATAL_ERROR, "Invalid selected ability: %d", m.Action.SelectedAbility);
+					}
+
 					// Check whether the user is a local client (we are letting local clients have authority of updating action components right now)
 					// TODO: See if we can update local client on server instead...
 					NetworkEntityID id;
@@ -748,7 +753,7 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStart);
 								m.Serialize(true, &bs);
 
 								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
@@ -789,7 +794,7 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStop);
 								m.Serialize(true, &bs);
 
 								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
@@ -814,7 +819,8 @@ namespace RootForce
 							if (player != nullptr)
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-								action->ActionID = m.Action;
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->AbilityTime = lastHalfPing;
 							}
 						}
@@ -831,7 +837,7 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeStart);
 								m.Serialize(true, &bs);
 
 								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
@@ -856,6 +862,8 @@ namespace RootForce
 							if (player != nullptr)
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::START_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
 							}
@@ -873,7 +881,7 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
 								m.Serialize(true, &bs);
 
 								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
@@ -898,6 +906,8 @@ namespace RootForce
 							if (player != nullptr)
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
 							}
@@ -916,7 +926,52 @@ namespace RootForce
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
+				{
+					NetworkMessage::AbilityChargeAndChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+								action->ActionID = m.Action;
+								action->AbilityTime = m.Time;
+							}
+						}
+					
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (i != m.User && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
 								m.Serialize(true, &bs);
 
 								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);

@@ -28,8 +28,12 @@ namespace RootForce
 		enum AbilityState
 		{
 			OFF,
+			START_CHARGING,
 			CHARGING,
-			CHANNELING
+			START_CHANNELING,
+			CHANNELING,
+			STOP_CHANNELING,
+			STOP_CHARGING_AND_CHANNELING
 		};
 	}
 

@@ -87,6 +87,83 @@ namespace RootSystems
 				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
 				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
 				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
+
+				switch (player->AbilityState)
+				{
+					case RootForce::AbilityState::START_CHARGING:
+					{
+						player->AbilityState = RootForce::AbilityState::CHARGING;
+					} break;
+
+					case RootForce::AbilityState::START_CHANNELING:
+					{
+						player->AbilityState = RootForce::AbilityState::CHANNELING;
+
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->ExecuteScript();
+					} break;
+
+					case RootForce::AbilityState::STOP_CHANNELING:
+					{
+						player->AbilityState = RootForce::AbilityState::OFF;
+
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->ExecuteScript();
+
+						action->AbilityTime = 0.0f;
+
+						// Put ability on cooldown and decrease charges.
+						player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
+						player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
+
+						player->AbilityScripts[player->SelectedAbility].Charges--;
+						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
+							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+					} break;
+
+					case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
+					{
+						player->AbilityState = RootForce::AbilityState::OFF;
+
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->ExecuteScript();
+
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->ExecuteScript();
+
+						action->AbilityTime = 0.0f;
+
+						// Put ability on cooldown and decrease charges.
+						player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
+						player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
+
+						player->AbilityScripts[player->SelectedAbility].Charges--;
+						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
+							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+					} break;
+				}
+			}
+
+			/*
+			player->SelectedAbility = action->SelectedAbility - 1;
+			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
+			if (abilityName != "")
+			{
+				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
+				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
+				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
 				switch (player->AbilityState)
 				{
 					case RootForce::AbilityState::CHARGING:
@@ -241,6 +318,7 @@ namespace RootSystems
 					} break;
 				}
 			}
+			*/
 
 			// Count down cooldown on all abilities.
 			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
