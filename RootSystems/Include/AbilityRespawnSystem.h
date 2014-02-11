@@ -14,14 +14,21 @@ namespace RootForce
 		float Timer;
 		AbilityInfo CurrentAbility;
 		bool Claimed;
+
+		AbilityRespawnComponent()
+		{
+			Timer = 0;
+			CurrentAbility = AbilityInfo();
+			Claimed = false;
+		}
 	};
 
 	class AbilityRespawnSystem : public ECS::EntitySystem
 	{
 	public:
-		AbilityRespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+		AbilityRespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext, std::string p_workingDir)
 			: ECS::EntitySystem(p_world)
-			, m_engineContext(p_engineContext)
+			, m_engineContext(p_engineContext), m_workingDir(p_workingDir)
 		{ 
 			SetUsage<RootForce::AbilityRespawnComponent>();
 		}
@@ -34,5 +41,6 @@ namespace RootForce
 
 		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
 		std::vector<std::string> m_levelAbilities;
+		std::string m_workingDir;
 	};
 }

@@ -19,21 +19,21 @@ namespace RootForce
 		float dt = m_world->GetDelta();
 		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
 
-		if(respawn->Claimed && !respawn->CurrentAbility.Name.compare(""))
+		if(respawn->Claimed && respawn->CurrentAbility.Name.compare("") != 0)
 		{
 			respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 			m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity); //Remove the render component to show that there is no ability to claim
-			respawn->Timer = 30; //30 second timer until a new ability respawns
+			respawn->Timer = 30.0f; //30 second timer until a new ability respawns
 		}
-		else if(respawn->Timer <= 0 && respawn->CurrentAbility.Name.compare(""))
+		else if(respawn->Timer <= 0.0f && respawn->CurrentAbility.Name.compare("") == 0)
 		{
-			unsigned chosenSpawn = rand()%m_levelAbilities.size()-1;
+			unsigned chosenSpawn = rand()%m_levelAbilities.size();
 			respawn->CurrentAbility.Name = m_levelAbilities.at(chosenSpawn);
 			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
 			respawn->CurrentAbility.OnCooldown = false;
 
 			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
-			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilityRespawnPoint");
+			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
 			renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
 			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->GetTexture(respawn->CurrentAbility.Name);
 			renderable->m_material->m_effect = m_engineContext->m_resourceManager->GetEffect("Mesh");
@@ -43,7 +43,7 @@ namespace RootForce
 
 	void AbilityRespawnSystem::LoadAbilities(std::string p_abilityPack)
 	{
-		std::ifstream file(p_abilityPack);
+		std::ifstream file(m_workingDir + "Assets/AbilityPacks/" + p_abilityPack + ".txt");
 		if(file.is_open())
 		{
 			std::string temp;
@@ -51,6 +51,7 @@ namespace RootForce
 			{
 				m_levelAbilities.push_back(temp);
 			}
+			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Succesfully loaded the ability pack");
 		}
 		else
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Ability pack not found");
