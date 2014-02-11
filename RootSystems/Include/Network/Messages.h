@@ -48,7 +48,12 @@ namespace RootForce
 				UserDisconnected,
 				UserInformation,
 				PlayerCommand,
-				CooldownOff,
+				JumpStart,
+				JumpStop,
+				AbilityChargeStart,
+				AbilityChargeDone,
+				AbilityChannelingDone,
+				AbilityCooldownOff,
 				DestroyEntities,
 				SpawnUser,
 				LoadMap,
@@ -125,9 +130,65 @@ namespace RootForce
 		};
 
 		/*
+			Sent by a client when a jump is started. Forwarded by the server.
+		*/
+		struct JumpStart
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by a client when a jump has ended. Forwarded by the server.
+		*/
+		struct JumpStop
+		{
+			Network::UserID_t User;
+			float Time;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by a client when an ability is activated and the charging starts. Forwarded by the server.
+		*/
+		struct AbilityChargeStart
+		{
+			Network::UserID_t User;
+			Network::ActionID_t Action;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by a client when the ability charge is done or interrupted. Forwarded by the server.
+		*/
+		struct AbilityChargeDone
+		{
+			Network::UserID_t User;
+			Network::ActionID_t Action;
+			float Time;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by a client when the ability channeling is done or interrupted. Forwarded by the server.
+		*/
+		struct AbilityChannelingDone
+		{
+			Network::UserID_t User;
+			Network::ActionID_t Action;
+			float Time;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
 			Sent to the client whenever the cooldown for a certain ability on the server reaches zero.
 		*/
-		struct CooldownOff
+		struct AbilityCooldownOff
 		{
 			Network::UserID_t User;
 			uint8_t AbilityIndex;

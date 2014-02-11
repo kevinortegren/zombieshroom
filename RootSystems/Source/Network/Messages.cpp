@@ -64,7 +64,38 @@ namespace RootForce
 				p_bs->Serialize(p_writeToBitstream, AimingDeviceOrientation[i]);
 		}
 
-		void CooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		void JumpStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void JumpStop::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityChargeStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+		}
+
+		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityCooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
 			p_bs->Serialize(p_writeToBitstream, AbilityIndex);

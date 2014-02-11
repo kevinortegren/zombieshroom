@@ -9,7 +9,9 @@ function AbilityBall.ChargeDone(time, userId, actionId)
 end
 
 function AbilityBall.ChannelingDone(time, userId, actionId)
-	AbilityBall.OnCreate(userId, actionId);
+	if time >= AbilityBall.chargeTime then
+		AbilityBall.OnCreate(userId, actionId);
+	end
 end
 
 function AbilityBall.OnCreate (userId, actionId)

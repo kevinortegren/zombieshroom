@@ -218,6 +218,8 @@ namespace RootForce
 		// Set the server peer to the action system, if we are a server.
 		if (m_networkContext.m_server != nullptr)
 			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();

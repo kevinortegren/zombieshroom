@@ -102,9 +102,26 @@ namespace RootSystems
 
 							player->AbilityState = RootForce::AbilityState::CHANNELING;
 
-							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
-
 							// TODO: Consider temporarily setting cooldown here to prevent double-action-per-frame cheese.
+
+							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+							{
+								// Send this action to the server
+								RootForce::NetworkMessage::AbilityChargeDone m;
+								m.User = network->ID.UserID;
+								m.Action = action->ActionID;
+								m.Time = action->AbilityTime;
+
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeDone);
+								m.Serialize(true, &bs);
+
+								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+							}
+
+							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 						}
 					} break;
 
@@ -130,6 +147,23 @@ namespace RootSystems
 							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 
+							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+							{
+								// Send this action to the server
+								RootForce::NetworkMessage::AbilityChannelingDone m;
+								m.User = network->ID.UserID;
+								m.Action = action->ActionID;
+								m.Time = action->AbilityTime;
+
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChannelingDone);
+								m.Serialize(true, &bs);
+
+								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+							}
+
 							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 						}
 					} break;
@@ -148,7 +182,24 @@ namespace RootSystems
 								g_engineContext.m_script->AddParameterNumber(action->ActionID);
 								g_engineContext.m_script->ExecuteScript();
 
-								g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
+								if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+								{
+									// Send this action to the server
+									RootForce::NetworkMessage::AbilityChargeDone m;
+									m.User = network->ID.UserID;
+									m.Action = action->ActionID;
+									m.Time = action->AbilityTime;
+
+									RakNet::BitStream bs;
+									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+									bs.Write(RakNet::GetTime());
+									bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeDone);
+									m.Serialize(true, &bs);
+
+									m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+								}
+
+								//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 							}
 
 							// Call on channeling done since the ability is up.
@@ -167,6 +218,23 @@ namespace RootSystems
 							player->AbilityScripts[player->SelectedAbility].Charges--;
 							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
+
+							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+							{
+								// Send this action to the server
+								RootForce::NetworkMessage::AbilityChannelingDone m;
+								m.User = network->ID.UserID;
+								m.Action = action->ActionID;
+								m.Time = action->AbilityTime;
+
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChannelingDone);
+								m.Serialize(true, &bs);
+
+								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+							}
 
 							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
 						}
@@ -191,14 +259,14 @@ namespace RootSystems
 					//g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Cooldown on ability %d for player %d is off", i, network->ID.UserID);
 
 					// Send notification about finished cooldown to the client.		
-					RootForce::NetworkMessage::CooldownOff m;
+					RootForce::NetworkMessage::AbilityCooldownOff m;
 					m.User = network->ID.UserID;
 					m.AbilityIndex = i;
 
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::CooldownOff);
+					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityCooldownOff);
 					m.Serialize(true, &bs);
 
 					m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
@@ -314,6 +382,11 @@ namespace RootSystems
 	void ActionSystem::SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer)
 	{
 		m_serverPeer = p_serverPeer;
+	}
+
+	void ActionSystem::SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer)
+	{
+		m_clientPeer = p_clientPeer;
 	}
 
 }

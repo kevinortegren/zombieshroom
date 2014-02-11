@@ -59,8 +59,8 @@ namespace RootForce
 			};
 		}
 
-		const SequenceID_t SID_PLAYER_ENTITY = 0;
-		const SequenceID_t SID_AIMING_DEVICE_ENTITY = 1;
+		const SequenceID_t SEQUENCE_PLAYER_ENTITY = 0;
+		const SequenceID_t SEQUENCE_AIMING_DEVICE_ENTITY = 1;
 
 		/*
 			Uniquely identifies an entity across all peers.

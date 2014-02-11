@@ -173,6 +173,22 @@ namespace RootForce
 					{
 						playerComponent->AbilityState = AbilityState::CHARGING;
 						action->ActionID = s_nextActionID++;
+
+						if (m_clientPeer != nullptr)
+						{
+							// Send this action to the server
+							RootForce::NetworkMessage::AbilityChargeStart m;
+							m.User = network->ID.UserID;
+							m.Action = action->ActionID;
+
+							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
+							bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeStart);
+							m.Serialize(true, &bs);
+
+							m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+						}
 					}
 
 					if (playerComponent->AbilityState != AbilityState::OFF)
@@ -188,6 +204,21 @@ namespace RootForce
 				{
 					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
 					{
+						if (action->JumpTime <= 0.0f && m_clientPeer != nullptr)
+						{
+							// Send this action to the server
+							RootForce::NetworkMessage::JumpStart m;
+							m.User = network->ID.UserID;
+
+							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
+							bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStart);
+							m.Serialize(true, &bs);
+
+							m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+						}
+
 						// Start/Keep jumping
 						action->JumpTime += dt;
 					}
@@ -195,6 +226,22 @@ namespace RootForce
 				break;
 			case PlayerAction::JUMP_RELEASED:
 				{
+					if (m_clientPeer != nullptr)
+					{
+						// Send this action to the server
+						RootForce::NetworkMessage::JumpStop m;
+						m.User = network->ID.UserID;
+						m.Time = action->JumpTime;
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStop);
+						m.Serialize(true, &bs);
+
+						m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					}
+
 					action->JumpTime = 0.0f;
 				}
 				break;
