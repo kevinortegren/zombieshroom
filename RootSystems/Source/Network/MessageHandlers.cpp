@@ -308,6 +308,8 @@ namespace RootForce
 						if (player != nullptr)
 						{
 							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = m.Action;
 							action->AbilityTime = lastHalfPing;
 						}
@@ -325,6 +327,8 @@ namespace RootForce
 						if (player != nullptr)
 						{
 							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::START_CHANNELING;
 							action->ActionID = m.Action;
 							action->AbilityTime = m.Time;
 						}
@@ -342,6 +346,27 @@ namespace RootForce
 						if (player != nullptr)
 						{
 							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+							action->ActionID = m.Action;
+							action->AbilityTime = m.Time;
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
+				{
+					NetworkMessage::AbilityChargeAndChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 							action->ActionID = m.Action;
 							action->AbilityTime = m.Time;
 						}
