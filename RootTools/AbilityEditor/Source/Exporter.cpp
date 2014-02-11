@@ -216,29 +216,33 @@ namespace AbilityEditorNameSpace
 					AbilityComponents::Damage* damage = static_cast<AbilityComponents::Damage*>(p_component);
 					p_emitter << YAML::Key << "Damage" << YAML::Value << damage->m_damage;
 				}
+				break;
 			case AbilityComponents::ComponentType::KNOCKBACK:
 				{
 					AbilityComponents::Knockback* knockback = static_cast<AbilityComponents::Knockback*>(p_component);
 					p_emitter << YAML::Key << "Knockback" << YAML::Value << knockback->m_knockback;
 				}
+				break;
 			case AbilityComponents::ComponentType::STATCHANGECASTER:
 				{
 					AbilityComponents::StatChangeCaster* statCaster = static_cast<AbilityComponents::StatChangeCaster*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << statCaster->m_speed;
-					p_emitter << YAML::Key << "JumpHeight" << YAML::Value << statCaster->m_jumpHeight;
-					p_emitter << YAML::Key << "KnockbackResistance" << YAML::Value << statCaster->m_knockbackResistance;
+					p_emitter << YAML::Key << "CasterSpeed" << YAML::Value << statCaster->m_speed;
+					p_emitter << YAML::Key << "CasterJumpHeight" << YAML::Value << statCaster->m_jumpHeight;
+					p_emitter << YAML::Key << "CasterKnockbackResistance" << YAML::Value << statCaster->m_knockbackResistance;
 				}
+				break;
 			case AbilityComponents::ComponentType::STATCHANGETARGET:
 				{
 					AbilityComponents::StatChangeTarget* statTarget = static_cast<AbilityComponents::StatChangeTarget*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << statTarget->m_speed;
-					p_emitter << YAML::Key << "JumpHeight" << YAML::Value << statTarget->m_jumpHeight;
-					p_emitter << YAML::Key << "KnockbackResistance" << YAML::Value << statTarget->m_knockbackResistance;
+					p_emitter << YAML::Key << "TargetSpeed" << YAML::Value << statTarget->m_speed;
+					p_emitter << YAML::Key << "TargetJumpHeight" << YAML::Value << statTarget->m_jumpHeight;
+					p_emitter << YAML::Key << "TargetKnockbackResistance" << YAML::Value << statTarget->m_knockbackResistance;
 				}
+				break;
 			case AbilityComponents::ComponentType::PHYSICS:
 				{
 					AbilityComponents::Physics* physCon = static_cast<AbilityComponents::Physics*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
+					p_emitter << YAML::Key << "PhysicsSpeed" << YAML::Value << physCon->m_speed;
 					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
 					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;

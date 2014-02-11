@@ -52,8 +52,9 @@ namespace AbilityEditorNameSpace
 				m_compNames.append("Ability Particle");
 				m_compNames.append("Damage");
 				m_compNames.append("Knockback");
-				m_compNames.append("Stat Change");
-				m_compNames.append("Physics Controlled");
+				m_compNames.append("Stat Change (Caster)");
+				m_compNames.append("Stat Change (Target)");
+				m_compNames.append("Physics");
 				m_compNames.append("Explosive"); //Maybe not?
 			}
 		} static g_componentNameList;

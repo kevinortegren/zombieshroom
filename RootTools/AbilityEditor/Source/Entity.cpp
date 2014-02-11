@@ -4,6 +4,11 @@ namespace AbilityEditorNameSpace
 {
 	Entity::Entity(QString p_name)
 	{
+		m_charges = 0;
+		m_cooldown = 0.0f;
+		m_chargeTime = 0.0f;
+		m_channelingTime = 0.0f;
+		m_duration = 0.0f;
 		for(int i = 0 ; i < AbilityComponents::ComponentType::END_OF_ENUM; i++)
 		{
 			m_nameToEnumMapper[AbilityComponents::g_componentNameList.m_compNames.at(i)] = (AbilityComponents::ComponentType::ComponentType)i;

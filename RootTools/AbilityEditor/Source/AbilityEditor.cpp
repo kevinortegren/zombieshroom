@@ -94,7 +94,7 @@ void AbilityEditor::Init()
 	connect(ui.abilityNameEdit, SIGNAL(editingFinished()), this, SLOT(ChangeAbilityName()));
 	
 	connect(ui.cooldownSpinbox, SIGNAL(valueChanged(double)), this, SLOT(SetCooldown(double)));
-	connect(ui.chargesSpinbox, SIGNAL(valueChanged(double)), this, SLOT(SetCharges(double)));
+	connect(ui.chargesSpinbox, SIGNAL(valueChanged(int)), this, SLOT(SetCharges(int)));
 	connect(ui.chargingSpinbox, SIGNAL(valueChanged(double)), this, SLOT(SetChargeTime(double)));
 	connect(ui.channelingSpingbox, SIGNAL(valueChanged(double)), this, SLOT(SetChannelingTime(double)));
 	connect(ui.durationSpinbox, SIGNAL(valueChanged(double)), this, SLOT(SetDuration(double)));
@@ -294,9 +294,9 @@ void AbilityEditor::SetCooldown( double p_cooldown )
 	m_entity->SetCooldown((float)p_cooldown);
 }
 
-void AbilityEditor::SetCharges( double p_charges )
+void AbilityEditor::SetCharges( int p_charges )
 {
-	m_entity->SetCharges((float)p_charges);
+	m_entity->SetCharges(p_charges);
 }
 
 void AbilityEditor::SetChargeTime( double p_chargeTime )

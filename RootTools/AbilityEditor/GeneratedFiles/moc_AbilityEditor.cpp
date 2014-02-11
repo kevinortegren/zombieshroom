@@ -95,7 +95,7 @@ static const uint qt_meta_data_AbilityEditor[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Double,   12,
-    QMetaType::Void, QMetaType::Double,   12,
+    QMetaType::Void, QMetaType::Int,   12,
     QMetaType::Void, QMetaType::Double,   12,
     QMetaType::Void, QMetaType::Double,   12,
     QMetaType::Void, QMetaType::Double,   17,
@@ -117,7 +117,7 @@ void AbilityEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 6: _t->BrowseName(); break;
         case 7: _t->ChangeAbilityName(); break;
         case 8: _t->SetCooldown((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 9: _t->SetCharges((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 9: _t->SetCharges((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 10: _t->SetChargeTime((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 11: _t->SetChannelingTime((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 12: _t->SetDuration((*reinterpret_cast< double(*)>(_a[1]))); break;

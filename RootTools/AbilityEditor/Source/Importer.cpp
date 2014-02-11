@@ -40,7 +40,7 @@ namespace AbilityEditorNameSpace
 			//Entity* entity = new Entity(abilityName.c_str());
 			
 			//Charges
-			float charges;
+			int charges;
 			doc[counter]["Charges"] >> charges;
 			counter++;
 			p_entity->SetCharges(charges);
@@ -271,40 +271,40 @@ namespace AbilityEditorNameSpace
 		case AbilityComponents::ComponentType::STATCHANGECASTER:
 			{
 				AbilityComponents::StatChangeCaster* tempcomp = new AbilityComponents::StatChangeCaster();
-				if(p_node.FindValue("Speed"))
-					p_node["Speed"] >> tempcomp->m_speed;
-				if(p_node.FindValue("JumpHeight"))
-					p_node["JumpHeight"] >> tempcomp->m_jumpHeight;
-				if(p_node.FindValue("KnockbackResistance"))
-					p_node["KnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				if(p_node.FindValue("CasterSpeed"))
+					p_node["CasterSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("CasterJumpHeight"))
+					p_node["CasterJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("CasterKnockbackResistance"))
+					p_node["CasterKnockbackResistance"] >> tempcomp->m_knockbackResistance;
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
 		case AbilityComponents::ComponentType::STATCHANGETARGET:
 			{
 				AbilityComponents::StatChangeTarget* tempcomp = new AbilityComponents::StatChangeTarget();
-				if(p_node.FindValue("Speed"))
-					p_node["Speed"] >> tempcomp->m_speed;
-				if(p_node.FindValue("JumpHeight"))
-					p_node["JumpHeight"] >> tempcomp->m_jumpHeight;
-				if(p_node.FindValue("KnockbackResistance"))
-					p_node["KnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				if(p_node.FindValue("TargetSpeed"))
+					p_node["TargetSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("TargetJumpHeight"))
+					p_node["TargetJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("TargetKnockbackResistance"))
+					p_node["TargetKnockbackResistance"] >> tempcomp->m_knockbackResistance;
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
 		case AbilityComponents::ComponentType::PHYSICS:
 			{
 				AbilityComponents::Physics* tempcomp = new AbilityComponents::Physics();
-				if(p_node.FindValue("Speed"))
-					p_node["Speed"] >> tempcomp->m_speed;
-				if(p_node.FindValue("Mass"))
-					p_node["Mass"] >> tempcomp->m_mass;
-				if(p_node.FindValue("Gravity"))
+				if(p_node.FindValue("PhysicsSpeed"))
+					p_node["PhysicsSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("PhysicsMass"))
+					p_node["PhysicsMass"] >> tempcomp->m_mass;
+				if(p_node.FindValue("PhysicsGravity"))
 				{
 					float x,y,z;
-					p_node["Gravity"][0] >> x;
-					p_node["Gravity"][1] >> y;
-					p_node["Gravity"][2] >> z;
+					p_node["PhysicsGravity"][0] >> x;
+					p_node["PhysicsGravity"][1] >> y;
+					p_node["PhysicsGravity"][2] >> z;
 					tempcomp->m_gravity = QVector3D(x,y,z);
 				}
 

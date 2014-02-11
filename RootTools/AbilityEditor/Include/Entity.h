@@ -30,8 +30,8 @@ namespace AbilityEditorNameSpace
 		void SetCooldown(float p_cooldown) { m_cooldown = p_cooldown; }
 		float GetCooldown() { return m_cooldown; }
 
-		void SetCharges(float p_charges) { m_charges = p_charges; }
-		float GetCharges() { return m_charges; }
+		void SetCharges(int p_charges) { m_charges = p_charges; }
+		int GetCharges() { return m_charges; }
 
 		void SetChargeTime(float p_chargeTime) { m_chargeTime = p_chargeTime; }
 		float GetChargeTime() { return m_chargeTime; }
@@ -46,7 +46,7 @@ namespace AbilityEditorNameSpace
 	private:
 		QString m_name;
 		float m_cooldown;
-		float m_charges;
+		int m_charges;
 		float m_chargeTime;
 		float m_channelingTime;
 		float m_duration;

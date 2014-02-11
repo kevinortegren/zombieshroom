@@ -20,6 +20,8 @@ namespace AbilityEditorNameSpace
 	private:
 		void WriteVariables();
 		void WriteOnCreate(OnCreate* p_onCreate);
+		void WriteChargeDone();
+		void WriteChannelingDone();
 		void WriteOnCollide(OnCreate* p_onCreate, OnCollide* p_onCollide);
 		void WriteOnDestroy(OnDestroy* p_onDestroy);
 
