@@ -22,7 +22,7 @@ uniform sampler2D g_Depth;
 
 out vec4 out_Color;
 layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
+layout (location = 1) out vec2 normals;
 layout (location = 2) out vec4 background;
 
 void main()
@@ -38,7 +38,7 @@ void main()
     vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
 	diffuse = vec4(frag_color.xyz, specTerm);
-	normals = vec3(bumpNormal * 0.5 + 0.5);
+	normals = bumpNormal.xy;
 	background.w = 0.0f;
 
 	if(frag_color.a < 0.5)

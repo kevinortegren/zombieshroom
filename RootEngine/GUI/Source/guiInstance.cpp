@@ -12,22 +12,20 @@ namespace RootEngine
 	{
 		guiInstance* guiInstance::s_gui = nullptr;
 		RootEngine::SubsystemSharedContext g_context;
+
 		void guiInstance::Startup(void)
 		{
-			m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
-			g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
-			m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
-			m_core->set_surface_factory(m_glTexSurfaceFactory);
-			m_dispatcher = new Dispatcher();
 		}
 
 
 		void guiInstance::Shutdown(void)
 		{
+			m_shouldTerminate = true;
+			m_thread.join();
+
 			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 			{
-				m_viewBuffer.at(i)->Stop();
-				m_viewBuffer.at(i)->Destroy();
+				delete m_viewBuffer.at(i);
 			}
 			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
 
@@ -36,23 +34,15 @@ namespace RootEngine
 			delete m_glTexSurfaceFactory;
 		}
 
-		void guiInstance::Initialize( int p_width, int p_height )
+		void guiInstance::Initialize( int p_width, int p_height, SDL_Window* p_window, SDL_GLContext p_glContext )
 		{
 			m_width = p_width;
 			m_height = p_height;
+			m_window = p_window;
+			m_glContext = p_glContext;
   
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
-
-			// Prepare a texture for output
-			glActiveTexture(GL_TEXTURE0);
-			glGenTextures(1, &m_texture);
-			glBindTexture(GL_TEXTURE_2D, m_texture);
-
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
@@ -73,27 +63,28 @@ namespace RootEngine
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL+2*sizeof(float));
 			// Done, unbind VAO
 			glBindVertexArray(0);
+			
+			m_shouldTerminate = false;
+			m_thread = std::thread(&guiInstance::RunThread, this);
 		}
 
 		void guiInstance::Update()
 		{
-			m_core->Update();
+			
 		}
 
-		void guiInstance::Render(Awesomium::WebView* p_view)
+		void guiInstance::Render(WebView* p_view)
 		{
 			m_program->Apply();
 
 			glBindVertexArray(m_vertexArrayBuffer);
-
+			m_drawMutex.lock();
 			glActiveTexture(GL_TEXTURE0);
-
-			//for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-			//{
-				SurfaceToTexture((GLTextureSurface*)p_view->surface());
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			//}
-
+			SurfaceToTexture((GLTextureSurface*)((WebViewImpl*)p_view)->m_webView->surface());
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			m_drawMutex.unlock();
+			
 			glBindVertexArray(0);
 		}
 
@@ -105,43 +96,40 @@ namespace RootEngine
 			return s_gui;
 		}
 
-		Awesomium::WebView* guiInstance::LoadURL( std::string p_path )
+		WebView* guiInstance::LoadURL( std::string p_callbackObjectName, std::string p_path )
 		{
 			Awesomium::WebURL url(Awesomium::WSLit(("file://" + m_workingDir + "Assets/GUI/" + p_path).c_str()));
 			//Awesomium::WebURL url(Awesomium::WSLit("http://www.google.com"));
 
-			Awesomium::WebView* temp = m_core->CreateWebView(m_width, m_height);
+			WebViewImpl* temp = new WebViewImpl(p_callbackObjectName, m_dispatcher);
 
-			temp->SetTransparent(true);
+			m_loadListMutex.lock();
+			m_loadList.push_back(std::pair<WebViewImpl*,Awesomium::WebURL>(temp,url));
+			m_loadListMutex.unlock();
 
-			temp->LoadURL(url);
-
-			m_viewBuffer.push_back(temp);
+			while(!temp->m_webView)
+				Sleep(100);
 
 			return temp;
 
 		}
 
-		void guiInstance::DestroyView( Awesomium::WebView* p_view )
+		void guiInstance::DestroyView( WebView* p_view )
 		{
-
-			p_view->Stop();
-			p_view->Destroy();
+			m_viewBufferMutex.lock();
 			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 				if(m_viewBuffer.at(i) == p_view)
-					m_viewBuffer.erase(m_viewBuffer.begin() + i);
+					m_viewBuffer.erase(m_viewBuffer.begin() + i--);
+			m_viewBuffer.shrink_to_fit();
+			m_viewBufferMutex.unlock();
 		}
 
 		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
 		{
+			SDL_GLContext tmp = SDL_GL_GetCurrentContext();
+			GLuint texture = p_surface->GetTexture();
 			if(p_surface)
-				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
-
-			/*if(m_view->IsLoading() || p_surface == 0 || !p_surface->is_dirty())
-				return;*/
-
-			//glInvalidateTexImage(m_texture, 0);
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, p_surface->buffer());
+				glBindTexture(GL_TEXTURE_2D, texture);
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -254,6 +242,90 @@ namespace RootEngine
 			return -1;
 		}
 
+		void guiInstance::RunThread()
+		{
+			try
+			{
+				SDL_GL_MakeCurrent(m_window, m_glContext);
+				// Initialize Awesomium
+				m_glTexSurfaceFactory = new GLTextureSurfaceFactory();
+				m_dispatcher = new Dispatcher();
+				m_core = Awesomium::WebCore::Initialize(Awesomium::WebConfig());
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::INIT_PRINT, "GUI subsystem initialized!");
+				m_core->set_surface_factory(m_glTexSurfaceFactory);
+			
+				uint64_t oldTime = SDL_GetPerformanceCounter();
+
+				while(!m_shouldTerminate)
+				{
+					m_loadListMutex.lock();
+						for(auto pair : m_loadList)
+						{
+							pair.first->m_webView = m_core->CreateWebView(m_width, m_height);
+
+							pair.first->m_webView->SetTransparent(true);
+
+							pair.first->m_webView->LoadURL(pair.second);
+					
+							m_viewBuffer.push_back(pair.first);
+						}
+						m_loadList.clear();
+					m_loadListMutex.unlock();
+
+					m_viewBufferMutex.lock();
+						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+							if(m_viewBuffer[i])
+								m_viewBuffer[i]->Update();
+					m_viewBufferMutex.unlock();
+
+					m_drawMutex.lock();
+						m_core->Update();
+						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
+							{
+								GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+								if(surface)
+									surface->UpdateTexture(); // Force a texture update
+							}
+						// Wait until texture updates are complete before releasing the lock
+						GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+						GLenum result; 
+						while(true) 
+						{ 
+							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
+						} 
+					m_drawMutex.unlock();
+				
+					uint64_t newTime = SDL_GetPerformanceCounter();
+					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
+					oldTime = newTime;
+					if(dt < 0.032f)
+					{
+						long time = (long)floorf((0.032f-dt)*1000);
+						Sleep(time);
+					}
+				}
+				SDL_GL_DeleteContext(m_glContext);
+			}
+			catch(...)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Awesomium update thread has crashed due to interference in the Force!");
+			}
+		}
+		
+		void guiInstance::ResizeAllViews(int p_width, int p_height)
+		{
+			m_width = p_width;
+			m_height = p_height;
+
+			m_drawMutex.lock();
+				m_viewBufferMutex.lock();
+					for(auto view : m_viewBuffer )
+						view->m_webView->Resize(p_width, p_height);
+				m_viewBufferMutex.unlock();
+			m_drawMutex.unlock();
+		}
 
 		void guiTest::OnDocumentReady(Awesomium::WebView* called, const Awesomium::WebURL& url)
 		{

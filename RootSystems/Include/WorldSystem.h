@@ -17,17 +17,20 @@ namespace RootForce
 
 #ifndef COMPILE_LEVEL_EDITOR
 		void LoadWorld(const std::string& p_worldName);
+		void CreatePlayerCamera();
 #endif
 
-		void SetAmbientLight(glm::vec3 p_ambient);
+		void SetAmbientLight(glm::vec4 p_ambient);
 		void CreateSun();
 		void CreateSkyBox();
-		void CreatePlayerCamera();
+		
 		void AddStaticEntitiesToPhysics();
-
+		
 		void Process();
 		void ShowDebug(bool p_value);
-		RootForce::AABB GetWorldAABB(){return m_quadTree.GetRoot()->GetBounds();}
+
+		QuadTree* GetQuadTree();
+
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;

@@ -27,6 +27,13 @@ namespace Render
 			TRANSPOSITION,
 			ORBITSPEED,
 			ORBITRADIUS,
+			MK1,
+			MK2,
+			MK3,
+			XMAX,
+			YMAX,
+			EYEWORLDPOS,
+			DX,
 		};
 	}
 
@@ -47,7 +54,12 @@ namespace Render
 			COMPUTEIN,
 			COMPUTEOUT,
 			SHADOWDEPTHPCF,
-			SHADOWDEPTH
+			SHADOWDEPTH,
+			COMPUTENORMAL,
+			TEXTURE_RN,
+			TEXTURE_GN,
+			TEXTURE_BN
+
 		};
 	}
 }

@@ -24,6 +24,6 @@ namespace RootForce
 	private:
 		NetworkContext& m_networkContext;
 		SharedSystems& m_sharedSystems;
-		Awesomium::WebView* m_loadingScreen;
+		RootEngine::GUISystem::WebView* m_loadingScreen;
 	};
 }

@@ -11,41 +11,41 @@
 #include <windows.h>
 void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* param) 
 {
-	Render::g_context.m_logger->LogText("message: %s", message);
-	Render::g_context.m_logger->LogText("type: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "message: %s", message);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT,"type: ");
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR:
-		Render::g_context.m_logger->LogText("ERROR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("DEPRECATED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		Render::g_context.m_logger->LogText("UNDEFINED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		Render::g_context.m_logger->LogText("PORTABILITY");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		Render::g_context.m_logger->LogText("PERFORMANCE");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		Render::g_context.m_logger->LogText("OTHER");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "OTHER");
 		break;
 	}
 
-	Render::g_context.m_logger->LogText("id: %i", id);
-	Render::g_context.m_logger->LogText("severity: ");
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "id: %i", id);
+	Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "severity: ");
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_LOW:
-		Render::g_context.m_logger->LogText("LOW");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "LOW");
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
-		Render::g_context.m_logger->LogText("MEDIUM");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "MEDIUM");
 		break;
 	case GL_DEBUG_SEVERITY_HIGH:
-		Render::g_context.m_logger->LogText("HIGH");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "HIGH");
 		break;
 	}
 }
@@ -83,21 +83,23 @@ namespace Render
 	{
 		m_window = p_window;
 
-		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
+		int flags = 0;
 #if defined (_DEBUG)
-		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
+		flags = SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, flags);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
-			g_context.m_logger->LogText("%s", SDL_GetError());
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "%s", SDL_GetError());
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -254,7 +256,13 @@ namespace Render
 
 		InitialziePostProcesses();
 
-		m_resources.PrintResourceUsage();
+		m_sjobCount[0] = 0;
+		m_sjobCount[1] = 0;
+		m_sjobCount[2] = 0;
+		m_sjobCount[3] = 0;
+
+		//Generate query for gpu timer
+		g_context.m_profiler->InitQuery();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -280,12 +288,18 @@ namespace Render
 		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
 		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
 		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
+		s_sizes[Semantic::MK1]			= sizeof(float);
+		s_sizes[Semantic::MK2]			= sizeof(float);
+		s_sizes[Semantic::MK3]			= sizeof(float);
+		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
+		s_sizes[Semantic::DX]			= sizeof(float);
 
 		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
 		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
 		s_textureSlots[TextureSemantic::SPECULAR] = 1;
 		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
 		s_textureSlots[TextureSemantic::NORMAL] = 2;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW] = 3;
 		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
 		s_textureSlots[TextureSemantic::DEPTH] = 4;
@@ -295,6 +309,7 @@ namespace Render
 		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
+
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -302,17 +317,36 @@ namespace Render
 		m_glowDevice.Init(this, m_width, m_height);		
 	}
 
-	void GLRenderer::SetResolution(int p_width, int p_height)
+	void GLRenderer::SetResolution(bool p_fullscreen, int p_width, int p_height)
 	{
-		SDL_SetWindowSize(m_window, p_width, p_height);	
-
-		m_gbuffer.Resize(p_width, p_height);
-		m_lighting.Resize(p_width, p_height);
-
-		glViewport(0, 0, p_width, p_height);
-
 		m_width = p_width;
 		m_height = p_height;
+
+		if(p_fullscreen)
+		{
+			SDL_DisplayMode nativeMode;
+			SDL_GetDesktopDisplayMode(0, &nativeMode);
+
+			m_width = nativeMode.w;
+			m_height = nativeMode.h;
+
+			SDL_SetWindowDisplayMode(m_window, &nativeMode);
+		}
+
+		SDL_SetWindowSize(m_window, m_width, m_height);
+		SDL_SetWindowFullscreen(m_window, p_fullscreen);
+		SDL_SetWindowSize(m_window, m_width, m_height);
+
+		glViewport(0, 0, m_width, m_height);
+
+		m_gbuffer.Resize(m_width, m_height);
+		m_lighting.Resize(m_width, m_height);
+		m_glowDevice.Resize(m_width, m_height);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		m_color0->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
@@ -367,15 +401,11 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for(int i = 0; i < 2; i++)
+		PROFILE("Geometry Pass", g_context.m_profiler);
 		{
+			for(int i = 0; i < 2; i++)
 			{
-				PROFILE("Geometry Pass", g_context.m_profiler);
 				GeometryPass(i);
-			}
-
-			{
-				PROFILE("Lighting Pass", g_context.m_profiler);
 				LightingPass();	
 			}
 		}
@@ -401,6 +431,11 @@ namespace Render
 		{
 			PROFILE("Output", g_context.m_profiler);
 			Output();
+		}
+
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
 		}
 
 		m_allocator.Clear();
@@ -437,31 +472,21 @@ namespace Render
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
+		// Clear framebuffers.
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		}
+
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
 			glDrawBuffers(0, NULL);
+			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
 
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-			// Buffer Per Frame data.
-			struct
-			{
-				glm::mat4 m_projection;
-				glm::mat4 m_view;
-				glm::mat4 m_invView;
-				glm::mat4 m_invProj;
-				glm::mat4 m_invViewProj;
-
-			} matrices;
-
-			matrices.m_view = m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-			matrices.m_projection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i];
-			matrices.m_invView = glm::inverse(m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i]);
-			glm::mat4 viewProjection = m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
-
-			m_cameraBuffer->BufferSubData(0, sizeof(matrices), &matrices);
 
 			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 			{
@@ -592,10 +617,10 @@ namespace Render
 
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
-
+		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 		m_lighting.Clear();
 		m_lighting.Process(m_fullscreenQuad);
-
+		//m_gbuffer.m_depthTexture->Unbind(10);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
@@ -707,6 +732,11 @@ namespace Render
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
 	}
 
+	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
+	{
+		m_resources.PrintResourceUsage(p_bufferUsage, p_textureUsage, p_numBuffers, p_numTextures);
+	}
+
 	BufferInterface* GLRenderer::CreateBuffer(GLenum p_type)
 	{ 
 		return m_resources.CreateBuffer(p_type);
@@ -747,6 +777,11 @@ namespace Render
 		return m_resources.CreateEffect();
 	}
 
+	std::string GLRenderer::GetStringFromMaterial(Material* p_material)
+	{
+		return m_resources.GetStringFromMaterial(p_material);
+	}
+
 	ParticleSystem* GLRenderer::CreateParticleSystem()
 	{
 		return m_particles.Create(this);
@@ -777,14 +812,35 @@ namespace Render
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
+				{
 					(*texture).second->Bind((*texture).first);
+					(*texture).second->BindImage((*texture).first);
+				}
 		}
 
 		for(auto tech = p_job->m_effect->GetTechniques().begin(); tech != p_job->m_effect->GetTechniques().end(); ++tech)
 		{
+			for(auto param = p_job->m_params.begin(); param != p_job->m_params.end(); ++param)
+			{	
+				m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+			}
+
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
+			//g_context.m_profiler->BeginGPUTimer();
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			//double time = g_context.m_profiler->EndGPUTimer();
+			//g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Compute time: %f ms", time);
+		}
+
+		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
+		{
+			if((*texture).second != nullptr)
+			{
+				(*texture).second->Unbind((*texture).first);
+				(*texture).second->UnBindImage((*texture).first);
+			}
 		}
 	}
 

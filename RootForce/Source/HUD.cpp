@@ -16,10 +16,10 @@ namespace RootForce
 	{
 	}
 
-	void HUD::Initialize( Awesomium::WebView* p_view, RootEngine::GUISystem::DispatcherInterface* p_dispatcher, RootEngine::GameSharedContext* p_engineContext )
+	void HUD::Initialize( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext* p_engineContext )
 	{
 		m_view = p_view;
-		m_chatSystem->Initialize(p_view, p_dispatcher, p_engineContext);
+		m_chatSystem->Initialize(p_view, p_engineContext);
 
 		SetValue("PlayerScore", "0");
 		SetValue("PlayerDeaths", "0");
@@ -58,8 +58,7 @@ namespace RootForce
 
 	void HUD::Update()
 	{
-
-		m_view->ExecuteJavascript(Awesomium::WSLit(m_commandBuffer.c_str()), Awesomium::WSLit(""));
+		m_view->BufferJavascript(m_commandBuffer);
 		m_commandBuffer = "";
 	}
 

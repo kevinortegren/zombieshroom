@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv5.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level2/RootIslandsv7.mb</source_data>
     </contributor>
-    <created>2014-01-30T11:35:45</created>
-    <modified>2014-01-30T11:35:45</modified>
+    <created>2014-02-10T07:58:47</created>
+    <modified>2014-02-10T07:58:47</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -224,7 +224,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="RootIslandsv5">
+    <visual_scene id="VisualSceneNode" name="RootIslandsv7">
       <node id="Roots3" name="Roots3" type="NODE">
         <translate sid="translate">0 0 0</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>

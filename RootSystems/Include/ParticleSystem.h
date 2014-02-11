@@ -16,6 +16,7 @@ namespace RootForce
 	{
 		std::vector<RootEngine::ParticleSystemStruct*> m_particleSystems;
 		std::vector<Render::ParticleSystemInterface*> m_systems;
+		std::string m_name;
 
 		~ParticleEmitter()
 		{

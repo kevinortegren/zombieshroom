@@ -138,9 +138,12 @@ void main() {
 	vec3 diffuse = rt0.xyz;
 	float specTerm = rt0.w;
 
-	vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
+	vec2 vert_normal = texture(g_Normals, ex_TexCoord).xy;
 	
-	vec3 normal = normalize(vert_normal.xyz*2-1); 
+	vec3 normal;
+	normal.xy = vert_normal.xy;
+    normal.z = sqrt(1-dot(normal.xy, normal.xy));
+
 	vec3 position = GetVSPositionFromDepth();
 
 	vec4 worldPosition = invView * vec4(position, 1.0);
@@ -191,7 +194,7 @@ void main() {
 	vec3 viewDir = -normalize(position);
 	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
+	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
 	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
 
 	out_Color = vec4(diffuse_color + spec_color, 1.0);

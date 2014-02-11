@@ -28,6 +28,7 @@ namespace RootForce
 
 		bool CheckBox(const AABB& p_box);
 		bool CheckBoxEx(const AABB& p_box);
+		bool CheckSphere(const glm::vec3& p_center, float radius);
 
 		Plane m_planes[6];
 		PlaneEx m_planesEx[6];

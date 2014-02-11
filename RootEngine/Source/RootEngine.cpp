@@ -69,12 +69,8 @@ namespace RootEngine
 		m_gui = nullptr;
 		m_physics = nullptr;
 		m_scriptEngine = nullptr;
-
 #endif
 		m_renderer = nullptr;
-
-		m_memTracker = new MemoryTracker(&g_logger);
-		m_profiler.SetMemoryTracker(m_memTracker);
 
 		// Setup the subsystem context
 		m_subsystemSharedContext.m_logger = &g_logger;
@@ -90,7 +86,7 @@ namespace RootEngine
 
 #ifndef COMPILING_LEVEL_EDITOR
 				
-			m_subsystemSharedContext.m_debugOverlay = &m_debugOverlay;
+		m_subsystemSharedContext.m_debugOverlay = &m_debugOverlay;
 
 		// Load external dlls.
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
@@ -120,6 +116,10 @@ namespace RootEngine
 		// TODO: Load the rest of the submodules
 
 		// Setup the game context
+
+		m_memTracker = new MemoryTracker(&g_logger);
+		m_profiler.SetMemoryTracker(m_memTracker);
+		m_profiler.SetRenderInterface(m_renderer);
 
 		m_gameSharedContext.m_logger = &g_logger;
 		m_gameSharedContext.m_memTracker = m_memTracker;

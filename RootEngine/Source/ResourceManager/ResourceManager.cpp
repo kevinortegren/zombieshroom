@@ -57,10 +57,12 @@ namespace RootEngine
 	{
 		if(m_models.find(p_path) == m_models.end())
 		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[MODEL] Starting to load: '%s'", p_path.c_str());
 			Model* model = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE");
 
 			if(model)
 			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[MODEL] Loaded: '%s'", p_path.c_str());
 				m_models[p_path] = model;
 				return m_models[p_path];
 			}
@@ -88,7 +90,7 @@ namespace RootEngine
 			}
 			else
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded script: '%s.lua'", p_scriptName.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[SCRIPT] Loaded: '%s.lua'", p_scriptName.c_str());
 			}
 			m_scripts[p_scriptName] = p_scriptName;
 			
@@ -121,7 +123,7 @@ namespace RootEngine
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Loading effect: %s", p_path.c_str());
 
 			m_effectImporter->Load(m_workingDirectory + "Assets\\Effects\\" + p_path + ".effect");
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded effect: '%s'", p_path.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[EFFECT] Loaded: '%s'", p_path.c_str());
 			m_effects[p_path] = m_effectImporter->m_effect;
 
 			if(m_effectImporter->m_effect)
@@ -157,7 +159,7 @@ namespace RootEngine
 
 			if(tex)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "Loaded texture '%s'", p_path.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[TEXTURE] Loaded: '%s'", p_path.c_str());
 				m_textures[p_path] = tex;
 				return m_textures[p_path];
 			}
@@ -185,6 +187,7 @@ namespace RootEngine
 			
 			if(particleStruct.size() != 0)
 			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[PARTICLE] Loaded: '%s'", p_handle.c_str());
 				m_particles[p_handle] = particleStruct;
 				return particleStruct;
 			}

@@ -30,6 +30,8 @@ namespace RootForce
 			DIRECTIONALLIGHT,
 			SERVERINFORMATION,
 			CLIENT,
+			RAGDOLL,
+			WATERCOLLIDER,
 		};
 	}
 }

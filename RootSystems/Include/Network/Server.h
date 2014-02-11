@@ -16,8 +16,11 @@ namespace RootForce
 		class Server
 		{
 		public:
-			Server(Logging* p_logger, ECS::World* p_world, WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated);
+			Server(Logging* p_logger, ECS::World* p_world, const RootSystems::ServerConfig& p_config);
 			~Server();
+
+			// For initializing server components on an existing server socket
+			void Initialize( WorldSystem* p_worldSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated );
 
 			const NetworkMessage::ServerInformation& GetServerInformation() const;
 			void SetServerInformation(const NetworkMessage::ServerInformation& p_information);
