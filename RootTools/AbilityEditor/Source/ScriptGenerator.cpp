@@ -32,6 +32,7 @@ namespace AbilityEditorNameSpace
 			thedir.mkdir(p_name);
 		}*/
 		m_entity = p_entity;
+
 		p_filePath.chop(p_filePath.size() - p_filePath.lastIndexOf("/") - 1);
 
 		m_name = p_name.toStdString();
@@ -40,18 +41,7 @@ namespace AbilityEditorNameSpace
 		//Begin writing in the file
 		m_file << m_name << " = {};\n";
 		
-		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
-		{
-			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::OFFENSIVEABILITY)
-			{
-				m_damage = ((AbilityComponents::OffensiveAbility*)m_entity->GetComponents()->at(j))->m_damage;
-				m_knockback = ((AbilityComponents::OffensiveAbility*)m_entity->GetComponents()->at(j))->m_knockbackPower;
-				m_file << m_name << ".damage = " << m_damage << ";\n";
-				m_file << m_name << ".pushback = " << m_knockback << ";\n";
-			}
-			//TODO : Add cooldown stuff
-		}
-		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
+		WriteVariables(m_entity);
 
 		m_file << "\n";
 
@@ -71,8 +61,8 @@ namespace AbilityEditorNameSpace
 
 		m_file << "function " << m_name << ".OnCreate (userId, actionId)\n";
 		m_file << "\tlocal self = Entity.New();\n";
-		m_file << "\tlocal playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
-		m_file << "\tlocal posVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetTransformation():GetPos();\n";
+		m_file << "\tlocal casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
+		m_file << "\tlocal posVec = casterEnt:GetTransformation():GetPos();\n";
 		m_file << "\tlocal frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
 		m_file << "\tlocal networkEnt = Network.New(self, userId, actionId);\n";
 		m_file << "\n";
@@ -316,5 +306,28 @@ namespace AbilityEditorNameSpace
 		m_file << "\tCollision.RemoveObjectFromWorld(collision);\n"; //Should this be here?
 		m_file << "end\n";
 	}
+
+	void ScriptGenerator::WriteVariables()
+	{
+		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
+		{
+			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::DAMAGE)
+			{
+				m_damage = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(j))->m_damage;
+				m_file << m_name << ".damage = " << m_damage << ";\n";
+			}
+			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
+			{
+				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(j))->m_knockback;
+				m_file << m_name << ".pushback = " << m_knockback << ";\n";
+			}
+		}
+		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
+		m_file << m_name << ".charges = " << m_entity->GetCharges() << ";\n";
+		m_file << m_name << ".chargeTime = " << m_entity->GetChargeTime() << ";\n";
+		m_file << m_name << ".channelingTime = " << m_entity->GetChannelingTime() << ";\n";
+		m_file << m_name << ".duration = " << m_entity->GetDuration() << ";\n";
+	}
+
 }
 

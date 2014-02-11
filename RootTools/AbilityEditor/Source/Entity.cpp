@@ -32,15 +32,21 @@ namespace AbilityEditorNameSpace
 		switch (p_type)
 		{
 
-		case AbilityComponents::ComponentType::TRANSFORM:
+		case AbilityComponents::ComponentType::STARTPOS:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Transform();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StartPos();
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::COLLISION:			
+		case AbilityComponents::ComponentType::TARGPOS:			
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Collision();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::TargetPos();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::VELOCITY:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Velocity();
 				AddComponent(temp);
 			}
 			break;
@@ -56,21 +62,39 @@ namespace AbilityEditorNameSpace
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
-			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::PhysicsControlled();
-				AddComponent(temp);
-			}
-			break;
 		case AbilityComponents::ComponentType::ABILITYPARTICLE:
 			{
 				AbilityComponents::MainComponent* temp = new AbilityComponents::AbilityParticle();
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::OFFENSIVEABILITY:
+		case AbilityComponents::ComponentType::DAMAGE:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::OffensiveAbility();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Damage();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::KNOCKBACK:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Knockback();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGECASTER:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StatChangeCaster();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGETARGET:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StatChangeTarget();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::PHYSICS:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Physics();
 				AddComponent(temp);
 			}
 			break;

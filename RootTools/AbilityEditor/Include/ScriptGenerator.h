@@ -18,6 +18,7 @@ namespace AbilityEditorNameSpace
 		void GenerateScript(QString p_filePath, QString p_name, Entity* p_entity, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy);
 
 	private:
+		void WriteVariables();
 		void WriteOnCreate(OnCreate* p_onCreate);
 		void WriteOnCollide(OnCreate* p_onCreate, OnCollide* p_onCollide);
 		void WriteOnDestroy(OnDestroy* p_onDestroy);

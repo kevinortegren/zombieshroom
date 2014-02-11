@@ -23,7 +23,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTreeView>
@@ -44,9 +44,9 @@ public:
     QAction *actionQuit;
     QAction *actionGenerate_Script;
     QAction *actionEntity;
+    QAction *actionNew_Ability;
     QWidget *centralWidget;
-    QPushButton *buttonNameBrowser;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QGridLayout *gridLayout;
     CustomCompListWidget *listAbilityComponents;
     QTabWidget *toolBoxWidget;
@@ -70,12 +70,20 @@ public:
     QVBoxLayout *verticalLayout_3;
     CustomTreeWidget *treeOnDestroy;
     QWidget *propertyWidget;
-    QWidget *widget1;
+    QWidget *layoutWidget1;
     QHBoxLayout *horizontalLayout;
-    QLineEdit *abilityNameEdit;
-    QSpacerItem *horizontalSpacer;
+    QLabel *chargesLable;
+    QSpinBox *chargesSpinbox;
+    QLabel *chargingLable;
+    QDoubleSpinBox *chargingSpinbox;
+    QLabel *channelingLable;
+    QDoubleSpinBox *channelingSpingbox;
+    QLabel *durationLable;
+    QDoubleSpinBox *durationSpinbox;
     QLabel *cooldownLabel;
     QDoubleSpinBox *cooldownSpinbox;
+    QLineEdit *abilityNameEdit;
+    QPushButton *buttonNameBrowser;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QStatusBar *statusBar;
@@ -84,7 +92,7 @@ public:
     {
         if (AbilityEditorClass->objectName().isEmpty())
             AbilityEditorClass->setObjectName(QStringLiteral("AbilityEditorClass"));
-        AbilityEditorClass->resize(783, 738);
+        AbilityEditorClass->resize(791, 738);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -102,25 +110,24 @@ public:
         actionGenerate_Script->setObjectName(QStringLiteral("actionGenerate_Script"));
         actionEntity = new QAction(AbilityEditorClass);
         actionEntity->setObjectName(QStringLiteral("actionEntity"));
+        actionNew_Ability = new QAction(AbilityEditorClass);
+        actionNew_Ability->setObjectName(QStringLiteral("actionNew_Ability"));
         centralWidget = new QWidget(AbilityEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        buttonNameBrowser = new QPushButton(centralWidget);
-        buttonNameBrowser->setObjectName(QStringLiteral("buttonNameBrowser"));
-        buttonNameBrowser->setGeometry(QRect(585, 9, 189, 23));
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(10, 39, 771, 661));
-        gridLayout = new QGridLayout(widget);
+        layoutWidget = new QWidget(centralWidget);
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 69, 771, 631));
+        gridLayout = new QGridLayout(layoutWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        listAbilityComponents = new CustomCompListWidget(widget);
+        listAbilityComponents = new CustomCompListWidget(layoutWidget);
         listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
 
         gridLayout->addWidget(listAbilityComponents, 0, 0, 1, 1);
 
-        toolBoxWidget = new QTabWidget(widget);
+        toolBoxWidget = new QTabWidget(layoutWidget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
@@ -161,7 +168,7 @@ public:
 
         gridLayout->addWidget(toolBoxWidget, 0, 1, 1, 1);
 
-        OnTabWidget = new QTabWidget(widget);
+        OnTabWidget = new QTabWidget(layoutWidget);
         OnTabWidget->setObjectName(QStringLiteral("OnTabWidget"));
         tabOnCreate = new QWidget();
         tabOnCreate->setObjectName(QStringLiteral("tabOnCreate"));
@@ -202,42 +209,79 @@ public:
 
         gridLayout->addWidget(OnTabWidget, 1, 0, 1, 1);
 
-        propertyWidget = new QWidget(widget);
+        propertyWidget = new QWidget(layoutWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
 
         gridLayout->addWidget(propertyWidget, 1, 1, 1, 1);
 
-        widget1 = new QWidget(centralWidget);
-        widget1->setObjectName(QStringLiteral("widget1"));
-        widget1->setGeometry(QRect(20, 10, 371, 22));
-        horizontalLayout = new QHBoxLayout(widget1);
+        layoutWidget1 = new QWidget(centralWidget);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 40, 771, 25));
+        horizontalLayout = new QHBoxLayout(layoutWidget1);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        abilityNameEdit = new QLineEdit(widget1);
-        abilityNameEdit->setObjectName(QStringLiteral("abilityNameEdit"));
+        chargesLable = new QLabel(layoutWidget1);
+        chargesLable->setObjectName(QStringLiteral("chargesLable"));
 
-        horizontalLayout->addWidget(abilityNameEdit);
+        horizontalLayout->addWidget(chargesLable, 0, Qt::AlignRight);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        chargesSpinbox = new QSpinBox(layoutWidget1);
+        chargesSpinbox->setObjectName(QStringLiteral("chargesSpinbox"));
 
-        horizontalLayout->addItem(horizontalSpacer);
+        horizontalLayout->addWidget(chargesSpinbox);
 
-        cooldownLabel = new QLabel(widget1);
+        chargingLable = new QLabel(layoutWidget1);
+        chargingLable->setObjectName(QStringLiteral("chargingLable"));
+
+        horizontalLayout->addWidget(chargingLable, 0, Qt::AlignRight);
+
+        chargingSpinbox = new QDoubleSpinBox(layoutWidget1);
+        chargingSpinbox->setObjectName(QStringLiteral("chargingSpinbox"));
+
+        horizontalLayout->addWidget(chargingSpinbox);
+
+        channelingLable = new QLabel(layoutWidget1);
+        channelingLable->setObjectName(QStringLiteral("channelingLable"));
+
+        horizontalLayout->addWidget(channelingLable, 0, Qt::AlignRight);
+
+        channelingSpingbox = new QDoubleSpinBox(layoutWidget1);
+        channelingSpingbox->setObjectName(QStringLiteral("channelingSpingbox"));
+
+        horizontalLayout->addWidget(channelingSpingbox);
+
+        durationLable = new QLabel(layoutWidget1);
+        durationLable->setObjectName(QStringLiteral("durationLable"));
+
+        horizontalLayout->addWidget(durationLable, 0, Qt::AlignRight);
+
+        durationSpinbox = new QDoubleSpinBox(layoutWidget1);
+        durationSpinbox->setObjectName(QStringLiteral("durationSpinbox"));
+
+        horizontalLayout->addWidget(durationSpinbox);
+
+        cooldownLabel = new QLabel(layoutWidget1);
         cooldownLabel->setObjectName(QStringLiteral("cooldownLabel"));
 
-        horizontalLayout->addWidget(cooldownLabel);
+        horizontalLayout->addWidget(cooldownLabel, 0, Qt::AlignRight);
 
-        cooldownSpinbox = new QDoubleSpinBox(widget1);
+        cooldownSpinbox = new QDoubleSpinBox(layoutWidget1);
         cooldownSpinbox->setObjectName(QStringLiteral("cooldownSpinbox"));
 
         horizontalLayout->addWidget(cooldownSpinbox);
 
+        abilityNameEdit = new QLineEdit(centralWidget);
+        abilityNameEdit->setObjectName(QStringLiteral("abilityNameEdit"));
+        abilityNameEdit->setGeometry(QRect(10, 10, 141, 20));
+        buttonNameBrowser = new QPushButton(centralWidget);
+        buttonNameBrowser->setObjectName(QStringLiteral("buttonNameBrowser"));
+        buttonNameBrowser->setGeometry(QRect(590, 10, 189, 23));
         AbilityEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AbilityEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 783, 21));
+        menuBar->setGeometry(QRect(0, 0, 791, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         AbilityEditorClass->setMenuBar(menuBar);
@@ -246,10 +290,14 @@ public:
         AbilityEditorClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
+        menuFile->addAction(actionNew_Ability);
+        menuFile->addSeparator();
         menuFile->addAction(actionSave_As);
         menuFile->addAction(actionSave);
+        menuFile->addSeparator();
         menuFile->addAction(actionLoad);
         menuFile->addAction(actionGenerate_Script);
+        menuFile->addSeparator();
         menuFile->addAction(actionQuit);
 
         retranslateUi(AbilityEditorClass);
@@ -270,7 +318,7 @@ public:
         actionQuit->setText(QApplication::translate("AbilityEditorClass", "Quit", 0));
         actionGenerate_Script->setText(QApplication::translate("AbilityEditorClass", "Generate Script...", 0));
         actionEntity->setText(QApplication::translate("AbilityEditorClass", "Entity", 0));
-        buttonNameBrowser->setText(QApplication::translate("AbilityEditorClass", "Browse name for property manager...", 0));
+        actionNew_Ability->setText(QApplication::translate("AbilityEditorClass", "New Ability", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabComponents), QApplication::translate("AbilityEditorClass", "Components", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabEntities), QApplication::translate("AbilityEditorClass", "Entities", 0));
         toolBoxWidget->setTabText(toolBoxWidget->indexOf(tabConditions), QApplication::translate("AbilityEditorClass", "Conditions", 0));
@@ -283,8 +331,13 @@ public:
         QTreeWidgetItem *___qtreewidgetitem2 = treeOnDestroy->headerItem();
         ___qtreewidgetitem2->setText(0, QApplication::translate("AbilityEditorClass", "Conditions & Entities", 0));
         OnTabWidget->setTabText(OnTabWidget->indexOf(tabOnDestroy), QApplication::translate("AbilityEditorClass", "OnDestroy", 0));
-        abilityNameEdit->setText(QApplication::translate("AbilityEditorClass", "AbilityName", 0));
+        chargesLable->setText(QApplication::translate("AbilityEditorClass", "Charges", 0));
+        chargingLable->setText(QApplication::translate("AbilityEditorClass", "Charging Time", 0));
+        channelingLable->setText(QApplication::translate("AbilityEditorClass", "Channeling Time", 0));
+        durationLable->setText(QApplication::translate("AbilityEditorClass", "Duration", 0));
         cooldownLabel->setText(QApplication::translate("AbilityEditorClass", "Cooldown", 0));
+        abilityNameEdit->setText(QApplication::translate("AbilityEditorClass", "AbilityName", 0));
+        buttonNameBrowser->setText(QApplication::translate("AbilityEditorClass", "Browse name for property manager...", 0));
         menuFile->setTitle(QApplication::translate("AbilityEditorClass", "File", 0));
     } // retranslateUi
 

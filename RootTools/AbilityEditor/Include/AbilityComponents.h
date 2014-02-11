@@ -24,15 +24,19 @@ namespace AbilityEditorNameSpace
 		{
 			enum ComponentType
 			{
-				TRANSFORM,
-				COLLISION,
+				STARTPOS,
+				TARGPOS,
+				VELOCITY,
 				ABILITYMODEL,
 				COLLISIONSHAPE,
 				ABILITYPARTICLE,
-				PHYSICSCONTROLLED,
-				OFFENSIVEABILITY,
-				EXPLOSIVE,
-				END_OF_ENUM
+				DAMAGE,
+				KNOCKBACK,
+				STATCHANGECASTER,
+				STATCHANGETARGET,
+				PHYSICS,
+				EXPLOSIVE, 
+				END_OF_ENUM //TODO : EntityChange
 			};
 		}
 		const struct ComponentNameList
@@ -40,14 +44,17 @@ namespace AbilityEditorNameSpace
 			QStringList m_compNames;
 			ComponentNameList()
 			{
-				m_compNames.append("Transform");
-				m_compNames.append("Collision");
+				m_compNames.append("Start Position");
+				m_compNames.append("Target Position");
+				m_compNames.append("Velocity");
 				m_compNames.append("Ability Model");
 				m_compNames.append("Collision Shape");
 				m_compNames.append("Ability Particle");
+				m_compNames.append("Damage");
+				m_compNames.append("Knockback");
+				m_compNames.append("Stat Change");
 				m_compNames.append("Physics Controlled");
-				m_compNames.append("Offensive Ability");
-				m_compNames.append("Explosive");
+				m_compNames.append("Explosive"); //Maybe not?
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -58,59 +65,41 @@ namespace AbilityEditorNameSpace
 			{
 				m_type = p_type;
 			}
-			virtual void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;			
+			virtual void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;
 			virtual void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;
 		};
 	
-		////////////////////////////////////////////////////////On create components ////////////////////////////////////////////////////////
-		struct Transform: MainComponent
+
+		struct StartPos: MainComponent
 		{ 
-			QVector3D m_rotation;
-			QVector3D m_scale;
-			Transform(QVector3D p_rotation = QVector3D(0,0,0), QVector3D p_scale = QVector3D(1,1,1)): MainComponent(ComponentType::TRANSFORM)
+			QVector3D m_startPos;
+			StartPos(QVector3D p_startPos = QVector3D(0,0,0)): MainComponent(ComponentType::STARTPOS)
 			{
-				m_rotation = p_rotation;
-				m_scale = p_scale;
+				m_startPos = p_startPos;
 			}
-			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
-				QtVariantProperty* rotation, *scale , *x, *y, *z;
+				QtVariantProperty* position, *x, *y, *z; //TODO : show other variables than just absolute positions (caster pos, enemy pos, and so on)
 				QList<QtProperty*> list;
 				QString combinedValue;
 				//Show rotation vector
-				rotation = p_propMan->addProperty(QVariant::String, "Rotation");
+				position = p_propMan->addProperty(QVariant::String, "Start Position");
 				x = p_propMan->addProperty(QVariant::Double, "x");
 				y = p_propMan->addProperty(QVariant::Double, "y");
 				z = p_propMan->addProperty(QVariant::Double, "z");
-				p_propMan->setValue(x, m_rotation.x());
-				p_propMan->setValue(y, m_rotation.y());
-				p_propMan->setValue(z, m_rotation.z());
-				rotation->addSubProperty(x);
-				rotation->addSubProperty(y);
-				rotation->addSubProperty(z);
-				list = rotation->subProperties();
+				p_propMan->setValue(x, m_startPos.x());
+				p_propMan->setValue(y, m_startPos.y());
+				p_propMan->setValue(z, m_startPos.z());
+				position->addSubProperty(x);
+				position->addSubProperty(y);
+				position->addSubProperty(z);
+				list = position->subProperties();
 				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
-				p_propMan->setValue(rotation,combinedValue);
-
-				//show Scale vector
-				scale = p_propMan->addProperty(QVariant::String, "Scale");
-				x = p_propMan->addProperty(QVariant::Double, "x");
-				y = p_propMan->addProperty(QVariant::Double, "y");
-				z = p_propMan->addProperty(QVariant::Double, "z");
-				p_propMan->setValue(x, m_scale.x());
-				p_propMan->setValue(y, m_scale.y());
-				p_propMan->setValue(z, m_scale.z());		
-				scale->addSubProperty(x);
-				scale->addSubProperty(y);
-				scale->addSubProperty(z);
-				list = scale->subProperties();
-				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
-				p_propMan->setValue(scale,combinedValue);
+				p_propMan->setValue(position,combinedValue);
 
 				//Add to browser widget
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(rotation);
-				p_propBrows->addProperty(scale);
+				p_propBrows->addProperty(position);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -121,42 +110,100 @@ namespace AbilityEditorNameSpace
 				subprops = props.at(0)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_rotation[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+					m_startPos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
-				subprops = props.at(1)->subProperties();
-				for(int i = 0; i < subprops.size(); i++)
-				{
-					m_scale[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
-				}
-			
-
 			}
 		};
 
-		struct Collision : MainComponent
-		{
-			bool m_collidesWithWorld;
-			Collision(bool p_colWithWorld = true) : MainComponent(ComponentType::COLLISION)
+		struct TargetPos: MainComponent
+		{ 
+			QVector3D m_targetPos;
+			TargetPos(QVector3D p_targetPos = QVector3D(0,0,0)): MainComponent(ComponentType::TARGPOS)
 			{
-				m_collidesWithWorld = p_colWithWorld;
+				m_targetPos = p_targetPos;
 			}
-			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
-				QtVariantProperty* collidesWithWorld;
+				QtVariantProperty* position, *x, *y, *z; //TODO : show other variables than just absolute positions (caster pos, enemy pos, and so on)
+				QList<QtProperty*> list;
+				QString combinedValue;
+				//Show rotation vector
+				position = p_propMan->addProperty(QVariant::String, "Target Position");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_targetPos.x());
+				p_propMan->setValue(y, m_targetPos.y());
+				p_propMan->setValue(z, m_targetPos.z());
+				position->addSubProperty(x);
+				position->addSubProperty(y);
+				position->addSubProperty(z);
+				list = position->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(position,combinedValue);
 
-				collidesWithWorld = p_propMan->addProperty(QVariant::Bool, "Collides with world" );
-				p_propMan->setValue(collidesWithWorld, m_collidesWithWorld);
+				//Add to browser widget
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(collidesWithWorld);
+				p_propBrows->addProperty(position);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_collidesWithWorld = props.at(0)->valueText().compare("True") == 0 ? true : false;
+
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
+				subprops = props.at(0)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_targetPos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
 			}
 		};
 
+		struct Velocity: MainComponent
+		{ 
+			QVector3D m_velocity;
+			Velocity(QVector3D p_velocity = QVector3D(0,0,0)): MainComponent(ComponentType::VELOCITY)
+			{
+				m_velocity = p_velocity;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
+			{
+				QtVariantProperty* velocity, *x, *y, *z; 
+				QList<QtProperty*> list;
+				QString combinedValue;
+				//Show rotation vector
+				velocity = p_propMan->addProperty(QVariant::String, "Velocity");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_velocity.x());
+				p_propMan->setValue(y, m_velocity.y());
+				p_propMan->setValue(z, m_velocity.z());
+				velocity->addSubProperty(x);
+				velocity->addSubProperty(y);
+				velocity->addSubProperty(z);
+				list = velocity->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(velocity,combinedValue);
+
+				//Add to browser widget
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(velocity);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+
+				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
+				subprops = props.at(0)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_velocity[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
+			}
+		};
 
 		struct AbilityModel : MainComponent
 		{
@@ -325,12 +372,136 @@ namespace AbilityEditorNameSpace
 			}
 		};
 
-		struct PhysicsControlled : MainComponent
+		struct Damage : MainComponent
+		{
+			float m_damage;
+			Damage(float p_damage = 0.0f) : MainComponent(ComponentType::DAMAGE)
+			{
+				m_damage = p_damage;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* damage;
+
+				damage = p_propMan->addProperty(QVariant::String, "Damage" );
+				p_propMan->setValue(damage, m_damage);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(damage);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_damage = p_propMan->variantProperty(props.at(0))->value().toFloat();
+			}
+		};
+
+		struct Knockback : MainComponent
+		{
+			float m_knockback;
+			Knockback(float p_knockback = 0.0f) : MainComponent(ComponentType::KNOCKBACK)
+			{
+				m_knockback = p_knockback;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* knockback;
+
+				knockback = p_propMan->addProperty(QVariant::String, "Knockback" );
+				p_propMan->setValue(knockback, m_knockback);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(knockback);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_knockback = p_propMan->variantProperty(props.at(0))->value().toFloat();
+			}
+		};
+
+		struct StatChangeCaster : MainComponent
+		{
+			float m_speed, m_jumpHeight, m_knockbackResistance;
+			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
+			{
+				m_speed = p_speed;
+				m_jumpHeight = p_jumpHeight;
+				m_knockbackResistance = p_knockbackResistance;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+
+				speed = p_propMan->addProperty(QVariant::String, "Speed" );
+				p_propMan->setValue(speed, m_speed);
+
+				jumpHeight = p_propMan->addProperty(QVariant::String, "JumpHeight" );
+				p_propMan->setValue(jumpHeight, m_jumpHeight);
+
+				knockbackResistance = p_propMan->addProperty(QVariant::String, "Knockback Resistance" );
+				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(speed);
+				p_propBrows->addProperty(jumpHeight);
+				p_propBrows->addProperty(knockbackResistance);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+			}
+		};
+
+		struct StatChangeTarget : MainComponent
+		{
+			float m_speed, m_jumpHeight, m_knockbackResistance;
+			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
+			{
+				m_speed = p_speed;
+				m_jumpHeight = p_jumpHeight;
+				m_knockbackResistance = p_knockbackResistance;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+
+				speed = p_propMan->addProperty(QVariant::String, "Speed" );
+				p_propMan->setValue(speed, m_speed);
+
+				jumpHeight = p_propMan->addProperty(QVariant::String, "JumpHeight" );
+				p_propMan->setValue(jumpHeight, m_jumpHeight);
+
+				knockbackResistance = p_propMan->addProperty(QVariant::String, "Knockback Resistance" );
+				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(speed);
+				p_propBrows->addProperty(jumpHeight);
+				p_propBrows->addProperty(knockbackResistance);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+			}
+		};
+
+		struct Physics : MainComponent
 		{
 			float m_speed;
 			float m_mass;
 			QVector3D m_gravity;
-			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f)) : MainComponent(ComponentType::PHYSICSCONTROLLED)
+			Physics(float p_speed = 0.0f, float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f)) : MainComponent(ComponentType::PHYSICS)
 			{
 				m_speed = p_speed;
 				m_mass = p_mass;
@@ -382,38 +553,6 @@ namespace AbilityEditorNameSpace
 				{
 					m_gravity[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
-			}
-		};
-
-		//////////////////////////////////////////////On collide components////////////////////////////////////////////////////////
-		struct OffensiveAbility: MainComponent
-		{
-			float m_damage;
-			float m_knockbackPower;
-			OffensiveAbility(float p_damage = 0.0f, float p_knockbackPower = 0.0f) : MainComponent(ComponentType::OFFENSIVEABILITY)
-			{
-				m_damage = p_damage;
-				m_knockbackPower = p_knockbackPower;
-			}
-			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
-			{
-				QtVariantProperty* damage, *knockbackpower;
-
-				damage = p_propMan->addProperty(QVariant::Double, "Damage" );
-				p_propMan->setValue(damage, m_damage);
-				knockbackpower = p_propMan->addProperty(QVariant::Double, "KnockbackPower" );
-				p_propMan->setValue(knockbackpower, m_knockbackPower);
-				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(damage);
-				p_propBrows->addProperty(knockbackpower);
-
-			}
-			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
-			{
-				QList<QtProperty*> props, subprops;
-				props = p_propBrows->properties();
-				m_damage = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				m_knockbackPower = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};
 

@@ -39,6 +39,30 @@ namespace AbilityEditorNameSpace
 			p_entity->SetName(QString::fromStdString(abilityName));
 			//Entity* entity = new Entity(abilityName.c_str());
 			
+			//Charges
+			float charges;
+			doc[counter]["Charges"] >> charges;
+			counter++;
+			p_entity->SetCharges(charges);
+
+			//Charging Time
+			float chargingTime;
+			doc[counter]["ChargeTime"] >> chargingTime;
+			counter++;
+			p_entity->SetChargeTime(chargingTime);
+
+			//Channeling Time
+			float channelingTime;
+			doc[counter]["ChannelingTime"] >> channelingTime;
+			counter++;
+			p_entity->SetChannelingTime(channelingTime);
+
+			//Duration
+			float duration;
+			doc[counter]["Duration"] >> duration;
+			counter++;
+			p_entity->SetDuration(duration);
+
 			//Cooldown
 			float cooldown;
 			doc[counter]["Cooldown"] >> cooldown;
@@ -134,38 +158,49 @@ namespace AbilityEditorNameSpace
 
 	AbilityComponents::MainComponent* Importer::ImportComponents(const YAML::Node& p_node, unsigned int p_type)
 	{
-		//Todo, to make it slightly more simple, aka easier to put data into the components, fix their constructors to take arguments and that cool stuff
 
-		
 		switch (p_type)
 		{
-		case AbilityComponents::ComponentType::TRANSFORM:
+		case AbilityComponents::ComponentType::STARTPOS:
 			{
-				AbilityComponents::Transform* tempcomp = new AbilityComponents::Transform();
-				if(p_node.FindValue("Rotation"))
+				AbilityComponents::StartPos* tempcomp = new AbilityComponents::StartPos();
+				if(p_node.FindValue("StartPos"))
 				{
 					float x,y,z;
-					p_node["Rotation"][0] >> x;
-					p_node["Rotation"][1] >> y;
-					p_node["Rotation"][2] >> z;
-					tempcomp->m_rotation = QVector3D(x,y,z);
-				}
-				if(p_node.FindValue("scale"))
-				{
-					float x,y,z;
-					p_node["scale"][0] >> x;
-					p_node["scale"][1] >> y;
-					p_node["scale"][2] >> z;
-					tempcomp->m_scale = QVector3D(x,y,z);
+					p_node["StartPos"][0] >> x;
+					p_node["StartPos"][1] >> y;
+					p_node["StartPos"][2] >> z;
+					tempcomp->m_startPos = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
-		case AbilityComponents::ComponentType::COLLISION:			
+		case AbilityComponents::ComponentType::TARGPOS:
 			{
-				AbilityComponents::Collision* tempcomp = new AbilityComponents::Collision();
+				AbilityComponents::TargetPos* tempcomp = new AbilityComponents::TargetPos();
+				if(p_node.FindValue("TargetPos"))
+				{
+					float x,y,z;
+					p_node["TargetPos"][0] >> x;
+					p_node["TargetPos"][1] >> y;
+					p_node["TargetPos"][2] >> z;
+					tempcomp->m_targetPos = QVector3D(x,y,z);
+				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
-				//Nothing in this one yet, might never be, might be removed, who knows
+			}
+			break;
+		case AbilityComponents::ComponentType::VELOCITY:
+			{
+				AbilityComponents::Velocity* tempcomp = new AbilityComponents::Velocity();
+				if(p_node.FindValue("Velocity"))
+				{
+					float x,y,z;
+					p_node["Velocity"][0] >> x;
+					p_node["Velocity"][1] >> y;
+					p_node["Velocity"][2] >> z;
+					tempcomp->m_velocity = QVector3D(x,y,z);
+				}
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
 		case AbilityComponents::ComponentType::ABILITYMODEL:
@@ -215,9 +250,51 @@ namespace AbilityEditorNameSpace
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
-		case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+		case AbilityComponents::ComponentType::DAMAGE:
 			{
-				AbilityComponents::PhysicsControlled* tempcomp = new AbilityComponents::PhysicsControlled();
+				AbilityComponents::Damage* tempcomp = new AbilityComponents::Damage();
+				if(p_node.FindValue("Damage"))
+					p_node["Damage"] >> tempcomp->m_damage;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::KNOCKBACK:
+			{
+				AbilityComponents::Knockback* tempcomp = new AbilityComponents::Knockback();
+				if(p_node.FindValue("Knockback"))
+					p_node["Knockback"] >> tempcomp->m_knockback;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGECASTER:
+			{
+				AbilityComponents::StatChangeCaster* tempcomp = new AbilityComponents::StatChangeCaster();
+				if(p_node.FindValue("Speed"))
+					p_node["Speed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("JumpHeight"))
+					p_node["JumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("KnockbackResistance"))
+					p_node["KnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGETARGET:
+			{
+				AbilityComponents::StatChangeTarget* tempcomp = new AbilityComponents::StatChangeTarget();
+				if(p_node.FindValue("Speed"))
+					p_node["Speed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("JumpHeight"))
+					p_node["JumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("KnockbackResistance"))
+					p_node["KnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::PHYSICS:
+			{
+				AbilityComponents::Physics* tempcomp = new AbilityComponents::Physics();
 				if(p_node.FindValue("Speed"))
 					p_node["Speed"] >> tempcomp->m_speed;
 				if(p_node.FindValue("Mass"))
@@ -233,17 +310,7 @@ namespace AbilityEditorNameSpace
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
-			break;		
-		case AbilityComponents::ComponentType::OFFENSIVEABILITY:
-			{
-				AbilityComponents::OffensiveAbility* tempcomp = new AbilityComponents::OffensiveAbility();
-				if(p_node.FindValue("Damage"))
-					p_node["Damage"] >> tempcomp->m_damage;
-				if(p_node.FindValue("KnockbackPower"))
-					p_node["KnockbackPower"] >> tempcomp->m_knockbackPower;
-				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
-			}
-			break;
+			break;	
 		case AbilityComponents::ComponentType::EXPLOSIVE:
 			{
 				AbilityComponents::Explosive* tempcomp = new AbilityComponents::Explosive();

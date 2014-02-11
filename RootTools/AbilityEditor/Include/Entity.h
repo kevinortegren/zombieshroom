@@ -23,14 +23,33 @@ namespace AbilityEditorNameSpace
 		QString GetComponentNameFromId(unsigned int p_id);
 		
 		void RemoveAllComponents();
+
 		void SetName(QString p_name) { m_name = p_name; }
-		void SetCooldown(float p_cooldown) { m_cooldown = p_cooldown; }
 		QString GetName() { return m_name; }
+
+		void SetCooldown(float p_cooldown) { m_cooldown = p_cooldown; }
 		float GetCooldown() { return m_cooldown; }
+
+		void SetCharges(float p_charges) { m_charges = p_charges; }
+		float GetCharges() { return m_charges; }
+
+		void SetChargeTime(float p_chargeTime) { m_chargeTime = p_chargeTime; }
+		float GetChargeTime() { return m_chargeTime; }
+
+		void SetChannelingTime(float p_channelingTime) { m_channelingTime = p_channelingTime; }
+		float GetChannelingTime() { return m_channelingTime; }
+
+		void SetDuration(float p_duration) { m_duration = p_duration; }
+		float GetDuration() { return m_duration; }
+
 		std::vector<AbilityComponents::MainComponent*>* GetComponents() { return m_components; }
 	private:
 		QString m_name;
 		float m_cooldown;
+		float m_charges;
+		float m_chargeTime;
+		float m_channelingTime;
+		float m_duration;
 		std::vector<AbilityComponents::MainComponent*>* m_components;
 		std::map<QString, AbilityComponents::ComponentType::ComponentType> m_nameToEnumMapper;
 		
