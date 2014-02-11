@@ -140,14 +140,15 @@ namespace Ragdoll
 			if(index < 6)
 			{
 				if(index < 3) 
-					toTrans *= glm::rotate(p_transform, -180.0f, m_right) *  m_lastBoneMatrix[index];
+					toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
 				else
-					toTrans *= glm::rotate(p_transform, 180.0f, m_right) *   m_lastBoneMatrix[index];
+					toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
 
 			}
 			else
 			{
 				toTrans *=  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];
+				
 				
 			}
 			toTrans *= m_boneOffset[index];
@@ -324,6 +325,7 @@ namespace Ragdoll
 				0 , 0.20f * OFFSET, 0, 
 				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
+#pragma warning Hej! det är jag spom är ansvarig för crashes i sequentialconstraintsolvern, hurra för mig 
 			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
 			constraint->setLimit(0,0,PI_2,0,1,1);
 			//constraint->setDamping(0.85f);
@@ -372,9 +374,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
- 				//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				
+ 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);			
  				m_dynamicWorld->addConstraint(constraint);
  				constraint->setDbgDrawSize(0.5f);
  				return constraint;
