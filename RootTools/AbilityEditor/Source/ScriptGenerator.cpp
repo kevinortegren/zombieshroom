@@ -69,7 +69,7 @@ namespace AbilityEditorNameSpace
 			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
 			{
 				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(j))->m_knockback;
-				m_file << m_name << ".pushback = " << m_knockback << ";\n";
+				m_file << m_name << ".knockback = " << m_knockback << ";\n";
 			}
 		}
 		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
@@ -81,8 +81,6 @@ namespace AbilityEditorNameSpace
 
 	void ScriptGenerator::WriteOnCreate( OnCreate* p_onCreate)
 	{
-		//std::vector<AbilityEntity::Entity*>* entities = p_onCreate->GetEntities();
-
 		m_file << "function " << m_name << ".OnCreate (userId, actionId)\n";
 		m_file << "\tlocal self = Entity.New();\n";
 		m_file << "\tlocal casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
@@ -91,34 +89,43 @@ namespace AbilityEditorNameSpace
 		m_file << "\tlocal networkEnt = Network.New(self, userId, actionId);\n";
 		m_file << "\n";
 
-		
+		//Create entities, bind shape, set model/particle, and so on
 
 		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteChargeDone()
 	{
+		m_file << "function " << m_name << ".ChargeDone (ChargeTime, UserID, ActionID)\n";
 
+		//Cast the ability, shoot the ray, explode the explosion, change stat, and so on
+
+		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteOnCollide( OnCreate* p_onCreate, OnCollide* p_onCollide)
 	{
-
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
 		
+		//Knockback, do damage, change stat
 
 		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteChannelingDone()
 	{
+		m_file << "function " << m_name << ".ChannelingDone (ChargeTime, UserID, ActionID)\n";
 
+		//Remove stuff, or create other stuff
+
+		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteOnDestroy( OnDestroy* p_onDestroy)
 	{
 		m_file << "function " << m_name << ".OnDestroy (self)\n";
 
+		//Remove stuff
 
 		m_file << "end\n";
 	}

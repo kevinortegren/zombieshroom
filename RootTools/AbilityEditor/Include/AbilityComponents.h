@@ -36,7 +36,7 @@ namespace AbilityEditorNameSpace
 				STATCHANGETARGET,
 				PHYSICS,
 				EXPLOSIVE, 
-				END_OF_ENUM //TODO : EntityChange
+				END_OF_ENUM //TODO : EntityChange, ChargeDependant
 			};
 		}
 		const struct ComponentNameList
