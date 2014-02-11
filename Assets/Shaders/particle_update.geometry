@@ -37,6 +37,7 @@ in float vert_age[];
 in float vert_type[];
 in vec4 vert_color[];
 in vec3 vert_accel[];
+in float vert_rotation[];
 
 
 // Transform feedback values.
@@ -47,6 +48,7 @@ out float vert_age1;
 out float vert_type1;
 out vec4 vert_color1;
 out vec3 vert_accel1;
+out float vert_rot1;
 
 
 
@@ -97,6 +99,7 @@ void main()
 		 	vert_color1 		= g_color;
 		 	vert_accel1			= g_gravity;
 			lifeTime			= g_spawnTime;
+			vert_rot1			= GetRandomNumber(g_time, 0.0f, 6.29f);
 			EmitVertex();
 			EndPrimitive();
 		}
@@ -109,6 +112,7 @@ void main()
 		vert_type1			= 0.0f;
 		vert_color1			= vert_color[0];  
 		vert_accel1			= vert_accel[0];
+		vert_rot1			= vert_rotation[0];
 		EmitVertex();
 		EndPrimitive();
 	}
@@ -130,6 +134,7 @@ void main()
 			vert_type1			= 1.0f;
 			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
 			vert_accel1			= vert_accel[0];
+			vert_rot1			= vert_rotation[0];
 			EmitVertex();
 			EndPrimitive();
 		}
