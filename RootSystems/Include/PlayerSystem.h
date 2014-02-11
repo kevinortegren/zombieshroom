@@ -46,6 +46,9 @@ namespace RootForce
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
+
+		PlayerActionComponent()
+			: SelectedAbility(1) {}
 	};
 #endif
 
