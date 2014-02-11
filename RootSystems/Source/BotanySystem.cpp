@@ -19,7 +19,6 @@ namespace RootForce
 		m_quadTree = p_quadTree;
 	}
 
-
 	void BotanySystem::Process()
 	{
 		// Get eye camera.
@@ -45,6 +44,10 @@ namespace RootForce
 				Render::RenderJob job;
 				job.m_mesh = renderable->m_model->m_meshes[0];
 				job.m_material = m_material;
+
+				// Assign weight map.
+				job.m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] = renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP];
+
 				job.m_params = renderable->m_params;
 
 				m_engineContext->m_renderer->AddRenderJob(job);

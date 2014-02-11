@@ -9,10 +9,14 @@
       textures:
         - name: g_Diffuse
           slot: 0
+        - name: g_Weight
+          slot: 6
       programs:
         - name: Botany
           shaders:
             - name: botany
               type: vertex
+            - name: botany
+              type: geometry
             - name: botany
               type: fragment

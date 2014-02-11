@@ -17,6 +17,5 @@ void main()
 {
 	vert_normal = normalize( viewMatrix * vec4(in_normal, 0.0f)).xyz;
 	vert_texcoord = in_texcoord;
-
-	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0f );
+	gl_Position = vec4(in_position, 1.0f);
 }
