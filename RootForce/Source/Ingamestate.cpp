@@ -43,6 +43,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -176,6 +177,9 @@ namespace RootForce
 
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
+
+		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;

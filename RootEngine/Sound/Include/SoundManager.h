@@ -3,6 +3,9 @@
 #include <Fmod/fmod_errors.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <string>
+#include <glm/glm.hpp>
+#include <RootEngine/Sound/Include/SoundAudio.h>
+#include <RootEngine/Sound/Include/SoundChannel.h>
 
 #if defined(_WINDLL)
 #define SCRIPT_DLL_EXPORT __declspec(dllexport)
@@ -18,9 +21,12 @@ namespace RootEngine
 		{
 		public:
 			virtual void SetWorkingDir(std::string p_path) = 0;
-			virtual void PlaySound() = 0;
 			virtual void Update() = 0;
-			virtual void PlayBackgroundSound() = 0;
+			virtual void PlayBackgroundSound(std::string p_name) = 0;
+			virtual void SetListenerAttributes(glm::vec3 p_position, glm::vec3 p_up, glm::vec3 p_right) = 0;
+			virtual void SetMasterVolume(float p_masterVolume) = 0;
+			virtual SoundAudioInterface* CreateSoundAudio() = 0;
+			virtual SoundChannelInterface* CreateSoundChannel() = 0;
 		};
 
 		class SoundManager : public SoundInterface
@@ -31,14 +37,17 @@ namespace RootEngine
 			void Startup();
 			void Shutdown();
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
-			void PlaySound();
 			void Update();
-			void PlayBackgroundSound();
+			void PlayBackgroundSound(std::string p_name);
+			void SetListenerAttributes(glm::vec3 p_position, glm::vec3 p_up, glm::vec3 p_right);
+			void SetMasterVolume(float p_masterVolume);
+			SoundAudioInterface* CreateSoundAudio();
+			SoundChannelInterface* CreateSoundChannel();
 
 		private:
 			void ErrorCheck(FMOD_RESULT p_result);
 
-			std::string m_workingDir;
+			std::string			m_workingDir;
 			FMOD::System*		m_system;
 			FMOD_RESULT			m_result;
 			FMOD_SPEAKERMODE	m_speakerMode;
@@ -49,6 +58,8 @@ namespace RootEngine
 			unsigned int		m_version;
 			int					m_numDrivers;
 			char				m_name[256];
+
+
 		};
 	}
 }

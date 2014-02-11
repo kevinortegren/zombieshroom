@@ -2,6 +2,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Sound/Include/SoundManager.h>
 namespace RootEngine
 {
 
@@ -29,7 +30,12 @@ namespace RootEngine
 			(*partitr).second.clear();
 		}
 
-		m_models.clear();
+		for(auto soundItr = m_soundAudios.begin(); soundItr != m_soundAudios.end(); soundItr++)
+		{
+			delete (*soundItr).second;
+			(*soundItr).second = nullptr;
+		}
+		m_soundAudios.clear();
 	}
 
 	void ResourceManager::Init(std::string p_workingDirectory, GameSharedContext* p_context)
@@ -75,6 +81,39 @@ namespace RootEngine
 		{
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Model already exists: %s", p_path.c_str());
 			return m_models[p_path];
+		}
+		
+	}
+
+	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name, SoundFlags::SoundFlags p_flags )
+	{
+		if(m_soundAudios.find(p_name) == m_soundAudios.end())
+		{
+			Sound::SoundAudioInterface* soundaudio = m_context->m_sound->CreateSoundAudio();
+			if(soundaudio)
+			{
+				if(soundaudio->LoadSound(p_name, p_flags))
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[SOUND] Loaded: '%s'", p_name.c_str());
+					m_soundAudios[p_name] = soundaudio;
+					return soundaudio;
+				}
+				else
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when loading sound: '%s'", p_name.c_str());
+					delete soundaudio;
+					return nullptr;
+				}
+			}
+			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when creating sound: '%s'", p_name.c_str());
+				return nullptr;
+			}
+		}
+		else
+		{
+			return m_soundAudios[p_name];
 		}
 		
 	}
@@ -382,4 +421,5 @@ namespace RootEngine
 	{
 		return m_workingDirectory;
 	}
+
 }

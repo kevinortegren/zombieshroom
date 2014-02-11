@@ -91,11 +91,6 @@ namespace RootEngine
 					
 		}
 
-		void SoundManager::PlaySound()
-		{
-
-		}
-
 		void SoundManager::ErrorCheck( FMOD_RESULT p_result )
 		{
 			if(p_result !=  FMOD_OK)
@@ -110,9 +105,9 @@ namespace RootEngine
 			m_system->update();
 		}
 
-		void SoundManager::PlayBackgroundSound()
+		void SoundManager::PlayBackgroundSound(std::string p_name)
 		{
-			std::string p_name = m_workingDir + "Assets\\Audio\\GameBackground.wav";
+			std::string soundFile = m_workingDir + "Assets\\Audio\\" + p_name;
 			if(m_BackGroundChannel != nullptr)
 				m_BackGroundChannel->stop();
 			const char* l_temp = p_name.c_str();
@@ -126,6 +121,32 @@ namespace RootEngine
 			else
 				g_context.m_logger->LogText(LogTag::SOUND, LogLevel::DEBUG_PRINT, "Started background music!");
 		}
+
+		void SoundManager::SetListenerAttributes( glm::vec3 p_position, glm::vec3 p_up, glm::vec3 p_forward )
+		{
+			FMOD_VECTOR position	= {p_position.x, p_position.y, p_position.z};
+			FMOD_VECTOR up			= {p_up.x, p_up.y, p_up.z};
+			FMOD_VECTOR forward		= {p_forward.x, p_forward.y, p_forward.z};
+			m_system->set3DListenerAttributes(0, &position, 0, &forward, &up );
+		}
+
+		void SoundManager::SetMasterVolume( float p_masterVolume )
+		{
+			FMOD::ChannelGroup* chgrp = nullptr;
+			m_system->getMasterChannelGroup(&chgrp);
+			chgrp->setVolume(p_masterVolume);
+		}
+
+		SoundAudioInterface* SoundManager::CreateSoundAudio()
+		{
+			return new SoundAudio(m_system); //Let resourcemanager delete this
+		}
+
+		SoundChannelInterface* SoundManager::CreateSoundChannel()
+		{
+			return new SoundChannel(m_system); //Let component delete this
+		}
+
 	}
 }
 

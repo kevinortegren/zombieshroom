@@ -23,8 +23,6 @@ namespace RootForce
 		m_settingsMenu->BindEvents(p_view);
 
 		m_view->Focus();
-
-		m_context.m_sound->PlayBackgroundSound();
 	}
 
 	Menu::~Menu()
@@ -172,7 +170,6 @@ namespace RootForce
 	void Menu::Update()
 	{
 		m_settingsMenu->Update();
-		m_context.m_sound->Update();
 	}
 
 }
