@@ -2,6 +2,9 @@
 #include "AbilityRespawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/RenderingSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/Script.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <fstream>
 
 namespace RootForce
@@ -26,17 +29,20 @@ namespace RootForce
 		{
 			unsigned chosenSpawn = rand()%m_levelAbilities.size()-1;
 			respawn->CurrentAbility.Name = m_levelAbilities.at(chosenSpawn);
-			//TODO: read charge count and texture from script
+			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
+			respawn->CurrentAbility.OnCooldown = false;
 
 			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
-			//TODO: read texture and material from script
+			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilityRespawnPoint");
+			renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
+			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->GetTexture(respawn->CurrentAbility.Name);
+			renderable->m_material->m_effect = m_engineContext->m_resourceManager->GetEffect("Mesh");
 		}
 		respawn->Timer -= dt;
 	}
 
 	void AbilityRespawnSystem::LoadAbilities(std::string p_abilityPack)
 	{
-		//TODO get the ability-pack from the resource manager
 		std::ifstream file(p_abilityPack);
 		if(file.is_open())
 		{
@@ -48,6 +54,16 @@ namespace RootForce
 		}
 		else
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Ability pack not found");
+	}
+
+	void AbilityRespawnSystem::AttatchComponentToPoints()
+	{
+		ECS::GroupManager::GroupRange points = m_world->GetGroupManager()->GetEntitiesInGroup("AbilitySpawnPoints");
+
+		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
+		{
+			m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second);
+		}
 	}
 
 }

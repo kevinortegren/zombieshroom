@@ -28,6 +28,7 @@ namespace RootForce
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void LoadAbilities(std::string p_abilityPack);
+		void AttatchComponentToPoints();
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 
