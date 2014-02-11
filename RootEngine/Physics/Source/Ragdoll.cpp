@@ -107,80 +107,71 @@ namespace Ragdoll
 	btRigidBody* Ragdoll::CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode, glm::mat4 p_transform, int p_massFactor, const btVector3& p_parentBodyOffset, glm::mat4 p_boneOffset[20] )
 	{
 		
+		//Create shapes for the bones, these values are hardcoded atm, for a more dynamical approach they should preferably be written in some sort of file.
 		btCollisionShape* shape = CreateBone(p_rootNode->mName.data);
 		if(shape != nullptr)
 		{
 			float mass;
+			//set the hips as startpoint for traveling the tree for when getbones is called
 			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0)
 				m_hipsNode = p_rootNode;
 			btRigidBody* body;
+			//Set mass, Hips and spine should be the same to make it more stable, the rest weighs less and less the deeper down they are in the animation tree.
 			if(std::string(p_rootNode->mName.data).compare("Character1_Hips") == 0 || std::string(p_rootNode->mName.data).compare("Character1_Spine") == 0)
 				mass = 5.0f;
 			else
 				mass = 5.0f / p_massFactor;
+
 			btVector3 inertia = btVector3(0,0,0);
 			shape->calculateLocalInertia(mass, inertia);
-			
+			//Get bone index from name
 			int index = m_nameToIndex[p_rootNode->mName.data];
-			glm::mat4 toGlm = glm::mat4();
-			//body
-			//aiMatrix4x4 fromAi = p_rootNode->mTransformation; 
-			//memcpy(&toGlm[0][0], &fromAi[0][0], sizeof(aiMatrix4x4));
-			//glm::mat4 bonePos =  glm::transpose(toGlm);
-			btTransform trans;
-
-			//glm::vec3 temp = glm::vec3(p_boneOffset[index][3]);
-
-			//glm::mat4 shapeSizeTranslation = glm::mat4(1.0f);
-			//shapeSizeTranslation = glm::translate(shapeSizeTranslation, (m_boneShapeSize[index]));
 			
-			//glm::mat4 test = glm::mat4(1.0f);
-			//test *= glm::translate(test, temp );
+			//Build transform in glm
 			m_boneOffset[index] = p_boneOffset[index];
 			m_bodyPosOffset[index] += p_parentBodyOffset;
-			//m_boneTransform[index] = bonePos;
 			m_prevPos[index] = p_transform;
-			//test
-			m_lastBoneMatrix[index] =  p_bones[index]/* * test */* m_boneOffset[index];
-			glm::mat4 toTrans ;
-		
+			m_lastBoneMatrix[index] =  p_bones[index] * m_boneOffset[index];
+			
+			glm::mat4 toTrans;
+			//Rotate the arms, for some reason this is required
 			if(index < 6)
 			{
-
 				if(index < 3) 
 					toTrans = glm::rotate(p_transform, 270.0f, glm::vec3(0,0,1)) * m_lastBoneMatrix[index];
 				else
-					toTrans = glm::rotate(p_transform, -270.0f, glm::vec3(0,0,1)) * m_lastBoneMatrix[index];
+					toTrans = glm::rotate(p_transform, 90.0f, glm::vec3(0,0,1)) * m_lastBoneMatrix[index];
 			}
 			else
 			{
 				toTrans =  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];
 			}
-			
+			//From glm to bullet transform
+			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
  			trans.setFromOpenGLMatrix(data);
 			
-		//	if( index > 5)
-			{
+			//Glm and bullet represents quaternions differently, move from glm to bullet quaternion
 				float x,y,z,w;
 				x = trans.getRotation().y();
 				y = trans.getRotation().z();
 				z = trans.getRotation().w();
 				w = trans.getRotation().x();
 				trans.setRotation(btQuaternion(x,y,z,w));
-			}
+			//Make a slight hardcoded (bad bad hardcode) offset to avoid shapes spawning inside each other which would cause huge jitter
 			trans.setOrigin(trans.getOrigin() + m_bodyPosOffset[index]);
 
 
-			//This works don't touch
+			//Set up the bullet rigidbody and add it to the world
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			body = new btRigidBody(mass, motionstate, shape, inertia);
-			body->setDamping(0.05f,0.85f);
+		//	body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
 			body->setCcdMotionThreshold(0.7f);
 			body->setCcdSweptSphereRadius(0.4f);
 			body->setRestitution(1.3f);
-			//body->setFriction(1.5f);
+		
+			//This is supposed to stop collision  with abilities and other players, doesn't work atm
 			body->setCollisionFlags(btBroadphaseProxy::DebrisFilter);
 			m_bodies[index] = body;
 			
@@ -190,7 +181,10 @@ namespace Ragdoll
 				btRigidBody* childbody = CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor+1 , m_bodyPosOffset[index], p_boneOffset);
 				if(childbody != nullptr)
 				{
+					//"link" a node to its parent
 					SetBoneRelation(index, m_nameToIndex[p_rootNode->mChildren[i]->mName.data]);
+					
+					//Create constraint
 					btTypedConstraint* temp = CreateConstraint(body, childbody, p_rootNode->mName.data, p_rootNode->mChildren[i]->mName.data);
 					if(temp != nullptr)
 					{
@@ -202,6 +196,7 @@ namespace Ragdoll
 			}
 			return body;
 		}
+		//If the node don't have a specified boneshape
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			CreateBody(p_bones, p_rootNode->mChildren[i], p_transform,  p_massFactor, p_parentBodyOffset, p_boneOffset);
 	
@@ -215,99 +210,71 @@ namespace Ragdoll
 		{
 			m_boneShapeSize[BodyPart::HIPS] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.2f, 0.4f));
-			//return new btCapsuleShape(0.4f, 0.01f);
-			//return new btCylinderShape(btVector3(0.4f,0.2f,0.4f));
 		}
 		else if(p_name.compare("Character1_LeftArm") == 0)
 		{
-			m_boneShapeSize[BodyPart::LEFTARM] = glm::vec3(0,0.15f, 0);
+			m_boneShapeSize[BodyPart::LEFTARM] = glm::vec3(0,0.10f, 0);
 			return new btBoxShape(btVector3(0.3f, 0.2f, 0.2f));
-			//return new btCapsuleShape(0.28f, 0.30f);	
-			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_LeftFoot") == 0)
 		{
 			m_boneShapeSize[BodyPart::LEFTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
-			//return new btCapsuleShape(0.2f, 0.16f);
-			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftForeArm") == 0)
 		{
-			m_boneShapeSize[BodyPart::LEFTFOREARM] = glm::vec3(0,0.15f, 0);
+			m_boneShapeSize[BodyPart::LEFTFOREARM] = glm::vec3(0,0.10f, 0);
 			return new btBoxShape(btVector3(0.3f, 0.2f, 0.2f));
-			//return new btCapsuleShape(0.28f, 0.30f);
-			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_LeftHand") == 0)
 		{
-			m_boneShapeSize[BodyPart::LEFTHAND] = glm::vec3(0,0.1f, 0);
+			m_boneShapeSize[BodyPart::LEFTHAND] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.1f));
-			//return new btCapsuleShape(0.2f, 0.08f);
-			//	return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::LEFTLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-			//return new btCapsuleShape(0.20f, 0.36f);
-			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_LeftUpLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::LEFTUPLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-			//return new btCapsuleShape(0.2f, 0.36f);
-			//return new btCylinderShape(btVector3(0.1f,0.2f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightArm") == 0)
 		{
-			m_boneShapeSize[BodyPart::RIGHTARM] = glm::vec3(0,0.15f, 0);
+			m_boneShapeSize[BodyPart::RIGHTARM] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.3f, 0.2f, 0.2f));
-			//return new btCapsuleShape(0.28f, 0.3f);
-			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightFoot") == 0)
 		{
 			m_boneShapeSize[BodyPart::RIGHTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
-			//	return new btCapsuleShape(0.2f, 0.08f);
-			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightForeArm") == 0)
 		{
-			m_boneShapeSize[BodyPart::RIGHTFOREARM] = glm::vec3(0,0.15f, 0);
+			m_boneShapeSize[BodyPart::RIGHTFOREARM] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.3f, 0.2f, 0.2f));
-			//return new btCapsuleShape(0.28f, 0.3f);
-			//return new btCylinderShape(btVector3(0.05f,0.15f,0.05f));
 		}
 		else if(p_name.compare("Character1_RightHand") == 0)
 		{
-			m_boneShapeSize[BodyPart::RIGHTHAND] = glm::vec3(0,0.1f, 0);
+			m_boneShapeSize[BodyPart::RIGHTHAND] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.1f));
-			//return new btCapsuleShape(0.28f, 0.08f);
-			//return new btCylinderShape(btVector3(0.1f,0.04f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::RIGHTLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-			//return new btCapsuleShape(0.20f, 0.26f);
-			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_RightUpLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::RIGHTUPLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-			//return new btCapsuleShape(0.20f, 0.36f);
-			//return new btCylinderShape(btVector3(0.1f,0.25f,0.1f));
 		}
 		else if(p_name.compare("Character1_Spine") == 0)
 		{
-			m_boneShapeSize[BodyPart::SPINE] = glm::vec3(0,0.6f, 0);
+			m_boneShapeSize[BodyPart::SPINE] = glm::vec3(0,-0.3f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.6f, 0.4f));
-			//return new btCapsuleShape(0.4f,0.6f);
-			//return new btCylinderShape(btVector3(0.4f,0.4f,0.4f));
 		}
 
 		return nullptr;
@@ -321,6 +288,7 @@ namespace Ragdoll
 	glm::mat4* Ragdoll::GetBones()
 	{
 		glm::mat4* retVal = new glm::mat4[20];
+		//Recursive function the travels the animation tree with the hips as startpoint
 		FixPosition(retVal, m_hipsNode); 
 		return retVal;
 	}
@@ -522,8 +490,8 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0.1f , 0.00f * OFFSET, 0,
- 					-0.2f, -0.0f * OFFSET, 0,
+ 					0.0f , -0.1f * OFFSET, 0,
+ 					0.0f, 0.2f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
@@ -577,7 +545,7 @@ namespace Ragdoll
 		//m_bodies[BodyPart::SPINE]->setLinearVelocity(p_velocity);
 	}
 
-	//The magic function of constraint calculations,
+	//The magic function of constraint calculations, basically creates the constraint in the middle between the two bodies with a user defined offset applied
 	void Ragdoll::CalculateConstraintTransform(btRigidBody* p_bodyA, btRigidBody* p_bodyB,  float p_offsetXbodyA , float p_offsetYbodyA , float p_offsetZbodyA , 
 		float p_offsetXbodyB  , float p_offsetYbodyB, float p_offsetZbodyB,
 		float p_quatX, float p_quatY, float p_quatZ, float p_quatW, btTransform* p_transBodyA, btTransform* p_transBodyB  )
@@ -624,8 +592,8 @@ namespace Ragdoll
 		btTransform trans = m_bodies[myIndex]->getWorldTransform();
 		trans.getOpenGLMatrix(data);
 		float rootData[16];
-		int index = m_boneToFollow[myIndex];
-		//Rootnode Pos
+		int parentIndex = m_boneToFollow[myIndex];
+		//Rootnode(Hips) Pos
 		btTransform worldTrans = m_bodies[BodyPart::HIPS]->getWorldTransform();
 		float x,y,z,w;
 		x = worldTrans.getRotation().w();
@@ -636,19 +604,26 @@ namespace Ragdoll
 		worldTrans.getOpenGLMatrix(rootData);
 
 
+		
+
+		//Create a offset matrix to get the model parts better aligned with the shapes (midpoint to midpoint instead of midpoint to a edge)
+		btVector3 btAxis = (trans.getRotation().getAxis());
+		glm::vec3 axis = glm::vec3(btAxis.x(), btAxis.y(), btAxis.z());
+		float angle = trans.getRotation().getAngle();
+		glm::vec3 rotatedOffset = glm::rotate(m_boneShapeSize[myIndex], angle , axis);
+		glm::mat4 rotatedTranslation = glm::translate(glm::mat4(1.0f), rotatedOffset);
 
 
-
-		//Bullet world space to model space
+		//Bullet world space to model local space
 		m_prevPos[myIndex] =  glm::make_mat4(rootData);
-		//World to local space
-		p_bones[myIndex] = (glm::inverse(m_prevPos[myIndex]) *   glm::make_mat4(data)) ; 	
+		p_bones[myIndex] = (glm::inverse(m_prevPos[myIndex]) *  ( glm::make_mat4(data))); 	
 		p_bones[myIndex] *= m_boneOffset[myIndex];
-
+		p_bones[myIndex] *= rotatedTranslation;
 	
 
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 		{
+			//we must go deeper
 			FixPosition(p_bones, p_rootNode->mChildren[i]);
 		}
 	}
