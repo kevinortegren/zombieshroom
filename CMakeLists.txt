@@ -30,6 +30,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	find_package(Awesomium REQUIRED)
 	find_package(LUA REQUIRED)
 	find_package(Qt REQUIRED)
+	find_package(Fmod REQUIRED)
 
 	set(EXTERNAL_INCLUDE_DIRS 
 	    ${SDL2_INCLUDE_DIRS}
@@ -42,6 +43,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 		${AWESOMIUM_INCLUDE_DIRS}
 		${LUA_INCLUDE_DIRS}
 		${QT_INCLUDE_DIRS}
+		${FMOD_INCLUDE_DIRS}
 	)
     
 	if(NOT COMPILE_RELEASE_BUILD)
@@ -63,6 +65,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${QTWIDGETS_LIBRARY}
 			${QTPROPWIDGET_LIBRARY}
 			${QTCOLORTRIANGLE_LIBRARY}
+			${FMOD_LIBRARY_DEBUG}
 		)
 	else()
         # Link with release libraries
@@ -78,6 +81,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${YAML_LIBRARY}
 			${AWESOMIUM_LIBRARY}
 			${LUA_LIBRARY}
+			${FMOD_LIBRARY}
 		)
 	endif()
 else()

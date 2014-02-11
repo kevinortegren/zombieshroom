@@ -11,6 +11,7 @@
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 #include <RootEngine/Include/Profiling.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
+#include <RootEngine/Sound/Include/SoundManager.h>
 #endif
 
 Logging	g_logger;
@@ -49,6 +50,12 @@ namespace RootEngine
 			m_gui->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_guiModule);
 		}
+
+		if(m_soundEngine != nullptr)
+		{
+			m_soundEngine->Shutdown();
+			DynamicLoader::FreeSharedLibrary(m_soundModule);
+		}
 		
 #endif
 		if(m_renderer != nullptr)
@@ -69,6 +76,7 @@ namespace RootEngine
 		m_gui = nullptr;
 		m_physics = nullptr;
 		m_scriptEngine = nullptr;
+		m_soundEngine = nullptr;
 #endif
 		m_renderer = nullptr;
 
@@ -112,6 +120,12 @@ namespace RootEngine
 			LoadScriptEngine();
 			m_scriptEngine->SetWorkingDir(p_workingDirectory);
 		}
+
+		if((p_flags & SubsystemInit::INIT_SOUND) == SubsystemInit::INIT_SOUND)
+		{
+			LoadSoundEngine();
+			m_soundEngine->SetWorkingDir(p_workingDirectory);
+		}
 #endif
 		// TODO: Load the rest of the submodules
 
@@ -136,6 +150,7 @@ namespace RootEngine
 		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_script = m_scriptEngine;
 		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
+		m_gameSharedContext.m_sound = m_soundEngine;
 
 #endif
 
@@ -297,7 +312,31 @@ namespace RootEngine
 		}
 		
 	}
-	
+
+	void EngineMain::LoadSoundEngine()
+	{
+		m_soundModule = DynamicLoader::LoadSharedLibrary("Sound.dll");
+		if(m_scriptModule != nullptr)
+		{
+			CREATESOUNDINTERFACE libGetSoundEngine = (CREATESOUNDINTERFACE) DynamicLoader::LoadProcess(m_soundModule, "CreateSoundInterface");
+
+			if(libGetSoundEngine != nullptr)
+			{
+				m_soundEngine = (Sound::SoundInterface*)libGetSoundEngine(m_subsystemSharedContext);
+				m_soundEngine->Startup();
+			}
+			else
+			{
+				m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+			}
+		}
+		else
+		{
+			m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+		}
+	}
+
+
 #endif
 
 }
