@@ -120,7 +120,7 @@ namespace RootForce
 
 		glm::vec3 movement(0.0f);
 
-		action->ActionID = Network::ReservedActionID::NONE;
+		//action->ActionID = Network::ReservedActionID::NONE;
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
