@@ -327,12 +327,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+				m_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+			m_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
 

@@ -3,6 +3,7 @@
 #include <External/Include/dirent/dirent.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootEngine/Sound/Include/SoundManager.h>
 
 namespace RootForce
 {
@@ -22,6 +23,8 @@ namespace RootForce
 		m_settingsMenu->BindEvents(p_view);
 
 		m_view->Focus();
+
+		m_context.m_sound->PlayBackgroundSound();
 	}
 
 	Menu::~Menu()
@@ -169,6 +172,7 @@ namespace RootForce
 	void Menu::Update()
 	{
 		m_settingsMenu->Update();
+		m_context.m_sound->Update();
 	}
 
 }

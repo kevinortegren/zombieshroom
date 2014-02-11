@@ -1,6 +1,8 @@
 #pragma once
-#include <Fmod/fmod.h>
+#include <Fmod/fmod.hpp>
+#include <Fmod/fmod_errors.h>
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <string>
 
 #if defined(_WINDLL)
 #define SCRIPT_DLL_EXPORT __declspec(dllexport)
@@ -16,6 +18,9 @@ namespace RootEngine
 		{
 		public:
 			virtual void SetWorkingDir(std::string p_path) = 0;
+			virtual void PlaySound() = 0;
+			virtual void Update() = 0;
+			virtual void PlayBackgroundSound() = 0;
 		};
 
 		class SoundManager : public SoundInterface
@@ -26,9 +31,24 @@ namespace RootEngine
 			void Startup();
 			void Shutdown();
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
+			void PlaySound();
+			void Update();
+			void PlayBackgroundSound();
 
 		private:
+			void ErrorCheck(FMOD_RESULT p_result);
+
 			std::string m_workingDir;
+			FMOD::System*		m_system;
+			FMOD_RESULT			m_result;
+			FMOD_SPEAKERMODE	m_speakerMode;
+			FMOD_CAPS			m_caps;
+			FMOD::Sound*		m_backGroundStream;
+			FMOD::Channel*		m_BackGroundChannel;
+
+			unsigned int		m_version;
+			int					m_numDrivers;
+			char				m_name[256];
 		};
 	}
 }
