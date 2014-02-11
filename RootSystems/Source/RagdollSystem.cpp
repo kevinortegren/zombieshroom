@@ -7,6 +7,7 @@ namespace RootForce
 		m_animations.Init(m_world->GetEntityManager());
 		m_renderables.Init(m_world->GetEntityManager());
 		m_collisions.Init(m_world->GetEntityManager());
+		m_transforms.Init(m_world->GetEntityManager());
 		
 	}
 
@@ -20,7 +21,9 @@ namespace RootForce
 		Animation* animation = m_animations.Get(p_entity);
 		Renderable* renderable = m_renderables.Get(p_entity);
 		Collision* collision = m_collisions.Get(p_entity);
+		Transform* transform = m_transforms.Get(p_entity);
 		Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
+		
 		if(animation->m_animClip == AnimationClip::RAGDOLL)
 		{
 			
@@ -44,7 +47,7 @@ namespace RootForce
 					
 				//Starts the ragdoll in physics
 				//m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
-				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset);
+				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset, transform->m_orientation.GetFront());
 				
 				ragdoll->m_firstTime = false;
 				
@@ -82,9 +85,12 @@ namespace RootForce
 
 	void RagdollSystem::NameMapper( std::map<std::string, int>  *p_nameToIndex, aiNode* p_rootNode, RootEngine::RootAnimation::AnimationInterface* p_anim, const aiScene* p_aiScene)
 	{
-		int index  = p_anim->GetIndexFromBoneName(p_rootNode->mName.C_Str());
-		if(DoesAnimNodeExist(p_aiScene->mAnimations[0], p_rootNode->mName.data))
+		
+		if (p_anim->BoneExists(p_rootNode->mName.C_Str())) 
+		{
+			int index  = p_anim->GetIndexFromBoneName(p_rootNode->mName.C_Str());
 			(*p_nameToIndex)[p_rootNode->mName.C_Str()] = index; //Here be magic
+		}
 
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
 			NameMapper(p_nameToIndex, p_rootNode->mChildren[i], p_anim, p_aiScene);

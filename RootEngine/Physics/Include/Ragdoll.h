@@ -36,7 +36,7 @@ namespace Ragdoll
 		~Ragdoll();
 		void Activate(glm::mat4 p_bones[20], glm::mat4 p_transform);
 		void Deactivate();
-		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20] );
+		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20] , glm::vec3 p_right);
 		void RemoveBodies();
 		btVector3 GetPos();
 		glm::mat4* GetBones();
@@ -63,6 +63,7 @@ namespace Ragdoll
 		btVector3 m_bodyPosOffset[20];
 		std::map<std::string, int> m_nameToIndex;
 		aiNode* m_hipsNode;
+		glm::vec3 m_right;
 		int m_constraintCounter;
 		bool m_firsttime;
 	};
