@@ -43,6 +43,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -175,6 +176,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
 
+		//AbilitySpawnSystem to create new abilities across the map
+		m_abilitySpawnSystem = new RootForce::AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+		g_world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(m_abilitySpawnSystem);
+
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
@@ -221,6 +226,10 @@ namespace RootForce
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
+
+		//Load the ability pack and attatch components to the spawnpoints
+		m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read this some server game data instead
+		m_abilitySpawnSystem->AttatchComponentToPoints();
 
 		m_animationSystem->Start();
 
@@ -473,7 +482,10 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
-
+		{
+			PROFILE("AbilitySpawn system", g_engineContext.m_profiler);
+			m_abilitySpawnSystem->Process();
+		}
 
 		{
 			PROFILE("Ragdoll system", g_engineContext.m_profiler);
