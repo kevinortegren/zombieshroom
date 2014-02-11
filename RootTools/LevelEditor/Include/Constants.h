@@ -5,16 +5,16 @@
 #include <iostream>
 using namespace std;
 const int g_maxSceneObjects = 1000;
-const int g_maxMeshes = 300;
+const int g_maxMeshes = 400;
 const int g_maxCameras = 15;
 const int g_maxLights = 40;
 
-const int g_maxVerticesPerMesh = 50000;
+const int g_maxVerticesPerMesh = 20000;
 const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
-const int g_maxLocators = 20;
+const int g_maxLocators = 50;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/"; 
 const string g_textureLookPath = "C:/Users/BTH/Documents/zombieshroom/Assets/Textures/";
 
@@ -51,7 +51,7 @@ struct UpdateMessage
 
 struct Flags
 {
-	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard;
+	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard, _AbilitySpawnPoint;
 	int _PaintStatus; // -1: False, 0: Painting, 1: Painted
 
 	Flags()
@@ -62,6 +62,7 @@ struct Flags
 		_Particle = false;
 		_Water = false;
 		_Hazard = false;
+		_AbilitySpawnPoint = false;
 		_PaintStatus = -1;
 	}
 };

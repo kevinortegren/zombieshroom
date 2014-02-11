@@ -664,6 +664,9 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 	if(transformation.flags._SpawnPoint)
 		p_world->GetGroupManager()->RegisterEntity("SpawnPoint", entity);
 
+	if(transformation.flags._AbilitySpawnPoint)
+		p_world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", entity);
+
 	if(transformation.flags._Static)
 		p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
@@ -940,6 +943,9 @@ void LoadLocators()
 			locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
 
 		if(RM.PlocatorList[i]->transformation.flags._SpawnPoint)
+			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+
+		if(RM.PlocatorList[i]->transformation.flags._AbilitySpawnPoint)
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 
 		if(RM.PlocatorList[i]->transformation.flags._Water)

@@ -704,6 +704,10 @@ void getLocatorFlags(MObject object, int index)
 					SM.locatorList[index].transformation.flags._Particle = true;
 				if(name == "SpawnPoint")
 					SM.locatorList[index].transformation.flags._SpawnPoint = true;
+
+				if(name == "AbilitySpawnPoint")
+					SM.locatorList[index].transformation.flags._AbilitySpawnPoint = true;
+
 				if(name == "Water")
 					SM.locatorList[index].transformation.flags._Water = true;
 
