@@ -48,6 +48,7 @@ namespace RootForce
 				UserDisconnected,
 				UserInformation,
 				PlayerCommand,
+				CooldownOff,
 				DestroyEntities,
 				SpawnUser,
 				LoadMap,
@@ -119,6 +120,17 @@ namespace RootForce
 			glm::vec3 Position;
 			glm::quat Orientation;
 			glm::quat AimingDeviceOrientation;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to the client whenever the cooldown for a certain ability on the server reaches zero.
+		*/
+		struct CooldownOff
+		{
+			Network::UserID_t User;
+			uint8_t AbilityIndex;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

@@ -103,13 +103,15 @@ namespace RootForce
 
 		PlayerControl* controller = m_world->GetEntityManager()->GetComponent<PlayerControl>(entity);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(entity);
+		PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(entity);
 		Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(entity);
 		Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
+		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 
 		glm::vec3 movement(0.0f);
 
-		action->ActionID = s_nextActionID++;
+		action->ActionID = Network::ReservedActionID::NONE;
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
@@ -157,14 +159,34 @@ namespace RootForce
 			case PlayerAction::SELECT_ABILITY3:
 				action->SelectedAbility = 3;
 				break;
-			case PlayerAction::ACTIVATE_ABILITY:
+			case PlayerAction::ACTIVATE_ABILITY_PRESSED:
 				{
-					action->ActivateAbility = true;
+					if (playerComponent->AbilityState == AbilityState::OFF && !playerComponent->AbilityScripts[playerComponent->SelectedAbility].OnCooldown)
+					{
+						playerComponent->AbilityState = AbilityState::CHARGING;
+					}
+
+					if (playerComponent->AbilityState != AbilityState::OFF)
+						action->AbilityTime += dt;
 				}
 				break;
-			case PlayerAction::JUMP:
+			case PlayerAction::ACTIVATE_ABILITY_RELEASED:
 				{
-					action->Jump = true;
+					playerComponent->AbilityState = AbilityState::OFF;
+				}
+				break;
+			case PlayerAction::JUMP_PRESSED:
+				{
+					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
+					{
+						// Start/Keep jumping
+						action->JumpTime += dt;
+					}
+				}
+				break;
+			case PlayerAction::JUMP_RELEASED:
+				{
+					action->JumpTime = 0.0f;
 				}
 				break;
 			default:

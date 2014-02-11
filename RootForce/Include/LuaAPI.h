@@ -1590,11 +1590,11 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerAction");
 			return 1;
 		}
-		static int PlayerActionSetJump(lua_State* p_luaState)
+		static int PlayerActionSetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->Jump = 0 != lua_toboolean(p_luaState, 2);
+			(*s)->JumpTime = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSetMovePower(lua_State* p_luaState)
@@ -1618,11 +1618,11 @@ namespace RootForce
 			(*s)->Angle = *(glm::vec2*)luaL_checkudata(p_luaState, 2, "Vec2");
 			return 0;
 		}
-		static int PlayerActionSetActivateAbility(lua_State* p_luaState)
+		static int PlayerActionSetAbilityTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->ActivateAbility = 0 != lua_toboolean(p_luaState, 2);
+			(*s)->AbilityTime = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSelectAbility(lua_State* p_luaState)
@@ -1632,11 +1632,11 @@ namespace RootForce
 			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
-		static int PlayerActionGetJump(lua_State* p_luaState)
+		static int PlayerActionGetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushboolean(p_luaState, (*s)->Jump);
+			lua_pushnumber(p_luaState, (*s)->JumpTime);
 			return 1;
 		}
 		static int PlayerActionGetMovePower(lua_State* p_luaState)
@@ -1662,11 +1662,11 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Vec2");
 			return 1;
 		}
-		static int PlayerActionGetActivateAbility(lua_State* p_luaState)
+		static int PlayerActionGetAbilityTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushboolean(p_luaState, (*s)->ActivateAbility);
+			lua_pushnumber(p_luaState, (*s)->AbilityTime);
 			return 1;
 		}
 		static int PlayerActionGetSelectedAbility(lua_State* p_luaState)
@@ -2238,17 +2238,17 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg playeraction_m [] = {
-			{"SetJump", PlayerActionSetJump},
+			{"SetJumpTime", PlayerActionSetJumpTime},
 			{"SetMovePower", PlayerActionSetMovePower},
 			{"SetStrafePower", PlayerActionSetStrafePower},
 			{"SetAngle", PlayerActionSetAngle},
-			{"SetActivateAbility", PlayerActionSetActivateAbility},
+			{"SetAbilityTime", PlayerActionSetAbilityTime},
 			{"SelectAbility", PlayerActionSelectAbility},
-			{"GetJump", PlayerActionGetJump},
+			{"GetJumpTime", PlayerActionGetJumpTime},
 			{"GetMovePower", PlayerActionGetMovePower},
 			{"GetStrafePower", PlayerActionGetStrafePower},
 			{"GetAngle", PlayerActionGetAngle},
-			{"GetActivateAbility", PlayerActionGetActivateAbility},
+			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
 			{NULL, NULL}
 		};

@@ -9,6 +9,8 @@
 
 namespace RootForce
 {
+	const float JUMP_TIME_LIMIT = 1.0f;
+
 	namespace EntityState
 	{
 		enum EntityState
@@ -21,6 +23,16 @@ namespace RootForce
 		};
 	}
 
+	namespace AbilityState
+	{
+		enum AbilityState
+		{
+			OFF,
+			CHARGING,
+			CHANNELING
+		};
+	}
+
 
 #ifndef COMPILE_LEVEL_EDITOR
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
@@ -28,9 +40,11 @@ namespace RootForce
 		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
-		bool Jump;
 		glm::vec2 Angle;
-		bool ActivateAbility;
+
+		float JumpTime;
+
+		float AbilityTime;
 		uint8_t SelectedAbility;
 	};
 #endif
@@ -67,12 +81,14 @@ namespace RootForce
 	{
 		std::string Name;
 		float Cooldown;
+		bool OnCooldown;
 		int Charges;
 
 		AbilityInfo()
 		{
 			Name = "";
-			Cooldown = -1;
+			Cooldown = 0.0f;
+			OnCooldown = false;
 			Charges = -1;
 		}
 	};
@@ -84,8 +100,18 @@ namespace RootForce
 
 		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
+		AbilityState::AbilityState AbilityState;
 
 		int Score;
 		int Deaths;
+
+		PlayerComponent()
+		{
+			TeamID = 0;
+			SelectedAbility = 0;
+			AbilityState = AbilityState::OFF;
+			Score = 0;
+			Deaths = 0;
+		}
 	};
 }

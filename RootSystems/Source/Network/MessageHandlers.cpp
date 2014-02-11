@@ -247,7 +247,6 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						
 						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
@@ -263,6 +262,23 @@ namespace RootForce
 							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
 
 						transform->m_position += movement;
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::CooldownOff:
+				{
+					NetworkMessage::CooldownOff m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, 0)];
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+						playerComponent->AbilityScripts[m.AbilityIndex].Cooldown = 0.0f;
+						playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
 					}
 				} return true;
 
