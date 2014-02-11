@@ -120,7 +120,6 @@ namespace RootForce
 
 		glm::vec3 movement(0.0f);
 
-		//action->ActionID = Network::ReservedActionID::NONE;
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
@@ -289,8 +288,6 @@ namespace RootForce
 							}
 						}
 					}
-					
-					//playerComponent->AbilityState = AbilityState::OFF;
 				}
 				break;
 			case PlayerAction::JUMP_PRESSED:

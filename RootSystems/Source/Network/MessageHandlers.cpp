@@ -315,7 +315,7 @@ namespace RootForce
 						}
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart");
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChargeDone:
@@ -336,7 +336,7 @@ namespace RootForce
 						}
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone");
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChannelingDone:
@@ -357,7 +357,7 @@ namespace RootForce
 						}
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone");
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
@@ -378,7 +378,7 @@ namespace RootForce
 						}
 					}
 
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone");
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityCooldownOff:
@@ -681,11 +681,6 @@ namespace RootForce
 					NetworkMessage::PlayerCommand m;
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-
-					if (m.Action.SelectedAbility < 0 || m.Action.SelectedAbility > 3)
-					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::FATAL_ERROR, "Invalid selected ability: %d", m.Action.SelectedAbility);
-					}
 
 					// Check whether the user is a local client (we are letting local clients have authority of updating action components right now)
 					// TODO: See if we can update local client on server instead...

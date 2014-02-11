@@ -94,7 +94,7 @@ namespace RootSystems
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 					} break;
 
 					case RootForce::AbilityState::START_CHANNELING:
@@ -107,7 +107,7 @@ namespace RootSystems
 						g_engineContext.m_script->AddParameterNumber(action->ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 					} break;
 
 					case RootForce::AbilityState::STOP_CHANNELING:
@@ -130,7 +130,7 @@ namespace RootSystems
 						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 					} break;
 
 					case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
@@ -159,174 +159,10 @@ namespace RootSystems
 						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
 							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 					} break;
 				}
 			}
-
-			/*
-			player->SelectedAbility = action->SelectedAbility - 1;
-			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
-			if (abilityName != "")
-			{
-				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
-				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
-				switch (player->AbilityState)
-				{
-					case RootForce::AbilityState::CHARGING:
-					{
-						if (action->AbilityTime >= abilityChargeTime)
-						{
-							// We have been holding the button until charge time is up.
-							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-							g_engineContext.m_script->AddParameterNumber(action->ActionID);
-							g_engineContext.m_script->ExecuteScript();
-
-							player->AbilityState = RootForce::AbilityState::CHANNELING;
-
-							// TODO: Consider temporarily setting cooldown here to prevent double-action-per-frame cheese.
-
-							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
-							{
-								// Send this action to the server
-								RootForce::NetworkMessage::AbilityChargeDone m;
-								m.User = network->ID.UserID;
-								m.Action = action->ActionID;
-								m.Time = action->AbilityTime;
-
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeDone);
-								m.Serialize(true, &bs);
-
-								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-							}
-
-							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
-						}
-					} break;
-
-					case RootForce::AbilityState::CHANNELING:
-					{
-						if (action->AbilityTime >= abilityChargeTime + abilityChannelingTime)
-						{
-							// We have been holding the button until channeling time is up.
-							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-							g_engineContext.m_script->AddParameterNumber(action->ActionID);
-							g_engineContext.m_script->ExecuteScript();
-
-							action->AbilityTime = 0.0f;
-							player->AbilityState = RootForce::AbilityState::OFF;
-
-							// Put ability on cooldown and decrease charges.
-							player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
-							player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
-
-							player->AbilityScripts[player->SelectedAbility].Charges--;
-							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
-								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
-
-							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
-							{
-								// Send this action to the server
-								RootForce::NetworkMessage::AbilityChannelingDone m;
-								m.User = network->ID.UserID;
-								m.Action = action->ActionID;
-								m.Time = action->AbilityTime;
-
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChannelingDone);
-								m.Serialize(true, &bs);
-
-								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-							}
-
-							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling finished on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
-						}
-					} break;
-
-					case RootForce::AbilityState::OFF:
-					{
-						if (action->AbilityTime > 0.0f)
-						{
-							// If ability time is more than 0.0f, then we have just released the button.
-							if (action->AbilityTime < abilityChargeTime)
-							{
-								// We have released the button before the charge time was up, so call on ChargeDone.
-								g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-								g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-								g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-								g_engineContext.m_script->AddParameterNumber(action->ActionID);
-								g_engineContext.m_script->ExecuteScript();
-
-								if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
-								{
-									// Send this action to the server
-									RootForce::NetworkMessage::AbilityChargeDone m;
-									m.User = network->ID.UserID;
-									m.Action = action->ActionID;
-									m.Time = action->AbilityTime;
-
-									RakNet::BitStream bs;
-									bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-									bs.Write(RakNet::GetTime());
-									bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeDone);
-									m.Serialize(true, &bs);
-
-									m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-								}
-
-								//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Charging interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
-							}
-
-							// Call on channeling done since the ability is up.
-							g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-							g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-							g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-							g_engineContext.m_script->AddParameterNumber(action->ActionID);
-							g_engineContext.m_script->ExecuteScript();
-
-							action->AbilityTime = 0.0f;
-
-							// Put ability on cooldown and decrease charges.
-							player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
-							player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
-
-							player->AbilityScripts[player->SelectedAbility].Charges--;
-							if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
-								player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
-
-							if (m_clientPeer != nullptr && p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
-							{
-								// Send this action to the server
-								RootForce::NetworkMessage::AbilityChannelingDone m;
-								m.User = network->ID.UserID;
-								m.Action = action->ActionID;
-								m.Time = action->AbilityTime;
-
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChannelingDone);
-								m.Serialize(true, &bs);
-
-								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-							}
-
-							//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Channeling interrupted on ability %s for player %d", abilityName.c_str(), network->ID.UserID);
-						}
-					} break;
-				}
-			}
-			*/
 
 			// Count down cooldown on all abilities.
 			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
