@@ -70,6 +70,7 @@
             - name: vert_type1
             - name: vert_color1
             - name: vert_accel1
+            - name: vert_rotation1
 
     - name: Particle_Render
     
