@@ -22,33 +22,14 @@ namespace RootForce
 			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
 
 		void Initialize();
-
 		void SetQuadTree(QuadTree* p_quadTree);
-
-		void CalculatePaintedAABB();
-		void DensityRenderToTexture(RootForce::RenderingSystem* m_renderingSystem);
 		void Process();
 
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
+		
 		Render::EffectInterface* m_effect;
-
-		Render::RenderToTextureInterface* m_density;
-
-		// Bounds of painted objects.
-		AABB m_aabb;
-
-		// Dimensions of the plane grid.
-		int m_width;
-		int m_height;
-
-		std::uniform_real_distribution<float> m_floatDistrubution;
-		std::default_random_engine m_generator;
-
-		glm::mat4 m_proj;
-		glm::mat4 m_view;
-
-		std::map<ECS::Entity*, MatrixData> m_matrices;
+		Render::Material* m_material;
 
 		QuadTree* m_quadTree;
 
