@@ -314,6 +314,8 @@ namespace RootForce
 							action->AbilityTime = lastHalfPing;
 						}
 					}
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChargeDone:
@@ -333,6 +335,8 @@ namespace RootForce
 							action->AbilityTime = m.Time;
 						}
 					}
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChannelingDone:
@@ -352,6 +356,8 @@ namespace RootForce
 							action->AbilityTime = m.Time;
 						}
 					}
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
@@ -371,6 +377,8 @@ namespace RootForce
 							action->AbilityTime = m.Time;
 						}
 					}
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone");
 				} return true;
 
 				case NetworkMessage::MessageType::AbilityCooldownOff:
