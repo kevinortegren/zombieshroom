@@ -59,15 +59,16 @@ namespace RootForce
 		{
 			for (SDL_Scancode sc : kb.Bindings)
 			{
-				if(kb.Edge)
+				if (kb.Edge)
 				{
 					RootEngine::InputManager::KeyState::KeyState keystate = m_inputManager->GetKeyState(sc);
-					if(keystate == RootEngine::InputManager::KeyState::DOWN_EDGE)
+					if (keystate == RootEngine::InputManager::KeyState::DOWN_EDGE)
 					{
 						m_inputtedActionsCurrentFrame.push_back(kb.Action);
 						break;
 					}
-					if(keystate == RootEngine::InputManager::KeyState::UP_EDGE)
+
+					if (keystate == RootEngine::InputManager::KeyState::UP_EDGE)
 					{
 						m_inputtedActionsCurrentFrame.push_back(kb.ActionUp);
 						break;
@@ -75,11 +76,18 @@ namespace RootForce
 				}
 				else
 				{
-					if(m_inputManager->GetKeyState(sc) == RootEngine::InputManager::KeyState::DOWN)
+					RootEngine::InputManager::KeyState::KeyState keystate = m_inputManager->GetKeyState(sc);
+					if (keystate == RootEngine::InputManager::KeyState::DOWN)
 					{
 						m_inputtedActionsCurrentFrame.push_back(kb.Action);
 						break;
-					}	
+					}
+					
+					if (keystate == RootEngine::InputManager::KeyState::UP_EDGE)
+					{
+						m_inputtedActionsCurrentFrame.push_back(kb.ActionUp);
+						break;
+					}
 				}
 			}
 		}
@@ -164,6 +172,7 @@ namespace RootForce
 					if (playerComponent->AbilityState == AbilityState::OFF && !playerComponent->AbilityScripts[playerComponent->SelectedAbility].OnCooldown)
 					{
 						playerComponent->AbilityState = AbilityState::CHARGING;
+						action->ActionID = s_nextActionID++;
 					}
 
 					if (playerComponent->AbilityState != AbilityState::OFF)
