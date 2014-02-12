@@ -7,7 +7,8 @@ namespace RootForce
 {
 
 
-	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context )
+	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+		: m_keymapper(p_keymapper)
 	{
 		m_context = p_context;
 		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
@@ -80,10 +81,24 @@ namespace RootForce
 		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
 	}
 
+	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)
+	{
+		std::string action = Awesomium::ToString(p_array[0].ToString());
+		// TODO
+		//m_keymapper->FocusBindAction(action);
+	}
+
+	void SettingsMenu::UnfocusBindEvent(const Awesomium::JSArray& p_array)
+	{
+		m_keymapper->UnfocusBindAction();
+	}
+
 	void SettingsMenu::BindEvents( RootEngine::GUISystem::WebView* p_view )
 	{
 		p_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &SettingsMenu::RequestSettingsEvent));
 		p_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &SettingsMenu::SaveSettingsEvent));
+		p_view->RegisterJSCallback("FocusBind", JSDelegate1(this, &SettingsMenu::FocusBindEvent));
+		p_view->RegisterJSCallback("UnfocusBind", JSDelegate1(this, &SettingsMenu::UnfocusBindEvent));
 	}
 
 	void SettingsMenu::Update()
