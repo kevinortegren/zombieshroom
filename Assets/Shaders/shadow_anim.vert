@@ -10,8 +10,7 @@ layout(location = 6) in vec4 in_weights;
 
 layout(std140) uniform PerFrame
 {
-	mat4 projectionMatrix;
-	mat4 viewMatrix;
+	mat4 viewProjectionMatrix;
 };
 
 layout(std140) uniform PerObject
@@ -30,5 +29,5 @@ void main()
 
 	vec4 pos = boneTransform * vec4( in_position, 1.0f );
 
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * pos;
+	gl_Position = viewProjectionMatrix * modelMatrix * pos;
 }

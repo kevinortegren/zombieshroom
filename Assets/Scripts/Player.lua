@@ -62,7 +62,7 @@ function Player.OnCreate(userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
-    
+	
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
@@ -86,7 +86,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
-		playerControl:SetMouseSensitivity(1.2);
+		playerControl:SetMouseSensitivity(0.2);
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
@@ -99,6 +99,6 @@ end
 
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-    local collision = self:GetCollision();
+	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end

@@ -154,7 +154,7 @@ namespace RootEngine
 			{
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
-                case SDL_TEXTINPUT:
+				case SDL_TEXTINPUT:
 				{
 					char temp[20];
 					char* t = temp;
@@ -190,8 +190,8 @@ namespace RootEngine
 					}
 					if(p_event.type == SDL_KEYUP)
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
-                        
-                    for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 						m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
 
 				} break;
