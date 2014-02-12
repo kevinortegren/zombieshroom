@@ -181,21 +181,18 @@ namespace RootForce
 							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = s_nextActionID++;
 
-							if (m_clientPeer != nullptr)
-							{
-								// Send this action to the server
-								RootForce::NetworkMessage::AbilityChargeStart m;
-								m.User = network->ID.UserID;
-								m.Action = action->ActionID;
+							// Send this action to the server
+							RootForce::NetworkMessage::AbilityChargeStart m;
+							m.User = network->ID.UserID;
+							m.Action = action->ActionID;
 
-								RakNet::BitStream bs;
-								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-								bs.Write(RakNet::GetTime());
-								bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeStart);
-								m.Serialize(true, &bs);
+							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
+							bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeStart);
+							m.Serialize(true, &bs);
 
-								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-							}
+							m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 						}
 
 						if (playerComponent->AbilityState != AbilityState::OFF)

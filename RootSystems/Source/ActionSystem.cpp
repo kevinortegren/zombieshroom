@@ -85,6 +85,9 @@ namespace RootSystems
 			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
 			if (abilityName != "")
 			{
+				if (player->AbilityScripts[player->SelectedAbility].OnCooldown)
+					player->AbilityState = RootForce::AbilityState::OFF;
+
 				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
 				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
 				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
