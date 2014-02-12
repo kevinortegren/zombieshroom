@@ -14,7 +14,7 @@ namespace RootEngine
 
 		SoundChannel::~SoundChannel()
 		{
-			
+			m_channel->stop();
 		}
 
 		void SoundChannel::PlaySound( Sound::SoundAudioInterface* p_audio, float p_volume )
@@ -75,11 +75,6 @@ namespace RootEngine
 			{
 				g_context.m_logger->LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Fmod error: %d", (int)p_result);
 			}
-			else
-			{
-				g_context.m_logger->LogText(LogTag::SOUND, LogLevel::DEBUG_PRINT, "Fmod GOOD TIMES ARE ROLLING!");
-			}
 		}
-
 	}
 }

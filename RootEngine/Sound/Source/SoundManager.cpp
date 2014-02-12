@@ -46,7 +46,7 @@ namespace RootEngine
 
 			m_result =  m_system->setSpeakerMode(m_speakerMode);
 			ErrorCheck(m_result);
-
+			m_result = m_system->setDSPBufferSize(1024,2);
 			if(m_caps & FMOD_CAPS_HARDWARE_EMULATED)
 			{
 				/*
@@ -84,6 +84,22 @@ namespace RootEngine
 				m_result = m_system->init(1024, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
 			}
 			ErrorCheck(m_result);
+
+			FMOD_RESULT result;
+			unsigned int blocksize;
+			int numblocks;
+			float ms;
+			int frequency;
+			result = m_system->getDSPBufferSize(&blocksize, &numblocks);
+			result = m_system->getSoftwareFormat(&frequency, 0, 0, 0, 0, 0);
+
+			ms = (float)blocksize * 1000.0f / (float)frequency;
+
+			printf("Mixer blocksize        = %.02f ms\n", ms);
+			printf("Mixer Total buffersize = %.02f ms\n", ms * numblocks);
+			printf("Mixer Average Latency  = %.02f ms\n", ms * ((float)numblocks - 1.5f));
+
+
 		}
 
 		void SoundManager::Shutdown()

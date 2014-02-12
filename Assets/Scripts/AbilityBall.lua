@@ -45,9 +45,9 @@ function AbilityBall.OnCreate (userId, actionId)
 		local particleComp = ParticleEmitter.New(self, "fireball");
 		local renderComp = Renderable.New(self);
 		local soundComp = Soundable.New(self);
-		soundComp:SetSound("loopburner.mp3", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D));
-		soundComp:SetVolume(1);
-		soundComp:SetRange(0, 10000);
+		soundComp:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundComp:SetVolume(0.05);
+		soundComp:SetRange(1, 500);
 		soundComp:Play();
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");

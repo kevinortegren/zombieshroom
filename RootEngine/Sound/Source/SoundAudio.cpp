@@ -2,7 +2,6 @@
 #include <iostream>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
-
 namespace RootEngine
 {
 	namespace Sound
@@ -22,6 +21,7 @@ namespace RootEngine
 
 		bool SoundAudio::LoadSound( std::string p_name, unsigned p_flags )
 		{
+			p_flags = p_flags | SOUND_SOFTWARE;
 			FMOD_RESULT result;
 			if(m_sound == nullptr)
 			{
