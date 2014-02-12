@@ -238,7 +238,7 @@ namespace Physics
 					}
 				}
 			}
-			else
+			else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC)
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
@@ -253,6 +253,24 @@ namespace Physics
 
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(p_objectHandle)->m_shape != PhysicsShape::SHAPE_NONE)
+					{
+						m_userPointer.at(i)->m_vectorIndex--;
+					}
+				}
+			}
+			else
+			{
+				delete m_externallyControlled.at(removedIndex);
+				m_externallyControlled.erase(m_externallyControlled.begin() + removedIndex);
+
+				delete userPointer;
+				m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
+
+				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
+				{
+
+					m_userPointer.at(i)->m_id[0] --;
+					if(m_userPointer.at(removedIndex)->m_externalControlled == true)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
@@ -365,17 +383,20 @@ namespace Physics
 		{
 			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 			ghostObject->setCollisionShape(shape);
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
-			else
+			//if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_CHARACTER_OBJECT);
+			/*else
 			{
-				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-			}
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			}*/
 			if(!p_collideWithWorld)
 				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			ObjectController* controller = new ObjectController();
-			controller->Init(ghostObject, (btConvexShape*)shape);
-			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+			btTransform trans;
+			motionstate->getWorldTransform(trans);
+			ghostObject->setWorldTransform(trans);
+			controller->Init(ghostObject, (btConvexShape*)shape, m_dynamicWorld);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::CharacterFilter);
 			m_externallyControlled.push_back(controller);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
 			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
@@ -422,16 +443,16 @@ namespace Physics
 		{
 			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 			ghostObject->setCollisionShape(shape);
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
-			else
+			//if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_CHARACTER_OBJECT);
+			/*else
 			{
-				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-			}
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			}*/
 			if(!p_collideWithWorld)
 				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			ObjectController* controller = new ObjectController();
-			controller->Init(ghostObject, (btConvexShape*)shape);
+			controller->Init(ghostObject, (btConvexShape*)shape, m_dynamicWorld);
 			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 			m_externallyControlled.push_back(controller);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
@@ -479,16 +500,16 @@ namespace Physics
 		{
 			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 			ghostObject->setCollisionShape(shape);
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
-			else
+			//if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_CHARACTER_OBJECT);
+			/*else
 			{
-				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-			}
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			}*/
 			if(!p_collideWithWorld)
 				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			ObjectController* controller = new ObjectController();
-			controller->Init(ghostObject, (btConvexShape*)shape);
+			controller->Init(ghostObject, (btConvexShape*)shape, m_dynamicWorld);
 			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
 			m_externallyControlled.push_back(controller);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
@@ -537,16 +558,16 @@ namespace Physics
 		{
 			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 			ghostObject->setCollisionShape(shape);
-			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
-			else
+			//if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_CHARACTER_OBJECT);
+			/*else
 			{
-				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-			}
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+			}*/
 			if(!p_collideWithWorld)
 				ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			ObjectController* controller = new ObjectController();
-			controller->Init(ghostObject, (btConvexShape*)shape);
+			controller->Init(ghostObject, (btConvexShape*)shape, m_dynamicWorld);
 			ghostObject->setWorldTransform(trans);
 			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter);
 			m_externallyControlled.push_back(controller);

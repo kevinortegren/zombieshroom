@@ -44,6 +44,8 @@ namespace RootForce
 
 		float JumpTime;
 
+		bool TryPickup;
+
 		float AbilityTime;
 		uint8_t SelectedAbility;
 	};

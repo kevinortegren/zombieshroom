@@ -49,4 +49,6 @@ PhysicsType = {
 	TYPE_ABILITY = 1;
 	TYPE_DYNAMIC = 2;
 	TYPE_PLAYER = 3;
+  TYPE_RAGDOLL = 4;
+  TYPE_ABILITYSPAWN = 5;
 };

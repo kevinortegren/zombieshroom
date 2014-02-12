@@ -40,6 +40,7 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
+		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		std::vector<std::string> m_levelAbilities;
 		std::string m_workingDir;
 	};

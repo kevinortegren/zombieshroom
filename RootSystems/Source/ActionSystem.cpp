@@ -266,6 +266,7 @@ namespace RootSystems
 			}
 		}
 
+		
 		//action->MovePower = 0;
 		//action->StrafePower = 0;
 		//UpdateAimingDevice();

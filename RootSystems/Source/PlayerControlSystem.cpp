@@ -114,6 +114,7 @@ namespace RootForce
 		action->ActionID = Network::ReservedActionID::NONE;
 		action->MovePower = 0;
 		action->StrafePower = 0;
+		action->TryPickup = false;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
@@ -187,6 +188,11 @@ namespace RootForce
 			case PlayerAction::JUMP_RELEASED:
 				{
 					action->JumpTime = 0.0f;
+				}
+				break;
+			case PlayerAction::PICK_UP_ABILITY:
+				{
+					action->TryPickup = true;
 				}
 				break;
 			default:

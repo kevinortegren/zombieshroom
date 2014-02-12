@@ -1399,6 +1399,43 @@ namespace RootForce
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
+		//ABILITY PICKUP
+		//////////////////////////////////////////////////////////////////////////
+		static int EntityGetAbilitySpawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilityRespawnComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(*e);
+			luaL_setmetatable(p_luaState, "AbilitySpawn");
+			return 1;
+		}
+
+		static int AbilitySpawnGetCurrentName(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			lua_pushstring(p_luaState, (*s)->CurrentAbility.Name.c_str());
+			return 1;
+		}
+
+		static int AbilitySpawnGetCurrentCharges(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			lua_pushnumber(p_luaState, (*s)->CurrentAbility.Charges);
+			return 1;
+		}
+
+		static int AbilitySpawnSetClaimed(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			(*s)->Claimed = lua_toboolean(p_luaState, 2) != 0;
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//HEALTH
 		//////////////////////////////////////////////////////////////////////////
 		static int HealthCreate(lua_State* p_luaState)
@@ -1487,14 +1524,14 @@ namespace RootForce
 		}
 		static int PlayerComponentSetAbility(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(4); // self, index, name, charges
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
 				return 0;
 			(*s)->AbilityScripts[index] = RootForce::AbilityInfo();
 			(*s)->AbilityScripts[index].Cooldown = 0;
-			(*s)->AbilityScripts[index].Charges = -1;
+			(*s)->AbilityScripts[index].Charges = (int)luaL_checknumber(p_luaState, 4);
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
 			return 0;
 		}
@@ -1674,6 +1711,22 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
 			lua_pushnumber(p_luaState, (*s)->SelectedAbility);
+			return 1;
+		}
+
+		static int PlayerActionGetTryPickup(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			lua_pushboolean(p_luaState, (*s)->TryPickup);
+			return 1;
+		}
+
+		static int PlayerActionSetTryPickup(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			(*s)->TryPickup = lua_toboolean(p_luaState, 2) != 0;
 			return 1;
 		}
 
@@ -1949,6 +2002,8 @@ namespace RootForce
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
 			{"GetPlayerComponent", GetPlayerComponent},
+			{"GetPlayerAction", EntityGetPlayerAction},
+			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{NULL, NULL}
 		};
 
@@ -2250,6 +2305,8 @@ namespace RootForce
 			{"GetAngle", PlayerActionGetAngle},
 			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
+			{"TryPickup",PlayerActionGetTryPickup },
+			{"SetTryPickup", PlayerActionSetTryPickup},
 			{NULL, NULL}
 		};
 
@@ -2344,6 +2401,17 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg abilityspawn_f [] = {
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg abilityspawn_m [] = {
+			{"GetCurrentName", AbilitySpawnGetCurrentName},
+			{"GetCurrentCharges", AbilitySpawnGetCurrentCharges},
+			{"SetClaimed", AbilitySpawnSetClaimed},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2400,6 +2468,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::abilityspawn_f, RootForce::LuaAPI::abilityspawn_m, "AbilitySpawn");
 		}
 	}
 }

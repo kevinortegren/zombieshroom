@@ -3071,10 +3071,6 @@
     - Type: 14
       Data:
         []
-    - Type: 15
-      Data:
-        - Entity: 5
-          File: FallingLeafsParticle
     - Type: 16
       Data:
         []
