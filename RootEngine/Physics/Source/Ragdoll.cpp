@@ -91,8 +91,8 @@ namespace Ragdoll
 	{
 		
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
-		/*m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(0, 0.2f, 0);
-		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f, 0.2f, 0);*/
+	//	m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(0, 4.3f, 0);
+	//	m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f, 3.4f, 0);
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
 		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.30f ,0);
 		//m_bodyPosOffset[BodyPart::HIPS]= btVector3(0.0f , -0.4f, 0.0f);
@@ -136,22 +136,38 @@ namespace Ragdoll
 			m_lastBoneMatrix[index] =  p_bones[index] /** m_boneOffset[index]*/;
 			glm::mat4 toTrans = glm::mat4(1.0f);
 			
-			//Rotate the arms, for some reason this is required
-			if(index < 6)
-			{
-				if(index < 3) 
-					toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
-				else
-					toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
+			////Rotate the arms, for some reason this is required
+			//if(index < 6)
+			//{
+			//	if(index < 3) 
+			//		toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
+			//	else
+			//		toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
 
-			}
-			else
+			//}
+			//else
 			{
 				toTrans *=  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];
 				
 				
 			}
+			if(index < 6)
+			{
+				toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+			}
 			toTrans *= m_boneOffset[index];
+			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
+			{
+				toTrans[3].y = m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.2f;
+			}
+			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
+			{
+				if( index < 3)
+					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
+				else
+					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
+			}
+			
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
@@ -217,26 +233,13 @@ namespace Ragdoll
 			m_boneShapeSize[BodyPart::HIPS] = glm::vec3(0,0.1f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.2f, 0.4f));
 		}
-		else if(p_name.compare("Character1_LeftArm") == 0)
-		{
-			m_boneShapeSize[BodyPart::LEFTARM] = glm::vec3(0.0f,0.15f, 0);
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-		}
+		
 		else if(p_name.compare("Character1_LeftFoot") == 0)
 		{
 			m_boneShapeSize[BodyPart::LEFTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 		}
-		else if(p_name.compare("Character1_LeftForeArm") == 0)
-		{
-			m_boneShapeSize[BodyPart::LEFTFOREARM] = glm::vec3(0.0f,0.15f, 0);
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-		}
-		else if(p_name.compare("Character1_LeftHand") == 0)
-		{
-			m_boneShapeSize[BodyPart::LEFTHAND] = glm::vec3(0.0f,0.125f, 0);
-			return new btBoxShape(btVector3(0.1f, 0.25f, 0.1f));
-		}
+		
 		else if(p_name.compare("Character1_LeftLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::LEFTLEG] = glm::vec3(0,0.15f, 0);
@@ -247,26 +250,13 @@ namespace Ragdoll
 			m_boneShapeSize[BodyPart::LEFTUPLEG] = glm::vec3(0,0.15f, 0);
 			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
 		}
-		else if(p_name.compare("Character1_RightArm") == 0)
-		{
-			m_boneShapeSize[BodyPart::RIGHTARM] = glm::vec3(0.0f,0.15f, 0);
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-		}
+		
 		else if(p_name.compare("Character1_RightFoot") == 0)
 		{
 			m_boneShapeSize[BodyPart::RIGHTFOOT] = glm::vec3(0,0.05f, 0);
 			return new btBoxShape(btVector3(0.25f, 0.1f, 0.25f));
 		}
-		else if(p_name.compare("Character1_RightForeArm") == 0)
-		{
-			m_boneShapeSize[BodyPart::RIGHTFOREARM] = glm::vec3(0.0,0.15f, 0);
-			return new btBoxShape(btVector3(0.2f, 0.3f, 0.2f));
-		}
-		else if(p_name.compare("Character1_RightHand") == 0)
-		{
-			m_boneShapeSize[BodyPart::RIGHTHAND] = glm::vec3(0.0f,0.125f, 0);
-			return new btBoxShape(btVector3(0.1f, 0.25f, 0.1f));
-		}
+		
 		else if(p_name.compare("Character1_RightLeg") == 0)
 		{
 			m_boneShapeSize[BodyPart::RIGHTLEG] = glm::vec3(0,0.15f, 0);
@@ -282,7 +272,36 @@ namespace Ragdoll
 			m_boneShapeSize[BodyPart::SPINE] = glm::vec3(0,-0.3f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.6f, 0.4f));
 		}
-
+		else if(p_name.compare("Character1_LeftArm") == 0)
+		{
+			m_boneShapeSize[BodyPart::LEFTARM] = glm::vec3(0.120f,0.0f, 0);
+			return new btBoxShape(btVector3(0.24f, 0.2f, 0.2f));
+		}
+		else if(p_name.compare("Character1_LeftForeArm") == 0)
+		{
+			m_boneShapeSize[BodyPart::LEFTFOREARM] = glm::vec3(0.12f,0.0f, 0);
+			return new btBoxShape(btVector3(0.24f, 0.2f, 0.2f));
+		}
+		else if(p_name.compare("Character1_LeftHand") == 0)
+		{
+			m_boneShapeSize[BodyPart::LEFTHAND] = glm::vec3(0.125f,0.0f, 0);
+			return new btBoxShape(btVector3(0.25f, 0.1f, 0.1f));
+		}
+		else if(p_name.compare("Character1_RightArm") == 0)
+		{
+			m_boneShapeSize[BodyPart::RIGHTARM] = glm::vec3(0.12f,0.0f, 0);
+			return new btBoxShape(btVector3(0.24f, 0.2f, 0.2f));
+		}
+		else if(p_name.compare("Character1_RightForeArm") == 0)
+		{
+			m_boneShapeSize[BodyPart::RIGHTFOREARM] = glm::vec3(0.12f,0.0f, 0);
+			return new btBoxShape(btVector3(0.24f, 0.2f, 0.2f));
+		}
+		else if(p_name.compare("Character1_RightHand") == 0)
+		{
+			m_boneShapeSize[BodyPart::RIGHTHAND] = glm::vec3(0.125f,0.0f, 0);
+			return new btBoxShape(btVector3(0.25f, 0.1f, 0.1f));
+		}
 		return nullptr;
 	}
 
@@ -325,7 +344,7 @@ namespace Ragdoll
 				0 , 0.20f * OFFSET, 0, 
 				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
-#pragma warning Hej! det är jag spom är ansvarig för crashes i sequentialconstraintsolvern, hurra för mig 
+			// Hej! det är jag som är ansvarig för crashes i sequentialconstraintsolvern, hurra för mig 
 			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
 			constraint->setLimit(0,0,PI_2,0,1,1);
 			//constraint->setDamping(0.85f);
@@ -345,7 +364,7 @@ namespace Ragdoll
 				0 , 0, 0.92f, 0.38f, &localA, &localB);
 
 			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(- PI_2 , PI_2 /2);
+			constraint->setLimit(- PI_2 , PI_2 );
 			m_dynamicWorld->addConstraint(constraint);
 			constraint->setDbgDrawSize(0.5f);
 			return constraint;
@@ -360,7 +379,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
 
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+				constraint->setLimit(- PI_2 , PI_2 );
  				m_dynamicWorld->addConstraint(constraint);
  				constraint->setDbgDrawSize(0.5f);
  				return constraint;
@@ -374,7 +393,7 @@ namespace Ragdoll
  					0 , 0, 0.92f, 0.38f, &localA, &localB);
  
  				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);			
+ 				constraint->setLimit(- PI_2 , PI_2 );			
  				m_dynamicWorld->addConstraint(constraint);
  				constraint->setDbgDrawSize(0.5f);
  				return constraint;
@@ -388,7 +407,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 		 		constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -402,7 +421,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 		 		constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -416,7 +435,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 		 		constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -430,7 +449,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(-PI_2, PI_2 / 2.0f);
+ 		 		constraint->setLimit(-PI_2, PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -444,7 +463,7 @@ namespace Ragdoll
 			 		0 , 0, 1, 0, &localA, &localB);
 			 		 	
 			 	btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			 	constraint->setLimit(-PI_2, PI_2 / 2.0f);
+			 	constraint->setLimit(-PI_2, PI_2 );
 			 	m_dynamicWorld->addConstraint(constraint);
 			 	constraint->setDbgDrawSize(0.5f);
 			 	return constraint;
@@ -458,7 +477,7 @@ namespace Ragdoll
 					0 , 0, 1, 0, &localA, &localB);
 			
 				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(-PI_2, PI_2 / 2.0f);
+				constraint->setLimit(-PI_2, PI_2);
 				m_dynamicWorld->addConstraint(constraint);
 				constraint->setDbgDrawSize(0.5f);
 				return constraint;
@@ -472,7 +491,7 @@ namespace Ragdoll
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 	
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 		 		constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -481,12 +500,12 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_RightArm") == 0 && p_nameB.compare("Character1_RightForeArm") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0 , -0.20f * OFFSET, 0,
- 					0, 0.15f * OFFSET, 0,
+ 					-0.2f , -0.00f * OFFSET, 0,
+ 					0.15f, 0.0f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 		 		constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 		 		constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -495,12 +514,12 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_LeftForeArm") == 0 && p_nameB.compare("Character1_LeftHand") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0.0f , -0.1f * OFFSET, 0,
- 					0.0f, 0.2f * OFFSET, 0,
+ 					-0.1f , -0.0f * OFFSET, 0,
+ 					0.2f, 0.0f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 					constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 					constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;
@@ -509,12 +528,12 @@ namespace Ragdoll
  		 	else if(p_nameA.compare("Character1_RightForeArm") == 0 && p_nameB.compare("Character1_RightHand") == 0 )
  		 	{
  				CalculateConstraintTransform(p_bodyA, p_bodyB, 
- 					0.0f , -0.1f * OFFSET, 0,
- 					0.0, 0.2f * OFFSET, 0,
+ 					-0.1f , -0.0f * OFFSET, 0,
+ 					0.2f, 0.0f * OFFSET, 0,
  					0 , 0.7f, 0, 0.7f, &localA, &localB);
  		 		
  		 		btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
- 				constraint->setLimit(- PI_2 , PI_2 / 2.0f);
+ 				constraint->setLimit(- PI_2 , PI_2 );
  		 		m_dynamicWorld->addConstraint(constraint);
  		 		constraint->setDbgDrawSize(0.5f);
  		 		return constraint;

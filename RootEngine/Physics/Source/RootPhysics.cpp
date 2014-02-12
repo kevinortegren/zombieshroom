@@ -1347,6 +1347,12 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->Move(p_position, m_dt);
 		}
+		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Moving ragdolls not supported");
+			//index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			//m_ragdolls.at(index)->
+		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
@@ -1467,12 +1473,12 @@ namespace Physics
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_PLAYER;
 			m_playerObjects.at(playerIndex)->Activate();
 
-			for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
+			for(unsigned int i = 0; i < m_userPointer.size(); i++)
 			{
 				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER ||m_userPointer.at(i)->m_type == PhysicsType::TYPE_RAGDOLL)
 				{
 					
-					if(m_userPointer.at(i)->m_ragdollIndex != -1)
+					if(m_userPointer.at(i)->m_ragdollIndex > index)
 						m_userPointer.at(i)->m_ragdollIndex--;
 				}
 

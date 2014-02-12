@@ -388,7 +388,8 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 				//test a double fall height, to see if the character should interpolate it's fall (full) or not (partial)
 				m_ghostObject->convexSweepTest (m_convexShape, start, end_double, callback2, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 			}
-		} else
+		} 
+		else
 		{
 			collisionWorld->convexSweepTest (m_convexShape, start, end, callback, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 

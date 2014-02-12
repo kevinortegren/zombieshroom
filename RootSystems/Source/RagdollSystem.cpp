@@ -47,7 +47,7 @@ namespace RootForce
 					
 				//Starts the ragdoll in physics
 				//m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
-				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset, transform->m_orientation.GetFront());
+				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset, transform->m_orientation.GetRight());
 				
 				ragdoll->m_firstTime = false;
 				

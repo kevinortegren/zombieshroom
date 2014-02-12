@@ -81,7 +81,6 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 3.0f);
-	
 	m_kinController->setJumpSpeed(20.0f);
 	m_kinController->setFallSpeed(200.0f);
 	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
@@ -89,7 +88,6 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_kinController->setMaxSlope(btRadians(45.0f));
 	
 	m_hasBeenKnockbacked = false;
-	
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter  ^btBroadphaseProxy::DebrisFilter);
 	//m_dynamicWorld->addAction(m_kinController);
 
