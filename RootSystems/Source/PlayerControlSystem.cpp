@@ -277,6 +277,7 @@ namespace RootForce
 
 								m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 							}
+
 							if (playerComponent->AbilityState == AbilityState::CHANNELING)
 							{
 								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;

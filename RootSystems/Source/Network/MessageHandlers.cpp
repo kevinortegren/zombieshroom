@@ -860,7 +860,7 @@ namespace RootForce
 
 						for (unsigned int i = 0; i < addresses.Size(); ++i)
 						{
-							if (i != m.User && !addresses[i].IsLoopback())
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
 							{
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -904,7 +904,7 @@ namespace RootForce
 
 						for (unsigned int i = 0; i < addresses.Size(); ++i)
 						{
-							if (i != m.User && !addresses[i].IsLoopback())
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
 							{
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -949,7 +949,7 @@ namespace RootForce
 
 						for (unsigned int i = 0; i < addresses.Size(); ++i)
 						{
-							if (i != m.User && !addresses[i].IsLoopback())
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
 							{
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -994,7 +994,7 @@ namespace RootForce
 
 						for (unsigned int i = 0; i < addresses.Size(); ++i)
 						{
-							if (i != m.User && !addresses[i].IsLoopback())
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
 							{
 								RakNet::BitStream bs;
 								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
