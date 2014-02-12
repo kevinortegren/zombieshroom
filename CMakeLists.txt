@@ -10,11 +10,12 @@ project(${ROOT_PROJECT_NAME})
 # Check if we want to compile just the level editor.
 option(COMPILE_LEVEL_EDITOR "Should we compile level editor?" OFF)
 
-#Check if we want to compile release build
+# Check if we want to compile release build
 option(COMPILE_RELEASE_BUILD "Release Build" OFF)
 
-# Find external libraries
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+# Find external libraries and modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/" "${CMAKE_SOURCE_DIR}/CMake/Modules/rpavlik/")
+include(CreateLaunchers)
 
 if (NOT COMPILE_LEVEL_EDITOR)
     # Find all x86 libraries
@@ -159,4 +160,20 @@ else()
 		)
 	endif()
 endif()
- 
+
+# Set the startup project
+if (NOT COMPILE_RELEASE_BUILD)
+    create_default_target_launcher(RootForce
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug/)
+else()
+    create_default_target_launcher(RootForce
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Release/)
+endif()
+
+# Set the default configuration
+if (NOT COMPILE_RELEASE_BUILD)
+    set(CMAKE_BUILD_TYPE "Debug")
+else()
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "" FORCE)
