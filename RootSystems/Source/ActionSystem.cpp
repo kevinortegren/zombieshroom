@@ -50,9 +50,10 @@ namespace RootSystems
 		{
 			if( health->IsDead )
 			{
-				if(player->AbilityState == RootForce::AbilityState::CHARGING)
+				if(action->WantRespawn)
 				{
 					health->WantsRespawn = true;
+					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
 					action->AbilityTime = 0.0f;
 					player->AbilityState = RootForce::AbilityState::OFF;
