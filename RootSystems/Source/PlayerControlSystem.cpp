@@ -246,6 +246,10 @@ namespace RootForce
 							}
 						}
 					}
+					else
+					{
+						playerComponent->AbilityState = AbilityState::OFF;
+					}
 				}
 				break;
 			case PlayerAction::ACTIVATE_ABILITY_RELEASED:
