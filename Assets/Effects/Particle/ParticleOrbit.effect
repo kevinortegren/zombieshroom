@@ -8,12 +8,12 @@
     - name: Particle_Update
       bindings:   
         - name: PerFrame
-          slot: 0
+          slot: 4
         - name: PerObject
           slot: 1
       textures:
         - name: g_Random
-          slot: 4
+          slot: 10
       
       uniforms:
         - sem: POSITION

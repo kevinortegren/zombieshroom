@@ -4,18 +4,19 @@ layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_texcoord;
 
-layout(std140) uniform PerFrame
-{
-	mat4 projectionMatrix;
-	mat4 viewMatrix;
-};
+out vec3 cs_normal_in;
+out vec2 cs_texcoord_in;
 
-out vec3 vert_normal;
-out vec2 vert_texcoord;
+//out vec3 gs_normal_in;
+//out vec2 gs_texcoord_in;
 
 void main()
 {
-	vert_normal = normalize( viewMatrix * vec4(in_normal, 0.0f)).xyz;
-	vert_texcoord = in_texcoord;
+	cs_normal_in = in_normal;
+	cs_texcoord_in = in_texcoord;
+    
+    //gs_normal_in = in_normal;
+	//gs_texcoord_in = in_texcoord;
+    
 	gl_Position = vec4(in_position, 1.0f);
 }

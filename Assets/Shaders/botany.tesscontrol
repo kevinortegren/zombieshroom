@@ -1,0 +1,62 @@
+#version 410 core                                                                               
+                                                                                                
+// define the number of CPs in the output patch  
+layout (vertices = 3) in;                                                
+layout (vertices = 3) out;   
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+    mat4 inverseView;
+};
+
+// attributes of the input CPs                                                                  
+in vec3 cs_normal_in[];                                                                  
+in vec2 cs_texcoord_in[];       
+
+out vec3 es_normal_in[];                                                                  
+out vec2 es_texcoord_in[];    
+
+float GetTessLevel(float Distance0, float Distance1)                                            
+{                                                                                               
+    float AvgDistance = (Distance0 + Distance1) / 2.0;  
+	                                       
+	if (AvgDistance <= 30.0f)
+	{  
+		return 5.0f;
+	}                                                                                          
+    else 
+	{                                                                                      
+        return 1.0;                                                                             
+    }                                                                                           
+}  
+
+float GetDynamicTessFactor(float distance0, float distance1)
+{
+	float AvgDistance = (distance0 + distance1) / 2.0; 
+
+	return 16.0f*(1/(0.016*AvgDistance));
+}  
+
+void main()                                                                                     
+{                                                                                               
+    // Set the control points of the output patch                                               
+    es_texcoord_in[gl_InvocationID] = cs_texcoord_in[gl_InvocationID];                                                    
+    es_normal_in[gl_InvocationID] = cs_normal_in[gl_InvocationID];                            
+	              
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+                  
+    vec4 cameraPos = inverseView * vec4(0,0,0,1);
+                         
+    // Calculate the distance from the camera to the three control points                       
+    float EyeToVertexDistance0 = distance(cameraPos.xyz, gl_in[0].gl_Position.xyz);                     
+    float EyeToVertexDistance1 = distance(cameraPos.xyz, gl_in[1].gl_Position.xyz);                     
+    float EyeToVertexDistance2 = distance(cameraPos.xyz, gl_in[2].gl_Position.xyz);                     
+                                                                                                
+    // Calculate the tessellation levels                                                        
+    gl_TessLevelOuter[0] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);          
+    gl_TessLevelOuter[1] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);         
+    gl_TessLevelOuter[2] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);           
+    gl_TessLevelInner[0] = gl_TessLevelOuter[2];                                            
+}  

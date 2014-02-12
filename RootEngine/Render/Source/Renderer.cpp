@@ -125,7 +125,7 @@ namespace Render
 
 		glClearColor(0,0,0,1);
 		
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glEnable(GL_DEPTH_TEST);
 		
@@ -295,18 +295,18 @@ namespace Render
 
 
 		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
-		s_textureSlots[TextureSemantic::DEPTH]			= 4;
-		s_textureSlots[TextureSemantic::RANDOM]			= 5;
+		s_textureSlots[TextureSemantic::DEPTH]			= 4;	
 		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
+		s_textureSlots[TextureSemantic::RANDOM]			= 10;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
