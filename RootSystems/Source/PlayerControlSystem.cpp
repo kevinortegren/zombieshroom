@@ -174,9 +174,9 @@ namespace RootForce
 					{
 						action->WantRespawn = true;
 					}
-					else
+					else if ( !playerComponent->AbilityScripts[playerComponent->SelectedAbility].OnCooldown)
 					{
-						if (playerComponent->AbilityState == AbilityState::OFF && !playerComponent->AbilityScripts[playerComponent->SelectedAbility].OnCooldown)
+						if (playerComponent->AbilityState == AbilityState::OFF)
 						{
 							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = s_nextActionID++;
