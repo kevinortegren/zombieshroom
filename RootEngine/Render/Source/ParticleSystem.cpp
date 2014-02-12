@@ -22,6 +22,7 @@ namespace Render
 		particles[0].m_type			= 0.0f;
 		particles[0].m_color		= glm::vec4(0.0f);
 		particles[0].m_accel		= glm::vec3(0.0f);
+		particles[0].m_rot			= 0.0f;
 		
 		m_meshes[0] = p_renderer->CreateMesh();
 		m_meshes[0]->SetPrimitiveType(GL_POINTS);
@@ -44,7 +45,7 @@ namespace Render
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
-			attributes[i]->Init(7);
+			attributes[i]->Init(8);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
@@ -52,6 +53,7 @@ namespace Render
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 9 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 10 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 14 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 17 * sizeof(float));
 		
 			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
 			m_meshes[i]->SetVertexAttribute(attributes[i]);

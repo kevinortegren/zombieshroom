@@ -31,6 +31,7 @@ namespace RootEngine
 		std::string m_name;
 		float		m_orbitSpeed;
 		float		m_orbitRadius;
+		int			m_template;
 	};
 
 	class ParticleImporter
