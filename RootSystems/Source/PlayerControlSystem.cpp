@@ -178,10 +178,10 @@ namespace RootForce
 					{
 						if (playerComponent->AbilityState == AbilityState::OFF)
 						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Activating ability %s with action ID: %u", playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name.c_str(), action->ActionID);
-
 							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = s_nextActionID++;
+
+							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Activating ability %s with action ID: %u", playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name.c_str(), action->ActionID);
 
 							// Send this action to the server
 							RootForce::NetworkMessage::AbilityChargeStart m;
