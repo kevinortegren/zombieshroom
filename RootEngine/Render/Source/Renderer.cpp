@@ -294,20 +294,22 @@ namespace Render
 		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
 		s_sizes[Semantic::DX]			= sizeof(float);
 
-
-		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
-		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
-		s_textureSlots[TextureSemantic::NORMAL]			= 2;
-		s_textureSlots[TextureSemantic::GLOW]			= 3;
-		s_textureSlots[TextureSemantic::DEPTH]			= 4;
-		s_textureSlots[TextureSemantic::RANDOM]			= 5;
-		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
-		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
-		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
-		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
+		s_textureSlots[TextureSemantic::DIFFUSE] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
+		s_textureSlots[TextureSemantic::SPECULAR] = 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+		s_textureSlots[TextureSemantic::NORMAL] = 2;
 		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
+		s_textureSlots[TextureSemantic::GLOW] = 3;
+		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
+		s_textureSlots[TextureSemantic::DEPTH] = 4;
+		s_textureSlots[TextureSemantic::RANDOM] = 5;
+		s_textureSlots[TextureSemantic::TEXTUREMAP] = 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
+		s_textureSlots[TextureSemantic::TEXTURE_R] = 7;
+		s_textureSlots[TextureSemantic::TEXTURE_G] = 8;
+		s_textureSlots[TextureSemantic::TEXTURE_B] = 9;
+
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -350,13 +352,6 @@ namespace Render
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
 		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
-	}
-
-	void GLRenderer::AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade)
-	{
-		m_sjobCount[p_cascade] = p_jobs.size();
-		auto it = std::next(p_jobs.begin(), p_jobs.size());
-		std::move(p_jobs.begin(), it, std::back_inserter(m_sjobs));
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -445,7 +440,6 @@ namespace Render
 
 		m_allocator.Clear();
 		m_jobs.clear();
-		m_sjobs.clear();
 	}
 
 	void GLRenderer::Clear()
@@ -486,23 +480,41 @@ namespace Render
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 
-		int offset = 0;
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
 			glDrawBuffers(0, NULL);
-
 			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
 
-			for(int j = offset; j < (m_sjobCount[i] + offset); ++j)
-			{
-				m_sjobs[j].m_mesh->Bind();
-				m_sjobs[j].m_effect->GetTechniques()[1]->GetPrograms()[0]->Apply();
-				m_sjobs[j].m_mesh->Draw();
-				m_sjobs[j].m_mesh->Unbind();
-			}
 
-			offset = m_sjobCount[i];
+
+			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+			{
+				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
+					continue;
+
+				if((*job)->m_shadowMesh == nullptr)
+					continue;
+
+				(*job)->m_shadowMesh->Bind();
+
+				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
+				{
+					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
+					{
+						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+						}
+
+						(*tech)->GetPrograms()[0]->Apply();
+
+						(*job)->m_shadowMesh->Draw();	
+					}
+				}
+
+				(*job)->m_shadowMesh->Unbind();
+			}
 		}
 
 		glCullFace(GL_BACK);
@@ -514,7 +526,6 @@ namespace Render
 		m_gbuffer.UnbindTextures();	
 
 		// Bind lighting for blending.
-		
 		m_lighting.m_la->Bind(5);
 
 		m_gbuffer.Enable();
@@ -583,8 +594,12 @@ namespace Render
 	void GLRenderer::LightingPass()
 	{
 		// Bind cascade shadow map array.
-		glActiveTexture(GL_TEXTURE0 + TextureSemantic::DEPTH);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTHPCF]);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTHPCF], m_shadowDevice.m_samplerObjectPCF);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTH]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTH], m_shadowDevice.m_samplerObjectFloat);
 
 		static glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 
@@ -599,7 +614,7 @@ namespace Render
 			glm::mat4 lvp = biasMatrix * m_shadowDevice.m_shadowcasters[0].m_projectionMatrices[i] * m_shadowDevice.m_shadowcasters[0].m_viewMatrices[i];
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
-		
+
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.

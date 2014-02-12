@@ -17,10 +17,10 @@ namespace Render
 		// Emitter particle.
 		particles[0].m_initialPos	= glm::vec3(0.0f);
 		particles[0].m_initialVel	= glm::vec3(0.0f);
-		particles[0].m_size			= glm::vec2(1.0f);
-		particles[0].m_age			= 2.0f;
+		particles[0].m_size			= glm::vec2(0.0f);
+		particles[0].m_age			= 0.0f;
 		particles[0].m_type			= 0.0f;
-		particles[0].m_color		= glm::vec4(1.0f);
+		particles[0].m_color		= glm::vec4(0.0f);
 		particles[0].m_accel		= glm::vec3(0.0f);
 		particles[0].m_rot			= 0.0f;
 		

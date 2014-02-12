@@ -2,6 +2,15 @@ AbilityBall = {};
 AbilityBall.damage = 20;
 AbilityBall.pushback = 20;
 AbilityBall.cooldown = 1;
+AbilityBall.chargeTime = 0.0;
+AbilityBall.channelingTime = 0.0;
+
+function AbilityBall.ChargeDone(time, userId, actionId)
+end
+
+function AbilityBall.ChannelingDone(time, userId, actionId)
+	AbilityBall.OnCreate(userId, actionId);
+end
 
 function AbilityBall.OnCreate (userId, actionId)
 	local self = Entity.New();
@@ -34,8 +43,6 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
-	local playerComponent = playerEnt:GetPlayerComponent();
-	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityBall.cooldown);
 end
 
 function AbilityBall.OnCollide (self, entity)

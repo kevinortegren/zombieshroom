@@ -209,6 +209,7 @@ namespace RootForce
 			}
 		}
 		
+
 		m_renderable->m_model = m_context->m_resourceManager->CreateModel("WaterModel");
 		m_renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));

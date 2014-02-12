@@ -89,20 +89,25 @@ namespace RootForce
 		//keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::JUMP;
+		keybindings[4].Action = RootForce::PlayerAction::JUMP_PRESSED;
+		keybindings[4].ActionUp = RootForce::PlayerAction::JUMP_RELEASED;
 		//keybindings[4].Edge = true;
 		
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY_PRESSED;
+		keybindings[5].ActionUp = RootForce::PlayerAction::ACTIVATE_ABILITY_RELEASED;
 		//keybindings[5].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
@@ -213,6 +218,12 @@ namespace RootForce
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
+		// Set the server peer to the action system, if we are a server.
+		if (m_networkContext.m_server != nullptr)
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();

@@ -4,24 +4,17 @@ ACTION_COLLIDE = 1;
 --Set table name
 AbilityDash = {};
 AbilityDash.cooldown = 0;
+AbilityDash.chargeTime = 0.0;
+AbilityDash.channelingTime = 0.0;
 
-function AbilityDash.OnCreate(userId, actionId)
-	--local playerEnt = Entity.GetEntityByTag("Player");
-	--local frontVec  = Entity.GetEntityByTag("AimingDevice"):GetTransformation():GetOrient():GetFront();
+function AbilityDash.ChargeDone(time, userId, actionId)
+end
+
+function AbilityDash.ChannelingDone(time, userId, actionId)
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local aimingEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1);
 	local frontVec  = aimingEnt:GetTransformation():GetOrient():GetFront();
 
 	local handle = playerEnt:GetCollision():GetHandle();
 	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.1,0)+frontVec, 100);
-	local playerComponent = playerEnt:GetPlayerComponent();
-	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityDash.cooldown);
-end
-
-function AbilityDash.OnCollide (entityId)
-	
-end
-
-function AbilityDash.OnDestroy ()
-
 end
