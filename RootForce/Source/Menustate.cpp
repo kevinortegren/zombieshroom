@@ -105,7 +105,11 @@ namespace RootForce
 				// Retrieve hosting data and go into a connecting state.
 				m_playData.Host = true;
 				m_playData.ServerInfo.ServerName = Awesomium::ToString(event.data[0].ToString());
+
 				m_playData.ServerInfo.Port = event.data[1].ToInteger();
+				if(m_playData.ServerInfo.Port == 0)
+					m_playData.ServerInfo.Port = 5567;
+
 				m_playData.ServerInfo.Password = Awesomium::ToString(event.data[2].ToString());
 				m_playData.ServerInfo.MaxPlayers = event.data[3].ToInteger();
 				m_playData.ServerInfo.MatchTime = event.data[4].ToInteger();
@@ -121,7 +125,10 @@ namespace RootForce
 				m_playData.Host = false;
 				m_playData.ClientInfo.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.ClientInfo.Password = Awesomium::ToString(event.data[2].ToString());
+
 				m_playData.ClientInfo.Port = event.data[0].ToInteger();
+				if(m_playData.ClientInfo.Port == 0)
+					m_playData.ClientInfo.Port = 5567;
 
 				result = GameStates::Connecting;
 			} break;
