@@ -296,6 +296,7 @@ public:
         menuFile->addAction(actionSave);
         menuFile->addSeparator();
         menuFile->addAction(actionLoad);
+        menuFile->addSeparator();
         menuFile->addAction(actionGenerate_Script);
         menuFile->addSeparator();
         menuFile->addAction(actionQuit);

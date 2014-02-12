@@ -24,18 +24,18 @@ namespace AbilityEditorNameSpace
 		{
 			enum ComponentType
 			{
-				STARTPOS,
-				TARGPOS,
-				VELOCITY,
-				ABILITYMODEL,
-				COLLISIONSHAPE,
-				ABILITYPARTICLE,
-				DAMAGE,
-				KNOCKBACK,
-				STATCHANGECASTER,
-				STATCHANGETARGET,
-				PHYSICS,
-				CHARGEVARIABLES, 
+				STARTPOS, //done
+				TARGPOS, //done
+				VELOCITY, //useless?
+				ABILITYMODEL, //done
+				COLLISIONSHAPE, //done
+				ABILITYPARTICLE, //done
+				DAMAGE, 
+				KNOCKBACK, 
+				STATCHANGECASTER, //Still needs script implementation
+				STATCHANGETARGET, //Still needs script implementation
+				PHYSICS, //add collide w/ world
+				CHARGEVARIABLES, //done
 				END_OF_ENUM //TODO : EntityChange
 			};
 		}
@@ -55,7 +55,7 @@ namespace AbilityEditorNameSpace
 				m_compNames.append("Stat Change (Caster)");
 				m_compNames.append("Stat Change (Target)");
 				m_compNames.append("Physics");
-				m_compNames.append("Charge Variables"); //Maybe not?
+				m_compNames.append("Charge Variables"); 
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -73,24 +73,54 @@ namespace AbilityEditorNameSpace
 
 		struct StartPos: MainComponent
 		{ 
-			QVector3D m_startPos;
-			StartPos(QVector3D p_startPos = QVector3D(0,0,0)): MainComponent(ComponentType::STARTPOS)
+			enum pos
 			{
-				m_startPos = p_startPos;
+				ONCASTER,
+				UNDERCASTER,
+				CLOSESTENEMY,
+				CLOSESTFRIEND,
+				ABSOLUTE,
+				END_OF_ENUM
+			};
+
+			std::map<pos, QString> m_enumToText;
+			pos m_startPos;
+			QVector3D m_absolutePos;
+			StartPos(pos p_pos = pos::ONCASTER, QVector3D p_startPos = QVector3D(0,0,0)): MainComponent(ComponentType::STARTPOS)
+			{
+				m_enumToText[ONCASTER] = "On Caster";
+				m_enumToText[UNDERCASTER] = "Under Caster";
+				m_enumToText[CLOSESTENEMY] = "Closest Enemy";
+				m_enumToText[CLOSESTFRIEND] = "Closest Friend";
+				m_enumToText[ABSOLUTE] = "Absolute";
+				m_absolutePos = p_startPos;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
 				QtVariantProperty* position, *x, *y, *z; //TODO : show other variables than just absolute positions (caster pos, enemy pos, and so on)
 				QList<QtProperty*> list;
 				QString combinedValue;
+
+				QtProperty* enumPos;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(pos)i];
+				}
+				enumPos = enumMan->addProperty("Collision shape");
+				enumMan->setEnumNames(enumPos,enumTypes);
+				enumMan->setValue(enumPos, m_startPos);
+
 				//Show rotation vector
-				position = p_propMan->addProperty(QVariant::String, "Start Position");
+				position = p_propMan->addProperty(QVariant::String, "Absolute position (if selected)");
 				x = p_propMan->addProperty(QVariant::Double, "x");
 				y = p_propMan->addProperty(QVariant::Double, "y");
 				z = p_propMan->addProperty(QVariant::Double, "z");
-				p_propMan->setValue(x, m_startPos.x());
-				p_propMan->setValue(y, m_startPos.y());
-				p_propMan->setValue(z, m_startPos.z());
+				p_propMan->setValue(x, m_absolutePos.x());
+				p_propMan->setValue(y, m_absolutePos.y());
+				p_propMan->setValue(z, m_absolutePos.z());
 				position->addSubProperty(x);
 				position->addSubProperty(y);
 				position->addSubProperty(z);
@@ -99,7 +129,9 @@ namespace AbilityEditorNameSpace
 				p_propMan->setValue(position,combinedValue);
 
 				//Add to browser widget
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(enumPos);
 				p_propBrows->addProperty(position);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
@@ -111,7 +143,7 @@ namespace AbilityEditorNameSpace
 				subprops = props.at(0)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_startPos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+					m_absolutePos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
 			}
 		};

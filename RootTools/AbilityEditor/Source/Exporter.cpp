@@ -166,8 +166,9 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::STARTPOS:
 				{
 					AbilityComponents::StartPos* startPos = static_cast<AbilityComponents::StartPos*>(p_component);
-					glm::vec3 pos = glm::vec3(startPos->m_startPos.x(), startPos->m_startPos.y(), startPos->m_startPos.z());
-					p_emitter << YAML::Key << "StartPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
+					glm::vec3 pos = glm::vec3(startPos->m_absolutePos.x(), startPos->m_absolutePos.y(), startPos->m_absolutePos.z());
+					p_emitter << YAML::Key << "StartPos" << YAML::Value << startPos->m_startPos;
+					p_emitter << YAML::Key << "AbsoluteStartPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
 				}
 				break;
 			case AbilityComponents::ComponentType::TARGPOS:

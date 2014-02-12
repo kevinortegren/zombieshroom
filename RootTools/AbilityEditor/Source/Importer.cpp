@@ -166,11 +166,17 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::StartPos* tempcomp = new AbilityComponents::StartPos();
 				if(p_node.FindValue("StartPos"))
 				{
+					int temp;
+					p_node["StartPos"] >> temp;
+					tempcomp->m_startPos = (AbilityComponents::StartPos::pos)temp;
+				}
+				if(p_node.FindValue("AbsoluteStartPos"))
+				{
 					float x,y,z;
-					p_node["StartPos"][0] >> x;
-					p_node["StartPos"][1] >> y;
-					p_node["StartPos"][2] >> z;
-					tempcomp->m_startPos = QVector3D(x,y,z);
+					p_node["AbsoluteStartPos"][0] >> x;
+					p_node["AbsoluteStartPos"][1] >> y;
+					p_node["AbsoluteStartPos"][2] >> z;
+					tempcomp->m_absolutePos = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
