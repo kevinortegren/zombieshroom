@@ -3,11 +3,11 @@
 
 SharedMemory::SharedMemory()
 {
-	NumberOfMeshes = nullptr;
-	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
-	NumberOfCameras = nullptr;
-	NumberOfMaterials = nullptr;
-	NumberOfLocators = nullptr;
+	NumberOfMeshes = 0;
+	NumberOfLights = 0;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
+	NumberOfCameras = 0;
+	NumberOfMaterials = 0;
+	NumberOfLocators = 0;
 	NumberOfMessages = 0;
 	export = 0;
 	InitalizeSharedMemory();
@@ -145,7 +145,7 @@ void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform
 		int overwrite = -1;
 
 		//Check if last message is of same type and don't add new if true
-		if(nrOfMessages > 0)
+		if(nrOfMessages > 0 && nrOfMessages < g_maxMessages)
 		{
 			for(int i = 0; i < nrOfMessages; i++)
 			{

@@ -357,10 +357,15 @@ void sortObjectList()
 	//add all objects to a array.
 	while(!it.isDone())
 	{
+		if(it.item().hasFn(MFn::kMesh) || it.item().hasFn(MFn::kLight) ||  it.item().hasFn(MFn::kLocator) || it.item().hasFn(MFn::kCamera) || it.item().hasFn(MFn::kLambert))
+		{
 		g_objectList[currNrSceneObjects] = it.item();
 		currNrSceneObjects++;
+		}
+		
 		it.next();
 	}
+	Print(currNrSceneObjects);
 	//Sort the list mesh to meshlist and so on.
 	for(int i= 0; i < currNrSceneObjects; i ++)
 	{
@@ -983,6 +988,9 @@ void checkForDuplicatedMeshes(MObject node)
 
 	if (node.hasFn(MFn::kMesh))
 	{
+		
+	
+
 		MFnMesh mesh = node;
 		g_mayaMeshList[currNrMeshes] = node;
 
@@ -997,9 +1005,11 @@ void checkForDuplicatedMeshes(MObject node)
 			id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 
-			MayaMeshToList(node, currNrMeshes, true, true, true);
-			currNrMeshes++;		
+		MayaMeshToList(node, currNrMeshes, true, true, true);
+		currNrMeshes++;
+				
 		}
+
 	}
 }
 
@@ -1391,7 +1401,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
 		memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
 		SM.UpdateSharedMaterials(currNrMaterials, meshIndex);
-		//Print("Updated material ", materialName.asChar());
+		
 
 		}
 
@@ -1872,8 +1882,6 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 
 			out_textureNode.setObject(connections[n].node(&status));
 
-			Print("DEEP NAME ", out_textureNode.name());
-
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
 
@@ -1899,8 +1907,6 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("glowIntensity", true, &status);
-	if(status == true)
-	Print("GLOW");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -1911,11 +1917,9 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
-			Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_glow_path = ftn.asString(MDGContext::fsNormal);
-			Print(out_glow_path);
 			found_glow = true;
 		}
 	}
@@ -1987,8 +1991,6 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("specularColor", true, &status);
-	if(status == true)
-	Print("This Is TRUEEE");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -1999,7 +2001,6 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
-			Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_specular_path = ftn.asString(MDGContext::fsNormal);
@@ -2031,7 +2032,6 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		{
 			GetMaterialNode(shaders[j], material_node);
 			ExtractColor(material_node, out_color_path, out_textureNode);
-			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
 			ExtractGlow(material_node, out_glow_path);
