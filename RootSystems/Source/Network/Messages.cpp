@@ -362,7 +362,7 @@ namespace RootForce
 			if (component == nullptr)
 				return nullptr;
 			
-			T c;
+			T c = *component;
 			Serialize(false, p_bs, &c);
 			if (!p_discard)
 			{
