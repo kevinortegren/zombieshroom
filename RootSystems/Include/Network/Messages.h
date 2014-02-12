@@ -55,6 +55,7 @@ namespace RootForce
 				AbilityChannelingDone,
 				AbilityChargeAndChannelingDone,
 				AbilityCooldownOff,
+				RespawnRequest,
 				DestroyEntities,
 				SpawnUser,
 				LoadMap,
@@ -206,6 +207,16 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			uint8_t AbilityIndex;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent by the client to the server when a respawn is request. Server will respond with a spawn user if the request is approved.
+		*/
+		struct RespawnRequest
+		{
+			Network::UserID_t User;		// Pretty much useless.
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

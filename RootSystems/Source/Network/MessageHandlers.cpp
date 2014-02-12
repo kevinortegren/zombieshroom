@@ -1008,6 +1008,27 @@ namespace RootForce
 					}
 				} return true;
 
+				case NetworkMessage::MessageType::RespawnRequest:
+				{
+					NetworkMessage::RespawnRequest m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								action->WantRespawn = true;
+							}
+						}
+					}
+				} return true;
+
 				case NetworkMessage::MessageType::LoadMapStatus:
 				{
 					NetworkMessage::LoadMapStatus m;
