@@ -68,7 +68,7 @@ namespace RootEngine
 				m_result = m_system->setSoftwareFormat(4800, FMOD_SOUND_FORMAT_PCMFLOAT, 0, 0, FMOD_DSP_RESAMPLER_LINEAR);
 				ErrorCheck(m_result);
 			}
-			m_result = m_system->init(1024, FMOD_INIT_NORMAL, 0);
+			m_result = m_system->init(1024, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
 			if(m_result == FMOD_ERR_OUTPUT_CREATEBUFFER)
 			{
 				/*
@@ -81,7 +81,7 @@ namespace RootEngine
 				/*
 				... and re-init.
 				*/
-				m_result = m_system->init(1024, FMOD_INIT_NORMAL, 0);
+				m_result = m_system->init(1024, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
 			}
 			ErrorCheck(m_result);
 		}

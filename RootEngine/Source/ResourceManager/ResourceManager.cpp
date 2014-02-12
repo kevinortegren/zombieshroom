@@ -85,14 +85,15 @@ namespace RootEngine
 		
 	}
 
-	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name, SoundFlags::SoundFlags p_flags )
+	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name, unsigned p_flags )
 	{
 		if(m_soundAudios.find(p_name) == m_soundAudios.end())
 		{
 			Sound::SoundAudioInterface* soundaudio = m_context->m_sound->CreateSoundAudio();
 			if(soundaudio)
 			{
-				if(soundaudio->LoadSound(p_name, p_flags))
+				std::string filePath = m_workingDirectory + "Assets/Audio/" + p_name;
+				if(soundaudio->LoadSound(filePath, p_flags))
 				{
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[SOUND] Loaded: '%s'", p_name.c_str());
 					m_soundAudios[p_name] = soundaudio;

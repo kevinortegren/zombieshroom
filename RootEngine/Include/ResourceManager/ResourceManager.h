@@ -28,7 +28,7 @@ namespace RootEngine
 	public:
 		#ifndef COMPILE_LEVEL_EDITOR
 			virtual Model*	LoadCollada(std::string p_path) = 0;
-			virtual Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, SoundFlags::SoundFlags p_flags) = 0;
+			virtual Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, unsigned p_flags) = 0;
 			virtual Physics::PhysicsMeshInterface* GetPhysicsMesh(std::string p_handle) = 0;
 
 			virtual std::string ForceLoadScript(std::string p_scriptName) = 0;
@@ -71,7 +71,7 @@ namespace RootEngine
 
 		#ifndef COMPILE_LEVEL_EDITOR
 			Model*	LoadCollada(std::string p_path);
-			Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, SoundFlags::SoundFlags p_flags);
+			Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, unsigned p_flags);
 			Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
 
 			std::string ForceLoadScript(std::string p_scriptName);

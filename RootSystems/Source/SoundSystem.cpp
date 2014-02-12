@@ -31,7 +31,20 @@ namespace RootForce
 
 	void SoundSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
+		RootForce::Transform*		transform = m_transform.Get(p_entity);
+		RootForce::SoundComponent*	sound = m_sound.Get(p_entity);
 
+		if (sound->m_soundAudio == nullptr || sound->m_soundChannel == nullptr)
+			return;
+
+		if(sound->m_play)
+		{
+			sound->m_play = false;
+			sound->m_soundChannel->PlaySound(sound->m_soundAudio, sound->m_volume);
+			sound->m_soundChannel->SetMinMaxDistance(sound->m_minDist, sound->m_maxDist);
+		}
+
+		sound->m_soundChannel->SetPosition(transform->m_position);
 	}
 
 	void SoundSystem::End()

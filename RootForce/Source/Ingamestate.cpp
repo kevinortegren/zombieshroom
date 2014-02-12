@@ -220,6 +220,7 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
 	}
 
 	void IngameState::Exit()
@@ -495,7 +496,10 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
-		
+		{
+			PROFILE("Sound System", g_engineContext.m_profiler);
+			m_soundSystem->Process();
+		}
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -545,7 +549,7 @@ namespace RootForce
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
 		}
-
+		g_engineContext.m_sound->Update();
 		return GameStates::Ingame;
 	}
 }
