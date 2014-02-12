@@ -103,9 +103,9 @@ namespace AbilityEditorNameSpace
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::EXPLOSIVE:
+		case AbilityComponents::ComponentType::CHARGEVARIABLES:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Explosive();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::ChargeVariables();
 				AddComponent(temp);
 			}
 			break;

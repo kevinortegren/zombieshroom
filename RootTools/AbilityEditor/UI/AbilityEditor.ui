@@ -238,6 +238,7 @@
     <addaction name="actionSave"/>
     <addaction name="separator"/>
     <addaction name="actionLoad"/>
+    <addaction name="separator"/>
     <addaction name="actionGenerate_Script"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>

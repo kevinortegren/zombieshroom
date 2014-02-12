@@ -35,8 +35,8 @@ namespace AbilityEditorNameSpace
 				STATCHANGECASTER,
 				STATCHANGETARGET,
 				PHYSICS,
-				EXPLOSIVE, 
-				END_OF_ENUM //TODO : EntityChange, ChargeDependant
+				CHARGEVARIABLES, 
+				END_OF_ENUM //TODO : EntityChange
 			};
 		}
 		const struct ComponentNameList
@@ -55,7 +55,7 @@ namespace AbilityEditorNameSpace
 				m_compNames.append("Stat Change (Caster)");
 				m_compNames.append("Stat Change (Target)");
 				m_compNames.append("Physics");
-				m_compNames.append("Explosive"); //Maybe not?
+				m_compNames.append("Charge Variables"); //Maybe not?
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -557,28 +557,36 @@ namespace AbilityEditorNameSpace
 			}
 		};
 
-		struct Explosive : MainComponent
+		struct ChargeVariables : MainComponent
 		{
-			float m_radius;
-			Explosive(float p_radius = 0.0f) : MainComponent(ComponentType::EXPLOSIVE)
+			float m_chargeReq, m_chargeFactor;
+			ChargeVariables(float p_chargeReq = 1.0f, float p_chargeFactor = 1.0f) : MainComponent(ComponentType::CHARGEVARIABLES)
 			{
-				m_radius = p_radius;
+				m_chargeReq = p_chargeReq;
+				m_chargeFactor = p_chargeFactor;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* radius;
+				QtVariantProperty* chargeReq, *chargeFactor;
 
-				radius = p_propMan->addProperty(QVariant::String, "Radius" );
-				p_propMan->setValue(radius, m_radius);
+				chargeReq = p_propMan->addProperty(QVariant::Double, "Charge Required" );
+				p_propMan->setValue(chargeReq, m_chargeReq);
+				chargeReq->setToolTip("Factor of charge time required for the ability to activate [0.0 : 1.0]");
+				
+				chargeFactor = p_propMan->addProperty(QVariant::Double, "Charge Effect Factor" );
+				p_propMan->setValue(chargeFactor, m_chargeFactor);
+				chargeFactor->setToolTip("Increase in effect over time [1.0 : 2.0]");
 			
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(radius);
+				p_propBrows->addProperty(chargeReq);
+				p_propBrows->addProperty(chargeFactor);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_radius = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_chargeReq = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_chargeFactor = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};	
 	}

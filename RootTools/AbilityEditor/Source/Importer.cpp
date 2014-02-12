@@ -311,11 +311,13 @@ namespace AbilityEditorNameSpace
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;	
-		case AbilityComponents::ComponentType::EXPLOSIVE:
+		case AbilityComponents::ComponentType::CHARGEVARIABLES:
 			{
-				AbilityComponents::Explosive* tempcomp = new AbilityComponents::Explosive();
-				if(p_node.FindValue("Radius"))
-					p_node["Radius"] >> tempcomp->m_radius;
+				AbilityComponents::ChargeVariables* tempcomp = new AbilityComponents::ChargeVariables();
+				if(p_node.FindValue("ChargeRequired"))
+					p_node["ChargeRequired"] >> tempcomp->m_chargeReq;
+				if(p_node.FindValue("ChargeFactor"))
+					p_node["ChargeFactor"] >> tempcomp->m_chargeFactor;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

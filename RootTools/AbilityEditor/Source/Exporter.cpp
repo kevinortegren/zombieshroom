@@ -248,10 +248,11 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 				}
 				break;
-			case AbilityComponents::ComponentType::EXPLOSIVE:
+			case AbilityComponents::ComponentType::CHARGEVARIABLES:
 				{
-					AbilityComponents::Explosive* explosive = static_cast<AbilityComponents::Explosive*>(p_component);
-					p_emitter << YAML::Key << "Radius" << YAML::Value << explosive->m_radius;
+					AbilityComponents::ChargeVariables* chargeVar = static_cast<AbilityComponents::ChargeVariables*>(p_component);
+					p_emitter << YAML::Key << "ChargeRequired" << YAML::Value << chargeVar->m_chargeReq;
+					p_emitter << YAML::Key << "ChargeFactor" << YAML::Value << chargeVar->m_chargeFactor;
 				}
 				break;
 			default:
