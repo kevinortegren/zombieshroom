@@ -91,6 +91,7 @@ namespace RootForce
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
+		int SpawnIndex;
 	};
 #endif
 

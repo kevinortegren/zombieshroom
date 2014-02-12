@@ -18,6 +18,7 @@ namespace RootSystems
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext)
 			, m_serverPeer(nullptr)
+			, m_clientPeer(nullptr)
 		{ 
 			SetUsage<RootForce::HealthComponent>();
 			SetUsage<RootForce::Collision>();
@@ -28,9 +29,14 @@ namespace RootSystems
 		void LoadSpawnPoints();
 
 		void SetServerPeer(RakNet::RakPeerInterface* p_serverPeer);
+		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
-		unsigned GetRandomSpawnpoint();
-		RootForce::Transform* GetSpawnpointTransform(unsigned index);
+		static const glm::vec3 DEFAULT_SPAWN_POINT;
+
+		int GetRandomSpawnpoint();
+		RootForce::Transform* GetSpawnpointTransform(int index);
+		void Respawn(int index, ECS::Entity* p_player);
+
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
@@ -41,5 +47,6 @@ namespace RootSystems
 		ECS::GroupManager::GroupRange m_spawnPoints;
 
 		RakNet::RakPeerInterface* m_serverPeer;
+		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }

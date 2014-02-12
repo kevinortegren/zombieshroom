@@ -223,6 +223,10 @@ namespace RootForce
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
+		if (m_networkContext.m_server != nullptr)
+			m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		m_animationSystem->Start();
 

@@ -416,7 +416,10 @@ namespace RootForce
 
 					if (clientComponent->IsRemote)
 					{
-						// TODO: Send spawn point index to respawn system.
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->SpawnIndex = m.SpawnPointIndex;
 					}
 				} return true;
 
