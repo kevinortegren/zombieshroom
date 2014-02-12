@@ -171,6 +171,7 @@ namespace RootForce
 
 		sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
 		sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+		sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
 
 		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
 
