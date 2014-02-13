@@ -9,12 +9,16 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <fstream>
 
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+
 namespace RootForce
 {
 	void AbilityRespawnSystem::Init()
 	{
 		m_respawn.Init(m_world->GetEntityManager());
 		m_transform.Init(m_world->GetEntityManager());
+		m_network.Init(m_world->GetEntityManager());
+		m_script.Init(m_world->GetEntityManager());
 	}
 
 	void AbilityRespawnSystem::ProcessEntity( ECS::Entity* p_entity )
@@ -22,14 +26,23 @@ namespace RootForce
 		float dt = m_world->GetDelta();
 		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
 		Transform* transform = m_transform.Get(p_entity);
+		Script* script = m_script.Get(p_entity);
+		Network::NetworkComponent* network = m_network.Get(p_entity);
 
 		if(respawn->Claimed != Network::ReservedUserID::NONE && respawn->CurrentAbility.Name.compare("") != 0)
 		{
+			if(m_serverPeer != nullptr)
+			{
+				//TODO: send message  Ability claimed
+			}
+			
+			//TODO: ge rätt spelare abilityn
+
 			respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 			Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
 			m_engineContext->m_physics->RemoveObject(*collision->m_handle);
 			m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity); //Remove the render component to show that there is no ability to claim
-			//m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
+			m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
 			m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
 			
 			respawn->Timer = 30.0f; //30 second timer until a new ability respawns

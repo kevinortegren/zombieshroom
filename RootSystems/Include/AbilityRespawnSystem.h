@@ -30,7 +30,7 @@ namespace RootForce
 	public:
 		AbilityRespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext, std::string p_workingDir)
 			: ECS::EntitySystem(p_world)
-			, m_engineContext(p_engineContext), m_workingDir(p_workingDir)
+			, m_engineContext(p_engineContext), m_workingDir(p_workingDir), m_serverPeer(nullptr), m_clientPeer(nullptr)
 		{ 
 			SetUsage<RootForce::AbilityRespawnComponent>();
 		}
@@ -38,6 +38,8 @@ namespace RootForce
 		void ProcessEntity(ECS::Entity* p_entity);
 		void LoadAbilities(std::string p_abilityPack);
 		void AttatchComponentToPoints();
+		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
+		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
 	private:
 		void HideSpawnPoint(ECS::Entity* p_entity);
 		void RevealSpawnPoint(ECS::Entity* p_entity);
@@ -47,7 +49,11 @@ namespace RootForce
 		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
+		ECS::ComponentMapper<RootForce::Script> m_script;
 		std::vector<std::string> m_levelAbilities;
 		std::string m_workingDir;
+
+		RakNet::RakPeerInterface* m_serverPeer;
+		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }

@@ -1431,7 +1431,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
-			(*s)->Claimed = lua_toboolean(p_luaState, 2) != 0;
+			(*s)->Claimed = (uint16_t)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 
