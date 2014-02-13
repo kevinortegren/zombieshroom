@@ -395,6 +395,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	worldSystem->CreateSkyBox();
 	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
 	waterSystem->Init();
+
 }
 
 void LoadSceneFromMaya()
@@ -708,7 +709,10 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 		p_world->GetGroupManager()->RegisterEntity("Transparent", entity);
 
 	if(transformation.flags._Water)
+	{
 		p_world->GetGroupManager()->RegisterEntity("Water", entity);
+		p_world->GetGroupManager()->RegisterEntity("NonExport", entity);
+	}
 }
 
 float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
