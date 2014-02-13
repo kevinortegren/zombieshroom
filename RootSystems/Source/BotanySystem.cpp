@@ -34,10 +34,16 @@ namespace RootForce
 
 	void BotanySystem::Process()
 	{
+		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+		RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+
 		// Get eye camera.
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity);
 		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+
+		// Cull range.
+		float range = 50.0f;
 
 		/*float n = 1.0f;
 		float f = 10.0f;
@@ -46,7 +52,7 @@ namespace RootForce
 		modifiedProj[2][2] = (-f + n) / (f - n);
 		modifiedProj[2][3] = (-2.0f * f * n) / (f - n);*/
 		
-		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, 200.0f);
+		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(), (float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, range);
 
 		RootForce::Frustum frustum;
 		frustum.RecalculatePlanesEx(camera->m_viewMatrix, projectionMatrix);
@@ -60,7 +66,12 @@ namespace RootForce
 		{
 			AABB bounds = (*itr)->GetBounds();
 			glm::vec3 center = bounds.GetCenter();
-			float d = glm::distance(transform->m_position, center);
+			center.y = 0;
+
+			glm::vec3 player = transform->m_position;
+			player.y = 0;
+
+			float d = glm::distance(ptransform->m_position, center);
 
 			m_distances[j] = d;
 	

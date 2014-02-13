@@ -4,6 +4,8 @@
 layout (vertices = 3) in;                                                
 layout (vertices = 3) out;   
 
+uniform sampler2D g_Density;
+
 layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
@@ -16,20 +18,16 @@ in vec3 cs_normal_in[];
 in vec2 cs_texcoord_in[];       
 
 out vec3 es_normal_in[];                                                                  
-out vec2 es_texcoord_in[];    
+out float es_density_in[];
 
 float GetTessLevel(float Distance0, float Distance1)                                            
 {                                                                                               
     float AvgDistance = (Distance0 + Distance1) / 2.0;  
 	                                       
-	if (AvgDistance <= 80.0f)
+	if (AvgDistance <= 100.0)
 	{  
-		return 2.0f;
+		return 3.0f;
 	}
-    else if(AvgDistance <= 200.0f)
-    {
-        return 1.0f;
-    }
     else 
 	{                                                                                      
         return 1.0;                                                                             
@@ -44,23 +42,34 @@ float GetDynamicTessFactor(float distance0, float distance1)
 }  
 
 void main()                                                                                     
-{                                                                                               
-    // Set the control points of the output patch                                               
-    es_texcoord_in[gl_InvocationID] = cs_texcoord_in[gl_InvocationID];                                                    
-    es_normal_in[gl_InvocationID] = cs_normal_in[gl_InvocationID];                            
-	              
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-                  
-    vec4 cameraPos = inverseView * vec4(0,0,0,1);
-                         
-    // Calculate the distance from the camera to the three control points                       
-    float EyeToVertexDistance0 = distance(cameraPos.xyz, gl_in[0].gl_Position.xyz);                     
-    float EyeToVertexDistance1 = distance(cameraPos.xyz, gl_in[1].gl_Position.xyz);                     
-    float EyeToVertexDistance2 = distance(cameraPos.xyz, gl_in[2].gl_Position.xyz);                     
-                                                                                                
-    // Calculate the tessellation levels                                                        
-    gl_TessLevelOuter[0] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);          
-    gl_TessLevelOuter[1] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);         
-    gl_TessLevelOuter[2] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);           
-    gl_TessLevelInner[0] = gl_TessLevelOuter[2];                                            
+{            
+    float v0d = texture(g_Density, cs_texcoord_in[0]).g;
+    float v1d = texture(g_Density, cs_texcoord_in[1]).g;
+    float v2d = texture(g_Density, cs_texcoord_in[2]).g;
+    
+    // Density 0 - 1.
+    float avgDensity = (v0d + v1d + v2d) / 3;
+    
+    if(avgDensity < 0.1)
+    {
+        // Calculate the tessellation levels                                                        
+        gl_TessLevelOuter[0] = 1;        
+        gl_TessLevelOuter[1] = 1;        
+        gl_TessLevelOuter[2] = 1;
+        gl_TessLevelInner[0] = 1;   
+    }
+    else
+    {
+        // Calculate the tessellation levels                                                        
+        gl_TessLevelOuter[0] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);          
+        gl_TessLevelOuter[1] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);         
+        gl_TessLevelOuter[2] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);           
+        gl_TessLevelInner[0] = gl_TessLevelOuter[2];           
+    }
+    
+        // Set the control points of the output patch                                                                                            
+    es_normal_in[gl_InvocationID] = cs_normal_in[gl_InvocationID];      
+    es_density_in[gl_InvocationID] = avgDensity;
+           
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;                                                                                                                               
 }  

@@ -3,11 +3,16 @@
 layout(triangles) in; 
 
 in vec3 es_normal_in[];                                                                  
-in vec2 es_texcoord_in[];       
+in float es_density_in[];       
 
 out vec3 gs_normal_in;                                                                  
-out vec2 gs_texcoord_in;    
+out float gs_density_in;    
 
+vec2 interpolate(float v0, float v1, float v2)                                                 
+{                                                                                             
+    return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2; 
+}                                                                                             
+  
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)                                                 
 {                                                                                             
     return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2; 
@@ -19,8 +24,8 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 }
 
 void main()                                                                                     
-{                                                                                               
-    gs_texcoord_in = interpolate2D(es_texcoord_in[0], es_texcoord_in[1], es_texcoord_in[2]);
+{                                                                              
+    gs_density_in = interpolate(es_density_in[0], es_density_in[1], es_density_in[2]);
     gs_normal_in = es_normal_in[0];   
    
     gl_Position = vec4(interpolate3D(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz), 1.0);                                     

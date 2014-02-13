@@ -5,7 +5,7 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 30) out;
 //layout(triangle_strip, max_vertices = 3) out;
 
-uniform sampler2D g_Density;
+
 uniform sampler1D g_Random;
 
 layout(std140) uniform PerObject
@@ -26,10 +26,10 @@ layout(std140) uniform Time
 };
 
 in vec3 gs_normal_in[];
-in vec2 gs_texcoord_in[];
+in float gs_density_in[];
 
 out vec3 vert_normal1;
-out vec2 vert_texcoord1;
+//out vec2 vert_texcoord1;
 out vec3 vert_color1;
 
 // LOD 1
@@ -131,7 +131,6 @@ void CreateShortBlade(vec3 position, float angle)
         pos += vec4(position, 1.0);
         
         gl_Position = projectionMatrix * viewMatrix * pos;
-        vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
         vert_color1 = vec3(1,0,0);
         EmitVertex();
@@ -156,7 +155,6 @@ void CreateMediumBlade(vec3 position, float angle)
         pos += vec4(position, 1.0);
         
         gl_Position = projectionMatrix * viewMatrix * pos;
-        vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
         vert_color1 = vec3(0,1,0);
         EmitVertex();
@@ -181,7 +179,6 @@ void CreateLongBlade(vec3 position, float angle)
         pos += vec4(position, 1.0);
     
         gl_Position = projectionMatrix * viewMatrix * pos;
-        vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
         vert_color1 = vec3(0,1,0);
         EmitVertex();
@@ -209,7 +206,7 @@ void CreateImposter(vec3 position)
     for(i = 0; i < 4; i++)
     {
         gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        vert_texcoord1 = texCoords[i];
+        //vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         vert_color1 = vec3(0,0,1);
         EmitVertex();
@@ -246,7 +243,7 @@ void CreateQuad(vec3 position, float angle)
     for(i = 0; i < 4; i++)
     {
         gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        vert_texcoord1 = texCoords[i];
+        //vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         EmitVertex();
     }
@@ -256,32 +253,30 @@ void CreateQuad(vec3 position, float angle)
 
 void main() 
 {
-    float v0d = texture(g_Density, gs_texcoord_in[0]).g;
-    float v1d = texture(g_Density, gs_texcoord_in[1]).g;
-    float v2d = texture(g_Density, gs_texcoord_in[2]).g;
-    
-    // Density 0 - 1.
-    float avgDensity = (v0d + v1d + v2d) / 3;
-    
-    if(avgDensity < 0.1)
-        return;
-
+    // Triangle points.
     vec3 a = gl_in[0].gl_Position.xyz;
     vec3 b = gl_in[1].gl_Position.xyz;
     vec3 c = gl_in[2].gl_Position.xyz;
-   
+    
+    // Calculate triangle vectors.
     vec3 ab = b-a;
     vec3 ac = c-a;
     
+    // Calculate area.
     float area = length(cross(ab, ac)) / 2;
+    
+    // Get average density.
+    float avgDensity = gs_density_in[0];
+    
+    // Rejects triangles with low density.
+    if(avgDensity < 0.1)
+        return;
    
     // Calculate number of plants.
-    int plantNumber = int(avgDensity * area * 4.0) + 1;
+    int plantNumber = int(avgDensity * area * 2) + 1;
     
     // Cull nodes based on distance.
-    
-    // LOD 0
-    if(g_Distance < 80.0)
+    if(g_Distance < 50.0)
     {
         int i;
         for(i = 0; i < 4; i++)
@@ -317,10 +312,10 @@ void main()
         }  
     }
     // LOD 1
-    else if(g_Distance < 200.0)
+    else
     {
         int i;
-        for(i = 0; i < 6; i++)
+        for(i = 0; i < 2; i++)
         { 
             if(i < plantNumber)
             {
@@ -341,26 +336,4 @@ void main()
             }
         }
     }
-    // Place Imposters at far distance.
-    else
-    {
-        int i;
-        for(i = 0; i < 2; i++)
-        { 
-            if(i < plantNumber)
-            {
-               float r = random(a, i);
-               float s = random(b, i);
-               
-               if(r + s >= 1)
-                {
-                    r = 1 - r;
-                    s = 1 - s;
-                }
-               
-                vec3 pos = a + r*ab + s*ac;
-                CreateImposter(pos);
-            }
-        }
-    }  
 }
