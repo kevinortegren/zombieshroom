@@ -420,6 +420,7 @@ namespace RootForce
 						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
 						health->SpawnIndex = m.SpawnPointIndex;
+						health->SpawnPointReceived = true;
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received spawn location for player %u", m.User);
 					}

@@ -92,6 +92,7 @@ namespace RootForce
 		bool WantsRespawn;
 		float RespawnDelay;
 		int SpawnIndex;
+		bool SpawnPointReceived;
 
 		HealthComponent()
 		{
@@ -101,6 +102,7 @@ namespace RootForce
 			WantsRespawn = true;
 			RespawnDelay = 0.0f;
 			SpawnIndex = -1;
+			SpawnPointReceived = false;
 		}
 	};
 #endif

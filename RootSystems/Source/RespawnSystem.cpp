@@ -36,11 +36,13 @@ namespace RootSystems
 			health->RespawnDelay = 3.0f;
 		}
 
-		// Check if a spawn point has been received from the server as a response to a respawn request.
-		if (m_clientPeer != nullptr && health->SpawnIndex != -1)
+		// Check if a spawn point has been received from the server. Always respawn when the server tells us to.
+		if (m_clientPeer != nullptr && health->SpawnPointReceived)
 		{
+			m_engineContext->m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client respawning at %d", health->SpawnIndex);
+
 			Respawn(health->SpawnIndex, p_entity);
-			health->SpawnIndex = -1;
+			health->SpawnPointReceived = false;
 		}
 
 		//Check if the player wants to respawn, only allow him to respawn after a 3 second delay.
