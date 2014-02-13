@@ -92,6 +92,16 @@ namespace RootForce
 		bool WantsRespawn;
 		float RespawnDelay;
 		int SpawnIndex;
+
+		HealthComponent()
+		{
+			Health = 0;
+			LastDamageSourceID = 0;
+			IsDead = true;
+			WantsRespawn = true;
+			RespawnDelay = 0.0f;
+			SpawnIndex = -1;
+		}
 	};
 #endif
 

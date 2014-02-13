@@ -36,7 +36,7 @@ namespace RootSystems
 			health->RespawnDelay = 3.0f;
 		}
 
-		// Check if a spawn point has been received from the server.
+		// Check if a spawn point has been received from the server as a response to a respawn request.
 		if (m_clientPeer != nullptr && health->SpawnIndex != -1)
 		{
 			Respawn(health->SpawnIndex, p_entity);
@@ -61,7 +61,7 @@ namespace RootSystems
 					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::RespawnRequest);
 					m.Serialize(true, &bs);
 
-					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
 				
 				// If we are a server, call on spawn function and tell every client of the respawn.
@@ -84,41 +84,6 @@ namespace RootSystems
 
 					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
-
-
-
-				/*
-				// TODO: Find a spawn point
-				unsigned spawnpointIndex = GetRandomSpawnpoint();
-				RootForce::Transform* spawnpoint = GetSpawnpointTransform(spawnpointIndex);
-				if(spawnpoint != nullptr)
-				{
-					transform->m_position = spawnpoint->m_position;
-					transform->m_orientation = spawnpoint->m_orientation;
-				}
-				else
-					transform->m_position = glm::vec3(0,100,0);
-
-				health->Health = 100;
-				health->IsDead = false;
-				m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
-
-				// If server, send a message to all clients about the respawn.
-				if (m_serverPeer != nullptr)
-				{
-					RootForce::NetworkMessage::SpawnUser m;
-					m.User = network->ID.UserID;
-					m.SpawnPointIndex = spawnpointIndex;
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::SpawnUser);
-					m.Serialize(true, &bs);
-
-					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				}
-				*/
 			}
 			
 			health->WantsRespawn = false;

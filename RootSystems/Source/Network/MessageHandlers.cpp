@@ -420,6 +420,8 @@ namespace RootForce
 						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
 						health->SpawnIndex = m.SpawnPointIndex;
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received spawn location for player %u", m.User);
 					}
 				} return true;
 
@@ -1027,6 +1029,8 @@ namespace RootForce
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 								action->WantRespawn = true;
+
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
 							}
 						}
 					}
