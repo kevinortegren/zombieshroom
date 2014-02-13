@@ -20,6 +20,7 @@
 #include <RootSystems/Include/Components.h>
 #include <RootSystems/Include/ConcurrentTest.h>
 #include <RootSystems/Include/WaterSystem.h>
+#include <RootSystems/Include/SoundSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -71,5 +72,6 @@ namespace RootForce
 		RootSystems::ActionSystem*						m_actionSystem;
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
+		RootForce::SoundSystem*							m_soundSystem;
 	};
 }
