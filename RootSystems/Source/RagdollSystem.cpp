@@ -72,6 +72,12 @@ namespace RootForce
 		}
 		else
 		{
+			//If the client gets "pushed" back to alive state from the server we need to deactivate the ragdoll, otherwise bad stuff might happen
+			if(m_engineContext->m_physics->IsRagdoll(*(collision->m_handle)))
+			{
+				m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
+				transform->m_orientation.SetOrientation(glm::quat(0,0,1,0));
+			}
 			ragdoll->m_firstTime = true;
 			return;
 		}

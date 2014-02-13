@@ -1522,6 +1522,11 @@ namespace Physics
 		}
 	}
 
+	bool RootPhysics::IsRagdoll( int p_objecthandle )
+	{
+		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
+	}
+
 }
 }
 
