@@ -700,6 +700,16 @@ namespace RootForce
 			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
 			return 1;
 		}
+		static int PhysicsGetPlayerAtAim(lua_State* p_luaState)
+		{
+			NumberOfArgs(5);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*s = (ECS::Entity*)g_engineContext.m_physics->GetPlayerAtAim((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
+		//RootPhysics::GetPlayerAtAim( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
 		static int PhysicsSetGravity(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
@@ -2078,6 +2088,7 @@ namespace RootForce
 			{"CheckRadius", PhysicsCheckRadius},
 			{"ShootRay", PhysicsShootRay},
 			{"GetType", PhysicsGetType},
+			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
 			{NULL, NULL}
 		};

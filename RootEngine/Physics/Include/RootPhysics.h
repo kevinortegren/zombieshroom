@@ -108,6 +108,7 @@ namespace RootEngine
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
 			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 			virtual void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius) = 0;
+			virtual void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
@@ -176,9 +177,11 @@ namespace RootEngine
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
 			void DeactivateRagdoll(int p_objectHandle);
+
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 			void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius);
+			void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 

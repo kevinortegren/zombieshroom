@@ -235,18 +235,26 @@ namespace AbilityEditorNameSpace
 				}
 				else if (startEnum == AbilityComponents::StartPos::ENEMYPLAYER)
 				{
-					//if getClosestPlayer == enemy
-					//startPos = enemy.Pos();
+					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), startPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
+					m_file << "\tif self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\t local startPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\tend\n";
 				}
 				else if (startEnum == AbilityComponents::StartPos::FRIENDPLAYER)
 				{
-					//if getClosestPlayer == friend
-					//startPos = friend.Pos();
+					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), startPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
+					m_file << "\tif self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\t local startPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\tend\n";
 				}
 				else// if (startEnum == AbilityComponents::StartPos::ABSOLUTE)
 				{
 					m_file << "\tlocal startPos = Vec3.New(" << startPos.x() << ", " << startPos.y() << ", " << startPos.z() << ");\n"; 
 				}
+			}
+			else
+			{
+				m_file << "\tlocal startPos = Vec3.New(0,0,0);\n";
 			}
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
@@ -332,6 +340,9 @@ namespace AbilityEditorNameSpace
 			}
 		}
 			m_file << "\tend\n";
+
+		WriteNewAbilities(p_onCreate);
+
 		m_file << "end\n";
 	}
 
@@ -411,6 +422,8 @@ namespace AbilityEditorNameSpace
 			m_file << "\tend\n";
 		}
 
+		WriteNewAbilities(p_onCollide);
+
 		m_file << "end\n";
 	}
 
@@ -419,8 +432,25 @@ namespace AbilityEditorNameSpace
 		m_file << "function " << m_name << ".OnDestroy (self)\n";
 
 		//Remove stuff
+		WriteNewAbilities(p_onDestroy);
 
 		m_file << "end\n";
+	}
+
+	void ScriptGenerator::WriteNewAbilities( MainOnEvent* p_onEvent )
+	{
+		for (unsigned int i = 0; i < p_onEvent->GetConditions()->size(); i++)
+		{
+			m_file << "\t" << p_onEvent->GetConditions()->at(i)->GetCode().toStdString() << "\n";
+			std::vector<QString> scriptNames = p_onEvent->GetEntityNames(i);
+			for (unsigned int j = 0; j < scriptNames.size(); j++)
+			{
+				scriptNames.at(j).chop(4); 
+				//m_file << "\t\trequire(" << scriptNames.at(j).toStdString() << ");\n";
+				m_file << "\t\t" << scriptNames.at(j).toStdString() << ".OnCreate(network:GetUserId(), network:GetActionId());\n"; //TODO : Maybe take a closer look at this
+			}
+			m_file << "\tend\n";
+		}
 	}
 
 }

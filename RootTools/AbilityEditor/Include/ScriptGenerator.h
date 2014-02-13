@@ -24,7 +24,7 @@ namespace AbilityEditorNameSpace
 		void WriteChannelingDone();
 		void WriteOnCollide(OnCreate* p_onCreate, OnCollide* p_onCollide);
 		void WriteOnDestroy(OnDestroy* p_onDestroy);
-
+		void WriteNewAbilities(MainOnEvent* p_onEvent);
 	private:
 		std::string m_name;
 		std::ofstream m_file;
