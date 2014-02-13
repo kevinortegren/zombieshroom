@@ -197,7 +197,7 @@ namespace RootForce
 			job.m_params = renderable->m_params;
 			//job.m_mesh->SetWireFrame(true);
 
-			//m_engineContext->m_renderer->AddRenderJob(job);
+			m_engineContext->m_renderer->AddRenderJob(job);
 		}
 	}
 

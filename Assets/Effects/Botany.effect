@@ -16,7 +16,7 @@
         - name: g_Random
           slot: 10
       uniforms:
-        - sem: SPEEDMIN
+        - sem: POSITION
           offset: 0
       programs:
         - name: Botany

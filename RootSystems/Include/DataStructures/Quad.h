@@ -9,7 +9,7 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-#define QUADTREE_POLYGONS_PER_NODE 500
+#define QUADTREE_POLYGONS_PER_NODE 1000
 #define QUADTREE_MAX_CHILDS 4
 #define QUADTREE_SUBDIVIDE
 //#define QUADTREE_VERBOSE

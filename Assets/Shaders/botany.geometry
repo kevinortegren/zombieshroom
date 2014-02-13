@@ -3,15 +3,8 @@
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 30) out;
-//layout(triangle_strip, max_vertices = 3) out;
-
 
 uniform sampler1D g_Random;
-
-layout(std140) uniform PerObject
-{
-	float g_Distance;
-};
 
 layout(std140) uniform PerFrame
 {
@@ -27,6 +20,7 @@ layout(std140) uniform Time
 
 in vec3 gs_normal_in[];
 in float gs_density_in[];
+in float gs_lod_in[];
 
 out vec3 vert_normal1;
 //out vec2 vert_texcoord1;
@@ -138,6 +132,30 @@ void CreateShortBlade(vec3 position, float angle)
     EndPrimitive();
 }
 
+void CreateShortBladeLOD(vec3 position, float angle)
+{  
+    vec4 unit = vec4(0,0,1,0);
+    mat4 rotation;
+	rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+	rotation[1] = vec4(0, 1, 0, 0);
+	rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+	rotation[3] = vec4(0, 0, 0, 1);   
+    unit = rotation * unit;
+
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+        vec4 pos = rotation * vec4(shortBlade[i], 0.0);
+        pos += vec4(position, 1.0);
+        
+        gl_Position = projectionMatrix * viewMatrix * pos;
+        vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(1,1,0);
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
 void CreateMediumBlade(vec3 position, float angle)
 {  
     vec4 unit = vec4(0,0,1,0);
@@ -180,7 +198,7 @@ void CreateLongBlade(vec3 position, float angle)
     
         gl_Position = projectionMatrix * viewMatrix * pos;
         vert_normal1 = gs_normal_in[0];
-        vert_color1 = vec3(0,1,0);
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -251,8 +269,29 @@ void CreateQuad(vec3 position, float angle)
     EndPrimitive();   
 }
 
+vec3 GetRandomPosition(vec3 a, vec3 b, vec3 ab, vec3 ac, int i)
+{
+   float r = random(a, i);
+   float s = random(b, i);
+
+   if(r + s >= 1)
+    {
+        r = 1 - r;
+        s = 1 - s;
+    }
+   
+    return a + r*ab + s*ac;
+}
+
 void main() 
 {
+    // Get average density.
+    float avgDensity = gs_density_in[0];
+
+    // Rejects triangles with low density.
+    if(avgDensity < 0.2)
+        return;
+    
     // Triangle points.
     vec3 a = gl_in[0].gl_Position.xyz;
     vec3 b = gl_in[1].gl_Position.xyz;
@@ -265,75 +304,47 @@ void main()
     // Calculate area.
     float area = length(cross(ab, ac)) / 2;
     
-    // Get average density.
-    float avgDensity = gs_density_in[0];
+    // Calculate number of blades.
+    int density = int(avgDensity * area * 3) + 1;
     
-    // Rejects triangles with low density.
-    if(avgDensity < 0.1)
-        return;
-   
-    // Calculate number of plants.
-    int plantNumber = int(avgDensity * area * 2) + 1;
-    
-    // Cull nodes based on distance.
-    if(g_Distance < 50.0)
+    if(gs_lod_in[0] == 0)
     {
-        int i;
-        for(i = 0; i < 4; i++)
-        { 
-            if(i < plantNumber)
-            {
-               float r = random(a, i);
-               float s = random(b, i);
-               
-               if(r + s >= 1)
-                {
-                    r = 1 - r;
-                    s = 1 - s;
-                }
-               
-                vec3 pos = a + r*ab + s*ac;
-                float rotation = random(c, i);
-                
-                // Create blades based on density.
-                if(avgDensity > 0.7)
-                {
-                    CreateLongBlade(pos, 2*3.14*rotation);
-                }
-                else if(avgDensity > 0.3)
-                {
-                    CreateMediumBlade(pos, 2*3.14*rotation);
-                }
-                else
-                {
-                    CreateMediumBlade(pos, 2*3.14*rotation);
-                }       
-            }
-        }  
+        if(density > 0)
+        {
+            float rotation = random(c, 0);
+            CreateShortBlade(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
+        }
+    
+        if(density > 1)
+        {
+            float rotation = random(c, 1);
+            CreateMediumBlade(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
+        }
+    
+        if(density > 2)
+        {
+            float rotation = random(c, 2);
+            CreateLongBlade(GetRandomPosition(a,b,ab,ac,2), 2*3.14*rotation);
+        }
+        
+        if(density > 3)
+        {
+            float rotation = random(c, 3);
+            CreateLongBlade(GetRandomPosition(a,b,ab,ac,3), 2*3.14*rotation);
+        }
     }
-    // LOD 1
     else
     {
-        int i;
-        for(i = 0; i < 2; i++)
-        { 
-            if(i < plantNumber)
-            {
-               float r = random(a, i);
-               float s = random(b, i);
-               
-               if(r + s >= 1)
-                {
-                    r = 1 - r;
-                    s = 1 - s;
-                }
-               
-                vec3 pos = a + r*ab + s*ac;  
-                float rotation = random(c, i);
-                
-                // Create low poly 
-                CreateShortBlade(pos, 2*3.14*rotation);
-            }
+        if(density > 0)
+        {
+            float rotation = random(c, 0);
+            CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
+        }
+   
+        if(density > 1)
+        {
+            float rotation = random(c, 1);
+            CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
         }
     }
 }
