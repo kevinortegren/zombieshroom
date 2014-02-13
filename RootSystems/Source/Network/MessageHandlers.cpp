@@ -127,7 +127,7 @@ namespace RootForce
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 						{
-							clientComponent->State = ClientState::CONNECTED;
+							clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 						}
 					}
 				} return true;
@@ -187,7 +187,7 @@ namespace RootForce
 					else
 					{
 						// For a local client, just set the client state
-						clientComponent->State = ClientState::CONNECTED;
+						clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 					}
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d: %s): %s", m.User, p_packet->systemAddress.ToString(), m.Name.C_String());
@@ -423,6 +423,12 @@ namespace RootForce
 						health->SpawnPointReceived = true;
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received spawn location for player %u", m.User);
+					}
+
+					// If we were awaiting a spawn message for connection sequence, set us to connected now. For both local and remote players.
+					if (clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
+					{
+						clientComponent->State = ClientState::CONNECTED;
 					}
 				} return true;
 
@@ -1114,8 +1120,6 @@ namespace RootForce
 									}
 								}
 
-								clientComponent->State = ClientState::CONNECTED;
-
 								// Send a user connected message for all clients to the connectee.
 								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
@@ -1130,7 +1134,9 @@ namespace RootForce
 									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
 										continue;
 									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
-									if(clientComponent->State != ClientState::CONNECTED)
+									if(clientComponent->State != ClientState::CONNECTED && 
+									   clientComponent->State != ClientState::AWAITING_FIRST_GAMESTATE_DELTA && 
+									   clientComponent->State != ClientState::AWAITING_SPAWN_POINT)
 										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
@@ -1160,6 +1166,13 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
+
+								// Make sure the player will be spawned at a spawn point.
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								health->WantsRespawn = true;
+								health->RespawnDelay = 0.0f;
+
+								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 							}
 						} break;
 

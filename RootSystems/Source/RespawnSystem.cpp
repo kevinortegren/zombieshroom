@@ -43,11 +43,19 @@ namespace RootSystems
 
 			Respawn(health->SpawnIndex, p_entity);
 			health->SpawnPointReceived = false;
+
+			// Check whether this is the connection spawn message, and if so, set the client state to connected.
+			RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(m_world->GetTagManager()->GetEntityByTag("Client"));
+			if (clientComponent != nullptr && clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
+			{
+				clientComponent->State = RootForce::Network::ClientState::CONNECTED;
+			}
 		}
 
-		//Check if the player wants to respawn, only allow him to respawn after a 3 second delay.
-		//This is to stop accidental respawn clicks when a player has just died(one might want to check the score first)
-		if(health->IsDead && health->WantsRespawn)
+		// Check if the player wants to respawn, only allow him to respawn after a 3 second delay.
+		// This is to stop accidental respawn clicks when a player has just died(one might want to check the score first)
+		// Not checking for dead-status, since a server might want to spawn a living player. IsDead will only be checked in the ActionSystem.
+		if(health->WantsRespawn)
 		{
 			if(health->RespawnDelay <= 0.0f)
 			{
@@ -85,6 +93,13 @@ namespace RootSystems
 					m.Serialize(true, &bs);
 
 					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+
+					// Check whether this is the connection spawn message, and if so, set the client state to connected.
+					RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(p_entity);
+					if (clientComponent != nullptr && clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
+					{
+						clientComponent->State = RootForce::Network::ClientState::CONNECTED;
+					}
 				}
 			}
 			
