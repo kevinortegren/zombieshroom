@@ -6,6 +6,8 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 
 namespace RootForce
 {
@@ -13,13 +15,13 @@ namespace RootForce
 	{
 		float Timer;
 		AbilityInfo CurrentAbility;
-		bool Claimed;
+		Network::UserID_t Claimed;
 
 		AbilityRespawnComponent()
 		{
 			Timer = 0;
 			CurrentAbility = AbilityInfo();
-			Claimed = false;
+			Claimed = Network::ReservedUserID::NONE;
 		}
 	};
 
@@ -37,10 +39,14 @@ namespace RootForce
 		void LoadAbilities(std::string p_abilityPack);
 		void AttatchComponentToPoints();
 	private:
+		void HideSpawnPoint(ECS::Entity* p_entity);
+		void RevealSpawnPoint(ECS::Entity* p_entity);
+
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
+		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		std::vector<std::string> m_levelAbilities;
 		std::string m_workingDir;
 	};

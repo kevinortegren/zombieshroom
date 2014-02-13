@@ -23,7 +23,7 @@ namespace RootForce
 		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
 		Transform* transform = m_transform.Get(p_entity);
 
-		if(respawn->Claimed && respawn->CurrentAbility.Name.compare("") != 0)
+		if(respawn->Claimed != Network::ReservedUserID::NONE && respawn->CurrentAbility.Name.compare("") != 0)
 		{
 			respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 			Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
@@ -33,7 +33,7 @@ namespace RootForce
 			m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
 			
 			respawn->Timer = 30.0f; //30 second timer until a new ability respawns
-			respawn->Claimed = false;
+			respawn->Claimed = Network::ReservedUserID::NONE;
 		}
 		else if(respawn->Timer <= 0.0f && respawn->CurrentAbility.Name.compare("") == 0)
 		{
@@ -48,13 +48,13 @@ namespace RootForce
 			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
 			renderable->m_material->m_effect = m_engineContext->m_resourceManager->GetEffect("Mesh");
 
-			//CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(p_entity);
+			CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(p_entity);
 			Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(p_entity);
-			//collisionResp->m_collisions = std::map<void*,CollisionInfo>();
+			collisionResp->m_collisions = std::map<void*,CollisionInfo>();
 			collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)p_entity, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
 			collision->m_meshHandle = "AbilitySpawnPoint";
 			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 1.0f, 1.0f, false);
-			//m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
+			m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 
 		}
 		respawn->Timer -= dt;
@@ -83,7 +83,19 @@ namespace RootForce
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
 		{
 			m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second);
+			m_world->GetEntityManager()->CreateComponent<Network::NetworkComponent>(itr->second);
+			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
 		}
+	}
+
+	void AbilityRespawnSystem::HideSpawnPoint(ECS::Entity* p_entity)
+	{
+
+	}
+
+	void AbilityRespawnSystem::RevealSpawnPoint(ECS::Entity* p_entity)
+	{
+
 	}
 
 }
