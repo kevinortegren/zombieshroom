@@ -22,10 +22,13 @@ namespace Render
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
 
+		void SetupSSAO();
+		void BeginSSAO();
 		void Clear();
 		void Process(Mesh& p_fullscreenQuad);
 		void Resize(int p_width, int p_height);
 		void ClearLights();
+		
 
 	private:
 
@@ -43,8 +46,13 @@ namespace Render
 		size_t m_numPointLights;
 
 		std::shared_ptr<TechniqueInterface> m_deferredTech;
+		std::shared_ptr<TechniqueInterface> m_ssaoTech;
 
 		GLuint m_fbo;
 		TextureInterface* m_la;
+		TextureInterface* m_ssaoTex;
+		TextureInterface* m_noiseSSAOTex;
+		glm::vec3 m_kernel[16];
+		float Random(float p_low, float p_high);
 	};
 }

@@ -29,7 +29,7 @@
           # Blend Mode:
           # None = 0
           # AlphaBlend = 1
-          # Addative = 2
+          # Additive = 2
           blend: 0
 
           # Depth settings.

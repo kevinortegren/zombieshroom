@@ -661,7 +661,7 @@ typedef char GLchar;
 #define GL_TEXTURE 0x1702
 #define GL_COLOR 0x1800
 #define GL_DEPTH 0x1801
-#define GL_STENCIL 0x1802
+#define GL_STENCIL_TEST 0x1802
 #define GL_COLOR_INDEX 0x1900
 #define GL_STENCIL_INDEX 0x1901
 #define GL_DEPTH_COMPONENT 0x1902

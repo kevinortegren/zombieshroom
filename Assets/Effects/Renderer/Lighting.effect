@@ -23,6 +23,8 @@
           slot: 5
         - name: g_ShadowDepth
           slot: 6
+        - name: g_SSAO
+          slot: 7
       programs:
         - name: ambient
           shaders:
@@ -54,7 +56,7 @@
             write: 0
             test: 0
           blend: 2
-        - name: background-addative
+        - name: background-additive
           shaders:
             - name: output
               type: vertex

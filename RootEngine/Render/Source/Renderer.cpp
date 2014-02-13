@@ -386,7 +386,7 @@ namespace Render
 
 		{
 			PROFILE("Shadow pass", g_context.m_profiler);
-			ShadowPass();
+			//ShadowPass();
 		}
 
 		// Buffer Per Frame data.
@@ -618,7 +618,7 @@ namespace Render
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
-		m_lighting.Clear();
+
 		m_lighting.Process(m_fullscreenQuad);
 		//m_gbuffer.m_depthTexture->Unbind(10);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);

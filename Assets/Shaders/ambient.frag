@@ -4,6 +4,7 @@ in vec2 ex_TexCoord;
 out vec4 out_Color;
 
 uniform sampler2D g_Diffuse;
+uniform sampler2D g_SSAO;
 
 layout(std140) uniform Lights
 {
@@ -11,5 +12,6 @@ layout(std140) uniform Lights
 };
 
 void main() {
-    out_Color = vec4(g_Ambient.xyz * texture(g_Diffuse, ex_TexCoord.st).xyz, 1.0f);
+	
+    out_Color = vec4(g_Ambient.rgb * texture(g_SSAO, ex_TexCoord.st).r * texture(g_Diffuse, ex_TexCoord.st).rgb, 1.0f);
 }

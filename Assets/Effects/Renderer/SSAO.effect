@@ -1,0 +1,24 @@
+- name: SSAO
+  techniques:
+    - name: SSAO
+      bindings:
+        - name: PerTech
+          slot: 3
+      textures:
+        - name: g_Normals
+          slot: 1
+        - name: g_Depth
+          slot: 2
+        - name: g_Noise
+          slot: 7        
+      programs:
+      - name: ssao
+        shaders:
+          - name: postprocess
+            type: vertex
+          - name: ssao
+            type: fragment
+        depth:
+          write: 0
+          test: 0
+        blend: 0
