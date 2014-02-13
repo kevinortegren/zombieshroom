@@ -61,52 +61,6 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
-
-		// Initialize the system for controlling the player.
-		/*std::vector<RootForce::Keybinding> keybindings(6);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
-		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::MOVE_FORWARDS, SDL_SCANCODE_W);
-
-		/*keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
-		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
-		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::MOVE_BACKWARDS, SDL_SCANCODE_S);
-
-		/*keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
-		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
-		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::STRAFE_LEFT, SDL_SCANCODE_A);
-
-		/*keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
-		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
-		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::STRAFE_RIGHT, SDL_SCANCODE_D);
-
-		/*keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::JUMP;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::JUMP, SDL_SCANCODE_SPACE);
-		
-		/*keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::ACTIVATE_ABILITY, (SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-
-		/*keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
-		keybindings[keybindings.size()-1].Edge = true;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::SELECT_ABILITY1, SDL_SCANCODE_1);
-		/*keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
-		keybindings[keybindings.size()-1].Edge = true;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::SELECT_ABILITY2, SDL_SCANCODE_2);
-		/*keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
-		keybindings[keybindings.size()-1].Edge = true;*/
-		m_keymapper->SetActionBinding(RootForce::PlayerAction::SELECT_ABILITY3, SDL_SCANCODE_3);
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -205,7 +159,7 @@ namespace RootForce
 		m_hud->SetSelectedAbility(0);
 
 		//Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
@@ -217,10 +171,15 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		
+		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
 
 	void IngameState::Exit()
 	{
+		// Make sure the user is not stuck keymapping in case of disconnects or other abnormal termination
+		m_keymapper->UnfocusBindAction();
+
 		m_animationSystem->Terminate();
 
 		Network::NetworkEntityID id;

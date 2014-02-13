@@ -26,6 +26,13 @@ namespace RootForce
 
 	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
+		// Reload config
+		m_context.m_configManager->LoadConfig("config.yaml");
+		// Update keybinding manager
+		auto map = m_context.m_configManager->GetConfigValuePairs();
+		for(auto pair : map)
+			m_keymapper->SetActionBinding(pair.first, (SDL_Scancode)m_context.m_configManager->GetConfigValueAsInteger(pair.first));
+
 		// Get a list of options
 		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
 		Awesomium::JSObject jsArray;
@@ -83,14 +90,12 @@ namespace RootForce
 
 	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)
 	{
-		std::string action = Awesomium::ToString(p_array[0].ToString());
-		// TODO
-		//m_keymapper->FocusBindAction(action);
+		m_keymapper->FocusBindAction(Awesomium::ToString(p_array[0].ToString()));
 	}
 
 	void SettingsMenu::UnfocusBindEvent(const Awesomium::JSArray& p_array)
 	{
-		m_keymapper->UnfocusBindAction();
+		m_keymapper->UnfocusEvent();
 	}
 
 	void SettingsMenu::BindEvents( RootEngine::GUISystem::WebView* p_view )

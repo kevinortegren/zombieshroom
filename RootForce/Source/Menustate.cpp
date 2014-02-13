@@ -10,8 +10,7 @@ extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 namespace RootForce
 {	
 	MenuState::MenuState(NetworkContext& p_networkContext)
-		: m_networkContext(p_networkContext),
-		m_keymapper(p_keymapper)
+		: m_networkContext(p_networkContext)
 	{}
 
 	void MenuState::Initialize(const std::string& p_workingDir)
