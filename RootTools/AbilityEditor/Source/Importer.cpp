@@ -186,11 +186,17 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::TargetPos* tempcomp = new AbilityComponents::TargetPos();
 				if(p_node.FindValue("TargetPos"))
 				{
+					int temp;
+					p_node["TargetPos"] >> temp;
+					tempcomp->m_targPos = (AbilityComponents::TargetPos::pos)temp;
+				}
+				if(p_node.FindValue("AbsoluteTargetPos"))
+				{
 					float x,y,z;
-					p_node["TargetPos"][0] >> x;
-					p_node["TargetPos"][1] >> y;
-					p_node["TargetPos"][2] >> z;
-					tempcomp->m_targetPos = QVector3D(x,y,z);
+					p_node["AbsoluteTargetPos"][0] >> x;
+					p_node["AbsoluteTargetPos"][1] >> y;
+					p_node["AbsoluteTargetPos"][2] >> z;
+					tempcomp->m_absolutePos = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
@@ -198,13 +204,15 @@ namespace AbilityEditorNameSpace
 		case AbilityComponents::ComponentType::VELOCITY:
 			{
 				AbilityComponents::Velocity* tempcomp = new AbilityComponents::Velocity();
-				if(p_node.FindValue("Velocity"))
+				if(p_node.FindValue("Direction"))
 				{
-					float x,y,z;
-					p_node["Velocity"][0] >> x;
-					p_node["Velocity"][1] >> y;
-					p_node["Velocity"][2] >> z;
-					tempcomp->m_velocity = QVector3D(x,y,z);
+					int temp;
+					p_node["Direction"] >> temp;
+					tempcomp->m_direction = (AbilityComponents::Velocity::dir)temp;
+				}
+				if(p_node.FindValue("Speed"))
+				{
+					p_node["Speed"] >> tempcomp->m_speed;
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
@@ -259,6 +267,12 @@ namespace AbilityEditorNameSpace
 		case AbilityComponents::ComponentType::DAMAGE:
 			{
 				AbilityComponents::Damage* tempcomp = new AbilityComponents::Damage();
+				if(p_node.FindValue("DamagePlayers"))
+				{
+					int temp;
+					p_node["DamagePlayers"] >> temp;
+					tempcomp->m_affectedPlayers = (AbilityComponents::Damage::affected)temp;
+				}
 				if(p_node.FindValue("Damage"))
 					p_node["Damage"] >> tempcomp->m_damage;
 
@@ -268,6 +282,12 @@ namespace AbilityEditorNameSpace
 		case AbilityComponents::ComponentType::KNOCKBACK:
 			{
 				AbilityComponents::Knockback* tempcomp = new AbilityComponents::Knockback();
+				if(p_node.FindValue("KnockbackPlayers"))
+				{
+					int temp;
+					p_node["KnockbackPlayers"] >> temp;
+					tempcomp->m_affectedPlayers = (AbilityComponents::Knockback::affected)temp;
+				}
 				if(p_node.FindValue("Knockback"))
 					p_node["Knockback"] >> tempcomp->m_knockback;
 
@@ -301,8 +321,6 @@ namespace AbilityEditorNameSpace
 		case AbilityComponents::ComponentType::PHYSICS:
 			{
 				AbilityComponents::Physics* tempcomp = new AbilityComponents::Physics();
-				if(p_node.FindValue("PhysicsSpeed"))
-					p_node["PhysicsSpeed"] >> tempcomp->m_speed;
 				if(p_node.FindValue("PhysicsMass"))
 					p_node["PhysicsMass"] >> tempcomp->m_mass;
 				if(p_node.FindValue("PhysicsGravity"))
@@ -313,6 +331,8 @@ namespace AbilityEditorNameSpace
 					p_node["PhysicsGravity"][2] >> z;
 					tempcomp->m_gravity = QVector3D(x,y,z);
 				}
+				if(p_node.FindValue("PhysicsCollide"))
+					p_node["PhysicsCollide"] >> tempcomp->m_collide;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

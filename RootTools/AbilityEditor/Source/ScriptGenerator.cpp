@@ -44,11 +44,11 @@ namespace AbilityEditorNameSpace
 		
 		WriteVariables();
 		m_file << "\n";
-		WriteOnCreate(p_onCreate);
-		m_file << "\n";
 		WriteChargeDone();
 		m_file << "\n";
 		WriteChannelingDone();
+		m_file << "\n";
+		WriteOnCreate(p_onCreate);
 		m_file << "\n";
 		WriteOnCollide(p_onCreate, p_onCollide);
 		m_file << "\n";
@@ -84,7 +84,7 @@ namespace AbilityEditorNameSpace
 	{
 		float chargeReq = 0.0f, chargeFac = 1.0f;
 
-		m_file << "function " << m_name << ".ChargeDone (time, UserID, ActionID)\n";
+		m_file << "function " << m_name << ".ChargeDone (time, userId, actionId)\n";
 		for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
 		{
 			if(m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::CHARGEVARIABLES)
@@ -107,6 +107,15 @@ namespace AbilityEditorNameSpace
 		{
 			m_file << "\tend\n";
 		}
+		m_file << "end\n";
+	}
+
+	void ScriptGenerator::WriteChannelingDone()
+	{
+		m_file << "function " << m_name << ".ChannelingDone (time, userId, actionId)\n";
+
+		//Remove stuff, or create other stuff
+
 		m_file << "end\n";
 	}
 
@@ -139,16 +148,18 @@ namespace AbilityEditorNameSpace
 			float height = 1.0f;
 			int colShape = 3;
 			//Physics variables
-			float speed = 1.0f;
 			float mass = 1.0f;
 			QVector3D grav = QVector3D(0,9.82f,0);
-
+			//Positions
+			int startEnum, targetEnum;
 			QVector3D startPos = QVector3D(0,0,0);
 			QVector3D targetPos = QVector3D(0,0,0);
-			QVector3D velocity = QVector3D(0,0,0);
+			//Velocity
+			int direction = 0;
+			float speed = 1.0f;
 			//Collision variable
 			bool colWithWorld = false;
-
+			//Setting values
 			for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
 			{
 				if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::COLLISIONSHAPE)
@@ -159,59 +170,139 @@ namespace AbilityEditorNameSpace
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::PHYSICS)
 				{
-					speed = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_speed;
 					mass = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_mass;
 					grav = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_gravity;
-					//colWithWorld
+					colWithWorld = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_collide;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STARTPOS)
 				{
-					//startPos = ((AbilityComponents::StartPos*)m_entity->GetComponents()->at(i))->m_startPos; //This is probably gonna change
+					startEnum = ((AbilityComponents::StartPos*)m_entity->GetComponents()->at(i))->m_startPos;
+					startPos = ((AbilityComponents::StartPos*)m_entity->GetComponents()->at(i))->m_absolutePos;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::TARGPOS)
 				{
-					targetPos = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_targetPos;
+					targetEnum = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_targPos;
+					targetPos = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_absolutePos;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::VELOCITY)
 				{
-					velocity = ((AbilityComponents::Velocity*)m_entity->GetComponents()->at(i))->m_velocity;
+					direction = ((AbilityComponents::Velocity*)m_entity->GetComponents()->at(i))->m_direction;
+					speed = ((AbilityComponents::Velocity*)m_entity->GetComponents()->at(i))->m_speed;
 				}
 				//Rotation and stuff will be set by the followPlayer System
 			}
+			//Writing values
 
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::VELOCITY))
+			{
+				if (direction == AbilityComponents::Velocity::FORWARD)
+				{
+					m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+				}
+				else if (direction == AbilityComponents::Velocity::BACKWARD)
+				{
+					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+				}
+				else if (direction == AbilityComponents::Velocity::UP)
+				{
+					m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();\n";
+				}
+				else if (direction == AbilityComponents::Velocity::DOWN)
+				{
+					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();\n";
+				}
+				else if (direction == AbilityComponents::Velocity::RIGHT)
+				{
+					m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetRight();\n";
+				}
+				else if (direction == AbilityComponents::Velocity::LEFT)
+				{
+					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetRight();\n";
+				}
+			}
 
-			m_file << "\tlocal startPos = Vec3.New(" << startPos.x() << ", " << startPos.y() << ", " << startPos.z() << ");\n"; //Change this soon plz
-			m_file << "\tlocal frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STARTPOS))
+			{
+				if (startEnum == AbilityComponents::StartPos::ONCASTER)
+				{
+					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
+					m_file << "\tlocal startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
+				}
+				else if (startEnum == AbilityComponents::StartPos::UNDERCASTER)
+				{
+					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
+					m_file << "\tlocal startPos = Vec3.New(tempPos.x, tempPos.y - 2, tempPos.z);\n"; 
+				}
+				else if (startEnum == AbilityComponents::StartPos::ENEMYPLAYER)
+				{
+					//if getClosestPlayer == enemy
+					//startPos = enemy.Pos();
+				}
+				else if (startEnum == AbilityComponents::StartPos::FRIENDPLAYER)
+				{
+					//if getClosestPlayer == friend
+					//startPos = friend.Pos();
+				}
+				else// if (startEnum == AbilityComponents::StartPos::ABSOLUTE)
+				{
+					m_file << "\tlocal startPos = Vec3.New(" << startPos.x() << ", " << startPos.y() << ", " << startPos.z() << ");\n"; 
+				}
+			}
+
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
+			{
+				if (startEnum == AbilityComponents::TargetPos::ONAIM)
+				{
+					//tarPos = rayCast.getPosition()
+					//SetTargetPosition(tarPos);
+				}
+				else if (startEnum == AbilityComponents::TargetPos::ENEMYPLAYER)
+				{
+					//if getClosestPlayer == enemy
+					//tarPos = enemy.getPosition()
+					//SetTargetPosition(tarPos);
+				}
+				else if (startEnum == AbilityComponents::TargetPos::FRIENDLYPLAYER)
+				{
+					//if getClosestPlayer == friend
+					//tarPos = friend.getPosition()
+					//SetTargetPosition(tarPos);
+				}
+				else if (startEnum == AbilityComponents::TargetPos::ABSOLUTE)
+				{
+					//SetTargetPosition(Vec3.New(targetPos));
+				}
+			}
 
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::COLLISIONSHAPE))
 			{
 				if (colShape == AbilityComponents::CollisionShape::CYLINDER)
 				{
-					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, Vec3.New((startPos.x + frontVec.x * 3), (4 + startPos.y + frontVec.y * 3), (startPos.z + frontVec.z * 3)), Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::CONE)
 				{
-					m_file << "\tphysicsComp:BindConeShape(collisionComp, Vec3.New((startPos.x + frontVec.x * 3), (4 + startPos.y + frontVec.y * 3), (startPos.z + frontVec.z * 3)), Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindConeShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::SPHERE)
 				{
-					m_file << "\tphysicsComp:BindSphereShape(collisionComp, Vec3.New((startPos.x + frontVec.x * 3), (4 + startPos.y + frontVec.y * 3), (startPos.z + frontVec.z * 3)), Quat.New(0,0,0,1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::RAY)
 				{
 					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), startPos, Quat.New(0,0,0,1));\n";
-					m_file << "\tphysicsComp:ShootRay(collisionComp:GetHandle(), startPos, frontVec, "<< height <<");\n";
+					m_file << "\tphysicsComp:ShootRay(collisionComp:GetHandle(), startPos, dirVec, "<< height <<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::MESH)
 				{
-					m_file << "\tphysicsComp:BindMeshShape(collisionComp, Vec3.New((startPos.x + frontVec.x * 3), (4 + startPos.y + frontVec.y * 3), (startPos.z + frontVec.z * 3)), Quat.New(0,0,0,1), Vec3.New(1,1,1), "/*<-- scale, what do?*/<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, Quat.New(0,0,0,1), Vec3.New(1,1,1), "/*<-- scale, what do?*/<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 			}
 
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICS))
 			{
-				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * " << speed << ", frontVec.y * " << speed << ", frontVec.z * " << speed << ")\n";
-				m_file << "\tphysicsComp:SetGravity(collisionComp, Vec3.New(" << grav.x() << ", " << grav.y() << ", " << grav.z() << ")\n";
+				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * " << speed << ", dirVec.y * " << speed << ", dirVec.z * " << speed << "));\n";
+				m_file << "\tphysicsComp:SetGravity(collisionComp, Vec3.New(" << grav.x() << ", " << grav.y() << ", " << grav.z() << "));\n";
 			}
 			
 			m_file << "\ttransformComp:SetPos(startPos);\n";
@@ -221,6 +312,7 @@ namespace AbilityEditorNameSpace
 
 
 		//Client only components:
+			m_file << "\tif Global.IsClient then\n";
 		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
 		{
 			// Setting values
@@ -236,27 +328,88 @@ namespace AbilityEditorNameSpace
 			}
 			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::ABILITYPARTICLE)
 			{
-				m_file << "\t\tlocal particleComp = ParticleEmitter.New(self, " << ((AbilityComponents::AbilityParticle*)m_entity->GetComponents()->at(j))->m_particleName << ");\n";
+				m_file << "\t\tlocal particleComp = ParticleEmitter.New(self, \"" << ((AbilityComponents::AbilityParticle*)m_entity->GetComponents()->at(j))->m_particleName << "\");\n";
 			}
 		}
-
+			m_file << "\tend\n";
 		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteOnCollide( OnCreate* p_onCreate, OnCollide* p_onCollide)
 	{
+
+		int dmgEnum = 0, knockEnum = 0;
+		float dmg = 0.0f, knockb = 0.0f;
+
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
 		
-		//Knockback, do damage, change stat
+		// TODO : Knockback, do damage, change stat
 
-		m_file << "end\n";
-	}
+		for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
+		{
+			if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::DAMAGE)
+			{
+				dmgEnum = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
+				dmg = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(i))->m_damage;
+			}
+			else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
+			{
+				knockEnum = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
+				knockb = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_knockback;
+			}
+		}
 
-	void ScriptGenerator::WriteChannelingDone()
-	{
-		m_file << "function " << m_name << ".ChannelingDone (time, UserID, ActionID)\n";
+		m_file << "\tlocal hitCol = entity:GetCollision();\n";
+		m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
+		m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
 
-		//Remove stuff, or create other stuff
+		if (m_damage != 0.0f && m_knockback != 0.0f)
+		{
+			m_file << "\tif type == PhysicsType.TYPE_PLAYER then\n";
+				m_file << "\t\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
+				m_file << "\t\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
+				m_file << "\t\tlocal abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+				m_file << "\t\tlocal abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+				m_file << "\t\tlocal abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+
+				//Do damage
+				if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::DAMAGE))
+				{
+					if(dmgEnum == AbilityComponents::Damage::ENEMIES)
+						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
+					else if(dmgEnum == AbilityComponents::Damage::FRIENDLIES)
+						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+					else if(dmgEnum == AbilityComponents::Damage::EVERYONE)
+						m_file << "\n"; //always
+
+						m_file << "\t\t\tlocal health = entity:GetHealth();\n";
+						m_file << "\t\t\tif not health:IsDead() then\n";
+							m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
+							m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
+							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, AbilityBall.damage, receiverId);\n";
+						m_file << "\t\t\tend\n";
+					if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
+						m_file << "\t\tend\n";
+				}
+				//Knockback
+				if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::KNOCKBACK))
+				{
+					if(dmgEnum == AbilityComponents::Knockback::ENEMIES)
+						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
+					else if(dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
+						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+					else if(dmgEnum == AbilityComponents::Knockback::EVERYONE)
+						m_file << "\n"; //always
+
+						m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
+						m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
+						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".knockback);\n";
+
+					if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
+						m_file << "\t\tend\n";
+				}
+			m_file << "\tend\n";
+		}
 
 		m_file << "end\n";
 	}

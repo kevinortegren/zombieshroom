@@ -14,12 +14,24 @@ layout(std140) uniform PerFrame
 
 in vec2 vert_scale[];
 in vec4 vert_color[];
+in float vert_rotation[];
 
 out vec2 gs_TexCoord;
 out vec2 gs_ScreenCoord;
 out float gs_Depth;
 out vec4 gs_color;
-
+mat4 rotationMatrix(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
 void main(void) {
 	
 	vec4 positionV = viewMatrix * gl_in[0].gl_Position;
@@ -27,8 +39,9 @@ void main(void) {
 
     //vec3 cameraPos = vec3(invView[1][4], invView[2][4], invView[3][4]);
     
-    
-	vec4 corner = positionV + vec4(-scale.x, -scale.y, 0, 0);
+    mat4 rotation = rotationMatrix(vec3(0,0,1), vert_rotation[0]);
+
+	vec4 corner = positionV + vec4(-scale.x, -scale.y, 0, 0)*rotation;
 	vec4 positionH = projectionMatrix * corner;
     gs_ScreenCoord = positionH.xy / positionH.w;
     gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
@@ -38,7 +51,7 @@ void main(void) {
 	gs_color = vert_color[0];
 	EmitVertex();
 
-	corner = positionV + vec4(scale.x, -scale.y, 0, 0);
+	corner = positionV + vec4(scale.x, -scale.y, 0, 0)*rotation;
 	positionH = projectionMatrix * corner;
     gs_ScreenCoord = positionH.xy / positionH.w;
     gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
@@ -48,7 +61,7 @@ void main(void) {
 	gs_color = vert_color[0];
 	EmitVertex();
 	
-	corner = positionV + vec4(-scale.y, scale.x, 0, 0);
+	corner = positionV + vec4(-scale.y, scale.x, 0, 0)*rotation;
 	positionH = projectionMatrix * corner;
     gs_ScreenCoord = positionH.xy / positionH.w;
     gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));
@@ -58,7 +71,7 @@ void main(void) {
 	gs_color = vert_color[0];
 	EmitVertex();
 	
-	corner = positionV + vec4(scale.x, scale.y, 0, 0);
+	corner = positionV + vec4(scale.x, scale.y, 0, 0)*rotation;
 	positionH = projectionMatrix * corner;
     gs_ScreenCoord = positionH.xy / positionH.w;
     gs_ScreenCoord = 0.5f * (gs_ScreenCoord + vec2(1,1));

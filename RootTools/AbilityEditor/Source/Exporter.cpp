@@ -174,15 +174,16 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::TARGPOS:
 				{
 					AbilityComponents::TargetPos* targetPos = static_cast<AbilityComponents::TargetPos*>(p_component);
-					glm::vec3 pos = glm::vec3(targetPos->m_targetPos.x(), targetPos->m_targetPos.y(), targetPos->m_targetPos.z());
-					p_emitter << YAML::Key << "TargetPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
+					glm::vec3 pos = glm::vec3(targetPos->m_absolutePos.x(), targetPos->m_absolutePos.y(), targetPos->m_absolutePos.z());
+					p_emitter << YAML::Key << "TargetPos" << YAML::Value << targetPos->m_targPos;
+					p_emitter << YAML::Key << "AbsoluteTargetPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
 				}
 				break;
 			case AbilityComponents::ComponentType::VELOCITY:
 				{
 					AbilityComponents::Velocity* velocity = static_cast<AbilityComponents::Velocity*>(p_component);
-					glm::vec3 vel = glm::vec3(velocity->m_velocity.x(), velocity->m_velocity.y(), velocity->m_velocity.z());
-					p_emitter << YAML::Key << "Velocity" << YAML::Value << YAML::Flow << YAML::BeginSeq << vel.x << vel.y << vel.z << YAML::EndSeq;
+					p_emitter << YAML::Key << "Direction" << YAML::Value << velocity->m_direction;
+					p_emitter << YAML::Key << "Speed" << YAML::Value << velocity->m_speed;
 				}
 				break;
 			case AbilityComponents::ComponentType::ABILITYMODEL:
@@ -215,12 +216,14 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::DAMAGE:
 				{
 					AbilityComponents::Damage* damage = static_cast<AbilityComponents::Damage*>(p_component);
+					p_emitter << YAML::Key << "DamagePlayers" << YAML::Value << damage->m_affectedPlayers;
 					p_emitter << YAML::Key << "Damage" << YAML::Value << damage->m_damage;
 				}
 				break;
 			case AbilityComponents::ComponentType::KNOCKBACK:
 				{
 					AbilityComponents::Knockback* knockback = static_cast<AbilityComponents::Knockback*>(p_component);
+					p_emitter << YAML::Key << "KnockbackPlayers" << YAML::Value << knockback->m_affectedPlayers;
 					p_emitter << YAML::Key << "Knockback" << YAML::Value << knockback->m_knockback;
 				}
 				break;
@@ -243,10 +246,10 @@ namespace AbilityEditorNameSpace
 			case AbilityComponents::ComponentType::PHYSICS:
 				{
 					AbilityComponents::Physics* physCon = static_cast<AbilityComponents::Physics*>(p_component);
-					p_emitter << YAML::Key << "PhysicsSpeed" << YAML::Value << physCon->m_speed;
-					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
+					p_emitter << YAML::Key << "PhysicsMass" << YAML::Value << physCon->m_mass;
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
-					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
+					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
+					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
 				}
 				break;
 			case AbilityComponents::ComponentType::CHARGEVARIABLES:

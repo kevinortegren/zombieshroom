@@ -2,6 +2,7 @@
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Sound/Include/SoundManager.h>
 namespace RootEngine
 {
 
@@ -29,7 +30,12 @@ namespace RootEngine
 			(*partitr).second.clear();
 		}
 
-		m_models.clear();
+		for(auto soundItr = m_soundAudios.begin(); soundItr != m_soundAudios.end(); soundItr++)
+		{
+			delete (*soundItr).second;
+			(*soundItr).second = nullptr;
+		}
+		m_soundAudios.clear();
 	}
 
 	void ResourceManager::Init(std::string p_workingDirectory, GameSharedContext* p_context)
@@ -79,6 +85,40 @@ namespace RootEngine
 		
 	}
 
+	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name, unsigned p_flags )
+	{
+		if(m_soundAudios.find(p_name) == m_soundAudios.end())
+		{
+			Sound::SoundAudioInterface* soundaudio = m_context->m_sound->CreateSoundAudio();
+			if(soundaudio)
+			{
+				std::string filePath = m_workingDirectory + "Assets/Audio/" + p_name;
+				if(soundaudio->LoadSound(filePath, p_flags))
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[SOUND] Loaded: '%s'", p_name.c_str());
+					m_soundAudios[p_name] = soundaudio;
+					return soundaudio;
+				}
+				else
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when loading sound: '%s'", p_name.c_str());
+					delete soundaudio;
+					return nullptr;
+				}
+			}
+			else
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when creating sound: '%s'", p_name.c_str());
+				return nullptr;
+			}
+		}
+		else
+		{
+			return m_soundAudios[p_name];
+		}
+		
+	}
+
 	std::string ResourceManager::LoadScript( std::string p_scriptName )
 	{
 		if(m_scripts.find(p_scriptName) == m_scripts.end())
@@ -107,7 +147,7 @@ namespace RootEngine
 	std::string ResourceManager::ForceLoadScript( std::string p_scriptName )
 	{
 		// Do not reload global variables.
-		if (p_scriptName == "Global.lua")
+		if (p_scriptName == "Global")
 			return p_scriptName;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Force loaded script: '%s.lua', it may already exist in Resource Manager!", p_scriptName.c_str());
 		m_context->m_script->LoadScript(p_scriptName + ".lua");
@@ -382,4 +422,5 @@ namespace RootEngine
 	{
 		return m_workingDirectory;
 	}
+
 }

@@ -28,11 +28,11 @@ function Player.OnCreate(userId, actionId)
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 
-	playerAction:SetJump(false);
+	playerAction:SetJumpTime(0.0);
 	playerAction:SetMovePower(0);
 	playerAction:SetStrafePower(0);
 	playerAction:SetAngle(Vec2.New(0, 0));
-	playerAction:SetActivateAbility(false);
+	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
 	playerComponent:SetAbility(0, "AbilityBall");
@@ -62,7 +62,7 @@ function Player.OnCreate(userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
-    
+	
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
@@ -99,6 +99,6 @@ end
 
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-    local collision = self:GetCollision();
+	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end
