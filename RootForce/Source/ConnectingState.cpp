@@ -91,7 +91,7 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 
 		// Always set the client peer on the respawning system.
-		m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 	}
 
 	void ConnectingState::Exit()
