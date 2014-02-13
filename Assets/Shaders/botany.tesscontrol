@@ -29,8 +29,8 @@ void main()
     
     // Average density 0 - 1.
     float avgDensity = (v0d + v1d + v2d) / 3;
-    
-    if(avgDensity < 0.1)
+
+    if(avgDensity < 0.2)
     {
         // Calculate the tessellation levels                                                        
         gl_TessLevelOuter[0] = 1;        

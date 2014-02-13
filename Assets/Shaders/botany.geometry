@@ -156,6 +156,30 @@ void CreateShortBladeLOD(vec3 position, float angle)
     EndPrimitive();
 }
 
+void CreateShortBladeLOD2(vec3 position, float angle)
+{  
+    vec4 unit = vec4(0,0,1,0);
+    mat4 rotation;
+	rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+	rotation[1] = vec4(0, 1, 0, 0);
+	rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+	rotation[3] = vec4(0, 0, 0, 1);   
+    unit = rotation * unit;
+
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+        vec4 pos = rotation * vec4(shortBlade[i], 0.0);
+        pos += vec4(position, 1.0);
+        
+        gl_Position = projectionMatrix * viewMatrix * pos;
+        vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(1,0,1);
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
 void CreateMediumBlade(vec3 position, float angle)
 {  
     vec4 unit = vec4(0,0,1,0);
@@ -304,47 +328,55 @@ void main()
     // Calculate area.
     float area = length(cross(ab, ac)) / 2;
     
-    // Calculate number of blades.
-    int density = int(avgDensity * area * 3) + 1;
+    if(area < 0.8)
+        return;
     
     if(gs_lod_in[0] == 0)
     {
-        if(density > 0)
+        if(avgDensity > 0.2)
         {
             float rotation = random(c, 0);
             CreateShortBlade(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
         }
     
-        if(density > 1)
+        if(avgDensity > 0.4)
         {
             float rotation = random(c, 1);
             CreateMediumBlade(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
         }
     
-        if(density > 2)
+        if(avgDensity > 0.6)
         {
             float rotation = random(c, 2);
             CreateLongBlade(GetRandomPosition(a,b,ab,ac,2), 2*3.14*rotation);
         }
         
-        if(density > 3)
+        if(avgDensity > 0.8)
         {
             float rotation = random(c, 3);
             CreateLongBlade(GetRandomPosition(a,b,ab,ac,3), 2*3.14*rotation);
-        }
+        }      
     }
-    else
+    else if(gs_lod_in[0] == 1)
     {
-        if(density > 0)
+        if(avgDensity > 0.2)
         {
             float rotation = random(c, 0);
             CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
         }
    
-        if(density > 1)
+        if(avgDensity > 0.4)
         {
             float rotation = random(c, 1);
             CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
+        }
+    }
+    else
+    {
+        if(avgDensity > 0.2)
+        {
+            float rotation = random(c, 0);
+            CreateShortBladeLOD2(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
         }
     }
 }

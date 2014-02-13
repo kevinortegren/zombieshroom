@@ -39,13 +39,17 @@ void main()
     // Decide LOD.
     float distance = length(position - g_Position);
     
-    if(distance < 60.0)
+    if(distance < 20.0)
     {
         gs_lod_in = 0.0;
     }
-    else
+    else if(distance < 60.0)
     {
         gs_lod_in = 1.0;
+    }
+    else
+    {
+        gs_lod_in = 2.0;
     }
     
     gl_Position = vec4(position, 1.0);                                     
