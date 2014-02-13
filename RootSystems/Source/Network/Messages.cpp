@@ -108,6 +108,17 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, AbilityIndex);
 		}
 
+		void AbilityTryClaim::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void AbilityClaimedBy::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, AbilitySpawnPointID);
+		}
+
 		void RespawnRequest::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);

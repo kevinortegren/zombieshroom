@@ -228,7 +228,10 @@ namespace RootForce
 		*/
 		struct AbilityClaimedBy
 		{
+			Network::UserID_t User;
+			Network::NetworkEntityID AbilitySpawnPointID;
 
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
 		/*
