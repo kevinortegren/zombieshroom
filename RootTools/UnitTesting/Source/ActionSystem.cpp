@@ -61,16 +61,15 @@ TEST(ActionSystem, ProcessEntity)
 	{
 		health->IsDead = true;
 		action->ActionID = 15;
-		//action->Jump = true;
-		//action->ActivateAbility = true;
+		action->WantRespawn = true;
+		// TODO: Test that abilities and jumps can't be triggered while dead
 
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
 
 		EXPECT_TRUE(health->WantsRespawn);
-		//EXPECT_FALSE(action->Jump);
-		//EXPECT_FALSE(action->ActivateAbility);
+		EXPECT_FALSE(action->WantRespawn);
 		health->IsDead = false;
 	}
 
@@ -111,23 +110,22 @@ TEST(ActionSystem, ProcessEntity)
 
 	{
 		glm::vec3 pos = transform->m_position;
-		//action->Jump = true;
+		action->JumpTime += 0.5f;
 
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
 
 		EXPECT_GT(transform->m_position.y, pos.y);
-		//EXPECT_FALSE(action->Jump);
 	}
 
-	{
-		//action->ActivateAbility = true;
+	/*{ TODO: New test for ability triggering
+		action->AbilityTime += 0.5;
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
-		//EXPECT_FALSE(action->ActivateAbility);
-	}
+		EXPECT_FALSE(action->ActivateAbility);
+	}*/
 
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
