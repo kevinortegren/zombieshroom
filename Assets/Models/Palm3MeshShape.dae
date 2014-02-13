@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.12.mb</source_data>
+      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.14.mb</source_data>
     </contributor>
-    <created>2014-02-07T11:38:40</created>
-    <modified>2014-02-07T11:38:40</modified>
+    <created>2014-02-13T10:23:35</created>
+    <modified>2014-02-13T10:23:35</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -38,14 +38,14 @@
             <source>file5-surface</source>
           </sampler2D>
         </newparam>
-        <newparam sid="file7-surface">
+        <newparam sid="file16-surface">
           <surface type="2D">
-            <init_from>file7</init_from>
+            <init_from>file16</init_from>
           </surface>
         </newparam>
-        <newparam sid="file7-sampler">
+        <newparam sid="file16-sampler">
           <sampler2D>
-            <source>file7-surface</source>
+            <source>file16-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -93,7 +93,7 @@
           <extra>
             <technique profile="OpenCOLLADAMaya">
               <bump>
-                <texture texture="file7-sampler" texcoord="TEX1">
+                <texture texture="file16-sampler" texcoord="TEX1">
                   <extra>
                     <technique profile="OpenCOLLADA3dsMax">
                       <amount>1</amount>
@@ -140,13 +140,13 @@
         </technique>
       </extra>
     </image>
-    <image id="file7" name="file7">
+    <image id="file16" name="file16">
       <init_from>file:///C:/ZombieShroom/LevelEditor/Assets/Textures/PalmTreeTex_normal.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
           <image_sequence>0</image_sequence>
-          <originalMayaNodeId>file7</originalMayaNodeId>
+          <originalMayaNodeId>file16</originalMayaNodeId>
         </technique>
       </extra>
     </image>
@@ -224,7 +224,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="TortugaCoveV0.12">
+    <visual_scene id="VisualSceneNode" name="TortugaCoveV0.14">
       <node id="Palm3Mesh" name="Palm3Mesh" type="NODE">
         <translate sid="translate">70.7818 8.98034 -74.99189</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
