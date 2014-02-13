@@ -12,6 +12,9 @@
   DIRECTION: [0, 0, 0]
   SPREAD: 1
   SPAWNTIME: 0.03
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   TEXTURE: smoke
   EFFECT: Particle/Particle
   NAME: Fire
@@ -29,6 +32,9 @@
   DIRECTION: [0, 0, 0]
   SPREAD: 1
   SPAWNTIME: 0.03
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   TEXTURE: smoke
   EFFECT: Particle/Particle
   NAME: Smoke

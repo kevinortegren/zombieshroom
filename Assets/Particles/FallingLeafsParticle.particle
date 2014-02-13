@@ -12,6 +12,9 @@
   DIRECTION: [0, -1, 0]
   SPREAD: 0.5
   SPAWNTIME: 5
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   TEXTURE: Leaf
   EFFECT: Particle/Particle
   NAME: LeafEmiter
@@ -29,6 +32,9 @@
   DIRECTION: [0, -1, 0]
   SPREAD: 0.5
   SPAWNTIME: 7
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   TEXTURE: Leaf
   EFFECT: Particle/Particle
   NAME: LeafDarkGreen

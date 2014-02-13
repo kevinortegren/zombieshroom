@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <windows.h>
+#include <GL/glew.h>
 
 namespace Render
 {
@@ -23,6 +24,9 @@ namespace RootEngine
 		virtual void SetMemoryTracker(MemoryTracker* p_memTracker) = 0;
 		virtual void SetRenderInterface(Render::RendererInterface* p_renderer) = 0;
 #ifndef COMPILE_LEVEL_EDITOR
+		virtual void BeginGPUTimer() = 0;
+		virtual double EndGPUTimer() = 0;
+		virtual void InitQuery() = 0;
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
 #endif
 	private:
@@ -38,6 +42,9 @@ namespace RootEngine
 		void StoreSample(std::string p_name, __int64 p_elapsedTime);
 		void SetMemoryTracker(MemoryTracker* p_memTracker);
 		void SetRenderInterface(Render::RendererInterface* p_renderer);
+		void BeginGPUTimer();
+		double EndGPUTimer();
+		void InitQuery();
 #ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 #endif
@@ -52,6 +59,7 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 		float m_time;
 		int m_frames;
+		GLuint m_queryID;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

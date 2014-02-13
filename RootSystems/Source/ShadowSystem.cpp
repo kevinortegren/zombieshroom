@@ -121,9 +121,9 @@ namespace RootForce
 		// Define near/far planes for the sub frustrums.
 		float _near[RENDER_SHADOW_CASCADES];
 		_near[0] = camera->m_frustum.m_near;
-		_near[1] = 15.0f;
-		_near[2] = 60.0f;
-		_near[3] = 200.0f;
+		_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
+		_near[2] = 40.0f;
+		_near[3] = 150.0f;
 		
 		float _far[RENDER_SHADOW_CASCADES];
 		_far[0] = _near[1];
@@ -160,7 +160,7 @@ namespace RootForce
 			glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
 			
 			float nearPlane = 1.0f;
-			float lookAtDistance = glm::length(centerInViewSpace - m_maxWorldZ) + nearPlane;
+			float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
 			float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
 			float farPlane = lookAtDistance + radius;
 			
@@ -168,6 +168,10 @@ namespace RootForce
 			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
 			sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
 		}
+
+		sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
+		sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+		sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
 
 		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
 
@@ -207,7 +211,6 @@ namespace RootForce
 				jobs.push_back(std::move(job));
 			}
 
-			g_engineContext.m_renderer->AddShadowJob(jobs, i);
 #else
 #ifndef COMPILE_LEVEL_EDITOR
 			std::vector<Render::ShadowJob> jobs;
@@ -219,7 +222,6 @@ namespace RootForce
 				jobs.push_back(std::move(job));
 			}
 
-			g_engineContext.m_renderer->AddShadowJob(jobs, i);
 #endif
 #endif
 		}

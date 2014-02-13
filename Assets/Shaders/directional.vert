@@ -29,6 +29,7 @@ layout(std140) uniform Lights
 
 out vec2 ex_TexCoord;
 out DirectionalLight ex_Light;
+out vec3 sunPosition;
 
 void main() {
     gl_Position = vec4(vec3(in_PositionM, 0.0f), 1.0f);
@@ -36,5 +37,7 @@ void main() {
 
 
 	ex_Light = lights[gl_InstanceID];
+	sunPosition = 2000 * -ex_Light.LightDirection;
+	sunPosition = (viewMatrix * vec4(sunPosition, 1.0)).xyz;
 	ex_Light.LightDirection = normalize(viewMatrix * vec4(ex_Light.LightDirection, 0.0f)).xyz;
 }

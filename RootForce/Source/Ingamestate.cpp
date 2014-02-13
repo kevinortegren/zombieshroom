@@ -43,14 +43,13 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void IngameState::Initialize()
 	{
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -90,20 +89,25 @@ namespace RootForce
 		//keybindings[3].Edge = true;
 
 		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::JUMP;
+		keybindings[4].Action = RootForce::PlayerAction::JUMP_PRESSED;
+		keybindings[4].ActionUp = RootForce::PlayerAction::JUMP_RELEASED;
 		//keybindings[4].Edge = true;
 		
 		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY_PRESSED;
+		keybindings[5].ActionUp = RootForce::PlayerAction::ACTIVATE_ABILITY_RELEASED;
 		//keybindings[5].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
 		keybindings[keybindings.size()-1].Edge = true;
+
 		keybindings.push_back(RootForce::Keybinding());
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
@@ -179,6 +183,9 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -212,12 +219,19 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		// Set the server peer to the action system, if we are a server.
+		if (m_networkContext.m_server != nullptr)
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
 
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
 	}
 
 	void IngameState::Exit()
@@ -275,7 +289,7 @@ namespace RootForce
 			else
 			{
 				g_engineContext.m_gui->Render(m_hud->GetView());
-				//g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -404,27 +418,23 @@ namespace RootForce
 		{
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
 		}
 		//DEBUG -> toggle wireframe mode on water with I
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->ToggleWireFrame();
-
-
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->TogglePause();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->DecreaseDamping();
+			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->IncreaseSpeed();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->DecreaseSpeed();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->IncreaseWaterHeight();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->DecreaseWaterHeight();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_R) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ResetWater();
 
 #endif
 		
@@ -497,7 +507,10 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
-		
+		{
+			PROFILE("Sound System", g_engineContext.m_profiler);
+			m_soundSystem->Process();
+		}
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -547,7 +560,7 @@ namespace RootForce
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
 		}
-
+		g_engineContext.m_sound->Update();
 		return GameStates::Ingame;
 	}
 }

@@ -12,15 +12,22 @@ namespace RootForce
 		SetUsage<RootForce::WaterCollider>();
 	}
 
+	WaterSystem::~WaterSystem()
+	{
+		delete m_textureData;
+	}
+
 	void WaterSystem::Init()
 	{
 		m_transform.Init(m_world->GetEntityManager());
 		m_waterCollider.Init(m_world->GetEntityManager());
 		
-		m_maxX = m_maxZ = 1024;
+		m_texSize = 1024;
 		m_scale = 40.0f;
 		m_dt = 0;
 		m_gridSize = 64;
+
+		m_textureData = new float[m_texSize*m_texSize];
 	}
 
 	void WaterSystem::Begin()
@@ -31,7 +38,7 @@ namespace RootForce
 		m_dt += m_world->GetDelta();
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
-		{
+		{   	
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
@@ -40,7 +47,7 @@ namespace RootForce
 			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
 			//Reset timer and preserve non-exact time additions
 			m_dt -= m_timeStep;
-		}
+		}	
 	}
 
 	void WaterSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -54,27 +61,32 @@ namespace RootForce
 		float waterHeight = GetWaterHeight();
 
 		//If over water, set edge time to 0 and return
-		if(transform->m_position.y > waterHeight + waterCollider->m_radius)
+		if(transform->m_position.y > waterHeight + waterCollider->m_radius/2.0f)
 		{
 			waterCollider->m_waterState = RootForce::WaterState::WaterState::OVER_WATER;
 			waterCollider->m_edgeWaterTime = 0.0f;
 			return;
 		} //if under water, set edge time to 0 and return
-		else if(transform->m_position.y < waterHeight - waterCollider->m_radius)
+		else if(transform->m_position.y < waterHeight - waterCollider->m_radius/2.0f)
 		{
 			waterCollider->m_waterState = RootForce::WaterState::WaterState::UNDER_WATER;
 			waterCollider->m_edgeWaterTime = 0.0f;
 			return;
 		}
 		else //if by the edge of the water, start disturbing at given interval
-			waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
-
-		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 20.0f )
+			
+		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
 		{	//Disturb
-			Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower);
+			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
+				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
+			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
+				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower, waterCollider->m_radius);
+			else
+				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower/3.0f, waterCollider->m_radius);
 			waterCollider->m_prevPos = transform->m_position;
 			waterCollider->m_edgeWaterTime = waterCollider->m_disturbInterval;
 		}
+		waterCollider->m_waterState = RootForce::WaterState::WaterState::EDGE_WATER;
 		//Decrease edge time
 		waterCollider->m_edgeWaterTime -= m_world->GetDelta();
 	}
@@ -94,13 +106,13 @@ namespace RootForce
 
 		//Create empty textures for compute shader swap. Texture 0 and 1 are used for height values and texture 2 is used for normals.
 		m_texture[0] = m_context->m_resourceManager->CreateTexture("computeTex1");
-		m_texture[0]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[0]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[0]->SetAccess(GL_READ_WRITE);
 		m_texture[1] = m_context->m_resourceManager->CreateTexture("computeTex2");
-		m_texture[1]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
+		m_texture[1]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 		m_texture[2] = m_context->m_resourceManager->CreateTexture("computeTex3");
-		m_texture[2]->CreateEmptyTexture(m_maxX, m_maxZ, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
 		m_texture[2]->SetAccess(GL_READ_WRITE);
 
 		//Create compute effect
@@ -108,7 +120,7 @@ namespace RootForce
 
 		//Setup compute job
 		m_computeJob.m_effect		= m_effect;
-		m_computeJob.m_groupDim		= glm::uvec3(m_maxX/16, m_maxZ/16, 1);
+		m_computeJob.m_groupDim		= glm::uvec3(m_texSize/16, m_texSize/16, 1);
 		m_computeJob.m_textures[0]	= m_texture[0];
 		m_computeJob.m_textures[1]	= m_texture[1];
 		m_computeJob.m_textures[2]  = m_texture[2];
@@ -116,12 +128,11 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::MK2]	= &m_mk2;
 		m_computeJob.m_params[Render::Semantic::MK3]	= &m_mk3;
 		m_computeJob.m_params[Render::Semantic::DX]		= &m_dx;
-		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_maxX;
-		m_computeJob.m_params[Render::Semantic::YMAX]	= &m_maxZ;
+		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_texSize;
 
 		//Set standard values
 		m_speed		= 11.0f;
-		m_dx		= (m_scale*64.0f) / m_maxZ;
+		m_dx		= (m_scale*64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -160,146 +171,14 @@ namespace RootForce
 		m_pause = false;
 	}
 
-	void WaterSystem::Disturb( float p_x, float p_z, float p_power )
-	{
-		
-		float scaleHalfWidth = ((float)m_gridSize/2.0f) * m_scale;
-		glm::vec2 waterPos = glm::vec2((p_x + scaleHalfWidth) * m_maxX, (p_z + scaleHalfWidth) * m_maxZ) / (scaleHalfWidth*2.0f);
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
-
-		//Return if out of bounds
-		if(waterPos.x >= m_maxX || waterPos.x <= 0 || waterPos.y >= m_maxZ || waterPos.y <= 0)
-			return;
-
-		//Disturb 5 pixels. The one in the middle is disturbed at full power and the other 4 are disturbed at half the power
-		m_computeJob.m_textures[1]->Bind(0);
-		float emptyDataHalf = p_power/6.0f;
-		
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyData[0]); 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+1,	(int)waterPos.y-1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-1,	(int)waterPos.y+1,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x+2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x-2,	(int)waterPos.y,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y-2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, (int)waterPos.x,		(int)waterPos.y+2,	1, 1, GL_RED, GL_FLOAT, &emptyDataHalf);
-
-
-		m_computeJob.m_textures[1]->Unbind(0);
-	}
-
-	void WaterSystem::ToggleWireFrame()
-	{
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water wireframe toggled!");
-		m_wireFrame = m_wireFrame ? false : true;
-		m_renderable->m_model->m_meshes[0]->SetWireFrame(m_wireFrame);
-	}
-
-	void WaterSystem::TogglePause()
-	{
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water pause toggled!");
-		m_pause = m_pause ? false : true;
-	}
-
-	void WaterSystem::CalculateWaterConstants()
-	{
-		if(!ValidValues())
-		{
-			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Values are not valid!");
-			return;
-		}
-
-		float dts2		= m_damping*m_timeStep+2.0f;
-		float stsdx		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
-
-		m_mk1     = (m_damping*m_timeStep-2.0f)/ dts2;
-		m_mk2     = (4.0f-8.0f*stsdx) / dts2;
-		m_mk3     = (2.0f*stsdx) / dts2;
-	}
-
-	void WaterSystem::SetDamping( float p_damping )
-	{
-		m_damping = p_damping;
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water damping set to: %f", p_damping);
-		CalculateWaterConstants();
-	}
-
-	void WaterSystem::SetSpeed( float p_speed )
-	{
-		m_speed = p_speed;
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water speed set to: %f", p_speed);
-		CalculateWaterConstants();
-	}
-
-	void WaterSystem::InitDisturb()
-	{
-		for(int i = 0; i < 50; ++i)
-		{ 
-			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-
-			Disturb((float)x, (float)z, 10.0f);
-		}
-	}
-
-	void WaterSystem::IncreaseDamping()
-	{
-		m_damping += 0.1f;
-		if(m_damping > 1.0f)
-			m_damping = 1.0f;
-		SetDamping(m_damping);
-	}
-
-	void WaterSystem::IncreaseSpeed()
-	{
-		m_speed += 2.0f;
-		if(m_speed > 500.0f)
-			m_speed = 500.0f;
-		SetSpeed(m_speed);
-	}
-
-	void WaterSystem::DecreaseDamping()
-	{
-		m_damping -= 0.1f;
-		if(m_damping < 0.0f)
-			m_damping = 0.0f;
-		SetDamping(m_damping);
-	}
-
-	void WaterSystem::DecreaseSpeed()
-	{
-		m_speed -= 2.0f;
-		if(m_speed < 0.0f)
-			m_speed = 0.0f;
-		SetSpeed(m_speed);
-	}
-
-	bool WaterSystem::ValidValues()
-	{
-		float calc = (m_dx/(2*m_timeStep))*std::sqrtf(m_damping*m_timeStep+2);
-		if(m_speed > 0 && m_speed < calc)
-			return true;
-		else 
-			return false;
-	}
-
-	float WaterSystem::GetWaterHeight()
-	{
-		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
-	}
-
-	void WaterSystem::SetWaterHeight( float p_height )
-	{
-		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
-	}
-
 	void WaterSystem::CreateWaterMesh()
 	{
+		if(m_context->m_resourceManager->GetModel("WaterModel"))
+		{
+			m_renderable->m_model = m_context->m_resourceManager->GetModel("WaterModel");
+			return;
+		}
+
 		std::vector<Render::Vertex1P1N1UV1T1BT> vertices;
 		std::vector<unsigned int> indices;
 
@@ -309,7 +188,7 @@ namespace RootForce
 			{
 				Render::Vertex1P1N1UV1T1BT v;
 				v.m_pos		= glm::vec3(x-(float)m_gridSize/2.0f, 0.0f, z-(float)m_gridSize/2.0f);
-				v.m_normal	= glm::vec3(0.0f);
+				v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
 				v.m_UV		= glm::vec2(x/(float)m_gridSize, z/(float)m_gridSize);
 				v.m_tangent = glm::vec3(0.0f);//TODO
 				v.m_bitangent = glm::vec3(0.0f);//TODO
@@ -331,6 +210,7 @@ namespace RootForce
 			}
 		}
 		
+
 		m_renderable->m_model = m_context->m_resourceManager->CreateModel("WaterModel");
 		m_renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
@@ -340,6 +220,185 @@ namespace RootForce
 
 		//Set primitive type to GL_PATCHES because we use tesselation
 		m_renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES); 
+		//m_renderable->m_model->m_meshes[0]->SetNoCulling(true); 
 	}
 
+	void WaterSystem::Disturb( float p_x, float p_z, float p_power, int p_radius )
+	{
+		glm::vec2 waterPos = WorldSpaceToWaterSpace(glm::vec2(p_x, p_z));
+		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
+
+		//Return if out of bounds
+		if(waterPos.x >= m_texSize || waterPos.x <= 0 || waterPos.y >= m_texSize || waterPos.y <= 0)
+			return;
+
+		//Calculate disturb texels with a radius-to-pixelcircle algorithm
+		m_computeJob.m_textures[1]->Bind(0);
+		std::vector<glm::vec3> plumsPos;
+		for(int i = p_radius; abs(i) <= p_radius; i--)
+		{
+			plumsPos.push_back(glm::vec3(waterPos.x, waterPos.y + (float)i, (( abs(i)/(float)p_radius)-0.5f)*p_power));
+
+			for (int j = 1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)p_radius; j++)
+			{
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)p_radius)-0.5f)*p_power)));
+			}
+
+			for (int j = -1; sqrt(pow((float)j,2) + pow((float)i,2)) <= (float)p_radius; j--)
+			{
+				plumsPos.push_back(glm::vec3(waterPos.x + (float)j, waterPos.y + (float)i,  ((((sqrt(pow((float)j,2) + pow((float)i,2)))/(float)p_radius)-0.5f)*p_power)));
+			}
+		}
+
+		//m_context->m_profiler->BeginGPUTimer();
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, m_textureData);
+		//double time = m_context->m_profiler->EndGPUTimer();
+		//m_context->m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Compute time: %f ms", time);
+		
+		for(unsigned i = 0; i < plumsPos.size(); ++i)
+		{
+			//Check out of range
+			if((int)plumsPos[i].x <= 0 || (int)plumsPos[i].y <= 0 || (int)plumsPos[i].x >= m_texSize || (int)plumsPos[i].y >= m_texSize)
+				continue;
+			plumsPos[i].z += m_textureData[(int)plumsPos[i].x + m_texSize * (int)plumsPos[i].y];
+			glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)plumsPos[i].x, (GLint)plumsPos[i].y, 1, 1, GL_RED, GL_FLOAT, &plumsPos[i].z);//0.005ms
+		}
+
+		m_computeJob.m_textures[1]->Unbind(0);
+
+		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
+	}
+
+	void WaterSystem::InitDisturb()
+	{
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Starting earthquake to create water movement");
+		for(int i = 0; i < 50; ++i)
+		{ 
+			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
+			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
+
+			Disturb((float)x, (float)z, 0.5f, 20);
+		}
+		for(int i = 0; i < 50; ++i)
+		{ 
+			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
+			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
+
+			Disturb((float)x, (float)z, -0.5f, 20);
+		}
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is now moving");
+	}
+
+	void WaterSystem::CalculateWaterConstants()
+	{
+		if(!ValidValues())
+		{
+			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Values are not valid!");
+			return;
+		}
+
+		float dts2		= m_damping*m_timeStep+2.0f;
+		float stsdx		= (m_speed*m_speed)*(m_timeStep*m_timeStep)/(m_dx*m_dx);
+
+		m_mk1     = (m_damping*m_timeStep-2.0f)/ dts2;
+		m_mk2     = (4.0f-8.0f*stsdx) / dts2;
+		m_mk3     = (2.0f*stsdx) / dts2;
+	}
+
+	void WaterSystem::ToggleWireFrame()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water wireframe toggled!");
+		m_wireFrame = m_wireFrame ? false : true;
+		m_renderable->m_model->m_meshes[0]->SetWireFrame(m_wireFrame);
+	}
+
+	void WaterSystem::TogglePause()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water pause toggled!");
+		m_pause = m_pause ? false : true;
+	}
+
+	void WaterSystem::IncreaseSpeed()
+	{
+		m_speed += 2.0f;
+		if(m_speed > 500.0f)
+			m_speed = 500.0f;
+		SetSpeed(m_speed);
+	}
+
+	void WaterSystem::DecreaseSpeed()
+	{
+		m_speed -= 2.0f;
+		if(m_speed < 0.0f)
+			m_speed = 0.0f;
+		SetSpeed(m_speed);
+	}
+
+	void WaterSystem::SetSpeed( float p_speed )
+	{
+		m_speed = p_speed;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water speed set to: %f", p_speed);
+		CalculateWaterConstants();
+	}
+
+	void WaterSystem::IncreaseDamping()
+	{
+		m_damping += 0.1f;
+		if(m_damping > 1.0f)
+			m_damping = 1.0f;
+		SetDamping(m_damping);
+	}
+
+	void WaterSystem::DecreaseDamping()
+	{
+		m_damping -= 0.1f;
+		if(m_damping < 0.0f)
+			m_damping = 0.0f;
+		SetDamping(m_damping);
+	}
+
+	void WaterSystem::SetDamping( float p_damping )
+	{
+		m_damping = p_damping;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water damping set to: %f", p_damping);
+		CalculateWaterConstants();
+	}
+
+	float WaterSystem::GetWaterHeight()
+	{
+		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
+	}
+
+	void WaterSystem::SetWaterHeight( float p_height )
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
+	}
+
+	bool WaterSystem::ValidValues()
+	{
+		float calc = (m_dx/(2*m_timeStep))*std::sqrtf(m_damping*m_timeStep+2);
+		if(m_speed > 0 && m_speed < calc)
+			return true;
+		else 
+			return false;
+	}
+
+	void WaterSystem::ResetWater()
+	{
+		float* nada = new float[m_texSize*m_texSize]();
+		m_computeJob.m_textures[1]->Bind(0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_texSize, m_texSize, GL_RED, GL_FLOAT, nada);
+		m_computeJob.m_textures[1]->Unbind(0);
+		m_computeJob.m_textures[0]->Bind(0);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_texSize, m_texSize, GL_RED, GL_FLOAT, nada);
+		m_computeJob.m_textures[0]->Unbind(0);
+		delete nada;
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water has been reset!");
+	}
+
+	glm::vec2 WaterSystem::WorldSpaceToWaterSpace( glm::vec2 p_worldSpace )
+	{
+		float scaleHalfWidth = ((float)m_gridSize/2.0f) * m_scale;
+		return glm::vec2((p_worldSpace.x + scaleHalfWidth) * m_texSize, (p_worldSpace.y + scaleHalfWidth) * m_texSize) / (scaleHalfWidth*2.0f);
+	}
 }
