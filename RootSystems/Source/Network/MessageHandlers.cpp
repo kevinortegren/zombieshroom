@@ -1136,7 +1136,8 @@ namespace RootForce
 									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
 									if(clientComponent->State != ClientState::CONNECTED && 
 									   clientComponent->State != ClientState::AWAITING_FIRST_GAMESTATE_DELTA && 
-									   clientComponent->State != ClientState::AWAITING_SPAWN_POINT)
+									   clientComponent->State != ClientState::AWAITING_SPAWN_POINT &&
+									   clientComponent->State != ClientState::AWAITING_USER_CONNECT)
 										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);

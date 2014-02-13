@@ -6,6 +6,8 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootSystems
 {
 	const glm::vec3 RespawnSystem::DEFAULT_SPAWN_POINT(0, 100, 0);
@@ -29,7 +31,7 @@ namespace RootSystems
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
 		
 
-		//If the player has 0 health and is not already dead, kill him
+		// If the player has 0 health and is not already dead, kill him
 		if(health->Health <= 0 && !health->IsDead)
 		{
 			health->IsDead = true;
@@ -39,7 +41,7 @@ namespace RootSystems
 		// Check if a spawn point has been received from the server. Always respawn when the server tells us to.
 		if (m_clientPeer != nullptr && health->SpawnPointReceived)
 		{
-			m_engineContext->m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client respawning at %d", health->SpawnIndex);
+			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client respawning at %d", health->SpawnIndex);
 
 			Respawn(health->SpawnIndex, p_entity);
 			health->SpawnPointReceived = false;
@@ -113,12 +115,13 @@ namespace RootSystems
 	int RespawnSystem::GetRandomSpawnpoint()
 	{
 		unsigned numspawns = 0;
-		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
+		ECS::GroupManager::GroupRange spawnPoints = m_world->GetGroupManager()->GetEntitiesInGroup("SpawnPoint");
+		for (std::multimap<std::string, ECS::Entity*>::iterator itr = spawnPoints.first; itr != spawnPoints.second; ++itr, ++numspawns)
 			;
 
-		if(numspawns==0)
+		if (numspawns == 0)
 		{
-			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "No spawnpoints found!");
+			g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "No spawnpoints found!");
 			return -1;
 		}
 
@@ -131,7 +134,8 @@ namespace RootSystems
 			return nullptr;
 
 		unsigned numspawns = 0;
-		for(std::multimap<std::string, ECS::Entity*>::iterator itr = m_spawnPoints.first; itr != m_spawnPoints.second; ++itr, ++numspawns)
+		ECS::GroupManager::GroupRange spawnPoints = m_world->GetGroupManager()->GetEntitiesInGroup("SpawnPoint");
+		for(std::multimap<std::string, ECS::Entity*>::iterator itr = spawnPoints.first; itr != spawnPoints.second; ++itr, ++numspawns)
 		{
 			if(numspawns == index)
 			{
@@ -139,18 +143,13 @@ namespace RootSystems
 				x = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.x;
 				y = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.y;
 				z = m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second)->m_position.z;
-				//m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %f %f %f",index,x,y,z );
+				//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Found spawnpoint number: %d position: %f %f %f",index,x,y,z );
 
 				return m_world->GetEntityManager()->GetComponent<RootForce::Transform>((*itr).second);
 			}
 		}
 
 		return nullptr;
-	}
-
-	void RespawnSystem::LoadSpawnPoints()
-	{
-		m_spawnPoints = m_world->GetGroupManager()->GetEntitiesInGroup("SpawnPoint");
 	}
 
 	void RespawnSystem::SetServerPeer(RakNet::RakPeerInterface* p_serverPeer)
@@ -183,12 +182,12 @@ namespace RootSystems
 			transform->m_position = DEFAULT_SPAWN_POINT;
 		}
 
-		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Spawning player (%u) at spawn point %d: (%f, %f, %f)", network->ID.UserID, index, transform->m_position.x, transform->m_position.y, transform->m_position.z);
+		g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Spawning player (%u) at spawn point %d: (%f, %f, %f)", network->ID.UserID, index, transform->m_position.x, transform->m_position.y, transform->m_position.z);
 
 		// Resurrect the player
 		health->Health = 100;
 		health->IsDead = false;
-		m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
+		g_engineContext.m_physics->DeactivateRagdoll(*(collision->m_handle));
 	}
 }
 #endif

@@ -114,6 +114,10 @@ namespace RootForce
 		m_connectingState->Initialize();
 		m_ingameState->Initialize();
 
+		// Respawn system respawns players after they die
+		m_sharedSystems.m_respawnSystem = new RootSystems::RespawnSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
+
 		m_currentState = GameStates::Menu;
 	}
 

@@ -69,7 +69,6 @@ namespace RootForce
 		RootForce::MatchStateSystem*					m_gameLogicSystem;
 		RootForce::WaterSystem*							m_waterSystem;
 		RootSystems::ActionSystem*						m_actionSystem;
-		RootSystems::RespawnSystem*						m_respawnSystem;
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 	};

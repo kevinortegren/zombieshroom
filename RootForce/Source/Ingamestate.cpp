@@ -171,10 +171,6 @@ namespace RootForce
 		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem);
 
-		// Respawn system respawns players after they die
-		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
-
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
@@ -185,8 +181,6 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
-
-		
 	}
 
 	void IngameState::Enter()
@@ -220,13 +214,6 @@ namespace RootForce
 			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 		if (m_networkContext.m_client != nullptr)
 			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-
-		//Load the level spawn points into the respawn system
-		m_respawnSystem->LoadSpawnPoints();
-		if (m_networkContext.m_server != nullptr)
-			m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
-		if (m_networkContext.m_client != nullptr)
-			m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 
 		m_animationSystem->Start();
 
@@ -470,7 +457,7 @@ namespace RootForce
 		
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
-			m_respawnSystem->Process();
+			m_sharedSystems.m_respawnSystem->Process();
 		}
 
 

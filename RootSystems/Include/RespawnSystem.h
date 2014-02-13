@@ -14,14 +14,14 @@ namespace RootSystems
 	class RespawnSystem : public ECS::EntitySystem
 	{
 	public:
-		RespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+		RespawnSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
-			, m_engineContext(p_engineContext)
 			, m_serverPeer(nullptr)
 			, m_clientPeer(nullptr)
 		{ 
 			SetUsage<RootForce::HealthComponent>();
 			SetUsage<RootForce::Collision>();
+			SetUsage<RootForce::Transform>();
 			SetUsage<RootForce::Network::NetworkComponent>();
 		}
 		void Init();
@@ -37,14 +37,10 @@ namespace RootSystems
 		RootForce::Transform* GetSpawnpointTransform(int index);
 		void Respawn(int index, ECS::Entity* p_player);
 
-		RootEngine::GameSharedContext* m_engineContext;
-
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
-
-		ECS::GroupManager::GroupRange m_spawnPoints;
 
 		RakNet::RakPeerInterface* m_serverPeer;
 		RakNet::RakPeerInterface* m_clientPeer;
