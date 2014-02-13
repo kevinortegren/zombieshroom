@@ -432,6 +432,22 @@ namespace RootForce
 					}
 				} return true;
 
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->IsRemote)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->Health = 0;
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide message for user %u", m.User);
+					}
+				} return true;
+
 				case NetworkMessage::MessageType::LoadMap:
 				{
 					NetworkMessage::LoadMap m;
@@ -1038,6 +1054,50 @@ namespace RootForce
 								action->WantRespawn = true;
 
 								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+								health->Health = 0;
+
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received suicide message from client %u", m.User);
+
+								// Broadcast the suicide to all other clients
+								DataStructures::List<RakNet::SystemAddress> addresses;
+								DataStructures::List<RakNet::RakNetGUID> guids;
+								m_peer->GetSystemList(addresses, guids);
+
+								for (unsigned int i = 0; i < addresses.Size(); ++i)
+								{
+									if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+									{
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+										m.Serialize(true, &bs);
+
+										m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									}
+								}
 							}
 						}
 					}

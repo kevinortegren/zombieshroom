@@ -56,6 +56,7 @@ namespace RootForce
 				AbilityChargeAndChannelingDone,
 				AbilityCooldownOff,
 				RespawnRequest,
+				Suicide,
 				DestroyEntities,
 				SpawnUser,
 				LoadMap,
@@ -221,6 +222,13 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 		
+		struct Suicide
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
 		/*
 			Sent by the server to destroy a set of entities matching the given ID on a client.
 		*/

@@ -113,6 +113,11 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, User);
 		}
 
+		void Suicide::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
 		void DestroyEntities::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);

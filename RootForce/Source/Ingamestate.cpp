@@ -351,9 +351,21 @@ namespace RootForce
 			return GameStates::Menu;
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
-			// ToDo: Send a network message to server to indicate a suicide
+			// Kill ourselves.
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
 			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+
+			// Notify the server of our suicide.
+			NetworkMessage::Suicide m;
+			m.User = Network::ReservedUserID::NONE;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+			m.Serialize(true, &bs);
+
+			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 		}
 
 #ifdef _DEBUG
