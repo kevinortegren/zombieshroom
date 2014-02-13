@@ -186,6 +186,7 @@ namespace RootSystems
 
 		// Resurrect the player
 		health->Health = 100;
+		health->RespawnDelay = 0.0f;
 		health->IsDead = false;
 		g_engineContext.m_physics->DeactivateRagdoll(*(collision->m_handle));
 	}
