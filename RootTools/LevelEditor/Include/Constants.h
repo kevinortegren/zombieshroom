@@ -32,6 +32,9 @@ const int g_MaxResolution = 512 * 512 *4;
 const int g_tileFactor = 24;
 const int g_maxPaintTextures = 10;
 
+const int g_maxMegaMeshes = 2;
+const int g_maxVerticesPerMegaMesh = 100000;
+
 struct UpdateMessage
 {
 	char name[g_maxNameLength];
@@ -113,6 +116,30 @@ struct Mesh
 	{
 		paintIndex = -1;
 		MaterialID = -1;
+		nrOfVertices = 0;
+	}
+};
+
+struct MegaMesh
+{
+	Transform transformation;
+	int nrOfVertices;
+	glm::vec3 vertex[g_maxVerticesPerMegaMesh];
+	glm::vec2 UV[g_maxVerticesPerMegaMesh];
+	glm::vec3 normal[g_maxVerticesPerMegaMesh];
+	glm::vec3 tangent[g_maxVerticesPerMegaMesh];
+	glm::vec3 binormal[g_maxVerticesPerMegaMesh];
+	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
+	//int indices[g_maxVerticesPerMesh*3];
+	char materialName[g_maxNameLength];
+	char modelName[g_maxNameLength];
+	int paintIndex;	//ska sätta om -1 så har den ingen.
+
+	MegaMesh()
+	{
+		paintIndex = -1;
+		MaterialID = -1;
+		nrOfVertices = 0;
 	}
 };
 

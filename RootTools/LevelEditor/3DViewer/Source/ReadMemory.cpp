@@ -25,8 +25,9 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Locator) * g_maxLocators;
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
-	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(int) * 8; //NumberOfStuffs
 	total_memory_size += sizeof(WorldData);
+	total_memory_size += sizeof(MegaMesh)*g_maxMegaMeshes;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -120,6 +121,17 @@ int ReadMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(int));
 
 	worldData = (WorldData*)mem;
+
+	mem = (unsigned char*)(mem + sizeof(WorldData));
+
+	for(int i = 0; i < g_maxMegaMeshes; i++)
+	{
+		PmegaMeshes[i] = ((MegaMesh*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(MegaMesh) * g_maxMegaMeshes);
+
+	NumberOfMegaMeshes = (int*)mem;
 
 	if(first_process)
 	{

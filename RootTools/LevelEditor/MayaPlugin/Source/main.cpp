@@ -18,9 +18,9 @@ MSelectionList selected;
 
 MObject g_objectList[g_maxSceneObjects], g_mayaMeshList[g_maxMeshes], g_mayaCameraList[g_maxCameras], 
 		g_mayaLightList[g_maxLights], g_mayaMaterialList[g_maxMeshes], g_mayaLocatorList[g_maxLocators],
-		g_mayaAmbientLight, g_mayaDirectionalLight;
+		g_mayaAmbientLight, g_mayaDirectionalLight, g_mayaMegaMeshList[g_maxMegaMeshes];
 
-int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0;
+int currNrSceneObjects=0, currNrMeshes=0, currNrLights=0, currNrCameras=0, currNrMaterials = 0, currNrMaterialObjects = 0, currNrLocators = 0, currNrMegaMeshes = 0;
 
 void ConnectionCB(MPlug& srcPlug, MPlug& destPlug, bool made, void *clientData);
 void dirtyTextureNode(MObject &node, MPlug&, void *clientData);
@@ -115,18 +115,6 @@ void GivePaintId(int index, string filePath)
 {
 	bool painted = false;
 	bool painting = false;
-	//for(int i = 0; i < SM.meshList[index].transformation.nrOfFlags; i++)
-	//{
-	//	string flag = SM.meshList[index].transformation.flags[i];
-	//	if(flag == "Painted")
-	//	{
-	//		painted = true;
-	//	}
-	//	if(flag == "Painting")
-	//	{
-	//		painting = true;
-	//	}
-	//}
 
 	if(SM.meshList[index].transformation.flags._PaintStatus == 0)
 		painting = true;
@@ -149,7 +137,33 @@ void GivePaintId(int index, string filePath)
 	}
 }
 
-void PaintModel(int index, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting)
+void GivePaintIdToMegaMesh(int index, string filePath)
+{
+	bool painted = false;
+	bool painting = false;
+
+	if(SM.PmegaMeshes[index]->transformation.flags._PaintStatus == 0)
+		painting = true;
+	else if(SM.PmegaMeshes[index]->transformation.flags._PaintStatus == 1)
+		painted = true;
+
+	if (filePath == "PaintTexture" || painted || painting)
+	{
+		if(SM.PmegaMeshes[index]->paintIndex == -1)
+		{
+			//Print(SM.meshList[index].modelName, " given paintID ", paintCount);
+			SM.PmegaMeshes[index]->paintIndex = paintCount;
+
+			paintCount++;
+		}
+		else
+		{
+			//Print("Already has paintID!");
+		}
+	}
+}
+
+void PaintModel(int paintIndex, MImage& texture, MString Red, MString Green, MString Blue, int _tileFactor, bool painting)
 {
 	HANDLE TextureMutexHandle;
 	DWORD milliseconds;
@@ -166,43 +180,43 @@ void PaintModel(int index, MImage& texture, MString Red, MString Green, MString 
 		WaitForSingleObject(TextureMutexHandle, SM.milliseconds);
 		//Print("Done");
 
-		SM.PpaintList[SM.meshList[index].paintIndex]->heigth = y;
-		SM.PpaintList[SM.meshList[index].paintIndex]->width = x;
+		SM.PpaintList[paintIndex]->heigth = y;
+		SM.PpaintList[paintIndex]->width = x;
 
 		if(painting)
 		{
 			for(int i = 0; i < x*y*4; i++)
 			{
-				myTextures[SM.meshList[index].paintIndex].Pixels[i] = texture.pixels()[i];
+				myTextures[paintIndex].Pixels[i] = texture.pixels()[i];
 			}
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->Pixels, myTextures[SM.meshList[index].paintIndex].Pixels, x*y*4);
+			memcpy(SM.PpaintList[paintIndex]->Pixels, myTextures[paintIndex].Pixels, x*y*4);
 
 		}
 
 		if(Red != "")
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, Red.asChar(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureRed, Red.asChar(), g_maxNameLength);
 		else
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureRed, g_textureR.c_str(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureRed, g_textureR.c_str(), g_maxNameLength);
 
 		if(Green != "")
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, Green.asChar(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureGreen, Green.asChar(), g_maxNameLength);
 		else
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureGreen, g_textureG.c_str(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureGreen, g_textureG.c_str(), g_maxNameLength);
 
 		if(Blue != "")
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, Blue.asChar(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureBlue, Blue.asChar(), g_maxNameLength);
 		else
-			memcpy(SM.PpaintList[SM.meshList[index].paintIndex]->textureBlue, g_textureB.c_str(), g_maxNameLength);
+			memcpy(SM.PpaintList[paintIndex]->textureBlue, g_textureB.c_str(), g_maxNameLength);
 
 		if(_tileFactor != 0)
-			SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = _tileFactor;
+			SM.PpaintList[paintIndex]->tileFactor = _tileFactor;
 		else
-			SM.PpaintList[SM.meshList[index].paintIndex]->tileFactor = g_tileFactor;
+			SM.PpaintList[paintIndex]->tileFactor = g_tileFactor;
 	
 		*SM.NumberOfPaintTextures = paintCount;
 		ReleaseMutex(TextureMutexHandle);
 
-		SM.AddUpdateMessage("Texture", SM.meshList[index].paintIndex, false, false, false);
+		SM.AddUpdateMessage("Texture", paintIndex, false, false, false);
 		/*När man skapar en textur så ska man titta på om nament på materialet är paint (som avgör om vi ska måla den eller inte),
 		och i så fall ska vi lägga den som painttexture, sen tar vi en dirty node cb på den. och när det händer får vi skicka över pixel datan till
 		andra sidan*/
@@ -333,6 +347,40 @@ void Export()
 			MGlobal::executeCommand(ExportFunction);
 			Print(ExportFunction);
 		}
+
+
+	}
+
+	//EXPORT ALL MEGAMESHES WITHOUT CHECKING FOR DUPLICATES
+	for(int i = 0; i < currNrMegaMeshes; i++)
+	{
+		SM.LockMeshMutex();
+		MString name, realName, ExportFunction;
+		name = SM.PmegaMeshes[i]->modelName;
+
+		MFnMesh mesh = g_mayaMegaMeshList[i];
+		realName = mesh.fullPathName();
+
+		MGlobal::executeCommand("select -r " + realName);
+
+		string outputDirectory = g_savepath + "Models/";
+		MString savepath = outputDirectory.c_str();
+
+		ExportFunction = "file -force -options \"bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;\" -typ \"OpenCOLLADA exporter\" -pr -es \"" + savepath + name + ".dae\"";
+
+		//Copy textures
+		string saveToDir = g_savepath + "Textures/";
+		//DIFFUSE
+		string texturePath = SM.materialList[SM.PmegaMeshes[i]->MaterialID].texturePath;
+
+		copyTexture(saveToDir, SM.materialList[SM.PmegaMeshes[i]->MaterialID].texturePath);
+		copyTexture(saveToDir, SM.materialList[SM.PmegaMeshes[i]->MaterialID].normalPath);
+		copyTexture(saveToDir, SM.materialList[SM.PmegaMeshes[i]->MaterialID].specularPath);
+		copyTexture(saveToDir, SM.materialList[SM.PmegaMeshes[i]->MaterialID].glowPath);
+
+		MGlobal::executeCommand(ExportFunction);
+		Print(ExportFunction);
+		SM.UnLockMeshMutex();
 	}
 
 	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
@@ -357,24 +405,27 @@ void sortObjectList()
 	//add all objects to a array.
 	while(!it.isDone())
 	{
-		if(it.item().hasFn(MFn::kMesh) || it.item().hasFn(MFn::kLight) ||  it.item().hasFn(MFn::kLocator) || it.item().hasFn(MFn::kCamera) || it.item().hasFn(MFn::kLambert))
-		{
 		g_objectList[currNrSceneObjects] = it.item();
 		currNrSceneObjects++;
-		}
-		
 		it.next();
 	}
-	Print(currNrSceneObjects);
 	//Sort the list mesh to meshlist and so on.
 	for(int i= 0; i < currNrSceneObjects; i ++)
 	{
 		if(g_objectList[i].hasFn(MFn::kMesh))
 		{
 			MFnMesh tempMesh = g_objectList[i];
-			g_mayaMeshList[currNrMeshes] = g_objectList[i];
-			MayaMeshToList(g_mayaMeshList[currNrMeshes],currNrMeshes, true, true, true);
-			currNrMeshes ++;
+			if(tempMesh.numPolygons() * 3 < g_maxVerticesPerMesh)
+			{
+				g_mayaMeshList[currNrMeshes] = g_objectList[i];
+				MayaMeshToList(g_mayaMeshList[currNrMeshes],currNrMeshes, true, true, true);
+				currNrMeshes ++;
+			}
+			else if(tempMesh.numPolygons() * 3 < g_maxVerticesPerMegaMesh)
+			{
+				g_mayaMegaMeshList[currNrMegaMeshes] = g_objectList[i];
+				currNrMegaMeshes++;
+			}
 		}
 		else if(g_objectList[i].hasFn(MFn::kCamera))
 		{
@@ -477,6 +528,31 @@ void loadScene()
 		}
 
 		MayaMeshToList(g_mayaMeshList[i], i, true, true, true);
+		//SM.UpdateSharedMesh(i, true, true, currNrMeshes);
+		//DONE correct in ^^
+	}
+
+	for(int i = 0; i < currNrMegaMeshes; i++)
+	{
+		MFnMesh mesh = g_mayaMegaMeshList[i];
+
+		if(mesh.parent(0, &status).hasFn(MFn::kTransform))
+		{
+			MObject transform = mesh.parent(0, &status);
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+		}
+		if(g_mayaMeshList[i].hasFn(MFn::kMesh))
+		{
+			MCallbackId id = MNodeMessage::addNodeDirtyPlugCallback(g_mayaMegaMeshList[i], dirtyMeshNodeCB, nullptr, &status);
+			AddCallbackID(status, id);
+		}
+
+		SM.LockMeshMutex();
+		SM.PmegaMeshes[i]->MaterialID = -1;
+		SM.PmegaMeshes[i]->paintIndex = -1;
+		SM.UnLockMeshMutex();
+		MayaMeshToList(g_mayaMegaMeshList[i], i, true, true, true);
 		//SM.UpdateSharedMesh(i, true, true, currNrMeshes);
 		//DONE correct in ^^
 	}
@@ -631,7 +707,7 @@ void dirtyLightNodeCB(MObject &node, MPlug &plug, void *clientData)
 }
 
 ////////////////////////////	LOOK IF A TRANSFORMATION NODE IS DIRTY  //////////////////////////////////////////
-void getMeshFlags(MObject object, int index)
+void getMeshFlags(MObject object, Transform& transformation)
 {
 	if(object.hasFn(MFn::kTransform))
 	{
@@ -649,40 +725,19 @@ void getMeshFlags(MObject object, int index)
 				string name = temp.name().asChar();
 
 				if(name == "Hazard")
-					SM.meshList[index].transformation.flags._Hazard = true;
+					transformation.flags._Hazard = true;
 				if(name == "Painting")
-					SM.meshList[index].transformation.flags._PaintStatus = 0;
+					transformation.flags._PaintStatus = 0;
 				if(name == "Painted")
-					SM.meshList[index].transformation.flags._PaintStatus = 1;
+					transformation.flags._PaintStatus = 1;
 				if(name == "Static")
-					SM.meshList[index].transformation.flags._Static = true;
+					transformation.flags._Static = true;
 				if(name == "Transparent")
-					SM.meshList[index].transformation.flags._Transparent = true;
+					transformation.flags._Transparent = true;
 				if(name == "Water")
-					SM.meshList[index].transformation.flags._Water = true;
+					transformation.flags._Water = true;
 
-				//for(int j = 0; j < g_maxNrOfFlags; j ++)
-				//{
-				//	if(alreadyExists == false)
-				//	{					
-				//		if(name.compare(SM.meshList[index].transformation.flags[j]) == 0)
-				//		{
-				//			alreadyExists = true;
-				//			//Print("Flag exists skipping...");
-				//		}
-				//		else
-				//		{
-				//			if(SM.meshList[index].transformation.flags[j][0] == NULL)
-				//			{
-				//				memcpy(SM.meshList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-				//				//Print("Added flag ", temp.name().asChar(), " to ", SM.meshList[index].modelName, " at index ", j);
-				//				SM.meshList[index].transformation.nrOfFlags ++;
-				//				alreadyExists = true;
-				//			}
-				//		}
-				//	}
-				//}
-				getMeshFlags(trans.parent(i), index);
+				getMeshFlags(trans.parent(i), transformation);
 			}
 		}
 	}
@@ -801,16 +856,36 @@ void dirtyMaterialCB(MObject &node, MPlug &plug, void *clientData)
 		{
 			string temp = SM.meshList[i].materialName;
 		//	Print("Comparing", temp.c_str(), " and ", materialName.c_str());
-			if(SM.meshList[i].materialName == materialName)
+			if(temp == materialName)
 			{
 				MFnMesh mesh = g_mayaMeshList[i];
 
 			//	Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
 				MayaMeshToList(g_mayaMeshList[i], i, true, true, false);
-				SM.UpdateSharedMaterials(currNrMaterials, i);
+				SM.UpdateSharedMaterials(currNrMaterials, i, false);
+
 				//SM.UpdateSharedMesh(i, true, false, currNrMeshes);
 			}
 		}
+
+		SM.LockMeshMutex();
+		for(int i = 0; i < currNrMegaMeshes; i++)
+		{
+
+			string temp = SM.PmegaMeshes[i]->materialName;
+			//	Print("Comparing", temp.c_str(), " and ", materialName.c_str());
+			if(temp == materialName)
+			{
+				MFnMesh mesh = g_mayaMeshList[i];
+
+				//	Print("Updating ", materialName.c_str(), " and ", mesh.fullPathName(), " at index ", i);
+				MayaMeshToList(g_mayaMegaMeshList[i], i, true, true, false);
+				SM.UpdateSharedMaterials(currNrMaterials, i, false);
+
+				//SM.UpdateSharedMesh(i, true, false, currNrMeshes);
+			}
+		}
+		SM.UnLockMeshMutex();
 	}
 
 	MStatus status = MS::kSuccess;	
@@ -988,9 +1063,6 @@ void checkForDuplicatedMeshes(MObject node)
 
 	if (node.hasFn(MFn::kMesh))
 	{
-		
-	
-
 		MFnMesh mesh = node;
 		g_mayaMeshList[currNrMeshes] = node;
 
@@ -1005,11 +1077,9 @@ void checkForDuplicatedMeshes(MObject node)
 			id = MNodeMessage::addNodeDirtyPlugCallback(transform, dirtyTransformNodeCB, nullptr, &status);
 			AddCallbackID(status, id);
 
-		MayaMeshToList(node, currNrMeshes, true, true, true);
-		currNrMeshes++;
-				
+			MayaMeshToList(node, currNrMeshes, true, true, true);
+			currNrMeshes++;		
 		}
-
 	}
 }
 
@@ -1113,6 +1183,17 @@ int nodeExists(MObject node)
 		for(int i = 0; i < currNrMeshes; i++)
 		{
 			MFnMesh temp = g_mayaMeshList[i];
+
+			if(temp.fullPathName() == mesh.fullPathName())
+			{
+				answer = i;
+				break;
+			} 
+		}	
+
+		for(int i = 0; i < currNrMegaMeshes; i++)
+		{
+			MFnMesh temp = g_mayaMegaMeshList[i];
 
 			if(temp.fullPathName() == mesh.fullPathName())
 			{
@@ -1271,10 +1352,15 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 	double scale[3];
 	double rotX, rotY, rotZ, rotW;
 	MVector rotPivot, scalePivot;
-
-
 	MIntArray triangleCounts, triangleVertices;
+	bool ItsAmegaMesh = false;
 
+	SM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(SM.IdMutexHandle, SM.milliseconds);
+	int numberOfMegaMeshes = *SM.NumberOfMegaMeshes;
+	ReleaseMutex(SM.IdMutexHandle);
+
+	SM.LockMeshMutex();
 	///////////////////////	MESH
 	if (node.hasFn(MFn::kMesh))
 	{
@@ -1297,13 +1383,34 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MFnDependencyNode material_node;
 		MFnDependencyNode texture_node;
 
+		
+		if(mesh.numPolygons()*3 > g_maxVerticesPerMesh)
+		{
+			ItsAmegaMesh = true;
+			Print(mesh.fullPathName(), " isaMEGAMESH---------------------------------------------------------------------------------------------------------");
+		}
+
 		//Get the name of the transformation and the model name for the exporter.
 		MString transName = cleanFullPathName(mesh.fullPathName().asChar());
-		//Get and set mesh name
-		memcpy(SM.meshList[meshIndex].transformation.name, transName.asChar(), transName.numChars());
-
 		MString name = cleanFullPathName(mesh.name().asChar());
-		memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
+
+		if(ItsAmegaMesh)
+		{
+			SM.PmegaMeshes[meshIndex]->nrOfVertices = 0;
+			memcpy(SM.PmegaMeshes[meshIndex]->transformation.name, transName.asChar(), transName.numChars());		
+			memcpy(SM.PmegaMeshes[meshIndex]->modelName, name.asChar(), name.numChars());
+			MObject tempTrans = mesh.parent(0);
+			getMeshFlags(tempTrans, SM.PmegaMeshes[meshIndex]->transformation);
+		}
+		else
+		{
+			memcpy(SM.meshList[meshIndex].transformation.name, transName.asChar(), transName.numChars());		
+			memcpy(SM.meshList[meshIndex].modelName, name.asChar(), name.numChars());
+			SM.meshList[meshIndex].nrOfVertices = 0;
+			MObject tempTrans = mesh.parent(0);
+			getMeshFlags(tempTrans, SM.meshList[meshIndex].transformation);
+		}
+
 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
@@ -1317,44 +1424,67 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		bool painted = false;
 		bool painting = false;
 
-		if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 0)
-			painting = true;
-		else if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 1)
-			painted = true;
+		if(ItsAmegaMesh)
+		{
+			if(SM.PmegaMeshes[meshIndex]->transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(SM.PmegaMeshes[meshIndex]->transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
+		else
+		{
+			if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(SM.meshList[meshIndex].transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
 
-		//for(int i = 0; i < SM.meshList[meshIndex].transformation.nrOfFlags; i++)
-		//{
-		//string flag = SM.meshList[meshIndex].transformation.flags[i];
-		//if(flag == "Painted")
-		//{
-		//	painted = true;
-		//}
-		//if(flag == "Painting")
-		//{
-		//	painting = true;
-		//}
-		//}
 
 		//PAINT STUFF
 		if(painted || painting)
 		{		
-			GivePaintId(meshIndex, texPath);
-			if(SM.meshList[meshIndex].paintIndex >= 0)
+			if(ItsAmegaMesh)
 			{
-				MString Red, Green, Blue;
-				int tileFactor;
-
-				ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
-
-				if(painting)
+				GivePaintIdToMegaMesh(meshIndex, texPath);
+				if(SM.PmegaMeshes[meshIndex]->paintIndex >= 0)
 				{
-					MObject temp = texture_node.object();
-					texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+					MString Red, Green, Blue;
+					int tileFactor;
+
+					ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
+
+					if(painting)
+					{
+						MObject temp = texture_node.object();
+						texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+					}
+
+					PaintModel(SM.PmegaMeshes[meshIndex]->paintIndex, texture, Red, Green, Blue, tileFactor, painting);
+
 				}
-
-				PaintModel(meshIndex, texture, Red, Green, Blue, tileFactor, painting);
-
 			}
+			else
+			{
+				GivePaintId(meshIndex, texPath);
+				if(SM.meshList[meshIndex].paintIndex >= 0)
+				{
+					MString Red, Green, Blue;
+					int tileFactor;
+
+					ExtractRGBTextures(material_node, Red, Green, Blue, tileFactor);
+
+					if(painting)
+					{
+						MObject temp = texture_node.object();
+						texture.readFromTextureNode(temp, MImage::MPixelType::kByte);
+					}
+
+					PaintModel(SM.meshList[meshIndex].paintIndex, texture, Red, Green, Blue, tileFactor, painting);
+
+				}
+			}
+
+
 		}
 
 		//Check if the material already exists.
@@ -1382,14 +1512,31 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
 			memset(SM.materialList[currNrMaterials].glowPath, NULL, sizeof(SM.materialList[currNrMaterials].glowPath));
 			memcpy(SM.materialList[currNrMaterials].glowPath, glowName.asChar(),glowName.numChars());
-			SM.meshList[meshIndex].MaterialID = currNrMaterials;
+
+			if(ItsAmegaMesh)
+			{
+				SM.PmegaMeshes[meshIndex]->MaterialID = currNrMaterials;
+			}
+			else
+			{
+				SM.meshList[meshIndex].MaterialID = currNrMaterials;
+			}
+
 
 			currNrMaterials++;
 			
 		}
 		else
 		{
-			SM.meshList[meshIndex].MaterialID = materialID;
+			if(ItsAmegaMesh)
+			{
+				SM.PmegaMeshes[meshIndex]->MaterialID = materialID;
+			}
+			else
+			{
+				SM.meshList[meshIndex].MaterialID = materialID;
+			}
+
 			memset(SM.materialList[materialID].texturePath, NULL, sizeof(SM.materialList[materialID].texturePath));
 			memcpy(SM.materialList[materialID].texturePath, texturepath.asChar(), texturepath.numChars());
 			memset(SM.materialList[materialID].normalPath, NULL, sizeof(SM.materialList[materialID].normalPath));
@@ -1398,10 +1545,19 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
 		}
 
-		memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
-		memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
-		SM.UpdateSharedMaterials(currNrMaterials, meshIndex);
-		
+		if(ItsAmegaMesh)
+		{
+			memset(SM.PmegaMeshes[meshIndex]->materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
+			memcpy(SM.PmegaMeshes[meshIndex]->materialName, materialName.asChar(), materialName.numChars());
+		}
+		else
+		{
+			memset(SM.meshList[meshIndex].materialName, NULL, sizeof(SM.meshList[meshIndex].materialName));
+			memcpy(SM.meshList[meshIndex].materialName, materialName.asChar(), materialName.numChars());
+		}
+
+		SM.UpdateSharedMaterials(currNrMaterials, meshIndex, ItsAmegaMesh);
+		//Print("Updated material ", materialName.asChar());
 
 		}
 
@@ -1427,8 +1583,6 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MVector normal;
 		int count = 0;
 		MFloatVectorArray normals;
-
-		SM.meshList[meshIndex].nrOfVertices = 0;
 
 		int uvID;
 		//int tangentID;
@@ -1477,46 +1631,93 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 					int temp = i;
 					
 					
-					SM.meshList[meshIndex].vertex[count].x = floatPoints[triangleVertices[j]][0];
-					SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
-					SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
+					if(ItsAmegaMesh)
+					{
+						SM.PmegaMeshes[meshIndex]->vertex[count].x = floatPoints[triangleVertices[j]][0];
+						SM.PmegaMeshes[meshIndex]->vertex[count].y = floatPoints[triangleVertices[j]][1];
+						SM.PmegaMeshes[meshIndex]->vertex[count].z = floatPoints[triangleVertices[j]][2];
 
-					//mesh.getVertexNormal(localIndex[j], normal, space_local);
-					//OLD
+						//mesh.getVertexNormal(localIndex[j], normal, space_local);
+						//OLD
 
-					normal = normals[normalIDs[localIndex[j]]];					
+						normal = normals[normalIDs[localIndex[j]]];					
 
-					SM.meshList[meshIndex].normal[count].x = normal.x;
-					SM.meshList[meshIndex].normal[count].y = normal.y;
-					SM.meshList[meshIndex].normal[count].z = normal.z;
+						SM.PmegaMeshes[meshIndex]->normal[count].x = normal.x;
+						SM.PmegaMeshes[meshIndex]->normal[count].y = normal.y;
+						SM.PmegaMeshes[meshIndex]->normal[count].z = normal.z;
 
-					mesh.getPolygonUVid(i, localIndex[j], uvID, 0);
-					mesh.getUV(uvID, U, V, 0);
+						mesh.getPolygonUVid(i, localIndex[j], uvID, 0);
+						mesh.getUV(uvID, U, V, 0);
 
-					SM.meshList[meshIndex].UV[count].x = U;
-					SM.meshList[meshIndex].UV[count].y = 1-V;
+						SM.PmegaMeshes[meshIndex]->UV[count].x = U;
+						SM.PmegaMeshes[meshIndex]->UV[count].y = 1-V;
 
-					int herp = mesh.getTangentId(i, localIndex[j]);
-					mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, g_space_local);
+						int herp = mesh.getTangentId(i, localIndex[j]);
+						mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, g_space_local);
 
-					//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
-					//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
-					//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
+						//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
+						//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
+						//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
 
-					mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, g_space_local, 0);
-					
-					//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
+						mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, g_space_local, 0);
 
-					SM.meshList[meshIndex].binormal[count].x = tempBiNormal.x;
-					SM.meshList[meshIndex].binormal[count].y = tempBiNormal.y;
-					SM.meshList[meshIndex].binormal[count].z = tempBiNormal.z;
+						//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
 
-					SM.meshList[meshIndex].tangent[count].x = tempTangent.x;
-					SM.meshList[meshIndex].tangent[count].y = tempTangent.y;
-					SM.meshList[meshIndex].tangent[count].z = tempTangent.z;
+						SM.PmegaMeshes[meshIndex]->binormal[count].x = tempBiNormal.x;
+						SM.PmegaMeshes[meshIndex]->binormal[count].y = tempBiNormal.y;
+						SM.PmegaMeshes[meshIndex]->binormal[count].z = tempBiNormal.z;
 
-					count++;
-					SM.meshList[meshIndex].nrOfVertices ++;
+						SM.PmegaMeshes[meshIndex]->tangent[count].x = tempTangent.x;
+						SM.PmegaMeshes[meshIndex]->tangent[count].y = tempTangent.y;
+						SM.PmegaMeshes[meshIndex]->tangent[count].z = tempTangent.z;
+
+						count++;
+						SM.PmegaMeshes[meshIndex]->nrOfVertices = count;
+					}
+					else
+					{
+						SM.meshList[meshIndex].vertex[count].x = floatPoints[triangleVertices[j]][0];
+						SM.meshList[meshIndex].vertex[count].y = floatPoints[triangleVertices[j]][1];
+						SM.meshList[meshIndex].vertex[count].z = floatPoints[triangleVertices[j]][2];
+
+						//mesh.getVertexNormal(localIndex[j], normal, space_local);
+						//OLD
+
+						normal = normals[normalIDs[localIndex[j]]];					
+
+						SM.meshList[meshIndex].normal[count].x = normal.x;
+						SM.meshList[meshIndex].normal[count].y = normal.y;
+						SM.meshList[meshIndex].normal[count].z = normal.z;
+
+						mesh.getPolygonUVid(i, localIndex[j], uvID, 0);
+						mesh.getUV(uvID, U, V, 0);
+
+						SM.meshList[meshIndex].UV[count].x = U;
+						SM.meshList[meshIndex].UV[count].y = 1-V;
+
+						int herp = mesh.getTangentId(i, localIndex[j]);
+						mesh.getFaceVertexBinormal(i, localIndex[j], tempBiNormal, g_space_local);
+
+						//SM.meshList[meshIndex].tangent[count].x = tangentsArray[herp].x;
+						//SM.meshList[meshIndex].tangent[count].y = tangentsArray[herp].y;
+						//SM.meshList[meshIndex].tangent[count].z = tangentsArray[herp].z;
+
+						mesh.getFaceVertexTangent(i, localIndex[j], tempTangent, g_space_local, 0);
+
+						//Print("X: ",tangentsArray[herp].x, " " , tempTangent.x);
+
+						SM.meshList[meshIndex].binormal[count].x = tempBiNormal.x;
+						SM.meshList[meshIndex].binormal[count].y = tempBiNormal.y;
+						SM.meshList[meshIndex].binormal[count].z = tempBiNormal.z;
+
+						SM.meshList[meshIndex].tangent[count].x = tempTangent.x;
+						SM.meshList[meshIndex].tangent[count].y = tempTangent.y;
+						SM.meshList[meshIndex].tangent[count].z = tempTangent.z;
+
+						count++;
+						SM.meshList[meshIndex].nrOfVertices = count;
+					}
+
 				}
 			}
 		}
@@ -1525,50 +1726,41 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 		if(doTrans)
 		{///////////////////////	MESH TRANSFORM ////////////////////////////////////////
-		if(mesh.parent(0,&status).hasFn(MFn::kTransform))
-		{
-			MFnTransform transform = mesh.parent(0, &status);
-			MObject transObj = transform.object();
-			UpdateTransformation(SM.meshList[meshIndex].transformation, transObj);
+			if(mesh.parent(0,&status).hasFn(MFn::kTransform))
+			{
+				MFnTransform transform = mesh.parent(0, &status);
+				MObject transObj = transform.object();
 
-			//glm::vec3 position;
-			//MFnTransform transform = mesh.parent(0, &status);
-			//rotPivot = transform.rotatePivot(MSpace::kObject);
-			//scalePivot = transform.scalePivot(MSpace::kObject);
+				if(ItsAmegaMesh)
+				{
+					UpdateTransformation(SM.PmegaMeshes[meshIndex]->transformation, transObj);
 
-			//transform.getScale(scale);
-			//transform.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-			//position.x = transform.getTranslation(g_space_world).x;
-			//position.y = transform.getTranslation(g_space_world).y;
-			//position.z = transform.getTranslation(g_space_world).z;
+				}
+				else
+				{
+					UpdateTransformation(SM.meshList[meshIndex].transformation, transObj);
+				}
 
-			//SM.meshList[meshIndex].transformation.position.x = position.x;
-			//SM.meshList[meshIndex].transformation.position.y = position.y;
-			//SM.meshList[meshIndex].transformation.position.z = position.z;
 
-			//SM.meshList[meshIndex].transformation.scale.x = scale[0];
-			//SM.meshList[meshIndex].transformation.scale.y = scale[1];
-			//SM.meshList[meshIndex].transformation.scale.z = scale[2];
-
-			//SM.meshList[meshIndex].transformation.rotation.x = rotX;
-			//SM.meshList[meshIndex].transformation.rotation.y = rotY;
-			//SM.meshList[meshIndex].transformation.rotation.z = rotZ;
-			//SM.meshList[meshIndex].transformation.rotation.w = rotW;
-
-			//SM.meshList[meshIndex].transformation.rotPivot.x = rotPivot.x;
-			//SM.meshList[meshIndex].transformation.rotPivot.y = rotPivot.y;
-			//SM.meshList[meshIndex].transformation.rotPivot.z = rotPivot.z;
-
-			//SM.meshList[meshIndex].transformation.scalePivot.x = scalePivot.x;
-			//SM.meshList[meshIndex].transformation.scalePivot.y = scalePivot.y;
-			//SM.meshList[meshIndex].transformation.scalePivot.z = scalePivot.z;
-
-			getMeshFlags(mesh.parent(0,&status), meshIndex);
+			}
 		}
-		}
+
+
 	}
 
-	SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
+	if(ItsAmegaMesh)
+	{
+		numberOfMegaMeshes++;
+		*SM.NumberOfMegaMeshes = numberOfMegaMeshes;
+		SM.AddUpdateMessage("MegaMesh", meshIndex, doTrans, doMesh, false);
+
+	}
+	else
+	{
+		SM.UpdateSharedMesh(meshIndex, doTrans, doMesh, currNrMeshes);
+	}
+
+	SM.UnLockMeshMutex();
 }
 
 void UpdateTransformation(Transform& destination, MObject transObject)
@@ -1605,6 +1797,8 @@ void UpdateTransformation(Transform& destination, MObject transObject)
 	destination.scalePivot.x = scalePivot.x;
 	destination.scalePivot.y = scalePivot.y;
 	destination.scalePivot.z = scalePivot.z;
+
+	getMeshFlags(transObject, destination);
 }
 
 void MayaLightToList(MObject node, int lightIndex)
@@ -1882,6 +2076,8 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 
 			out_textureNode.setObject(connections[n].node(&status));
 
+			Print("DEEP NAME ", out_textureNode.name());
+
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
 
@@ -1907,6 +2103,8 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("glowIntensity", true, &status);
+	if(status == true)
+	Print("GLOW");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -1917,9 +2115,11 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
+			Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_glow_path = ftn.asString(MDGContext::fsNormal);
+			Print(out_glow_path);
 			found_glow = true;
 		}
 	}
@@ -1991,6 +2191,8 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("specularColor", true, &status);
+	if(status == true)
+	Print("This Is TRUEEE");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -2001,6 +2203,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
+			Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_specular_path = ftn.asString(MDGContext::fsNormal);
@@ -2032,6 +2235,7 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		{
 			GetMaterialNode(shaders[j], material_node);
 			ExtractColor(material_node, out_color_path, out_textureNode);
+			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
 			ExtractGlow(material_node, out_glow_path);

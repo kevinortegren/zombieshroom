@@ -31,6 +31,7 @@ public:
 
 	int* NumberOfMessages;
 	int* NumberOfPaintTextures;
+	int* NumberOfMegaMeshes;
 
 	UpdateMessage* updateMessages[g_maxMessages];
 
@@ -41,6 +42,7 @@ public:
 	Locator* PlocatorList[g_maxLocators];
 	PaintTexture* PpaintList[g_maxPaintTextures];
 	WorldData* worldData;
+	MegaMesh* PmegaMeshes[g_maxMegaMeshes];
 
 	int* export;
 

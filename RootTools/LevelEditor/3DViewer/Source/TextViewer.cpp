@@ -38,6 +38,7 @@ ReadMemory RM;
 int numberMeshes;
 int numberLights;
 int numberCameras;
+int numberMegaMeshes= 0;
 
 // Setup world.
 ECS::World m_world;
@@ -54,6 +55,7 @@ std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
 std::vector<ECS::Entity*> Entities;
 std::vector<ECS::Entity*> locatorEntities;
+std::vector<ECS::Entity*> MegaMeshes;
 
 Utility::CPUTimer timer;
 
@@ -61,9 +63,9 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID);
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID, bool itsAmegaMesh);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
-ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
 ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int index);
 void CreateCameraEntity(int index);
@@ -73,6 +75,7 @@ void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 void UpdateLight(int index, bool remove, bool firstTimeLoad, string type);
 void UpdateLocator(int index);
+void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 
 void ExportToLevel();
 void LoadSceneFromMaya();
@@ -238,6 +241,11 @@ int main(int argc, char* argv[])
 					if(type == "Locator")
 					{
 						UpdateLocator(updateID);
+					}
+
+					if(type == "MegaMesh")
+					{
+						UpdateMegaMesh(updateID, updateTransform, updateShape, false);
 					}
 				}							
 
@@ -409,7 +417,8 @@ void LoadSceneFromMaya()
 
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1);
+		//ITS a Mega Mesh false here correct?
+		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1, false);
 	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
@@ -419,6 +428,7 @@ void LoadSceneFromMaya()
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	numberMeshes = *RM.NumberOfMeshes;
+	numberMegaMeshes = *RM.NumberOfMegaMeshes;
 	ReleaseMutex(RM.MeshMutexHandle);
 
 	for(int i = 0; i < numberMeshes; i++)
@@ -429,7 +439,7 @@ void LoadSceneFromMaya()
 		string name = RM.PmeshList[i]->modelName;
 		ReleaseMutex(RM.MeshMutexHandle);
 
-		Entities.push_back(CreateMeshEntity(&m_world, name, i));
+		Entities.push_back(CreateMeshEntity(&m_world, name, i, false));
 		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
 		//auto mesh = model->m_meshes[0];
 		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
@@ -438,7 +448,22 @@ void LoadSceneFromMaya()
 		UpdateMesh(i, true, true, false);
 	}			
 
+	for(int i = 0; i < numberMegaMeshes; i++)
+	{				
+		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		//string name = RM.getMesh(i).modelName; 
+		string name = RM.PmegaMeshes[i]->modelName;
+		ReleaseMutex(RM.MeshMutexHandle);
 
+		MegaMeshes.push_back(CreateMeshEntity(&m_world, name, i, true));
+		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[i])->m_model;
+		//auto mesh = model->m_meshes[0];
+		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
+		//mesh->SetVertexBuffer(buffer);
+
+		UpdateMegaMesh(i, true, true, false);
+	}	
 
 	///////////////////////// Load Lights ////////////////////////////////
 
@@ -488,7 +513,7 @@ bool fexists(const std::string& filename)
   return Exists;
 }
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID)
+void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID, bool itsAmegaMesh)
 {
 	bool painted = false;
 	bool painting = false;
@@ -499,33 +524,33 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	ifstream ifile;
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-	paintID = RM.PmeshList[meshID]->paintIndex;
 
-	transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
-	if(meshID != -1)
+	if(itsAmegaMesh)
 	{
-	if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
-		painting = true;
-	else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
-		painted = true;
-	}
+		paintID = RM.PmegaMeshes[meshID]->paintIndex;
 
-	//for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
-	//{
-	//	string flag = RM.PmeshList[meshID]->transformation.flags[i];
-	//	if(flag == "Painted")
-	//	{
-	//		painted = true;
-	//	}
-	//	if(flag == "Painting")
-	//	{
-	//		painting = true;
-	//	}
-	//	if(flag == "Transparent")
-	//	{
-	//		transparent = true;
-	//	}
-	//}
+		transparent = RM.PmegaMeshes[meshID]->transformation.flags._Transparent;
+		if(meshID != -1)
+		{
+			if(RM.PmegaMeshes[meshID]->transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(RM.PmegaMeshes[meshID]->transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
+	}
+	else
+	{
+		paintID = RM.PmeshList[meshID]->paintIndex;
+
+		transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
+		if(meshID != -1)
+		{
+			if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
+	}
 
 	ReleaseMutex(RM.MeshMutexHandle);
 
@@ -553,7 +578,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 		}
-		
+
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -604,7 +629,16 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		//UPDATE TILEFACTOR
 		if(meshID != -1)
 		{
-			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+			RootForce::Renderable* rendy;
+			if(itsAmegaMesh)
+			{
+				rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[meshID]);
+			}
+			else
+			{
+				rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+			}
+
 			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
 			{
 				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
@@ -612,7 +646,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 
 			mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;	
 		}
-	
+
 
 		ReleaseMutex(RM.TextureMutexHandle);
 	}
@@ -642,7 +676,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		{
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 		}
-			
+
 	}
 
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
@@ -751,13 +785,19 @@ string modelExists(int meshIndex)
 		ReleaseMutex(RM.MeshMutexHandle);
 }
 
-ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index)
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 
-	p_name = modelExists(index);
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
+	if(!ItsAmegaMesh)
+		p_name = modelExists(index);
+
+	ReleaseMutex(RM.MeshMutexHandle);
 
 	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
 
@@ -767,7 +807,14 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
-	RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
+	if(ItsAmegaMesh)
+	{
+		RegisterEntityFlags(RM.PmegaMeshes[index]->transformation, entity, p_world);
+	}
+	else
+	{
+		RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
+	}
 
 	//for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
 	//{
@@ -916,29 +963,6 @@ void LoadLocators()
 
 	for(int i = 0; i < nrLoc; i++)
 	{
-		cout << "Found locator " << i << " " << RM.PlocatorList[i]->transformation.name << endl;
-		cout << "POS X Y Z " << RM.PlocatorList[i]->transformation.position.x << RM.PlocatorList[i]->transformation.position.y << RM.PlocatorList[i]->transformation.position.z << endl;
-
-		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		//{
-		//	string flagName = "Particle";
-		//	if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
-		//	{
-		//		locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
-		//	}
-		//}
-
-		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		//{
-		//	string flagName = "SpawnPoint";
-		//	string flagName2 = RM.PlocatorList[i]->transformation.flags[j];
-
-		//	if(flagName == flagName2)
-		//	{
-		//		locatorEntities.push_back(CreateTransformEntity(&m_world, i));
-		//	}
-		//}
-
 		if(RM.PlocatorList[i]->transformation.flags._Particle)
 			locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
 
@@ -991,7 +1015,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			string name = RM.PmeshList[MeshIndex]->transformation.name;
 			if(name != "")
 			{
-				Entities.push_back(CreateMeshEntity(&m_world, name, MeshIndex));
+				Entities.push_back(CreateMeshEntity(&m_world, name, MeshIndex, false));
 				cout << "Adding " << name << " to index: " << MeshIndex << endl;
 			}
 		}
@@ -1010,7 +1034,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 			////Update material list
 			if(RM.PmeshList[MeshIndex]->MaterialID >= 0 && RM.PmeshList[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex, false);
 			
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
 
@@ -1081,7 +1105,6 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			m_vertices[j].m_UV = RM.PmeshList[MeshIndex]->UV[j];
 			m_vertices[j].m_tangent = RM.PmeshList[MeshIndex]->tangent[j];
 			m_vertices[j].m_bitangent = RM.PmeshList[MeshIndex]->binormal[j];
-
 		}
 
 		
@@ -1091,9 +1114,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
 		delete m_vertices;
-		}
-
-		
+		}		
 	}
 
 	//Remove mesh at index
@@ -1103,6 +1124,131 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		m_world.GetEntityManager()->RemoveEntity(Entities[Entities.size()-1]);
 		Entities.pop_back();
 	}
+
+	ReleaseMutex(RM.MeshMutexHandle);
+}
+
+void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool remove)
+{
+	int MeshIndex = -1;
+	int RemoveMeshIndex = -1;
+
+	if(remove)
+	{
+		MeshIndex = -1;
+		RemoveMeshIndex = index;
+	}
+	else
+	{
+		MeshIndex = index;
+		RemoveMeshIndex = -1;
+	}
+
+
+	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	numberMegaMeshes = *RM.NumberOfMegaMeshes;	
+
+	if(MeshIndex != -1)					
+	{
+		bool newMaterial = false;
+		int size = MegaMeshes.size()-1;
+		if(MeshIndex > size)
+		{
+			string name = RM.PmegaMeshes[MeshIndex]->transformation.name;
+			if(name != "")
+			{
+				MegaMeshes.push_back(CreateMeshEntity(&m_world, name, MeshIndex, true));
+				cout << "Adding " << name << " to index: " << MeshIndex << endl;
+			}
+		}
+
+		if(updateTransformation)
+		{
+			// TRANSFORM AND SCALE
+			RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(MegaMeshes[MeshIndex]);
+
+			transform->m_position = RM.PmegaMeshes[MeshIndex]->transformation.position;
+			transform->m_scale = RM.PmegaMeshes[MeshIndex]->transformation.scale;
+
+			////Update material list
+			if(RM.PmegaMeshes[MeshIndex]->MaterialID >= 0 && RM.PmegaMeshes[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
+				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->glowPath), MeshIndex, true);
+
+			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex]);
+
+			Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName));
+			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			//{
+			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			//}
+
+			/// ROTATION
+			glm::quat rotation;
+			rotation.x = RM.PmegaMeshes[MeshIndex]->transformation.rotation.x;
+			rotation.y = RM.PmegaMeshes[MeshIndex]->transformation.rotation.y;
+			rotation.z = RM.PmegaMeshes[MeshIndex]->transformation.rotation.z;
+			rotation.w = RM.PmegaMeshes[MeshIndex]->transformation.rotation.w;	
+
+			transform->m_orientation.SetOrientation(rotation);
+
+			//PIVOT
+			glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.x, -RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.y, -RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.z));
+			glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.x, -RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.y, -RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.z));
+
+			glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
+			glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
+
+			glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+			glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
+
+			glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
+
+			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
+			transform->m_position += modifiedPos;
+
+			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
+
+			float x,y,z;
+			x = atan2(rotationTest[2][1], rotationTest[2][2]);
+			y = atan2(-rotationTest[2][0], sqrt(pow(rotationTest[2][1],2) + pow(rotationTest[2][2],2)));
+			z = atan2(rotationTest[1][0], rotationTest[0][0]);
+
+			rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName));	
+		}
+
+
+		if(updateShape)
+		{
+			// COPY VERTICES
+			Render::Vertex1P1N1UV1T1BT* m_vertices;
+			m_vertices = new Render::Vertex1P1N1UV1T1BT[g_maxVerticesPerMegaMesh];
+
+			for(int j = 0; j < RM.PmegaMeshes[MeshIndex]->nrOfVertices; j++)
+			{
+				m_vertices[j].m_pos = RM.PmegaMeshes[MeshIndex]->vertex[j];
+				m_vertices[j].m_normal = RM.PmegaMeshes[MeshIndex]->normal[j];
+				m_vertices[j].m_UV = RM.PmegaMeshes[MeshIndex]->UV[j];
+				m_vertices[j].m_tangent = RM.PmegaMeshes[MeshIndex]->tangent[j];
+				m_vertices[j].m_bitangent = RM.PmegaMeshes[MeshIndex]->binormal[j];
+
+			}
+
+			// SET INFORMATION TO GAME
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmegaMeshes[MeshIndex]->nrOfVertices); 
+			delete m_vertices;
+		}
+	}
+
+	////Remove mesh at index
+	//if(RemoveMeshIndex >= 0)	
+	//{
+	//	m_world.GetEntityManager()->RemoveAllComponents(MegaMeshes[MegaMeshes.size()-1]);
+	//	m_world.GetEntityManager()->RemoveEntity(MegaMeshes[MegaMeshes.size()-1]);
+	//	MegaMeshes.pop_back();
+	//}
 
 	ReleaseMutex(RM.MeshMutexHandle);
 }
@@ -1224,6 +1370,24 @@ void ExportToLevel()
 		mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 	}
 
+	for(int i = 0; i < MegaMeshes.size(); i++)
+	{
+		//UPDATE modelName for all Entities from shared memory
+
+		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(MegaMeshes[i]);
+		string materialName = GetNameFromPath(RM.PmegaMeshes[i]->materialName);
+		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+
+		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		string name = RM.PmegaMeshes[i]->modelName;
+		ReleaseMutex(RM.MeshMutexHandle);
+
+		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(MegaMeshes[i]);
+		collision->m_meshHandle = name + "0";
+
+		mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
+	}
 	m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
 
 	entityExport = false;

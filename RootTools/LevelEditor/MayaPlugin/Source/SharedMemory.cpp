@@ -9,6 +9,7 @@ SharedMemory::SharedMemory()
 	NumberOfMaterials = 0;
 	NumberOfLocators = 0;
 	NumberOfMessages = 0;
+	NumberOfMegaMeshes = 0;
 	export = 0;
 	InitalizeSharedMemory();
 }
@@ -29,8 +30,9 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Locator) * g_maxLocators;
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
-	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(int) * 8; //NumberOfStuffs
 	total_memory_size += sizeof(WorldData);
+	total_memory_size += sizeof(MegaMesh)*g_maxMegaMeshes;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -124,6 +126,17 @@ int SharedMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(int));
 
 	worldData = (WorldData*)mem;
+
+	mem = (unsigned char*)(mem + sizeof(WorldData));
+
+	for(int i = 0; i < g_maxMegaMeshes; i++)
+	{
+		PmegaMeshes[i] = ((MegaMesh*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(MegaMesh) * g_maxMegaMeshes);
+
+	NumberOfMegaMeshes = (int*)mem;
 
 	//if(first_process)
 	//{
@@ -349,7 +362,7 @@ void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
 	ReleaseMutex(LocatorMutexHandle);
 }
 
-void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
+void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID, bool itsAmegaMesh)
 {
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
@@ -365,19 +378,28 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 
 	*NumberOfMaterials = nrOfMaterials;		
 
-	if(meshID != -1)
+	if(itsAmegaMesh && meshID != -1)
 	{
-		memcpy(PmeshList[meshID]->materialName, meshList[meshID].materialName, g_maxNameLength);
-
-		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-		WaitForSingleObject(IdMutexHandle, milliseconds);
-		//AddUpdateMessage("Mesh", meshID, true, true, false);
-		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
-		PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
-		ReleaseMutex(IdMutexHandle);
-
-		AddUpdateMessage("Mesh", meshID, true, true, false);
+		AddUpdateMessage("MegaMesh", meshID, true, true, false);
 	}
+	else
+	{
+		if(meshID != -1)
+		{
+			memcpy(PmeshList[meshID]->materialName, meshList[meshID].materialName, g_maxNameLength);
+
+			//MESH MUTEX SHOULD BE HERE INSTEAD?
+			IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(IdMutexHandle, milliseconds);
+			//AddUpdateMessage("Mesh", meshID, true, true, false);
+			PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
+			PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
+			ReleaseMutex(IdMutexHandle);
+
+			AddUpdateMessage("Mesh", meshID, true, true, false);
+		}
+	}
+
 
 	ReleaseMutex(MeshMutexHandle);
 }
@@ -414,4 +436,15 @@ int SharedMemory::shutdown()
 	CloseHandle(LightMutexHandle);
 	CloseHandle(CameraMutexHandle);
 	return 0;
+}
+
+void SharedMemory::LockMeshMutex()
+{
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
+}
+
+void SharedMemory::UnLockMeshMutex()
+{
+	ReleaseMutex(MeshMutexHandle);
 }
