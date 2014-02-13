@@ -28,11 +28,11 @@ function Player.OnCreate(userId, actionId)
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 
-	playerAction:SetJump(false);
+	playerAction:SetJumpTime(0.0);
 	playerAction:SetMovePower(0);
 	playerAction:SetStrafePower(0);
 	playerAction:SetAngle(Vec2.New(0, 0));
-	playerAction:SetActivateAbility(false);
+	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
 	playerComponent:SetAbility(0, "AbilityBall");

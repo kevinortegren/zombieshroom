@@ -11,18 +11,15 @@ namespace RootForce
 	{
 	public:
 		Keymapper()
-			: m_bindAction(PlayerAction::NONE)
+			: m_bindAction(nullptr)
 		{
 		}
 		SDL_Scancode GetActionBinding(std::string p_actionId);
 		void SetActionBinding(std::string p_actionId, SDL_Scancode p_key);
-		SDL_Scancode GetActionBinding(PlayerAction::PlayerAction p_actionId);
-		void SetActionBinding(PlayerAction::PlayerAction p_actionId, SDL_Scancode p_key);
 		std::vector<Keybinding> GetKeybindings();
 		
 		// Used by menu to focus/unfocus keybinding
 		void FocusBindAction(std::string p_actionId);
-		void FocusBindAction(PlayerAction::PlayerAction p_actionId);
 		void UnfocusEvent();
 		// Used by C++ to unfocus the gui indicator as well (separated because of race condition issues with JavaScript)
 		void UnfocusBindAction();
@@ -34,9 +31,9 @@ namespace RootForce
 
 	private:
 		// The current action to bind, 0 for none
-		PlayerAction::PlayerAction m_bindAction;
+		Keybinding* m_bindAction;
 
-		std::map<PlayerAction::PlayerAction, SDL_Scancode> m_actionMap;
+		std::map<std::string, Keybinding> m_actionMap;
 		RootEngine::GUISystem::WebView* m_menu;
 	};
 }

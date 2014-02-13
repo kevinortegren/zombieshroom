@@ -33,6 +33,7 @@ namespace RootForce
 			RootForce::Network::ClientComponent::SetTypeId(RootForce::ComponentType::CLIENT);
 			RootForce::Ragdoll::SetTypeId(RootForce::ComponentType::RAGDOLL);
 			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
+			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
 		}
 
 		void InitializeServerComponents()

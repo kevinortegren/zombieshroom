@@ -44,6 +44,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -132,6 +133,9 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -165,13 +169,19 @@ namespace RootForce
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
+		// Set the server peer to the action system, if we are a server.
+		if (m_networkContext.m_server != nullptr)
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
 
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
-		
+
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
 
@@ -451,7 +461,10 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
-		
+		{
+			PROFILE("Sound System", g_engineContext.m_profiler);
+			m_soundSystem->Process();
+		}
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -503,7 +516,7 @@ namespace RootForce
 			// Update keybindings when returning to game
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
-
+		g_engineContext.m_sound->Update();
 		return GameStates::Ingame;
 	}
 }

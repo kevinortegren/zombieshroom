@@ -5,68 +5,68 @@
 
 namespace RootForce
 {
-	PlayerAction::PlayerAction ActionFromString(std::string p_action)
+	std::string KeybindString(std::string p_action)
 	{
-		// Preprocess string, if prefix found, remove it. Then capitalize string
 		std::string prefix = "settings-key-";
 		if(p_action.find(prefix) != std::string::npos)
 			p_action = p_action.substr(p_action.find(prefix)+prefix.length());
 		std::transform(p_action.begin(), p_action.end(), p_action.begin(), ::toupper);
-
-		PlayerAction::PlayerAction action;
+		return p_action;
+	}
+	void ActionFromString(Keybinding &p_binding, std::string p_action)
+	{
+		p_binding.Edge = false;
+		p_binding.ActionUp = PlayerAction::NONE;
 		if(p_action.compare("MOVE_FORWARDS")==0)
-			action = PlayerAction::MOVE_FORWARDS;
+			p_binding.Action = PlayerAction::MOVE_FORWARDS;
 		else if(p_action.compare("MOVE_BACKWARDS")==0)
-			action = PlayerAction::MOVE_BACKWARDS;
+			p_binding.Action = PlayerAction::MOVE_BACKWARDS;
 		else if(p_action.compare("STRAFE_RIGHT")==0)
-			action = PlayerAction::STRAFE_RIGHT;
+			p_binding.Action = PlayerAction::STRAFE_RIGHT;
 		else if(p_action.compare("STRAFE_LEFT")==0)
-			action = PlayerAction::STRAFE_LEFT;
+			p_binding.Action = PlayerAction::STRAFE_LEFT;
 		else if(p_action.compare("SELECT_ABILITY1")==0)
-			action = PlayerAction::SELECT_ABILITY1;
+			p_binding.Action = PlayerAction::SELECT_ABILITY1;
 		else if(p_action.compare("SELECT_ABILITY2")==0)
-			action = PlayerAction::SELECT_ABILITY2;
+			p_binding.Action = PlayerAction::SELECT_ABILITY2;
 		else if(p_action.compare("SELECT_ABILITY3")==0)
-			action = PlayerAction::SELECT_ABILITY3;
+			p_binding.Action = PlayerAction::SELECT_ABILITY3;
 		else if(p_action.compare("ACTIVATE_ABILITY")==0)
-			action = PlayerAction::ACTIVATE_ABILITY;
+		{
+			p_binding.Action = PlayerAction::ACTIVATE_ABILITY_PRESSED;
+			p_binding.ActionUp = PlayerAction::ACTIVATE_ABILITY_RELEASED;
+			p_binding.Edge = true;
+		}
 		else if(p_action.compare("JUMP")==0)
-			action = PlayerAction::JUMP;
+		{
+			p_binding.Action = PlayerAction::JUMP_PRESSED;
+			p_binding.ActionUp = PlayerAction::JUMP_RELEASED;
+			p_binding.Edge = true;
+		}
 		else
-			action = PlayerAction::NONE;
-		return action;
+			p_binding.Action = PlayerAction::NONE;
+
 	}
 	
 	SDL_Scancode Keymapper::GetActionBinding(std::string p_actionId)
 	{
-		return GetActionBinding(ActionFromString(p_actionId));
-	}
-	SDL_Scancode Keymapper::GetActionBinding(PlayerAction::PlayerAction p_actionId)
-	{
-		if(p_actionId == PlayerAction::NONE)
-			return SDL_SCANCODE_UNKNOWN;
-		return m_actionMap[p_actionId];
+		return m_actionMap[KeybindString(p_actionId)].Bindings.at(0);
 	}
 	void Keymapper::SetActionBinding(std::string p_actionId, SDL_Scancode p_key)
 	{
-		SetActionBinding(ActionFromString(p_actionId), p_key);
-	}
-	void Keymapper::SetActionBinding(PlayerAction::PlayerAction p_actionId, SDL_Scancode p_key)
-	{
-		if(p_actionId == PlayerAction::NONE)
-			return;
-		m_actionMap[p_actionId] = p_key;
+		std::string processedActionId = KeybindString(p_actionId);
+		ActionFromString(m_actionMap[processedActionId], processedActionId);
+		m_actionMap[processedActionId].Bindings.clear();
+		m_actionMap[processedActionId].Bindings.push_back(p_key);
 	}
 	std::vector<Keybinding> Keymapper::GetKeybindings()
 	{
 		std::vector<Keybinding> tmp;
 		for(auto bind : m_actionMap)
 		{
-			Keybinding tmpkey;
-			tmpkey.Edge = false;
-			tmpkey.Action = bind.first;
-			tmpkey.Bindings.push_back(bind.second);
-			tmp.push_back(tmpkey);
+			if(bind.second.Action == PlayerAction::NONE)
+				continue;
+			tmp.push_back(bind.second);
 		}
 		return tmp;
 	}
@@ -74,20 +74,19 @@ namespace RootForce
 	// Used by menu to focus keybinding
 	void Keymapper::FocusBindAction(std::string p_actionId)
 	{
-		FocusBindAction(ActionFromString(p_actionId));
-	}
-	void Keymapper::FocusBindAction(PlayerAction::PlayerAction p_actionId)
-	{
-		m_bindAction = p_actionId;
+		std::string processedActionId = KeybindString(p_actionId);
+		if(m_actionMap.find(processedActionId) == m_actionMap.end())
+			ActionFromString(m_actionMap[processedActionId], processedActionId);
+		m_bindAction = &m_actionMap[KeybindString(p_actionId)];
 	}
 	// Used by menu or C++ code to unfocus keybinding
 	void Keymapper::UnfocusEvent()
 	{
-		m_bindAction = RootForce::PlayerAction::NONE;
+		m_bindAction = nullptr;
 	}
 	void Keymapper::UnfocusBindAction()
 	{
-		m_bindAction = RootForce::PlayerAction::NONE;
+		m_bindAction = nullptr;
 		// Make all the keybind inputs lose focus
 		if(m_menu)
 			m_menu->BufferJavascript("$('.controls-settings-keybind').blur();");
@@ -97,7 +96,7 @@ namespace RootForce
 	//   otherwise do nothing and return false (to indicate the event should be processed further)
 	bool Keymapper::ProcessKey(SDL_Event p_event)
 	{
-		if(m_bindAction == RootForce::PlayerAction::NONE)
+		if(m_bindAction == nullptr)
 			return false;
 
 		SDL_Scancode value = (SDL_Scancode)0;
@@ -108,13 +107,14 @@ namespace RootForce
 		else
 			return false;
 
-		if(value == SDL_SCANCODE_ESCAPE)
+		if(value == SDL_SCANCODE_ESCAPE || value == SDL_SCANCODE_RETURN)
 		{
 			UnfocusBindAction();
 			return false;
 		}
 
-		m_actionMap[m_bindAction] = value;
+		m_bindAction->Bindings.clear();
+		m_bindAction->Bindings.push_back(value);
 		// Force the GUI to reload the keybindings
 		if(m_menu)
 			m_menu->BufferJavascript("$('.controls-settings-keybind:focus').val(" + std::to_string(value) + ");");

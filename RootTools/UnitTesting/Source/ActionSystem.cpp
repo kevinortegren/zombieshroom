@@ -61,16 +61,16 @@ TEST(ActionSystem, ProcessEntity)
 	{
 		health->IsDead = true;
 		action->ActionID = 15;
-		action->Jump = true;
-		action->ActivateAbility = true;
+		//action->Jump = true;
+		//action->ActivateAbility = true;
 
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
 
 		EXPECT_TRUE(health->WantsRespawn);
-		EXPECT_FALSE(action->Jump);
-		EXPECT_FALSE(action->ActivateAbility);
+		//EXPECT_FALSE(action->Jump);
+		//EXPECT_FALSE(action->ActivateAbility);
 		health->IsDead = false;
 	}
 
@@ -111,22 +111,22 @@ TEST(ActionSystem, ProcessEntity)
 
 	{
 		glm::vec3 pos = transform->m_position;
-		action->Jump = true;
+		//action->Jump = true;
 
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
 
 		EXPECT_GT(transform->m_position.y, pos.y);
-		EXPECT_FALSE(action->Jump);
+		//EXPECT_FALSE(action->Jump);
 	}
 
 	{
-		action->ActivateAbility = true;
+		//action->ActivateAbility = true;
 		system->Process();
 		g_engineContext.m_physics->Update(0.01f);
 		pSystem->Process();
-		EXPECT_FALSE(action->ActivateAbility);
+		//EXPECT_FALSE(action->ActivateAbility);
 	}
 
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
