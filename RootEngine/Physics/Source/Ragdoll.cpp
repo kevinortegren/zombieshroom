@@ -347,10 +347,11 @@ namespace Ragdoll
 				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
 			// Hej! det är jag som är ansvarig för crashes i sequentialconstraintsolvern, hurra för mig 
-			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
-			constraint->setLimit(0,0,PI_2,0,1,1);
+// 			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
+// 			constraint->setLimit(0,0,PI_2,0,1,1);
 			//constraint->setDamping(0.85f);
-
+			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			constraint->setLimit(0 ,0 );
 
 
 			m_dynamicWorld->addConstraint(constraint,true);
@@ -559,15 +560,15 @@ namespace Ragdoll
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
 		
-			for(int i = 0 ;  i < BodyPart::TOTAL_BONE_AMUNT; i++)
-				if(i != BodyPart::HIPS && i !=BodyPart::SPINE)
-					m_bodies[i]->applyCentralImpulse(p_velocity);
-				else
-				{
-					m_bodies[i]->applyCentralImpulse(p_velocity);
-				}
-		//m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
-		//m_bodies[BodyPart::SPINE]->setLinearVelocity(p_velocity);
+		for(int i = 0 ;  i < BodyPart::TOTAL_BONE_AMUNT; i++)
+			if(i != BodyPart::HIPS && i !=BodyPart::SPINE)
+				m_bodies[i]->applyCentralImpulse(p_velocity);
+			else
+			{
+				m_bodies[i]->applyCentralImpulse(p_velocity);
+			}
+		/*m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
+		m_bodies[BodyPart::SPINE]->setLinearVelocity(p_velocity);*/
 	}
 
 	//The magic function of constraint calculations, basically creates the constraint in the middle between the two bodies with a user defined offset applied
