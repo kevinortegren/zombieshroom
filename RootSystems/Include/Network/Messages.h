@@ -55,6 +55,8 @@ namespace RootForce
 				AbilityChannelingDone,
 				AbilityChargeAndChannelingDone,
 				AbilityCooldownOff,
+				AbilityTryClaim,
+				AbilityClaimedBy,
 				RespawnRequest,
 				DestroyEntities,
 				SpawnUser,
@@ -209,6 +211,24 @@ namespace RootForce
 			uint8_t AbilityIndex;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to the server when a player wants to pick up an ability
+		*/		
+		struct AbilityTryClaim
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to all clients when a player has successfully picked up an ability
+		*/
+		struct AbilityClaimedBy
+		{
+
 		};
 
 		/*

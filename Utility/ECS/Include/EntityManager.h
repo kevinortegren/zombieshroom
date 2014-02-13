@@ -67,7 +67,7 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
-			assert(p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
+			assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
 	
 			m_allocator.Free<T>((T*) m_components[Component<T>::GetTypeId()][p_entity->m_id]);
 
