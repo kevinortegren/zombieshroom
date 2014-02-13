@@ -9,7 +9,8 @@ namespace ECS
 
 	ComponentAllocator::~ComponentAllocator()
 	{
-		for(auto itr = m_lists.begin(); itr != m_lists.end(); ++itr)
+		int i = 0;
+		for(auto itr = m_lists.begin(); itr != m_lists.end(); ++itr, ++i)
 		{
 			if((*itr).second != nullptr)
 			{

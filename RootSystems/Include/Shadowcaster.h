@@ -9,6 +9,6 @@ namespace RootForce
 	{
 		Shadowcaster() : m_directionalLightSlot(0) {}
 
-		int m_directionalLightSlot;
+		long long m_directionalLightSlot;
 	};
 }
