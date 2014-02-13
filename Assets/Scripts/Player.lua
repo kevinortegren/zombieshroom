@@ -35,9 +35,9 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall");
-	playerComponent:SetAbility(1, "AbilityDash");
-	playerComponent:SetAbility(2, "MagicMissile");
+	playerComponent:SetAbility(0, "AbilityBall", -1);
+	playerComponent:SetAbility(1, "AbilityDash", -1);
+	playerComponent:SetAbility(2, "MagicMissile" ,-1);
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(20);
@@ -95,6 +95,22 @@ end
 
 function Player.OnCollide (self, entity)
 	-- Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
+ 	local hitCol = entity:GetCollision();
+ 	local hitPhys = entity:GetPhysics();
+	local type = hitPhys:GetType(hitCol);
+  if  type == PhysicsType.TYPE_ABILITYSPAWN then
+    --Logging.Log(LogLevel.DEBUG_PRINT, "collided with ability spawn!");
+    local action = self:GetPlayerAction();
+    local playerComponent = self:GetPlayerComponent();
+    if action:TryPickup() then
+      local abilitySpawn = entity:GetAbilitySpawn();
+      playerComponent:SetAbility(playerComponent:GetSelectedAbility(), abilitySpawn:GetCurrentName(), abilitySpawn:GetCurrentCharges());
+      action:SetTryPickup(false);
+      abilitySpawn:SetClaimed(true);
+      Logging.Log(LogLevel.DEBUG_PRINT, "pick up successful!");
+    end
+  end
+  
 end
 
 function Player.OnDestroy (self)

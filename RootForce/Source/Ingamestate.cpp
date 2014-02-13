@@ -43,6 +43,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -111,6 +112,10 @@ namespace RootForce
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
 		keybindings[keybindings.size()-1].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_LSHIFT);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::PICK_UP_ABILITY;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -175,6 +180,10 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
 
+		//AbilitySpawnSystem to create new abilities across the map
+		m_abilitySpawnSystem = new RootForce::AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+		g_world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(m_abilitySpawnSystem);
+
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
@@ -223,6 +232,10 @@ namespace RootForce
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
+
+		//Load the ability pack and attatch components to the spawnpoints
+		m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read this some server game data instead
+		m_abilitySpawnSystem->AttatchComponentToPoints();
 
 		m_animationSystem->Start();
 
@@ -356,8 +369,14 @@ namespace RootForce
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// ToDo: Send a network message to server to indicate a suicide
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			if(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health != 0)
+			{
+				if(!g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->IsDead)
+				{
+					g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+					MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+				}
+			}
 		}
 
 #ifdef _DEBUG
@@ -441,7 +460,7 @@ namespace RootForce
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
-			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused() || m_displayIngameMenu);
 			m_playerControlSystem->Process();
 		}
 
@@ -458,8 +477,7 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			if(!m_displayIngameMenu)
-				m_actionSystem->Process();
+			m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -469,7 +487,10 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
-
+		{
+			PROFILE("AbilitySpawn system", g_engineContext.m_profiler);
+			m_abilitySpawnSystem->Process();
+		}
 
 		{
 			PROFILE("Ragdoll system", g_engineContext.m_profiler);

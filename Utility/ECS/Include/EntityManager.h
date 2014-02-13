@@ -69,7 +69,7 @@ namespace ECS
 		{
 			assert(p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
 	
-			m_allocator.Free<T>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
+			m_allocator.Free<T>((T*) m_components[Component<T>::GetTypeId()][p_entity->m_id]);
 
 			m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
 

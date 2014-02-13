@@ -48,13 +48,16 @@ ObjectController::ObjectController()
 
 ObjectController::~ObjectController()
 {
-
+	m_dynamicWorld->removeCollisionObject(m_ghostObject);
+	delete m_ghostObject;
+	delete m_convexShape;
 }
 
-void ObjectController::Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape)
+void ObjectController::Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btDiscreteDynamicsWorld* p_dynamicWorld)
 {
 	m_ghostObject = p_ghostObject;
 	m_convexShape = p_convexShape;
+	m_dynamicWorld = p_dynamicWorld;
 }
 
 void ObjectController::Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_world )

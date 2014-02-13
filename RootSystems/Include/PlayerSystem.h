@@ -48,6 +48,8 @@ namespace RootForce
 
 		float JumpTime;
 
+		bool TryPickup;
+
 		float AbilityTime;
 		uint8_t SelectedAbility;
 
@@ -103,6 +105,7 @@ namespace RootForce
 
 		AbilityInfo()
 		{
+			Name = "";
 			Cooldown = 0.0f;
 			OnCooldown = false;
 			Charges = -1;
