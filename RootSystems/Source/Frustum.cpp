@@ -64,12 +64,6 @@ namespace RootForce
 	{
 		glm::mat4 matrix;
 
-		float a = -(m_far + m_near) / (m_far - m_near);
-		float b = -(2 * m_far * m_near) / (m_far - m_near);
-
-		float c = p_proj[2][2];
-		float d = p_proj[3][2];
-
 		matrix = p_proj * p_view;
 
 		m_planesEx[NEARP].a = matrix[0][3] + matrix[0][2];

@@ -98,12 +98,18 @@ namespace Render
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
 
 		virtual void Compute(ComputeJob* p_job) = 0;
+
+		virtual float GetTime() = 0;
+		virtual int GetJobCount() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
 	{
 	public:
 		
+		float GetTime();
+		int GetJobCount();
+
 		GLRenderer();
 		~GLRenderer();
 		void Startup();
@@ -231,6 +237,9 @@ namespace Render
 		std::shared_ptr<TechniqueInterface> m_fullscreenQuadTech;
 
 		bool m_displayNormals;
+
+		float m_renderTime;
+		int m_renderJobs;
 	};
 }
 

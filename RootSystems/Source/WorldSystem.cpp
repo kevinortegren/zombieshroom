@@ -147,7 +147,7 @@ namespace RootForce
 		
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustum = Frustum(45.0f, 1.0f, 250.0f, aspectRatio);
+		camera->m_frustum = Frustum(45.0f, 1.0f, 1000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -195,7 +195,7 @@ namespace RootForce
 			job.m_flags = renderable->m_renderFlags;
 			job.m_renderPass = renderable->m_pass;
 			job.m_params = renderable->m_params;
-			job.m_mesh->SetWireFrame(true);
+			//job.m_mesh->SetWireFrame(true);
 
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}

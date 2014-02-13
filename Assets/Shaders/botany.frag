@@ -2,6 +2,7 @@
 
 in vec2 vert_texcoord1;
 in vec3 vert_normal1;
+in vec3 vert_color1;
 
 uniform sampler2D g_Diffuse;
 
@@ -21,5 +22,5 @@ void main()
 	diffuse = vec4(vec3(0.0), 0.0);
 	normals = normal.xy;
 	glow = vec4(vec3(0), 0.0f);
-    background = vec4(vec3(0,1,0), 1.0);
+    background = vec4(vert_color1, 1.0);
 }

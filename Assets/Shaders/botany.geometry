@@ -2,11 +2,16 @@
 #extension GL_EXT_geometry_shader4 : enable  
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices = 113) out;
+layout(triangle_strip, max_vertices = 30) out;
 //layout(triangle_strip, max_vertices = 3) out;
 
 uniform sampler2D g_Density;
 uniform sampler1D g_Random;
+
+layout(std140) uniform PerObject
+{
+	float g_Distance;
+};
 
 layout(std140) uniform PerFrame
 {
@@ -25,6 +30,7 @@ in vec2 gs_texcoord_in[];
 
 out vec3 vert_normal1;
 out vec2 vert_texcoord1;
+out vec3 vert_color1;
 
 // LOD 1
 
@@ -127,6 +133,7 @@ void CreateShortBlade(vec3 position, float angle)
         gl_Position = projectionMatrix * viewMatrix * pos;
         vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(1,0,0);
         EmitVertex();
     }
     EndPrimitive();
@@ -151,6 +158,7 @@ void CreateMediumBlade(vec3 position, float angle)
         gl_Position = projectionMatrix * viewMatrix * pos;
         vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(0,1,0);
         EmitVertex();
     }
     EndPrimitive();
@@ -175,9 +183,39 @@ void CreateLongBlade(vec3 position, float angle)
         gl_Position = projectionMatrix * viewMatrix * pos;
         vert_texcoord1 = gs_texcoord_in[0];
         vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(0,1,0);
         EmitVertex();
     }
     EndPrimitive();
+}
+
+void CreateImposter(vec3 position)
+{
+    vec3 scale = vec3(1.8, 0.8, 1.8);
+	vec4 vertices[4];  
+	vertices[0] = vec4(position.x + scale.x, position.y + 2 * scale.y, position.z + scale.z, 1.0f);  
+	vertices[1] = vec4(position.x - scale.x, position.y + 2 * scale.y, position.z - scale.z, 1.0f);   
+	vertices[2] = vec4(position.x + scale.x, position.y, position.z + scale.z, 1.0f);  
+	vertices[3] = vec4(position.x - scale.x, position.y, position.z - scale.z, 1.0f);
+
+    vec2 texCoords[4];
+	texCoords[0] = vec2(0,0);
+	texCoords[1] = vec2(1,0);
+	texCoords[2] = vec2(0,1);
+	texCoords[3] = vec2(1,1);
+
+    // Output four vertices.
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+        gl_Position = projectionMatrix * viewMatrix * vertices[i];
+        vert_texcoord1 = texCoords[i];
+        vert_normal1 = gs_normal_in[0];
+        vert_color1 = vec3(0,0,1);
+        EmitVertex();
+    }
+    
+    EndPrimitive();   
 }
 
 void CreateQuad(vec3 position, float angle)
@@ -208,7 +246,7 @@ void CreateQuad(vec3 position, float angle)
     for(i = 0; i < 4; i++)
     {
         gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        vert_texcoord1 = gs_texcoord_in[i];
+        vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         EmitVertex();
     }
@@ -218,77 +256,111 @@ void CreateQuad(vec3 position, float angle)
 
 void main() 
 {
-    vec3 a = gl_in[0].gl_Position.xyz;
-    vec3 b = gl_in[1].gl_Position.xyz;
-    vec3 c = gl_in[2].gl_Position.xyz;
-    
-    /*gl_Position = projectionMatrix * viewMatrix * gl_in[0].gl_Position;
-    vert_texcoord1 = gs_texcoord_in[0];
-    vert_normal1 = gs_normal_in[0];
-    EmitVertex();
-    
-    gl_Position = projectionMatrix * viewMatrix * gl_in[1].gl_Position;
-    vert_texcoord1 = gs_texcoord_in[1];
-    vert_normal1 = gs_normal_in[1];
-    EmitVertex();
-    
-    gl_Position = projectionMatrix * viewMatrix * gl_in[2].gl_Position;
-    vert_texcoord1 = gs_texcoord_in[2];
-    vert_normal1 = gs_normal_in[2];
-    EmitVertex();
-    
-    EndPrimitive();*/
-    
-    vec3 ab = b-a;
-    vec3 ac = c-a;
-    
     float v0d = texture(g_Density, gs_texcoord_in[0]).g;
     float v1d = texture(g_Density, gs_texcoord_in[1]).g;
     float v2d = texture(g_Density, gs_texcoord_in[2]).g;
-    
-    float area = length(cross(ab, ac)) / 2;
     
     // Density 0 - 1.
     float avgDensity = (v0d + v1d + v2d) / 3;
     
     if(avgDensity < 0.1)
         return;
+
+    vec3 a = gl_in[0].gl_Position.xyz;
+    vec3 b = gl_in[1].gl_Position.xyz;
+    vec3 c = gl_in[2].gl_Position.xyz;
+   
+    vec3 ab = b-a;
+    vec3 ac = c-a;
     
+    float area = length(cross(ab, ac)) / 2;
+   
     // Calculate number of plants.
     int plantNumber = int(avgDensity * area * 4.0) + 1;
     
-    int i;
-    for(i = 0; i < 16; i++)
-    { 
-        if(i < plantNumber)
-        {
-           float r = random(a, i);
-           float s = random(b, i);
-           
-           if(r + s >= 1)
+    // Cull nodes based on distance.
+    
+    // LOD 0
+    if(g_Distance < 80.0)
+    {
+        int i;
+        for(i = 0; i < 4; i++)
+        { 
+            if(i < plantNumber)
             {
-                r = 1 - r;
-                s = 1 - s;
+               float r = random(a, i);
+               float s = random(b, i);
+               
+               if(r + s >= 1)
+                {
+                    r = 1 - r;
+                    s = 1 - s;
+                }
+               
+                vec3 pos = a + r*ab + s*ac;
+                float rotation = random(c, i);
+                
+                // Create blades based on density.
+                if(avgDensity > 0.7)
+                {
+                    CreateLongBlade(pos, 2*3.14*rotation);
+                }
+                else if(avgDensity > 0.3)
+                {
+                    CreateMediumBlade(pos, 2*3.14*rotation);
+                }
+                else
+                {
+                    CreateMediumBlade(pos, 2*3.14*rotation);
+                }       
             }
-           
-            vec3 pos = a + r*ab + s*ac;
-            //vec3 pos = a + pattern2[i].x*ab + pattern2[i].y*ac;
-            
-            float rotation = random(c, i);
-            
-            if(avgDensity > 0.7)
+        }  
+    }
+    // LOD 1
+    else if(g_Distance < 200.0)
+    {
+        int i;
+        for(i = 0; i < 6; i++)
+        { 
+            if(i < plantNumber)
             {
-                CreateLongBlade(pos, 2*3.14*rotation);
-            }
-            else if(avgDensity > 0.3)
-            {
-                CreateMediumBlade(pos, 2*3.14*rotation);
-            }
-            else
-            {
+               float r = random(a, i);
+               float s = random(b, i);
+               
+               if(r + s >= 1)
+                {
+                    r = 1 - r;
+                    s = 1 - s;
+                }
+               
+                vec3 pos = a + r*ab + s*ac;  
+                float rotation = random(c, i);
+                
+                // Create low poly 
                 CreateShortBlade(pos, 2*3.14*rotation);
             }
-        
         }
     }
+    // Place Imposters at far distance.
+    else
+    {
+        int i;
+        for(i = 0; i < 2; i++)
+        { 
+            if(i < plantNumber)
+            {
+               float r = random(a, i);
+               float s = random(b, i);
+               
+               if(r + s >= 1)
+                {
+                    r = 1 - r;
+                    s = 1 - s;
+                }
+               
+                vec3 pos = a + r*ab + s*ac;
+                CreateImposter(pos);
+            }
+        }
+    }  
 }

@@ -34,5 +34,6 @@ namespace RootForce
 		QuadTree* m_quadTree;
 
 		std::vector<Render::MeshInterface*> m_meshes;
+		std::vector<float> m_distances;
 	};
 }

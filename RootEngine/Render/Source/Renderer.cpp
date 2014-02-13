@@ -60,7 +60,7 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_allocator(10000 * sizeof(RenderJob))
-		, m_activeRTT(nullptr)
+		, m_activeRTT(nullptr), m_renderTime(0)
 	{
 		
 	}
@@ -424,7 +424,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			PostProcessPass();
+			//PostProcessPass();
 		}
 
 		{
@@ -539,16 +539,52 @@ namespace Render
 
 		m_renderFlags |= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
-		ProcessRenderJobs();
+		GLuint64 startTime, stopTime;
+		unsigned int queryID[2];
+
+		if(p_layer == 0)
+		{
+			m_renderJobs = m_jobs.size();
+
+			glGenQueries(2, queryID);
+			glQueryCounter(queryID[0], GL_TIMESTAMP);
+
+			ProcessRenderJobs();
 		
+			glQueryCounter(queryID[1], GL_TIMESTAMP);
+
+			GLint stopTimerAvailable = 0;
+			while (!stopTimerAvailable) {
+				glGetQueryObjectiv(queryID[1], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable);
+			}
+
+			glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
+			glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
+
+			m_renderTime = (stopTime - startTime) / 1000000.0;
+
+		}
+
 		m_renderFlags ^= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
 		// Bind textures for read.
 		m_gbuffer.BindTextures();
 	}
 
+	float GLRenderer::GetTime()
+	{
+		return m_renderTime;
+	}
+
+	int GLRenderer::GetJobCount()
+	{
+		return m_renderJobs;
+	}
+
 	void GLRenderer::ProcessRenderJobs()
 	{
+		
+
 		if(m_activeRTT != nullptr)
 		{
 			// Render to texture.
