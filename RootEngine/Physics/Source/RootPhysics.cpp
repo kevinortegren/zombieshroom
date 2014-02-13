@@ -352,7 +352,10 @@ namespace Physics
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+			{
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+				body->setRestitution(0.7f);
+			}
 			m_dynamicWorld->addRigidBody(body);
 			m_dynamicObjects.push_back(body);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
@@ -366,7 +369,7 @@ namespace Physics
 			btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 			ghostObject->setCollisionShape(shape);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
+				ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_KINEMATIC_OBJECT);
 			else
 			{
 				ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
@@ -524,7 +527,10 @@ namespace Physics
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			{
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
+				body->setRestitution(0.5f);
+			}
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 			m_dynamicWorld->addRigidBody(body);
@@ -1486,6 +1492,11 @@ namespace Physics
 		}
 	}
 
+	bool RootPhysics::IsRagdoll( int p_objecthandle )
+	{
+		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
+	}
+
 	float RootPhysics::RayTest( glm::vec3 p_startPos, glm::vec3 p_endPos )
 	{
 		RayAgainstStaticCast rayResult;
@@ -1520,11 +1531,6 @@ namespace Physics
 				m_userPointer.at(p_objectHandle)->m_collisions->insert(std::make_pair(((CustomUserPointer*)(m_playerObjects.at(i)->GetUserPointer()))->m_entity, info));
 			}
 		}
-	}
-
-	bool RootPhysics::IsRagdoll( int p_objecthandle )
-	{
-		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
 	}
 
 }

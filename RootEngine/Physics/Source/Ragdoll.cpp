@@ -92,8 +92,8 @@ namespace Ragdoll
 	{
 		
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
-	//	m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(0, 4.3f, 0);
-	//	m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f, 3.4f, 0);
+		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(-0.1f, 0.0f, 0);
+		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.1f,0.f, 0);
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
 		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.30f ,0);
 		//m_bodyPosOffset[BodyPart::HIPS]= btVector3(0.0f , -0.4f, 0.0f);
@@ -168,7 +168,10 @@ namespace Ragdoll
 				else
 					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
 			}
-			
+			if(index < 6)
+			{
+				toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+			}
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
@@ -192,7 +195,7 @@ namespace Ragdoll
 			m_dynamicWorld->addRigidBody(body);
 			body->setCcdMotionThreshold(0.7f);
 			body->setCcdSweptSphereRadius(0.4f);
-			body->setRestitution(0.5f);
+			body->setRestitution(1.0f);
 			
 			//This is supposed to stop collision  with abilities and other players, doesn't work atm
 			body->setCollisionFlags(btBroadphaseProxy::DebrisFilter);
@@ -450,15 +453,15 @@ namespace Ragdoll
  		 	//Spine - Left upper arm
  			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
 			{
-				glm::vec3 rotFix = -m_right * (0.26f);
+				glm::vec3 rotFix = -m_right * (0.28f);
 			 	CalculateConstraintTransform(p_bodyA, p_bodyB, 
 			 		/*-0.20f , 0.0f * OFFSET, 0,*/
-					rotFix.x, rotFix.y + .1f, rotFix.z,
+					rotFix.x, rotFix.y , rotFix.z,
 			 		0.0f, 0.0f * OFFSET, 0,
 			 		0 , 0, 1, 0, &localA, &localB);
 			 		 	
 			 	btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			 	constraint->setLimit(-PI_2, PI_2 );
+			 	constraint->setLimit(-PI_2, PI_2/2);
 			 	m_dynamicWorld->addConstraint(constraint);
 			 	constraint->setDbgDrawSize(0.5f);
 			 	return constraint;
@@ -466,15 +469,15 @@ namespace Ragdoll
 			////Spine - Right upper arm
 			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
 			{
-				glm::vec3 rotFix = m_right * (0.26f);
+				glm::vec3 rotFix = m_right * (0.28f);
 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
 					/*0.20f , 0.0f * OFFSET, 0,*/
-					rotFix.x, rotFix.y + 0.1f, rotFix.z,
+					rotFix.x, rotFix.y , rotFix.z,
 					-0.0f, 0.0f * OFFSET, 0,
 					0 , 0, 1, 0, &localA, &localB);
 			
 				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(-PI_2, PI_2);
+				constraint->setLimit(-PI_2, PI_2/2);
 				m_dynamicWorld->addConstraint(constraint);
 				constraint->setDbgDrawSize(0.5f);
 				return constraint;
@@ -561,12 +564,14 @@ namespace Ragdoll
 	{
 		
 		for(int i = 0 ;  i < BodyPart::TOTAL_BONE_AMUNT; i++)
+		{
 			if(i != BodyPart::HIPS && i !=BodyPart::SPINE)
-				m_bodies[i]->applyCentralImpulse(p_velocity);
+				m_bodies[i]->applyCentralImpulse(p_velocity* 2);
 			else
 			{
-				m_bodies[i]->applyCentralImpulse(p_velocity);
+				m_bodies[i]->applyCentralImpulse(p_velocity );
 			}
+		}
 		/*m_bodies[BodyPart::HIPS]->setLinearVelocity(p_velocity);
 		m_bodies[BodyPart::SPINE]->setLinearVelocity(p_velocity);*/
 	}

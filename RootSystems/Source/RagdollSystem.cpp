@@ -76,7 +76,7 @@ namespace RootForce
 			if(m_engineContext->m_physics->IsRagdoll(*(collision->m_handle)))
 			{
 				m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
-				transform->m_orientation.SetOrientation(glm::quat(0,0,1,0));
+				transform->m_orientation.SetOrientation(m_engineContext->m_physics->GetOrientation(*(collision->m_handle)));
 			}
 			ragdoll->m_firstTime = true;
 			return;
