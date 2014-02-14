@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 using namespace std;
-const int g_maxSceneObjects = 1000;
+const int g_maxSceneObjects = 3000;
 const int g_maxMeshes = 400;
 const int g_maxCameras = 15;
 const int g_maxLights = 40;
