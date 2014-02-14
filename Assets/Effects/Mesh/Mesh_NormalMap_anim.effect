@@ -25,9 +25,9 @@
       programs:
         - name: Mesh_Normal_Anim
           shaders:
-            - name: mesh_normal_anim
+            - name: Mesh/mesh_normal_anim
               type: vertex
-            - name: mesh_normal_anim
+            - name: Mesh/mesh_normal_anim
               type: fragment
               
     -  name: Mesh_Normal_Anim_Shadow
@@ -48,7 +48,7 @@
        programs:
          - name: Shadow_Anim
            shaders:
-             - name: shadow_anim
+             - name: Renderer/shadow_anim
                type: vertex
            depth:
              write: 1

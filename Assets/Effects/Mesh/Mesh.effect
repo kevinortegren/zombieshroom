@@ -1,6 +1,6 @@
-- name: Mesh_Normal
+- name: Mesh
   techniques:
-    - name: Mesh_Normal
+    - name: Mesh
       bindings:
         - name: PerFrame
           slot: 0
@@ -16,18 +16,17 @@
           slot: 0
         - name: g_Specular
           slot: 1
-        - name: g_Normal
-          slot: 2
         - name: g_Glow
           slot: 3
       programs:
-        - name: Mesh_Normal
+        - name: Mesh
           shaders:
-            - name: mesh_normal
+            - name: Mesh/mesh
               type: vertex
-            - name: mesh_normal
+            - name: Mesh/mesh
               type: fragment
-    -  name: Mesh_Normal_Shadow
+              
+    -  name: Mesh_Shadow
        bindings:
          - name: PerFrame
            slot: 0
@@ -36,15 +35,16 @@
        uniforms:
          - sem: MODEL
            offset: 0
-         - sem: NORMAL
-           offset: 64
        flags:
          - name: Shadow
        programs:
          - name: Shadow
            shaders:
-             - name: shadow
+             - name: Renderer/shadow
                type: vertex
            depth:
              write: 1
              test: 1
+
+              
+

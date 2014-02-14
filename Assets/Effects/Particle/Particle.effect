@@ -54,9 +54,9 @@
       programs:
         - name: particle_update
           shaders:
-            - name: particle_update
+            - name: Particle/particle_update
               type: vertex
-            - name: particle_update
+            - name: Particle/particle_update
               type: geometry
           feedback:
             - name: vert_initialPos1
@@ -87,11 +87,11 @@
       programs:
         - name: particle_render
           shaders:
-            - name: particle-render
+            - name: Particle/particle-render
               type: vertex
-            - name: particle-render
+            - name: Particle/particle-render
               type: geometry
-            - name: particle-render
+            - name: Particle/particle-render
               type: fragment
           
           # Blend Mode:

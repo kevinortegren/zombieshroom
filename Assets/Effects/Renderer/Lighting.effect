@@ -1,6 +1,7 @@
 - name: Deferred
   techniques:
     - name: Deferred
+    
       bindings:
         - name: PerFrame
           slot: 0
@@ -8,6 +9,7 @@
           slot: 1
         - name: Lights
           slot: 2
+          
       textures:
         - name: g_Diffuse
           slot: 0
@@ -23,12 +25,13 @@
           slot: 5
         - name: g_ShadowDepth
           slot: 6
+          
       programs:
         - name: ambient
           shaders:
-            - name: ambient
+            - name: Renderer/ambient
               type: vertex
-            - name: ambient
+            - name: Renderer/ambient
               type: fragment
           depth:
             write: 0
@@ -36,9 +39,9 @@
           blend: 2
         - name: directional
           shaders:
-            - name: directional
+            - name: Renderer/directional
               type: vertex
-            - name: directional
+            - name: Renderer/directional
               type: fragment
           depth:
             write: 0
@@ -46,9 +49,9 @@
           blend: 2
         - name: pointlight
           shaders:
-            - name: pointlight
+            - name: Renderer/pointlight
               type: vertex
-            - name: pointlight
+            - name: Renderer/pointlight
               type: fragment
           depth:
             write: 0
@@ -56,7 +59,7 @@
           blend: 2
         - name: pointlight_stencil
           shaders:
-            - name: pointlight
+            - name: Renderer/pointlight
               type: vertex
           depth:
             write: 0
@@ -64,9 +67,9 @@
           blend: 2
         - name: background-alphablend
           shaders:
-            - name: output
+            - name: Renderer/output
               type: vertex
-            - name: output
+            - name: Renderer/output
               type: fragment
           depth:
             write: 0
@@ -74,9 +77,9 @@
           blend: 1
         - name: background-addative
           shaders:
-            - name: output
+            - name: Renderer/output
               type: vertex
-            - name: output
+            - name: Renderer/output
               type: fragment
           depth:
             write: 0

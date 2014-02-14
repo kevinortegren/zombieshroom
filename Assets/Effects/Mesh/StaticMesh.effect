@@ -14,9 +14,9 @@
       programs:
         - name: staticmesh
           shaders:
-            - name: staticmesh
+            - name: Mesh/staticmesh
               type: vertex
-            - name: mesh
+            - name: Mesh/mesh
               type: fragment
               
     -  name: StaticMeshShadow
@@ -28,7 +28,7 @@
        programs:
          - name: staticmesh_shadow
            shaders:
-             - name: staticmesh_shadow
+             - name: Renderer/shadow_staticmesh
                type: vertex
            depth:
              write: 1

@@ -1,6 +1,6 @@
-- name: Mesh_Normal_Trans
+- name: Mesh
   techniques:
-    - name: Mesh_Normal_Trans
+    - name: Mesh
       bindings:
         - name: PerFrame
           slot: 0
@@ -16,26 +16,18 @@
           slot: 0
         - name: g_Specular
           slot: 1
-        - name: g_Normal
-          slot: 2
+        - name: g_Glow
+          slot: 3
+        - name: g_LA
+          slot: 5
+      flags:
+        - name: Forward
       programs:
-        - name: Mesh_Normal_Trans
+        - name: Mesh
           shaders:
-            - name: mesh_normal_trans
+            - name: Mesh/mesh
               type: vertex
-            - name: mesh_normal_trans
+            - name: Mesh/mesh_trans
               type: fragment
-
-          # Blend Mode:
-          # None = 0
-          # AlphaBlend = 1
-          # Addative = 2
-          blend: 0
-
-          # Depth settings.
-          depth:
-            write: 1
-            test: 1
-
-
+              
 

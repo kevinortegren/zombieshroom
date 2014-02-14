@@ -29,7 +29,7 @@
       programs:
         - name: Mesh_Blend
           shaders:
-            - name: mesh_blend_flipped
+            - name: Mesh/mesh_blend_flipped
               type: vertex
-            - name: mesh_blend_flipped
+            - name: Mesh/mesh_blend_flipped
               type: fragment

@@ -6,6 +6,7 @@
       textures:
         - name: g_Input
           slot: 5
+          
       programs:
         - name: output
           shaders:
@@ -17,11 +18,3 @@
             write: 0
             test: 0
           blend: 0
-          
-    # Early Z reject.
-    - name: EarlyZ
-      programs:
-        - name: earlyz
-          shaders:
-            - name: earlyz
-              type: vertex
