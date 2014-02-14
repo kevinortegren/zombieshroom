@@ -8,9 +8,10 @@ extern ECS::World* g_world;
 
 namespace RootForce
 {
-	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
+	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems, Keymapper* p_keymapper)
 		: m_networkContext(p_networkContext)
 		, m_sharedSystems(p_sharedSystems)
+		, m_keymapper(p_keymapper)
 	{	
 		ComponentType::Initialize();
 		
@@ -43,14 +44,13 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
 
 	void IngameState::Initialize()
 	{
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::START_PRINT, "Added start print for logging start messages, e.g starting to load a model. Make sure there is a corresponding SUCCESS message efter this.");
-		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::PINK_PRINT, "Added pink print for temporary prints. Don't abuse FFS. So fluffy.");
 		//Bind c++ functions and members to Lua
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
@@ -62,57 +62,11 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
-
-		// Initialize the system for controlling the player.
-		std::vector<RootForce::Keybinding> keybindings(6);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
-		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
-		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
-		//keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
-		//keybindings[0].Edge = true;
-
-		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
-		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
-		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
-		//keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
-		//keybindings[1].Edge = true;
-
-		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
-		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
-		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
-		//keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
-		//keybindings[2].Edge = true;
-
-		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
-		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
-		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
-		//keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
-		//keybindings[3].Edge = true;
-
-		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
-		keybindings[4].Action = RootForce::PlayerAction::JUMP;
-		//keybindings[4].Edge = true;
-		
-		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
-		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY;
-		//keybindings[5].Edge = true;
-		keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
-		keybindings[keybindings.size()-1].Edge = true;
-		keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
-		keybindings[keybindings.size()-1].Edge = true;
-		keybindings.push_back(RootForce::Keybinding());
-		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
-		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
-		keybindings[keybindings.size()-1].Edge = true;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-		m_playerControlSystem->SetKeybindings(keybindings);
+		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
 		// Initialize physics system
@@ -179,6 +133,9 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
+		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -206,11 +163,17 @@ namespace RootForce
 		m_hud->SetSelectedAbility(0);
 
 		//Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+
+		// Set the server peer to the action system, if we are a server.
+		if (m_networkContext.m_server != nullptr)
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		if (m_networkContext.m_client != nullptr)
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
@@ -218,10 +181,15 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
+		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
 
 	void IngameState::Exit()
 	{
+		// Make sure the user is not stuck keymapping in case of disconnects or other abnormal termination
+		m_keymapper->UnfocusBindAction();
+
 		m_animationSystem->Terminate();
 
 		Network::NetworkEntityID id;
@@ -404,27 +372,23 @@ namespace RootForce
 		{
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, 2);
+			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
 		}
 		//DEBUG -> toggle wireframe mode on water with I
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->ToggleWireFrame();
-
-
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->TogglePause();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_L) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->DecreaseDamping();
+			m_waterSystem->IncreaseDamping();
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->DecreaseDamping();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->IncreaseSpeed();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_H) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 			m_waterSystem->DecreaseSpeed();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->IncreaseWaterHeight();
-		//if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		//	m_waterSystem->DecreaseWaterHeight();
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_R) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+			m_waterSystem->ResetWater();
 
 #endif
 		
@@ -497,7 +461,10 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
-		
+		{
+			PROFILE("Sound System", g_engineContext.m_profiler);
+			m_soundSystem->Process();
+		}
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -546,8 +513,10 @@ namespace RootForce
 			m_displayIngameMenu = false;
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
+			// Update keybindings when returning to game
+			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
-
+		g_engineContext.m_sound->Update();
 		return GameStates::Ingame;
 	}
 }

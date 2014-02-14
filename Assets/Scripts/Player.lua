@@ -15,24 +15,24 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
-	local waterCollider = WaterCollider.New(player);
-
+	--local waterCollider = WaterCollider.New(player);
+	--waterCollider:SetDisturbPower(0.0);
+	--waterCollider:SetDisturbInterval(0.5);
+	--waterCollider:SetRadius(5);
 
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
-	waterCollider:SetDisturbPower(0.1);
-	waterCollider:SetDisturbInterval(0.5);
-	waterCollider:SetRadius(2);
+	
 
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 
-	playerAction:SetJump(false);
+	playerAction:SetJumpTime(0.0);
 	playerAction:SetMovePower(0);
 	playerAction:SetStrafePower(0);
 	playerAction:SetAngle(Vec2.New(0, 0));
-	playerAction:SetActivateAbility(false);
+	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
 	playerComponent:SetAbility(0, "AbilityBall");
@@ -62,7 +62,7 @@ function Player.OnCreate(userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
-    
+	
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
@@ -86,7 +86,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
-		playerControl:SetMouseSensitivity(1.2);
+		playerControl:SetMouseSensitivity(0.2);
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
@@ -99,6 +99,6 @@ end
 
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-    local collision = self:GetCollision();
+	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end

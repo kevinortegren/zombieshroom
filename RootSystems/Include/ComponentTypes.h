@@ -32,6 +32,7 @@ namespace RootForce
 			CLIENT,
 			RAGDOLL,
 			WATERCOLLIDER,
+			SOUND,
 		};
 	}
 }

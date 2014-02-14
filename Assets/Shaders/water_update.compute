@@ -12,13 +12,12 @@ layout(std140) uniform MK
 	float mk3;
 	float dx;
 	int xMax;
-	int yMax;
 };
 
 void main() 
 {   
 	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
-	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == yMax)
+	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == xMax)
 		return;
 	
 	float prev = imageLoad(prevTex, storePos).r;

@@ -71,49 +71,46 @@ namespace UnitTesting
 			throw std::runtime_error("Failed to initialize SDL");
 		}
 
+		int width = 1;
+		int height = 1;
 
 		// TODO: Make these parameters (even?) more configurable.
 		m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
 			"Root Force",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenWidth"),
-			g_engineContext.m_configManager->GetConfigValueAsInteger("ScreenHeight"),
+			width,
+			height,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN),
 			SDL_DestroyWindow);
 		if (m_window == nullptr) 
 		{
 			throw std::runtime_error("Failed to create window");
 		}
-
+		
+		
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 		RootForce::ComponentType::Initialize();
 
+		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);
+
+		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
+		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
+		SDL_GL_MakeCurrent(m_window.get(), mainContext);
+
+		// Initialize GUI
+		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), m_window.get(), guiContext);
+
+
 		RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		g_engineContext.m_resourceManager->LoadScript("Global");
-
-		
-		/*
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::entity_f, RootForce::LuaAPI::entity_m, "Entity");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::renderable_f, RootForce::LuaAPI::renderable_m, "Renderable");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::transformation_f, RootForce::LuaAPI::transformation_m, "Transformation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::physicsaccessor_f, RootForce::LuaAPI::physicsaccessor_m, "Physics");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collision_f, RootForce::LuaAPI::collision_m, "Collision");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::collisionresponder_f, RootForce::LuaAPI::collisionresponder_m, "CollisionResponder");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::orient_f, RootForce::LuaAPI::orient_m, "Orientation");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::script_f, RootForce::LuaAPI::script_m, "Script");
-		RootForce::LuaAPI::LuaSetupType(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::pointLight_f, RootForce::LuaAPI::pointLight_m, "PointLight");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
-		RootForce::LuaAPI::LuaSetupTypeNoMethods(g_engineContext.m_script->GetLuaState(), RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
-		*/
 
 	}
 
 	Main::~Main() 
 	{
-		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
+		g_engineContext.m_gui->Shutdown();
 		SDL_Quit();
 		DynamicLoader::FreeSharedLibrary(m_engineModule);
 	}

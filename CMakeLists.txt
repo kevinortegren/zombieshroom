@@ -10,11 +10,12 @@ project(${ROOT_PROJECT_NAME})
 # Check if we want to compile just the level editor.
 option(COMPILE_LEVEL_EDITOR "Should we compile level editor?" OFF)
 
-#Check if we want to compile release build
+# Check if we want to compile release build
 option(COMPILE_RELEASE_BUILD "Release Build" OFF)
 
-# Find external libraries
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+# Find external libraries and modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/" "${CMAKE_SOURCE_DIR}/CMake/Modules/rpavlik/")
+include(CreateLaunchers)
 
 if (NOT COMPILE_LEVEL_EDITOR)
     # Find all x86 libraries
@@ -30,6 +31,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	find_package(Awesomium REQUIRED)
 	find_package(LUA REQUIRED)
 	find_package(Qt REQUIRED)
+	find_package(Fmod REQUIRED)
 
 	set(EXTERNAL_INCLUDE_DIRS 
 	    ${SDL2_INCLUDE_DIRS}
@@ -42,6 +44,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 		${AWESOMIUM_INCLUDE_DIRS}
 		${LUA_INCLUDE_DIRS}
 		${QT_INCLUDE_DIRS}
+		${FMOD_INCLUDE_DIRS}
 	)
     
 	if(NOT COMPILE_RELEASE_BUILD)
@@ -63,6 +66,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${QTWIDGETS_LIBRARY}
 			${QTPROPWIDGET_LIBRARY}
 			${QTCOLORTRIANGLE_LIBRARY}
+			${FMOD_LIBRARY_DEBUG}
 		)
 	else()
         # Link with release libraries
@@ -78,6 +82,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 			${YAML_LIBRARY}
 			${AWESOMIUM_LIBRARY}
 			${LUA_LIBRARY}
+			${FMOD_LIBRARY}
 		)
 	endif()
 else()
@@ -114,6 +119,7 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(/wd4005)    # Disable macro redefinition warning
 add_definitions(/MP)        # Multicore compiling
+add_definitions(/WX)        # Treat all warnings as errors >:)
 
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -158,4 +164,20 @@ else()
 		)
 	endif()
 endif()
- 
+
+# Set the startup project
+if (NOT COMPILE_RELEASE_BUILD)
+    create_default_target_launcher(RootForce
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug/)
+else()
+    create_default_target_launcher(RootForce
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Release/)
+endif()
+
+# Set the default configuration
+if (NOT COMPILE_RELEASE_BUILD)
+    set(CMAKE_BUILD_TYPE "Debug")
+else()
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "" FORCE)

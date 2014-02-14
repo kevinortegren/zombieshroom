@@ -20,7 +20,7 @@ namespace RootForce
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
 
-	void MenuState::Enter()
+	void MenuState::Enter(Keymapper* p_keymapper)
 	{
 		// Destroy any existing entities
 		Network::NetworkEntityID id;
@@ -40,7 +40,7 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext, p_keymapper));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
@@ -105,7 +105,11 @@ namespace RootForce
 				// Retrieve hosting data and go into a connecting state.
 				m_playData.Host = true;
 				m_playData.ServerInfo.ServerName = Awesomium::ToString(event.data[0].ToString());
+
 				m_playData.ServerInfo.Port = event.data[1].ToInteger();
+				if(m_playData.ServerInfo.Port == 0)
+					m_playData.ServerInfo.Port = 5567;
+
 				m_playData.ServerInfo.Password = Awesomium::ToString(event.data[2].ToString());
 				m_playData.ServerInfo.MaxPlayers = event.data[3].ToInteger();
 				m_playData.ServerInfo.MatchTime = event.data[4].ToInteger();
@@ -121,7 +125,10 @@ namespace RootForce
 				m_playData.Host = false;
 				m_playData.ClientInfo.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.ClientInfo.Password = Awesomium::ToString(event.data[2].ToString());
+
 				m_playData.ClientInfo.Port = event.data[0].ToInteger();
+				if(m_playData.ClientInfo.Port == 0)
+					m_playData.ClientInfo.Port = 5567;
 
 				result = GameStates::Connecting;
 			} break;

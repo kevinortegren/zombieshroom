@@ -84,6 +84,11 @@ namespace RootEngine
 			doc[i]["SPREAD"]		>> outStruct->at(i)->m_spread;
 			//Spawn time				
 			doc[i]["SPAWNTIME"]		>> outStruct->at(i)->m_spawnTime;
+			//Orbit
+			doc[i]["ORBITSPEED"]	>> outStruct->at(i)->m_orbitSpeed;
+			doc[i]["ORBITRADIUS"]	>> outStruct->at(i)->m_orbitRadius;
+			//Template
+			doc[i]["TEMPLATE"]		>> outStruct->at(i)->m_template;
 			//Name						
 			doc[i]["NAME"]			>> outStruct->at(i)->m_name;
 
@@ -102,6 +107,11 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::DIRECTION]			= &outStruct->at(i)->m_direction;
 			outStruct->at(i)->m_params[Render::Semantic::SPREAD]			= &outStruct->at(i)->m_spread;
 			outStruct->at(i)->m_params[Render::Semantic::SPAWNTIME]			= &outStruct->at(i)->m_spawnTime;
+			if(outStruct->at(i)->m_template == 1)
+			{
+				outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]			= &outStruct->at(i)->m_orbitRadius;
+				outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]			= &outStruct->at(i)->m_orbitSpeed;
+			}
 		}
 		return outStruct;
 	}

@@ -6,20 +6,22 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
-
+#include <RootForce/Include/Keymapper.h>
 
 namespace RootForce
 {
 	class SettingsMenu
 	{
 	public:
-		SettingsMenu(RootEngine::GameSharedContext p_context);
+		SettingsMenu(RootEngine::GameSharedContext p_context, Keymapper* p_keymapper);
 		~SettingsMenu();
 		void BindEvents(RootEngine::GUISystem::WebView* p_view);
 		void Update();
 	private:
 		Awesomium::JSValue RequestSettingsEvent(const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(const Awesomium::JSArray& p_array);
+		void FocusBindEvent(const Awesomium::JSArray& p_array);
+		void UnfocusBindEvent(const Awesomium::JSArray& p_array);
 
 		RootEngine::GameSharedContext m_context;
 		std::string m_workingDir;
@@ -27,5 +29,6 @@ namespace RootForce
 		bool m_fullscreen;
 		int m_screenWidth;
 		int m_screenHeight;
+		Keymapper* m_keymapper;
 	};
 }

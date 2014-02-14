@@ -1590,11 +1590,11 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerAction");
 			return 1;
 		}
-		static int PlayerActionSetJump(lua_State* p_luaState)
+		static int PlayerActionSetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->Jump = 0 != lua_toboolean(p_luaState, 2);
+			(*s)->JumpTime = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSetMovePower(lua_State* p_luaState)
@@ -1618,11 +1618,11 @@ namespace RootForce
 			(*s)->Angle = *(glm::vec2*)luaL_checkudata(p_luaState, 2, "Vec2");
 			return 0;
 		}
-		static int PlayerActionSetActivateAbility(lua_State* p_luaState)
+		static int PlayerActionSetAbilityTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->ActivateAbility = 0 != lua_toboolean(p_luaState, 2);
+			(*s)->AbilityTime = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSelectAbility(lua_State* p_luaState)
@@ -1632,11 +1632,11 @@ namespace RootForce
 			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
-		static int PlayerActionGetJump(lua_State* p_luaState)
+		static int PlayerActionGetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushboolean(p_luaState, (*s)->Jump);
+			lua_pushnumber(p_luaState, (*s)->JumpTime);
 			return 1;
 		}
 		static int PlayerActionGetMovePower(lua_State* p_luaState)
@@ -1662,11 +1662,11 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Vec2");
 			return 1;
 		}
-		static int PlayerActionGetActivateAbility(lua_State* p_luaState)
+		static int PlayerActionGetAbilityTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushboolean(p_luaState, (*s)->ActivateAbility);
+			lua_pushnumber(p_luaState, (*s)->AbilityTime);
 			return 1;
 		}
 		static int PlayerActionGetSelectedAbility(lua_State* p_luaState)
@@ -1914,10 +1914,53 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::WaterCollider **s = (RootForce::WaterCollider**)luaL_checkudata(p_luaState, 1, "WaterCollider");
-			(*s)->m_radius = (float)luaL_checknumber(p_luaState, 2);
+			(*s)->m_radius = (int)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//Soundable
+		//////////////////////////////////////////////////////////////////////////
+		static int SoundableCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::SoundComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::SoundComponent>(*e);
+			(*s)->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
+			luaL_setmetatable(p_luaState, "Soundable");
+			return 1;
+		}
+		static int SoundableSetSound(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
+			unsigned flags = (unsigned)luaL_checknumber(p_luaState, 3);
+			(*s)->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 2), flags);
+			return 0;
+		}
+		static int SoundableSetRange(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
+			(*s)->m_minDist = (float)luaL_checknumber(p_luaState, 2);
+			(*s)->m_maxDist = (float)luaL_checknumber(p_luaState, 3);
+			return 0;
+		}
+		static int SoundableSetVolume(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
+			(*s)->m_volume = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int SoundablePlay(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
+			(*s)->m_play = true;
+			return 0;
+		}
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{NULL, NULL}
@@ -2238,17 +2281,17 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg playeraction_m [] = {
-			{"SetJump", PlayerActionSetJump},
+			{"SetJumpTime", PlayerActionSetJumpTime},
 			{"SetMovePower", PlayerActionSetMovePower},
 			{"SetStrafePower", PlayerActionSetStrafePower},
 			{"SetAngle", PlayerActionSetAngle},
-			{"SetActivateAbility", PlayerActionSetActivateAbility},
+			{"SetAbilityTime", PlayerActionSetAbilityTime},
 			{"SelectAbility", PlayerActionSelectAbility},
-			{"GetJump", PlayerActionGetJump},
+			{"GetJumpTime", PlayerActionGetJumpTime},
 			{"GetMovePower", PlayerActionGetMovePower},
 			{"GetStrafePower", PlayerActionGetStrafePower},
 			{"GetAngle", PlayerActionGetAngle},
-			{"GetActivateAbility", PlayerActionGetActivateAbility},
+			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
 			{NULL, NULL}
 		};
@@ -2344,6 +2387,19 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg soundable_f [] = {
+			{"New", SoundableCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg soundable_m [] = {
+			{"SetSound", SoundableSetSound},
+			{"SetRange", SoundableSetRange},
+			{"SetVolume", SoundableSetVolume},
+			{"Play", SoundablePlay},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2396,6 +2452,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");

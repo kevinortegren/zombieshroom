@@ -18,19 +18,19 @@ void APIENTRY PrintOpenGLError(GLenum source, GLenum type, GLuint id, GLenum sev
 		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "ERROR");
 		break;
 	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "DEPRECATED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "DEPRECATED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "UNDEFINED_BEHAVIOR");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "UNDEFINED_BEHAVIOR");
 		break;
 	case GL_DEBUG_TYPE_PORTABILITY:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PORTABILITY");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PORTABILITY");
 		break;
 	case GL_DEBUG_TYPE_PERFORMANCE:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "PERFORMANCE");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "PERFORMANCE");
 		break;
 	case GL_DEBUG_TYPE_OTHER:
-		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "OTHER");
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "OTHER");
 		break;
 	}
 
@@ -66,7 +66,7 @@ namespace Render
 
 	GLRenderer::~GLRenderer()
 	{
-		//TODO: Delete resources.
+		
 	}
 
 	void GLRenderer::Startup()
@@ -83,18 +83,19 @@ namespace Render
 	{
 		m_window = p_window;
 
-		int flags = SDL_GL_CONTEXT_PROFILE_CORE;
+		int flags = 0;
 #if defined (_DEBUG)
-		flags |= SDL_GL_CONTEXT_DEBUG_FLAG;
+		flags = SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, flags);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, flags);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
 		if(!m_glContext) {
@@ -248,6 +249,8 @@ namespace Render
 		m_sjobCount[2] = 0;
 		m_sjobCount[3] = 0;
 
+		//Generate query for gpu timer
+		g_context.m_profiler->InitQuery();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -279,20 +282,22 @@ namespace Render
 		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
 		s_sizes[Semantic::DX]			= sizeof(float);
 
-
 		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
+		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
 		s_textureSlots[TextureSemantic::DEPTH]			= 4;
 		s_textureSlots[TextureSemantic::RANDOM]			= 5;
 		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
+
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -335,13 +340,6 @@ namespace Render
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
 		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
-	}
-
-	void GLRenderer::AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade)
-	{
-		m_sjobCount[p_cascade] = p_jobs.size();
-		auto it = std::next(p_jobs.begin(), p_jobs.size());
-		std::move(p_jobs.begin(), it, std::back_inserter(m_sjobs));
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -430,7 +428,6 @@ namespace Render
 
 		m_allocator.Clear();
 		m_jobs.clear();
-		m_sjobs.clear();
 	}
 
 	void GLRenderer::Clear()
@@ -467,6 +464,7 @@ namespace Render
 		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 
@@ -474,7 +472,6 @@ namespace Render
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
 			glDrawBuffers(0, NULL);
-
 			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
 
 			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
@@ -489,7 +486,7 @@ namespace Render
 
 				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 				{
-					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) == Render::TechniqueFlags::RENDER_SHADOW)
+					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
 					{
 						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
 						{	
@@ -514,7 +511,7 @@ namespace Render
 	{
 		m_gbuffer.UnbindTextures();	
 
-		// Bind lighting for blending.	
+		// Bind lighting for blending.
 		m_lighting.m_la->Bind(5);
 
 		m_gbuffer.Enable();
@@ -583,8 +580,12 @@ namespace Render
 		m_gbuffer.BindTextures();
 
 		// Bind cascade shadow map array.
-		glActiveTexture(GL_TEXTURE0 + 3);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTHPCF]);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTHPCF], m_shadowDevice.m_samplerObjectPCF);
+		glActiveTexture(GL_TEXTURE0 + s_textureSlots[TextureSemantic::SHADOWDEPTH]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowDevice.m_depthTextureArray);
+		glBindSampler(s_textureSlots[TextureSemantic::SHADOWDEPTH], m_shadowDevice.m_samplerObjectFloat);
 
 		static glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0, 
@@ -600,6 +601,8 @@ namespace Render
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
 
+		// Bind background as Input.
+		m_gbuffer.m_backgroundTexture->Bind(5);
 		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 
 		// Clear previous la result.
@@ -804,9 +807,11 @@ namespace Render
 
 			// Apply program.
 			(*tech)->GetPrograms()[0]->Apply();
-		
+			//g_context.m_profiler->BeginGPUTimer();
 			glDispatchCompute(p_job->m_groupDim.x, p_job->m_groupDim.y, p_job->m_groupDim.z);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			//double time = g_context.m_profiler->EndGPUTimer();
+			//g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Compute time: %f ms", time);
 		}
 
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)

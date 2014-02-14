@@ -17,25 +17,6 @@ $(document).ready(function() {
   $("#main-exit").click(function() {
     Menu.Exit();
   } );
-  // Settings menu
-  $("#settings-player").click(function() {
-    $("#settings-menu").css("display", "none");
-    $("#player-settings-menu").css("display", "table");
-  } );
-  $("#settings-graphics").click(function() {
-    $("#settings-menu").css("display", "none");
-    $("#graphics-settings-menu").css("display", "table");
-  } );
-  $("#settings-sound").click(function() {
-    ShowError("Not yet implemented! D:");
-  } );
-  $("#settings-controls").click(function() {
-    ShowError("Not yet implemented! D:");
-  } );
-  $("#settings-back").click(function() {
-    $("#settings-menu").css("display", "none");
-    $("#main-menu").css("display", "table-row");
-  } );
   // Lan menu
   var ClearTable = function ()
   {

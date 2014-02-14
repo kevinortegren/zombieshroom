@@ -7,7 +7,8 @@ namespace RootForce
 {
 
 
-	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context )
+	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+		: m_keymapper(p_keymapper)
 	{
 		m_context = p_context;
 		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
@@ -25,6 +26,13 @@ namespace RootForce
 
 	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
+		// Reload config
+		m_context.m_configManager->LoadConfig("config.yaml");
+		// Update keybinding manager
+		auto map = m_context.m_configManager->GetConfigValuePairs();
+		for(auto pair : map)
+			m_keymapper->SetActionBinding(pair.first, (SDL_Scancode)m_context.m_configManager->GetConfigValueAsInteger(pair.first));
+
 		// Get a list of options
 		std::map<std::string, std::string> valuePairs = m_context.m_configManager->GetConfigValuePairs();
 		Awesomium::JSObject jsArray;
@@ -33,7 +41,7 @@ namespace RootForce
 
 		std::string displayModes = "[";
 		SDL_DisplayMode displayMode;
-		for(unsigned i = 0; i < SDL_GetNumDisplayModes(0); i++)
+		for(int i = 0; i < SDL_GetNumDisplayModes(0); i++)
 		{
 			SDL_GetDisplayMode(0, i, &displayMode);
 			if(displayMode.format == SDL_PIXELFORMAT_RGB888 && displayMode.refresh_rate == 60)
@@ -80,10 +88,22 @@ namespace RootForce
 		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
 	}
 
+	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)
+	{
+		m_keymapper->FocusBindAction(Awesomium::ToString(p_array[0].ToString()));
+	}
+
+	void SettingsMenu::UnfocusBindEvent(const Awesomium::JSArray& p_array)
+	{
+		m_keymapper->UnfocusEvent();
+	}
+
 	void SettingsMenu::BindEvents( RootEngine::GUISystem::WebView* p_view )
 	{
 		p_view->RegisterJSCallback("RequestSettings", JSDelegate1WithRetval(this, &SettingsMenu::RequestSettingsEvent));
 		p_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &SettingsMenu::SaveSettingsEvent));
+		p_view->RegisterJSCallback("FocusBind", JSDelegate1(this, &SettingsMenu::FocusBindEvent));
+		p_view->RegisterJSCallback("UnfocusBind", JSDelegate1(this, &SettingsMenu::UnfocusBindEvent));
 	}
 
 	void SettingsMenu::Update()

@@ -1,5 +1,6 @@
 #pragma once
 #include <RootForce/Include/Menu.h>
+#include <RootForce/Include/Keymapper.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/LanList.h>
@@ -14,7 +15,7 @@ namespace RootForce
 		MenuState(NetworkContext& p_networkContext);
 
 		void Initialize(const std::string& p_workingDir);
-		void Enter();
+		void Enter(Keymapper* p_keymapper);
 		void Exit();
 		GameStates::GameStates Update();
 

@@ -32,6 +32,9 @@ namespace Render
 		TextureInterface* m_depthTexture;
 		GLuint m_depthTextureArray;
 		GLuint m_framebuffers[RENDER_SHADOW_CASCADES];
+
+		GLuint m_samplerObjectPCF;
+		GLuint m_samplerObjectFloat;
 	private:
 		int m_width;
 		int m_height;

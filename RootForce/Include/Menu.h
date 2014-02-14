@@ -31,7 +31,7 @@ namespace RootForce
 	class Menu
 	{
 	public:
-		Menu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context);
+		Menu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper);
 		~Menu();
 		MenuEvent::MenuEvent PollEvent();
 		RootEngine::GUISystem::WebView* GetView();

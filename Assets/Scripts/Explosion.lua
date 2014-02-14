@@ -2,6 +2,8 @@ Explosion = {};
 Explosion.damage = 60;
 Explosion.pushback = 20;
 Explosion.cooldown = 0;
+Explosion.chargeTime = 0.0;
+Explosion.channelingTime = 0.0;
 
 function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
