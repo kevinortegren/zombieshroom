@@ -310,6 +310,11 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 3, "R", "render", "Render"))
+		{
+			g_engineContext.m_renderer->ParseCommands(&event.Data);
+		}
+
 		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
 			return GameStates::Menu;
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))

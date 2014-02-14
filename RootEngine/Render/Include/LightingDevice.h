@@ -35,9 +35,15 @@ namespace Render
 		void BufferLights();
 		void Ambient();
 		void Directional();
-		void PointLightStencil();
-		void PointLightRender();
-		void PointLightFSQ();
+		void Point();
+
+		void ShowAmbient(bool p_value);
+		void ShowDirectional(bool p_value);
+		void ShowPointLights(bool p_value);
+		void ShowBackgroundBlend(bool p_value);
+
+
+		
 		void BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode);
 
 		void Clear();
@@ -46,6 +52,10 @@ namespace Render
 		void Resize(int p_width, int p_height);
 		
 	private:
+
+		void PointLightStencil();
+		void PointLightRender();
+		void PointLightFSQ();
 
 		// Light data.
 		struct
@@ -78,6 +88,9 @@ namespace Render
 		std::shared_ptr<ProgramInterface> m_backgroundAddative;
 		std::shared_ptr<ProgramInterface> m_backgroundAlphaBlend;
 
-		// TODO: Add gpu timer.
+		bool m_showAmbient;
+		bool m_showDirectional;
+		bool m_showPointlights;
+		bool m_showBackgroundBlend;
 	};
 }

@@ -92,6 +92,8 @@ namespace Render
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
 
 		virtual void Compute(ComputeJob* p_job) = 0;
+
+		virtual void ParseCommands(std::stringstream* p_ss) = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -160,6 +162,8 @@ namespace Render
 		static std::map<Semantic::Semantic, unsigned> s_sizes;
 		static std::map<TextureSemantic::TextureSemantic, unsigned> s_textureSlots;
 
+		void ParseCommands(std::stringstream* p_ss);
+
 	private:
 
 		bool CheckExtension(const char* p_extension);
@@ -219,7 +223,10 @@ namespace Render
 		std::shared_ptr<TechniqueInterface> m_earlyZTech;
 		std::shared_ptr<TechniqueInterface> m_fullscreenQuadTech;
 
+		bool m_layers[2];
+
 		bool m_displayNormals;
+		bool m_shadowsOn;
 	};
 }
 

@@ -42,6 +42,11 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, p_gbuffer->m_depthTexture->GetHandle(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_showAmbient = true;;
+		m_showDirectional = true;
+		m_showPointlights = true;
+		m_showBackgroundBlend = true;
 	}
 
 	void LightingDevice::SetAmbientLight(const glm::vec4& p_color)
@@ -74,18 +79,33 @@ namespace Render
 
 	void LightingDevice::Ambient()
 	{
-		m_fullscreenQuad->Bind();
-		m_ambient->Apply();
-		m_fullscreenQuad->Draw();
-		m_fullscreenQuad->Unbind();
+		if(m_showAmbient)
+		{
+			m_fullscreenQuad->Bind();
+			m_ambient->Apply();
+			m_fullscreenQuad->Draw();
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::Directional()
 	{
-		m_fullscreenQuad->Bind();
-		m_directional->Apply();
-		m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
-		m_fullscreenQuad->Unbind();
+		if(m_showDirectional)
+		{
+			m_fullscreenQuad->Bind();
+			m_directional->Apply();
+			m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
+			m_fullscreenQuad->Unbind();
+		}
+	}
+
+	void LightingDevice::Point()
+	{
+		if(m_showPointlights)
+		{
+			PointLightStencil();
+			PointLightRender();
+		}
 	}
 
 	void LightingDevice::PointLightStencil()
@@ -130,6 +150,7 @@ namespace Render
 		glCullFace(GL_BACK);
 	}
 
+
 	void LightingDevice::PointLightFSQ()
 	{
 
@@ -137,23 +158,46 @@ namespace Render
 
 	void LightingDevice::BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode)
 	{
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-		m_fullscreenQuad->Bind();
-		
-		switch(p_mode)
+		if(m_showBackgroundBlend)
 		{
-		case BackgroundBlend::ADDATIVE:
-			m_backgroundAddative->Apply();
-			break;
-		case BackgroundBlend::ALPHABLEND:
-		default:
-			m_backgroundAlphaBlend->Apply();
-			break;
-		}
+			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 
-		m_fullscreenQuad->Draw();
-		m_fullscreenQuad->Unbind();
+			m_fullscreenQuad->Bind();
+		
+			switch(p_mode)
+			{
+			case BackgroundBlend::ADDATIVE:
+				m_backgroundAddative->Apply();
+				break;
+			case BackgroundBlend::ALPHABLEND:
+			default:
+				m_backgroundAlphaBlend->Apply();
+				break;
+			}
+
+			m_fullscreenQuad->Draw();
+			m_fullscreenQuad->Unbind();
+		}
+	}
+
+	void LightingDevice::ShowAmbient(bool p_value)
+	{
+		m_showAmbient = p_value;
+	}
+
+	void LightingDevice::ShowDirectional(bool p_value)
+	{
+		m_showDirectional = p_value;
+	}
+
+	void LightingDevice::ShowPointLights(bool p_value)
+	{
+		m_showPointlights = p_value;
+	}
+
+	void LightingDevice::ShowBackgroundBlend(bool p_value)
+	{
+		m_showBackgroundBlend = p_value;
 	}
 
 	/*void LightingDevice::Process(Mesh& p_fullscreenQuad, int p_backgroundEffect)

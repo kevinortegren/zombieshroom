@@ -42,52 +42,64 @@ namespace Render
 		data.blurStrength = 0.2f;
 
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
+
+		m_display = true;
 	}
 
 	void GlowDevice::SetGlowFactor(float p_factor)
 	{
+		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow factor to %f", p_factor);
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(8, sizeof(float), &p_factor);
 	}
 
 	void GlowDevice::SetGlowStrength(float p_strength)
 	{
+		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow strength to %f", p_strength);
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &p_strength);
 	}
 
 	void GlowDevice::SetGlowRadius(float p_radius)
 	{
+		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow radius to %f", p_radius);
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &p_radius);
 	}
 
-	void GlowDevice::Process(GLRenderer* p_renderer, Mesh* m_mesh)
+	void GlowDevice::HorizontalPass(Mesh* m_mesh)
 	{
-		// Apply technique.
-		m_glowEffect->GetTechniques()[0]->Apply();
+		if(m_display)
+		{
+			// Apply technique.
+			m_glowEffect->GetTechniques()[0]->Apply();
 
-		// Clear glow fbo.
-		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
+			// Clear glow fbo.
+			glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
 
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+			glDrawBuffers(1, buffers);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Horizontal pass.
-		glViewport(0, 0, m_width / 2, m_height / 2);
+			// Horizontal pass.
+			glViewport(0, 0, m_width / 2, m_height / 2);
 
-		m_glowEffect->GetTechniques()[0]->GetPrograms()[0]->Apply();
-		m_mesh->Draw();
+			m_glowEffect->GetTechniques()[0]->GetPrograms()[0]->Apply();
+			m_mesh->Draw();
+		}
+	}
 
-		p_renderer->BindForwardFramebuffer();
+	void GlowDevice::VerticalPass(Mesh* m_mesh)
+	{
+		if(m_display)
+		{
+			// Bind glow as input.
+			glActiveTexture(GL_TEXTURE0 + 5);
+			glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
 
-		// Bind glow as input.
-		glActiveTexture(GL_TEXTURE0 + 5);
-		glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
+			// Vertical pass.
+			glViewport(0, 0, m_width, m_height);
 
-		// Vertical pass.
-		glViewport(0, 0, m_width, m_height);
-
-		m_glowEffect->GetTechniques()[0]->GetPrograms()[1]->Apply();
-		m_mesh->Draw();
+			m_glowEffect->GetTechniques()[0]->GetPrograms()[1]->Apply();
+			m_mesh->Draw();
+		}
 	}
 
 	void GlowDevice::Resize(int p_width, int p_height)
@@ -98,5 +110,10 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
 		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);	
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void GlowDevice::Display(bool p_value)
+	{
+		m_display = p_value;
 	}
 }
