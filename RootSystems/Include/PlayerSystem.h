@@ -104,12 +104,8 @@ namespace RootForce
 		int Charges;
 
 		AbilityInfo()
-		{
-			Name = "";
-			Cooldown = 0.0f;
-			OnCooldown = false;
-			Charges = -1;
-		}
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1)
+		{}
 	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>

@@ -18,11 +18,8 @@ namespace RootForce
 		Network::UserID_t Claimed;
 
 		AbilityRespawnComponent()
-		{
-			Timer = 0;
-			CurrentAbility = AbilityInfo();
-			Claimed = Network::ReservedUserID::NONE;
-		}
+			: Timer(0), Claimed(Network::ReservedUserID::NONE)
+		{}
 	};
 
 	class AbilityRespawnSystem : public ECS::EntitySystem

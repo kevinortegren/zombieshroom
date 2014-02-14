@@ -300,7 +300,20 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, RootForce::AbilityRespawnComponent* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->Claimed);
-			p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility);
+			if (p_writeToBitstream)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->CurrentAbility.Name.c_str()) );
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Cooldown );
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Charges );
+				}
+				else
+				{
+					RakNet::RakString s;
+					p_bs->Serialize(p_writeToBitstream, s);
+					p_c->CurrentAbility.Name = std::string(s.C_String());
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Cooldown);
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Charges);
+				}
 			p_bs->Serialize(p_writeToBitstream, p_c->Timer);
 		}
 
