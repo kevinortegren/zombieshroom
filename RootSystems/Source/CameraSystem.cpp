@@ -20,6 +20,7 @@ namespace RootForce
 
 		camera->m_frustum.RecalculatePlanesEx(viewMatrix, projectionMatrix);
 		camera->m_viewMatrix = viewMatrix;
+		camera->m_projMatrix = projectionMatrix;
 
 		if(m_world->GetTagManager()->GetEntityByTag("Camera") == p_entity)
 		{

@@ -1,5 +1,6 @@
 #version 400
 
+in vec3 world_position;
 in vec3 vert_normal;
 in vec2 vert_texcoord;
 in vec3 vert_tangent;
@@ -16,8 +17,20 @@ layout (location = 2) out vec4 glow;
 
 void main()
 {
+
+    vec2 coord;
+
+    float width = 1423;
+    float height = 1352;
+    
+    float u = (world_position.x + 692) / width;
+    float v = (world_position.z + 721) / height;
+    
+    coord.x = 1 - u;
+    coord.y = v;
+    
 	float specTerm = texture(g_Specular, vert_texcoord).r;
-	vec3 frag_color = texture(g_Diffuse, vert_texcoord).xyz;
+	vec3 frag_color = texture(g_Diffuse, coord).xyz;
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
 	
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
@@ -27,7 +40,7 @@ void main()
 
 	vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
-	diffuse = vec4(frag_color.xyz, specTerm);
+	diffuse = vec4(frag_color.zyx, specTerm);
 	normals = bumpNormal.xy;
 	glow = vec4(vec3(glow_color.xyz), 0.0f);
 }

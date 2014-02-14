@@ -34,6 +34,13 @@ namespace RootEngine
 		int bufferUsage, textureUsage, numBuffers, numTextures;
 		m_renderer->GetResourceUsage(bufferUsage, textureUsage, numBuffers, numTextures);
 
+		output = "Render time: " + std::to_string(m_renderer->GetTime()) + " ms";
+		m_ouputList.push_back(output);
+
+		output = "Nr jobs: " + std::to_string(m_renderer->GetJobCount());
+		m_ouputList.push_back(output);
+
+		/*
 		output = "Buffers (" + std::to_string(numBuffers) + ") : " + std::to_string(bufferUsage) + "Kb ";
 		m_ouputList.push_back(output);
 		output = "Textures (" + std::to_string(numTextures) + ") : " + std::to_string(textureUsage) + "Kb ";
@@ -88,7 +95,7 @@ namespace RootEngine
 			m_ouputList.push_back("<div style='min-width: 180px; display: inline-block;'>" + names[index] + " :</div>" + "T: " + std::to_string(avgTimes[index]) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxTimes[index]) + "</div> S: " + std::to_string(samples[index]));
 			avgTimes[index] = 0.0;
 		}
-	
+		*/
 		m_ouputList.push_back("</div>");
 	}
 

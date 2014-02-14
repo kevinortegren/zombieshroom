@@ -12,7 +12,7 @@
       programs:
         - name: output
           shaders:
-            - name: shadow
+            - name: Renderer/shadow
               type: vertex
           depth:
             write: 1
@@ -32,7 +32,7 @@
       programs:
         - name: output
           shaders:
-            - name: shadow_anim
+            - name: Renderer/shadow
               type: vertex
           depth:
             write: 1

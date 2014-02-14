@@ -1,0 +1,55 @@
+#version 410 core                                                                               
+                                                                                                
+// define the number of CPs in the output patch  
+layout (vertices = 3) in;                                                
+layout (vertices = 3) out;   
+
+uniform sampler2D g_Density;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+    mat4 inverseView;
+};
+
+// attributes of the input CPs                                                                  
+in vec3 cs_normal_in[];                                                                  
+in vec2 cs_texcoord_in[];       
+
+out vec3 es_normal_in[];                                                                  
+out float es_density_in[];
+
+void main()                                                                                     
+{            
+    // Sample triangle density.
+    float v0d = texture(g_Density, cs_texcoord_in[0]).g;
+    float v1d = texture(g_Density, cs_texcoord_in[1]).g;
+    float v2d = texture(g_Density, cs_texcoord_in[2]).g;
+    
+    // Average density 0 - 1.
+    float avgDensity = (v0d + v1d + v2d) / 3;
+
+    if(avgDensity < 0.2)
+    {
+        // Calculate the tessellation levels                                                        
+        gl_TessLevelOuter[0] = 1;        
+        gl_TessLevelOuter[1] = 1;        
+        gl_TessLevelOuter[2] = 1;
+        gl_TessLevelInner[0] = 1;   
+    }
+    else
+    {
+        // Calculate the tessellation levels                                                        
+        gl_TessLevelOuter[0] = 3;         
+        gl_TessLevelOuter[1] = 3;          
+        gl_TessLevelOuter[2] = 3;             
+        gl_TessLevelInner[0] = 3;           
+    }
+    
+    // Set the control points of the output patch                                                                                            
+    es_normal_in[gl_InvocationID] = cs_normal_in[gl_InvocationID];      
+    es_density_in[gl_InvocationID] = avgDensity;
+           
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;                                                                                                                               
+}  

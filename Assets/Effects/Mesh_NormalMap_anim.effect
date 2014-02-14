@@ -1,0 +1,55 @@
+- name: Mesh_Normal_Anim
+  techniques:
+    - name: Mesh_Normal_Anim
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: BONES
+          offset: 128
+      textures:
+        - name: g_Diffuse
+          slot: 0
+        - name: g_Specular
+          slot: 1
+        - name: g_Normal
+          slot: 2
+        - name: g_Glow
+          slot: 3
+      programs:
+        - name: Mesh_Normal_Anim
+          shaders:
+            - name: Mesh/mesh_normal_anim
+              type: vertex
+            - name: Mesh/mesh_normal_anim
+              type: fragment
+              
+    -  name: Mesh_Normal_Anim_Shadow
+       bindings:
+         - name: PerFrame
+           slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+         - sem: NORMAL
+           offset: 64
+         - sem: BONES
+           offset: 128
+       flags:
+         - name: Shadow
+       programs:
+         - name: Shadow_Anim
+           shaders:
+             - name: Renderer/shadow_anim
+               type: vertex
+           depth:
+             write: 1
+             test: 1

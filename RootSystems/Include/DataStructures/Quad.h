@@ -17,7 +17,7 @@
 #endif
 
 //#define QUADTREE_VERBOSE
-//#define QUADTREE_DRAWLINES
+#define QUADTREE_DRAWLINES
 
 namespace RootForce
 {
@@ -32,7 +32,9 @@ namespace RootForce
 		const AABB& GetBounds() const;
 
 		// Indices to entity vector.
-		std::vector<unsigned> m_indices;
+		std::vector<unsigned> m_entityIndices;
+		std::vector<unsigned> m_terrainEntityIndices;
+
 
 	private:
 		const AABB m_bounds;
@@ -85,13 +87,15 @@ namespace RootForce
 		QuadNode* PickRoot(glm::vec2 p_position);
 		QuadNode* PickNode(QuadNode* p_node, glm::vec2 p_position);
 
-		void Cull(RootForce::Frustum* p_frustrum, QuadNode* p_node);
-		void Cull(std::vector<glm::vec4>& p_points, QuadNode* p_node);
+		void CullNodes(RootForce::Frustum* p_frustrum, QuadNode* p_node);
+		void CullEntities(RootForce::Frustum* p_frustrum, QuadNode* p_node);
+		void CullEntities(std::vector<glm::vec4>& p_points, QuadNode* p_node);
 
 		void Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world);
 
 		std::vector<ECS::Entity*> m_entities;
 		std::vector<int> m_culledEntities;
+		std::vector<QuadNode*> m_culledNodes;
 
 	private:
 		
@@ -104,7 +108,7 @@ namespace RootForce
 
 		glm::vec2 CalcXZCenter(const Polygon& p_polygon) const;
 		std::vector<Triangle> Trianglulate(const std::vector<Polygon>& p_polygons) const;
-		std::vector<unsigned> CreateEntities(std::vector<Triangle>& p_triangles);
+		std::vector<unsigned> CreateEntities(std::vector<Triangle>& p_triangles, QuadNode* p_node);
 
 		QuadNode* m_root;
 		RootEngine::GameSharedContext* m_context;

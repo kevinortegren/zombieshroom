@@ -1,6 +1,6 @@
 - name: Mesh_Blend
   techniques:
-    - name: Mesh_Blend
+    - name: Mesh_Blend_Flipped
       bindings:
         - name: PerFrame
           slot: 0
@@ -20,27 +20,16 @@
         - name: g_Glow
           slot: 3
       uniforms:
-        - sem: SIZEMIN
+        - sem: MODEL
           offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: SIZEMIN
+          offset: 128
       programs:
         - name: Mesh_Blend
           shaders:
-            - name: Mesh/staticmesh_blend
+            - name: Mesh/mesh_blend_flipped
               type: vertex
-            - name: Mesh/mesh_blend
+            - name: Mesh/mesh_blend_flipped
               type: fragment
-              
-    - name: Mesh_Blend_Shadow
-      bindings:
-        - name: PerFrame
-          slot: 0
-      flags:
-        - name: Shadow
-      programs:
-        - name: Shadow
-          shaders:
-            - name: Mesh/staticmesh_shadow
-              type: vertex
-          depth:
-            write: 1
-            test: 1

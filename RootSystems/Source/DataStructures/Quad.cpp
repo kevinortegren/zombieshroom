@@ -74,14 +74,14 @@ namespace RootForce
 		return nullptr;
 	}
 
-	void QuadTree::Cull(RootForce::Frustum* p_frustrum, QuadNode* p_node)
+	void QuadTree::CullNodes(RootForce::Frustum* p_frustrum, QuadNode* p_node)
 	{
 		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
-				// Insert range.
-				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
+				m_culledNodes.push_back(p_node);
+
 #ifdef QUADTREE_DRAWLINES
 				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
 #endif
@@ -90,26 +90,56 @@ namespace RootForce
 			{
 				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
 				{
-					Cull( p_frustrum, p_node->GetChilds().at(i)); 
+					CullNodes( p_frustrum, p_node->GetChilds().at(i)); 
 				}
 			}
 		}
 	}
 
-	void QuadTree::Cull(std::vector<glm::vec4>& p_points, QuadNode* p_node)
+	void QuadTree::CullEntities(RootForce::Frustum* p_frustrum, QuadNode* p_node)
+	{
+		if(p_frustrum->CheckBoxEx(p_node->GetBounds()))
+		{
+			if(p_node->GetChilds().size() == 0)
+			{
+				// Insert range.
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_entityIndices.begin(), p_node->m_entityIndices.end());
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_terrainEntityIndices.begin(), p_node->m_terrainEntityIndices.end());
+
+#ifdef QUADTREE_DRAWLINES
+				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
+#endif
+			}
+			else
+			{
+				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
+				{
+					CullEntities( p_frustrum, p_node->GetChilds().at(i)); 
+				}
+			}
+		}
+	}
+
+
+	void QuadTree::CullEntities(std::vector<glm::vec4>& p_points, QuadNode* p_node)
 	{
 		if(Intersect(p_points, p_node->GetBounds()))
 		{
 			if(p_node->GetChilds().size() == 0)
 			{
 				// Insert range.
-				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_entityIndices.begin(), p_node->m_entityIndices.end());
+				m_culledEntities.insert(m_culledEntities.end(), p_node->m_terrainEntityIndices.begin(), p_node->m_terrainEntityIndices.end());
+
+#ifdef QUADTREE_DRAWLINES
+				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
+#endif
 			}
 			else
 			{
 				for(unsigned i = 0; i < p_node->GetChilds().size(); ++i)
 				{
-					Cull( p_points, p_node->GetChilds().at(i)); 
+					CullEntities( p_points, p_node->GetChilds().at(i)); 
 				}
 			}
 		}
@@ -125,7 +155,7 @@ namespace RootForce
 		m_world = p_world;
 
 		// Get working set.
-		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
+		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Painted");
 
 		unsigned indexOffset = 0;
 		unsigned matPtr = 0;
@@ -346,7 +376,7 @@ namespace RootForce
 
 			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomLeft.m_y, bottomLeft.m_y + halfheight);
 			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomRight.m_y, bottomRight.m_y + halfheight);
-			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
+			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, (float)m_minY,(float) m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
 			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
 			std::vector<Polygon> tr;
@@ -398,7 +428,7 @@ namespace RootForce
 #endif
 			std::vector<Triangle> triangles = Trianglulate(p_polygons);
 
-			p_node->m_indices = CreateEntities(triangles);
+			CreateEntities(triangles, p_node);
 		}
 	}
 
@@ -538,7 +568,7 @@ namespace RootForce
 		return triangles;
 	}
 
-	std::vector<unsigned> QuadTree::CreateEntities(std::vector<Triangle>& p_triangles)
+	std::vector<unsigned> QuadTree::CreateEntities(std::vector<Triangle>& p_triangles, QuadNode* p_node)
 	{
 		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_materialIndex < b.m_materialIndex; });
 
@@ -586,10 +616,13 @@ namespace RootForce
 					{
 						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
 						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+						p_node->m_terrainEntityIndices.push_back(entityId);
 					}
 					else
 					{
 						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
+						p_node->m_entityIndices.push_back(entityId);
+
 					}
 	
 					verticesPNUV.clear();
@@ -602,10 +635,13 @@ namespace RootForce
 					{
 						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
 						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+						p_node->m_terrainEntityIndices.push_back(entityId);
 					}
 					else
 					{
 						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
+						p_node->m_entityIndices.push_back(entityId);
+
 					}
 
 					verticesPNUVTBT.clear();
@@ -704,10 +740,14 @@ namespace RootForce
 			if(renderable->m_material->m_tileFactor != 0)
 			{
 				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+				m_world->GetGroupManager()->RegisterEntity("Painted", entity);
+				p_node->m_terrainEntityIndices.push_back(entityId);
 			}
 			else
 			{
 				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
+				p_node->m_entityIndices.push_back(entityId);
+
 			}
 	
 			verticesPNUV.clear();
@@ -719,10 +759,13 @@ namespace RootForce
 			if(renderable->m_material->m_tileFactor != 0)
 			{
 				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+				m_world->GetGroupManager()->RegisterEntity("Painted", entity);
+				p_node->m_terrainEntityIndices.push_back(entityId);
 			}
 			else
 			{
 				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
+				p_node->m_entityIndices.push_back(entityId);
 			}
 
 			verticesPNUVTBT.clear();
@@ -731,7 +774,6 @@ namespace RootForce
 		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
 				
 		indices.clear();
-		entitiesIds.push_back(entityId);
 
 		return entitiesIds;
 	}

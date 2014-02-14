@@ -106,7 +106,7 @@ namespace Render
 
 		CreateRandom1DTexture();
 
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::RANDOM);
+		glActiveTexture(GL_TEXTURE0 + Render::GLRenderer::s_textureSlots[Render::TextureSemantic::RANDOM]);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -159,7 +159,7 @@ namespace Render
 
 		m_perFrameBuffer->BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_perFrameBuffer->GetBufferId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_TIME, m_perFrameBuffer->GetBufferId());
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer->GetBufferId());
 	}
 

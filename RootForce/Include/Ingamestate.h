@@ -21,6 +21,7 @@
 #include <RootSystems/Include/ConcurrentTest.h>
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
+#include <RootSystems/Include/BotanySystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -76,5 +77,7 @@ namespace RootForce
 		RootForce::SoundSystem*							m_soundSystem;
 
 		Keymapper* m_keymapper;
+		RootForce::BotanySystem*						m_botanySystem;
+
 	};
 }

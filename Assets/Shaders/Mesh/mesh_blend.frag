@@ -1,5 +1,6 @@
 #version 400
 
+in vec3 world_position;
 in vec3 vert_normal;
 in vec2 vert_texcoord;
 in vec2 vert_texcoord_scaled;
@@ -24,7 +25,6 @@ void main()
     vec4 diffuseB = texture(g_DiffuseB, vert_texcoord_scaled);
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
     
-
     float value = 1.0f / (weight.r + weight.g + weight.b);
     
     diffuseR *= weight.r * value;

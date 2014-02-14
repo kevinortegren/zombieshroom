@@ -17,8 +17,6 @@
           slot: 8
         - name: g_DiffuseB
           slot: 9
-        - name: g_Glow
-          slot: 3
       uniforms:
         - sem: SIZEMIN
           offset: 0
@@ -39,7 +37,7 @@
       programs:
         - name: Shadow
           shaders:
-            - name: Mesh/staticmesh_shadow
+            - name: Renderer/shadow_staticmesh
               type: vertex
           depth:
             write: 1

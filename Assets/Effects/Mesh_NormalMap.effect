@@ -1,9 +1,16 @@
-- name: StaticMesh
+- name: Mesh_Normal
   techniques:
-    - name: StaticMesh
+    - name: Mesh_Normal
       bindings:
         - name: PerFrame
           slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+          - sem: MODEL
+            offset: 0
+          - sem: NORMAL
+            offset: 64
       textures:
         - name: g_Diffuse
           slot: 0
@@ -14,27 +21,31 @@
         - name: g_Glow
           slot: 3
       programs:
-        - name: staticmesh
+        - name: Mesh_Normal
           shaders:
-            - name: Mesh/staticmesh_normal
+            - name: Mesh/mesh_normal
               type: vertex
             - name: Mesh/mesh_normal
               type: fragment
-              
+              ¨
     -  name: Mesh_Normal_Shadow
        bindings:
          - name: PerFrame
            slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+         - sem: NORMAL
+           offset: 64
        flags:
          - name: Shadow
        programs:
          - name: Shadow
            shaders:
-             - name: Mesh/staticmesh_shadow
+             - name: Renderer/shadow
                type: vertex
            depth:
              write: 1
              test: 1
-
-              
-

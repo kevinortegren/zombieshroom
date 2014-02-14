@@ -10,9 +10,9 @@
       programs:
         - name: output
           shaders:
-            - name: output
+            - name: Renderer/output
               type: vertex
-            - name: output
+            - name: Renderer/output
               type: fragment
           depth:
             write: 0

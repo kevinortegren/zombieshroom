@@ -20,17 +20,20 @@ in vec3 WorldPos_FS_in[];
 in vec3 Normal_FS_in[];
 in vec2 TexCoord_FS_in[];
 
-out vec4 vert_color;
+out vec2 vert_texcoord;
+out vec3 vert_normal;
 
 void main() 
 {
 	for(int i = 0; i < gl_VerticesIn; ++i)
 	{
 		gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in[i], 1.0f);
+        vert_normal = Normal_FS_in[i];
 		vert_color = vec4(0,0,1,1);
 		EmitVertex();
 
 		gl_Position = projectionMatrix * viewMatrix * (vec4(WorldPos_FS_in[i], 1.0f) + vec4(Normal_FS_in[i], 0.0f) * 0.4f);
+        vert_normal = Normal_FS_in[i];
 		vert_color = vec4(1,0,0,1);
 		EmitVertex();
 

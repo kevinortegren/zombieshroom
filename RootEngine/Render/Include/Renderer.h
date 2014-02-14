@@ -38,6 +38,9 @@
 #define RENDER_SLOT_PEROBJECT 1
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
+#define RENDER_SLOT_TIME 4
+
+//#define RENDER_USE_COMPUTE
 
 namespace Render
 {
@@ -66,6 +69,7 @@ namespace Render
 		virtual void Render() = 0;
 		virtual void Swap() = 0;
 		virtual void DisplayNormals(bool p_display) = 0;
+		virtual void SetRenderToTexture(RenderToTextureInterface* p_renderToTexture) = 0;
 
 		// Resource Management.
 		virtual void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures) = 0;
@@ -77,6 +81,7 @@ namespace Render
 		virtual VertexAttributesInterface* CreateVertexAttributes() = 0;
 		virtual MeshInterface* CreateMesh() = 0;
 		virtual EffectInterface* CreateEffect() = 0;
+		virtual RenderToTextureInterface* CreateRenderToTexture() = 0;
 		virtual std::string GetStringFromMaterial(Material* p_material) = 0;
 
 		// Particle systems.
@@ -94,12 +99,17 @@ namespace Render
 		virtual void Compute(ComputeJob* p_job) = 0;
 
 		virtual void ParseCommands(std::stringstream* p_ss) = 0;
+		virtual float GetTime() = 0;
+		virtual int GetJobCount() = 0;
 	};
 
 	class GLRenderer : public RendererInterface
 	{
 	public:
 		
+		float GetTime();
+		int GetJobCount();
+
 		GLRenderer();
 		~GLRenderer();
 		void Startup();
@@ -126,6 +136,7 @@ namespace Render
 		void Render();
 		void Swap();
 		void DisplayNormals(bool p_display) { m_displayNormals = p_display; }
+		void SetRenderToTexture(RenderToTextureInterface* p_renderToTexture);
 		
 		// Resource Management.
 		void GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures);
@@ -137,6 +148,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
+		RenderToTextureInterface* CreateRenderToTexture();
 		std::string GetStringFromMaterial(Material* p_material);
 
 		// Particle systems.
@@ -194,6 +206,8 @@ namespace Render
 		int m_sjobCount[RENDER_SHADOW_CASCADES];
 		std::vector<ShadowJob> m_sjobs;
 
+		RenderToTextureInterface* m_activeRTT;
+
 		// Default framebuffer.
 		GLuint m_fbo;
 		Render::TextureInterface* m_color0;
@@ -227,6 +241,9 @@ namespace Render
 
 		bool m_displayNormals;
 		bool m_shadowsOn;
+
+		float m_renderTime;
+		int m_renderJobs;
 	};
 }
 

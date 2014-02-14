@@ -163,7 +163,7 @@ namespace Render
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-			glTexImage2D(m_target, 0, GL_RGBA, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+			glTexImage2D(m_target, 0, GL_RGBA8, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
 		else if(p_format == TextureFormat::TEXTURE_RGB || p_format == TextureFormat::TEXTURE_BGR)
 		{
@@ -174,6 +174,7 @@ namespace Render
 				m_textureFormat = GL_RGB;
 			else
 				m_textureFormat = GL_BGR;
+
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -359,5 +360,33 @@ namespace Render
 		m_access = p_access;
 	}
 
+	void Texture::Store(const char* p_filename)
+	{
+		int width = m_textureWidth;
+		int height = m_textureHeight;
+
+		int imageSize = width * height * m_bpp;
+
+		unsigned char* data = new unsigned char[imageSize];
+		
+		glBindTexture(m_target, m_textureHandle);
+		glGetTexImage(m_target, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+		int xa= width % 256;
+		int xb= (width-xa)/256;int ya= height % 256;
+		int yb= (height-ya)/256;//assemble the header
+		unsigned char header[18]={0,0,2,0,0,0,0,0,0,0,0,0,(char)xa,(char)xb,(char)ya,(char)yb,24,0};
+
+		// write header and data to file
+		std::fstream File(p_filename, std::ios::out | std::ios::binary);
+		File.write (reinterpret_cast<char *>(header), sizeof (char)*18);
+		File.write (reinterpret_cast<char *>(data), sizeof (char)*imageSize);
+		File.close();
+		
+		delete[] data;
+		data=NULL;
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+	}
 }
 
