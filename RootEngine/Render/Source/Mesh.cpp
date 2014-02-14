@@ -85,6 +85,8 @@ namespace Render
 	{
 		m_vertexAttributes->Bind();
 
+		glBindBuffer(GL_ARRAY_BUFFER,  m_vertexBuffer->GetBufferId());
+
 		if(m_elementBuffer != nullptr)
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer->GetBufferId());
@@ -93,7 +95,6 @@ namespace Render
 
 	void Mesh::BindTransformFeedback()
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback);
 	}
 

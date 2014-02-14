@@ -67,10 +67,10 @@ namespace Render
 
 	void ParticleSystem::Update()
 	{
-		 m_meshes[m_currentVB]->BindTransformFeedback();
-		 m_meshes[m_currentVB]->Bind();
-
-		 glBeginTransformFeedback(GL_POINTS);
+		m_meshes[m_currentVB]->Bind();
+		m_meshes[m_currentTFB]->BindTransformFeedback();
+		 
+		glBeginTransformFeedback(GL_POINTS);
 
 		if (m_first) {
 			glDrawArrays(GL_POINTS, 0, 1);

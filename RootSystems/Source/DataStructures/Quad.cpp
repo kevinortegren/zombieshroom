@@ -268,14 +268,14 @@ namespace RootForce
 		m_maxY = maxY;
 		m_minY = minY;
 
-		quadTreeBounds.m_maxX = RoundToPow2(maxX);
-		quadTreeBounds.m_minX = -RoundToPow2(abs(minX));
+		quadTreeBounds.m_maxX = (float)RoundToPow2(maxX);
+		quadTreeBounds.m_minX = (float)-RoundToPow2(abs(minX));
 
-		quadTreeBounds.m_maxY = maxY;
-		quadTreeBounds.m_minY = minY;
+		quadTreeBounds.m_maxY = (float)maxY;
+		quadTreeBounds.m_minY = (float)minY;
 
-		quadTreeBounds.m_maxZ = RoundToPow2(maxZ);
-		quadTreeBounds.m_minZ = -RoundToPow2(abs(minZ));
+		quadTreeBounds.m_maxZ = (float)RoundToPow2(maxZ);
+		quadTreeBounds.m_minZ = (float)-RoundToPow2(abs(minZ));
 
 		m_root = new QuadNode(quadTreeBounds);
 
@@ -374,10 +374,10 @@ namespace RootForce
 			Rectangle topLeft = Rectangle(aabb->m_minX, aabb->m_minZ + halfheight, halfwidth, halfheight);
 			Rectangle topRight = Rectangle(aabb->m_minX + halfwidth, aabb->m_minZ + halfheight, halfwidth, halfheight);
 
-			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, m_minY, m_maxY, bottomLeft.m_y, bottomLeft.m_y + halfheight);
-			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, m_minY, m_maxY, bottomRight.m_y, bottomRight.m_y + halfheight);
-			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, m_minY, m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
-			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, m_minY, m_maxY, topRight.m_y, topRight.m_y + halfheight);
+			AABB bottomLeftAABB = AABB(bottomLeft.m_x, bottomLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomLeft.m_y, bottomLeft.m_y + halfheight);
+			AABB bottomRightAABB = AABB(bottomRight.m_x, bottomRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, bottomRight.m_y, bottomRight.m_y + halfheight);
+			AABB topLeftAABB = AABB(topLeft.m_x, topLeft.m_x + halfwidth, (float)m_minY, (float)m_maxY, topLeft.m_y, topLeft.m_y + halfheight);
+			AABB topRightAABB = AABB(topRight.m_x, topRight.m_x + halfwidth, (float)m_minY, (float)m_maxY, topRight.m_y, topRight.m_y + halfheight);
 
 			std::vector<Polygon> tr;
 			std::vector<Polygon> tl;

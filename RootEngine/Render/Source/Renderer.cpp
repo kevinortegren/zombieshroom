@@ -351,21 +351,21 @@ namespace Render
 		s_sizes[Semantic::DX]			= sizeof(float);
 
 		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
 		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
 		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
 		s_textureSlots[TextureSemantic::DEPTH]			= 4;
-		s_textureSlots[TextureSemantic::RANDOM]			= 5;
+		s_textureSlots[TextureSemantic::INPUT]			= 5;
 		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
-		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH]	= 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-
+		s_textureSlots[TextureSemantic::RANDOM]			= 10;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -478,7 +478,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			//PostProcessPass();
+			PostProcessPass();
 		}
 
 		{
@@ -600,7 +600,7 @@ namespace Render
 		m_gbuffer.UnbindTextures();	
 
 		// Bind lighting for blending.
-		m_lighting.m_la->Bind(5);
+		m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::INPUT]);
 
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_STENCIL_BUFFER_BIT);
@@ -633,8 +633,12 @@ namespace Render
 			glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
 			glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
 
-			m_renderTime = (stopTime - startTime) / 1000000.0;
+			m_renderTime = (float)((stopTime - startTime) / 1000000.0);
 
+		}
+		else
+		{
+			ProcessRenderJobs();
 		}
 
 		m_renderFlags ^= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
@@ -655,15 +659,6 @@ namespace Render
 
 	void GLRenderer::ProcessRenderJobs()
 	{
-		
-
-		if(m_activeRTT != nullptr)
-		{
-			// Render to texture.
-			//glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
-
-		}
-
 		int currentMaterialID = -1;
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
@@ -738,8 +733,7 @@ namespace Render
 		}
 
 		// Bind background as Input.
-		m_gbuffer.m_backgroundTexture->Bind(5);
-		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
+		m_gbuffer.m_backgroundTexture->Bind(s_textureSlots[TextureSemantic::INPUT]);
 
 		// Clear previous la result.
 		m_lighting.Clear();
@@ -797,10 +791,10 @@ namespace Render
 		}
 
 		// Bind result of render pipeline.
-		m_color0->Bind(5);
+		m_color0->Bind(s_textureSlots[TextureSemantic::INPUT]);
 
 		if(!m_glowDevice.m_display)
-			m_lighting.m_la->Bind(5);
+			m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::INPUT]);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
@@ -809,7 +803,7 @@ namespace Render
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
-		m_color0->Unbind(5);
+		m_color0->Unbind(s_textureSlots[TextureSemantic::INPUT]);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 

@@ -149,7 +149,6 @@ namespace RootForce
 
 		m_botanySystem->Initialize();
 		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
-		//m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);

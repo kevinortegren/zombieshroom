@@ -58,8 +58,8 @@ namespace Render
 			COMPUTENORMAL,
 			TEXTURE_RN,
 			TEXTURE_GN,
-			TEXTURE_BN
-
+			TEXTURE_BN,
+			INPUT,
 		};
 	}
 }

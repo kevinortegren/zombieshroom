@@ -1,30 +1,17 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
+#define VERTICES_OUTPUT 10
+
 layout(triangles) in;
-layout(points, max_vertices = 30) out;
-
-uniform sampler1D g_Random;
-
-layout(std140) uniform PerFrame
-{
-	mat4 projectionMatrix;
-	mat4 viewMatrix;
-};
-
-layout(std140) uniform Time
-{
-	float g_dt;
-	float g_time;
-};
+layout(points, max_vertices = 10) out;
 
 in vec3 gs_normal_in[];
 in float gs_density_in[];
-in float gs_lod_in[];
 
-out vec3 vert_normal1;
-//out vec2 vert_texcoord1;
-out vec3 vert_color1;
+out vec3 vert_pos;
+out vec3 vert_normal;
+out float vert_density;
 
 float random(vec3 seed, int i){
      vec4 seed4 = vec4(seed, i);
@@ -36,17 +23,35 @@ vec3 GetRandomPosition(vec3 a, vec3 b, vec3 ab, vec3 ac, int i)
 {
    float r = random(a, i);
    float s = random(b, i);
-
    if(r + s >= 1)
     {
         r = 1 - r;
         s = 1 - s;
-    }
-   
+    }  
     return a + r*ab + s*ac;
 }
 
 void main() 
 {
+    // Triangle points.
+    vec3 a = gl_in[0].gl_Position.xyz;
+    vec3 b = gl_in[1].gl_Position.xyz;
+    vec3 c = gl_in[2].gl_Position.xyz;
     
+    // Calculate triangle vectors.
+    vec3 ab = b-a;
+    vec3 ac = c-a;
+    
+    // Calculate area.
+    float area = length(cross(ab, ac)) / 2;
+    
+    int i;
+    for(i = 0; i < 10; i++)
+    {
+        vert_pos = vec3(1.0,1.0,1.0);
+        vert_normal	= vec3(2.0,2.0,2.0);
+        vert_density = 15.0;
+        EmitVertex();
+        EndPrimitive();
+    }    
 }
