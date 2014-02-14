@@ -41,8 +41,6 @@ namespace RootForce
 		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
 	private:
-		void HideSpawnPoint(ECS::Entity* p_entity);
-		void RevealSpawnPoint(ECS::Entity* p_entity);
 
 		RootEngine::GameSharedContext* m_engineContext;
 

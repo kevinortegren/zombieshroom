@@ -119,18 +119,12 @@ namespace RootForce
 			m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Network::NetworkComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
+
+			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
+			script->Name = "AbilitySpawnPoint";
 		}
 	}
 
-	void AbilityRespawnSystem::HideSpawnPoint(ECS::Entity* p_entity)
-	{
-
-	}
-
-	void AbilityRespawnSystem::RevealSpawnPoint(ECS::Entity* p_entity)
-	{
-
-	}
 
 }
 

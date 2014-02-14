@@ -123,7 +123,6 @@ namespace RootForce
 
 		action->MovePower = 0;
 		action->StrafePower = 0;
-		action->TryPickup = false;
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
@@ -350,7 +349,6 @@ namespace RootForce
 				break;
 			case PlayerAction::PICK_UP_ABILITY:
 				{
-					//action->TryPickup = true;
 					RootForce::NetworkMessage::AbilityTryClaim m;
 					m.User = network->ID.UserID;
 
