@@ -5,6 +5,7 @@
 #include <RootEngine/Render/Include/VertexAttributes.h>
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/Material.h>
+#include <RootEngine/Render/Include/RenderToTexture.h>
 
 namespace Render
 {
@@ -30,6 +31,7 @@ namespace Render
 		VertexAttributesInterface* CreateVertexAttributes();
 		MeshInterface* CreateMesh();
 		EffectInterface* CreateEffect();
+		RenderToTexture* CreateRenderToTexture();
 
 		std::string GetStringFromMaterial(Material* p_material);
 
@@ -43,5 +45,6 @@ namespace Render
 		std::vector<Render::VertexAttributesInterface*> m_vaos;
 		std::vector<Render::EffectInterface*> m_effects;
 		std::vector<Render::MeshInterface*> m_meshes;
+		std::vector<Render::RenderToTexture*> m_renderToTextures;
 	};
 }

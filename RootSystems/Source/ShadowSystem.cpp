@@ -200,7 +200,7 @@ namespace RootForce
 			}
 
 			m_quadTree->m_culledEntities.clear();
-			m_quadTree->Cull(points, m_quadTree->GetRoot());
+			m_quadTree->CullEntities(points, m_quadTree->GetRoot());
 
 			std::vector<Render::ShadowJob> jobs;
 			for(auto itr = m_quadTree->m_culledEntities.begin(); itr != m_quadTree->m_culledEntities.end(); ++itr)

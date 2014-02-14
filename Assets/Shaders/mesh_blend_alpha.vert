@@ -14,25 +14,19 @@ layout(std140) uniform PerObject
 {
 	mat4 modelMatrix;
 	mat4 normalMatrix;
-    float tileFactor;
 };
 
-out vec3 world_position;
 out vec3 vert_normal;
 out vec2 vert_texcoord;
-out vec2 vert_texcoord_scaled;
 out vec4 view;
 
 void main()
 {
 	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
 	vert_texcoord = in_texcoord;
-    vert_texcoord_scaled = in_texcoord * tileFactor;
+
 	view = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 
-    world_position = vec3(modelMatrix * vec4( in_position, 1.0f )).xyz;
-    
-    
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 
 }

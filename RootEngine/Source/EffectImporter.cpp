@@ -69,11 +69,17 @@ namespace RootEngine
 						glType = GL_GEOMETRY_SHADER;
 						extension = ".geometry";
 					}
+
 					else if(type == "compute")
 					{
+#ifndef RENDER_USE_COMPUTE
+							return;
+#endif
+
 						glType = GL_COMPUTE_SHADER;
 						extension = ".compute";
 					}
+
 					else if(type == "tess_evaluation")
 					{
 						glType = GL_TESS_EVALUATION_SHADER;
@@ -350,6 +356,10 @@ namespace RootEngine
 					else if(name == "Shadow")
 					{
 						technique->m_flags |= Render::TechniqueFlags::RENDER_SHADOW;
+					}
+					else if(name == "Rtt")
+					{
+						technique->m_flags |= Render::TechniqueFlags::RENDER_RTT;
 					}
 				}
 			}

@@ -23,7 +23,7 @@ namespace RootForce
 		void SetAmbientLight(glm::vec4 p_ambient);
 		void CreateSun();
 		void CreateSkyBox();
-		
+
 		void AddStaticEntitiesToPhysics();
 		
 		void Process();
@@ -31,10 +31,14 @@ namespace RootForce
 
 		QuadTree* GetQuadTree();
 
+		
+
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		QuadTree m_quadTree;
 		bool m_showDebug;
 		unsigned m_culledNodes;
+
+		
 	};
 }

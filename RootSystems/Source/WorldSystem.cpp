@@ -134,7 +134,6 @@ namespace RootForce
 		}
 	}
 
-
 	void WorldSystem::CreatePlayerCamera()
 	{
 		// Add camera entity.	
@@ -148,7 +147,7 @@ namespace RootForce
 		
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		camera->m_frustum = Frustum(45.0f, 1.0f, 5000.0f, aspectRatio);
+		camera->m_frustum = Frustum(45.0f, 1.0f, 1000.0f, aspectRatio);
 
 		cameraLookAt->m_targetTag = "AimingDevice";
 		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -168,7 +167,7 @@ namespace RootForce
 		testCameraTransform->m_position = glm::vec3(0.0f, 30.0f, 0.0f);
 		aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
-		testCamera->m_frustum = Frustum(45.0f, 1.0f, 1000.0f, aspectRatio);
+		testCamera->m_frustum = Frustum(45.0f, 1.0f, 100.0f, aspectRatio);
 
 		m_world->GetTagManager()->RegisterEntity("TestCamera", testCameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", testCameraEntity);
@@ -181,10 +180,10 @@ namespace RootForce
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
-		
+
 		// Cull static geometry.
 		m_quadTree.m_culledEntities.clear();
-		m_quadTree.Cull(frustrum, m_quadTree.GetRoot());
+		m_quadTree.CullEntities(frustrum, m_quadTree.GetRoot());
 
 		for(auto itr = m_quadTree.m_culledEntities.begin(); itr != m_quadTree.m_culledEntities.end(); ++itr)
 		{
@@ -196,6 +195,7 @@ namespace RootForce
 			job.m_flags = renderable->m_renderFlags;
 			job.m_renderPass = renderable->m_pass;
 			job.m_params = renderable->m_params;
+			//job.m_mesh->SetWireFrame(true);
 
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}

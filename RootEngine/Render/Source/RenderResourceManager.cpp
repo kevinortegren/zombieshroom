@@ -11,13 +11,36 @@ namespace Render
 		m_meshes.reserve(10000);
 		m_vaos.reserve(10000);
 		m_effects.reserve(1000);
+		m_renderToTextures.reserve(100);
 	}
 
 	RenderResourceManager::~RenderResourceManager()
 	{
-
+		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
+		{
+			delete (*itr);
+		}
+		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+		{
+			delete (*itr);
+		}
+		for(auto itr = m_vaos.begin(); itr != m_vaos.end(); ++itr)
+		{
+			delete (*itr);
+		}
+		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
+		{
+			delete (*itr);
+		}
+		for(auto itr = m_meshes.begin(); itr != m_meshes.end(); ++itr)
+		{
+			delete (*itr);
+		}
+		for(auto itr = m_renderToTextures.begin(); itr != m_renderToTextures.end(); ++itr)
+		{
+			delete (*itr);
+		}
 	}
-
 
 	void RenderResourceManager::PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
 	{
@@ -107,6 +130,13 @@ namespace Render
 		Effect* effect = new Effect();
 		m_effects.push_back(effect);
 		return effect;
+	}
+
+	RenderToTexture* RenderResourceManager::CreateRenderToTexture()
+	{
+		RenderToTexture* rtt = new RenderToTexture();
+		m_renderToTextures.push_back(rtt);
+		return rtt;
 	}
 
 	std::string RenderResourceManager::GetStringFromMaterial(Material* p_material)

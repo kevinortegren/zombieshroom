@@ -81,7 +81,8 @@ namespace Render
 			RENDER_DEFERRED1 = 0x02,
 			RENDER_DEFERRED0 = 0x04,
 			RENDER_DEBUG = 0x08,
-			RENDER_SHADOW = 0x10
+			RENDER_SHADOW = 0x10,
+			RENDER_RTT = 0x20
 		};
 	}
 

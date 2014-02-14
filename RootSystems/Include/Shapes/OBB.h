@@ -54,5 +54,4 @@ namespace RootForce
 
 		return true;
 	};
-
 }

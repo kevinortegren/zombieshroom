@@ -67,9 +67,7 @@ namespace Render
 
 	void ParticleSystem::Update()
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback()); 
-
+		 m_meshes[m_currentVB]->BindTransformFeedback();
 		 m_meshes[m_currentVB]->Bind();
 
 		 glBeginTransformFeedback(GL_POINTS);
@@ -106,7 +104,7 @@ namespace Render
 
 		CreateRandom1DTexture();
 
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::RANDOM);
+		glActiveTexture(GL_TEXTURE0 + Render::GLRenderer::s_textureSlots[Render::TextureSemantic::RANDOM]);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -159,7 +157,7 @@ namespace Render
 
 		m_perFrameBuffer->BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_perFrameBuffer->GetBufferId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_TIME, m_perFrameBuffer->GetBufferId());
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer->GetBufferId());
 	}
 

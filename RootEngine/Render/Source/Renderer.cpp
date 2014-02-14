@@ -128,6 +128,7 @@ namespace Render
 
 	GLRenderer::GLRenderer()
 		: m_allocator(10000 * sizeof(RenderJob))
+		, m_activeRTT(nullptr), m_renderTime(0)
 	{
 		
 	}
@@ -193,7 +194,7 @@ namespace Render
 
 		glClearColor(0,0,0,0);
 		
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glEnable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);	
@@ -317,6 +318,7 @@ namespace Render
 
 		//Generate query for gpu timer
 		g_context.m_profiler->InitQuery();
+		m_renderFlags = 0;
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -476,7 +478,7 @@ namespace Render
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
-			PostProcessPass();
+			//PostProcessPass();
 		}
 
 		{
@@ -508,6 +510,20 @@ namespace Render
 	void GLRenderer::Swap()
 	{
 		SDL_GL_SwapWindow(m_window);
+	}
+
+	void GLRenderer::SetRenderToTexture(RenderToTextureInterface* p_renderToTexture)
+	{
+		m_activeRTT = p_renderToTexture;
+
+		if(p_renderToTexture != nullptr)
+		{
+			m_renderFlags |= TechniqueFlags::RENDER_RTT;
+		}
+		else
+		{
+			m_renderFlags ^= TechniqueFlags::RENDER_RTT;
+		}
 	}
 
 	static bool SortRenderJobs(RenderJob* a, RenderJob* b)
@@ -593,13 +609,61 @@ namespace Render
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
-		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+		m_renderFlags |= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
-		ProcessRenderJobs();
+		GLuint64 startTime, stopTime;
+		unsigned int queryID[2];
+
+		if(p_layer == 0)
+		{
+			m_renderJobs = m_jobs.size();
+
+			glGenQueries(2, queryID);
+			glQueryCounter(queryID[0], GL_TIMESTAMP);
+
+			ProcessRenderJobs();
+		
+			glQueryCounter(queryID[1], GL_TIMESTAMP);
+
+			GLint stopTimerAvailable = 0;
+			while (!stopTimerAvailable) {
+				glGetQueryObjectiv(queryID[1], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable);
+			}
+
+			glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
+			glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
+
+			m_renderTime = (stopTime - startTime) / 1000000.0;
+
+		}
+
+		m_renderFlags ^= (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+
+		// Bind textures for read.
+		m_gbuffer.BindTextures();
+	}
+
+	float GLRenderer::GetTime()
+	{
+		return m_renderTime;
+	}
+
+	int GLRenderer::GetJobCount()
+	{
+		return m_renderJobs;
 	}
 
 	void GLRenderer::ProcessRenderJobs()
 	{
+		
+
+		if(m_activeRTT != nullptr)
+		{
+			// Render to texture.
+			//glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
+
+		}
+
 		int currentMaterialID = -1;
 		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
 		{
@@ -712,9 +776,27 @@ namespace Render
 
 	void GLRenderer::Output()
 	{
-		// Restore backbuffer.
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if((m_renderFlags & TechniqueFlags::RENDER_RTT) == TechniqueFlags::RENDER_RTT)
+		{
+			// Render to texture.
+			glViewport(0, 0, m_activeRTT->GetTexture()->GetWidth(), m_activeRTT->GetTexture()->GetHeight());
 
+			glBindFramebuffer(GL_FRAMEBUFFER, m_activeRTT->GetFramebuffer());
+
+			GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+			glDrawBuffers(1, buffers);
+
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		}
+		else
+		{
+			// Bind backbuffer.
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+
+		// Bind result of render pipeline.
 		m_color0->Bind(5);
 
 		if(!m_glowDevice.m_display)
@@ -722,11 +804,13 @@ namespace Render
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
+		// Draw result.
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
 		m_color0->Unbind(5);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderer::BindForwardFramebuffer()
@@ -833,6 +917,11 @@ namespace Render
 		return m_resources.CreateEffect();
 	}
 
+	RenderToTextureInterface* GLRenderer::CreateRenderToTexture()
+	{
+		return m_resources.CreateRenderToTexture();
+	}
+
 	std::string GLRenderer::GetStringFromMaterial(Material* p_material)
 	{
 		return m_resources.GetStringFromMaterial(p_material);
@@ -865,6 +954,7 @@ namespace Render
 
 	void GLRenderer::Compute( ComputeJob* p_job )
 	{
+#ifdef RENDER_USE_COMPUTE
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
@@ -898,6 +988,7 @@ namespace Render
 				(*texture).second->UnBindImage((*texture).first);
 			}
 		}
+#endif
 	}
 
 	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )

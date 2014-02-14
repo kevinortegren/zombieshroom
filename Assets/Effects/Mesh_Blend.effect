@@ -33,6 +33,7 @@
               type: vertex
             - name: mesh_blend
               type: fragment
+              
     - name: Mesh_Blend_Shadow
       bindings:
         - name: PerFrame
@@ -56,3 +57,30 @@
           depth:
             write: 1
             test: 1
+
+    - name: Botany
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: g_BlendMap
+          slot: 6
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: SIZEMIN
+          offset: 128
+      flags:
+        - name: Rtt
+        - name: Deferred
+      programs:
+        - name: Botany
+          shaders:
+            - name: mesh_blend_alpha
+              type: vertex
+            - name: mesh_blend_alpha
+              type: fragment

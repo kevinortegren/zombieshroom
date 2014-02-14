@@ -136,16 +136,20 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+	
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
-		m_displayWorldDebug = false;
-
-		
+		m_displayWorldDebug = false;	
 	}
 
 	void IngameState::Enter()
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+		m_botanySystem->Initialize();
+		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		//m_botanySystem->DensityRenderToTexture(m_renderingSystem);
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -180,7 +184,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		//m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
@@ -483,6 +487,7 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
+			m_botanySystem->UpdateGeometry();
 		}
 
 		{

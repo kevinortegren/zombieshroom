@@ -10,5 +10,6 @@ namespace RootForce
 	{
 		Frustum m_frustum;
 		glm::mat4 m_viewMatrix; //This is set when the component is processed in the CameraSystem
+		glm::mat4 m_projMatrix;
 	};
 }
