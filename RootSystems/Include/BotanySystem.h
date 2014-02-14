@@ -23,6 +23,9 @@ namespace RootForce
 
 		void Initialize();
 		void SetQuadTree(QuadTree* p_quadTree);
+
+		void UpdateGeometry();
+
 		void Process();
 
 	private:

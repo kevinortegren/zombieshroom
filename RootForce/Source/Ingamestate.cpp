@@ -515,7 +515,7 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
-			m_botanySystem->Process();
+			m_botanySystem->UpdateGeometry();
 		}
 
 		{

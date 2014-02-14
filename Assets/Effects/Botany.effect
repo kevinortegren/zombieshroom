@@ -1,6 +1,6 @@
 - name: Botany
   techniques:
-    - name: Botany
+    - name: Botany_Update
       bindings:
         - name: PerFrame
           slot: 0
@@ -27,8 +27,14 @@
               type: tess_control
             - name: botany
               type: tess_evaluation
-            - name: botany
+            - name: botany_update
               type: geometry
-            - name: botany
-              type: fragment
+          feedback:
+            - name: vert_initialPos1
+            - name: vert_initialVel1
+            - name: vert_scale1
+            - name: vert_age1
+            - name: vert_type1
+            - name: vert_color1
+            - name: vert_accel1          
           blend: 0

@@ -6,7 +6,7 @@ namespace RootForce
 {
 	void BotanySystem::Initialize()
 	{
-		// Load rendering effects.
+		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
 
 		// Load material.
@@ -19,7 +19,7 @@ namespace RootForce
 		for(int i = 0; i < 200; i++)
 		{
 			m_meshes[i] = m_engineContext->m_renderer->CreateMesh();
-			m_meshes[i]->SetPrimitiveType(GL_PATCHES);
+			m_meshes[i]->SetTransformFeedback();
 		}
 	}
 
@@ -28,7 +28,7 @@ namespace RootForce
 		m_quadTree = p_quadTree;
 	}
 
-	void BotanySystem::Process()
+	void BotanySystem::UpdateGeometry()
 	{
 		// Get player.
 		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
@@ -41,13 +41,64 @@ namespace RootForce
 
 		// Cull range.
 		float farPlane = 50.0f;
+		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(),
+			(float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, farPlane);
 
-		/*float n = 1.0f;
-		float f = 10.0f;
-		glm::mat4 modifiedProj = camera->m_projMatrix;
-		modifiedProj[2][2] = (-f + n) / (f - n);
-		modifiedProj[2][3] = (-2.0f * f * n) / (f - n);*/
-		
+		RootForce::Frustum frustum;
+		frustum.RecalculatePlanesEx(camera->m_viewMatrix, projectionMatrix);
+
+		// Cull terrain chunks.
+		m_quadTree->m_culledNodes.clear();
+		m_quadTree->CullNodes(&frustum, m_quadTree->GetRoot());
+
+		glEnable(GL_RASTERIZER_DISCARD); 
+
+		int meshCount = 0;
+		for(auto itr = m_quadTree->m_culledNodes.begin(); itr != m_quadTree->m_culledNodes.end(); ++itr)
+		{
+			// Render terrain entities.
+			for(auto entity = (*itr)->m_terrainEntityIndices.begin(); entity != (*itr)->m_terrainEntityIndices.end(); ++entity)
+			{
+				RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*entity)]);
+
+				// Set geometry data.
+				Render::MeshInterface* mesh = m_meshes[meshCount];
+				mesh->SetVertexBuffer(renderable->m_model->m_meshes[0]->GetVertexBuffer());
+				mesh->SetElementBuffer(renderable->m_model->m_meshes[0]->GetElementBuffer());
+				mesh->SetVertexAttribute(renderable->m_model->m_meshes[0]->GetVertexAttribute());
+	
+				// Bind transform buffer output.
+				mesh->BindTransformFeedback();
+				mesh->Bind();
+
+				glBeginTransformFeedback(GL_TRIANGLES);
+				mesh->Draw();
+				glEndTransformFeedback();
+
+				mesh->Unbind();
+
+				meshCount++;
+			}
+		}
+
+		glDisable(GL_RASTERIZER_DISCARD); 
+	}
+
+	void BotanySystem::Process()
+	{
+		/*
+		// Get player.
+		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+		RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+
+		// Get eye camera.
+		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity);
+		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+
+		// Cull range.
+		float farPlane = 50.0f;
+
 		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(),
 			(float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, farPlane);
 
@@ -88,5 +139,6 @@ namespace RootForce
 				renderJobCount++;
 			}
 		}
+		*/
 	}
 }

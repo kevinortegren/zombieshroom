@@ -65,9 +65,7 @@ namespace Render
 
 	void ParticleSystem::Update()
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback()); 
-
+		 m_meshes[m_currentVB]->BindTransformFeedback();
 		 m_meshes[m_currentVB]->Bind();
 
 		 glBeginTransformFeedback(GL_POINTS);
