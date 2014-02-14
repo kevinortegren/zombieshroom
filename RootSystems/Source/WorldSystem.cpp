@@ -24,6 +24,8 @@ namespace RootForce
 
 		// Spatial divide world and split the meshes.
 		m_quadTree.Init(m_engineContext, m_world);
+
+		m_loaded = true;
 	}
 #endif
 
@@ -209,6 +211,11 @@ namespace RootForce
 	QuadTree* WorldSystem::GetQuadTree()
 	{
 		return &m_quadTree;
+	}
+
+	bool WorldSystem::IsLoaded() const
+	{
+		return m_loaded;
 	}
 }
 
