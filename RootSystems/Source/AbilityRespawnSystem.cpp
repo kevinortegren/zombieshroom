@@ -38,7 +38,7 @@ namespace RootForce
 			{
 				//send message:  Ability claimed
 				RootForce::NetworkMessage::AbilityClaimedBy m;
-				m.User = network->ID.UserID;
+				m.User = respawn->Claimed;
 				m.AbilitySpawnPointID = network->ID;
 
 				RakNet::BitStream bs;
