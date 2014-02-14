@@ -52,7 +52,7 @@ namespace Render
 		TextureInterface* m_la;
 		TextureInterface* m_ssaoTex;
 		TextureInterface* m_noiseSSAOTex;
-		glm::vec3 m_kernel[16];
+		glm::vec4 m_kernel[16];
 		float Random(float p_low, float p_high);
 	};
 }

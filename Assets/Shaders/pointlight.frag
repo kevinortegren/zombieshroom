@@ -57,7 +57,10 @@ void main() {
     float specTerm = rt0.w;
     vec3 vert_normal = texture(g_Normals, ex_TexCoord).xyz;
 
-    vec3 normal = normalize(vert_normal.xyz*2-1); 
+  	vec3 normal;
+	normal.xy = vert_normal.xy;
+    normal.z = sqrt(1-dot(normal.xy, normal.xy));
+    normal = normalize(normal);
     
     vert_lightVec = normalize(vert_lightVec);
 

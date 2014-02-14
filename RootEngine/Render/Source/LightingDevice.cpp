@@ -31,10 +31,23 @@ namespace Render
 		m_ssaoTex->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 		m_noiseSSAOTex = p_renderer->CreateTexture();
 		m_noiseSSAOTex->CreateEmptyTexture(4,4, TextureFormat::TEXTURE_RG16);
+		m_noiseSSAOTex->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		m_noiseSSAOTex->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_ssaoTex->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, p_gbuffer->m_depthTexture->GetHandle(), 0);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+			break;
+		default:
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+			break;
+		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -71,22 +84,30 @@ namespace Render
 
 	void LightingDevice::SetupSSAO()
 	{
+		srand (static_cast <unsigned> (time(0)));
 		int kernelSize = 16;
 		for (int i = 0; i < kernelSize; ++i)
 		{
-			m_kernel[i] = glm::vec3(
+			m_kernel[i] = glm::vec4(
 				Random(-1.0f, 1.0f),
 				Random(-1.0f, 1.0f),
-				Random(0.0f, 1.0f));
+				Random(0.0f, 1.0f),
+				0.0f);
 			m_kernel[i] = glm::normalize(m_kernel[i]);
 			//m_kernel[i] *= Random(0.0f, 1.0f);
 			float scale = float(i) / float(kernelSize);
 			scale = glm::mix<float>(0.1f, 1.0f, scale * scale);
 			m_kernel[i] *= scale;
+			g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Kernel X: %f, Y: %f, Z: %f", m_kernel[i].x, m_kernel[i].y, m_kernel[i].z);
+		}
+	
+		for(int i = 0; i < kernelSize; i++)
+		{
+			g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Length: %f", glm::length(m_kernel[i]));
 		}
 
 		BufferInterface* ssaoBuff = m_ssaoTech->GetBufferInterface();
-		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec3), &m_kernel[0]);
+		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0]);
 
 		const int noiseSize = 16;
 		glm::vec2 noise[noiseSize];
@@ -107,6 +128,9 @@ namespace Render
 
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT1};
 		glDrawBuffers(1, buffers);
+
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilMask(0x00);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
@@ -129,13 +153,13 @@ namespace Render
 		p_fullscreenQuad.Bind();
 		//SSAO
 		BeginSSAO();
-		glDisable(GL_STENCIL_TEST);
+		//glDisable(GL_STENCIL_TEST);
 		auto ssao = m_ssaoTech->GetPrograms()[0];
 		m_noiseSSAOTex->Bind(7);
 		m_ssaoTech->Apply();
 		ssao->Apply();
 		p_fullscreenQuad.Draw();
-		glEnable(GL_STENCIL_TEST);
+		//glEnable(GL_STENCIL_TEST);
 		Clear();
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 
@@ -183,8 +207,11 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_ssaoTex->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_ssaoTex->GetHandle(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

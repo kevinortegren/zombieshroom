@@ -386,7 +386,7 @@ namespace Render
 
 		{
 			PROFILE("Shadow pass", g_context.m_profiler);
-			//ShadowPass();
+			ShadowPass();
 		}
 
 		// Buffer Per Frame data.
