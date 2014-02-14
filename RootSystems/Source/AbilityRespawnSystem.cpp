@@ -123,6 +123,27 @@ namespace RootForce
 			network->SetID(itr->second,Network::ReservedUserID::NONE, Network::ReservedActionID::ABILITYSPAWN);
 			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
 			script->Name = "AbilitySpawnPoint";
+
+			AbilityRespawnComponent* respawn = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(itr->second);
+			Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(itr->second);
+			
+			unsigned chosenSpawn = rand()%m_levelAbilities.size();
+			respawn->CurrentAbility.Name = m_levelAbilities.at(chosenSpawn);
+			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
+			respawn->CurrentAbility.OnCooldown = false;
+
+			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(itr->second);
+			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
+			renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
+			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
+			renderable->m_material->m_effect = m_engineContext->m_resourceManager->GetEffect("Mesh");
+
+			CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(itr->second);
+			Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(itr->second);
+			collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)itr->second, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
+			collision->m_meshHandle = "AbilitySpawnPoint";
+			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 1.0f, 1.0f, false);
+			m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 		}
 	}
 
