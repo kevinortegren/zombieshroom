@@ -56,15 +56,15 @@ namespace RootForce
 		bool WantRespawn;
 
 		PlayerActionComponent() 
-		{
-			ActionID = Network::ReservedActionID::NONE;
-			MovePower = 0.0f;
-			StrafePower = 0.0f;
-			JumpTime = 0.0f;
-			AbilityTime = 0.0f;
-			SelectedAbility = 1;
-			WantRespawn = false;
-		}
+			: ActionID(Network::ReservedActionID::NONE)
+			, MovePower(0.0f)
+			, StrafePower(0.0f)
+			, JumpTime(0.0f)
+			, AbilityTime(0.0f)
+			, SelectedAbility(1)
+			, WantRespawn(false)
+			, TryPickup(false)
+		{}
 	};
 #endif
 

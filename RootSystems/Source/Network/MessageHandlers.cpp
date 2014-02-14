@@ -406,6 +406,10 @@ namespace RootForce
 
 					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
 					spawnPoint->Claimed = m.User;
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+					action->TryPickup = false;
 				} return true;
 
 				case NetworkMessage::MessageType::DestroyEntities:
