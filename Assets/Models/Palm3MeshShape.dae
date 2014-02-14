@@ -15,8 +15,8 @@
 		</comments>
       <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.16.mb</source_data>
     </contributor>
-    <created>2014-02-14T14:28:24</created>
-    <modified>2014-02-14T14:28:24</modified>
+    <created>2014-02-14T09:34:37</created>
+    <modified>2014-02-14T09:34:37</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -226,7 +226,7 @@
   <library_visual_scenes>
     <visual_scene id="VisualSceneNode" name="TortugaCoveV0.16">
       <node id="Palm3Mesh" name="Palm3Mesh" type="NODE">
-        <translate sid="translate">70.7818 18.29837 -74.99189</translate>
+        <translate sid="translate">70.7818 10.08346 -74.99189</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 29.42046</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
