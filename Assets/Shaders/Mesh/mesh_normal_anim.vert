@@ -25,7 +25,6 @@ out vec3 vert_normal;
 out vec2 vert_texcoord;
 out vec3 vert_tangent;
 out vec3 vert_bitangent;
-out vec4 view;
 
 void main()
 {
@@ -41,8 +40,6 @@ void main()
 	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0f)).xyz;
 
 	vert_texcoord = in_texcoord;
-
-	view = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 
 	vec4 pos = boneTransform * vec4( in_position, 1.0f );
 

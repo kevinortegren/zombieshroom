@@ -2,7 +2,6 @@
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
-in vec4 view;
 in vec3 vert_tangent;
 in vec3 vert_bitangent;
 
@@ -20,7 +19,6 @@ void main()
 	float specTerm = texture(g_Specular, vert_texcoord).r;
 	vec3 frag_color = texture(g_Diffuse, vert_texcoord).xyz;
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
-	
 
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
 	normalT = normalT * 2.0f - 1.0f;

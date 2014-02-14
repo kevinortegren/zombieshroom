@@ -2,7 +2,6 @@
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
-in vec4 view;
 
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Specular;
@@ -25,14 +24,10 @@ void main()
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
     
     vec3 trans = la + diffuse_color.xyz;
-    
 	vec3 normal = normalize(vert_normal);	
 
 	diffuse = vec4(diffuse_color.xyz, specTerm);
 	normals = normal.xy;
 	glow = vec4(glow_color, 0.0);
-    
-    float alpha = 0.3;
-    //background = vec4(trans, 1.0 - diffuse_color.a);
-    background = vec4(trans, 1.0 - alpha);
+    background = vec4(trans, 1.0 - diffuse_color.a);
 }

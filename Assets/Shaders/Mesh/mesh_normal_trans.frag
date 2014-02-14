@@ -11,7 +11,6 @@ layout(std140) uniform PerFrame
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
-in vec4 view;
 in vec3 vert_tangent;
 in vec3 vert_bitangent;
 
@@ -20,10 +19,8 @@ uniform sampler2D g_Specular;
 uniform sampler2D g_Normal;
 uniform sampler2D g_Depth;
 
-out vec4 out_Color;
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec2 normals;
-layout (location = 2) out vec4 background;
 
 void main()
 {
@@ -37,10 +34,11 @@ void main()
 
     vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
+    if(frag_color.a < 0.5)
+		discard;
+    
 	diffuse = vec4(frag_color.xyz, specTerm);
 	normals = bumpNormal.xy;
-	background.w = 0.0f;
 
-	if(frag_color.a < 0.5)
-		discard;
+
 }
