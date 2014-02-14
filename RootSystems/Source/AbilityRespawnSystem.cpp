@@ -84,7 +84,6 @@ namespace RootForce
 
 			CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(p_entity);
 			Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(p_entity);
-			collisionResp->m_collisions = std::map<void*,CollisionInfo>();
 			collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)p_entity, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
 			collision->m_meshHandle = "AbilitySpawnPoint";
 			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 1.0f, 1.0f, false);
@@ -120,6 +119,8 @@ namespace RootForce
 			m_world->GetEntityManager()->CreateComponent<Network::NetworkComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
 
+			Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(itr->second);
+			network->SetID(itr->second,Network::ReservedUserID::NONE, Network::ReservedActionID::NONE);
 			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
 			script->Name = "AbilitySpawnPoint";
 		}

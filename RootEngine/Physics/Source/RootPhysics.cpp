@@ -109,24 +109,22 @@ namespace Physics
 
 		if(pointer1->m_collisions != nullptr)
 		{
-			if(pointer1->m_type == PhysicsType::TYPE_PLAYER || pointer1->m_type == PhysicsType::TYPE_ABILITY)
-			{
+			
 				btVector3 temp = p_cp.getPositionWorldOnA();
 				RootForce::CollisionInfo info;
 				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
 				pointer1->m_collisions->insert(std::make_pair(pointer2->m_entity, info));
-			}
+			
 		}
 			
 		if(pointer2->m_collisions != nullptr)
 		{
-			if(pointer2->m_type == PhysicsType::TYPE_PLAYER || pointer2->m_type == PhysicsType::TYPE_ABILITY)
-			{
+			
 				btVector3 temp = p_cp.getPositionWorldOnA();
 				RootForce::CollisionInfo info;
 				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
 				pointer2->m_collisions->insert(std::make_pair(pointer1->m_entity, info));
-			}
+			
 				//pointer2->m_collidedEntities->insert(pointer1->m_entity);
 		}
 

@@ -61,6 +61,7 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
+		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 
 		// Initialize the system for controlling the player.
 		std::vector<RootForce::Keybinding> keybindings(6);
