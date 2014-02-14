@@ -172,12 +172,8 @@ namespace RootForce
 	{
 		for( unsigned i = 0; i < 6; i++ )
 		{
-			glm::vec4 plane = glm::vec4(m_planesEx[i].a, m_planesEx[i].b, m_planesEx[i].c, m_planesEx[i].d);
 
-			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
-			{
-				continue;
-			}
+			glm::vec4 plane = glm::vec4(m_planesEx[i].a, m_planesEx[i].b, m_planesEx[i].c, m_planesEx[i].d);
 
 			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
 			{
@@ -186,10 +182,10 @@ namespace RootForce
 
 			if(glm::dot(plane, glm::vec4(p_box.m_maxX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
 			{
-				continue;
+			continue;
 			}
 
-			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_minZ, 1.0f)) >= 0.0f)
+			if(glm::dot(plane, glm::vec4(p_box.m_minX, p_box.m_minY, p_box.m_maxZ, 1.0f)) >= 0.0f)
 			{
 				continue;
 			}
@@ -219,8 +215,9 @@ namespace RootForce
 				continue;
 			}
 
-      		return false;
+			 return false;
 		}
+
 		return true;
 	}
 
