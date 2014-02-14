@@ -120,7 +120,7 @@ namespace RootForce
 			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
 
 			Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(itr->second);
-			network->SetID(itr->second,Network::ReservedUserID::NONE, Network::ReservedActionID::NONE);
+			network->SetID(itr->second,Network::ReservedUserID::NONE, Network::ReservedActionID::ABILITYSPAWN);
 			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
 			script->Name = "AbilitySpawnPoint";
 		}
