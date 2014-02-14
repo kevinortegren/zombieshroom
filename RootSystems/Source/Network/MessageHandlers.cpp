@@ -444,6 +444,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status
@@ -546,6 +548,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status

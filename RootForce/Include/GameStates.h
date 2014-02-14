@@ -52,6 +52,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::MatchStateSystem> m_matchStateSystem;
 		// System responsible for creating the world.
 		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
+		RootForce::AbilityRespawnSystem* m_abilitySpawnSystem;
 		// TODO: Add more
 	};
 }
