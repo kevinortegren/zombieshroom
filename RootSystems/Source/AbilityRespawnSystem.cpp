@@ -7,7 +7,10 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RakNet/GetTime.h>
 #include <fstream>
+#include <RakNet/RakPeerInterface.h>
+#include <RakNet/BitStream.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
@@ -33,11 +36,29 @@ namespace RootForce
 		{
 			if(m_serverPeer != nullptr)
 			{
-				//TODO: send message  Ability claimed
+				//send message:  Ability claimed
+				RootForce::NetworkMessage::AbilityClaimedBy m;
+				m.User = network->ID.UserID;
+				m.AbilitySpawnPointID = network->ID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityClaimedBy);
+				m.Serialize(true, &bs);
+
+				m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 			
-			//TODO: ge rätt spelare abilityn
+			//Give the ability to the correct player
+			RootForce::Network::NetworkEntityID id;
+			id.UserID = respawn->Claimed;
+			id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
+			id.SequenceID = 0;
+			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
+			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
 
+			//Clear the ability spawnpoint
 			respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 			Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
 			m_engineContext->m_physics->RemoveObject(*collision->m_handle);
