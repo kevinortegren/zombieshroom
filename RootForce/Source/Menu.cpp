@@ -8,12 +8,13 @@
 namespace RootForce
 {
 
-	RootForce::Menu::Menu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context )
+	RootForce::Menu::Menu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
 	{
 		m_view = p_view;
 		m_context = p_context;
-		m_settingsMenu = new SettingsMenu(p_context);
+		m_settingsMenu = new SettingsMenu(p_context, p_keymapper);
 		m_view->WaitLoading();
+		p_keymapper->SetMenu(m_view);
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &Menu::ExitEvent));
 		m_view->RegisterJSCallback("Host", JSDelegate1(this, &Menu::HostEvent));

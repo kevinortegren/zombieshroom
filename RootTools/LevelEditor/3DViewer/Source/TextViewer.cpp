@@ -1293,7 +1293,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 				LightEntities.push_back(CreateLightEntity(&m_world));
 			}
 
-			float density = 10.0f;
+			float density = 1.0f;
 
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
@@ -1301,20 +1301,6 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = (5.0f - (RM.PlightList[LightIndex]->Intensity * 0.5f)) / density;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
-
-
-			if(RM.PlightList[LightIndex]->Intensity > 9.0f)
-			{
-				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_range = 100.0f;
-			}
-			else if(RM.PlightList[LightIndex]->Intensity < 7.0f)
-			{
-				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_range = 10.0f;
-			}
-			else
-			{
-				m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_range = 20.0f;
-			}
 		}		
 	}
 

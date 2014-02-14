@@ -236,6 +236,9 @@ namespace RootForce
 		
 			if(distance < -radius)
 				return false;
+
+			else if(distance < radius)
+				return true;
 		}
 		return true;
 	}

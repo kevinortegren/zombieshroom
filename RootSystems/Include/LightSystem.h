@@ -35,12 +35,18 @@ namespace RootForce
 		void End();
 
 	private:	
+
+		void LightStressTest();
+
+		float CalculateScale(PointLight* p_pl);
+
 		ECS::ComponentMapper<PointLight> m_plights;
 		ECS::ComponentMapper<Transform> m_transforms;
 		RootEngine::GameSharedContext* m_context;
 
 		Frustum* m_frustum;
 		int m_lightCount;
+		bool m_test;
 	};
 
 	class DirectionalLightSystem : public ECS::EntitySystem
@@ -62,5 +68,6 @@ namespace RootForce
 		ECS::ComponentMapper<Transform> m_transforms;
 		RootEngine::GameSharedContext* m_context;
 		int m_lightCount;
+
 	};
 }

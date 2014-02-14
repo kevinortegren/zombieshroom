@@ -3,7 +3,6 @@
 in vec3 vert_texcoord;
 
 uniform samplerCube CubeMap;
-uniform sampler2D g_LA;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec3 normals;

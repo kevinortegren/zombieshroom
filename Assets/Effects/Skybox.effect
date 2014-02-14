@@ -4,8 +4,6 @@
       textures:
         - name: CubeMap
           slot: 0
-        - name: g_LA
-          slot: 5
       bindings:
         - name: PerFrame
           slot: 0
