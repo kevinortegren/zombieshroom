@@ -7,6 +7,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -396,6 +397,15 @@ namespace RootForce
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
 					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityClaimedBy:
+				{
+					NetworkMessage::AbilityClaimedBy m;
+					m.Serialize(false, p_bs);
+
+					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+					spawnPoint->Claimed = m.User;
 				} return true;
 
 				case NetworkMessage::MessageType::DestroyEntities:
@@ -1006,6 +1016,16 @@ namespace RootForce
 							}
 						}
 					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityTryClaim:
+				{
+					NetworkMessage::AbilityTryClaim m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+					action->TryPickup = true;
 				} return true;
 
 				case NetworkMessage::MessageType::RespawnRequest:
