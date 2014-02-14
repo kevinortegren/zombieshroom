@@ -100,15 +100,15 @@ function Player.OnCollide (self, entity)
 	local type = hitPhys:GetType(hitCol);
   if  type == PhysicsType.TYPE_ABILITYSPAWN then
     --Logging.Log(LogLevel.DEBUG_PRINT, "collided with ability spawn!");
-    local action = self:GetPlayerAction();
-    local playerComponent = self:GetPlayerComponent();
-    if action:TryPickup() then
-      local abilitySpawn = entity:GetAbilitySpawn();
-      playerComponent:SetAbility(playerComponent:GetSelectedAbility(), abilitySpawn:GetCurrentName(), abilitySpawn:GetCurrentCharges());
-      action:SetTryPickup(false);
-      abilitySpawn:SetClaimed(true);
-      Logging.Log(LogLevel.DEBUG_PRINT, "pick up successful!");
-    end
+    --local action = self:GetPlayerAction();
+    --local playerComponent = self:GetPlayerComponent();
+    --if action:TryPickup() then
+    --  local abilitySpawn = entity:GetAbilitySpawn();
+    --  playerComponent:SetAbility(playerComponent:GetSelectedAbility(), abilitySpawn:GetCurrentName(), abilitySpawn:GetCurrentCharges());
+    --  action:SetTryPickup(false);
+    --  abilitySpawn:SetClaimed(true);
+    --  Logging.Log(LogLevel.DEBUG_PRINT, "pick up successful!");
+    --end
   end
   
 end
