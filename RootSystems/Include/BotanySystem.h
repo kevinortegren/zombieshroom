@@ -34,9 +34,13 @@ namespace RootForce
 		Render::EffectInterface* m_effect;
 		Render::Material* m_material;
 
+		// Tree structure to query visible meshes.
 		QuadTree* m_quadTree;
-
+		
+		// Mesh cache.
 		std::vector<Render::MeshInterface*> m_meshes;
-		std::vector<float> m_distances;
+
+		int m_meshCount;
+
 	};
 }

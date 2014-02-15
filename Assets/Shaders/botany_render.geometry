@@ -1,10 +1,8 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
-layout(triangles) in;
+layout(points) in;
 layout(triangle_strip, max_vertices = 30) out;
-
-uniform sampler1D g_Random;
 
 layout(std140) uniform PerFrame
 {
@@ -309,74 +307,47 @@ vec3 GetRandomPosition(vec3 a, vec3 b, vec3 ab, vec3 ac, int i)
 
 void main() 
 {
-    // Get average density.
     float avgDensity = gs_density_in[0];
-
-    // Rejects triangles with low density.
-    if(avgDensity < 0.2)
-        return;
-    
-    // Triangle points.
-    vec3 a = gl_in[0].gl_Position.xyz;
-    vec3 b = gl_in[1].gl_Position.xyz;
-    vec3 c = gl_in[2].gl_Position.xyz;
-    
-    // Calculate triangle vectors.
-    vec3 ab = b-a;
-    vec3 ac = c-a;
-    
-    // Calculate area.
-    float area = length(cross(ab, ac)) / 2;
-    
-    if(area < 0.8)
-        return;
     
     if(gs_lod_in[0] == 0)
     {
         if(avgDensity > 0.2)
         {
-            float rotation = random(c, 0);
-            CreateShortBlade(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
+            CreateShortBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 2);
         }
     
         if(avgDensity > 0.4)
         {
-            float rotation = random(c, 1);
-            CreateMediumBlade(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
+            CreateMediumBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 1);
         }
     
         if(avgDensity > 0.6)
         {
-            float rotation = random(c, 2);
-            CreateLongBlade(GetRandomPosition(a,b,ab,ac,2), 2*3.14*rotation);
+            CreateLongBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0.2), 4);
         }
         
         if(avgDensity > 0.8)
         {
-            float rotation = random(c, 3);
-            CreateLongBlade(GetRandomPosition(a,b,ab,ac,3), 2*3.14*rotation);
+            CreateLongBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 1);
         }      
     }
     else if(gs_lod_in[0] == 1)
     {
         if(avgDensity > 0.2)
         {
-            float rotation = random(c, 0);
-            CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
+            CreateShortBladeLOD(gl_in[0].gl_Position.xyz, 3.14);
         }
    
         if(avgDensity > 0.4)
         {
-            float rotation = random(c, 1);
-            CreateShortBladeLOD(GetRandomPosition(a,b,ab,ac,1), 2*3.14*rotation);
+            CreateShortBladeLOD(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0.1), 1);
         }
     }
     else
     {
         if(avgDensity > 0.2)
         {
-            float rotation = random(c, 0);
-            CreateShortBladeLOD2(GetRandomPosition(a,b,ab,ac,0), 2*3.14*rotation);
+            CreateShortBladeLOD2(gl_in[0].gl_Position.xyz, 1);
         }
     }
 }

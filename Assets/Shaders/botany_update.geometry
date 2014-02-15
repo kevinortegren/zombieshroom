@@ -4,7 +4,7 @@
 #define VERTICES_OUTPUT 10
 
 layout(triangles) in;
-layout(points, max_vertices = 10) out;
+layout(points, max_vertices = VERTICES_OUTPUT) out;
 
 in vec3 gs_normal_in[];
 in float gs_density_in[];
@@ -46,11 +46,11 @@ void main()
     float area = length(cross(ab, ac)) / 2;
     
     int i;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < VERTICES_OUTPUT; i++)
     {
-        vert_pos = vec3(1.0,1.0,1.0);
-        vert_normal	= vec3(2.0,2.0,2.0);
-        vert_density = 15.0;
+        vert_pos = GetRandomPosition(a, b, ab, ac, i);
+        vert_normal	= gs_normal_in[0];
+        vert_density = gs_density_in[0];
         EmitVertex();
         EndPrimitive();
     }    
