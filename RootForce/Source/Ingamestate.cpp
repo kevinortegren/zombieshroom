@@ -147,8 +147,8 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-		m_botanySystem->Initialize();
-		m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		//m_botanySystem->Initialize();
+		//m_botanySystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -183,7 +183,7 @@ namespace RootForce
 
 		m_animationSystem->Start();
 
-		//m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
@@ -486,9 +486,7 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
-
-			m_botanySystem->UpdateGeometry();
-			m_botanySystem->Process();
+			//m_botanySystem->Process();
 		}
 
 		{

@@ -2,7 +2,7 @@
 #extension GL_EXT_geometry_shader4 : enable  
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 30) out;
+layout(triangle_strip, max_vertices = 80) out;
 
 layout(std140) uniform PerFrame
 {
@@ -21,7 +21,6 @@ in float gs_density_in[];
 in float gs_lod_in[];
 
 out vec3 vert_normal1;
-//out vec2 vert_texcoord1;
 out vec3 vert_color1;
 
 // LOD 1
@@ -100,12 +99,6 @@ vec2 pattern2[20] = vec2[](
     vec2(0.69,0.23)
 );
 
-float random(vec3 seed, int i){
-     vec4 seed4 = vec4(seed, i);
-     float dot_product = dot(seed4, vec4(12.9898,78.233,45.164,94.673));
-     return fract(sin(dot_product) * 43758.5453);
-}
-
 void CreateShortBlade(vec3 position, float angle)
 {  
     vec4 unit = vec4(0,0,1,0);
@@ -132,18 +125,10 @@ void CreateShortBlade(vec3 position, float angle)
 
 void CreateShortBladeLOD(vec3 position, float angle)
 {  
-    vec4 unit = vec4(0,0,1,0);
-    mat4 rotation;
-	rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
-	rotation[1] = vec4(0, 1, 0, 0);
-	rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
-	rotation[3] = vec4(0, 0, 0, 1);   
-    unit = rotation * unit;
-
     int i;
     for(i = 0; i < 4; i++)
     {
-        vec4 pos = rotation * vec4(shortBlade[i], 0.0);
+        vec4 pos = vec4(shortBlade[i], 0.0);
         pos += vec4(position, 1.0);
         
         gl_Position = projectionMatrix * viewMatrix * pos;
@@ -246,7 +231,6 @@ void CreateImposter(vec3 position)
     for(i = 0; i < 4; i++)
     {
         gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        //vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         vert_color1 = vec3(0,0,1);
         EmitVertex();
@@ -283,26 +267,11 @@ void CreateQuad(vec3 position, float angle)
     for(i = 0; i < 4; i++)
     {
         gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        //vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         EmitVertex();
     }
     
     EndPrimitive();   
-}
-
-vec3 GetRandomPosition(vec3 a, vec3 b, vec3 ab, vec3 ac, int i)
-{
-   float r = random(a, i);
-   float s = random(b, i);
-
-   if(r + s >= 1)
-    {
-        r = 1 - r;
-        s = 1 - s;
-    }
-   
-    return a + r*ab + s*ac;
 }
 
 void main() 
@@ -311,16 +280,26 @@ void main()
     
     if(gs_lod_in[0] == 0)
     {
-        if(avgDensity > 0.2)
+        if(avgDensity > 0.1)
         {
             CreateShortBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 2);
         }
     
-        if(avgDensity > 0.4)
+        if(avgDensity > 0.2)
         {
-            CreateMediumBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 1);
+            CreateShortBlade(gl_in[0].gl_Position.xyz + vec3(0.2, 0, 0.1), 3);
         }
     
+        if(avgDensity > 0.3)
+        {
+            CreateMediumBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0.2), 4);
+        }
+        
+        if(avgDensity > 0.4)
+        {
+            CreateMediumBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 5);
+        }   
+
         if(avgDensity > 0.6)
         {
             CreateLongBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0.2), 4);
@@ -329,7 +308,7 @@ void main()
         if(avgDensity > 0.8)
         {
             CreateLongBlade(gl_in[0].gl_Position.xyz + vec3(0.1, 0, 0), 1);
-        }      
+        }          
     }
     else if(gs_lod_in[0] == 1)
     {

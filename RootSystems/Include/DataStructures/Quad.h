@@ -11,7 +11,7 @@
 
 #define QUADTREE_POLYGONS_PER_NODE 2500
 #define QUADTREE_MAX_CHILDS 4
-#define QUADTREE_SUBDIVIDE
+//#define QUADTREE_SUBDIVIDE
 //#define QUADTREE_VERBOSE
 #define QUADTREE_DRAWLINES
 
@@ -31,6 +31,8 @@ namespace RootForce
 		std::vector<unsigned> m_entityIndices;
 		std::vector<unsigned> m_terrainEntityIndices;
 
+		// Unique id.
+		int m_id;
 
 	private:
 		const AABB m_bounds;
@@ -115,6 +117,8 @@ namespace RootForce
 		std::vector<Render::Material*> m_materials;
 		std::vector<int> m_sizes;
 
-		int m_minY, m_maxY;	
+		int m_minY;
+		int m_maxY;
+		int m_idPool;
 	};
 }

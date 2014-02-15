@@ -148,6 +148,8 @@ namespace RootForce
 
 	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
 	{
+		m_idPool = 0;
+
 		m_vertices.clear();
 		m_materials.clear();
 
@@ -155,7 +157,7 @@ namespace RootForce
 		m_world = p_world;
 
 		// Get working set.
-		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Painted");
+		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
 		unsigned indexOffset = 0;
 		unsigned matPtr = 0;
@@ -429,6 +431,8 @@ namespace RootForce
 			std::vector<Triangle> triangles = Trianglulate(p_polygons);
 
 			CreateEntities(triangles, p_node);
+
+			p_node->m_id = m_idPool++;
 		}
 	}
 

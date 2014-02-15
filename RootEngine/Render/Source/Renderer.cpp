@@ -194,7 +194,7 @@ namespace Render
 
 		glClearColor(0,0,0,0);
 		
-		//glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glEnable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);	
@@ -685,6 +685,7 @@ namespace Render
 			{
 				if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
 				{
+
 					// Buffer uniforms.
 					for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
 					{	
