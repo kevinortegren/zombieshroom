@@ -626,6 +626,8 @@ namespace Render
 			{
 				if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
 				{
+					(*tech)->Apply();
+
 					// Buffer uniforms.
 					for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
 					{	

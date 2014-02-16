@@ -125,7 +125,22 @@ namespace Render
 		else if(m_transformFeedback != 0)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
-			glDrawTransformFeedback(m_primitive, m_transformFeedback);
+			if(m_wireFrame)
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				glDrawTransformFeedback(m_primitive, m_transformFeedback);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			else if(m_noCulling)
+			{
+				glDisable(GL_CULL_FACE);
+				glDrawTransformFeedback(m_primitive, m_transformFeedback);
+				glEnable(GL_CULL_FACE);
+			}
+			else
+			{
+				glDrawTransformFeedback(m_primitive, m_transformFeedback);
+			}	
 		}
 		else
 		{
