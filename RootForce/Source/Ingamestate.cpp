@@ -14,10 +14,7 @@ namespace RootForce
 		, m_keymapper(p_keymapper)
 	{	
 		ComponentType::Initialize();
-		
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
@@ -136,16 +133,21 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
-		m_displayWorldDebug = false;
-
-		
+		m_displayWorldDebug = false;		
 	}
 
 	void IngameState::Enter()
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+		// Init.
+		m_botanySystem->Initialize();
+
+		m_sharedSystems.m_worldSystem->SubdivideTree();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -483,6 +485,11 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
+		}
+
+		{
+			PROFILE("Botany System", g_engineContext.m_profiler);
+			m_botanySystem->Process();
 		}
 
 		{

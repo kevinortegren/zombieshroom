@@ -91,6 +91,11 @@ namespace Render
 		}
 	}
 
+	void Mesh::BindTransformFeedback()
+	{
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_transformFeedback); 
+	}
+
 	void Mesh::Unbind()
 	{
 		m_vertexAttributes->Unbind();

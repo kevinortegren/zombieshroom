@@ -12,6 +12,7 @@ namespace Render
 	{
 	public:
 		virtual void Bind() = 0;
+		virtual void BindTransformFeedback() = 0;
 		virtual void Unbind() = 0;
 		virtual void Draw() = 0;
 		virtual void DrawInstanced(GLsizei p_instances) = 0;
@@ -75,6 +76,7 @@ namespace Render
 		void CreateVertexBuffer1P1N1UV1T1BT1BID1W(Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices);
 
 		void Bind();
+		void BindTransformFeedback();
 		void Unbind();
 		void Draw();
 		void DrawInstanced(GLsizei p_instances);

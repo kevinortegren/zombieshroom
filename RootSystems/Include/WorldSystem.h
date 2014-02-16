@@ -20,6 +20,8 @@ namespace RootForce
 		void CreatePlayerCamera();
 #endif
 
+		void SubdivideTree();
+
 		void SetAmbientLight(glm::vec4 p_ambient);
 		void CreateSun();
 		void CreateSkyBox();

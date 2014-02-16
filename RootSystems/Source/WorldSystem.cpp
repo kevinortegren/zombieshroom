@@ -22,10 +22,15 @@ namespace RootForce
 		// Add collisions shapes for the group "Static".
 		AddStaticEntitiesToPhysics();
 
-		// Spatial divide world and split the meshes.
-		m_quadTree.Init(m_engineContext, m_world);
+		// Put the static entities into a spatial quad tree.
+		m_quadTree.Initialize(m_engineContext, m_world, "Static");		
 	}
 #endif
+
+	void WorldSystem::SubdivideTree()
+	{
+		m_quadTree.BeginDivide(2500, true, true);
+	}
 
 	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
 	{
@@ -49,9 +54,7 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
-
 
 	void WorldSystem::CreateSkyBox()
 	{
