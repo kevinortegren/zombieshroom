@@ -33,6 +33,7 @@ namespace RootForce
 			RAGDOLL,
 			WATERCOLLIDER,
 			SOUND,
+			TIMER,
 		};
 	}
 }

@@ -167,6 +167,10 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, KillCount);
 		}
 
+		void TimeUp::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);
+		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{

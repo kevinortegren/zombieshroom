@@ -34,6 +34,7 @@ namespace RootForce
 			RootForce::Ragdoll::SetTypeId(RootForce::ComponentType::RAGDOLL);
 			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
 			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
+			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
 		}
 
 		void InitializeServerComponents()
@@ -52,6 +53,7 @@ namespace RootForce
 			RootForce::PlayerPhysics::SetTypeId(RootForce::ComponentType::PLAYERPHYSICS);
             RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
+			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
 		}
 #endif
 	}

@@ -5,7 +5,7 @@ AbilityTest.cooldown = 1;
 AbilityTest.charges = 5;
 AbilityTest.chargeTime = 0;
 AbilityTest.channelingTime = 0;
-AbilityTest.duration = 0;
+AbilityTest.duration = 5;
 
 function AbilityTest.ChargeDone (time, userId, actionId)
 	AbilityTest.OnCreate(userId, actionId);
@@ -25,6 +25,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
+	local timerComp = Timer.New(self, AbilityTest.duration);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -33,9 +34,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);
 	if entityAtAim:DoesExist() then
-		Logging.Log(LogLevel.DEBUG_PRINT, "EXISTS");
-		if self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
-			Logging.Log(LogLevel.DEBUG_PRINT, "NOT FRIEND");
+		if entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
 			startPos = entityAtAim:GetTransformation():GetPos();
 		end
 	end
@@ -83,7 +82,4 @@ function AbilityTest.OnCollide (self, entity)
 end
 
 function AbilityTest.OnDestroy (self)
-	--local network = self:GetNetwork();
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
 end

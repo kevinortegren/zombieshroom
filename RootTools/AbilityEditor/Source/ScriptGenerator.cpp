@@ -134,6 +134,7 @@ namespace AbilityEditorNameSpace
 			m_file << "\tlocal colRespComp = CollisionResponder.New(self);\n";
 			m_file << "\tlocal physicsComp = Physics.New(self);\n";
 			m_file << "\tlocal scriptComp = Script.New(self, \"" << m_name << "\");\n";
+			m_file << "\tlocal timerComp = Timer.New(self, " << m_name << ".duration);\n";
 
 			m_file << "\t--Setting stuff\n";
 			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICS))
@@ -237,7 +238,7 @@ namespace AbilityEditorNameSpace
 				{
 					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
 					m_file << "\tif entityAtAim:DoesExist() then\n";
-					m_file << "\t\tif self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\tif entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
 					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
 					m_file << "\t\tend\n";
 					m_file << "\tend\n";
@@ -247,7 +248,7 @@ namespace AbilityEditorNameSpace
 					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
 					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
 					m_file << "\tif entityAtAim:DoesExist() then\n";
-					m_file << "\t\tif self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\tif entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
 					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
 					m_file << "\t\tend\n";
 					m_file << "\tend\n";

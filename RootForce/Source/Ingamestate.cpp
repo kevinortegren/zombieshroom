@@ -44,6 +44,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -187,6 +188,9 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		m_timerSystem = new RootForce::TimerSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -232,6 +236,9 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
+		if(m_networkContext.m_server != nullptr)
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 	}
 
@@ -466,6 +473,11 @@ namespace RootForce
 			PROFILE("Action system", g_engineContext.m_profiler);
 			if(!m_displayIngameMenu)
 				m_actionSystem->Process();
+		}
+
+		{
+			PROFILE("Timer system", g_engineContext.m_profiler);
+			m_timerSystem->Process();
 		}
 
 		m_animationSystem->Run();

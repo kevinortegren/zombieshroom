@@ -74,5 +74,6 @@ namespace RootForce
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 		RootForce::SoundSystem*							m_soundSystem;
+		RootForce::TimerSystem*							m_timerSystem;
 	};
 }

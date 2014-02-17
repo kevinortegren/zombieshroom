@@ -553,6 +553,21 @@ namespace RootForce
 					// Set the new client state
 					clientComponent->State = ClientState::AWAITING_USER_CONNECT;
 				} return true;
+				case NetworkMessage::MessageType::TimeUp:
+				{
+					NetworkMessage::TimeUp m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = g_networkEntityMap[m.ID];
+					if(entity != nullptr)
+					{
+						TimerComponent* timer = m_world->GetEntityManager()->GetComponent<TimerComponent>(entity);
+						if(timer != nullptr)
+							timer->TimeUp = true;
+
+					}
+
+				} return true;
 			}
 
 			return false;

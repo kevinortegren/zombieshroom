@@ -18,6 +18,7 @@
 #include <RootSystems/Include/RagdollSystem.h>
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
+#include <RootSystems/Include/TimerSystem.h>
 
 namespace RootForce
 {

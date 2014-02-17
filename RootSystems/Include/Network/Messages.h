@@ -64,7 +64,8 @@ namespace RootForce
 				SetGameMode,
 				SetMatchTime,
 				SetKillCount,
-				ServerInformation
+				ServerInformation,
+				TimeUp
 			};
 		}
 
@@ -326,7 +327,15 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
+		/*
+			Sent by the server when a timer component reaches 0. 
+		*/
+		struct TimeUp 
+		{
+			Network::NetworkEntityID ID;
 
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 
 		/*
 			Serialize functions for components
