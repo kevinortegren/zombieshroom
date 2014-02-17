@@ -28,9 +28,11 @@ TEST(AbilitySpawn, LoadAndAttatch)
 	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
-	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoints", testity);
+	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", testity);
 	RootForce::AbilityRespawnSystem* system = new RootForce::AbilityRespawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
 	world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(system);
+	g_engineContext.m_resourceManager->LoadScript("AbilityBall");
+	g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 	//Test so that loading an ability pack works
 	{
 		system->LoadAbilities("Fake"); //Load a fake pack, should give a logg message but no crash
@@ -59,13 +61,15 @@ TEST(AbilitySpawn, ProcessEntity)
 	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
-	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoints", testity);
+	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", testity);
 	RootForce::AbilityRespawnSystem* system = new RootForce::AbilityRespawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
 	world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(system);
 
+	g_engineContext.m_resourceManager->LoadScript("AbilityBall");
+	g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+
 	system->LoadAbilities("Standard"); //Load existing pack
 	system->AttatchComponentToPoints();
-	g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 
 	RootForce::Renderable* rendcomp;
 	RootForce::AbilityRespawnComponent* spawncomp;
