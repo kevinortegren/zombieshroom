@@ -83,7 +83,7 @@ namespace RootForce
 
 		bool	m_wireFrame, m_pause;
 		int		m_texSize, m_gridSize;	
-		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
+		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*	m_textureData;
 
 		bool ValidValues();
