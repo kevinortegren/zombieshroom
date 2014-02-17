@@ -8,6 +8,7 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/ParticleSystem.h>
 
 namespace RootForce
 {
@@ -39,12 +40,21 @@ namespace RootForce
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
 	private:
 
+		void HideSpawnpoint(ECS::Entity* p_entity);
+		void RevealSpawnpoint(ECS::Entity* p_entity);
+
+		void NewCurrentAbility(ECS::Entity* p_entity);
+		void CreateRenderComponent(ECS::Entity* p_entity);
+		void CreateCollisionComponents(ECS::Entity* p_entity);
+		void CreateParticleEmitter(ECS::Entity* p_entity);
+
 		RootEngine::GameSharedContext* m_engineContext;
 
 		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::Script> m_script;
+		ECS::ComponentMapper<RootForce::ParticleEmitter> m_particle;
 		std::vector<std::string> m_levelAbilities;
 		std::string m_workingDir;
 
