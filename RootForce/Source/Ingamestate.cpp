@@ -301,6 +301,14 @@ namespace RootForce
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
+		{
+			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+		}
+		if(RootServer::MatchAny(event.EventType, 2, "RS", "RELOADSCRIPTS"))
+		{
+			g_engineContext.m_resourceManager->ReloadAllScripts();
+		}
 		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
 			return GameStates::Menu;
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
@@ -365,34 +373,6 @@ namespace RootForce
 				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
 			}
 		}
-
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F5) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			g_engineContext.m_resourceManager->ReloadAllScripts();
-		
-		//Debug -> Disturb water with O
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_O) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-			RootForce::Transform* trans =  g_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			m_waterSystem->Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
-		}
-		//DEBUG -> toggle wireframe mode on water with I
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_I) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->ToggleWireFrame();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_P) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->TogglePause();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_K) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->IncreaseDamping();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_J) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->DecreaseDamping();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->IncreaseSpeed();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_N) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->DecreaseSpeed();
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_R) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-			m_waterSystem->ResetWater();
-
 #endif
 		
 		{
