@@ -1,5 +1,6 @@
 #include "RagdollSystem.h"
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RootSystems/Include/CameraSystem.h>
 namespace RootForce
 {
 	void RagdollSystem::Init()
@@ -23,17 +24,18 @@ namespace RootForce
 		Collision* collision = m_collisions.Get(p_entity);
 		Transform* transform = m_transforms.Get(p_entity);
 		Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
+		ECS::Entity* camera = m_world->GetTagManager()->GetEntityByTag("Camera");
+		ThirdPersonBehavior* cameraThird = m_world->GetEntityManager()->GetComponent<ThirdPersonBehavior>(camera);
 		
 		if(animation->m_animClip == AnimationClip::RAGDOLL)
 		{
 			
 			if(ragdoll->m_firstTime)
 			{	
-				
-				
-				
-				//mappa namn till index själv, jobbiga jävla anrop annars
-				//renderable->m_model->m_animation->GetIndexFromBoneName()
+				//Lock the camera if the local player are the entity entering ragdoll mode
+				if(m_world->GetTagManager()->GetEntityByTag("Player") == p_entity)
+					cameraThird->m_rotateWithTarget = false;
+
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
 				glm::mat4 bones[20], boneOffset[20];
@@ -43,10 +45,7 @@ namespace RootForce
 					
 					boneOffset[i] = renderable->m_model->m_animation[0].GetBoneOffset(i);
 				}
-				
-					
 				//Starts the ragdoll in physics
-				//m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), animation->m_bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, renderable->m_model->m_transform);
 				m_engineContext->m_physics->BuildRagdoll(*(collision->m_handle), bones, renderable->m_model->m_animation->GetScene()->mRootNode, nameToIndex, boneOffset, transform->m_orientation.GetRight());
 				
 				ragdoll->m_firstTime = false;
@@ -76,8 +75,11 @@ namespace RootForce
 			if(m_engineContext->m_physics->IsRagdoll(*(collision->m_handle)))
 			{
 				m_engineContext->m_physics->DeactivateRagdoll(*(collision->m_handle));
-				transform->m_orientation.SetOrientation(m_engineContext->m_physics->GetOrientation(*(collision->m_handle)));
+				transform->m_orientation.SetOrientation(m_engineContext->m_physics->GetOrientation(*(collision->m_handle)));		
 			}
+			//Restart rotations following if the local player leaving ragdoll mode
+			if(m_world->GetTagManager()->GetEntityByTag("Player") == p_entity)
+				cameraThird->m_rotateWithTarget = true;
 			ragdoll->m_firstTime = true;
 			return;
 		}

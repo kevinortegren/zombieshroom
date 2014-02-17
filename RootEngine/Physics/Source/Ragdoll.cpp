@@ -163,7 +163,7 @@ namespace Ragdoll
 			}
 			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
 			{
-				if( index < 3)
+				if( index < 2)
 					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
 				else
 					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
@@ -171,6 +171,11 @@ namespace Ragdoll
 			if(index < 6)
 			{
 				toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+				glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
+				if(index < 3)
+					toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
+				else
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
 			}
 			//From glm to bullet transform
 			btTransform trans;
@@ -274,7 +279,7 @@ namespace Ragdoll
 		}
 		else if(p_name.compare("Character1_Spine") == 0)
 		{
-			m_boneShapeSize[BodyPart::SPINE] = glm::vec3(0,-0.35f, 0);
+			m_boneShapeSize[BodyPart::SPINE] = glm::vec3(0,-0.40f, 0);
 			return new btBoxShape(btVector3(0.4f, 0.6f, 0.4f));
 		}
 		else if(p_name.compare("Character1_LeftArm") == 0)
@@ -325,6 +330,7 @@ namespace Ragdoll
 
 	btQuaternion Ragdoll::GetOrientation()
 	{
+		//return btQuaternion(0,1,0,1);
 		return m_bodies[BodyPart::HIPS]->getWorldTransform().getRotation();
 	}
 
