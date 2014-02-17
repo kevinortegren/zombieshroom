@@ -35,13 +35,11 @@ namespace RootForce
 		{
 			p_binding.Action = PlayerAction::ACTIVATE_ABILITY_PRESSED;
 			p_binding.ActionUp = PlayerAction::ACTIVATE_ABILITY_RELEASED;
-			p_binding.Edge = true;
 		}
 		else if(p_action.compare("JUMP")==0)
 		{
 			p_binding.Action = PlayerAction::JUMP_PRESSED;
 			p_binding.ActionUp = PlayerAction::JUMP_RELEASED;
-			p_binding.Edge = true;
 		}
 		else
 			p_binding.Action = PlayerAction::NONE;
