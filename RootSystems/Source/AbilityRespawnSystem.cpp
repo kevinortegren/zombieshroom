@@ -75,6 +75,7 @@ namespace RootForce
 			respawn->CurrentAbility.Name = m_levelAbilities.at(chosenSpawn);
 			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
 			respawn->CurrentAbility.OnCooldown = false;
+			respawn->Claimed = Network::ReservedUserID::NONE;
 
 			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
 			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
