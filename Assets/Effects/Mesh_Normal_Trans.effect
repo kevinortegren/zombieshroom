@@ -45,6 +45,8 @@
            shaders:
              - name: shadow
                type: vertex
+             - name: shadow_alpha
+               type: fragment
            depth:
              write: 1
              test: 1
