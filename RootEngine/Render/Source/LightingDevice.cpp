@@ -135,7 +135,7 @@ namespace Render
 	{
 		m_fullscreenQuad->Bind();
 		m_pointLightFSQ->Apply();
-		m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
+		m_fullscreenQuad->DrawInstanced(m_numPointLights);
 		m_fullscreenQuad->Unbind();
 	}
 
