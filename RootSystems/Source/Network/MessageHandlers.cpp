@@ -437,6 +437,8 @@ namespace RootForce
 					NetworkMessage::Suicide m;
 					m.Serialize(false, p_bs);
 
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide notification from user %u", m.User);
+
 					if (clientComponent->IsRemote)
 					{
 						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
@@ -444,7 +446,7 @@ namespace RootForce
 
 						health->Health = 0;
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide message for user %u", m.User);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide message for user %u", m.User);
 					}
 				} return true;
 
@@ -1041,6 +1043,8 @@ namespace RootForce
 					NetworkMessage::RespawnRequest m;
 					m.Serialize(false, p_bs);
 
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
+
 					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
 					if (client != nullptr)
 					{
@@ -1052,8 +1056,6 @@ namespace RootForce
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 								action->WantRespawn = true;
-
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
 							}
 						}
 					}
@@ -1066,6 +1068,8 @@ namespace RootForce
 
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received suicide message from client %u", m.User);
+
 					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
 					if (client != nullptr)
 					{
@@ -1077,8 +1081,6 @@ namespace RootForce
 							{
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 								health->Health = 0;
-
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received suicide message from client %u", m.User);
 
 								// Broadcast the suicide to all other clients
 								DataStructures::List<RakNet::SystemAddress> addresses;

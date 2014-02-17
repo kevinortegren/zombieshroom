@@ -4,9 +4,11 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/Network/Messages.h>
+#include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootSystems
 {
@@ -41,8 +43,8 @@ namespace RootSystems
 		// Check if a spawn point has been received from the server. Always respawn when the server tells us to.
 		if (m_clientPeer != nullptr && health->SpawnPointReceived)
 		{
-			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client respawning at %d", health->SpawnIndex);
-
+			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Client %u respawning at %d", network->ID.UserID, health->SpawnIndex);
+			
 			Respawn(health->SpawnIndex, p_entity);
 			health->SpawnPointReceived = false;
 
@@ -74,6 +76,8 @@ namespace RootSystems
 					m.Serialize(true, &bs);
 
 					m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending respawn request to server");
 				}
 				
 				// If we are a server, call on spawn function and tell every client of the respawn.
@@ -97,11 +101,15 @@ namespace RootSystems
 					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 
 					// Check whether this is the connection spawn message, and if so, set the client state to connected.
-					RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(p_entity);
+					ECS::Entity* clientEntity = g_networkEntityMap[RootForce::Network::NetworkEntityID(network->ID.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY)];
+					RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(clientEntity);
 					if (clientComponent != nullptr && clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
 					{
 						clientComponent->State = RootForce::Network::ClientState::CONNECTED;
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "User %u received spawn point, now connected", m.User);
 					}
+
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Respawning user %u, broadcasting to all other clients.", m.User);
 				}
 			}
 			
