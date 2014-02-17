@@ -190,6 +190,10 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		// Initialize the system for resetting the TryPickupComponent
+		m_tryPickupResetSystem = new TryPickupResetSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<TryPickupResetSystem>(m_tryPickupResetSystem);
+
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -456,6 +460,11 @@ namespace RootForce
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
+		}
+
+		{
+			PROFILE("Try-Pickup reset system", g_engineContext.m_profiler);
+			m_tryPickupResetSystem->Process();
 		}
 		
 		{

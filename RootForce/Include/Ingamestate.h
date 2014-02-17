@@ -21,6 +21,7 @@
 #include <RootSystems/Include/ConcurrentTest.h>
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/TryPickupResetSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -73,5 +74,6 @@ namespace RootForce
 		RootSystems::RespawnSystem*						m_respawnSystem;
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
+		RootForce::TryPickupResetSystem* 				m_tryPickupResetSystem;
 	};
 }
