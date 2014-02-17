@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 
 namespace RootForce
@@ -37,5 +38,11 @@ namespace RootForce
 	{
 
 	}
+
+	Collision::~Collision()
+	{
+		g_engineContext.m_physics->RemoveObject(*m_handle);
+	}
+
 }
 #endif

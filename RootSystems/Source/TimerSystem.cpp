@@ -57,3 +57,8 @@ void RootForce::TimerSystem::SetServerPeer( RakNet::RakPeerInterface* p_serverPe
 	m_serverPeer = p_serverPeer;
 }
 
+void RootForce::TimerSystem::Begin()
+{
+	int asdf = 0;
+}
+

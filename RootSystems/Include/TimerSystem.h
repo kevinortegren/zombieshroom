@@ -29,6 +29,7 @@ namespace RootForce
 		}
 
 		void Init();
+		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void SetServerPeer(RakNet::RakPeerInterface* p_serverPeer);
 
