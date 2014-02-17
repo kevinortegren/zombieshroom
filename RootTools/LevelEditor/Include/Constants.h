@@ -18,7 +18,7 @@ const int g_maxLocators = 50;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/"; 
 const string g_textureLookPath = "C:/Users/BTH/Documents/zombieshroom/Assets/Textures/";
 
-const string g_levelName = "RootIslandV1";
+const string g_levelName = "CaveTestV1";
 
 const string g_textureR = "RED";
 const string g_textureG = "GREEN";
