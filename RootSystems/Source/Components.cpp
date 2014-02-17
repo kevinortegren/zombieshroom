@@ -34,6 +34,7 @@ namespace RootForce
 			RootForce::Ragdoll::SetTypeId(RootForce::ComponentType::RAGDOLL);
 			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
 			RootForce::AbilityRespawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
+			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 		}
 
 		void InitializeServerComponents()
@@ -53,6 +54,7 @@ namespace RootForce
             RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
 			RootForce::AbilityRespawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
+			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 		}
 #endif
 	}

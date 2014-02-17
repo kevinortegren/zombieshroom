@@ -48,8 +48,6 @@ namespace RootForce
 
 		float JumpTime;
 
-		bool TryPickup;
-
 		float AbilityTime;
 		uint8_t SelectedAbility;
 
@@ -63,7 +61,6 @@ namespace RootForce
 			, AbilityTime(0.0f)
 			, SelectedAbility(1)
 			, WantRespawn(false)
-			, TryPickup(false)
 		{}
 	};
 #endif
@@ -128,5 +125,17 @@ namespace RootForce
 			Score = 0;
 			Deaths = 0;
 		}
+	};
+
+	struct TryPickupComponent : public ECS::Component<TryPickupComponent>
+	{
+		union
+		{
+			bool TryPickup;
+			int Padding[2]; // world's most handsome code (components need to have size >= 8?)
+		};
+
+		TryPickupComponent()
+			: TryPickup(false) {}
 	};
 }

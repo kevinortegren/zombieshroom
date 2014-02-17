@@ -246,6 +246,24 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Animation");
 			return 1;
 		}
+		static int EntityGetAbilitySpawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilityRespawnComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(*e);
+			luaL_setmetatable(p_luaState, "AbilitySpawn");
+			return 1;
+		}
+		static int EntityGetTryPickupComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TryPickupComponent **s = (RootForce::TryPickupComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::TryPickupComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::TryPickupComponent>(*e);
+			luaL_setmetatable(p_luaState, "TryPickupComponent");
+			return 1;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//TRANSFORMATION
@@ -504,7 +522,10 @@ namespace RootForce
 		{
 			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
 			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			g_engineContext.m_physics->RemoveObject(*collision->m_handle);
+			if (collision)
+				g_engineContext.m_physics->RemoveObject(*collision->m_handle);
+			else
+				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::WARNING, "Trying to remove non-existing CollisionObject.");
 			return 0;
 		}
 
@@ -1401,15 +1422,6 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		//ABILITY PICKUP
 		//////////////////////////////////////////////////////////////////////////
-		static int EntityGetAbilitySpawn(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilityRespawnComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(*e);
-			luaL_setmetatable(p_luaState, "AbilitySpawn");
-			return 1;
-		}
 
 		static int AbilitySpawnGetCurrentName(lua_State* p_luaState)
 		{
@@ -1713,20 +1725,32 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->SelectedAbility);
 			return 1;
 		}
-
-		static int PlayerActionGetTryPickup(lua_State* p_luaState)
+		
+		//////////////////////////////////////////////////////////////////////////
+		//TRYPICKUPCOMPONENT
+		//////////////////////////////////////////////////////////////////////////
+		static int TryPickupComponentCreate(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushboolean(p_luaState, (*s)->TryPickup);
+			RootForce::TryPickupComponent **s = (RootForce::TryPickupComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::TryPickupComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TryPickupComponent>(*e);
+			luaL_setmetatable(p_luaState, "TryPickupComponent");
 			return 1;
 		}
-
-		static int PlayerActionSetTryPickup(lua_State* p_luaState)
+		static int TryPickupComponentSetTryPickup(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			RootForce::TryPickupComponent **s = (RootForce::TryPickupComponent**)luaL_checkudata(p_luaState, 1, "TryPickupComponent");
 			(*s)->TryPickup = lua_toboolean(p_luaState, 2) != 0;
+			return 0;
+		}
+
+		static int TryPickupComponentGetTryPickup(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TryPickupComponent **s = (RootForce::TryPickupComponent**)luaL_checkudata(p_luaState, 1, "TryPickupComponent");
+			lua_pushboolean(p_luaState, (*s)->TryPickup);
 			return 1;
 		}
 
@@ -2004,6 +2028,7 @@ namespace RootForce
 			{"GetPlayerComponent", GetPlayerComponent},
 			{"GetPlayerAction", EntityGetPlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
+			{"GetTryPickupComponent", EntityGetTryPickupComponent},
 			{NULL, NULL}
 		};
 
@@ -2305,8 +2330,17 @@ namespace RootForce
 			{"GetAngle", PlayerActionGetAngle},
 			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
-			{"TryPickup",PlayerActionGetTryPickup },
-			{"SetTryPickup", PlayerActionSetTryPickup},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg trypickupcomponent_f [] = {
+			{"New", TryPickupComponentCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg trypickupcomponent_m [] = {
+			{"SetTryPickup", TryPickupComponentSetTryPickup},
+			{"GetTryPickup", TryPickupComponentGetTryPickup},
 			{NULL, NULL}
 		};
 
@@ -2456,6 +2490,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::health_f, RootForce::LuaAPI::health_m, "Health");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercomponent_f, RootForce::LuaAPI::playercomponent_m, "PlayerComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playeraction_f, RootForce::LuaAPI::playeraction_m, "PlayerAction");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::trypickupcomponent_f, RootForce::LuaAPI::trypickupcomponent_m, "TryPickupComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::network_f, RootForce::LuaAPI::network_m, "Network");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::animation_f, RootForce::LuaAPI::animation_m, "Animation");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::ragdoll_f, RootForce::LuaAPI::ragdoll_m, "Ragdoll");

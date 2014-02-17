@@ -408,8 +408,8 @@ namespace RootForce
 					spawnPoint->Claimed = m.User;
 
 					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
-					PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-					action->TryPickup = false;
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = false;
 				} return true;
 
 				case NetworkMessage::MessageType::DestroyEntities:
@@ -1032,8 +1032,8 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
-					PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-					action->TryPickup = true;
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = true;
 				} return true;
 
 				case NetworkMessage::MessageType::RespawnRequest:

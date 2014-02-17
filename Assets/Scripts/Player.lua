@@ -15,6 +15,7 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
+	local tryPickup = TryPickupComponent.New(player);
 	--local waterCollider = WaterCollider.New(player);
 	--waterCollider:SetDisturbPower(0.0);
 	--waterCollider:SetDisturbInterval(0.5);

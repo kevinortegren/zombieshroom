@@ -33,6 +33,7 @@ namespace RootForce
 			RAGDOLL,
 			WATERCOLLIDER,
 			ABILITYSPAWN,
+			TRYPICKUPCOMPONENT,
 		};
 	}
 }

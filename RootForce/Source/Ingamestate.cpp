@@ -44,6 +44,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
