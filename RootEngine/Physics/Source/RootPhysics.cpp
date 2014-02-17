@@ -166,7 +166,7 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
-		if(m_debugDrawEnabled == false)
+		//if(m_debugDrawEnabled == false)
 		m_dynamicWorld->stepSimulation(m_dt,4);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
@@ -369,6 +369,8 @@ namespace Physics
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 			else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+			if(!p_collideWithWorld)
+				body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			m_dynamicWorld->addRigidBody(body);
 			m_dynamicObjects.push_back(body);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
@@ -394,7 +396,7 @@ namespace Physics
 			motionstate->getWorldTransform(trans);
 			ghostObject->setWorldTransform(trans);
 			controller->Init(ghostObject, (btConvexShape*)shape, m_dynamicWorld);
-			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::CharacterFilter);
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter);
 			m_externallyControlled.push_back(controller);
 			m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
 			ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
