@@ -34,10 +34,9 @@ namespace Ragdoll
 	public:
 		Ragdoll(btDiscreteDynamicsWorld* p_dynamicWorld);
 		~Ragdoll();
-		void Activate(glm::mat4 p_bones[20], glm::mat4 p_transform);
 		void Deactivate();
 		void BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20] , glm::vec3 p_right);
-		void RemoveBodies();
+
 		btVector3 GetPos();
 		glm::mat4* GetBones();
 		btQuaternion GetOrientation();
@@ -54,7 +53,7 @@ namespace Ragdoll
 		btTypedConstraint* CreateConstraint(btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB);
 		btRigidBody* m_bodies[20];
 		btTypedConstraint* m_joints[20];
-		glm::mat4 m_boneTransform[20];
+
 		glm::mat4 m_prevPos[20];
 		glm::mat4 m_lastBoneMatrix[20];
 		glm::mat4 m_boneOffset[20];
