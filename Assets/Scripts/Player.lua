@@ -35,7 +35,7 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall");
+	playerComponent:SetAbility(0, "AbilityTest");
 	playerComponent:SetAbility(1, "AbilityDash");
 	playerComponent:SetAbility(2, "MagicMissile");
 	playerComponent:SelectAbility(0);

@@ -56,6 +56,7 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
+		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");

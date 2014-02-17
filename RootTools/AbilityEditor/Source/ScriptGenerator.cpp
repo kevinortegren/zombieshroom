@@ -223,28 +223,33 @@ namespace AbilityEditorNameSpace
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STARTPOS))
 			{
+				m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
+				m_file << "\tloval startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
 				if (startEnum == AbilityComponents::StartPos::ONCASTER)
 				{
-					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
-					m_file << "\tlocal startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
+					//m_file << "\tstartPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
 				}
 				else if (startEnum == AbilityComponents::StartPos::UNDERCASTER)
 				{
-					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
-					m_file << "\tlocal startPos = Vec3.New(tempPos.x, tempPos.y - 2, tempPos.z);\n"; 
+					m_file << "\tstartPos = Vec3.New(tempPos.x, tempPos.y - 2, tempPos.z);\n"; 
 				}
 				else if (startEnum == AbilityComponents::StartPos::ENEMYPLAYER)
 				{
-					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), startPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
-					m_file << "\tif self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
-					m_file << "\t\t local startPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
+					m_file << "\tif entityAtAim:DoesExist() then\n";
+					m_file << "\t\tif self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\t\tend\n";
 					m_file << "\tend\n";
 				}
 				else if (startEnum == AbilityComponents::StartPos::FRIENDPLAYER)
 				{
-					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), startPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
-					m_file << "\tif self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
-					m_file << "\t\t local startPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
+					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
+					m_file << "\tif entityAtAim:DoesExist() then\n";
+					m_file << "\t\tif self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\t\tend\n";
 					m_file << "\tend\n";
 				}
 				else// if (startEnum == AbilityComponents::StartPos::ABSOLUTE)

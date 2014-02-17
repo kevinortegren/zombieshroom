@@ -130,6 +130,17 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityDoesExist(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			bool exists = false;
+			if(*e != nullptr)
+				exists = true;
+			lua_pushboolean(p_luaState, exists);
+			return 1;
+		}
+
 		static int EntityGetTransformation(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1994,6 +2005,7 @@ namespace RootForce
 
 		static const struct luaL_Reg entity_m [] = {
 			{"GetId", EntityGetId},
+			{"DoesExist", EntityDoesExist},
 			{"GetTransformation", EntityGetTransformation},
 			{"GetRenderable", EntityGetRenderable},
 			{"GetPhysics", EntityGetPhysics},
