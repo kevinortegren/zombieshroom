@@ -230,7 +230,7 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
@@ -250,7 +250,7 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(p_objectHandle)->m_shape != PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
@@ -268,7 +268,9 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(removedIndex)->m_externalControlled == true)
+					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER
+						&& m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE
+						&& m_userPointer.at(i)->m_type != PhysicsType::TYPE_DYNAMIC)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
@@ -975,6 +977,14 @@ namespace Physics
 				if(m_shapelessObjects.size() == 0 || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_shapelessObjects.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
 					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing shapeless object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
+					return false;
+				}
+			}
+			else if((unsigned int)m_userPointer.at(p_objectHandle)->m_externalControlled)
+			{
+				if(m_externallyControlled.size() == 0  || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_externallyControlled.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
+				{
+					g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Attemting to access non existing externally controlled object at index %d", m_userPointer.at(p_objectHandle)->m_vectorIndex);
 					return false;
 				}
 			}
