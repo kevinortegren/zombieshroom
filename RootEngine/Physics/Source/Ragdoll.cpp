@@ -45,8 +45,10 @@ namespace Ragdoll
 	{
 		
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
-		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(-0.1f, 0.0f, 0);
-		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.1f,0.f, 0);
+		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(-0.0f, 0.0f, 0);
+		m_bodyPosOffset[BodyPart::LEFTFOREARM] = btVector3(0.0f, 0.1f, 0);
+		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f,0.1f, 0);
+		m_bodyPosOffset[BodyPart::RIGHTFOREARM] = btVector3(-0.0f,0.f, 0);
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
 		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.30f ,0);
 		//m_bodyPosOffset[BodyPart::HIPS]= btVector3(0.0f , -0.4f, 0.0f);
@@ -105,31 +107,41 @@ namespace Ragdoll
 				
 				
 			}
-			if(index < 6)
-			{
-				toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
-			}
+			
 			toTrans *= m_boneOffset[index];
-			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
-			{
-				toTrans[3].y = m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.2f;
-			}
-			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
-			{
-				if( index < 2)
-					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
-				else
-					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + (m_boneOffset[index][3].y - m_boneOffset[index + 1][3].y);
-			}
 			/*if(index < 6)
 			{
 			toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
-			glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
-			if(index < 3)
-			toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
-			else
-			toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
 			}*/
+			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
+			{
+				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.2f);
+				if(index == BodyPart::RIGHTARM)
+				{
+					m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) /** m_right.x*/);
+					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) /** m_right.z*/);
+				}
+				else
+				{
+					m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) /** m_right.x*/);
+					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) /** m_right.z*/);
+				}
+			}
+			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
+			{
+					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y + 0.1f);
+			}
+			//if(index < 6)
+			//{
+			//	
+			//	glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
+			////	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+
+			//	if(index < 3)
+			//		toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
+			//	else
+			//		toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
+			//}
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
@@ -143,6 +155,7 @@ namespace Ragdoll
 			w = trans.getRotation().x();
 			trans.setRotation(btQuaternion(x,y,z,w));
 			//Make a slight hardcoded (bad bad hardcode) offset to avoid shapes spawning inside each other which would cause huge jitter
+			
 			trans.setOrigin(trans.getOrigin() + m_bodyPosOffset[index]);
 
 			
@@ -151,10 +164,10 @@ namespace Ragdoll
 			body = new btRigidBody(mass, motionstate, shape, inertia);
 			body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
-			body->setCcdMotionThreshold(0.7f);
+			body->setCcdMotionThreshold(0.6f);
 			body->setCcdSweptSphereRadius(0.4f);
 			body->setRestitution(1.0f);
-			
+			body->setActivationState(DISABLE_DEACTIVATION);
 			//This is supposed to stop collision  with abilities and other players, doesn't work atm
 			body->setCollisionFlags(btBroadphaseProxy::DebrisFilter);
 			m_bodies[index] = body;
@@ -289,13 +302,13 @@ namespace Ragdoll
 
 	void Ragdoll::SetOrientation( glm::quat p_orientation )
 	{
-		btQuaternion btquat;
-		
+		/*	btQuaternion btquat;
+
 		btquat.setX(p_orientation.y);
 		btquat.setY(p_orientation.z);
 		btquat.setZ(p_orientation.w);
 		btquat.setW(p_orientation.x);
-		m_bodies[BodyPart::HIPS]->getWorldTransform().setRotation(btquat);
+		m_bodies[BodyPart::HIPS]->getWorldTransform().setRotation(btquat);*/
 	}
 
 	btTypedConstraint* Ragdoll::CreateConstraint( btRigidBody* p_bodyA, btRigidBody* p_bodyB, std::string p_nameA, std::string p_nameB )
@@ -308,12 +321,12 @@ namespace Ragdoll
 				0 , 0.20f * OFFSET, 0, 
 				0, -0.20f * OFFSET, 0, 
 				0 , 0, 0, 1, &localA, &localB);
-			// Hej! det är jag som är ansvarig för crashes i sequentialconstraintsolvern, hurra för mig 
-// 			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
-// 			constraint->setLimit(0,0,PI_2,0,1,1);
+			
+			btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB/*, btVector3(0,1,0), btVector3(0,-1,0)*/);
+			constraint->setLimit(0,0,PI_2,0,1,1);
 			//constraint->setDamping(0.85f);
-			btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			constraint->setLimit(0 ,0 );
+			//btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
+		//	constraint->setLimit(0 ,0 );
 
 
 			m_dynamicWorld->addConstraint(constraint,true);
@@ -412,16 +425,14 @@ namespace Ragdoll
  		 	//Spine - Left upper arm
  			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
 			{
-				//glm::vec3 rotFix = -m_right * (0.28f);
-				glm::vec3 rotFix = -glm::vec3(0,0,1) * (0.28f);
+				glm::vec3 rotFix = -m_right * (0.28f);
 			 	CalculateConstraintTransform(p_bodyA, p_bodyB, 
-			 		/*-0.20f , 0.0f * OFFSET, 0,*/
-					rotFix.x, rotFix.y , rotFix.z,
-			 		rotFix.x, 0.0f * OFFSET, rotFix.z,
+					rotFix.x, 0.0f , rotFix.z,
+			 		-rotFix.x, 0.0f * OFFSET, -rotFix.z,
 			 		0 , 0, 1, 0, &localA, &localB);
 			 		 	
-			 	btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			 	constraint->setLimit(PI_2, 0 );
+			 	btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			 	constraint->setLimit(-PI_2, 0, PI_2);
 			 	m_dynamicWorld->addConstraint(constraint);
 			 	constraint->setDbgDrawSize(0.5f);
 			 	return constraint;
@@ -429,16 +440,14 @@ namespace Ragdoll
 			////Spine - Right upper arm
 			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
 			{
-				//glm::vec3 rotFix = m_right * (0.28f);
-				glm::vec3 rotFix = glm::vec3(0,0,1) * (0.28f);
+				glm::vec3 rotFix = m_right * (0.28f);			
 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
-					/*0.20f , 0.0f * OFFSET, 0,*/
-					rotFix.x, rotFix.y , rotFix.z,
-					-rotFix.x, 0.0f * OFFSET, rotFix.z,
+					-rotFix.x, 0.0f , -rotFix.z,
+					rotFix.x, 0.0f * OFFSET, rotFix.z,
 					0 , 0, 1, 0, &localA, &localB);
 			
-				btHingeConstraint* constraint = new btHingeConstraint(*p_bodyA, *p_bodyB, localA, localB);
-				constraint->setLimit(PI_2, 0);
+				btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
+				constraint->setLimit(-PI_2, 0, PI_2);
 				m_dynamicWorld->addConstraint(constraint);
 				constraint->setDbgDrawSize(0.5f);
 				return constraint;
