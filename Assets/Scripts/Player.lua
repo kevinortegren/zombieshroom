@@ -38,7 +38,7 @@ function Player.OnCreate(userId, actionId)
 
 	playerComponent:SetAbility(0, "AbilityBall", -1);
 	playerComponent:SetAbility(1, "AbilityDash", -1);
-	playerComponent:SetAbility(2, "MagicMissile" ,-1);
+	playerComponent:SetAbility(2, "AbilityRay" ,-1);
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(20);
