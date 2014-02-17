@@ -10,7 +10,7 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/Transform.h>
 #include "glm/glm.hpp"
-
+#include <RootSystems/Include/ChatSystem.h>
 namespace RootForce
 {
 	namespace WaterState
@@ -49,23 +49,10 @@ namespace RootForce
 		
 		void CalculateWaterConstants();
 
-		void SetDamping(float p_damping);
-		void SetSpeed(float p_speed);
-
-		void IncreaseDamping();
-		void IncreaseSpeed();
-
-		void DecreaseDamping();
-		void DecreaseSpeed();
-
-		void TogglePause();
-		void ToggleWireFrame();
-
 		float GetWaterHeight();
 		void SetWaterHeight(float p_height);
 
-		void ResetWater();
-
+		void ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data);
 
 	private:
 
@@ -89,5 +76,19 @@ namespace RootForce
 		bool ValidValues();
 		void CreateWaterMesh();
 		glm::vec2 WorldSpaceToWaterSpace(glm::vec2 p_worldSpace);
+
+		void SetDamping(float p_damping);
+		void SetSpeed(float p_speed);
+
+		void IncreaseDamping();
+		void IncreaseSpeed();
+
+		void DecreaseDamping();
+		void DecreaseSpeed();
+
+		void TogglePause();
+		void ToggleWireFrame();
+
+		void ResetWater();
 	};
 }

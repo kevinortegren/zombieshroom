@@ -1,6 +1,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+
 extern RootEngine::GameSharedContext g_engineContext;
 namespace RootForce
 {
@@ -408,5 +409,102 @@ namespace RootForce
 	{
 		float scaleHalfWidth = ((float)m_gridSize/2.0f) * m_scale;
 		return glm::vec2((p_worldSpace.x + scaleHalfWidth) * m_texSize, (p_worldSpace.y + scaleHalfWidth) * m_texSize) / (scaleHalfWidth*2.0f);
+	}
+
+	void WaterSystem::ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data )
+	{
+		std::string module;
+		std::string param;
+		std::string value;
+
+		std::getline(*p_data, module, ' ');
+		std::getline(*p_data, module, ' ');
+
+		if(module == "wireframe" || module == "wf")
+		{	
+			ToggleWireFrame();
+		}
+		if(module == "pause" || module == "p")
+		{	
+			TogglePause();
+		}
+		if(module == "reset" || module == "r")
+		{	
+			ResetWater();
+		}
+
+		if(module == "damping" || module == "d")
+		{	
+			std::getline(*p_data, param, ' ');
+			std::getline(*p_data, value, ' ');
+
+			if(param == "increase" || param == "i")
+			{
+				IncreaseDamping();
+			}
+			else if(param == "decrease" || param == "d")
+			{
+				DecreaseDamping();
+			}
+			else if(param == "set" || param == "s")
+			{
+				SetDamping((float)atof(value.c_str()));
+			}
+			else if(param == "help")
+			{
+				p_chat->JSAddMessage("[WATER DAMPING COMMANDS]");
+				p_chat->JSAddMessage("/W[ATER] d[amping] i[ncrease] - Increase water damping");
+				p_chat->JSAddMessage("/W[ATER] d[amping] d[ecrease] - Decrease water damping");
+				p_chat->JSAddMessage("/W[ATER] d[amping] s[et] X	- Set water damping to X(float)");
+			}
+		}
+		else if(module == "speed" || module == "s")
+		{
+			std::getline(*p_data, param, ' ');
+			std::getline(*p_data, value, ' ');
+
+			if(param == "increase" || param == "i")
+			{
+				IncreaseSpeed();
+			}
+			else if(param == "decrease" || param == "d")
+			{
+				DecreaseSpeed();
+			}
+			else if(param == "set" || param == "s")
+			{
+				SetSpeed((float)atof(value.c_str()));
+			}
+			else if(param == "help")
+			{
+				p_chat->JSAddMessage("[WATER SPEED COMMANDS]");
+				p_chat->JSAddMessage("/W[ATER] s[peed] i[ncrease] - Increase water speed");
+				p_chat->JSAddMessage("/W[ATER] s[peed] d[ecrease] - Decrease water speed");
+				p_chat->JSAddMessage("/W[ATER] s[peed] s[et] X	  - Set water speed to X(float)");
+			}
+		}
+		else if(module == "height" || module == "h")
+		{
+			std::getline(*p_data, value, ' ');
+
+			SetWaterHeight((float)atof(value.c_str()));
+		}
+		else if(module == "disturb" || module == "dis")
+		{
+			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* trans =  m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+			Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
+		}
+		else if(module == "help")
+		{
+			p_chat->JSAddMessage("[WATER COMMANDS]");
+			p_chat->JSAddMessage("/W[ATER] p[ause]		 - Toggle water simulation pause");
+			p_chat->JSAddMessage("/W[ATER] w[ire]f[rame] - Toggle water wireframe mode");
+			p_chat->JSAddMessage("/W[ATER] r[eset]		 - Reset the water simulation");
+			p_chat->JSAddMessage("/W[ATER] dis[turb]	 - Disturb water at player position");
+			p_chat->JSAddMessage("/W[ATER] h[eight] X	 - Set water height to X(float)");
+			p_chat->JSAddMessage("/W[ATER] d[amping]	 - Damping settings");
+			p_chat->JSAddMessage("/W[ATER] s[peed]		 - Speed settings");
+		}
 	}
 }
