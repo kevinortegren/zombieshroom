@@ -35,7 +35,7 @@ namespace RootForce
 	class IngameState
 	{
 	public:
-		IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems);
+		IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems, Keymapper* p_keymapper);
 
 		void Initialize();
 		void Enter();
@@ -73,5 +73,7 @@ namespace RootForce
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 		RootForce::SoundSystem*							m_soundSystem;
+
+		Keymapper* m_keymapper;
 	};
 }

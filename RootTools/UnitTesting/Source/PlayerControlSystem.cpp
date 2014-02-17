@@ -6,6 +6,7 @@
 TEST(PlayerControlSystem, Process)
 {
 	ECS::World* world = CreateWorld();
+	world->SetDelta(1.0f);
 	g_world = world;
 	g_networkEntityMap.clear();
 
@@ -14,13 +15,11 @@ TEST(PlayerControlSystem, Process)
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
 	keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
 	keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
-	keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
 	keybindings[0].Edge = true;
 
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
 	keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
 	keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
-	keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
 	keybindings[1].Edge = true;
 
 	keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
@@ -111,12 +110,11 @@ TEST(PlayerControlSystem, Process)
 	{
 		falseevent.key.keysym.scancode = SDL_SCANCODE_SPACE;
 		falseevent.type = SDL_KEYDOWN;
-
 		ii->HandleInput(falseevent);
 
 		system->Process();
 
-		EXPECT_TRUE(action->JumpTime > 0.0f);
+		EXPECT_GT(action->JumpTime, 0);
 	}
 
 	//Orientation test

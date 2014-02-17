@@ -20,7 +20,7 @@ namespace RootForce
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
 
-	void MenuState::Enter()
+	void MenuState::Enter(Keymapper* p_keymapper)
 	{
 		// Destroy any existing entities
 		Network::NetworkEntityID id;
@@ -40,7 +40,7 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext, p_keymapper));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);

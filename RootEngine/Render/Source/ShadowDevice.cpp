@@ -27,15 +27,6 @@ namespace Render
 	{
 		m_width = p_width;
 		m_height = p_height;
-		//m_depthTexture = p_renderer->CreateTexture();
-		//m_depthTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_COMPONENT);
-		//m_depthTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		//m_depthTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		//m_depthTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		//m_depthTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		////m_depthTexture->SetParameter(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-		//m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		//m_depthTexture->SetParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
 		glGenTextures(1, &m_depthTextureArray);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_depthTextureArray);

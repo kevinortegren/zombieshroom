@@ -13,7 +13,9 @@ namespace RootForce
 		enum RenderPass
 		{
 			RENDERPASS_DEFAULT,
-			RENDERPASS_SKYBOX
+			RENDERPASS_SKYBOX,
+			RENDERPASS_PARTICLES,
+			RENDERPASS_WATER
 		};
 	}
 

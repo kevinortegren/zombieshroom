@@ -128,19 +128,15 @@ namespace RootForce
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-			case PlayerAction::MOVE_BACKWARDS_STOP:
 					action->MovePower += 1;
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-			case PlayerAction::MOVE_FORWARDS_STOP:
 					action->MovePower -= 1;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-			case PlayerAction::STRAFE_LEFT_STOP:
 					action->StrafePower += 1;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-			case PlayerAction::STRAFE_RIGHT_STOP:
 					action->StrafePower -= 1;
 				break;
 			case PlayerAction::ORIENTATE:
