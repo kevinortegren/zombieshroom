@@ -50,10 +50,10 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, Action.ActionID);
 			p_bs->Serialize(p_writeToBitstream, Action.MovePower);
 			p_bs->Serialize(p_writeToBitstream, Action.StrafePower);
-			p_bs->Serialize(p_writeToBitstream, Action.Jump);
 			for (int i = 0; i < 2; ++i)
 				p_bs->Serialize(p_writeToBitstream, Action.Angle[i]);
-			p_bs->Serialize(p_writeToBitstream, Action.ActivateAbility);
+			p_bs->Serialize(p_writeToBitstream, Action.JumpTime);
+			p_bs->Serialize(p_writeToBitstream, Action.AbilityTime);
 			p_bs->Serialize(p_writeToBitstream, Action.SelectedAbility);
 
 			for (int i = 0; i < 3; ++i)
@@ -62,6 +62,60 @@ namespace RootForce
 				p_bs->Serialize(p_writeToBitstream, Orientation[i]);
 			for (int i = 0; i < 4; ++i)
 				p_bs->Serialize(p_writeToBitstream, AimingDeviceOrientation[i]);
+		}
+
+		void JumpStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void JumpStop::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityChargeStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+		}
+
+		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityChargeAndChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, Time);
+		}
+
+		void AbilityCooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, AbilityIndex);
+		}
+
+		void RespawnRequest::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void Suicide::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
 		}
 
 		void DestroyEntities::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -313,7 +367,7 @@ namespace RootForce
 			if (component == nullptr)
 				return nullptr;
 			
-			T c;
+			T c = *component;
 			Serialize(false, p_bs, &c);
 			if (!p_discard)
 			{
@@ -469,7 +523,7 @@ namespace RootForce
 			if (it == p_map.end())
 			{
 				// Entity doesn't exist, use the script to create it.	
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from DeserializeEntity");
+				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u) with script: %s", id.UserID, id.ActionID, scriptName.C_String());
 				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
 				g_engineContext.m_script->AddParameterNumber(id.UserID);
 				g_engineContext.m_script->AddParameterNumber(id.ActionID);

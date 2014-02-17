@@ -426,9 +426,9 @@ TEST(Network, MessageSerializationPlayerCommand)
 	m1.Action.ActionID = 76;
 	m1.Action.MovePower = 1.0f;
 	m1.Action.StrafePower = -1.0f;
-	m1.Action.Jump = true;
+	m1.Action.JumpTime = 5.0f;
 	m1.Action.Angle = glm::vec2(1.5, 0.7);
-	m1.Action.ActivateAbility = true;
+	m1.Action.AbilityTime = 3.0f;
 	m1.Action.SelectedAbility = 2;
 	m1.Position = glm::vec3(1.0f, 2.0f, 3.0f);
 	m1.Orientation = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);

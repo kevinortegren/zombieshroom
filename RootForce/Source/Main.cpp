@@ -45,6 +45,9 @@ namespace RootForce
 		m_workingDirectory = p_workingDirectory;
 		g_world = &m_world;
 
+		// Seed the PRNG
+		srand( (unsigned int)time(nullptr) );
+
 		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
@@ -105,20 +108,28 @@ namespace RootForce
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
+		
+		m_keymapper = new Keymapper();
 
 		m_menuState = std::shared_ptr<MenuState>(new MenuState(m_networkContext));
 		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_networkContext, m_sharedSystems));
-		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_networkContext, m_sharedSystems));
+		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_networkContext, m_sharedSystems, m_keymapper));
 
 		m_menuState->Initialize(m_workingDirectory);
 		m_connectingState->Initialize();
 		m_ingameState->Initialize();
 
+		// Respawn system respawns players after they die
+		m_sharedSystems.m_respawnSystem = new RootSystems::RespawnSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
+
 		m_currentState = GameStates::Menu;
+
 	}
 
 	Main::~Main() 
 	{
+		delete m_keymapper;
 		g_engineContext.m_gui->Shutdown();
 		//m_world.GetEntityExporter()->Export(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\test_2.world");
 		SDL_Quit();
@@ -134,7 +145,7 @@ namespace RootForce
 			{
 				case RootForce::GameStates::Menu:
 				{
-					m_menuState->Enter();
+					m_menuState->Enter(m_keymapper);
 					
 					while (m_currentState == RootForce::GameStates::Menu && m_running)
 					{
@@ -199,6 +210,8 @@ namespace RootForce
 				break;
 
 			default:
+				if(m_keymapper->ProcessKey(event))
+					continue;
 				if (g_engineContext.m_inputSys != nullptr)
 					g_engineContext.m_inputSys->HandleInput(event);
 				if (g_engineContext.m_gui != nullptr)

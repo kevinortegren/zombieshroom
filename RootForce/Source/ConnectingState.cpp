@@ -74,15 +74,24 @@ namespace RootForce
 			// Setup the rules
 			rules->ScoreLimit = p_playData.ServerInfo.KillCount;
 			rules->TimeLeft = (float)p_playData.ServerInfo.MatchTime;
+
+			// Set the spawn points and server peer on the respawn system if we are hosting.
+			m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 		}
 		else
 		{
 			// Connect the client
 			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port, true);
+
+			// Set the server peer to null on the respawn system, since we're a dedicated client.
+			m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
 		}
 
 		// Setup the client
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
+
+		// Always set the client peer on the respawning system.
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 	}
 
 	void ConnectingState::Exit()
@@ -95,6 +104,8 @@ namespace RootForce
 			m_networkContext.m_server->Update();
 		m_networkContext.m_client->Update();
 
+		m_sharedSystems.m_respawnSystem->Process();
+
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 		if (clientComponent->State == RootForce::Network::ClientState::CONNECTED)
@@ -104,6 +115,8 @@ namespace RootForce
 		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_USER_CONNECT)
 			return GameStates::Connecting;
 		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
+			return GameStates::Connecting;
+		if (clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
 			return GameStates::Connecting;
 		if (clientComponent->State == RootForce::Network::ClientState::DISCONNECTED_TIMEOUT)
 			return GameStates::Menu;

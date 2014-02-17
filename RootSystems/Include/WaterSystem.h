@@ -10,7 +10,7 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/Transform.h>
 #include "glm/glm.hpp"
-
+#include <RootSystems/Include/ChatSystem.h>
 namespace RootForce
 {
 	namespace WaterState
@@ -49,23 +49,10 @@ namespace RootForce
 		
 		void CalculateWaterConstants();
 
-		void SetDamping(float p_damping);
-		void SetSpeed(float p_speed);
-
-		void IncreaseDamping();
-		void IncreaseSpeed();
-
-		void DecreaseDamping();
-		void DecreaseSpeed();
-
-		void TogglePause();
-		void ToggleWireFrame();
-
 		float GetWaterHeight();
 		void SetWaterHeight(float p_height);
 
-		void ResetWater();
-
+		void ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data);
 
 	private:
 
@@ -83,11 +70,25 @@ namespace RootForce
 
 		bool	m_wireFrame, m_pause;
 		int		m_texSize, m_gridSize;	
-		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale;	
+		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*	m_textureData;
 
 		bool ValidValues();
 		void CreateWaterMesh();
 		glm::vec2 WorldSpaceToWaterSpace(glm::vec2 p_worldSpace);
+
+		void SetDamping(float p_damping);
+		void SetSpeed(float p_speed);
+
+		void IncreaseDamping();
+		void IncreaseSpeed();
+
+		void DecreaseDamping();
+		void DecreaseSpeed();
+
+		void TogglePause();
+		void ToggleWireFrame();
+
+		void ResetWater();
 	};
 }

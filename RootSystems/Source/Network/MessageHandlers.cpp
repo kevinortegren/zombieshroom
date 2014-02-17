@@ -48,7 +48,7 @@ namespace RootForce
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
-
+			
 			switch (p_id)
 			{
 				case ID_CONNECTION_REQUEST_ACCEPTED:
@@ -127,7 +127,7 @@ namespace RootForce
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 						{
-							clientComponent->State = ClientState::CONNECTED;
+							clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 						}
 					}
 				} return true;
@@ -187,7 +187,7 @@ namespace RootForce
 					else
 					{
 						// For a local client, just set the client state
-						clientComponent->State = ClientState::CONNECTED;
+						clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 					}
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d: %s): %s", m.User, p_packet->systemAddress.ToString(), m.Name.C_String());
@@ -247,7 +247,6 @@ namespace RootForce
 						*playerAction = m.Action;
 
 						// Set the position of the player
-						
 						PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(player);
 						Transform* transform = m_world->GetEntityManager()->GetComponent<Transform>(player);
 						Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingDevice);
@@ -263,6 +262,139 @@ namespace RootForce
 							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
 
 						transform->m_position += movement;
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::JumpStart:
+				{
+					NetworkMessage::JumpStart m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							action->JumpTime = lastHalfPing;
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::JumpStop:
+				{
+					NetworkMessage::JumpStop m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							action->JumpTime = 0.0f;
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeStart:
+				{
+					NetworkMessage::AbilityChargeStart m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::START_CHARGING;
+							action->ActionID = m.Action;
+							action->AbilityTime = lastHalfPing;
+						}
+					}
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart");
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeDone:
+				{
+					NetworkMessage::AbilityChargeDone m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::START_CHANNELING;
+							action->ActionID = m.Action;
+							action->AbilityTime = m.Time;
+						}
+					}
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone");
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChannelingDone:
+				{
+					NetworkMessage::AbilityChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+							action->ActionID = m.Action;
+							action->AbilityTime = m.Time;
+						}
+					}
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone");
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
+				{
+					NetworkMessage::AbilityChargeAndChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						if (player != nullptr)
+						{
+							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+							action->ActionID = m.Action;
+							action->AbilityTime = m.Time;
+						}
+					}
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone");
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityCooldownOff:
+				{
+					NetworkMessage::AbilityCooldownOff m;
+					m.Serialize(false, p_bs);
+
+					if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, 0)];
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+						playerComponent->AbilityScripts[m.AbilityIndex].Cooldown = 0.0f;
+						playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
+
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
 					}
 				} return true;
 
@@ -284,7 +416,37 @@ namespace RootForce
 
 					if (clientComponent->IsRemote)
 					{
-						// TODO: Send spawn point index to respawn system.
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->SpawnIndex = m.SpawnPointIndex;
+						health->SpawnPointReceived = true;
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received spawn location for player %u", m.User);
+					}
+
+					// If we were awaiting a spawn message for connection sequence, set us to connected now. For both local and remote players.
+					if (clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
+					{
+						clientComponent->State = ClientState::CONNECTED;
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide notification from user %u", m.User);
+
+					if (clientComponent->IsRemote)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->Health = 0;
+
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide message for user %u", m.User);
 					}
 				} return true;
 
@@ -617,6 +779,332 @@ namespace RootForce
 					}
 				} return true;
 
+				case NetworkMessage::MessageType::JumpStart:
+				{
+					NetworkMessage::JumpStart m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								action->JumpTime = lastHalfPing;
+							}
+						}
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (i != m.User && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStart);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::JumpStop:
+				{
+					NetworkMessage::JumpStop m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								action->JumpTime = m.Time;
+							}
+						}
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (i != m.User && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStop);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeStart:
+				{
+					NetworkMessage::AbilityChargeStart m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::START_CHARGING;
+								action->AbilityTime = lastHalfPing;
+							}
+						}
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeStart);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeDone:
+				{
+					NetworkMessage::AbilityChargeDone m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::START_CHANNELING;
+								action->ActionID = m.Action;
+								action->AbilityTime = m.Time;
+							}
+						}
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChannelingDone:
+				{
+					NetworkMessage::AbilityChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+								action->ActionID = m.Action;
+								action->AbilityTime = m.Time;
+							}
+						}
+					
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
+				{
+					NetworkMessage::AbilityChargeAndChannelingDone m;
+					m.Serialize(false, p_bs);
+
+					// If a remote player, acknowledge this.
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+								action->ActionID = m.Action;
+								action->AbilityTime = m.Time;
+							}
+						}
+					
+
+						// Broadcast the action to all other clients
+						DataStructures::List<RakNet::SystemAddress> addresses;
+						DataStructures::List<RakNet::RakNetGUID> guids;
+						m_peer->GetSystemList(addresses, guids);
+
+						for (unsigned int i = 0; i < addresses.Size(); ++i)
+						{
+							if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+							{
+								RakNet::BitStream bs;
+								bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+								bs.Write(RakNet::GetTime());
+								bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
+								m.Serialize(true, &bs);
+
+								m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::RespawnRequest:
+				{
+					NetworkMessage::RespawnRequest m;
+					m.Serialize(false, p_bs);
+
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
+
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
+								action->WantRespawn = true;
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received suicide message from client %u", m.User);
+
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+								health->Health = 0;
+
+								// Broadcast the suicide to all other clients
+								DataStructures::List<RakNet::SystemAddress> addresses;
+								DataStructures::List<RakNet::RakNetGUID> guids;
+								m_peer->GetSystemList(addresses, guids);
+
+								for (unsigned int i = 0; i < addresses.Size(); ++i)
+								{
+									if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+									{
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+										m.Serialize(true, &bs);
+
+										m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									}
+								}
+							}
+						}
+					}
+				} return true;
+
 				case NetworkMessage::MessageType::LoadMapStatus:
 				{
 					NetworkMessage::LoadMapStatus m;
@@ -694,8 +1182,6 @@ namespace RootForce
 									}
 								}
 
-								clientComponent->State = ClientState::CONNECTED;
-
 								// Send a user connected message for all clients to the connectee.
 								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
@@ -710,7 +1196,10 @@ namespace RootForce
 									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
 										continue;
 									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
-									if(clientComponent->State != ClientState::CONNECTED)
+									if(clientComponent->State != ClientState::CONNECTED && 
+									   clientComponent->State != ClientState::AWAITING_FIRST_GAMESTATE_DELTA && 
+									   clientComponent->State != ClientState::AWAITING_SPAWN_POINT &&
+									   clientComponent->State != ClientState::AWAITING_USER_CONNECT)
 										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
@@ -740,6 +1229,13 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
+
+								// Make sure the player will be spawned at a spawn point.
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								health->WantsRespawn = true;
+								health->RespawnDelay = 0.0f;
+
+								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 							}
 						} break;
 

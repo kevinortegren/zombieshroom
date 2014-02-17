@@ -29,6 +29,10 @@ namespace RootEngine
 	{
 		class ScriptInterface;
 	}
+	namespace Sound
+	{
+		class SoundInterface;
+	}
 }
 
 #endif
@@ -52,12 +56,13 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 		ProfilingInterface* m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
-		Network::NetworkInterface* m_network;
-		GUISystem::GUISystemInterface* m_gui;
-		DebugOverlayInterface* m_debugOverlay;
-		InputManager::InputInterface* m_inputSys;
-		Physics::PhysicsInterface* m_physics;
-		Script::ScriptInterface* m_script;
+		Network::NetworkInterface*		m_network;
+		GUISystem::GUISystemInterface*	m_gui;
+		DebugOverlayInterface*			m_debugOverlay;
+		InputManager::InputInterface*	m_inputSys;
+		Physics::PhysicsInterface*		m_physics;
+		Script::ScriptInterface*		m_script;
+		Sound::SoundInterface*			m_sound;
 #endif
 
 

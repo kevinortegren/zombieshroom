@@ -90,4 +90,5 @@ void main() {
     out_Color = vec4(occlusion);
 
 	//out_Color = vec4(vec3(errtest), 1.0);
+	//out_Color = vec4(1.0, 0.0, 0.0, 1.0);
 }
