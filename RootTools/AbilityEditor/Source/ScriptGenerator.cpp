@@ -93,14 +93,14 @@ namespace AbilityEditorNameSpace
 				chargeFac = ((AbilityComponents::ChargeVariables*)m_entity->GetComponents()->at(i))->m_chargeFactor;
 			}
 		}
-		if (chargeFac > 1.0f)
+		if (chargeFac >= 1.0f)
 		{
 			m_file << "\t" << m_name << ".damage = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
 			m_file << "\t" << m_name << ".knockback = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
 		}
 		if (chargeReq > 0.0f)
 		{
-			m_file << "\tif time >= " << m_name << ".chargeTime * " << chargeReq << "then\n\t";
+			m_file << "\tif time >= " << m_name << ".chargeTime * " << chargeReq << " then\n\t";
 		}
 		m_file << "\t" << m_name << ".OnCreate(userId, actionId);\n";
 		if (chargeReq > 0.0f)
@@ -157,7 +157,7 @@ namespace AbilityEditorNameSpace
 			QVector3D targetPos = QVector3D(0,0,0);
 			//Velocity
 			int direction = 0;
-			float speed = 1.0f;
+			float speed = 0.0f;
 			//Collision variable
 			bool colWithWorld = false;
 			//Setting values
@@ -221,11 +221,15 @@ namespace AbilityEditorNameSpace
 					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetRight();\n";
 				}
 			}
+			else
+			{
+				m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+			}
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STARTPOS))
 			{
 				m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
-				m_file << "\tloval startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
+				m_file << "\tlocal startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
 				if (startEnum == AbilityComponents::StartPos::ONCASTER)
 				{
 					//m_file << "\tstartPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));\n"; 
@@ -356,7 +360,7 @@ namespace AbilityEditorNameSpace
 	{
 
 		int dmgEnum = 0, knockEnum = 0;
-		float dmg = 0.0f, knockb = 0.0f;
+		//float dmg = 0.0f, knockb = 0.0f;
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
 		
@@ -367,12 +371,12 @@ namespace AbilityEditorNameSpace
 			if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::DAMAGE)
 			{
 				dmgEnum = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
-				dmg = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(i))->m_damage;
+				m_damage = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(i))->m_damage;
 			}
 			else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
 			{
 				knockEnum = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
-				knockb = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_knockback;
+				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_knockback;
 			}
 		}
 
@@ -380,7 +384,7 @@ namespace AbilityEditorNameSpace
 		m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
 		m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
 
-		if (m_damage != 0.0f && m_knockback != 0.0f)
+		if (m_damage != 0.0f || m_knockback != 0.0f)
 		{
 			m_file << "\tif type == PhysicsType.TYPE_PLAYER then\n";
 				m_file << "\t\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";

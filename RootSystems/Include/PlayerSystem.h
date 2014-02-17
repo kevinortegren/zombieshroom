@@ -5,7 +5,7 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
-#define PLAYER_NUM_ABILITIES 3
+#define PLAYER_NUM_ABILITIES 4
 
 namespace RootForce
 {
@@ -117,7 +117,7 @@ namespace RootForce
 		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
 		AbilityState::AbilityState AbilityState;
-
+		AbilityState::AbilityState PushAbilityState;
 		int Score;
 		int Deaths;
 
@@ -126,6 +126,7 @@ namespace RootForce
 			TeamID = 0;
 			SelectedAbility = 0;
 			AbilityState = AbilityState::OFF;
+			PushAbilityState = AbilityState::OFF;
 			Score = 0;
 			Deaths = 0;
 		}

@@ -55,6 +55,7 @@ namespace RootForce
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
+		g_engineContext.m_resourceManager->LoadScript("Push");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
 		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
@@ -114,6 +115,12 @@ namespace RootForce
 		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
 		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
 		keybindings[keybindings.size()-1].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::RIGHT);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED;
+		keybindings[keybindings.size()-1].ActionUp = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED;
+		//keybindings[keybindings.size()-1].Edge = true;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
