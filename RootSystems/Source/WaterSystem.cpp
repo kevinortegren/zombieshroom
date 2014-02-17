@@ -6,7 +6,7 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true)
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f)
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -36,6 +36,7 @@ namespace RootForce
 			return;
 
 		m_dt += m_world->GetDelta();
+		m_totalTime += m_world->GetDelta();
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{   	
@@ -152,11 +153,16 @@ namespace RootForce
 
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
+		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
-		
+		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] = m_context->m_resourceManager->LoadTexture("waternormal", Render::TextureType::TEXTURE_2D);
+		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
 		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+
+		//Total running time
+		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
 
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
