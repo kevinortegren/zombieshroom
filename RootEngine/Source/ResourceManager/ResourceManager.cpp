@@ -430,5 +430,4 @@ namespace RootEngine
 		m_defaultTexture = m_context->m_renderer->CreateTexture();
 		m_defaultTexture->CreateEmptyTexture(4, 4, Render::TextureFormat::TEXTURE_RGBA);
 	}
-
 }
