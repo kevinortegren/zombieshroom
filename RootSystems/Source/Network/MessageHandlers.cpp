@@ -1704,7 +1704,7 @@ namespace RootForce
 							if (ClientState::IsConnected(clientComponent->State))
 							{
 								// Kill the player.
-								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
 
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
