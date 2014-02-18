@@ -15,13 +15,7 @@ namespace Ragdoll
 
 	Ragdoll::~Ragdoll()
 	{
-		/*for (int i = 0; i < m_constraintCounter; i++)
-		{
-		m_dynamicWorld->removeConstraint(m_joints[i]);
-		delete m_joints[i]; m_joints[i] = 0;
-		}*/
 		Deactivate();
-
 	}
 
 
@@ -45,10 +39,7 @@ namespace Ragdoll
 	{
 		
 		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
-		m_bodyPosOffset[BodyPart::LEFTARM] = btVector3(-0.0f, 0.0f, 0);
-		m_bodyPosOffset[BodyPart::LEFTFOREARM] = btVector3(0.0f, 0.1f, 0);
-		m_bodyPosOffset[BodyPart::RIGHTARM] = btVector3(0.0f,0.1f, 0);
-		m_bodyPosOffset[BodyPart::RIGHTFOREARM] = btVector3(-0.0f,0.f, 0);
+
 		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
 		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.30f ,0);
 		//m_bodyPosOffset[BodyPart::HIPS]= btVector3(0.0f , -0.4f, 0.0f);
@@ -107,17 +98,7 @@ namespace Ragdoll
 				
 				
 			}
-			if(index < 3)
-			{
-
-				glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
-				//	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
-
-				if(index < 3)
-					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
-				else
-					toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
-			}
+ 			
 
 			toTrans *= m_boneOffset[index];
 			/*if(index < 6)
@@ -126,7 +107,7 @@ namespace Ragdoll
 			}*/
 			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
 			{
-				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.4f);
+				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.3f);
 				if(index == BodyPart::RIGHTARM)
 				{
 					toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() + m_right.x* 0.8f);
@@ -145,9 +126,10 @@ namespace Ragdoll
 			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
 			{
 				btVector3 btAxis = (m_bodies[index + 1]->getWorldTransform().getRotation().getAxis());
-				glm::vec3 axis = glm::vec3(btAxis.x(), btAxis.y(), btAxis.z());
-				glm::vec3 rot = axis * 0.2f;
-			//	glm::vec3 rot = glm::rotate(glm::vec3(0.2f,0.2f,0.2f), m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
+				glm::vec3 axis = glm::vec3(btAxis.y(), btAxis.x(), btAxis.z());
+				//glm::vec3 rot = axis * 0.4f;
+				//glm::vec3 rot = axis * m_boneShapeSize[index];
+				glm::vec3 rot = glm::rotate(m_boneShapeSize[index + 1], m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
 				toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + rot.y;
 				if(index < 3)
 				{
@@ -164,7 +146,17 @@ namespace Ragdoll
 				
 					
 			}
-			
+			if(index < 3)
+			{
+
+				glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
+				//	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+
+				if(index < 3)
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
+				else
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
+			}
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
