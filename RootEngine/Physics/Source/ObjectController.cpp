@@ -49,8 +49,8 @@ ObjectController::ObjectController()
 ObjectController::~ObjectController()
 {
 	m_dynamicWorld->removeCollisionObject(m_ghostObject);
-	delete m_ghostObject;
 	delete m_convexShape;
+	delete m_ghostObject;
 }
 
 void ObjectController::Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btDiscreteDynamicsWorld* p_dynamicWorld)
