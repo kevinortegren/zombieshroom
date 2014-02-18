@@ -1099,7 +1099,7 @@ namespace RootForce
 					}
 					else
 					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "No client entity associated with peer (%d:%s)", m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), p_packet->systemAddress.ToString());
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "No client entity associated with peer (%d: %s)", m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), p_packet->systemAddress.ToString());
 					}
 				} return true;
 
