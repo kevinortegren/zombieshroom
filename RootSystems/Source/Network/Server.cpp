@@ -1,11 +1,13 @@
 #ifndef COMPILE_LEVEL_EDITOR
 
 #include <RakNet/GetTime.h>
+#include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Network/Server.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
 #include <stdexcept>
 
+extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 #define WORLD_DELTA_UPDATE_INTERVAL 2.0
@@ -23,9 +25,13 @@ namespace RootForce
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
 
+			RakNet::StartupResult r;
 			RakNet::SocketDescriptor sd(p_config.Port, nullptr);
-			if (m_peer->Startup(p_config.MaxPlayers, &sd, 1) != RakNet::RAKNET_STARTED)
+			if ((r = m_peer->Startup(p_config.MaxPlayers, &sd, 1)) != RakNet::RAKNET_STARTED)
+			{
+				g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::FATAL_ERROR, "Failed to startup RakNet server. Startup result: %d.", r);
 				throw std::runtime_error("Failed to create RakNet server");
+			}
 
 			m_peer->SetMaximumIncomingConnections(p_config.MaxPlayers);
 			m_peer->SetOccasionalPing(true);
