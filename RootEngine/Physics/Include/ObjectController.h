@@ -9,7 +9,7 @@ class ObjectController
 public:
 	ObjectController();
 	~ObjectController();
-	void Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape);
+	void Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btDiscreteDynamicsWorld* p_dynamicWorld);
 	void Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_world );
 	glm::vec3 GetPos() const{return m_currentPos;}
 	void SetOrientation(glm::quat p_orientation);
@@ -18,5 +18,5 @@ private:
 	glm::vec3 m_currentPos;
 	btPairCachingGhostObject* m_ghostObject;
 	btConvexShape*	m_convexShape;
-	
+	btDiscreteDynamicsWorld* m_dynamicWorld;
 };

@@ -4,6 +4,7 @@ AbilityBall.pushback = 20;
 AbilityBall.cooldown = 3.0;
 AbilityBall.chargeTime = 0.0;
 AbilityBall.channelingTime = 0.0;
+AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone(time, userId, actionId)
 end

@@ -11,6 +11,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/WorldSystem.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -37,4 +38,5 @@ private:
 	
 	// System responsible for creating the world.
 	std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
+	RootForce::AbilityRespawnSystem* m_abilityRespawnSystem;
 };

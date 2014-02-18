@@ -54,6 +54,8 @@ namespace RootForce
 
 		// System responsible for creating the world.
 		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
+		RootForce::AbilityRespawnSystem* m_abilitySpawnSystem;
+		// TODO: Add more
 
 		// System responsible for respawning and spawning players.
 		RootSystems::RespawnSystem* m_respawnSystem;

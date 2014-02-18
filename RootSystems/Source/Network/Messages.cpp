@@ -12,6 +12,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -106,6 +107,17 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
 			p_bs->Serialize(p_writeToBitstream, AbilityIndex);
+		}
+
+		void AbilityTryClaim::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
+		void AbilityClaimedBy::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, AbilitySpawnPointID);
 		}
 
 		void RespawnRequest::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -290,6 +302,26 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->JumpForce);
 		}
 
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, RootForce::AbilityRespawnComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Claimed);
+			if (p_writeToBitstream)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->CurrentAbility.Name.c_str()) );
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Cooldown );
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Charges );
+				}
+				else
+				{
+					RakNet::RakString s;
+					p_bs->Serialize(p_writeToBitstream, s);
+					p_c->CurrentAbility.Name = std::string(s.C_String());
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Cooldown);
+					p_bs->Serialize(p_writeToBitstream, p_c->CurrentAbility.Charges);
+				}
+			p_bs->Serialize(p_writeToBitstream, p_c->Timer);
+		}
+
 
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{
@@ -304,6 +336,7 @@ namespace RootForce
 				case ComponentType::PLAYER:
 				case ComponentType::TDMRULES:
 				case ComponentType::PLAYERPHYSICS:
+				//case ComponentType::ABILITYSPAWN:
 					return true;
 				default:
 					return false;
@@ -352,6 +385,10 @@ namespace RootForce
 				case ComponentType::PLAYERPHYSICS:
 					Serialize(true, p_bs, (RootForce::PlayerPhysics*) p_component);
 				return true;
+
+			//	case ComponentType::ABILITYSPAWN:
+			//		Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
+			//	return true;
 			}
 
 			return false;
@@ -423,6 +460,10 @@ namespace RootForce
 					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager, false);
 				break;
 
+			//	case ComponentType::ABILITYSPAWN:
+			//		component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
+			//	break;
+				
 				default:
 					return nullptr;
 			}

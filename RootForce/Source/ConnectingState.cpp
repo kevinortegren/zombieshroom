@@ -5,6 +5,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -25,6 +26,11 @@ namespace RootForce
 	void ConnectingState::Initialize()
 	{
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
+
+		//AbilitySpawnSystem to create new abilities across the map
+		m_sharedSystems.m_abilitySpawnSystem = new AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+		g_world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(m_sharedSystems.m_abilitySpawnSystem);
+
 		m_loadingScreen = g_engineContext.m_gui->LoadURL("Loading", "loading.html");
 	}
 
@@ -67,7 +73,7 @@ namespace RootForce
 			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 			
-			m_networkContext.m_server->Initialize(m_sharedSystems.m_worldSystem.get(), p_playData.ServerInfo, false);
+			m_networkContext.m_server->Initialize(m_sharedSystems.m_worldSystem.get(), m_sharedSystems.m_abilitySpawnSystem, p_playData.ServerInfo, false);
 			m_networkContext.m_server->SetMessageHandler(m_networkContext.m_serverMessageHandler.get());
 			m_networkContext.m_client->Connect("127.0.0.1", p_playData.ServerInfo.Password, p_playData.ServerInfo.Port, false);
 
@@ -90,6 +96,9 @@ namespace RootForce
 			m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 		}
 
+		// Setup the client
+		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
+		m_networkContext.m_clientMessageHandler->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
 		// Always set the client peer on the respawning system (this will only not be set for a dedicated server).
 		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 	}

@@ -45,8 +45,7 @@ namespace RootForce
 		m_workingDirectory = p_workingDirectory;
 		g_world = &m_world;
 
-		// Seed the PRNG
-		srand( (unsigned int)time(nullptr) );
+		srand((unsigned)time(NULL));
 
 		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
