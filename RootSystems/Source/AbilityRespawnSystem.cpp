@@ -94,7 +94,7 @@ namespace RootForce
 
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
 		{
-			m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second);
+			//m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second); Is imported from the level file
 			m_world->GetEntityManager()->CreateComponent<Network::NetworkComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
 
@@ -113,7 +113,7 @@ namespace RootForce
 			CreateCollisionComponents(itr->second);
 
 			//And the particle emitter component
-			CreateParticleEmitter(itr->second);
+			//CreateParticleEmitter(itr->second);
 
 		}
 	}
