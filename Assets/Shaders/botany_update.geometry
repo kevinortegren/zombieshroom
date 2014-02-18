@@ -1,7 +1,7 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
-#define VERTICES_OUTPUT 1
+#define VERTICES_OUTPUT 10
 
 layout(triangles) in;
 layout(points, max_vertices = VERTICES_OUTPUT) out;

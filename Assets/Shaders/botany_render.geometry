@@ -37,7 +37,18 @@ out vec2 vert_texcoord1;
 out vec3 vert_normal1;
 out vec3 vert_color1;
 
-// LOD 0
+float FlipNormal(vec3 position, vec3 normal, vec3 cameraPosition)
+{
+    // Flip normals if camera is aligned with normals.
+    float flipped = 1.0;
+    vec3 n = normalize(normal); 
+    vec3 direction = vec3((position + n) - cameraPosition);
+    if(dot(direction, n) > 0)
+        flipped = -1.0;
+    return flipped;
+}
+
+// LOD 0 cluster.
 
 // Positions.
 vec3 mediumBlade3[5] = vec3[](
@@ -66,48 +77,22 @@ vec3 mediumBlade3Normals[5] = vec3[](
     vec3(-0.451078, -0.791268, -0.412824)
 );
 
-
-void CreateMediumBlade3(vec3 position)
+// Output medium blade 3.
+void CreateMediumBlade3(vec3 position, vec3 cameraPosition)
 {
-#ifdef SHOW_NORMALS
-    int i;
-    for(i = 0; i < 5; i++)
-    {
-        vec4 pos = vec4(position + mediumBlade3[i], 1.0);
-        gl_Position = projectionMatrix * viewMatrix * pos;
-        EmitVertex();
-
-        vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
-
-        vec4 pos2 = vec4(position + mediumBlade3[i] + normal * 0.2, 1.0);
-        gl_Position = projectionMatrix * viewMatrix * pos2;
-        EmitVertex();
-        EndPrimitive();
-    }
-#else
-
-    float flipped = 1;
-    vec3 normal = normalize(mediumBlade3Normals[0].xyz);
-    vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
-    vec3 direction = vec3((position + mediumBlade3[0]) - cameraPos);
-    if(dot(direction, normal) > 0)
-        flipped = -1;
+    float flip = FlipNormal(position, mediumBlade3[0], cameraPosition);
        
     int i;
     for(i = 0; i < 5; i++)
     {
         vec4 pos = vec4(position + mediumBlade3[i], 1.0);
-        gl_Position = projectionMatrix * viewMatrix * pos;
-     
+        gl_Position = projectionMatrix * viewMatrix * pos;  
         vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz;
-        vert_normal1 *= flipped;
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
         vert_texcoord1 = mediumBlade3TC[i];
-
         EmitVertex();
     }
     EndPrimitive();
-#endif
 }
 
 vec3 mediumBlade[5] = vec3[](
@@ -146,124 +131,31 @@ vec3 tallBlade2[7] = vec3[](
     vec3(0,0,0)
 );
 
-// OLD
-/*vec3 shortBlade[4] = vec3[]( 
-    vec3(0.088837, 0.000000, 0.000000),
-    vec3(-0.087622, 0.000000, 0.000000), 
-    vec3(0.038313, 0.227795, 0.070106),
-    vec3(-0.087622, 0.374425, 0.263618)
-);
 
-vec3 mediumBlade[5] = vec3[]( 
-    vec3(-0.088230, 0.000000, 0.000000),
-    vec3(0.088230, 0.000000, 0.000000), 
-    vec3(-0.075922, 0.341586, -0.110473),
-    vec3(0.075922, 0.341586, -0.110473),
-    vec3(0.000000, 0.590890, -0.433083)
-);
 
-vec3 longBlade[7] = vec3[]( 
-    vec3(-0.088230, 0.000000, 0.000000),
-    vec3(0.088230, 0.000000, 0.000000), 
-    vec3(-0.088230, 0.341586, -0.009296),
-    vec3(0.088230, 0.341586, -0.009296),
-    vec3(-0.075922, 0.630581, -0.062587),
-    vec3(0.075922, 0.630581, -0.062587),
-    vec3(0.000000, 0.999042, -0.226456)
-);*/
-
-vec2 pattern[20] = vec2[]( 
-    vec2(0,0),
-    vec2(0.1,0),
-    vec2(0.2,0),
-    vec2(0.3,0),
-    vec2(0.4,0),
-    vec2(0.5,0),
-    vec2(0.1,0.1),
-    vec2(0.2,0.2),
-    vec2(0.3,0.3),
-    vec2(0.4,0.4),
-    vec2(0.5,0.5),
-    vec2(0,0.1),
-    vec2(0,0.2),
-    vec2(0,0.3),
-    vec2(0,0.4),
-    vec2(0,0.5),
-    vec2(0.1,0.2),
-    vec2(0.2,0.3),
-    vec2(0.3,0.4),
-    vec2(0.4,0.5)
-);
-
-vec2 pattern2[20] = vec2[]( 
-    vec2(0.45,0.45),
-    vec2(0.35,0.35),
-    vec2(0.30,0.30),
-    vec2(0.5,0.5),
-    vec2(0.45,0.55),
-    vec2(0.40,0.60),
-    vec2(0.30,0.70),
-    vec2(0.70,0.30),
-    vec2(0.60,0.40),
-    vec2(0.40,0.60),
-    vec2(0.43,0.72),
-    vec2(0.56,0.42),
-    vec2(0.25,0.75),
-    vec2(0.75,0.25),
-    vec2(0.53,0.23),
-    vec2(0.19,0.45),
-    vec2(0.18,0.72),
-    vec2(0.32,0.41),
-    vec2(0.25,0.67),
-    vec2(0.69,0.23)
-);
-
-void CreateImposter(vec3 position)
+void CreateQuad(vec3 position, vec3 cameraPosition)
 {
-    vec3 scale = vec3(1.8, 0.8, 1.8);
-	vec4 vertices[4];  
-	vertices[0] = vec4(position.x + scale.x, position.y + 2 * scale.y, position.z + scale.z, 1.0f);  
-	vertices[1] = vec4(position.x - scale.x, position.y + 2 * scale.y, position.z - scale.z, 1.0f);   
-	vertices[2] = vec4(position.x + scale.x, position.y, position.z + scale.z, 1.0f);  
-	vertices[3] = vec4(position.x - scale.x, position.y, position.z - scale.z, 1.0f);
-
-    vec2 texCoords[4];
-	texCoords[0] = vec2(0,0);
-	texCoords[1] = vec2(1,0);
-	texCoords[2] = vec2(0,1);
-	texCoords[3] = vec2(1,1);
-
-    // Output four vertices.
-    int i;
-    for(i = 0; i < 4; i++)
-    {
-        gl_Position = projectionMatrix * viewMatrix * vertices[i];
-        vert_normal1 = gs_normal_in[0];
-        vert_texcoord1 = texCoords[i];
-        vert_color1 = vec3(0,0,1);
-        EmitVertex();
-    }
+    // Scale.
+    vec2 scale = vec2(0.5, 0.5);
     
-    EndPrimitive();   
-}
-
-void CreateQuad(vec3 position, float angle)
-{
-    vec4 unit = vec4(0,0,1,0);
-    mat4 rotation;
-	rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
-	rotation[1] = vec4(0, 1, 0, 0);
-	rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
-	rotation[3] = vec4(0, 0, 0, 1);   
-    unit = rotation * unit;
-
-    vec3 scale = vec3(1.8, 0.8, 1.8);
+    // Local vertices.
 	vec4 vertices[4];  
-	vertices[0] = vec4(position.x + unit.x * scale.x, position.y + 2 * scale.y, position.z + unit.z * scale.z, 1.0f);  
-	vertices[1] = vec4(position.x - unit.x * scale.x, position.y + 2 * scale.y, position.z - unit.z * scale.z, 1.0f);   
-	vertices[2] = vec4(position.x + unit.x * scale.x, position.y, position.z + unit.z * scale.z, 1.0f);  
-	vertices[3] = vec4(position.x - unit.x * scale.x, position.y, position.z - unit.z * scale.z, 1.0f);
+	vertices[0] = vec4(-scale.x, scale.y, 0, 1.0f);  
+	vertices[1] = vec4(scale.x, scale.y, 0, 1.0f);   
+	vertices[2] = vec4(-scale.x, -scale.y, 0, 1.0f);  
+	vertices[3] = vec4(scale.x, -scale.y, 0, 1.0f);
 
+    // Billboard basis.
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    vec3 direction = normalize(position - cameraPosition);
+    vec3 side = normalize(cross(up, direction));
+    
+    mat4 billboardTransform;
+    billboardTransform[0] = vec4(side, 0);
+    billboardTransform[1] = vec4(up, 0);
+    billboardTransform[2] = vec4(direction, 0);
+    billboardTransform[3] = vec4(position, 1.0);
+    
     vec2 texCoords[4];
 	texCoords[0] = vec2(0,0);
 	texCoords[1] = vec2(1,0);
@@ -274,7 +166,7 @@ void CreateQuad(vec3 position, float angle)
     int i;
     for(i = 0; i < 4; i++)
     {
-        gl_Position = projectionMatrix * viewMatrix * vertices[i];
+        gl_Position = projectionMatrix * viewMatrix * billboardTransform * vertices[i];
         vert_texcoord1 = texCoords[i];
         vert_normal1 = gs_normal_in[0];
         EmitVertex();
@@ -285,13 +177,17 @@ void CreateQuad(vec3 position, float angle)
 
 void main() 
 {
+    // Average density.
     float avgDensity = gs_density_in[0];
+    
+    // Camera position.
+    vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
     
     if(gs_lod_in[0] == 0)
     {
         if(avgDensity > 0.1)
         {
-            CreateMediumBlade3(gl_in[0].gl_Position.xyz);
+            CreateMediumBlade3(gl_in[0].gl_Position.xyz, cameraPos);
         }     
     }
     else if(gs_lod_in[0] == 1)
@@ -300,6 +196,6 @@ void main()
     }
     else
     {
-
+        //CreateQuad(gl_in[0].gl_Position.xyz, cameraPos);
     }
 }

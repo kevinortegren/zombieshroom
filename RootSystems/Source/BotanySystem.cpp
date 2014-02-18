@@ -8,8 +8,7 @@ namespace RootForce
 	{
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
-		glm::vec3 pos = glm::vec3(0);
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferData(1, sizeof(glm::vec3), &pos);
+		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferData(1, sizeof(glm::vec3), &glm::vec3(0));
 
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
