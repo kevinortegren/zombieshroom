@@ -93,21 +93,32 @@ namespace Ragdoll
 			glm::mat4 toTrans = glm::mat4(1.0f);
 			
 			////Rotate the arms, for some reason this is required
-			//if(index < 6)
-			//{
-			//	if(index < 3) 
-			//		toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
-			//	else
-			//		toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
+			/*if(index < 6)
+			{
+			if(index < 3) 
+			toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
+			else
+			toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
 
-			//}
-			//else
+			}
+			else*/
 			{
 				toTrans *=  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];
 				
 				
 			}
-			
+			if(index < 3)
+			{
+
+				glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
+				//	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+
+				if(index < 3)
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
+				else
+					toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
+			}
+
 			toTrans *= m_boneOffset[index];
 			/*if(index < 6)
 			{
@@ -115,33 +126,45 @@ namespace Ragdoll
 			}*/
 			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
 			{
-				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.2f);
+				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.4f);
 				if(index == BodyPart::RIGHTARM)
 				{
-					m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) /** m_right.x*/);
-					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) /** m_right.z*/);
+					toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() + m_right.x* 0.8f);
+					toTrans[3].z  = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() + m_right.z* 0.8f);
+					/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
+					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
 				}
 				else
 				{
-					m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) /** m_right.x*/);
-					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) /** m_right.z*/);
+					toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - m_right.x* 0.8f);
+					toTrans[3].z = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - m_right.z* 0.8f);
+					/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
+					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
 				}
 			}
 			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
 			{
-					toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y + 0.1f);
+				btVector3 btAxis = (m_bodies[index + 1]->getWorldTransform().getRotation().getAxis());
+				glm::vec3 axis = glm::vec3(btAxis.x(), btAxis.y(), btAxis.z());
+				glm::vec3 rot = axis * 0.2f;
+			//	glm::vec3 rot = glm::rotate(glm::vec3(0.2f,0.2f,0.2f), m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
+				toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + rot.y;
+				if(index < 3)
+				{
+					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() + rot.x);
+					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() + rot.z);
+					
+				}
+				else
+				{
+					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.x);
+					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
+					//toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y);
+				}
+				
+					
 			}
-			//if(index < 6)
-			//{
-			//	
-			//	glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
-			////	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
-
-			//	if(index < 3)
-			//		toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
-			//	else
-			//		toTrans *= glm::rotate(glm::mat4(1.0f), -90.0f, front);
-			//}
+			
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
@@ -425,12 +448,10 @@ namespace Ragdoll
  		 	//Spine - Left upper arm
  			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
 			{
-				glm::vec3 rotFix = -m_right * (0.28f);
-			 	CalculateConstraintTransform(p_bodyA, p_bodyB, 
-					rotFix.x, 0.0f , rotFix.z,
-			 		-rotFix.x, 0.0f * OFFSET, -rotFix.z,
-			 		0 , 0, 1, 0, &localA, &localB);
-			 		 	
+				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+					0, 0.0f , 0,
+					-0, 0.0f * OFFSET, 0,
+					0 , 0, 1, 0, &localA, &localB); 	
 			 	btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
 			 	constraint->setLimit(-PI_2, 0, PI_2);
 			 	m_dynamicWorld->addConstraint(constraint);
@@ -440,12 +461,10 @@ namespace Ragdoll
 			////Spine - Right upper arm
 			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
 			{
-				glm::vec3 rotFix = m_right * (0.28f);			
 				CalculateConstraintTransform(p_bodyA, p_bodyB, 
-					-rotFix.x, 0.0f , -rotFix.z,
-					rotFix.x, 0.0f * OFFSET, rotFix.z,
-					0 , 0, 1, 0, &localA, &localB);
-			
+					0, 0.0f , 0,
+					-0, 0.0f * OFFSET, 0,
+					0 , 0, 1, 0, &localA, &localB); 	
 				btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
 				constraint->setLimit(-PI_2, 0, PI_2);
 				m_dynamicWorld->addConstraint(constraint);
