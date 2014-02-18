@@ -1,7 +1,7 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
-#define VERTICES_OUTPUT 10
+#define VERTICES_OUTPUT 1
 
 layout(triangles) in;
 layout(points, max_vertices = VERTICES_OUTPUT) out;
@@ -45,13 +45,18 @@ void main()
     // Calculate area.
     float area = length(cross(ab, ac)) / 2;
     
+    int nrPlants = int(gs_density_in[0] * area * 2.0);
+    
     int i;
     for(i = 0; i < VERTICES_OUTPUT; i++)
     {
-        vert_pos = GetRandomPosition(a, b, ab, ac, i);
-        vert_normal	= gs_normal_in[0];
-        vert_density = gs_density_in[0];
-        EmitVertex();
-        EndPrimitive();
+        if(i < nrPlants)
+        {   
+            vert_pos = GetRandomPosition(a, b, ab, ac, i);
+            vert_normal	= gs_normal_in[0];
+            vert_density = gs_density_in[0];
+            EmitVertex();
+            EndPrimitive();
+        }
     }    
 }

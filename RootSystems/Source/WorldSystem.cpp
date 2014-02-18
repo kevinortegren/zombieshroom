@@ -195,6 +195,7 @@ namespace RootForce
 
 			Render::RenderJob job;
 			job.m_mesh = renderable->m_model->m_meshes[0];
+			job.m_shadowMesh = renderable->m_model->m_meshes[0];
 			job.m_material = renderable->m_material;
 			job.m_flags = renderable->m_renderFlags;
 			job.m_renderPass = renderable->m_pass;

@@ -36,6 +36,7 @@
       textures:
         - name: g_Diffuse
           slot: 0
+
       programs:
         - name: Botany_Render
           shaders:
@@ -45,3 +46,6 @@
               type: geometry
             - name: botany_render
               type: fragment
+              
+          # Alpha-Blend.
+          blend: 0

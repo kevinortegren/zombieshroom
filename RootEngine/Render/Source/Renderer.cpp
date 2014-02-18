@@ -867,6 +867,7 @@ namespace Render
 
 	void GLRenderer::Compute( ComputeJob* p_job )
 	{
+#ifdef RENDER_USE_COMPUTE
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
@@ -900,6 +901,7 @@ namespace Render
 				(*texture).second->UnBindImage((*texture).first);
 			}
 		}
+#endif
 	}
 
 	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )

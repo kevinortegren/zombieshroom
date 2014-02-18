@@ -310,6 +310,7 @@ namespace RootForce
 		}
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
+
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
 		if(RootServer::MatchAny(event.EventType, 3, "R", "render", "Render"))

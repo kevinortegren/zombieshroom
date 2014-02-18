@@ -47,7 +47,7 @@ vec3 GetVSPositionFromDepth(vec2 texcoord)
 
 void main() {
 
-    vec2 TexCoord = gl_FragCoord.xy / vec2(1280,720);
+    vec2 TexCoord = gl_FragCoord.xy / textureSize(g_Diffuse, 0);
 
     // Position.
     vec3 position = GetVSPositionFromDepth(TexCoord);
