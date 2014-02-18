@@ -54,7 +54,7 @@ struct UpdateMessage
 
 struct Flags
 {
-	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard, _AbilitySpawnPoint;
+	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard, _AbilitySpawnPoint, _NoRender;
 	int _PaintStatus; // -1: False, 0: Painting, 1: Painted
 
 	Flags()
@@ -66,6 +66,7 @@ struct Flags
 		_Water = false;
 		_Hazard = false;
 		_AbilitySpawnPoint = false;
+		_NoRender = false;
 		_PaintStatus = -1;
 	}
 };
@@ -79,9 +80,6 @@ struct Transform
 	glm::vec3 scale;
 	glm::vec3 rotPivot;
 	glm::vec3 scalePivot;
-	//glm::mat4x4 transform;
-	//char flags[g_maxNrOfFlags][g_shortMaxNameLength];
-	//int nrOfFlags;
 	Flags flags;
 
 	Transform()
@@ -92,8 +90,6 @@ struct Transform
 		scale = glm::vec3(0,0,0);
 		rotPivot = glm::vec3(0,0,0);
 		scalePivot = glm::vec3(0,0,0);
-		//transform = glm::mat4x4;
-		//nrOfFlags = 0;
 	}
 };
 
@@ -107,7 +103,6 @@ struct Mesh
 	glm::vec3 tangent[g_maxVerticesPerMesh];
 	glm::vec3 binormal[g_maxVerticesPerMesh];
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
-	//int indices[g_maxVerticesPerMesh*3];
 	char materialName[g_maxNameLength];
 	char modelName[g_maxNameLength];
 	int paintIndex;	//ska sätta om -1 så har den ingen.
@@ -130,7 +125,6 @@ struct MegaMesh
 	glm::vec3 tangent[g_maxVerticesPerMegaMesh];
 	glm::vec3 binormal[g_maxVerticesPerMegaMesh];
 	int MaterialID; //Added so that a mesh can get a material on 3d viewers side.
-	//int indices[g_maxVerticesPerMesh*3];
 	char materialName[g_maxNameLength];
 	char modelName[g_maxNameLength];
 	int paintIndex;	//ska sätta om -1 så har den ingen.

@@ -351,13 +351,6 @@ void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
 	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
 	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
 
-	//PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
-	//for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
-	//{
-	//	memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
-	//	memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
-	//}
-
 	PlocatorList[index]->transformation.flags = locatorList[index].transformation.flags;
 	ReleaseMutex(LocatorMutexHandle);
 }

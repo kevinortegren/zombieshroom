@@ -736,6 +736,8 @@ void getMeshFlags(MObject object, Transform& transformation)
 					transformation.flags._Transparent = true;
 				if(name == "Water")
 					transformation.flags._Water = true;
+				if(name == "NoRender")
+					transformation.flags._NoRender = true;
 
 				getMeshFlags(trans.parent(i), transformation);
 			}
@@ -770,28 +772,6 @@ void getLocatorFlags(MObject object, int index)
 
 				if(name == "Water")
 					SM.locatorList[index].transformation.flags._Water = true;
-
-				//for(int j = 0; j < g_maxNrOfFlags; j ++)
-				//{
-				//	if(alreadyExists == false)
-				//	{					
-				//		if(name.compare(SM.locatorList[index].transformation.flags[j]) == 0)
-				//		{
-				//			alreadyExists = true;
-				//			//Print("Flag exists skipping...");
-				//		}
-				//		else
-				//		{
-				//			if(SM.locatorList[index].transformation.flags[j][0] == NULL)
-				//			{
-				//				memcpy(SM.locatorList[index].transformation.flags[j], temp.name().asChar(), g_shortMaxNameLength);
-				//				//Print("Added flag ", SM.locatorList[index].transformation.flags[j], " to ", SM.locatorList[index].transformation.name, " at index ", j);
-				//				SM.locatorList[index].transformation.nrOfFlags ++;
-				//				alreadyExists = true;
-				//			}
-				//		}
-				//	}
-				//}
 
 				getLocatorFlags(trans.parent(i), index);
 			}
@@ -1317,26 +1297,6 @@ void MayaLocatorToList(MObject object)
 		MObject transObj = trans.object();
 		UpdateTransformation(SM.locatorList[index].transformation, transObj);
 		memcpy(SM.locatorList[index].transformation.name, locator.name().asChar(), locator.name().numChars());
-
-		//trans.getScale(scale);
-		//trans.getRotationQuaternion(rotX, rotY, rotZ, rotW, MSpace::kPreTransform);
-
-		//position.x = trans.getTranslation(g_space_world).x;
-		//position.y = trans.getTranslation(g_space_world).y;
-		//position.z = trans.getTranslation(g_space_world).z;
-
-		//SM.locatorList[index].transformation.position.x = position.x;
-		//SM.locatorList[index].transformation.position.y = position.y;
-		//SM.locatorList[index].transformation.position.z = position.z;
-
-		//SM.locatorList[index].transformation.scale.x = scale[0];
-		//SM.locatorList[index].transformation.scale.y = scale[1];
-		//SM.locatorList[index].transformation.scale.z = scale[2];
-
-		//SM.locatorList[index].transformation.rotation.x = rotX;
-		//SM.locatorList[index].transformation.rotation.y = rotY;
-		//SM.locatorList[index].transformation.rotation.z = rotZ;
-		//SM.locatorList[index].transformation.rotation.w = rotW;
 
 		getLocatorFlags(locator.parent(0), index);
 

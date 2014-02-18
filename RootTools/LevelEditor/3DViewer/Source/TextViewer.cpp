@@ -156,12 +156,6 @@ int main(int argc, char* argv[])
 				std::deque<UpdateMessage> localMessages;
 				int numberMessages = 0;
 
-				if(type != "")
-				{
-					cout << type << " ID " << updateID << endl;
-					//cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
-				}
-
 				// GET EXPORT STATE
 				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
 				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
@@ -441,7 +435,7 @@ void LoadSceneFromMaya()
 		ReleaseMutex(RM.MeshMutexHandle);
 
 		Entities.push_back(CreateMeshEntity(&m_world, name, i, false));
-		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
+		//auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
 		//auto mesh = model->m_meshes[0];
 		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
 		//mesh->SetVertexBuffer(buffer);
@@ -713,6 +707,9 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 		p_world->GetGroupManager()->RegisterEntity("Water", entity);
 		p_world->GetGroupManager()->RegisterEntity("NonExport", entity);
 	}
+
+	if(transformation.flags._NoRender)
+		p_world->GetGroupManager()->RegisterEntity("NoRender", entity);
 }
 
 float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
@@ -792,8 +789,36 @@ string modelExists(int meshIndex)
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
+	bool noRender = false;
+
+	if(ItsAmegaMesh)
+	{
+		if(RM.PmegaMeshes[index]->transformation.flags._NoRender)
+		{
+			noRender = true;
+		}
+	}
+	else
+	{
+		if(RM.PmeshList[index]->transformation.flags._NoRender)
+		{
+			noRender = true;
+		}
+	}
 
 	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+
+	if(!noRender)
+	{
+		renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
+		renderable->m_model->m_transform = glm::mat4x4(1);
+	}
+	else
+	{
+		RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+		rendy->m_material = nullptr;
+		rendy->m_model = nullptr;
+	}
 
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
@@ -802,10 +827,6 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 		p_name = modelExists(index);
 
 	ReleaseMutex(RM.MeshMutexHandle);
-
-	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
-
-	renderable->m_model->m_transform = glm::mat4x4(1);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
@@ -819,16 +840,6 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 	{
 		RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
 	}
-
-	//for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
-	//{
-	//	p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
-	//}
-	//p_world->GetGroupManager()->RegisterEntity("Static", entity);
-	//p_world->GetGroupManager()->UnregisterEntity("Static", entity);
-
-
-
 
 	return entity;
 }
@@ -873,11 +884,6 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	particle->m_name = p_name;
 	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
 		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
-
-	//for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
-	//{
-	//	p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
-	//}
 
 	RegisterEntityFlags(RM.PlocatorList[index]->transformation, entity, p_world);
 
@@ -974,8 +980,9 @@ void LoadLocators()
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 
 		if(RM.PlocatorList[i]->transformation.flags._AbilitySpawnPoint)
-			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
-
+		{
+			locatorEntities.push_back(CreateParticleEntity(&m_world, "AbilitySpawn", i));
+		}
 		if(RM.PlocatorList[i]->transformation.flags._Water)
 		{
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
@@ -993,6 +1000,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 {
 	int MeshIndex = -1;
 	int RemoveMeshIndex = -1;
+	bool NoRender = false;
 
 	if(remove)
 	{
@@ -1005,13 +1013,13 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		RemoveMeshIndex = -1;
 	}
 
-
 	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 	numberMeshes = *RM.NumberOfMeshes;	
 
 	if(MeshIndex != -1)					
 	{
+		NoRender = RM.PmeshList[MeshIndex]->transformation.flags._NoRender;
 		bool newMaterial = false;
 		int size = Entities.size()-1;
 		if(MeshIndex > size)
@@ -1040,13 +1048,9 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			if(RM.PmeshList[MeshIndex]->MaterialID >= 0 && RM.PmeshList[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
 				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex, false);
 			
-			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+
 
 			Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
-			//{
-			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-			//}
 
 			/// ROTATION
 			glm::quat rotation;
@@ -1072,10 +1076,6 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
 			transform->m_position += modifiedPos;
 
-			//cout << "position x " << transform->m_position.x << endl;
-			//cout << "position y " << transform->m_position.y << endl;
-			//cout << "position z " << transform->m_position.z << endl;
-
 			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
 
 			float x,y,z;
@@ -1083,20 +1083,16 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			y = atan2(-rotationTest[2][0], sqrt(pow(rotationTest[2][1],2) + pow(rotationTest[2][2],2)));
 			z = atan2(rotationTest[1][0], rotationTest[0][0]);
 
-				
-			//cout << "rot x " << -glm::degrees(x) << endl;
-			//cout << "rot y " << -glm::degrees(y) << endl;
-			//cout << "rot z " << -glm::degrees(z) << endl;
-
 			// Get material connected to mesh and set it from materiallist
-			
-			rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
-
-			
+			if(!NoRender)
+			{
+				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+				rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));				
+			}
 		}
 		
 
-		if(updateShape)
+		if(updateShape && !NoRender)
 		{
 		// COPY VERTICES
 		Render::Vertex1P1N1UV1T1BT* m_vertices;
@@ -1343,21 +1339,23 @@ void ExportToLevel()
 {
 	for(int i = 0; i < Entities.size(); i++)
 	{
-		//UPDATE modelName for all Entities from shared memory
-
-		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
-		string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
-		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
-
 		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		//UPDATE modelName for all Entities from shared memory
+
 		string name = RM.PmeshList[i]->modelName;
+		if(!RM.PmeshList[i]->transformation.flags._NoRender)
+		{
+			RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
+			string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
+			mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+			mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
+		}
+
 		ReleaseMutex(RM.MeshMutexHandle);
 
 		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
 		collision->m_meshHandle = name + "0";
-
-		mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 	}
 
 	for(int i = 0; i < MegaMeshes.size(); i++)
