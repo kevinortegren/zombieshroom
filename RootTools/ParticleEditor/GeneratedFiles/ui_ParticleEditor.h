@@ -120,6 +120,7 @@ public:
     QWidget *tab;
     QTreeView *modelTreeView;
     QTreeView *modeltexTreeView;
+    QPushButton *removeObjectButton;
     QGroupBox *groupBox;
     QListWidget *listWidget;
     QFrame *frame;
@@ -288,12 +289,16 @@ public:
         gridLayout_3->setContentsMargins(0, 0, 0, 0);
         orbitRadiusSpinBox = new QDoubleSpinBox(gridLayoutWidget_3);
         orbitRadiusSpinBox->setObjectName(QStringLiteral("orbitRadiusSpinBox"));
+        orbitRadiusSpinBox->setMinimum(-100);
+        orbitRadiusSpinBox->setMaximum(100);
         orbitRadiusSpinBox->setSingleStep(0.1);
 
         gridLayout_3->addWidget(orbitRadiusSpinBox, 1, 1, 1, 1);
 
         orbitSpeedSpinBox = new QDoubleSpinBox(gridLayoutWidget_3);
         orbitSpeedSpinBox->setObjectName(QStringLiteral("orbitSpeedSpinBox"));
+        orbitSpeedSpinBox->setMinimum(-100);
+        orbitSpeedSpinBox->setMaximum(100);
         orbitSpeedSpinBox->setSingleStep(0.1);
 
         gridLayout_3->addWidget(orbitSpeedSpinBox, 0, 1, 1, 1);
@@ -575,10 +580,16 @@ public:
         tab->setObjectName(QStringLiteral("tab"));
         modelTreeView = new QTreeView(tab);
         modelTreeView->setObjectName(QStringLiteral("modelTreeView"));
-        modelTreeView->setGeometry(QRect(6, 4, 497, 415));
+        modelTreeView->setGeometry(QRect(6, 28, 497, 391));
         modeltexTreeView = new QTreeView(tab);
         modeltexTreeView->setObjectName(QStringLiteral("modeltexTreeView"));
         modeltexTreeView->setGeometry(QRect(6, 422, 497, 339));
+        removeObjectButton = new QPushButton(tab);
+        removeObjectButton->setObjectName(QStringLiteral("removeObjectButton"));
+        removeObjectButton->setGeometry(QRect(6, 4, 497, 23));
+        QFont font2;
+        font2.setPointSize(9);
+        removeObjectButton->setFont(font2);
         tabWidget->addTab(tab, QString());
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -701,9 +712,9 @@ public:
         label_4 = new QLabel(dockWidgetContents);
         label_4->setObjectName(QStringLiteral("label_4"));
         label_4->setGeometry(QRect(10, 0, 59, 39));
-        QFont font2;
-        font2.setPointSize(15);
-        label_4->setFont(font2);
+        QFont font3;
+        font3.setPointSize(15);
+        label_4->setFont(font3);
         lookAtSpinBoxY = new QDoubleSpinBox(dockWidgetContents);
         lookAtSpinBoxY->setObjectName(QStringLiteral("lookAtSpinBoxY"));
         lookAtSpinBoxY->setGeometry(QRect(102, 58, 47, 22));
@@ -734,9 +745,9 @@ public:
         label_18 = new QLabel(dockWidgetContents);
         label_18->setObjectName(QStringLiteral("label_18"));
         label_18->setGeometry(QRect(4, 52, 63, 31));
-        QFont font3;
-        font3.setPointSize(11);
-        label_18->setFont(font3);
+        QFont font4;
+        font4.setPointSize(11);
+        label_18->setFont(font4);
         dockWidget->setWidget(dockWidgetContents);
         ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
         colorDockWidget = new QDockWidget(ParticleEditorClass);
@@ -951,6 +962,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Textures", 0));
+        removeObjectButton->setText(QApplication::translate("ParticleEditorClass", "Remove model", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("ParticleEditorClass", "Models", 0));
         groupBox->setTitle(QApplication::translate("ParticleEditorClass", "Emitters", 0));
         groupBox_6->setTitle(QApplication::translate("ParticleEditorClass", "Manage emitters", 0));

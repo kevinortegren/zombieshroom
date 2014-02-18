@@ -19,6 +19,9 @@ namespace Render
 		m_backgroundAlphaBlend = lightingEffect->GetTechniques()[0]->GetPrograms()[4];
 		m_backgroundAddative = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
 
+		Render::EffectInterface* ssaoEffect = g_context.m_resourceManager->LoadEffect("Renderer/SSAO");
+		m_ssaoTech = ssaoEffect->GetTechniques()[0];
+
 		m_fullscreenQuad = p_fullscreenQuad;
 
 		// Load unit sphere mesh.
@@ -37,11 +40,19 @@ namespace Render
 
 		m_la = p_renderer->CreateTexture();
 		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_ssaoTex = p_renderer->CreateTexture();
+		m_ssaoTex->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_noiseSSAOTex = p_renderer->CreateTexture();
+		m_noiseSSAOTex->CreateEmptyTexture(4,4, TextureFormat::TEXTURE_RG16);
+		m_noiseSSAOTex->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		m_noiseSSAOTex->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_ssaoTex->GetHandle(), 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, p_gbuffer->m_depthTexture->GetHandle(), 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		SetupSSAO();
 	}
 
 	void LightingDevice::SetAmbientLight(const glm::vec4& p_color)
@@ -72,11 +83,27 @@ namespace Render
 		m_lights->BufferSubData(0, sizeof(m_lightVars), &m_lightVars);
 	}
 
+	void LightingDevice::SSAO()
+	{
+		m_fullscreenQuad->Bind();
+		//SSAO
+		BeginSSAO();
+		glDisable(GL_STENCIL_TEST);
+		auto ssao = m_ssaoTech->GetPrograms()[0];
+		m_noiseSSAOTex->Bind(7);
+		m_ssaoTech->Apply();
+		ssao->Apply();
+		m_fullscreenQuad->Draw();
+		glEnable(GL_STENCIL_TEST);
+	}
+
 	void LightingDevice::Ambient()
 	{
 		m_fullscreenQuad->Bind();
 		m_ambient->Apply();
+		m_ssaoTex->Bind(7);
 		m_fullscreenQuad->Draw();
+		m_ssaoTex->Unbind(7);
 		m_fullscreenQuad->Unbind();
 	}
 
@@ -156,6 +183,61 @@ namespace Render
 		m_fullscreenQuad->Unbind();
 	}
 
+	void LightingDevice::SetupSSAO()
+	{
+		srand (static_cast <unsigned> (time(0)));
+		int kernelSize = 16;
+		for (int i = 0; i < kernelSize; ++i)
+		{
+			m_kernel[i] = glm::vec4(
+				Random(-1.0f, 1.0f),
+				Random(-1.0f, 1.0f),
+				Random(0.0f, 1.0f),
+				0.0f);
+			m_kernel[i] = glm::normalize(m_kernel[i]);
+			//m_kernel[i] *= Random(0.0f, 1.0f);
+			float scale = float(i) / float(kernelSize);
+			scale = glm::mix<float>(0.1f, 1.0f, scale * scale);
+			m_kernel[i] *= scale;
+			//g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Kernel X: %f, Y: %f, Z: %f", m_kernel[i].x, m_kernel[i].y, m_kernel[i].z);
+		}
+
+		for(int i = 0; i < kernelSize; i++)
+		{
+			//g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Length: %f", glm::length(m_kernel[i]));
+		}
+
+		BufferInterface* ssaoBuff = m_ssaoTech->GetBufferInterface();
+		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0]);
+
+		const int noiseSize = 16;
+		glm::vec2 noise[noiseSize];
+		for (int i = 0; i < noiseSize; ++i) {
+			noise[i] = glm::vec2(
+				Random(-1.0f, 1.0f),
+				Random(-1.0f, 1.0f));
+			noise[i] = glm::normalize(noise[i]);
+		}
+
+		m_noiseSSAOTex->BufferData(&noise[0]);
+	};
+
+	void LightingDevice::BeginSSAO()
+	{
+		// Bind la-buffer.
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		GLenum buffers[] = {GL_COLOR_ATTACHMENT1};
+		glDrawBuffers(1, buffers);
+
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glStencilMask(0x00);
+
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+
 	/*void LightingDevice::Process(Mesh& p_fullscreenQuad, int p_backgroundEffect)
 	{
 
@@ -214,4 +296,10 @@ namespace Render
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
+
+	float LightingDevice::Random( float p_low, float p_high )
+	{
+		return p_low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(p_high-p_low)));
+	}
+
 }
