@@ -28,7 +28,7 @@ namespace RootForce
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)
 				throw std::runtime_error("Failed to create RakNet client");
 
-			// Create a client entity
+			// Create a new client entity.
 			ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
 			m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
 			m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
