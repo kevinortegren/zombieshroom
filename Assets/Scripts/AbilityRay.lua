@@ -1,18 +1,18 @@
-MagicMissile = {};
-MagicMissile.damage = 0;
-MagicMissile.pushback = 0;
-MagicMissile.cooldown = 5;
-MagicMissile.chargeTime = 0.0;
-MagicMissile.channelingTime = 0.0;
+AbilityRay = {};
+AbilityRay.damage = 0;
+AbilityRay.pushback = 0;
+AbilityRay.cooldown = 5;
+AbilityRay.chargeTime = 0.0;
+AbilityRay.channelingTime = 0.0;
 
-function MagicMissile.ChargeDone(time, userId, actionId)
+function AbilityRay.ChargeDone(time, userId, actionId)
 end
 
-function MagicMissile.ChannelingDone(time, userId, actionId)
-	MagicMissile.OnCreate(userId, actionId);
+function AbilityRay.ChannelingDone(time, userId, actionId)
+	AbilityRay.OnCreate(userId, actionId);
 end
 
-function MagicMissile.OnCreate (userId, actionId)
+function AbilityRay.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");
 	local self = Entity.New();
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -24,19 +24,21 @@ function MagicMissile.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	collisionComp:CreateHandle(self, 1, true);
-	local scriptComp = Script.New(self, "MagicMissile");
+	local scriptComp = Script.New(self, "AbilityRay");
 	colRespComp:SetContainer(collisionComp);
 	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Missile handle: "..collisionComp:GetHandle());
 	physicsComp:ShootRay(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 1000);
+ 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
 	transformComp:SetPos(posVec);
 	if Global.IsClient then
+  	local particleComp = ParticleEmitter.New(self, "AbilityRay");
 	end
 	local playerComponent = playerEnt:GetPlayerComponent();
-	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), MagicMissile.cooldown);
+	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityRay.cooldown);
 end
 
-function MagicMissile.OnCollide (self, entity)
+function AbilityRay.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
@@ -53,7 +55,7 @@ function MagicMissile.OnCollide (self, entity)
 	end
 end
 
-function MagicMissile.OnDestroy (self)
+function AbilityRay.OnDestroy (self)
 	--local network = self:GetNetwork();
 	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
