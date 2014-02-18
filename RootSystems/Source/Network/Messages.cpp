@@ -341,7 +341,7 @@ namespace RootForce
 				case ComponentType::PLAYER:
 				case ComponentType::TDMRULES:
 				case ComponentType::PLAYERPHYSICS:
-				//case ComponentType::ABILITYSPAWN:
+				case ComponentType::ABILITYSPAWN:
 					return true;
 				default:
 					return false;
@@ -391,9 +391,9 @@ namespace RootForce
 					Serialize(true, p_bs, (RootForce::PlayerPhysics*) p_component);
 				return true;
 
-			//	case ComponentType::ABILITYSPAWN:
-			//		Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
-			//	return true;
+				case ComponentType::ABILITYSPAWN:
+					Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
+				return true;
 			}
 
 			return false;
