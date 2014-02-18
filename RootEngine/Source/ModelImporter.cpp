@@ -18,8 +18,9 @@ namespace RootEngine
 		
 	}
 
-	Model* ModelImporter::LoadModel(const std::string p_fileName)
+	Model* ModelImporter::LoadModel(const std::string p_fileName, bool p_noRender)
 	{
+		m_noRender = p_noRender;
 		m_model = new Model(); //Owned by ResourceManager
 
 		std::shared_ptr<Assimp::Importer> m_importer = std::shared_ptr<Assimp::Importer>(new Assimp::Importer);
@@ -62,7 +63,10 @@ namespace RootEngine
 	{
 		for(unsigned i = 0; i < p_node->mNumMeshes; ++i)
 		{
-			InitMesh(i, p_scene->mMeshes[i], p_filename);
+			if(m_noRender)
+				InitPhysicsMesh(i, p_scene->mMeshes[i], p_filename);
+			else
+				InitMesh(i, p_scene->mMeshes[i], p_filename);
 
 			memcpy(&m_model->m_transform, &p_node->mTransformation, sizeof(aiMatrix4x4));
 			m_model->m_transform = glm::transpose(m_model->m_transform);
@@ -242,6 +246,49 @@ namespace RootEngine
 		m_model->m_meshes[1] = nullptr;
 	}
 
+	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
+	{
+		if(m_context->m_physics)
+		{
+			std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
+
+			if(!p_aiMesh->HasPositions())
+			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %s, missing vertex position data.", handle.c_str());
+				return;
+			}
+
+			//Read vertex positions from mesh
+			std::vector<glm::vec3> positions;
+			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) 
+			{
+				const aiVector3D* pPos	= &(p_aiMesh->mVertices[i]);
+				glm::vec3 pos			= glm::vec3(pPos->x, pPos->y, pPos->z);
+				positions.push_back(pos);
+			}
+			//Read indices from mesh
+			std::vector<unsigned int> indices;
+			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
+			{
+				const aiFace& Face = p_aiMesh->mFaces[i];
+				if(Face.mNumIndices != 3)
+				{
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+				}
+				indices.push_back(Face.mIndices[0]);
+				indices.push_back(Face.mIndices[1]);
+				indices.push_back(Face.mIndices[2]);
+			}
+
+			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+
+			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+
+			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+			m_model->m_physicsMeshes.push_back(pmesh.get());
+		}
+	}
+
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d materials to model", p_scene->mNumMaterials);
@@ -355,9 +402,6 @@ namespace RootEngine
 		cutPath		= cutPath.substr(0, dotIndex);
 		return cutPath;
 	}
-
-	
-
 }
 
 #endif
