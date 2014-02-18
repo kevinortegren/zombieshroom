@@ -610,6 +610,18 @@ namespace RootForce
 					// Set the new client state
 					clientComponent->State = ClientState::AWAITING_USER_CONNECT;
 				} return true;
+
+				case NetworkMessage::MessageType::AbilitySpawn:
+					{
+						NetworkMessage::AbilitySpawn m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* point = g_networkEntityMap[m.ID];
+
+						RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
+						component->AbilityReceived = m.AbilityName;
+
+					} return true;
 			}
 
 			return false;

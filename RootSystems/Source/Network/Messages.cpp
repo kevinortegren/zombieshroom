@@ -165,7 +165,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, Seconds);
 		}
-
+		
 		void SetKillCount::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, Count);
@@ -184,6 +184,11 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, KillCount);
 		}
 
+		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, ID);
+			p_bs->Serialize(p_writeToBitstream, AbilityName);
+		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{

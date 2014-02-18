@@ -67,7 +67,9 @@ namespace RootForce
 				SetGameMode,
 				SetMatchTime,
 				SetKillCount,
-				ServerInformation
+				ServerInformation,
+				TimeUp,
+				AbilitySpawn,
 			};
 		}
 
@@ -357,7 +359,13 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
+		struct AbilitySpawn
+		{
+			Network::NetworkEntityID ID;
+			RakNet::RakString AbilityName;
 
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 
 		/*
 			Serialize functions for components

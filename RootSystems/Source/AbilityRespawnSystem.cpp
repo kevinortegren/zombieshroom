@@ -66,7 +66,10 @@ namespace RootForce
 		{
 			
 			//Add new components to the spawnpoint and give it a new current ability
-			RevealSpawnpoint(p_entity);
+			if(respawn->AbilityReceived.compare("") == 0)
+				NewCurrentAbility(p_entity);
+			else
+				RevealSpawnpoint(p_entity);
 		}
 		respawn->Timer -= dt;
 		transform->m_orientation.Rotate(0 , dt * 50.0f , 0);
@@ -106,14 +109,6 @@ namespace RootForce
 			//Create a random current ability from the ability pack
 			NewCurrentAbility(itr->second);
 
-			//Setup the renderable component for the first time
-			CreateRenderComponent(itr->second);
-
-			//Do the same for the two collision components
-			CreateCollisionComponents(itr->second);
-
-			//And the particle emitter component
-			//CreateParticleEmitter(itr->second);  Is imported from the level file
 
 		}
 	}
@@ -141,7 +136,7 @@ namespace RootForce
 	void AbilityRespawnSystem::RevealSpawnpoint( ECS::Entity* p_entity )
 	{
 		
-		NewCurrentAbility(p_entity);
+		SetClientCurrentAbility(p_entity);
 		
 		CreateRenderComponent(p_entity);
 
@@ -153,14 +148,41 @@ namespace RootForce
 
 	void AbilityRespawnSystem::NewCurrentAbility( ECS::Entity* p_entity )
 	{
-		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+		if(m_serverPeer != nullptr)
+		{
+			Network::NetworkComponent* network = m_network.Get(p_entity);
 
-		unsigned chosenSpawn = rand()%m_levelAbilities.size();
-		respawn->CurrentAbility.Name = m_levelAbilities.at(chosenSpawn);
-		respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
-		respawn->CurrentAbility.OnCooldown = false;
-		respawn->Claimed = Network::ReservedUserID::NONE;
+			unsigned chosenSpawn = rand()%m_levelAbilities.size();
+
+			RootForce::NetworkMessage::AbilitySpawn m;
+			m.ID = network->ID;
+			m.AbilityName = RakNet::RakString(m_levelAbilities.at(chosenSpawn).c_str());
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilitySpawn);
+			m.Serialize(true, &bs);
+
+			m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+		}
 	}
+
+
+	void AbilityRespawnSystem::SetClientCurrentAbility( ECS::Entity* p_entity )
+	{
+		if(m_clientPeer != nullptr)
+		{
+			AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+
+			respawn->CurrentAbility.Name = respawn->AbilityReceived;
+			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
+			respawn->CurrentAbility.OnCooldown = false;
+			respawn->Claimed = Network::ReservedUserID::NONE;
+			respawn->AbilityReceived = "";
+		}
+	}
+
 
 	void AbilityRespawnSystem::CreateRenderComponent(ECS::Entity* p_entity)
 	{
