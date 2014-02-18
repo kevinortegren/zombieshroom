@@ -193,7 +193,7 @@ namespace Render
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 1024, 1024);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
