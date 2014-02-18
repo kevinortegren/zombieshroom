@@ -213,7 +213,6 @@ namespace RootForce
 							}
 
 							// Call the OnCreate script
-							g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Calling Player:OnCreate from Message::UserConnected");
 							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
 							g_engineContext.m_script->AddParameterNumber(m.User);
 							g_engineContext.m_script->AddParameterNumber(ReservedActionID::CONNECT);
@@ -234,7 +233,7 @@ namespace RootForce
 							clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 						}
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d: %s): %s", m.User, p_packet->systemAddress.ToString(), m.Name.C_String());
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d): %s", m.User, m.Name.C_String());
 					}
 					else
 					{
@@ -1857,7 +1856,7 @@ namespace RootForce
 
 												NetworkMessage::UserConnected n;
 												n.User = userID;
-												n.IsYou = false;
+												n.IsYou = addresses[i] == p_packet->systemAddress;
 												n.Name = RakNet::RakString(otherPlayerComponent->Name.c_str());
 
 												RakNet::BitStream bs;
