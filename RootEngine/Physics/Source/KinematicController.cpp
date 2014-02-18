@@ -147,7 +147,10 @@ void KinematicController::Update(float p_dt)
 void KinematicController::Jump()
 {
 	if(m_kinController->canJump())
+	{
+		m_kinController->StopKnockback();
 		m_kinController->jump();
+	}
 }
 
 void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
@@ -222,6 +225,7 @@ void KinematicController::Deactivate()
 void KinematicController::Activate()
 {
 	m_activated = true;
+	m_kinController->StopKnockback();
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
-	m_kinController->Knockback(btVector3(1,1,1),0);
+	
 }

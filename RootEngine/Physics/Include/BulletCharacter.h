@@ -15,6 +15,7 @@ public:
 	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
+	void StopKnockback();
 	void stepForwardAndStrafe ( btCollisionWorld* collisionWorld, const btVector3& walkMove);
 	void stepDown ( btCollisionWorld* collisionWorld, btScalar dt);
 	void stepUp ( btCollisionWorld* world);

@@ -491,3 +491,9 @@ float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, bt
 	m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
 	return callback.m_closestHitFraction;
 }
+
+void BulletCharacter::StopKnockback()
+{
+	m_knockbackVelocity.setZero();
+	m_hasBeenKnockbacked = false;
+}
