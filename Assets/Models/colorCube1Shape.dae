@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/ColorCube2.1</source_data>
+      <source_data>file:///C:/Users/BTH/Desktop/ColorCube2.0</source_data>
     </contributor>
-    <created>2014-02-18T10:45:26</created>
-    <modified>2014-02-18T10:45:26</modified>
+    <created>2014-02-18T11:35:20</created>
+    <modified>2014-02-18T11:35:20</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>

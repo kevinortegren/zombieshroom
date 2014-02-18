@@ -13,23 +13,19 @@
     - 13
     - 14
     - 15
-    - 16
-    - 17
-    - 18
 - Components:
     - Type: 0
       Data:
-        - Entity: 13
+        - Entity: 11
           Model: colorCube1Shape
           Material:
             Name: lambert2
             Effect: Mesh
             Diffuse: ColorGrid
+        - Entity: 12
+        - Entity: 13
         - Entity: 14
         - Entity: 15
-        - Entity: 16
-        - Entity: 17
-        - Entity: 18
     - Type: 1
       Data:
         - Entity: 0
@@ -37,90 +33,74 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 3
-          Position: [-190.489, 33.0818, 0]
+          Position: [-378.025, 35.8909, 375.013]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 4
-          Position: [-190.489, 33.0818, 0]
+          Position: [369.821, 35.8909, 375.013]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 5
-          Position: [-190.489, 32.5596, -44.8878]
+          Position: [369.821, 35.8909, -373.819]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 6
-          Position: [-190.489, 32.5596, -44.8878]
+          Position: [-374.671, 35.8909, -373.819]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 7
-          Position: [-190.489, 31.9818, -82.4814]
+          Position: [-9.79986, 0.346393, 375.013]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 8
-          Position: [-190.489, 31.9818, -82.4814]
+          Position: [369.821, 0.0902576, -23.4942]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 9
-          Position: [-190.489, 31.9818, -125.208]
+          Position: [-5.14987, 0.165263, -373.819]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 10
-          Position: [-190.489, 31.9818, -125.208]
+          Position: [-374.671, 0.0666531, 9.78438]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 11
-          Position: [-190.489, 31.9818, -191.979]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 12
-          Position: [-190.489, 31.9818, -191.979]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 13
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
+        - Entity: 12
+          Position: [-375.252, 90.8842, -375.037]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 13
+          Position: [374.61, 90.8842, -375.218]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
         - Entity: 14
-          Position: [0, 67.2565, 0]
+          Position: [375.322, 112.415, 375.011]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 15
-          Position: [375.608, 67.2565, -380.871]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 16
-          Position: [-362.659, 67.2565, -380.871]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 17
-          Position: [-362.659, 67.2565, 344.376]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 18
-          Position: [371.65, 64.8652, 344.376]
+          Position: [-374.342, 112.415, 374.499]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 14
-          Attenuation: [0, 0.0500002, 0]
-          Color: [1, 1, 1, 1]
-          Range: 10
-        - Entity: 15
-          Attenuation: [0, 0.0500002, 0]
-          Color: [1, 0.910117, 0, 1]
-          Range: 10
-        - Entity: 16
-          Attenuation: [0, 0.0500002, 0]
-          Color: [1, 0.910117, 0, 1]
-          Range: 10
-        - Entity: 17
-          Attenuation: [0, 0.0500002, 0]
+        - Entity: 12
+          Attenuation: [0, 0.181818, 0]
           Color: [1, 0, 0, 1]
           Range: 10
-        - Entity: 18
-          Attenuation: [0, 0.0500002, 0]
+        - Entity: 13
+          Attenuation: [0, 0.181818, 0]
+          Color: [1, 1, 0, 1]
+          Range: 10
+        - Entity: 14
+          Attenuation: [0, 0.181818, 0]
           Color: [0, 1, 0, 1]
+          Range: 10
+        - Entity: 15
+          Attenuation: [0, 0.181818, 0]
+          Color: [0, 0, 1, 1]
           Range: 10
     - Type: 3
       Data:
@@ -148,7 +128,7 @@
         []
     - Type: 11
       Data:
-        - Entity: 13
+        - Entity: 11
           MeshHandle: colorCube1Shape0
     - Type: 12
       Data:
@@ -161,7 +141,14 @@
         []
     - Type: 15
       Data:
-        []
+        - Entity: 7
+          File: AbilitySpawn
+        - Entity: 8
+          File: AbilitySpawn
+        - Entity: 9
+          File: AbilitySpawn
+        - Entity: 10
+          File: AbilitySpawn
     - Type: 16
       Data:
         []
@@ -312,14 +299,6 @@
     - Id: 0
       Tag: Sun
 - Groups:
-    - Id: 3
-      Group: AbilitySpawnPoint
-    - Id: 4
-      Group: AbilitySpawnPoint
-    - Id: 5
-      Group: AbilitySpawnPoint
-    - Id: 6
-      Group: AbilitySpawnPoint
     - Id: 7
       Group: AbilitySpawnPoint
     - Id: 8
@@ -327,10 +306,6 @@
     - Id: 9
       Group: AbilitySpawnPoint
     - Id: 10
-      Group: AbilitySpawnPoint
-    - Id: 11
-      Group: AbilitySpawnPoint
-    - Id: 12
       Group: AbilitySpawnPoint
     - Id: 3
       Group: SpawnPoint
@@ -340,20 +315,8 @@
       Group: SpawnPoint
     - Id: 6
       Group: SpawnPoint
-    - Id: 7
-      Group: SpawnPoint
-    - Id: 8
-      Group: SpawnPoint
-    - Id: 9
-      Group: SpawnPoint
-    - Id: 10
-      Group: SpawnPoint
     - Id: 11
-      Group: SpawnPoint
-    - Id: 12
-      Group: SpawnPoint
-    - Id: 13
       Group: Static
 - Storage:
     - Key: Ambient
-      Value: 0.484855 0.484855 0.484855 1
+      Value: 0.496971 0.496971 0.496971 1
