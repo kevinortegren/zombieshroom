@@ -218,7 +218,7 @@ namespace Physics
 		else //TODO : Remove the shapeless ability!
 		{
 			unsigned int removedIndex = userPointer->m_vectorIndex;
-			if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
+			if (userPointer->m_shape == PhysicsShape::SHAPE_NONE)
 			{
 				delete m_shapelessObjects.at(removedIndex);
 				m_shapelessObjects.erase(m_shapelessObjects.begin() + removedIndex);
@@ -230,13 +230,13 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
-			else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC)
+			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
@@ -250,13 +250,13 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
-			else
+			else if(userPointer->m_externalControlled == true)
 			{
 				delete m_externallyControlled.at(removedIndex);
 				m_externallyControlled.erase(m_externallyControlled.begin() + removedIndex);
@@ -268,9 +268,7 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER
-						&& m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE
-						&& m_userPointer.at(i)->m_type != PhysicsType::TYPE_DYNAMIC)
+					if(m_userPointer.at(i)->m_externalControlled == true && m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE)
 					{
 						m_userPointer.at(i)->m_vectorIndex--;
 					}
@@ -290,6 +288,11 @@ namespace Physics
 		for(unsigned int i = 0; i < m_shapelessObjects.size(); i++)
 		{
 			ShapelessObject* temp = m_shapelessObjects[i];
+			delete temp;
+		}
+		for(unsigned int i = 0; i < m_externallyControlled.size(); i++)
+		{
+			ObjectController* temp = m_externallyControlled[i];
 			delete temp;
 		}
 		for(int i = m_dynamicWorld->getNumCollisionObjects()-1; i>=0; i--)
@@ -920,7 +923,7 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		m_playerObjects.at(index)->Walk(p_direction, m_dt); //SADFJAKSJDGKLAS
+		m_playerObjects.at(index)->Walk(p_direction, m_dt); 
 	}
 
 	void RootPhysics::PlayerJump( int p_objectHandle, float p_jumpForce )
@@ -980,7 +983,7 @@ namespace Physics
 					return false;
 				}
 			}
-			else if((unsigned int)m_userPointer.at(p_objectHandle)->m_externalControlled)
+			else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 			{
 				if(m_externallyControlled.size() == 0  || (unsigned int)m_userPointer.at(p_objectHandle)->m_vectorIndex > m_externallyControlled.size()-1 || m_userPointer.at(p_objectHandle)->m_vectorIndex < 0)
 				{
