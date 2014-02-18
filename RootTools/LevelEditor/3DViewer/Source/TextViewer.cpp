@@ -157,11 +157,10 @@ int main(int argc, char* argv[])
 				int numberMessages = 0;
 
 				// GET EXPORT STATE
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				RM.LockMutex("IdMutex");
 				entityExport = *RM.export;				
 				numberMessages = *RM.NumberOfMessages;
-				ReleaseMutex(RM.IdMutexHandle);
+				RM.UnlockMutex("IdMutex");
 
 				for(int i = 0; i < numberMessages; i ++)
 				{
@@ -222,13 +221,12 @@ int main(int argc, char* argv[])
 					{
 						if(updateID != -1)
 						{
-							RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-							WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+							RM.LockMutex("TextureMutex");
 							cout << RM.PpaintList[updateID]->heigth << endl;
 							cout << RM.PpaintList[updateID]->width << endl;
 
 							//painter->BufferData(RM.PpaintList[updateID]->Pixels);
-							ReleaseMutex(RM.TextureMutexHandle);
+							RM.UnlockMutex("TextureMutex");
 						}
 					}
 
@@ -306,12 +304,11 @@ void HandleEvents()
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
 				{
 					entityExport = true;
-					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					RM.LockMutex("IdMutex");
 
 					*RM.export = 1;
 
-					ReleaseMutex(RM.IdMutexHandle);
+					RM.UnlockMutex("IdMutex");
 				}
 				if(event.key.keysym.scancode == SDL_SCANCODE_T)
 				{
@@ -330,13 +327,12 @@ void HandleEvents()
 
 void Initialize(RootEngine::GameSharedContext g_engineContext)
 {
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+	RM.LockMutex("IdMutex");
 
 	*RM.export = 0;
 	entityExport = 0;
 
-	ReleaseMutex(RM.IdMutexHandle);
+	RM.UnlockMutex("IdMutex");
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -398,80 +394,59 @@ void LoadSceneFromMaya()
 
 
 	//LOAD CAMERAS
-	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-	WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+	RM.LockMutex("CameraMutex");
 	numberCameras = *RM.NumberOfCameras;
-	ReleaseMutex(RM.CameraMutexHandle);
+	RM.UnlockMutex("CameraMutex");
 	CreateCameraEntity(0);
 
 	LoadLocators();
 	//LOAD MATERIALS
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-	int renderNrOfMaterials = *RM.NumberOfMaterials;
+	RM.LockMutex("MeshMutex");
 
+	int renderNrOfMaterials = *RM.NumberOfMaterials;
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
 		//ITS a Mega Mesh false here correct?
 		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1, false);
 	}
 
-	ReleaseMutex(RM.MeshMutexHandle);
-
 	/////////////////////// LOAD MESHES ////////////////////////////////
 
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
 	numberMeshes = *RM.NumberOfMeshes;
 	numberMegaMeshes = *RM.NumberOfMegaMeshes;
-	ReleaseMutex(RM.MeshMutexHandle);
+
 
 	for(int i = 0; i < numberMeshes; i++)
 	{				
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-		//string name = RM.getMesh(i).modelName; 
 		string name = RM.PmeshList[i]->modelName;
-		ReleaseMutex(RM.MeshMutexHandle);
-
 		Entities.push_back(CreateMeshEntity(&m_world, name, i, false));
-		//auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
-		//auto mesh = model->m_meshes[0];
-		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
-		//mesh->SetVertexBuffer(buffer);
 
 		UpdateMesh(i, true, true, false);
 	}			
 
 	for(int i = 0; i < numberMegaMeshes; i++)
 	{				
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-		//string name = RM.getMesh(i).modelName; 
 		string name = RM.PmegaMeshes[i]->modelName;
-		ReleaseMutex(RM.MeshMutexHandle);
-
 		MegaMeshes.push_back(CreateMeshEntity(&m_world, name, i, true));
-		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[i])->m_model;
-		//auto mesh = model->m_meshes[0];
-		//auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
-		//mesh->SetVertexBuffer(buffer);
+		//auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[i])->m_model;
 
 		UpdateMegaMesh(i, true, true, false);
 	}	
 
+	RM.UnlockMutex("MeshMutex");
 	///////////////////////// Load Lights ////////////////////////////////
 
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	RM.LockMutex("LightMutex");
 	numberLights = *RM.NumberOfLights;
-	ReleaseMutex(RM.LightMutexHandle);
+
 
 	for(int i = 0; i < numberLights; i++)
 	{
 		UpdateLight(i, false, true, RM.PlightList[i]->LightType);
 	}
 
+	RM.UnlockMutex("LightMutex");
 	UpdateLight(0, false, true, "AmbientLight");
 	UpdateLight(0, false, true, "DirectionalLight");
 }
@@ -517,8 +492,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	string temp;
 	string NormalName;
 	ifstream ifile;
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("MeshMutex");
 
 	if(itsAmegaMesh)
 	{
@@ -547,7 +521,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		}
 	}
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
 
 	if(textureName == "" || textureName == "NONE")
 	{
@@ -557,8 +531,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	}
 	else if(textureName == "PaintTexture" || painted || painting)
 	{
-		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+		RM.LockMutex("TextureMutex");
 
 		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 
@@ -643,7 +616,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		}
 
 
-		ReleaseMutex(RM.TextureMutexHandle);
+		RM.UnlockMutex("TextureMutex");
 	}
 	else
 	{
@@ -720,9 +693,7 @@ float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
 string modelExists(int meshIndex)
 {	
 		float THRESHOLD = 0.01;
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-		//Print("Index ", i, " ", SM.meshList[i].transformation.name);
+		RM.LockMutex("MeshMutex");
 		int count = 0;
 		bool exists = true;
 		int saveJ = 0;
@@ -783,7 +754,7 @@ string modelExists(int meshIndex)
 			return RM.PmeshList[meshIndex]->modelName;
 		}
 
-		ReleaseMutex(RM.MeshMutexHandle);
+		RM.UnlockMutex("MeshMutex");
 }
 
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh)
@@ -806,27 +777,21 @@ ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index
 		}
 	}
 
-	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+
 
 	if(!noRender)
 	{
+		RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
 		renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
 		renderable->m_model->m_transform = glm::mat4x4(1);
 	}
-	else
-	{
-		RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-		rendy->m_material = nullptr;
-		rendy->m_model = nullptr;
-	}
 
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("MeshMutex");
 
 	if(!ItsAmegaMesh)
 		p_name = modelExists(index);
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
@@ -941,8 +906,7 @@ void UpdateCamera(int index)
 		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameras[0]);
 		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameras[0]);
 
-		RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-		WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+		RM.LockMutex("CameraMutex");
 
 		glm::quat rotation;
 		rotation.x = RM.PcameraList[index]->transformation.rotation.x;
@@ -961,14 +925,13 @@ void UpdateCamera(int index)
 		camera->m_frustum.m_near = RM.PcameraList[index]->nearClippingPlane;
 		camera->m_frustum.m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
 
-		ReleaseMutex(RM.CameraMutexHandle);
+		RM.UnlockMutex("CameraMutex");
 	}
 }
 
 void LoadLocators()
 {
-	RM.LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
-	WaitForSingleObject(RM.LocatorMutexHandle, RM.milliseconds);
+	RM.LockMutex("LocatorMutex");
 	int nrLoc = *RM.NumberOfLocators;
 
 	for(int i = 0; i < nrLoc; i++)
@@ -993,7 +956,7 @@ void LoadLocators()
 
 	}
 
-	ReleaseMutex(RM.LocatorMutexHandle);
+	RM.UnlockMutex("LocatorMutex");
 }
 
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove)
@@ -1013,8 +976,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		RemoveMeshIndex = -1;
 	}
 
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("MeshMutex");
 	numberMeshes = *RM.NumberOfMeshes;	
 
 	if(MeshIndex != -1)					
@@ -1125,7 +1087,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		Entities.pop_back();
 	}
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
 }
 
 void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool remove)
@@ -1145,8 +1107,7 @@ void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool
 	}
 
 
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("MeshMutex");
 	numberMegaMeshes = *RM.NumberOfMegaMeshes;	
 
 	if(MeshIndex != -1)					
@@ -1250,7 +1211,7 @@ void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool
 	//	MegaMeshes.pop_back();
 	//}
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
 }
 
 void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
@@ -1270,15 +1231,11 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 		RemoveLightIndex = -1;
 	}
 
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	RM.LockMutex("LightMutex");
 	numberLights = *RM.NumberOfLights;
-	ReleaseMutex(RM.LightMutexHandle);
+
 
 	int size = LightEntities.size()-1;
-	//string type = RM.PlightList[LightIndex]->LightType;
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 	if(LightIndex != -1)					
 	{		
@@ -1321,10 +1278,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 		//ambientInfoExists = true;
 	}
 
-	//if(!ambientInfoExists)
-		//g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	ReleaseMutex(RM.LightMutexHandle);
+	RM.UnlockMutex("LightMutex");
 
 	if(RemoveLightIndex >= 0)	
 	{					
@@ -1339,8 +1293,7 @@ void ExportToLevel()
 {
 	for(int i = 0; i < Entities.size(); i++)
 	{
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		RM.LockMutex("MeshMutex");
 		//UPDATE modelName for all Entities from shared memory
 
 		string name = RM.PmeshList[i]->modelName;
@@ -1352,7 +1305,7 @@ void ExportToLevel()
 			mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 		}
 
-		ReleaseMutex(RM.MeshMutexHandle);
+		RM.UnlockMutex("MeshMutex");
 
 		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
 		collision->m_meshHandle = name + "0";
@@ -1366,10 +1319,9 @@ void ExportToLevel()
 		string materialName = GetNameFromPath(RM.PmegaMeshes[i]->materialName);
 		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
 
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+		RM.LockMutex("MeshMutex");
 		string name = RM.PmegaMeshes[i]->modelName;
-		ReleaseMutex(RM.MeshMutexHandle);
+		RM.UnlockMutex("MeshMutex");
 
 		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(MegaMeshes[i]);
 		collision->m_meshHandle = name + "0";
@@ -1379,8 +1331,7 @@ void ExportToLevel()
 	m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
 
 	entityExport = false;
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+	RM.LockMutex("IdMutex");
 	*RM.export = 0;
-	ReleaseMutex(RM.IdMutexHandle);
+	RM.UnlockMutex("IdMutex");
 }

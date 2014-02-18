@@ -298,3 +298,75 @@ int ReadMemory::shutdown()
 	CloseHandle(CameraMutexHandle);
 	return 0;
 }
+
+void ReadMemory::LockMutex(string mutexName)
+{
+	if(mutexName == "MeshMutex")
+	{
+		MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(MeshMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "IdMutex")
+	{
+		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+		WaitForSingleObject(IdMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "LightMutex")
+	{
+		LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+		WaitForSingleObject(LightMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "CameraMutex")
+	{
+		CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+		WaitForSingleObject(CameraMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "LocatorMutex")
+	{
+		LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
+		WaitForSingleObject(LocatorMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "TextureMutex")
+	{
+		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		WaitForSingleObject(TextureMutexHandle, milliseconds);
+	}
+}
+
+void ReadMemory::UnlockMutex(string mutexName)
+{
+	if(mutexName == "MeshMutex")
+	{
+		ReleaseMutex(MeshMutexHandle);
+	}
+
+	if(mutexName == "IdMutex")
+	{
+		ReleaseMutex(IdMutexHandle);
+	}
+
+	if(mutexName == "LightMutex")
+	{
+		ReleaseMutex(LightMutexHandle);
+	}
+
+	if(mutexName == "CameraMutex")
+	{
+		ReleaseMutex(CameraMutexHandle);
+	}
+
+	if(mutexName == "LocatorMutex")
+	{
+		ReleaseMutex(LocatorMutexHandle);
+	}
+
+	if(mutexName == "TextureMutex")
+	{
+		ReleaseMutex(TextureMutexHandle);
+	}
+}
