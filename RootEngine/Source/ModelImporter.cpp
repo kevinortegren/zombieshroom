@@ -42,7 +42,7 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, m_importer->GetErrorString());
 		}
 
-		if(aiscene->HasAnimations())
+		if(aiscene->HasAnimations() && m_model->m_animation )
 		{
 			m_model->m_animation->SetAiImporter(m_importer);
 			m_model->m_animation->SplitAnimation();
