@@ -75,7 +75,6 @@ namespace Ragdoll
 			shape->calculateLocalInertia(mass, inertia);
 			//Get bone index from name
 			int index = m_nameToIndex[p_rootNode->mName.data];
-			
 			//Build transform in glm
 			m_boneOffset[index] = p_boneOffset[index];
 			m_bodyPosOffset[index] += p_parentBodyOffset;
@@ -84,79 +83,81 @@ namespace Ragdoll
 			glm::mat4 toTrans = glm::mat4(1.0f);
 			
 			////Rotate the arms, for some reason this is required
-			/*if(index < 6)
-			{
-			if(index < 3) 
-			toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
-			else
-			toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
-
-			}
-			else*/
-			{
+// 			if(index < 6)
+// 			{
+// 				if(index < 3) 
+// 					toTrans *= glm::rotate(p_transform, 90.0f, m_right) *  m_lastBoneMatrix[index];
+// 				else
+// 					toTrans *= glm::rotate(p_transform, -90.0f, m_right) *   m_lastBoneMatrix[index];
+// 
+// 			}
+// 			else
+ 			{
 				toTrans *=  p_transform  /** bonePos*/ * m_lastBoneMatrix[index];
 				
 				
 			}
  			
-
-			toTrans *= m_boneOffset[index];
+			//if(index > 5)
+				toTrans *=  m_boneOffset[index];
+			
+				if(index < 6)
+				{
+					toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
+				}
+ 		//	if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
+ 		//	{
+ 		//		toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.3f);
+ 		//		if(index == BodyPart::RIGHTARM)
+ 		//		{
+ 		//			toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() + m_right.x* 0.8f);
+ 		//			toTrans[3].z  = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() + m_right.z* 0.8f);
+ 		//			/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
+ 		//			m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
+ 		//		}
+ 		//		else
+ 		//		{
+ 		//			toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - m_right.x* 0.8f);
+ 		//			toTrans[3].z = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - m_right.z* 0.8f);
+ 		//			/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
+ 		//			m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
+ 		//		}
+ 		//	}
+ 		//	if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
+ 		//	{
+ 		//		btVector3 btAxis = (m_bodies[index + 1]->getWorldTransform().getRotation().getAxis());
+ 		//		glm::vec3 axis = glm::vec3(btAxis.y(), btAxis.x(), btAxis.z());
+ 		//	//	glm::vec3 rot = axis * 0.4f;
+ 		//		glm::vec3 rot = m_boneShapeSize[index] *  axis ;
+ 		//		//glm::vec3 rot = glm::rotate(glm::vec3(0.0f, 0.3f, 0.0f), m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
+ 		//		toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - rot.y;
+ 		//		if(index < 2)
+ 		//		{
+ 		//			toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.x);
+ 		//			toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
+ 		//			
+ 		//		}
+ 		//		else
+ 		//		{
+ 		//			toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.x);
+ 		//			toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
+ 		//			//toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y);
+ 		//		}
+			//	
+			//		
+			//}
+			
 			/*if(index < 6)
-			{
-			toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
-			}*/
-			if( index == BodyPart::RIGHTARM || index == BodyPart::LEFTARM)
-			{
-				toTrans[3].y = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().y() - 0.3f);
-				if(index == BodyPart::RIGHTARM)
-				{
-					toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() + m_right.x* 0.8f);
-					toTrans[3].z  = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() + m_right.z* 0.8f);
-					/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
-					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
-				}
-				else
-				{
-					toTrans[3].x = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - m_right.x* 0.8f);
-					toTrans[3].z = (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - m_right.z* 0.8f);
-					/*m_bodyPosOffset[index].setX((m_bodyPosOffset[index].getX() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().x() - toTrans[3].x) * 0.8f) / ** m_right.x* /);
-					m_bodyPosOffset[index].setZ((m_bodyPosOffset[index].getZ() + (m_bodies[BodyPart::SPINE]->getWorldTransform().getOrigin().z() - toTrans[3].z) * 0.8f) / ** m_right.z* /);*/
-				}
-			}
-			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
-			{
-				btVector3 btAxis = (m_bodies[index + 1]->getWorldTransform().getRotation().getAxis());
-				glm::vec3 axis = glm::vec3(btAxis.x(), btAxis.y(), btAxis.z());
-				//glm::vec3 rot = axis * 0.4f;
-				//glm::vec3 rot = axis * m_boneShapeSize[index];
-				glm::vec3 rot = glm::rotate(m_boneShapeSize[index + 1], m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
-				toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - rot.x;
-				if(index < 3)
-				{
-					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.y);
-					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
-					
-				}
-				else
-				{
-					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.y);
-					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
-					//toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y);
-				}
-				
-					
-			}
-			if(index < 3)
 			{
 
 				glm::vec3 front = glm::cross(m_right, glm::vec3(0,1,0));
 				//	toTrans *= glm::rotate(glm::mat4(1.0f), 180.0f, m_right);
 
 				if(index < 3)
-					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, m_right);
 				else
-					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f, front);
-			}
+					toTrans *= glm::rotate(glm::mat4(1.0f), 90.0f,m_right);
+			}*/
 			//From glm to bullet transform
 			btTransform trans;
 			const float* data = glm::value_ptr(toTrans);
