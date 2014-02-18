@@ -199,12 +199,12 @@ namespace Render
 			float scale = float(i) / float(kernelSize);
 			scale = glm::mix<float>(0.1f, 1.0f, scale * scale);
 			m_kernel[i] *= scale;
-			g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Kernel X: %f, Y: %f, Z: %f", m_kernel[i].x, m_kernel[i].y, m_kernel[i].z);
+			//g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Kernel X: %f, Y: %f, Z: %f", m_kernel[i].x, m_kernel[i].y, m_kernel[i].z);
 		}
 
 		for(int i = 0; i < kernelSize; i++)
 		{
-			g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Length: %f", glm::length(m_kernel[i]));
+			//g_context.m_logger->LogText(LogTag::GENERAL, LogLevel::DEBUG_PRINT, "Length: %f", glm::length(m_kernel[i]));
 		}
 
 		BufferInterface* ssaoBuff = m_ssaoTech->GetBufferInterface();

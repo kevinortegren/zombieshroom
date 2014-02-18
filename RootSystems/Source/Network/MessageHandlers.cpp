@@ -7,6 +7,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -47,27 +48,29 @@ namespace RootForce
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
-			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
+			float halfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 			
 			switch (p_id)
 			{
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
+					if (clientComponent->State == ClientState::AWAITING_CONNECTION_ACCEPT)
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
+						clientComponent->State = ClientState::AWAITING_SERVER_INFO;
 
-					clientComponent->State = ClientState::AWAITING_SERVER_INFO;
+						// Send user information
+						NetworkMessage::UserInformation m;
+						m.Name = clientComponent->Name;
 
-					// Send user information
-					NetworkMessage::UserInformation m;
-					m.Name = clientComponent->Name;
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
+						m.Serialize(true, &bs);
 
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
-					m.Serialize(true, &bs);
-
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+						m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+					}
 				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -98,6 +101,13 @@ namespace RootForce
 					clientComponent->State = ClientState::DISCONNECTED_REFUSED;
 				} return true;
 
+				case ID_INVALID_PASSWORD:
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Invalid password");
+
+					clientComponent->State = ClientState::DISCONNECTED_REFUSED_INVALID_PASSWORD;
+				} return true;
+
 				case ID_UNCONNECTED_PONG:
 				{
 					if (clientComponent->State == ClientState::UNCONNECTED)
@@ -118,7 +128,7 @@ namespace RootForce
 					// Local clients share world with server - does not need to do anything.
 					if (clientComponent->IsRemote
 						&& (clientComponent->State == ClientState::CONNECTED
-							|| clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA))
+						|| clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA))
 					{
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
@@ -259,7 +269,7 @@ namespace RootForce
 						glm::vec3 right = transform->m_orientation.GetRight();
 						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
 						if (movement != glm::vec3(0))
-							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 						transform->m_position += movement;
 					}
@@ -276,7 +286,7 @@ namespace RootForce
 						if (player != nullptr)
 						{
 							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-							action->JumpTime = lastHalfPing;
+							action->JumpTime = halfPing;
 						}
 					}
 				} return true;
@@ -311,7 +321,7 @@ namespace RootForce
 							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = m.Action;
-							action->AbilityTime = lastHalfPing;
+							action->AbilityTime = halfPing;
 						}
 					}
 
@@ -398,6 +408,19 @@ namespace RootForce
 					}
 				} return true;
 
+				case NetworkMessage::MessageType::AbilityClaimedBy:
+				{
+					NetworkMessage::AbilityClaimedBy m;
+					m.Serialize(false, p_bs);
+
+					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+					spawnPoint->Claimed = m.User;
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = false;
+				} return true;
+
 				case NetworkMessage::MessageType::DestroyEntities:
 				{
 					NetworkMessage::DestroyEntities m;
@@ -464,6 +487,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status
@@ -566,6 +591,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status
@@ -599,7 +626,7 @@ namespace RootForce
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 
-			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
+			float halfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 
 			switch (p_id)
 			{
@@ -750,7 +777,7 @@ namespace RootForce
 						glm::vec3 right = transform->m_orientation.GetRight();
 						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
 						if (movement != glm::vec3(0))
-							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 						transform->m_position += movement;
 					}
@@ -795,7 +822,7 @@ namespace RootForce
 							if (player != nullptr)
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-								action->JumpTime = lastHalfPing;
+								action->JumpTime = halfPing;
 							}
 						}
 
@@ -879,7 +906,7 @@ namespace RootForce
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
-								action->AbilityTime = lastHalfPing;
+								action->AbilityTime = halfPing;
 							}
 						}
 
@@ -1036,6 +1063,16 @@ namespace RootForce
 							}
 						}
 					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityTryClaim:
+				{
+					NetworkMessage::AbilityTryClaim m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = true;
 				} return true;
 
 				case NetworkMessage::MessageType::RespawnRequest:

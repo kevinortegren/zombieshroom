@@ -44,6 +44,8 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
@@ -51,25 +53,27 @@ namespace RootForce
 
 	void IngameState::Initialize()
 	{
-		//Bind c++ functions and members to Lua
+		// Bind c++ functions and members to Lua.
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
+		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
-		
+		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+
+		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
-		// Initialize physics system
+		// Initialize physics systems.
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem);
 
@@ -97,7 +101,7 @@ namespace RootForce
 		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
-		// Initialize anim system
+		// Initialize anim system.
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_animationSystem->SetGameSharedContext(&g_engineContext);
@@ -106,7 +110,7 @@ namespace RootForce
 		m_particleSystem = new RootForce::ParticleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
 
-		//Initialize Ragdoll system
+		//Initialize Ragdoll system.
 		m_ragdollSystem = new RootForce::RagdollSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::RagdollSystem>(m_ragdollSystem);
 
@@ -118,20 +122,32 @@ namespace RootForce
 		m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem);
 
-		// Action system handles local and remote player issued actions and updates the world accordingly
+		// Action system handles local and remote player issued actions and updates the world accordingly.
 		m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem);
 
-		// State system updates the current state of an entity for animation purposes
+		// Respawn system respawns players after they die
+		m_sharedSystems.m_respawnSystem = new RootSystems::RespawnSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
+
+
+		// State system updates the current state of an entity for animation purposes.
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
+		// Initialize the water system.
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
+		// Initialize the system for resetting the TryPickupComponent
+		m_tryPickupResetSystem = new TryPickupResetSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<TryPickupResetSystem>(m_tryPickupResetSystem);
+
+		// Initialize the sound system.
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
@@ -147,28 +163,34 @@ namespace RootForce
 		// Setup the network
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
+		
+		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
-		//Initialize the debug, setting the html view
+		// Set the server peer to the action and abilityspawn system, if we are a server.
+		if (m_networkContext.m_server != nullptr)
+		{
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		}
+		if (m_networkContext.m_client != nullptr)
+		{
+			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+			m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		}
+
+		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
 
-		//Init the hud and set one test ability for now
+		// Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
-		//Reset the ingame menu before we start the match
+		// Reset the ingame menu before we start the match
 		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_displayIngameMenu = false;
-
-		//Set the network context to the matchstatesystem
-		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-
-		// Set the server peer to the action system, if we are a server.
-		if (m_networkContext.m_server != nullptr)
-			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		if (m_networkContext.m_client != nullptr)
-			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-
+		
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
@@ -183,27 +205,24 @@ namespace RootForce
 
 		m_animationSystem->Terminate();
 
-		Network::NetworkEntityID id;
-		id.UserID = Network::ReservedUserID::ALL;
-		id.ActionID = Network::ReservedActionID::ALL;
-		id.SequenceID = Network::ReservedSequenceID::ALL;
-
-		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager());
+		// Remove all networked entities and reset the entity map and sequence map.
+		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
+		// Destroy the ingame GUI views.
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
-
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
 
+		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
-		if(m_networkContext.m_server.get() != nullptr)
+		if(m_networkContext.m_server != nullptr)
 			m_networkContext.m_server->SetMessageHandler(nullptr);
 		m_networkContext.m_client->SetMessageHandler(nullptr);
 	}
@@ -379,11 +398,16 @@ namespace RootForce
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
 		}
+
+		{
+			PROFILE("Try-Pickup reset system", g_engineContext.m_profiler);
+			m_tryPickupResetSystem->Process();
+		}
 		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
-			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused() || m_displayIngameMenu);
 			m_playerControlSystem->Process();
 		}
 
@@ -400,8 +424,7 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			if(!m_displayIngameMenu)
-				m_actionSystem->Process();
+			m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -411,7 +434,10 @@ namespace RootForce
 			m_sharedSystems.m_respawnSystem->Process();
 		}
 
-
+		{
+			PROFILE("AbilitySpawn system", g_engineContext.m_profiler);
+			m_sharedSystems.m_abilitySpawnSystem->Process();
+		}
 
 		{
 			PROFILE("Ragdoll system", g_engineContext.m_profiler);

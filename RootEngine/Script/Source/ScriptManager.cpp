@@ -143,7 +143,13 @@ namespace RootEngine
 		int ScriptManager::LoadScript( std::string p_scriptPath )
 		{
 			// Execute the script
-			return luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+
+			if (luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str()))
+			{
+				printf("%s\n", lua_tostring(m_luaState, -1));
+				return 1;
+			}
+			return 0;
 		}
 
 		lua_State* ScriptManager::GetLuaState()

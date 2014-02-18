@@ -42,7 +42,8 @@ namespace RootForce
 		{
 			enum ReservedActionID
 			{
-				NONE = 0xFFFFFFFD,
+				NONE = 0xFFFFFFFC,
+				ABILITYSPAWN,
 				CONNECT,
 				ALL,
 			};
