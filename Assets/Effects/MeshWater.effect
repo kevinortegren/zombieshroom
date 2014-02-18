@@ -15,6 +15,8 @@
             offset: 128
           - sem: LIFETIMEMIN
             offset: 140
+          - sem: COLOR
+            offset: 144
       textures:
           - name: g_Diffuse
             slot: 0
