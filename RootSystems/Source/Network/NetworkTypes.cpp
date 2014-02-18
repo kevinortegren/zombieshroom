@@ -53,6 +53,15 @@ namespace RootForce
 				p_map.erase(destroy[i]);
 			}
 		}
+
+
+		ECS::Entity* FindEntity(NetworkEntityMap& p_map, const NetworkEntityID& p_id)
+		{
+			NetworkEntityMap::iterator it = p_map.find(p_id);
+			if (it == p_map.end())
+				return nullptr;
+			return it->second;
+		}
 	}
 }
 

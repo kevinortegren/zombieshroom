@@ -112,6 +112,7 @@ namespace RootForce
 			Defines a map between network entity IDs and local entities.
 		*/
 		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
+		ECS::Entity* FindEntity(NetworkEntityMap& p_map, const NetworkEntityID& p_id);
 
 		/*
 			Remove a set of entities from the network entity map and delete them.
