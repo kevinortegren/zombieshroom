@@ -22,6 +22,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <RootSystems/Include/TryPickupResetSystem.h>
+#include <RootSystems/Include/SoundSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -36,7 +37,7 @@ namespace RootForce
 	class IngameState
 	{
 	public:
-		IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems);
+		IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems, Keymapper* p_keymapper);
 
 		void Initialize();
 		void Enter();
@@ -71,9 +72,11 @@ namespace RootForce
 		RootForce::MatchStateSystem*					m_gameLogicSystem;
 		RootForce::WaterSystem*							m_waterSystem;
 		RootSystems::ActionSystem*						m_actionSystem;
-		RootSystems::RespawnSystem*						m_respawnSystem;
 		RootSystems::StateSystem*						m_stateSystem;
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 		RootForce::TryPickupResetSystem* 				m_tryPickupResetSystem;
+		RootForce::SoundSystem*							m_soundSystem;
+
+		Keymapper* m_keymapper;
 	};
 }

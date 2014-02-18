@@ -13,7 +13,7 @@ namespace RootForce
 	class IngameMenu
 	{
 	public:
-		IngameMenu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context);
+		IngameMenu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper);
 		~IngameMenu();
 		RootEngine::GUISystem::WebView* GetView() { return m_view; }
 		bool GetReturn() { return m_return; }

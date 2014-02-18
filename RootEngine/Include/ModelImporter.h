@@ -77,7 +77,7 @@ namespace RootEngine
 		~ModelImporter();
 
 
-		Model* LoadModel(const std::string p_fileName);
+		Model* LoadModel(const std::string p_fileName, bool p_noRender);
 		
 	private:
 
@@ -87,6 +87,7 @@ namespace RootEngine
 
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
+		void InitPhysicsMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		void LoadBones(const aiMesh* p_aiMesh);
 		void LoadAnimation(unsigned int p_index, const aiScene* p_scene);
@@ -95,6 +96,7 @@ namespace RootEngine
 		std::vector<VertexBoneData> m_boneData;
 		GameSharedContext*			m_context;
 		Model*						m_model; 
+		bool						m_noRender;
 	
 	};
 #endif

@@ -235,6 +235,11 @@ namespace Render
 		m_uniformsParams[p_sem] = p_offset;
 	}
 
+	BufferInterface* Technique::GetBufferInterface()
+	{
+		return m_perTechniqueBuffer;
+	}
+
 	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);

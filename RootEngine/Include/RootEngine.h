@@ -21,13 +21,14 @@ namespace RootEngine
 	{
 		enum SubsystemInit
 		{
-			INIT_NETWORK = 1,
-			INIT_INPUT = 2,
-			INIT_RENDER = 4,
-			INIT_GUI = 8,
-			INIT_PHYSICS = 16,
-			INIT_SCRIPTING = 32,
-			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI | INIT_PHYSICS | INIT_SCRIPTING
+			INIT_NETWORK	= 1,
+			INIT_INPUT		= 2,
+			INIT_RENDER		= 4,
+			INIT_GUI		= 8,
+			INIT_PHYSICS	= 16,
+			INIT_SCRIPTING	= 32,
+			INIT_SOUND		= 64,
+			INIT_ALL = INIT_NETWORK | INIT_INPUT | INIT_RENDER | INIT_GUI | INIT_PHYSICS | INIT_SCRIPTING | INIT_SOUND
 		};
 	}
 
@@ -50,6 +51,7 @@ namespace RootEngine
 		void LoadPhysics();
 
 		void LoadScriptEngine();
+		void LoadSoundEngine();
 #endif
 
 		void* m_networkModule;
@@ -58,6 +60,7 @@ namespace RootEngine
 		void* m_inputModule;
 		void* m_physicsModule;
 		void* m_scriptModule;
+		void* m_soundModule;
 
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
@@ -73,9 +76,10 @@ namespace RootEngine
 		DebugOverlay m_debugOverlay;
 		Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
-		InputManager::InputInterface* m_inputSys;
-		Physics::PhysicsInterface* m_physics;
-		Script::ScriptInterface* m_scriptEngine;
+		InputManager::InputInterface*	m_inputSys;
+		Physics::PhysicsInterface*		m_physics;
+		Script::ScriptInterface*		m_scriptEngine;
+		Sound::SoundInterface*			m_soundEngine;
 #endif
 
 	};

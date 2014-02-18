@@ -35,6 +35,7 @@ namespace RootForce
 			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
 			RootForce::AbilityRespawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
 			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
+			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
 		}
 
 		void InitializeServerComponents()

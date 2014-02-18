@@ -28,7 +28,7 @@ namespace RootForce
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)
 				throw std::runtime_error("Failed to create RakNet client");
 
-			// Create a client entity
+			// Create a new client entity.
 			ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
 			m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
 			m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
@@ -62,9 +62,10 @@ namespace RootForce
 				m_world->GetEntityManager()->CreateComponent<Network::ClientComponent>(clientEntity);
 				m_world->GetTagManager()->RegisterEntity("Client", clientEntity);
 			}
+
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 			clientComponent->IsRemote = p_isRemote;
-			clientComponent->State = ClientState::UNCONNECTED;
+			clientComponent->State = ClientState::AWAITING_CONNECTION_ACCEPT;
 			clientComponent->Name = g_engineContext.m_configManager->GetConfigValueAsString("settings-player-name").c_str();
 
 			if (m_peer->Connect(p_address.c_str(), p_port, p_password.c_str(), p_password.size() + 1) != RakNet::CONNECTION_ATTEMPT_STARTED)

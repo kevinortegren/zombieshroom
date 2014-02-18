@@ -303,7 +303,7 @@ inline storage loadStorageDDS
 )
 {
 	std::ifstream FileIn(Filename.c_str(), std::ios::in | std::ios::binary);
-	assert(!FileIn.fail());
+	//assert(!FileIn.fail());
 
 	if(FileIn.fail())
 		return storage();

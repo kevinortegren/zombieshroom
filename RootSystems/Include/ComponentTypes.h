@@ -34,6 +34,7 @@ namespace RootForce
 			WATERCOLLIDER,
 			ABILITYSPAWN,
 			TRYPICKUPCOMPONENT,
+			SOUND,
 		};
 	}
 }

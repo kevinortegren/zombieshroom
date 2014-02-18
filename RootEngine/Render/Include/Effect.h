@@ -92,6 +92,7 @@ namespace Render
 		virtual std::vector<std::shared_ptr<Program>>& GetPrograms() = 0;
 		virtual void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset) = 0;
 		virtual void Apply() = 0;
+		virtual BufferInterface* GetBufferInterface() = 0;
 	};
 
 	class Technique : public TechniqueInterface
@@ -103,7 +104,7 @@ namespace Render
 
 		void Apply();
 		void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset);
-
+		BufferInterface* GetBufferInterface();
 		std::map<Semantic::Semantic, unsigned int> m_uniformsParams;
 		BufferInterface* m_perTechniqueBuffer;
 

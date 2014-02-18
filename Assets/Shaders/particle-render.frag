@@ -25,7 +25,10 @@ layout (location = 3) out vec4 background;
 
 void main(void) {
 
+    vec2 TexCoord = gl_FragCoord.xy / vec2(1280,720);   
+
 	vec4 frag_color = texture(g_Diffuse, gs_TexCoord);
+    vec3 la = texture(g_LA, TexCoord).xyz;
     
     float depth = gs_Depth;   
     float depthSample = texture(g_Depth, gs_ScreenCoord).x;
@@ -45,5 +48,5 @@ void main(void) {
     diffuse = vec4(vec3(0), 0);
 	normals = vec3(0);
 	glow = vec4(vec3(0), 0.0f);
-	background = vec4(frag_color.xyz, frag_color.a) * gs_color;
+	background = vec4(la + frag_color.xyz, frag_color.a) * gs_color;
 }

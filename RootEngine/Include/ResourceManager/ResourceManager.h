@@ -9,6 +9,7 @@
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
 #include <RootEngine/Include/ParticleImporter.h>
+#include <RootEngine/Sound/Include/SoundAudio.h>
 
 #pragma warning(disable: 4715)//Temporary solution
 
@@ -27,12 +28,14 @@ namespace RootEngine
 	public:
 		#ifndef COMPILE_LEVEL_EDITOR
 			virtual Model*	LoadCollada(std::string p_path) = 0;
+			virtual Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, unsigned p_flags) = 0;
 			virtual Physics::PhysicsMeshInterface* GetPhysicsMesh(std::string p_handle) = 0;
 
 			virtual std::string ForceLoadScript(std::string p_scriptName) = 0;
 			virtual std::string LoadScript(std::string p_scriptName) = 0;
 			virtual std::string GetScript(std::string p_scriptName) = 0;
 			virtual void		ReloadAllScripts() = 0;
+			
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
@@ -68,6 +71,7 @@ namespace RootEngine
 
 		#ifndef COMPILE_LEVEL_EDITOR
 			Model*	LoadCollada(std::string p_path);
+			Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name, unsigned p_flags);
 			Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
 
 			std::string ForceLoadScript(std::string p_scriptName);
@@ -106,7 +110,9 @@ namespace RootEngine
 		std::map<std::string, std::shared_ptr<Physics::PhysicsMeshInterface>> m_physicMeshes;
 		std::map<std::string, std::string> m_scripts;
 		std::map<std::string, std::vector<ParticleSystemStruct*>> m_particles;
+		std::map<std::string, Sound::SoundAudioInterface*> m_soundAudios;
 
+		Render::TextureInterface* m_defaultTexture;
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR
 		std::shared_ptr<ModelImporter>		m_modelImporter;
@@ -119,5 +125,7 @@ namespace RootEngine
 		//Other
 		GameSharedContext* m_context;
 		std::string m_workingDirectory;
+
+		void SetupDefaultResources();
 	};
 }

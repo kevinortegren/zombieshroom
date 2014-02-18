@@ -23,6 +23,8 @@
           slot: 5
         - name: g_ShadowDepth
           slot: 6
+        - name: g_SSAO
+          slot: 7
       programs:
         - name: ambient
           shaders:
@@ -54,15 +56,13 @@
             write: 0
             test: 0
           blend: 2
-        - name: background-addative
+        - name: pointlight_stencil
           shaders:
-            - name: output
+            - name: pointlight
               type: vertex
-            - name: output
-              type: fragment
           depth:
             write: 0
-            test: 0
+            test: 1
           blend: 2
         - name: background-alphablend
           shaders:
@@ -74,4 +74,15 @@
             write: 0
             test: 0
           blend: 1
+        - name: background-addative
+          shaders:
+            - name: output
+              type: vertex
+            - name: output
+              type: fragment
+          depth:
+            write: 0
+            test: 0
+          blend: 2
+
           
