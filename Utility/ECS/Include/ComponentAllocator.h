@@ -39,7 +39,7 @@ namespace ECS
 		template<class T>
 		void Free(T* p_ptr)
 		{
-			static_cast<T*>(ptr)->~T();
+			static_cast<T*>(p_ptr)->~T();
 
 			unsigned id = Component<T>::GetTypeId();
 

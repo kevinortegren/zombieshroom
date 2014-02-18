@@ -44,7 +44,7 @@ namespace RootForce
 	{
 		m_workingDirectory = p_workingDirectory;
 		g_world = &m_world;
-
+		srand((unsigned)time(NULL));
 		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 

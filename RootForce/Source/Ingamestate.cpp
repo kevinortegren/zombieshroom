@@ -8,10 +8,9 @@ extern ECS::World* g_world;
 
 namespace RootForce
 {
-	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems, Keymapper* p_keymapper)
+	IngameState::IngameState(NetworkContext& p_networkContext, SharedSystems& p_sharedSystems)
 		: m_networkContext(p_networkContext)
 		, m_sharedSystems(p_sharedSystems)
-		, m_keymapper(p_keymapper)
 	{	
 		ComponentType::Initialize();
 		
@@ -44,7 +43,8 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -57,16 +57,72 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("MagicMissile");
+		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
+		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+
+		// Initialize the system for controlling the player.
+		std::vector<RootForce::Keybinding> keybindings(6);
+		keybindings[0].Bindings.push_back(SDL_SCANCODE_UP);
+		keybindings[0].Bindings.push_back(SDL_SCANCODE_W);
+		keybindings[0].Action = RootForce::PlayerAction::MOVE_FORWARDS;
+		//keybindings[0].ActionUp = RootForce::PlayerAction::MOVE_FORWARDS_STOP;
+		//keybindings[0].Edge = true;
+
+		keybindings[1].Bindings.push_back(SDL_SCANCODE_DOWN);
+		keybindings[1].Bindings.push_back(SDL_SCANCODE_S);
+		keybindings[1].Action = RootForce::PlayerAction::MOVE_BACKWARDS;
+		//keybindings[1].ActionUp = RootForce::PlayerAction::MOVE_BACKWARDS_STOP;
+		//keybindings[1].Edge = true;
+
+		keybindings[2].Bindings.push_back(SDL_SCANCODE_LEFT);
+		keybindings[2].Bindings.push_back(SDL_SCANCODE_A);
+		keybindings[2].Action = RootForce::PlayerAction::STRAFE_LEFT;
+		//keybindings[2].ActionUp = RootForce::PlayerAction::STRAFE_LEFT_STOP;
+		//keybindings[2].Edge = true;
+
+		keybindings[3].Bindings.push_back(SDL_SCANCODE_RIGHT);
+		keybindings[3].Bindings.push_back(SDL_SCANCODE_D);
+		keybindings[3].Action = RootForce::PlayerAction::STRAFE_RIGHT;
+		//keybindings[3].ActionUp = RootForce::PlayerAction::STRAFE_RIGHT_STOP;
+		//keybindings[3].Edge = true;
+
+		keybindings[4].Bindings.push_back(SDL_SCANCODE_SPACE);
+		keybindings[4].Action = RootForce::PlayerAction::JUMP_PRESSED;
+		keybindings[4].ActionUp = RootForce::PlayerAction::JUMP_RELEASED;
+		//keybindings[4].Edge = true;
+		
+		keybindings[5].Bindings.push_back((SDL_Scancode)RootEngine::InputManager::MouseButton::LEFT);
+		keybindings[5].Action = RootForce::PlayerAction::ACTIVATE_ABILITY_PRESSED;
+		keybindings[5].ActionUp = RootForce::PlayerAction::ACTIVATE_ABILITY_RELEASED;
+		//keybindings[5].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_1);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY1;
+		keybindings[keybindings.size()-1].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_2);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY2;
+		keybindings[keybindings.size()-1].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_3);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::SELECT_ABILITY3;
+		keybindings[keybindings.size()-1].Edge = true;
+
+		keybindings.push_back(RootForce::Keybinding());
+		keybindings[keybindings.size()-1].Bindings.push_back(SDL_SCANCODE_LSHIFT);
+		keybindings[keybindings.size()-1].Action = RootForce::PlayerAction::PICK_UP_ABILITY;
 		
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
+		m_playerControlSystem->SetKeybindings(keybindings);
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
 		// Initialize physics system
@@ -126,6 +182,7 @@ namespace RootForce
 		m_respawnSystem = new RootSystems::RespawnSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
 
+
 		// State system updates the current state of an entity for animation purposes
 		m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
@@ -133,8 +190,9 @@ namespace RootForce
 		m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
 
-		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
-		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
+		// Initialize the system for resetting the TryPickupComponent
+		m_tryPickupResetSystem = new TryPickupResetSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<TryPickupResetSystem>(m_tryPickupResetSystem);
 
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
@@ -163,17 +221,23 @@ namespace RootForce
 		m_hud->SetSelectedAbility(0);
 
 		//Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext));
 		m_displayIngameMenu = false;
 
 		//Set the network context to the matchstatesystem
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 
-		// Set the server peer to the action system, if we are a server.
+		// Set the server peer to the action and abilityspawn system, if we are a server.
 		if (m_networkContext.m_server != nullptr)
+		{
 			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+		}
 		if (m_networkContext.m_client != nullptr)
+		{
 			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+			m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		}
 
 		//Load the level spawn points into the respawn system
 		m_respawnSystem->LoadSpawnPoints();
@@ -181,15 +245,10 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
-
-		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
 
 	void IngameState::Exit()
 	{
-		// Make sure the user is not stuck keymapping in case of disconnects or other abnormal termination
-		m_keymapper->UnfocusBindAction();
-
 		m_animationSystem->Terminate();
 
 		Network::NetworkEntityID id;
@@ -315,8 +374,14 @@ namespace RootForce
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// ToDo: Send a network message to server to indicate a suicide
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			if(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health != 0)
+			{
+				if(!g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->IsDead)
+				{
+					g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+					MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+				}
+			}
 		}
 
 #ifdef _DEBUG
@@ -396,11 +461,16 @@ namespace RootForce
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
 		}
+
+		{
+			PROFILE("Try-Pickup reset system", g_engineContext.m_profiler);
+			m_tryPickupResetSystem->Process();
+		}
 		
 		{
 			PROFILE("Player control system", g_engineContext.m_profiler);
 
-			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused());
+			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused() || m_displayIngameMenu);
 			m_playerControlSystem->Process();
 		}
 
@@ -417,8 +487,7 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			if(!m_displayIngameMenu)
-				m_actionSystem->Process();
+			m_actionSystem->Process();
 		}
 
 		m_animationSystem->Run();
@@ -428,7 +497,10 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
-
+		{
+			PROFILE("AbilitySpawn system", g_engineContext.m_profiler);
+			m_sharedSystems.m_abilitySpawnSystem->Process();
+		}
 
 		{
 			PROFILE("Ragdoll system", g_engineContext.m_profiler);
@@ -461,10 +533,7 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
-		{
-			PROFILE("Sound System", g_engineContext.m_profiler);
-			m_soundSystem->Process();
-		}
+		
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -513,10 +582,8 @@ namespace RootForce
 			m_displayIngameMenu = false;
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
-			// Update keybindings when returning to game
-			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
-		g_engineContext.m_sound->Update();
+
 		return GameStates::Ingame;
 	}
 }

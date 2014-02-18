@@ -7,6 +7,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -118,7 +119,7 @@ namespace RootForce
 					// Local clients share world with server - does not need to do anything.
 					if (clientComponent->IsRemote
 						&& (clientComponent->State == ClientState::CONNECTED
-							|| clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA))
+						|| clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA))
 					{
 						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
@@ -398,6 +399,19 @@ namespace RootForce
 					}
 				} return true;
 
+				case NetworkMessage::MessageType::AbilityClaimedBy:
+				{
+					NetworkMessage::AbilityClaimedBy m;
+					m.Serialize(false, p_bs);
+
+					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+					spawnPoint->Claimed = m.User;
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = false;
+				} return true;
+
 				case NetworkMessage::MessageType::DestroyEntities:
 				{
 					NetworkMessage::DestroyEntities m;
@@ -434,6 +448,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status
@@ -536,6 +552,8 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
+						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
 					// Send load map status
@@ -1006,6 +1024,16 @@ namespace RootForce
 							}
 						}
 					}
+				} return true;
+
+				case NetworkMessage::MessageType::AbilityTryClaim:
+				{
+					NetworkMessage::AbilityTryClaim m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+					tryPickup->TryPickup = true;
 				} return true;
 
 				case NetworkMessage::MessageType::RespawnRequest:

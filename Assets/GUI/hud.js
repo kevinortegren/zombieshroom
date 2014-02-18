@@ -103,7 +103,10 @@ function Set(p_id, p_value)
 	}
 	if(p_id == "Health")
 	{
-		SetDeathScreen(parseInt(value) <= 0);
+    var oldHealth = parseInt($("#"+p_id).html());
+    var newHealth = parseInt(value);
+		SetDeathScreen(newHealth <= 0);
+    DamageIndicator(oldHealth-newHealth);
 	}
 	if(p_id == "EndGame")
 	{
@@ -136,11 +139,26 @@ function StartCooldown(p_slot, p_duration)
 	}
 }
 
+function DamageIndicator(p_damage)
+{
+  if(p_damage > 0)
+  {
+    var opacity = $("#damageTaken").css("opacity") + (p_damage/20.0);
+    $("#damageTaken").stop().css("opacity", opacity).animate({opacity: 0}, 1000 * opacity);
+  }
+  // else if(p_damage < 0)
+  // {
+    // $("#damageTaken").stop().css("opacity", 0);
+  // }
+}
+
 $(document).ready(function(){
 	// SetAbilityFocus(0);
 	// SetAbility(1, "TestBall");
 	// StartCooldown(1, 3);
 	//UpdateScoreScreen(2, "doqunbop", [[2,"doqunbop",1,11],[1,"The Enemy",11,2],[1,"The Enemy2",0,2],[2,"The Ally",3,0]]);
-	Set("ShowScore", "true");
-	UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
+	//Set("ShowScore", "true");
+	//UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
+  // DamageIndicator(40);
+  // setTimeout("DamageIndicator(40);", 2000);
 });

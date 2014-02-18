@@ -343,6 +343,20 @@ namespace RootForce
 					action->JumpTime = 0.0f;
 				}
 				break;
+			case PlayerAction::PICK_UP_ABILITY:
+				{
+					RootForce::NetworkMessage::AbilityTryClaim m;
+					m.User = network->ID.UserID;
+
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
+					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+					m.Serialize(true, &bs);
+
+					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				}
+				break;
 			default:
 				break;
 			}
