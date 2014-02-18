@@ -169,8 +169,9 @@ namespace RootForce
 		Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
 		renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
-		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
-		renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh_Normal_Trans");
+		renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("AbilityBackground", Render::TextureType::TEXTURE_2D);
+		renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
 	}
 
 	void AbilityRespawnSystem::CreateCollisionComponents(ECS::Entity* p_entity)
