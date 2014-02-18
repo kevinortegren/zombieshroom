@@ -1855,7 +1855,7 @@ namespace RootForce
 												assert(otherPlayerComponent != nullptr);
 
 												NetworkMessage::UserConnected n;
-												n.User = userID;
+												n.User = m_peer->GetIndexFromSystemAddress(addresses[i]);
 												n.IsYou = addresses[i] == p_packet->systemAddress;
 												n.Name = RakNet::RakString(otherPlayerComponent->Name.c_str());
 
