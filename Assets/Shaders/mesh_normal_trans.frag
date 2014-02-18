@@ -38,7 +38,8 @@ void main()
     vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
 	diffuse = vec4(frag_color.xyz, specTerm);
-	normals = bumpNormal.xy;
+    float p = sqrt(bumpNormal.z*8+8);
+    normals = bumpNormal.xy/p + 0.5;
 	background.w = 0.0f;
 
 	if(frag_color.a < 0.5)

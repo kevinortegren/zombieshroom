@@ -73,6 +73,18 @@ vec3 GetVSPositionFromDepth()
 	return (sPos.xyz / sPos.w);
 }
 
+vec3 GetDecodedNormal(vec2 TexCoord)
+{
+	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	    
+    vec2 fenc = vert_normal*4-2;
+    float f = dot(fenc,fenc);
+    float g = sqrt(1-f/4);
+    vec3 normal;
+    normal.xy = fenc*g;
+    normal.z = 1-f/2;
+    return normal;
+}
+
 vec3 FindBlocker(vec3 coord, int useCascade, float offset)
 {
 	float searchWidth = 2 * offset;
@@ -138,11 +150,7 @@ void main() {
 	vec3 diffuse = rt0.xyz;
 	float specTerm = rt0.w;
 
-	vec2 vert_normal = texture(g_Normals, ex_TexCoord).xy;
-	
-	vec3 normal;
-	normal.xy = vert_normal.xy;
-    normal.z = sqrt(1-dot(normal.xy, normal.xy));
+    vec3 normal = GetDecodedNormal(ex_TexCoord);
 
 	vec3 position = GetVSPositionFromDepth();
 

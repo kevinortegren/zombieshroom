@@ -45,6 +45,18 @@ vec3 GetVSPositionFromDepth(vec2 texcoord)
 	return (sPos.xyz / sPos.w);
 }
 
+vec3 GetDecodedNormal(vec2 TexCoord)
+{
+	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	    
+    vec2 fenc = vert_normal*4-2;
+    float f = dot(fenc,fenc);
+    float g = sqrt(1-f/4);
+    vec3 normal;
+    normal.xy = fenc*g;
+    normal.z = 1-f/2;
+    return normal;
+}
+
 void main() {
 
     vec2 TexCoord = gl_FragCoord.xy / textureSize(g_Diffuse, 0);
@@ -59,10 +71,7 @@ void main() {
 	vec3 light = vec3(0.0);
 	
 	// Normal.
-	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	
-	vec3 normal;
-	normal.xy = vert_normal.xy;
-	normal.z = sqrt(1-dot(normal.xy, normal.xy));
+	vec3 normal = GetDecodedNormal(TexCoord);
   
 	// Materials.
 	vec4 rt0 = texture(g_Diffuse, TexCoord);

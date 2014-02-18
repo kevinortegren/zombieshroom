@@ -2,9 +2,14 @@
 #extension GL_EXT_geometry_shader4 : enable  
 
 //#define SHOW_LOD
+//#define SHOW_NORMALS
 
 layout(points) in;
+#ifdef SHOW_NORMALS
+layout(line_strip, max_vertices = 10) out;
+#else
 layout(triangle_strip, max_vertices = 80) out;
+#endif
 
 layout(std140) uniform PerFrame
 {
@@ -28,8 +33,8 @@ in vec3 gs_normal_in[];
 in float gs_density_in[];
 in float gs_lod_in[];
 
-out vec3 vert_normal1;
 out vec2 vert_texcoord1;
+out vec3 vert_normal1;
 out vec3 vert_color1;
 
 // LOD 0
@@ -45,11 +50,11 @@ vec3 mediumBlade3[5] = vec3[](
 
 // Texcoords.
 vec2 mediumBlade3TC[5] = vec2[](
-    vec2(0.999992, 0.000006),
-    vec2(0.000008, 0.000006),
-    vec2(0.930247, 0.578085),
-    vec2(0.069754, 0.578085),
-    vec2(0.500000, 0.999991)
+    vec2(0.999992, -0.000006),
+    vec2(0.000008, -0.000006),
+    vec2(0.930247, -0.578085),
+    vec2(0.069754, -0.578085),
+    vec2(0.500000, -0.999991)
 );
 
 // Normals.
@@ -61,32 +66,48 @@ vec3 mediumBlade3Normals[5] = vec3[](
     vec3(-0.451078, -0.791268, -0.412824)
 );
 
+
 void CreateMediumBlade3(vec3 position)
 {
-    float flipped = 1;
-    vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
-    vec3 direction = normalize((position + mediumBlade3[0]) - cameraPos);
-        if(dot(direction, mediumBlade3Normals[0]) > 0)
-            flipped = -1;
-    
+#ifdef SHOW_NORMALS
     int i;
     for(i = 0; i < 5; i++)
     {
         vec4 pos = vec4(position + mediumBlade3[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;
-        
-        vert_texcoord1 = mediumBlade3TC[i];
-        vert_normal1 = (viewMatrix * vec4(mediumBlade3Normals[i], 0.0)).xyz;
+        EmitVertex();
+
+        vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
+
+        vec4 pos2 = vec4(position + mediumBlade3[i] + normal * 0.2, 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos2;
+        EmitVertex();
+        EndPrimitive();
+    }
+#else
+
+    float flipped = 1;
+    vec3 normal = normalize(mediumBlade3Normals[0].xyz);
+    vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
+    vec3 direction = vec3((position + mediumBlade3[0]) - cameraPos);
+    if(dot(direction, normal) > 0)
+        flipped = -1;
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade3[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;
+     
+        vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz;
         vert_normal1 *= flipped;
-        
-  
-        
-        
-        
+        vert_texcoord1 = mediumBlade3TC[i];
 
         EmitVertex();
     }
     EndPrimitive();
+#endif
 }
 
 vec3 mediumBlade[5] = vec3[](
