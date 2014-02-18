@@ -126,20 +126,20 @@ namespace Ragdoll
 			if(index < BodyPart::LEFTARM && index != BodyPart::RIGHTARM)
 			{
 				btVector3 btAxis = (m_bodies[index + 1]->getWorldTransform().getRotation().getAxis());
-				glm::vec3 axis = glm::vec3(btAxis.y(), btAxis.x(), btAxis.z());
+				glm::vec3 axis = glm::vec3(btAxis.x(), btAxis.y(), btAxis.z());
 				//glm::vec3 rot = axis * 0.4f;
 				//glm::vec3 rot = axis * m_boneShapeSize[index];
 				glm::vec3 rot = glm::rotate(m_boneShapeSize[index + 1], m_bodies[index + 1]->getWorldTransform().getRotation().getAngle(), axis);
-				toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() + rot.y;
+				toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - rot.x;
 				if(index < 3)
 				{
-					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() + rot.x);
-					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() + rot.z);
+					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.y);
+					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
 					
 				}
 				else
 				{
-					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.x);
+					toTrans[3].x = (m_bodies[index + 1]->getWorldTransform().getOrigin().x() - rot.y);
 					toTrans[3].z = (m_bodies[index + 1]->getWorldTransform().getOrigin().z() - rot.z);
 					//toTrans[3].y = m_bodies[index + 1]->getWorldTransform().getOrigin().y() - (m_boneShapeSize[index].y + m_boneShapeSize[index + 1].y);
 				}

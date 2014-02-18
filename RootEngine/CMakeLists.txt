@@ -25,6 +25,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	add_subdirectory(Render)
 	add_subdirectory(GUI)
 	add_subdirectory(Script)
+	add_subdirectory(Sound)
 else()
 	# Add defines
 	add_definitions(-DCOMPILING_LEVEL_EDITOR)

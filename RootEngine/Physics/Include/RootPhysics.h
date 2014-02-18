@@ -30,7 +30,8 @@ namespace RootEngine
 				TYPE_ABILITY,
 				TYPE_DYNAMIC,
 				TYPE_PLAYER,
-				TYPE_RAGDOLL
+				TYPE_RAGDOLL,
+				TYPE_ABILITYSPAWN,
 			};
 		}
 		namespace PhysicsShape	

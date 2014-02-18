@@ -2,6 +2,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootSystems/Include/RenderingSystem.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
@@ -50,6 +51,7 @@ namespace RootForce
 			job.m_mesh = emitter->m_systems[i]->GetMesh();
 			job.m_material = emitter->m_particleSystems[i]->m_material;
 			job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
+			job.m_renderPass = RenderPass::RENDERPASS_PARTICLES;
 
 			g_engineContext.m_renderer->AddRenderJob(job);
 		}

@@ -9,6 +9,8 @@
 
 namespace RootForce
 {
+	const float JUMP_TIME_LIMIT = 1.0f;
+
 	namespace EntityState
 	{
 		enum EntityState
@@ -21,6 +23,20 @@ namespace RootForce
 		};
 	}
 
+	namespace AbilityState
+	{
+		enum AbilityState
+		{
+			OFF,
+			START_CHARGING,
+			CHARGING,
+			START_CHANNELING,
+			CHANNELING,
+			STOP_CHANNELING,
+			STOP_CHARGING_AND_CHANNELING
+		};
+	}
+
 
 #ifndef COMPILE_LEVEL_EDITOR
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
@@ -28,10 +44,24 @@ namespace RootForce
 		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
-		bool Jump;
 		glm::vec2 Angle;
-		bool ActivateAbility;
+
+		float JumpTime;
+
+		float AbilityTime;
 		uint8_t SelectedAbility;
+
+		bool WantRespawn;
+
+		PlayerActionComponent() 
+			: ActionID(Network::ReservedActionID::NONE)
+			, MovePower(0.0f)
+			, StrafePower(0.0f)
+			, JumpTime(0.0f)
+			, AbilityTime(0.0f)
+			, SelectedAbility(1)
+			, WantRespawn(false)
+		{}
 	};
 #endif
 
@@ -60,6 +90,19 @@ namespace RootForce
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
+		int SpawnIndex;
+		bool SpawnPointReceived;
+
+		HealthComponent()
+		{
+			Health = 0;
+			LastDamageSourceID = 0;
+			IsDead = true;
+			WantsRespawn = true;
+			RespawnDelay = 0.0f;
+			SpawnIndex = -1;
+			SpawnPointReceived = false;
+		}
 	};
 #endif
 
@@ -67,7 +110,12 @@ namespace RootForce
 	{
 		std::string Name;
 		float Cooldown;
+		bool OnCooldown;
 		int Charges;
+
+		AbilityInfo()
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1)
+		{}
 	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>
@@ -77,8 +125,30 @@ namespace RootForce
 
 		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
+		AbilityState::AbilityState AbilityState;
 
 		int Score;
 		int Deaths;
+
+		PlayerComponent()
+		{
+			TeamID = 0;
+			SelectedAbility = 0;
+			AbilityState = AbilityState::OFF;
+			Score = 0;
+			Deaths = 0;
+		}
+	};
+
+	struct TryPickupComponent : public ECS::Component<TryPickupComponent>
+	{
+		union
+		{
+			bool TryPickup;
+			int Padding[2]; // world's most handsome code (components need to have size >= 8?)
+		};
+
+		TryPickupComponent()
+			: TryPickup(false) {}
 	};
 }

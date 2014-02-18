@@ -17,6 +17,8 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/RagdollSystem.h>
 #include <RootSystems/Include/WaterSystem.h>
+#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/SoundSystem.h>
 
 namespace RootForce
 {

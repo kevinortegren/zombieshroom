@@ -76,15 +76,30 @@ TEST(StateSystem, ProcessEntity)
 		system->Process();
 	}
 
+
+	//Check that we cannot jump over the jump limit of 1.0f
 	{
 		EXPECT_EQ(state->CurrentState, RootForce::EntityState::GROUNDED);
-		action->Jump = true;
+		action->JumpTime = 1.5f;
+		aSystem->Process();
+		g_engineContext.m_physics->Update(0.1f);
+		pSystem->Process();
+		system->Process();
+		EXPECT_EQ(state->CurrentState, RootForce::EntityState::GROUNDED);
+	}
+
+	//Do an allowed jump
+	{
+		EXPECT_EQ(state->CurrentState, RootForce::EntityState::GROUNDED);
+		action->JumpTime = 0.5f;
 		aSystem->Process();
 		g_engineContext.m_physics->Update(0.1f);
 		pSystem->Process();
 		system->Process();
 		EXPECT_EQ(state->CurrentState, RootForce::EntityState::ASCENDING);
 	}
+
+
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	world->GetTagManager()->UnregisterAll();
 	world->GetGroupManager()->UnregisterAll();

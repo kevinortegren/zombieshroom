@@ -8,6 +8,7 @@ namespace RootEngine
 {
 	struct ConfigManagerInterface
 	{
+		virtual void LoadConfig(const std::string& p_filepath) = 0;
 		virtual void StoreConfig(const std::string& p_filepath) = 0;
 
 		virtual bool GetConfigValueAsBool(const std::string& p_key) = 0;

@@ -66,6 +66,7 @@
             - name: vert_type1
             - name: vert_color1
             - name: vert_accel1
+            - name: vert_rotation1
 
     - name: Particle_Render
     
@@ -80,9 +81,6 @@
         - name: g_LA
           slot: 5
           
-      flags:
-        - name: Forward
-          
       programs:
         - name: particle_render
           shaders:
@@ -96,7 +94,7 @@
           # Blend Mode:
           # None = 0
           # AlphaBlend = 1
-          # Addative = 2
+          # Additive = 2
           blend: 1
           
           # Depth settings.

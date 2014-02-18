@@ -1,7 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
-#include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility\ECS\Include\Component.h>
 #include <Utility\ECS\Include\EntitySystem.h>
@@ -32,6 +31,8 @@ namespace RootSystems
 		ActionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext)
+			, m_serverPeer(nullptr)
+			, m_clientPeer(nullptr)
 		{
 			SetUsage<RootForce::PlayerActionComponent>();
 			SetUsage<RootForce::Network::NetworkComponent>();
@@ -47,10 +48,15 @@ namespace RootSystems
 		void Init();
 
 		void ProcessEntity(ECS::Entity* p_entity);
+        
 		void UpdateAimingDevice(bool m_inMenu);
+		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer);
+		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer);
 	private:
 
 		RootEngine::GameSharedContext* m_engineContext;
+		RakNet::RakPeerInterface* m_serverPeer;
+		RakNet::RakPeerInterface* m_clientPeer;
 
 		ECS::ComponentMapper<RootForce::PlayerActionComponent> m_action;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;

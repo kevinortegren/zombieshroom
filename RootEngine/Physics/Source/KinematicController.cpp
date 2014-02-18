@@ -76,7 +76,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject->setContactProcessingThreshold(0.f);
 	
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	

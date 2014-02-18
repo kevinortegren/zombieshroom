@@ -15,6 +15,7 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
+	local tryPickup = TryPickupComponent.New(player);
 	--local waterCollider = WaterCollider.New(player);
 	--waterCollider:SetDisturbPower(0.0);
 	--waterCollider:SetDisturbInterval(0.5);
@@ -28,16 +29,16 @@ function Player.OnCreate(userId, actionId)
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 
-	playerAction:SetJump(false);
+	playerAction:SetJumpTime(0.0);
 	playerAction:SetMovePower(0);
 	playerAction:SetStrafePower(0);
 	playerAction:SetAngle(Vec2.New(0, 0));
-	playerAction:SetActivateAbility(false);
+	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall");
-	playerComponent:SetAbility(1, "AbilityDash");
-	playerComponent:SetAbility(2, "MagicMissile");
+	playerComponent:SetAbility(0, "AbilityBall", -1);
+	playerComponent:SetAbility(1, "AbilityDash", -1);
+	playerComponent:SetAbility(2, "AbilityRay" ,-1);
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(20);
@@ -62,7 +63,7 @@ function Player.OnCreate(userId, actionId)
 	local aimingNetwork = Network.New(aimingEntity, userId, actionId);
 
 	Entity.RegisterGroup("NonExport", aimingEntity);
-    
+	
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
@@ -86,7 +87,9 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
-		playerControl:SetMouseSensitivity(0.15);
+
+		playerControl:SetMouseSensitivity(0.2);
+
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
@@ -95,10 +98,26 @@ end
 
 function Player.OnCollide (self, entity)
 	-- Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
+ 	local hitCol = entity:GetCollision();
+ 	local hitPhys = entity:GetPhysics();
+	local type = hitPhys:GetType(hitCol);
+  if  type == PhysicsType.TYPE_ABILITYSPAWN then
+    --Logging.Log(LogLevel.DEBUG_PRINT, "collided with ability spawn!");
+    --local action = self:GetPlayerAction();
+    --local playerComponent = self:GetPlayerComponent();
+    --if action:TryPickup() then
+    --  local abilitySpawn = entity:GetAbilitySpawn();
+    --  playerComponent:SetAbility(playerComponent:GetSelectedAbility(), abilitySpawn:GetCurrentName(), abilitySpawn:GetCurrentCharges());
+    --  action:SetTryPickup(false);
+    --  abilitySpawn:SetClaimed(true);
+    --  Logging.Log(LogLevel.DEBUG_PRINT, "pick up successful!");
+    --end
+  end
+  
 end
 
 function Player.OnDestroy (self)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-    local collision = self:GetCollision();
+	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
 end

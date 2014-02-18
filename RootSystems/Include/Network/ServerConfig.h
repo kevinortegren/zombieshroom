@@ -28,6 +28,8 @@ namespace RootSystems
 		std::string Password;
 		// Level file name
 		std::string MapName;
+		//Ability pack to be used by the server
+		std::string AbilityPack;
 		// Game mode, see enum for details
 		GameMode::GameMode GameMode;
 		// Match length in seconds
@@ -42,6 +44,7 @@ namespace RootSystems
 			ServerName = "Server";
 			Password = "";
 			MapName = "Nyaste";
+			AbilityPack = "Standard";
 			GameMode = GameMode::DEATHMATCH;
 			MatchTime = 15*60; // 15 min
 			KillCount = 0; // no killcount-victory

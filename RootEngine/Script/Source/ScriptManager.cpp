@@ -79,28 +79,59 @@ namespace RootEngine
 			m_parameterCount++;
 		}
 
-		void ScriptManager::SetGlobalString(const std::string& p_variableName, const std::string& p_string)
+		void ScriptManager::SetGlobalString(const std::string& p_variableName, const std::string& p_string, const std::string& p_globalName)
 		{
-			lua_getglobal(m_luaState, "Global");
+			lua_getglobal(m_luaState, p_globalName.c_str());
 			lua_pushstring(m_luaState, p_string.c_str());
 			lua_setfield(m_luaState, -2, p_variableName.c_str());
 			lua_pop(m_luaState, 1);
 		}
 
-		void ScriptManager::SetGlobalNumber(const std::string& p_variableName, double p_double)
+		void ScriptManager::SetGlobalNumber(const std::string& p_variableName, double p_double, const std::string& p_globalName)
 		{	
-			lua_getglobal(m_luaState, "Global");
+			lua_getglobal(m_luaState, p_globalName.c_str());
 			lua_pushnumber(m_luaState, p_double);
 			lua_setfield(m_luaState, -2, p_variableName.c_str());
 			lua_pop(m_luaState, 1);
 		}
 
-		void ScriptManager::SetGlobalBoolean(const std::string& p_variableName, bool p_bool)
+		void ScriptManager::SetGlobalBoolean(const std::string& p_variableName, bool p_bool, const std::string& p_globalName)
 		{
-			lua_getglobal(m_luaState, "Global");
+			lua_getglobal(m_luaState, p_globalName.c_str());
 			lua_pushboolean(m_luaState, p_bool);
 			lua_setfield(m_luaState, -2, p_variableName.c_str());
 			lua_pop(m_luaState, 1);
+		}
+
+
+		std::string ScriptManager::GetGlobalString(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			std::string variable(lua_tostring(m_luaState, -1));
+			lua_pop(m_luaState, 2);
+
+			return variable;
+		}
+
+		double ScriptManager::GetGlobalNumber(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			double variable = (double) lua_tonumber(m_luaState, -1);
+			lua_pop(m_luaState, 2);
+
+			return variable;
+		}
+
+		bool ScriptManager::GetGlobalBoolean(const std::string& p_variableName, const std::string& p_globalName)
+		{
+			lua_getglobal(m_luaState, p_globalName.c_str());
+			lua_getfield(m_luaState, -1, p_variableName.c_str());
+			bool variable = lua_toboolean(m_luaState, -1) != 0;
+			lua_pop(m_luaState, 2);
+
+			return variable;
 		}
 
 
@@ -112,7 +143,13 @@ namespace RootEngine
 		int ScriptManager::LoadScript( std::string p_scriptPath )
 		{
 			// Execute the script
-			return luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+
+			if (luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str()))
+			{
+				printf("%s\n", lua_tostring(m_luaState, -1));
+				return 1;
+			}
+			return 0;
 		}
 
 		lua_State* ScriptManager::GetLuaState()

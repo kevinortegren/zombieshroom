@@ -20,14 +20,10 @@ namespace RootForce
 		m_lanList = std::shared_ptr<RootSystems::LanList>(new RootSystems::LanList);
 	}
 
-	void MenuState::Enter()
+	void MenuState::Enter(Keymapper* p_keymapper)
 	{
 		// Destroy any existing entities
-		Network::NetworkEntityID id;
-		id.UserID = Network::ReservedUserID::ALL;
-		id.ActionID = Network::ReservedActionID::ALL;
-		id.SequenceID = Network::ReservedSequenceID::ALL;
-		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager()); 
+		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager()); 
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -40,18 +36,16 @@ namespace RootForce
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 
 		// Initialize the menu
-		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext));
+		m_menu = std::shared_ptr<Menu>(new Menu(g_engineContext.m_gui->LoadURL("Menu", "menu.html"), g_engineContext, p_keymapper));
 
 		// Reset the menu
 		m_menu->LoadDefaults(g_engineContext.m_configManager, m_workingDir);
 
 		// Destroy any existing server/client and setup a new network client so we can search for LAN-servers
-		if(!m_networkContext.m_client)
-		{
-			m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
-			m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
-			m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
-		}
+		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
+		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
+		m_networkContext.m_client->SetMessageHandler(m_networkContext.m_clientMessageHandler.get());
+
 		m_networkContext.m_server = nullptr;
 		m_networkContext.m_serverMessageHandler = nullptr;
 
@@ -81,7 +75,7 @@ namespace RootForce
 		for(unsigned int i = 0; i < lanList.size(); i++)
 			m_menu->AddServer(lanList.at(i));
 
-		//Update Menu to make sure Setting changes are made in the main thread
+		// Update Menu to make sure Setting changes are made in the main thread
 		m_menu->Update();
 
 		// Handle GUI events
@@ -105,7 +99,11 @@ namespace RootForce
 				// Retrieve hosting data and go into a connecting state.
 				m_playData.Host = true;
 				m_playData.ServerInfo.ServerName = Awesomium::ToString(event.data[0].ToString());
+
 				m_playData.ServerInfo.Port = event.data[1].ToInteger();
+				if(m_playData.ServerInfo.Port == 0)
+					m_playData.ServerInfo.Port = 5567;
+
 				m_playData.ServerInfo.Password = Awesomium::ToString(event.data[2].ToString());
 				m_playData.ServerInfo.MaxPlayers = event.data[3].ToInteger();
 				m_playData.ServerInfo.MatchTime = event.data[4].ToInteger();
@@ -121,7 +119,10 @@ namespace RootForce
 				m_playData.Host = false;
 				m_playData.ClientInfo.Address = Awesomium::ToString(event.data[1].ToString());
 				m_playData.ClientInfo.Password = Awesomium::ToString(event.data[2].ToString());
+
 				m_playData.ClientInfo.Port = event.data[0].ToInteger();
+				if(m_playData.ClientInfo.Port == 0)
+					m_playData.ClientInfo.Port = 5567;
 
 				result = GameStates::Connecting;
 			} break;

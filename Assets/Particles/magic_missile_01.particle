@@ -12,6 +12,9 @@
   DIRECTION: [1, 0, 0]
   SPREAD: 0.1
   SPAWNTIME: 0.04
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   TEXTURE: smoke
   EFFECT: Particle/Particle
   NAME: 1
@@ -28,6 +31,9 @@
   GRAVITY: [2.77556e-017, 0, 0]
   DIRECTION: [1, 0, 0]
   SPREAD: 0.1
+  ORBITSPEED: 0.0
+  ORBITRADIUS: 0.0
+  TEMPLATE: 0
   SPAWNTIME: 0.04
   TEXTURE: smoke
   EFFECT: Particle/Particle

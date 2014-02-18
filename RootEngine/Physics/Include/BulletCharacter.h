@@ -15,10 +15,18 @@ public:
 	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
+
 	void StopKnockback();
+
+
+	///////// Taken from Bulletkinematiccontrolled and overwritten to improve controller
+	void preStep (  btCollisionWorld* collisionWorld);
 	void stepForwardAndStrafe ( btCollisionWorld* collisionWorld, const btVector3& walkMove);
 	void stepDown ( btCollisionWorld* collisionWorld, btScalar dt);
 	void stepUp ( btCollisionWorld* world);
+	bool recoverFromPenetration ( btCollisionWorld* collisionWorld);
+	
+
 	float test(const btVector3& start,const btVector3& end, btCollisionWorld* world );
 	btVector3 GetKnockbackVector() const {return m_knockbackVelocity;}
 private:

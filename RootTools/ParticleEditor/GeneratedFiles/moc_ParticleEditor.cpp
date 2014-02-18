@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ParticleEditor_t {
-    QByteArrayData data[51];
-    char stringdata[752];
+    QByteArrayData data[57];
+    char stringdata[863];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -79,7 +79,13 @@ QT_MOC_LITERAL(46, 647, 23),
 QT_MOC_LITERAL(47, 671, 26),
 QT_MOC_LITERAL(48, 698, 15),
 QT_MOC_LITERAL(49, 714, 18),
-QT_MOC_LITERAL(50, 733, 17)
+QT_MOC_LITERAL(50, 733, 17),
+QT_MOC_LITERAL(51, 751, 19),
+QT_MOC_LITERAL(52, 771, 18),
+QT_MOC_LITERAL(53, 790, 21),
+QT_MOC_LITERAL(54, 812, 22),
+QT_MOC_LITERAL(55, 835, 7),
+QT_MOC_LITERAL(56, 843, 18)
     },
     "ParticleEditor\0MenuNew\0\0MenuOpen\0"
     "MenuSave\0ManuSaveAs\0MenuExit\0MenuViewStats\0"
@@ -102,6 +108,9 @@ QT_MOC_LITERAL(50, 733, 17)
     "colorAlphaSliderChanged\0"
     "endColorAlphaSliderChanged\0TemplateChanged\0"
     "OrbitRadiusChanged\0OrbitSpeedChanged\0"
+    "SpreadSliderChanged\0ModelDoubleClicked\0"
+    "ModelTexDoubleClicked\0BackgroundColorChanged\0"
+    "p_value\0RemoveObjectButton\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -111,7 +120,7 @@ static const uint qt_meta_data_ParticleEditor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      43,   14, // methods
+      48,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -119,49 +128,54 @@ static const uint qt_meta_data_ParticleEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  229,    2, 0x08,
-       3,    0,  230,    2, 0x08,
-       4,    0,  231,    2, 0x08,
-       5,    0,  232,    2, 0x08,
-       6,    0,  233,    2, 0x08,
-       7,    0,  234,    2, 0x08,
-       8,    0,  235,    2, 0x08,
-       9,    0,  236,    2, 0x08,
-      10,    0,  237,    2, 0x08,
-      11,    0,  238,    2, 0x08,
-      12,    0,  239,    2, 0x08,
-      13,    0,  240,    2, 0x08,
-      14,    0,  241,    2, 0x08,
-      15,    1,  242,    2, 0x08,
-      17,    1,  245,    2, 0x08,
-      19,    1,  248,    2, 0x08,
-      21,    1,  251,    2, 0x08,
-      23,    1,  254,    2, 0x08,
-      25,    1,  257,    2, 0x08,
-      26,    1,  260,    2, 0x08,
-      27,    1,  263,    2, 0x08,
-      28,    1,  266,    2, 0x08,
-      29,    1,  269,    2, 0x08,
-      30,    1,  272,    2, 0x08,
-      31,    1,  275,    2, 0x08,
-      32,    1,  278,    2, 0x08,
-      33,    1,  281,    2, 0x08,
-      34,    1,  284,    2, 0x08,
-      35,    1,  287,    2, 0x08,
-      36,    1,  290,    2, 0x08,
-      37,    1,  293,    2, 0x08,
-      38,    1,  296,    2, 0x08,
-      39,    1,  299,    2, 0x08,
-      40,    1,  302,    2, 0x08,
-      41,    1,  305,    2, 0x08,
-      43,    0,  308,    2, 0x08,
-      44,    1,  309,    2, 0x08,
-      45,    0,  312,    2, 0x08,
-      46,    1,  313,    2, 0x08,
-      47,    1,  316,    2, 0x08,
-      48,    1,  319,    2, 0x08,
-      49,    1,  322,    2, 0x08,
-      50,    1,  325,    2, 0x08,
+       1,    0,  254,    2, 0x08,
+       3,    0,  255,    2, 0x08,
+       4,    0,  256,    2, 0x08,
+       5,    0,  257,    2, 0x08,
+       6,    0,  258,    2, 0x08,
+       7,    0,  259,    2, 0x08,
+       8,    0,  260,    2, 0x08,
+       9,    0,  261,    2, 0x08,
+      10,    0,  262,    2, 0x08,
+      11,    0,  263,    2, 0x08,
+      12,    0,  264,    2, 0x08,
+      13,    0,  265,    2, 0x08,
+      14,    0,  266,    2, 0x08,
+      15,    1,  267,    2, 0x08,
+      17,    1,  270,    2, 0x08,
+      19,    1,  273,    2, 0x08,
+      21,    1,  276,    2, 0x08,
+      23,    1,  279,    2, 0x08,
+      25,    1,  282,    2, 0x08,
+      26,    1,  285,    2, 0x08,
+      27,    1,  288,    2, 0x08,
+      28,    1,  291,    2, 0x08,
+      29,    1,  294,    2, 0x08,
+      30,    1,  297,    2, 0x08,
+      31,    1,  300,    2, 0x08,
+      32,    1,  303,    2, 0x08,
+      33,    1,  306,    2, 0x08,
+      34,    1,  309,    2, 0x08,
+      35,    1,  312,    2, 0x08,
+      36,    1,  315,    2, 0x08,
+      37,    1,  318,    2, 0x08,
+      38,    1,  321,    2, 0x08,
+      39,    1,  324,    2, 0x08,
+      40,    1,  327,    2, 0x08,
+      41,    1,  330,    2, 0x08,
+      43,    0,  333,    2, 0x08,
+      44,    1,  334,    2, 0x08,
+      45,    0,  337,    2, 0x08,
+      46,    1,  338,    2, 0x08,
+      47,    1,  341,    2, 0x08,
+      48,    1,  344,    2, 0x08,
+      49,    1,  347,    2, 0x08,
+      50,    1,  350,    2, 0x08,
+      51,    1,  353,    2, 0x08,
+      52,    1,  356,    2, 0x08,
+      53,    1,  359,    2, 0x08,
+      54,    1,  362,    2, 0x08,
+      56,    0,  365,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -207,6 +221,11 @@ static const uint qt_meta_data_ParticleEditor[] = {
     QMetaType::Void, QMetaType::Int,   24,
     QMetaType::Void, QMetaType::Double,   24,
     QMetaType::Void, QMetaType::Double,   24,
+    QMetaType::Void, QMetaType::Int,   24,
+    QMetaType::Void, QMetaType::QModelIndex,   42,
+    QMetaType::Void, QMetaType::QModelIndex,   42,
+    QMetaType::Void, QMetaType::Int,   55,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -259,6 +278,11 @@ void ParticleEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 40: _t->TemplateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 41: _t->OrbitRadiusChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 42: _t->OrbitSpeedChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 43: _t->SpreadSliderChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 44: _t->ModelDoubleClicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 45: _t->ModelTexDoubleClicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 46: _t->BackgroundColorChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 47: _t->RemoveObjectButton(); break;
         default: ;
         }
     }
@@ -289,13 +313,13 @@ int ParticleEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 43)
+        if (_id < 48)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 43;
+        _id -= 48;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 43)
+        if (_id < 48)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 43;
+        _id -= 48;
     }
     return _id;
 }

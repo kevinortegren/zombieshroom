@@ -61,7 +61,6 @@ namespace Render
 		
 		// Rendering
 		virtual void AddRenderJob(RenderJob& p_job) = 0;
-		virtual void AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade) = 0;
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
@@ -121,7 +120,6 @@ namespace Render
 		// Rendering
 		void Clear();
 		void AddRenderJob(RenderJob& p_job);
-		void AddShadowJob(const std::vector<ShadowJob>& p_jobs, int p_cascade);
 		void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color);
 		void Render();
 		void Swap();
@@ -169,9 +167,9 @@ namespace Render
 		void ProcessRenderJobs();
 
 		void Sorting();
-		void GeometryPass(int p_layer);
 		void ShadowPass();
-		void LightingPass();
+		void GeometryPass(int p_layer);	
+		void LightingPass(int p_layer);
 		void ForwardPass();
 		void PostProcessPass();
 		void Output();
