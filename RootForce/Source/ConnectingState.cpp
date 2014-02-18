@@ -62,7 +62,7 @@ namespace RootForce
 
 		if (p_playData.Host)
 		{
-			// Setup the server and connect a local client.
+			// Setup the server and connect a local client. Reset the server before creating a new one, since the server must be destructed before a new one can be created.
 			m_networkContext.m_server.reset();
 			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
