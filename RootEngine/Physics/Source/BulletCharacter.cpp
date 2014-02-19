@@ -412,7 +412,8 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 				//test a double fall height, to see if the character should interpolate it's fall (full) or not (partial)
 				m_ghostObject->convexSweepTest (m_convexShape, start, end_double, callback2, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 			}
-		} else
+		} 
+		else
 		{
 			collisionWorld->convexSweepTest (m_convexShape, start, end, callback, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 
@@ -582,4 +583,10 @@ float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, bt
 	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
 	m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
 	return callback.m_closestHitFraction;
+}
+
+void BulletCharacter::StopKnockback()
+{
+	m_knockbackVelocity.setZero();
+	m_hasBeenKnockbacked = false;
 }

@@ -143,7 +143,7 @@ function DamageIndicator(p_damage)
 {
   if(p_damage > 0)
   {
-    var opacity = $("#damageTaken").css("opacity") + (p_damage/20.0);
+    var opacity = (p_damage/10.0);
     $("#damageTaken").stop().css("opacity", opacity).animate({opacity: 0}, 1000 * opacity);
   }
   // else if(p_damage < 0)

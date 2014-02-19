@@ -199,6 +199,7 @@ namespace RootForce
 						std::string abilityName = playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name;
 						if (abilityName != "")
 						{
+							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Ability %s charge timer %f, charge state %d", abilityName.c_str(), action->AbilityTime, (int) playerComponent->AbilityState);
 
 							float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
 							float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);

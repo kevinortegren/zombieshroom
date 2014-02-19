@@ -193,7 +193,7 @@ namespace Render
 		m_gbuffer.Init(this, width, height);
 
 		// Setup shadow device.
-		m_shadowDevice.Init(this, 1024, 1024);
+		m_shadowDevice.Init(this, 2048, 2048);
 
 		// Setup lighting device.
 		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
@@ -394,7 +394,7 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		PROFILE("Deffered Pass", g_context.m_profiler);
+		PROFILE("Deferred Pass", g_context.m_profiler);
 		{
 			// Loop through layers.
 			for(int i = 0; i < 2; i++)
@@ -605,9 +605,10 @@ namespace Render
 
 		// Bind background as Input.
 		m_gbuffer.m_backgroundTexture->Bind(5);
-		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 
+		m_lighting.SSAO();
 		// Clear previous la result.
+		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 		m_lighting.Clear();
 
 		// Apply lighting.
@@ -617,6 +618,7 @@ namespace Render
 		//m_lighting.PointLightRender();
 		m_lighting.PointLightFSQ();
 		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}

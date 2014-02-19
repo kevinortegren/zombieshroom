@@ -315,6 +315,12 @@
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="orbitRadiusSpinBox">
+             <property name="minimum">
+              <double>-100.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>100.000000000000000</double>
+             </property>
              <property name="singleStep">
               <double>0.100000000000000</double>
              </property>
@@ -322,6 +328,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="orbitSpeedSpinBox">
+             <property name="minimum">
+              <double>-100.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>100.000000000000000</double>
+             </property>
              <property name="singleStep">
               <double>0.100000000000000</double>
              </property>
@@ -760,9 +772,9 @@
       <property name="geometry">
        <rect>
         <x>6</x>
-        <y>4</y>
+        <y>28</y>
         <width>497</width>
-        <height>415</height>
+        <height>391</height>
        </rect>
       </property>
      </widget>
@@ -774,6 +786,24 @@
         <width>497</width>
         <height>339</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="removeObjectButton">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>4</y>
+        <width>497</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Remove model</string>
       </property>
      </widget>
     </widget>

@@ -44,7 +44,7 @@ namespace RootEngine
 
 		unsigned int Animation::GetIndexFromBoneName( std::string p_boneName )
 		{
-			return m_boneMapping[p_boneName];
+				return m_boneMapping[p_boneName];
 		}
 
 

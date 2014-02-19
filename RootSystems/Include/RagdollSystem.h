@@ -5,6 +5,7 @@
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/CollisionSystem.h>
+#include <RootSystems/Include/Transform.h>
 namespace RootForce
 {
 	struct Ragdoll : public ECS::Component<Ragdoll>
@@ -28,6 +29,7 @@ namespace RootForce
 			SetUsage<Ragdoll>();
 			SetUsage<Animation>();
 			SetUsage<Renderable>();
+			SetUsage<Transform>();
 		}
 		~RagdollSystem();
 		void Init();
@@ -40,6 +42,7 @@ namespace RootForce
 		ECS::ComponentMapper<Ragdoll> m_ragdoll;
 		ECS::ComponentMapper<Renderable> m_renderables;
 		ECS::ComponentMapper<Collision> m_collisions;
+		ECS::ComponentMapper<Transform> m_transforms;
 
 	private:
 		void NameMapper( std::map<std::string, int> * p_nameToIndex, aiNode* p_rootNode, RootEngine::RootAnimation::AnimationInterface* p_anim, const aiScene* p_aiScene);
