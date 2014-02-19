@@ -43,6 +43,11 @@ namespace RootForce
 		}
 		else if(p_action.compare("PICK_UP_ABILITY") == 0)
 			p_binding.Action = PlayerAction::PICK_UP_ABILITY;
+		else if(p_action.compare("ACTIVATE_PUSH_ABILITY") == 0)
+		{
+			p_binding.Action = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED;
+			p_binding.ActionUp = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED;
+		}
 		else
 			p_binding.Action = PlayerAction::NONE;
 
