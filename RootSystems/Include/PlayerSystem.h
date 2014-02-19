@@ -69,6 +69,7 @@ namespace RootForce
 	{
 		float MovementSpeed;
 		float JumpForce;
+		float JumpBoostForce;
 	};
 
 	struct StateComponent : public ECS::Component<StateComponent>

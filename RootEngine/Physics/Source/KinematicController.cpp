@@ -153,6 +153,11 @@ void KinematicController::Jump()
 	}
 }
 
+void KinematicController::JumpBoost( float p_boostPower )
+{
+	m_kinController->JumpBoost(p_boostPower);
+}
+
 void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
 {
 	if(!m_activated)

@@ -1405,6 +1405,13 @@ namespace RootForce
 			(*s)->JumpForce = (float)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
+		static int PlayerPhysicsSetJumpBoostForce(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			(*s)->JumpBoostForce = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
 		static int PlayerPhysicsGetMovementSpeed(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1417,6 +1424,13 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
 			lua_pushnumber(p_luaState, (*s)->JumpForce);
+			return 1;
+		}
+		static int PlayerPhysicsGetJumpBoostForce(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerPhysics **s = (RootForce::PlayerPhysics**)luaL_checkudata(p_luaState, 1, "PlayerPhysics");
+			lua_pushnumber(p_luaState, (*s)->JumpBoostForce);
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -2312,8 +2326,10 @@ namespace RootForce
 		static const struct luaL_Reg playerphysics_m [] = {
 			{"SetMovementSpeed",	PlayerPhysicsSetMovementSpeed},
 			{"SetJumpForce",		PlayerPhysicsSetJumpForce},
+			{"SetJumpBoostForce",	PlayerPhysicsSetJumpBoostForce},
 			{"GetMovementSpeed",	PlayerPhysicsGetMovementSpeed},
 			{"GetJumpForce",		PlayerPhysicsGetJumpForce},
+			{"GetJumpBoostForce",	PlayerPhysicsGetJumpBoostForce},
 			{NULL, NULL}
 		};
 
