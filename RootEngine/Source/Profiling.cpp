@@ -4,7 +4,7 @@
 namespace RootEngine
 {
 	Profiling::Profiling()
-		: m_time(0.0f), m_frames(0)
+		: m_time(0.0f), m_frames(0), m_sort(true)
 	{
 	}
 
@@ -70,25 +70,35 @@ namespace RootEngine
 			itr->second.shrink_to_fit();
 		}
 
-		for(unsigned int i = 0; i < m_sampleMap.size(); i++)
+		if(m_sort)
 		{
-			unsigned int index = 0;
-			double currAvg = 0.0;
-
-			for(unsigned int j = 0; j < avgTimes.size(); j++)
+			//Find the largest avgTime index and push it for output and set it to 0, then re-iterate. Sorted when loop is done.
+			for(unsigned int i = 0; i < m_sampleMap.size(); i++)
 			{
-				if(avgTimes[j] > currAvg)
-				{
-					currAvg = avgTimes[j];
-					index = j;
-				}
-			}
+				unsigned int index = 0;
+				double currAvg = 0.0;
 
-			//Store output in vector for presenting 
-			m_ouputList.push_back("<div style='min-width: 180px; display: inline-block;'>" + names[index] + " :</div>" + "T: " + std::to_string(avgTimes[index]) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxTimes[index]) + "</div> S: " + std::to_string(samples[index]));
-			avgTimes[index] = 0.0;
+				for(unsigned int j = 0; j < avgTimes.size(); j++)
+				{
+					if(avgTimes[j] > currAvg)
+					{
+						currAvg = avgTimes[j];
+						index = j;
+					}
+				}
+
+				//Store output in vector for presenting 
+				m_ouputList.push_back("<div style='min-width: 180px; display: inline-block;'>" + names[index] + " :</div>" + "T: " + std::to_string(avgTimes[index]) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxTimes[index]) + "</div> S: " + std::to_string(samples[index]));
+				avgTimes[index] = 0.0;
+			}
 		}
-	
+		else
+		{
+			for(unsigned int i = 0; i < m_sampleMap.size(); i++)
+			{
+				m_ouputList.push_back("<div style='min-width: 180px; display: inline-block;'>" + names[i] + " :</div>" + "T: " + std::to_string(avgTimes[i]) + " <div style='color: #FFFFFF; display: inline-block;'> MaxT: "+ std::to_string(maxTimes[i]) + "</div> S: " + std::to_string(samples[i]));
+			}
+		}
 		m_ouputList.push_back("</div>");
 	}
 
@@ -109,6 +119,11 @@ namespace RootEngine
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
 #endif
+	}
+
+	void Profiling::ToggleSorted()
+	{
+		m_sort = m_sort ? false : true;
 	}
 
 	void Profiling::StoreSample( std::string p_name, __int64 p_elapsedTime )
@@ -151,6 +166,7 @@ namespace RootEngine
 	{
 		glGenQueries(1, &m_queryID);
 	}
+
 
 #endif
 }

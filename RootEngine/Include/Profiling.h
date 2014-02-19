@@ -26,10 +26,12 @@ namespace RootEngine
 		virtual void BeginGPUTimer() = 0;
 		virtual double EndGPUTimer() = 0;
 		virtual void InitQuery() = 0;
+		virtual void ToggleSorted() = 0;
 #ifndef COMPILE_LEVEL_EDITOR
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
 #endif
 	private:
+		
 	};
 
 	class Profiling : public ProfilingInterface
@@ -45,6 +47,7 @@ namespace RootEngine
 		void BeginGPUTimer();
 		double EndGPUTimer();
 		void InitQuery();
+		void ToggleSorted();
 #ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 #endif
@@ -60,6 +63,7 @@ namespace RootEngine
 		float m_time;
 		int m_frames;
 		GLuint m_queryID;
+		bool m_sort;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

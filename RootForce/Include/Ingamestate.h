@@ -51,6 +51,7 @@ namespace RootForce
 		bool m_displayWorldDebug;
 		bool m_displayIngameMenu;
 		bool m_displayDebugHUD;
+		bool m_displayGuiHUD;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
 		std::shared_ptr<RootForce::IngameMenu> m_ingameMenu;

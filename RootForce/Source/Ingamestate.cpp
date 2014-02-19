@@ -158,6 +158,7 @@ namespace RootForce
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
 		m_displayDebugHUD = true;
+		m_displayGuiHUD = true;
 	}
 
 	void IngameState::Enter()
@@ -262,7 +263,8 @@ namespace RootForce
 			}
 			else
 			{
-				g_engineContext.m_gui->Render(m_hud->GetView());
+				if(m_displayGuiHUD)
+					g_engineContext.m_gui->Render(m_hud->GetView());
 				if(m_displayDebugHUD)
 					g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
@@ -330,6 +332,11 @@ namespace RootForce
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
+
+		if(RootServer::MatchAny(event.EventType, 2, "SORTED", "SO"))
+		{
+			g_engineContext.m_profiler->ToggleSorted();
+		}
 		if(RootServer::MatchAny(event.EventType, 2, "PROFILER", "PR"))
 		{
 			m_displayDebugHUD = m_displayDebugHUD ? false : true;
@@ -371,6 +378,11 @@ namespace RootForce
 			m.Serialize(true, &bs);
 
 			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+		}
+
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_displayGuiHUD = m_displayGuiHUD ? false : true;
 		}
 
 #ifdef _DEBUG
