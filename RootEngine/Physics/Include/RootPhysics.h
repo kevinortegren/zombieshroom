@@ -97,7 +97,7 @@ namespace RootEngine
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual void RemoveAll() = 0;
-			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
+			
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
@@ -119,8 +119,11 @@ namespace RootEngine
 
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
-
-			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20] ) = 0;
+			
+			//Ragdoll affecting functions
+			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20], glm::vec3 p_right ) = 0;
+			virtual bool IsRagdoll(int p_objecthandle) = 0;
+			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
 
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -176,14 +179,16 @@ namespace RootEngine
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
-			void DeactivateRagdoll(int p_objectHandle);
+
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 			void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
-			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int> p_nameToIndex , glm::mat4 p_boneOffset[20] );
+			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int> p_nameToIndex , glm::mat4 p_boneOffset[20], glm::vec3 p_right );
+			bool IsRagdoll(int p_objecthandle);
+			void DeactivateRagdoll(int p_objectHandle);
 
 			//Binds
 			void BindSphereShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);
@@ -234,6 +239,8 @@ namespace RootEngine
 			void Init();
 			bool DoesObjectExist(int p_objectHandle);
 			bool DoesUserPointerExist( int p_objectHandle );
+			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld);
+			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld);
 			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
 			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);

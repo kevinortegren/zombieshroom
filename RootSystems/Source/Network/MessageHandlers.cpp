@@ -48,27 +48,29 @@ namespace RootForce
 		{
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
 			Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
-			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
+			float halfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 			
 			switch (p_id)
 			{
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
+					if (clientComponent->State == ClientState::AWAITING_CONNECTION_ACCEPT)
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::SUCCESS, "Connection accepted");
+						clientComponent->State = ClientState::AWAITING_SERVER_INFO;
 
-					clientComponent->State = ClientState::AWAITING_SERVER_INFO;
+						// Send user information
+						NetworkMessage::UserInformation m;
+						m.Name = clientComponent->Name;
 
-					// Send user information
-					NetworkMessage::UserInformation m;
-					m.Name = clientComponent->Name;
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
+						m.Serialize(true, &bs);
 
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::UserInformation);
-					m.Serialize(true, &bs);
-
-					m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+						m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, m_peer->GetSystemAddressFromIndex(0), false);
+					}
 				} return true;
 
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -97,6 +99,13 @@ namespace RootForce
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Connection attempt failed");
 
 					clientComponent->State = ClientState::DISCONNECTED_REFUSED;
+				} return true;
+
+				case ID_INVALID_PASSWORD:
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Invalid password");
+
+					clientComponent->State = ClientState::DISCONNECTED_REFUSED_INVALID_PASSWORD;
 				} return true;
 
 				case ID_UNCONNECTED_PONG:
@@ -128,7 +137,7 @@ namespace RootForce
 
 						if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 						{
-							clientComponent->State = ClientState::CONNECTED;
+							clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 						}
 					}
 				} return true;
@@ -188,7 +197,7 @@ namespace RootForce
 					else
 					{
 						// For a local client, just set the client state
-						clientComponent->State = ClientState::CONNECTED;
+						clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 					}
 
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d: %s): %s", m.User, p_packet->systemAddress.ToString(), m.Name.C_String());
@@ -260,7 +269,7 @@ namespace RootForce
 						glm::vec3 right = transform->m_orientation.GetRight();
 						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
 						if (movement != glm::vec3(0))
-							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 						transform->m_position += movement;
 					}
@@ -277,7 +286,7 @@ namespace RootForce
 						if (player != nullptr)
 						{
 							PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-							action->JumpTime = lastHalfPing;
+							action->JumpTime = halfPing;
 						}
 					}
 				} return true;
@@ -312,7 +321,7 @@ namespace RootForce
 							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 							playerComponent->AbilityState = AbilityState::START_CHARGING;
 							action->ActionID = m.Action;
-							action->AbilityTime = lastHalfPing;
+							action->AbilityTime = halfPing;
 						}
 					}
 
@@ -395,7 +404,7 @@ namespace RootForce
 						playerComponent->AbilityScripts[m.AbilityIndex].Cooldown = 0.0f;
 						playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Cooldown for user %d and ability %d off", m.User, m.AbilityIndex);
 					}
 				} return true;
 
@@ -430,7 +439,37 @@ namespace RootForce
 
 					if (clientComponent->IsRemote)
 					{
-						// TODO: Send spawn point index to respawn system.
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->SpawnIndex = m.SpawnPointIndex;
+						health->SpawnPointReceived = true;
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received spawn location for player %u", m.User);
+					}
+
+					// If we were awaiting a spawn message for connection sequence, set us to connected now. For both local and remote players.
+					if (clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
+					{
+						clientComponent->State = ClientState::CONNECTED;
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide notification from user %u", m.User);
+
+					if (clientComponent->IsRemote)
+					{
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+
+						health->Health = 0;
+
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Received suicide message for user %u", m.User);
 					}
 				} return true;
 
@@ -587,7 +626,7 @@ namespace RootForce
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
 			Network::ServerInformationComponent* serverInfo = m_world->GetEntityManager()->GetComponent<Network::ServerInformationComponent>(serverInfoEntity);
 
-			float lastHalfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
+			float halfPing = float(RakNet::GetTime() - p_timestamp) * 0.001f;
 
 			switch (p_id)
 			{
@@ -738,7 +777,7 @@ namespace RootForce
 						glm::vec3 right = transform->m_orientation.GetRight();
 						glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
 						if (movement != glm::vec3(0))
-							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * lastHalfPing;
+							movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 						transform->m_position += movement;
 					}
@@ -783,7 +822,7 @@ namespace RootForce
 							if (player != nullptr)
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-								action->JumpTime = lastHalfPing;
+								action->JumpTime = halfPing;
 							}
 						}
 
@@ -867,7 +906,7 @@ namespace RootForce
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
-								action->AbilityTime = lastHalfPing;
+								action->AbilityTime = halfPing;
 							}
 						}
 
@@ -1041,6 +1080,8 @@ namespace RootForce
 					NetworkMessage::RespawnRequest m;
 					m.Serialize(false, p_bs);
 
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received respawn request from player %u", m.User);
+
 					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
 					if (client != nullptr)
 					{
@@ -1052,6 +1093,50 @@ namespace RootForce
 							{
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 								action->WantRespawn = true;
+							}
+						}
+					}
+				} return true;
+
+				case NetworkMessage::MessageType::Suicide:
+				{
+					NetworkMessage::Suicide m;
+					m.Serialize(false, p_bs);
+
+					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+
+					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::DEBUG_PRINT, "Received suicide message from client %u", m.User);
+
+					ECS::Entity* client = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)];
+					if (client != nullptr)
+					{
+						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if (clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+							if (player != nullptr)
+							{
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+								health->Health = 0;
+
+								// Broadcast the suicide to all other clients
+								DataStructures::List<RakNet::SystemAddress> addresses;
+								DataStructures::List<RakNet::RakNetGUID> guids;
+								m_peer->GetSystemList(addresses, guids);
+
+								for (unsigned int i = 0; i < addresses.Size(); ++i)
+								{
+									if (addresses[i] != p_packet->systemAddress && !addresses[i].IsLoopback())
+									{
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+										m.Serialize(true, &bs);
+
+										m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									}
+								}
 							}
 						}
 					}
@@ -1134,8 +1219,6 @@ namespace RootForce
 									}
 								}
 
-								clientComponent->State = ClientState::CONNECTED;
-
 								// Send a user connected message for all clients to the connectee.
 								for (unsigned int i = 0; i < addresses.Size(); ++i)
 								{
@@ -1150,7 +1233,10 @@ namespace RootForce
 									if(!g_networkEntityMap[id] || !g_networkEntityMap[clientId])
 										continue;
 									ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(g_networkEntityMap[clientId]);
-									if(clientComponent->State != ClientState::CONNECTED)
+									if(clientComponent->State != ClientState::CONNECTED && 
+									   clientComponent->State != ClientState::AWAITING_FIRST_GAMESTATE_DELTA && 
+									   clientComponent->State != ClientState::AWAITING_SPAWN_POINT &&
+									   clientComponent->State != ClientState::AWAITING_USER_CONNECT)
 										continue;
 
 									PlayerComponent* peerPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
@@ -1180,6 +1266,13 @@ namespace RootForce
 
 									m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p_packet->systemAddress, false);
 								}
+
+								// Make sure the player will be spawned at a spawn point.
+								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								health->WantsRespawn = true;
+								health->RespawnDelay = 0.0f;
+
+								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
 							}
 						} break;
 

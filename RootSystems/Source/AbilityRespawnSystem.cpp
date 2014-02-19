@@ -113,7 +113,7 @@ namespace RootForce
 			CreateCollisionComponents(itr->second);
 
 			//And the particle emitter component
-			CreateParticleEmitter(itr->second);
+			//CreateParticleEmitter(itr->second);  Is imported from the level file
 
 		}
 	}

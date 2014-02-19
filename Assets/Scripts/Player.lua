@@ -67,7 +67,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
-		--local ragdoll = Ragdoll.New(player);
+		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
@@ -87,7 +87,9 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
+
 		playerControl:SetMouseSensitivity(0.2);
+
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);

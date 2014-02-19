@@ -23,11 +23,7 @@ namespace RootForce
 	void MenuState::Enter(Keymapper* p_keymapper)
 	{
 		// Destroy any existing entities
-		Network::NetworkEntityID id;
-		id.UserID = Network::ReservedUserID::ALL;
-		id.ActionID = Network::ReservedActionID::ALL;
-		id.SequenceID = Network::ReservedSequenceID::ALL;
-		Network::DeleteEntities(g_networkEntityMap, id, g_world->GetEntityManager()); 
+		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager()); 
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -79,7 +75,7 @@ namespace RootForce
 		for(unsigned int i = 0; i < lanList.size(); i++)
 			m_menu->AddServer(lanList.at(i));
 
-		//Update Menu to make sure Setting changes are made in the main thread
+		// Update Menu to make sure Setting changes are made in the main thread
 		m_menu->Update();
 
 		// Handle GUI events

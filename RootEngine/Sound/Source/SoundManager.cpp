@@ -92,14 +92,10 @@ namespace RootEngine
 			int frequency;
 			result = m_system->getDSPBufferSize(&blocksize, &numblocks);
 			result = m_system->getSoftwareFormat(&frequency, 0, 0, 0, 0, 0);
-
 			ms = (float)blocksize * 1000.0f / (float)frequency;
-
-			printf("Mixer blocksize        = %.02f ms\n", ms);
-			printf("Mixer Total buffersize = %.02f ms\n", ms * numblocks);
-			printf("Mixer Average Latency  = %.02f ms\n", ms * ((float)numblocks - 1.5f));
-
-
+			g_context.m_logger->LogText(LogTag::SOUND, LogLevel::DEBUG_PRINT, "Mixer blocksize        = %.02f ms", ms);
+			g_context.m_logger->LogText(LogTag::SOUND, LogLevel::DEBUG_PRINT, "Mixer Total buffersize = %.02f ms", ms * numblocks);
+			g_context.m_logger->LogText(LogTag::SOUND, LogLevel::DEBUG_PRINT, "Mixer Average Latency  = %.02f ms", ms * ((float)numblocks - 1.5f));
 		}
 
 		void SoundManager::Shutdown()

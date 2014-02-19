@@ -16,6 +16,9 @@ public:
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
 
+	void StopKnockback();
+
+
 	///////// Taken from Bulletkinematiccontrolled and overwritten to improve controller
 	void preStep (  btCollisionWorld* collisionWorld);
 	void stepForwardAndStrafe ( btCollisionWorld* collisionWorld, const btVector3& walkMove);

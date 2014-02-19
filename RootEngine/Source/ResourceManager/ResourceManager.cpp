@@ -52,6 +52,8 @@ namespace RootEngine
 		m_effectImporter->SetWorkingDirectory(m_workingDirectory);
 
 		m_particleImporter = std::shared_ptr<ParticleImporter>(new ParticleImporter(m_context));
+
+		SetupDefaultResources();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -64,7 +66,7 @@ namespace RootEngine
 		if(m_models.find(p_path) == m_models.end())
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[MODEL] Starting to load: '%s'", p_path.c_str());
-			Model* model = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE");
+			Model* model = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE", false);
 
 			if(model)
 			{
@@ -125,7 +127,7 @@ namespace RootEngine
 		{
 			if(m_context->m_script->LoadScript(p_scriptName + ".lua") == 1)
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error when loading script: '%s.lua'", p_scriptName.c_str());
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "[SCRIPT] Error when loading: '%s.lua'", p_scriptName.c_str());
 				return "";
 			}
 			else
@@ -205,8 +207,8 @@ namespace RootEngine
 			}
 			else
 			{
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Error loading texture '%s'", p_path.c_str());
-				return nullptr;
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "[TEXTURE] Error loading '%s'", p_path.c_str());
+				return m_defaultTexture;
 			}
 		}
 		else
@@ -373,8 +375,10 @@ namespace RootEngine
 		}
 		else
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Trying to get physics mesh: %s, but it has never been loaded!", p_handle.c_str());
-			return nullptr;
+			std::string nonIndexed = p_handle.substr(0, p_handle.size()-1);
+			delete m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + nonIndexed + ".DAE", true);
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::PINK_PRINT, "TESTING LOADING PHYSICS MESH ONLY! %s", p_handle.c_str());
+			return m_physicMeshes[p_handle].get();
 		}
 	}
 	
@@ -423,4 +427,9 @@ namespace RootEngine
 		return m_workingDirectory;
 	}
 
+	void ResourceManager::SetupDefaultResources()
+	{
+		m_defaultTexture = m_context->m_renderer->CreateTexture();
+		m_defaultTexture->CreateEmptyTexture(4, 4, Render::TextureFormat::TEXTURE_RGBA);
+	}
 }

@@ -9,6 +9,7 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/WorldSystem.h>
+#include <RootSystems/Include/RespawnSystem.h>
 
 #ifndef COMPILE_LEVEL_EDITOR
 
@@ -48,12 +49,16 @@ namespace RootForce
 
 	struct SharedSystems
 	{
-		//System responsible for keeping track of match rules
+		// System responsible for keeping track of match rules
 		std::shared_ptr<RootForce::MatchStateSystem> m_matchStateSystem;
+
 		// System responsible for creating the world.
 		std::shared_ptr<RootForce::WorldSystem> m_worldSystem;
 		RootForce::AbilityRespawnSystem* m_abilitySpawnSystem;
 		// TODO: Add more
+
+		// System responsible for respawning and spawning players.
+		RootSystems::RespawnSystem* m_respawnSystem;
 	};
 }
 

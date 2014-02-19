@@ -44,7 +44,9 @@ namespace RootForce
 	{
 		m_workingDirectory = p_workingDirectory;
 		g_world = &m_world;
+
 		srand((unsigned)time(NULL));
+
 		// Load the engine
 		m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
@@ -67,6 +69,7 @@ namespace RootForce
 			throw std::runtime_error("Failed to initialize SDL");
 		}
 
+		// Read the resolution from the settings
 		std::string resolutionString = g_engineContext.m_configManager->GetConfigValueAsString("settings-resolution");
 		int splitPos = resolutionString.find('x');
 		int width = std::stoi(resolutionString.substr(0, splitPos));
@@ -89,7 +92,6 @@ namespace RootForce
 		
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
-
 		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);
 
 		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
@@ -116,8 +118,11 @@ namespace RootForce
 		m_connectingState->Initialize();
 		m_ingameState->Initialize();
 
-		m_currentState = GameStates::Menu;
+		// Respawn system respawns players after they die
+		m_sharedSystems.m_respawnSystem = new RootSystems::RespawnSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
 
+		m_currentState = GameStates::Menu;
 	}
 
 	Main::~Main() 
