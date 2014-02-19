@@ -74,7 +74,7 @@ namespace RootEngine
 		m_values["settings-key-Activate_Push_Ability"] = std::to_string(RootEngine::InputManager::MouseButton::RIGHT);
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
-		m_values["AbilityPack"] = "Standard"; //TODO add specific file type?
+		m_values["AbilityPack"] = "Standard.txt";
 		m_values["ServerPort"] = "5567";
 		m_values["ServerPassword"] = "";
 		m_values["ServerMaxPlayers"] = "12";

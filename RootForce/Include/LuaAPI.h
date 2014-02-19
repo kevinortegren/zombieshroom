@@ -90,7 +90,7 @@ namespace RootForce
 			ID.SequenceID = (RootForce::Network::SequenceID_t) luaL_checknumber(p_luaState, 3);
 
 			ECS::Entity** s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
-			*s = g_networkEntityMap[ID];
+			*s = Network::FindEntity(g_networkEntityMap, ID);
 			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
 		}
