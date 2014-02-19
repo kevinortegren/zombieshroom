@@ -72,7 +72,7 @@ namespace RootEngine
 		m_values["settings-key-Pick_up_Ability"] = std::to_string(SDL_SCANCODE_LSHIFT);
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
-		m_values["AbilityPack"] = "Standard"; //TODO add specific file type?
+		m_values["AbilityPack"] = "Standard.txt";
 		m_values["ServerPort"] = "5567";
 		m_values["ServerPassword"] = "";
 		m_values["ServerMaxPlayers"] = "12";

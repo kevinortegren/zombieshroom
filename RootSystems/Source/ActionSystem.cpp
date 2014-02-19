@@ -198,6 +198,7 @@ namespace RootSystems
 		{
 			state = player->AbilityState;
 			abil = action->SelectedAbility - 1;
+			player->SelectedAbility = abil;
 		}
 
 		std::string abilityName = player->AbilityScripts[abil].Name;
