@@ -146,7 +146,7 @@ function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
     $(this).attr("id", "selected");
   } );
 }
-function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist,abilitylist)
+function SetDefaults(name,mapfile,abilitypack,port,password,maxplayers,matchlength,killvictory,maplist,abilitylist)
 {
   maplist.forEach(function(map) {
     $("#lan-host-map").append("<option value='"+map+"'>"+map+"</option>");
@@ -156,6 +156,7 @@ function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvicto
   });
   $("#lan-host-name").val(name);
   $("#lan-host-map").val(mapfile);
+  $("#lan-host-abilitypack").val(abilitypack);
   $("#lan-host-port").val(port);
   $("#lan-host-password").val(password);
   $("#lan-host-maxplayers").val(maxplayers);

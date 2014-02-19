@@ -55,6 +55,7 @@ namespace RootForce
 		std::string command = "SetDefaults(";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerName") + "',";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerMapfile") + "',";
+		command = command + "'" + p_configMan->GetConfigValueAsString("ServerAbilityfile") + "',";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerPort")) + ",";
 		command = command + "'" + p_configMan->GetConfigValueAsString("ServerPassword") + "',";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerMaxPlayers")) + ",";
