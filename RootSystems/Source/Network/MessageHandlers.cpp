@@ -650,9 +650,11 @@ namespace RootForce
 				{
 					NetworkMessage::AbilityClaimedBy m;
 					m.Serialize(false, p_bs);
-
-					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
-					spawnPoint->Claimed = m.User;
+					if(clientComponent->IsRemote)
+					{
+						AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						spawnPoint->Claimed = m.User;
+					}
 
 					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
 					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
