@@ -175,6 +175,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, ServerName);
 			p_bs->Serialize(p_writeToBitstream, MapName);
+			p_bs->Serialize(p_writeToBitstream, AbilityPack);
 			p_bs->Serialize(p_writeToBitstream, CurrentPlayers);
 			p_bs->Serialize(p_writeToBitstream, MaxPlayers);
 			p_bs->Serialize(p_writeToBitstream, PasswordProtected);

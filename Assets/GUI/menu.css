@@ -291,7 +291,8 @@ a
   width: 550px;
   height: 300px;
 }
-#lan-host-map
+#lan-host-map,
+#lan-host-abilitypack
 {
   -webkit-appearance: listbox;
   align-items: flex-start;

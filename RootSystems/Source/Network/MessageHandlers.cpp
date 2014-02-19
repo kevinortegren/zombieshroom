@@ -487,7 +487,7 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
-						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String()); 
 						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 
@@ -591,7 +591,7 @@ namespace RootForce
 
 						// Load the map
 						m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
-						m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+						m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String());
 						m_abilitySpawnSystem->AttatchComponentToPoints();
 					}
 

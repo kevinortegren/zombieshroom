@@ -349,6 +349,7 @@ namespace RootForce
 		{
 			RakNet::RakString ServerName;
 			RakNet::RakString MapName;
+			RakNet::RakString AbilityPack;
 			Network::UserID_t CurrentPlayers;
 			Network::UserID_t MaxPlayers;
 			bool PasswordProtected;

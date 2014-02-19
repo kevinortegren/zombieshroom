@@ -61,7 +61,8 @@ namespace RootForce
 		command = command + std::to_string(p_configMan->GetConfigValueAsFloat("ServerMatchLength")) + ",";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerKillVictory")) + ",";
 
-		command += GetMapList();
+		command += GetDirectoryList("Levels", ".world") + ",";
+		command += GetDirectoryList("AbilityPacks", ".txt");
 
 		command += ");";
 
@@ -131,17 +132,22 @@ namespace RootForce
 
 	Awesomium::JSValue Menu::GetMapListEvent(const Awesomium::JSArray& p_array)
 	{
-		return Awesomium::JSValue(Awesomium::WSLit(GetMapList().c_str()));
+		return Awesomium::JSValue(Awesomium::WSLit(GetDirectoryList("Levels", ".world").c_str()));
 	}
 
-	std::string Menu::GetMapList()
+	Awesomium::JSValue Menu::GetAbilityListEvent(const Awesomium::JSArray& p_array)
+	{
+		return Awesomium::JSValue(Awesomium::WSLit(GetDirectoryList("AbilityPack", ".txt").c_str()));
+	}
+
+	std::string Menu::GetDirectoryList(std::string p_subfolder, std::string p_extension)
 	{
 		// Create a list of available maps
 		DIR *dir;
 		struct dirent *ent;
 		std::string command;
 		command += "[";
-		if ((dir = opendir((m_workingDir+"Assets/Levels/").c_str())) != NULL)
+		if ((dir = opendir((m_workingDir+"Assets/"+p_subfolder+"/").c_str())) != NULL)
 		{
 			bool first = true;
 			/* print all the files and directories within directory */
@@ -150,19 +156,18 @@ namespace RootForce
 				if (ent->d_type != DT_REG) // Not a regular file
 					continue;
 				std::string fname = ent->d_name;
-				std::string extension = ".world";
-				if(fname.find(extension, (fname.length() - extension.length())) == std::string::npos) // Look for extension
+				if(fname.find(p_extension, (fname.length() - p_extension.length())) == std::string::npos) // Look for extension
 					continue; // Mismatching extension, skip file
 				if(!first)
 					command += ",";
 				else
 					first = !first;
-				command = command + "'" + fname.substr(0,fname.length() - extension.length()) + "'";
+				command = command + "'" + fname.substr(0,fname.length() - p_extension.length()) + "'";
 			}
 			closedir (dir);
 		}
 		else
-			m_context.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Could not open level directory");
+			m_context.m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, ("Could not open "+p_subfolder+" directory").c_str());
 
 		command += "]";
 		return command;
