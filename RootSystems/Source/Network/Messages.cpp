@@ -575,7 +575,8 @@ namespace RootForce
 				g_engineContext.m_script->AddParameterNumber(id.ActionID);
 				g_engineContext.m_script->ExecuteScript();
 
-				entity = p_map[id];
+				entity = Network::FindEntity(p_map, id);
+				assert(entity != nullptr);
 			}
 			else
 			{

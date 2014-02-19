@@ -101,7 +101,7 @@ namespace RootSystems
 					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 
 					// Check whether this is the connection spawn message, and if so, set the client state to connected.
-					ECS::Entity* clientEntity = g_networkEntityMap[RootForce::Network::NetworkEntityID(network->ID.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY)];
+					ECS::Entity* clientEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY));
 					RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(clientEntity);
 					if (clientComponent != nullptr && clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
 					{
