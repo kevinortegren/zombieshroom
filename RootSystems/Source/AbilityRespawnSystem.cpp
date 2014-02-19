@@ -70,9 +70,14 @@ namespace RootForce
 				NewCurrentAbility(p_entity);
 			else
 				RevealSpawnpoint(p_entity);
+
 		}
 		respawn->Timer -= dt;
 		transform->m_orientation.Rotate(0 , dt * 50.0f , 0);
+
+		Renderable* render = m_world->GetEntityManager()->GetComponent<Renderable>(p_entity);
+		if(respawn->CurrentAbility.Name.compare("") != 0 && render == nullptr)
+			CreateRenderComponent(p_entity);
 	}
 
 	void AbilityRespawnSystem::LoadAbilities(std::string p_abilityPack)
