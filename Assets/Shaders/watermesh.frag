@@ -31,6 +31,7 @@ layout(std140) uniform PerObject
 	mat4 normalMatrix;
 	vec3 gEyeWorldPos;
 	float gTime;
+	vec4 gOptions;
 };    
 
 vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
@@ -73,14 +74,17 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
     vec3 normalMap			= texture(g_Normal, TexCoord_FS_in).rgb;
 	normalMap				= normalize(normalMap.xyz*2-1); 
-	vec3 normal1 			= texture(g_NormalMap, TexCoord_FS_in * 64.0 + vec2(sin(time - 1.0) , time) ).xyz;
-	vec3 normal2 			= texture(g_NormalMap, -TexCoord_FS_in * 32.0 + vec2(sin(time*0.5)+1.0 , time*0.5) ).xyz;
-	vec3 normalT 			= mix(normal1, normal2, 0.5);
-	normalT 				= normalize(normalT);
-	vec3 tangent			= cross(vec3(0,1,0), normalMap);
-	vec3 bitangent			= cross(tangent, normalMap);
-	mat3 TBN				= mat3(tangent, bitangent, normalMap);
-	normalMap 				= TBN * normalT;
+	if(gOptions.y == 0.0)
+	{
+		vec3 normal1 			= texture(g_NormalMap, TexCoord_FS_in * 64.0 + vec2(sin(time - 1.0) , time) ).xyz;
+		vec3 normal2 			= texture(g_NormalMap, -TexCoord_FS_in * 32.0 + vec2(sin(time*0.5)+1.0 , time*0.5) ).xyz;
+		vec3 normalT 			= mix(normal1, normal2, 0.5);
+		normalT 				= normalize(normalT);
+		vec3 tangent			= cross(vec3(0,1,0), normalMap);
+		vec3 bitangent			= cross(tangent, normalMap);
+		mat3 TBN				= mat3(tangent, bitangent, normalMap);
+		normalMap 				= TBN * normalT;
+	}
 	vec3 viewNormal			= normalize(viewMatrix*vec4(normalMap,0.0f)).rgb;
 
 	////////////////////////////////////////////////////////////////////////////
@@ -92,7 +96,7 @@ void main()
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 	vec3 refractionColor;
 	//Check if refracted vector is hitting an object in the foreground
-	if(refractionDepth > gl_FragCoord.z)
+	if(refractionDepth > gl_FragCoord.z && gOptions.w == 0.0)
 		refractionColor	= texelFetch(g_LA, refractedUV, 0).rgb;
 	else
 	{
@@ -112,7 +116,8 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Real-time Local Reflections using ray marching
 	////////////////////////////////////////////////////////////////////////////
-	
+	if(gOptions.x == 0.0)
+	{
 	//Length of the reflection vector
 	float initialStepAmount = 0.01;
 
@@ -153,6 +158,9 @@ void main()
 			   currentPosition.y < 0 || currentPosition.y >= 1 ||
 			   currentPosition.z < 0 || currentPosition.z >= 1)
 			{
+				//firstOccludedSample = true;
+				//firstOccludedCount 	= count;
+				//firstOccludedPos	= oldPosition.xy;
 				count = loops;
 				break;
 			}
@@ -163,12 +171,12 @@ void main()
 			float diff 			= currentDepth - sampleDepth;
 			float error 		= length(refS);
 			//Save first time the ray goes behind an object, this is used to fill in non-existent color data
-			if(diff >= 0 && firstOccludedSample == false)
-			{
-				firstOccludedSample = true;
-				firstOccludedCount 	= count;
-				firstOccludedPos	= oldPosition.xy;
-			}
+			//if(diff >= 0 && firstOccludedSample == false)
+			//{
+			//	firstOccludedSample = true;
+			//	firstOccludedCount 	= count;
+			//	firstOccludedPos	= oldPosition.xy;
+			//}
 			//If ray is behind and object and in close proximity to it we have in intersection
 			if(diff >= 0 && diff < error*0.05)
 			{
@@ -177,18 +185,18 @@ void main()
 				numRefinements++;
 				if(numRefinements >= maxRefinements)
 				{
-					// vec2 normalAtPos = texture(g_SceneNormals, samplePos).xy;
-					// vec3 normal;
-					// normal.xy = normalAtPos.xy;
-    				// normal.z = sqrt(1-dot(normal.xy, normal.xy));
-					// float orientation = dot(refV, normal);
-					// if(orientation < 0)
-					// {
-					// 	float cosAngIncidence = -dot(viewVec, viewNormal);
-					// 	cosAngIncidence = clamp(1-cosAngIncidence,0.0,1.0);
-					// 	//Get the color and end the loop
-						finalResult =  texture(g_LA, samplePos).rgb * (1.0 - float(count)/float(loops));// * cosAngIncidence;
-					//}
+					 vec2 normalAtPos = texture(g_SceneNormals, samplePos).xy;
+					 vec3 normal;
+					 normal.xy = normalAtPos.xy;
+    				 normal.z = sqrt(1-dot(normal.xy, normal.xy));
+					 float orientation = dot(refV, normal);
+					 if(orientation < 0)
+					 {
+					 	float cosAngIncidence = -dot(viewVec, viewNormal);
+					 	cosAngIncidence = clamp(1-cosAngIncidence,0.0,1.0);
+					 	//Get the color and end the loop
+						finalResult =  texture(g_LA, samplePos).rgb * (1.0 - float(count)/float(loops)) * cosAngIncidence;
+					}
 					
 					break;
 				}
@@ -199,13 +207,13 @@ void main()
 			currentPosition = oldPosition + refS;
 			count++;
 		}
-		if(count == loops && firstOccludedSample == true)
-		{
+		//if(count == loops && firstOccludedSample == true)
+		//{
 			//if(texture(g_Depth, firstOccludedPos).r != 1)
-				//finalResult = texture(g_LA, firstOccludedPos).rgb * (1.0 - float(firstOccludedCount)/float(loops));
-		}
+			//finalResult = texture(g_LA, firstOccludedPos).rgb * (1.0 - float(firstOccludedCount)/float(loops));
+		//}
 	//}
-
+	}
 	//Mix reflection color with water color
 	finalResult = mix(finalResult, vec3(0.2, 0.4, 0.47), 0.5);
  
@@ -219,8 +227,12 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
-	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
-	float distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
+	float distFac = 0;
+	if(gOptions.z == 0.0)
+	{
+		float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+		distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
+	}
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
 
 	////////////////////////////////////////////////////////////////////////////
