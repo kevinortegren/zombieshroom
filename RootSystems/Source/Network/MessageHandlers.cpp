@@ -338,7 +338,7 @@ namespace RootForce
 							playerTransform->m_position += movement;
 
 							// Log the action (debug)
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
+							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
 						}
 						else
 						{
