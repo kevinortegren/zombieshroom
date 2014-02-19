@@ -199,10 +199,18 @@ namespace AbilityEditorNameSpace
 				if (direction == AbilityComponents::Velocity::FORWARD)
 				{
 					m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+					m_file << "\tlocal rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();\n";
+					m_file << "\ttransformComp:GetOrient():SetOrientation(rotQuat);\n";
+					m_file << "\ttransformComp:GetOrient():Pitch(-90);\n";
+					m_file << "\trotQuat = transformComp:GetOrient():GetQuaternion();\n";
 				}
 				else if (direction == AbilityComponents::Velocity::BACKWARD)
 				{
 					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+					m_file << "\tlocal rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();\n";
+					m_file << "\ttransformComp:GetOrient():SetOrientation(rotQuat);\n";
+					m_file << "\ttransformComp:GetOrient():Pitch(90);\n";
+					m_file << "\trotQuat = transformComp:GetOrient():GetQuaternion();\n";
 				}
 				else if (direction == AbilityComponents::Velocity::UP)
 				{
@@ -211,19 +219,32 @@ namespace AbilityEditorNameSpace
 				else if (direction == AbilityComponents::Velocity::DOWN)
 				{
 					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();\n";
+					m_file << "\tlocal rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();\n";
+					m_file << "\ttransformComp:GetOrient():SetOrientation(rotQuat);\n";
+					m_file << "\ttransformComp:GetOrient():Pitch(180);\n";
+					m_file << "\trotQuat = transformComp:GetOrient():GetQuaternion();\n";
 				}
 				else if (direction == AbilityComponents::Velocity::RIGHT)
 				{
 					m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetRight();\n";
+					m_file << "\tlocal rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();\n";
+					m_file << "\ttransformComp:GetOrient():SetOrientation(rotQuat);\n";
+					m_file << "\ttransformComp:GetOrient():Roll(-90);\n";
+					m_file << "\trotQuat = transformComp:GetOrient():GetQuaternion();\n";
 				}
 				else if (direction == AbilityComponents::Velocity::LEFT)
 				{
 					m_file << "\tlocal dirVec = -Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetRight();\n";
+					m_file << "\tlocal rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();\n";
+					m_file << "\ttransformComp:GetOrient():SetOrientation(rotQuat);\n";
+					m_file << "\ttransformComp:GetOrient():Roll(90);\n";
+					m_file << "\trotQuat = transformComp:GetOrient():GetQuaternion();\n";
 				}
 			}
 			else
 			{
 				m_file << "\tlocal dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+				m_file << "\tlocal rotQuat = Quat.New(0,0,0,1);\n";
 			}
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STARTPOS))
@@ -296,24 +317,24 @@ namespace AbilityEditorNameSpace
 			{
 				if (colShape == AbilityComponents::CollisionShape::CYLINDER)
 				{
-					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::CONE)
 				{
-					m_file << "\tphysicsComp:BindConeShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindConeShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::SPHERE)
 				{
-					m_file << "\tphysicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindSphereShape(collisionComp, startPos, rotQuat, "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::RAY)
 				{
-					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), startPos, Quat.New(0,0,0,1));\n";
+					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), startPos, rotQuat);\n";
 					m_file << "\tphysicsComp:ShootRay(collisionComp:GetHandle(), startPos, dirVec, "<< height <<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::MESH)
 				{
-					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, Quat.New(0,0,0,1), Vec3.New(1,1,1), "/*<-- scale, what do?*/<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, rotQuat, Vec3.New(1,1,1), "/*<-- scale, what do?*/<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 			}
 

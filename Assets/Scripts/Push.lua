@@ -4,7 +4,7 @@ Push.cooldown = 3;
 Push.charges = -1;
 Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 5;
+Push.duration = 0.2;
 
 function Push.ChargeDone (time, userId, actionId)
 	if time >= Push.chargeTime * 0.5 then
@@ -31,9 +31,13 @@ function Push.OnCreate (userId, actionId)
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
+	local rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();
+	transformComp:GetOrient():SetOrientation(rotQuat);
+	transformComp:GetOrient():Pitch(-90);
+	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindConeShape(collisionComp, startPos, Quat.New(0,0,0,1), 3, 3, 1, false);
+	physicsComp:BindConeShape(collisionComp, startPos, rotQuat, 6, 3, 1, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);

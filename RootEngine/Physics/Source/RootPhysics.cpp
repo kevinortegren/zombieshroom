@@ -165,7 +165,7 @@ namespace Physics
 	{
 		
 		m_dt = p_dt;
-		if(m_debugDrawEnabled == false)
+		//if(m_debugDrawEnabled == false)
 		m_dynamicWorld->stepSimulation(m_dt,4);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
