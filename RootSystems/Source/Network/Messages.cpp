@@ -465,9 +465,9 @@ namespace RootForce
 					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager, false);
 				break;
 
-			//	case ComponentType::ABILITYSPAWN:
-			//		component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
-			//	break;
+				case ComponentType::ABILITYSPAWN:
+					component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
 				
 				default:
 					return nullptr;
