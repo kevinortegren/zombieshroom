@@ -243,12 +243,11 @@ int main(int argc, char* argv[])
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
-
+				waterSystem->Process();
 				cameraSystem->Process();
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
 				particleSystem->Process();	
-				//waterSystem->Process();
 				shadowSystem->Process();			
 				renderingSystem->Process();
 
@@ -951,7 +950,7 @@ void LoadLocators()
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 			m_world.GetStorage()->SetValue("WaterHeight", RM.PlocatorList[i]->transformation.position.y);
 			waterSystem->CreateWater(RM.PlocatorList[i]->transformation.position.y);
-			waterSystem->ToggleWireFrame();
+			//waterSystem->ToggleWireFrame();
 		}
 
 	}
