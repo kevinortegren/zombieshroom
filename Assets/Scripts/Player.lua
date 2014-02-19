@@ -39,7 +39,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(35);
+	playerPhysics:SetMovementSpeed(25);
 	playerPhysics:SetJumpForce(20);
 	playerPhysics:SetJumpBoostForce(0.1);
 
