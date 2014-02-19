@@ -165,7 +165,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, Seconds);
 		}
-
+		
 		void SetKillCount::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, Count);
@@ -184,6 +184,11 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, KillCount);
 		}
 
+		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, ID);
+			p_bs->Serialize(p_writeToBitstream, AbilityName);
+		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{
@@ -336,7 +341,7 @@ namespace RootForce
 				case ComponentType::PLAYER:
 				case ComponentType::TDMRULES:
 				case ComponentType::PLAYERPHYSICS:
-				//case ComponentType::ABILITYSPAWN:
+				case ComponentType::ABILITYSPAWN:
 					return true;
 				default:
 					return false;
@@ -386,9 +391,9 @@ namespace RootForce
 					Serialize(true, p_bs, (RootForce::PlayerPhysics*) p_component);
 				return true;
 
-			//	case ComponentType::ABILITYSPAWN:
-			//		Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
-			//	return true;
+				case ComponentType::ABILITYSPAWN:
+					Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
+				return true;
 			}
 
 			return false;
@@ -460,9 +465,9 @@ namespace RootForce
 					component = CreateOrGetDeserializedComponent<RootForce::PlayerPhysics>(p_bs, p_entity, p_entityManager, false);
 				break;
 
-			//	case ComponentType::ABILITYSPAWN:
-			//		component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
-			//	break;
+				case ComponentType::ABILITYSPAWN:
+					component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
 				
 				default:
 					return nullptr;
