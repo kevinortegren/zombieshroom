@@ -982,17 +982,19 @@ namespace RootForce
 				{
 					g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::SUCCESS, "Client connected (%d: %s)", m_peer->GetIndexFromSystemAddress(p_packet->systemAddress), p_packet->systemAddress.ToString());
 
+					// Remove any entities associated with a previous player holding this ID.
+					int systemIndex = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
+					assert(systemIndex != -1);
+					Network::DeleteEntities(g_networkEntityMap, NetworkEntityID(systemIndex, ReservedActionID::ALL, ReservedSequenceID::ALL), m_world->GetEntityManager());
+					Network::NetworkComponent::ResetSequenceForUser(systemIndex);
+
+					// Create a new client entity for the connectee.
 					ECS::Entity* clientEntity = m_world->GetEntityManager()->CreateEntity();
 					ClientComponent* clientComponent = m_world->GetEntityManager()->CreateComponent<ClientComponent>(clientEntity);
 					clientComponent->State = ClientState::SERVER_AWAITING_USER_INFO;
 					clientComponent->IsRemote = !p_packet->systemAddress.IsLoopback(); // TODO: Find a better way to know if a client is in the same application or not.
-					
-					NetworkEntityID id;
-					id.UserID = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-					id.ActionID = ReservedActionID::CONNECT;
-					id.SequenceID = ReservedSequenceID::CLIENT_ENTITY;
 
-					g_networkEntityMap[id] = clientEntity;
+					g_networkEntityMap[NetworkEntityID((UserID_t)systemIndex, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY)] = clientEntity;
 				} return true;
 
 				case ID_DISCONNECTION_NOTIFICATION:
@@ -1885,6 +1887,7 @@ namespace RootForce
 
 									// Make sure the player will be spawned at a spawn point.
 									HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+									assert(health != nullptr);
 									health->WantsRespawn = true;
 									health->RespawnDelay = 0.0f;
 
