@@ -1240,9 +1240,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1251,43 +1252,39 @@ namespace RootForce
 								assert(action != nullptr);
 
 								action->JumpTime = halfPing;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStart);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStart);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStart received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStart received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStart received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1310,9 +1307,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1321,43 +1319,39 @@ namespace RootForce
 								assert(action != nullptr);
 
 								action->JumpTime = m.Time;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStop);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::JumpStop);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStop received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStop received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "JumpStop received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1380,9 +1374,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1395,43 +1390,39 @@ namespace RootForce
 
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->AbilityTime = halfPing;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeStart);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeStart);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeStart received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeStart received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeStart received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1454,9 +1445,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1470,43 +1462,39 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeDone received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1529,9 +1517,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1545,43 +1534,39 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChannelingDone received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1604,9 +1589,10 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							if (ClientState::IsConnected(clientComponent->State))
+							// Update the action component only for remote clients.
+							if (clientComponent->IsRemote)
 							{
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
@@ -1620,43 +1606,39 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+							}
 
-								// Broadcast the action to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the action to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
+										m.Serialize(true, &bs);
 
-										if (p_packet->systemAddress != addresses[i] && 
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeAndChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeAndChannelingDone received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeAndChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -1722,55 +1704,51 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (clientComponent->IsRemote)
+						// Make sure the client is connected.
+						if (ClientState::IsConnected(clientComponent->State))
 						{
-							// Make sure the client is connected.
-							if (ClientState::IsConnected(clientComponent->State))
+							// Kill the player only for remote clients.
+							if (clientComponent->IsRemote)
 							{
-								// Kill the player.
 								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 								assert(playerEntity != nullptr);
 
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
 								assert(health != nullptr);
 								health->Health = 0;
+							}
 
-								// Broadcast the suicide to all other connected clients.
-								DataStructures::List<RakNet::SystemAddress> addresses;
-								DataStructures::List<RakNet::RakNetGUID> guids;
-								m_peer->GetSystemList(addresses, guids);
+							// Broadcast the suicide to all other connected clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
 
-								for (unsigned int i = 0; i < addresses.Size(); ++i)
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
 								{
-									ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-									if (otherClientEntity != nullptr)
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (addresses[i] != p_packet->systemAddress &&
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
 									{
-										ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-										assert(otherClientComponent != nullptr);
+										RakNet::BitStream bs;
+										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+										bs.Write(RakNet::GetTime());
+										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+										m.Serialize(true, &bs);
 
-										if (addresses[i] != p_packet->systemAddress &&
-											otherClientComponent->IsRemote &&
-											ClientState::IsConnected(otherClientComponent->State))
-										{
-											RakNet::BitStream bs;
-											bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-											bs.Write(RakNet::GetTime());
-											bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
-											m.Serialize(true, &bs);
-
-											m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-										}
+										m_peer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
 									}
 								}
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Suicide received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Suicide received for local client.");
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Suicide received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
