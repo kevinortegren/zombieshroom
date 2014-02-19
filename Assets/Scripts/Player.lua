@@ -36,12 +36,9 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall", -1);
-	playerComponent:SetAbility(1, "AbilityDash", -1);
-	playerComponent:SetAbility(2, "AbilityRay" ,-1);
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(20);
+	playerPhysics:SetMovementSpeed(35);
 	playerPhysics:SetJumpForce(20);
 	playerPhysics:SetJumpBoostForce(0.1);
 
