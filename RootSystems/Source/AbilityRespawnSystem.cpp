@@ -77,7 +77,10 @@ namespace RootForce
 
 		Renderable* render = m_world->GetEntityManager()->GetComponent<Renderable>(p_entity);
 		if(respawn->CurrentAbility.Name.compare("") != 0 && render == nullptr)
+		{
 			CreateRenderComponent(p_entity);
+			CreateCollisionComponents(p_entity);
+		}
 	}
 
 	void AbilityRespawnSystem::LoadAbilities(std::string p_abilityPack)
