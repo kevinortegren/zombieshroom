@@ -227,12 +227,9 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
-	float distFac = 0;
-	if(gOptions.z == 0.0)
-	{
-		float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
-		distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
-	}
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
+	
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
 
 	////////////////////////////////////////////////////////////////////////////
