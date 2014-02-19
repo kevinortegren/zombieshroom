@@ -43,6 +43,7 @@ function Player.OnCreate(userId, actionId)
 
 	playerPhysics:SetMovementSpeed(20);
 	playerPhysics:SetJumpForce(20);
+	playerPhysics:SetJumpBoostForce(0.1);
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);

@@ -841,6 +841,15 @@ namespace Physics
 		m_playerObjects.at(index)->Jump();
 	}
 	
+	void RootPhysics::PlayerJumpBoost( int p_objectHandle, float p_boostPower )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		m_playerObjects.at(index)->JumpBoost(p_boostPower);
+	}
+
 	void RootPhysics::KnockbackObject( int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce )
 	{
 		if(!DoesObjectExist(p_objectHandle))

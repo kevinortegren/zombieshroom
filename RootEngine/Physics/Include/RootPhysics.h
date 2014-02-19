@@ -101,7 +101,8 @@ namespace RootEngine
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
-			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
+			virtual void PlayerJumpBoost(int p_objectHandle, float p_boostPower) = 0;
 			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
@@ -175,6 +176,7 @@ namespace RootEngine
 			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
+			void PlayerJumpBoost(int p_objectHandle, float p_boostPower);
 			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
