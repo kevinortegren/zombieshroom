@@ -77,6 +77,7 @@ namespace RootForce
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 		RootForce::TryPickupResetSystem* 				m_tryPickupResetSystem;
 		RootForce::SoundSystem*							m_soundSystem;
+		RootForce::TimerSystem*							m_timerSystem;
 
 		Keymapper* m_keymapper;
 	};

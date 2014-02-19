@@ -67,6 +67,8 @@ namespace RootSystems
 		ECS::ComponentMapper<RootForce::PlayerPhysics> m_physic;
 		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
+
+		void AbilitySwitch(ECS::Entity* p_entity, bool p_isPush);
 	};
 
 }

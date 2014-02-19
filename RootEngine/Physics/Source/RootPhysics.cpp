@@ -39,7 +39,7 @@ namespace Physics
 
 	struct RayAbilityCast : public btCollisionWorld::ClosestRayResultCallback
 	{
-		CustomUserPointer* m_caster;
+		CustomUserPointer* m_caster, *m_hit;
 		glm::vec3 from, to;
 		RayAbilityCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
 		{
@@ -48,12 +48,9 @@ namespace Physics
 		btScalar addSingleResult(btCollisionWorld::LocalRayResult& p_rayResult, bool p_normalInWorldSpace)
 		{
 			//p_rayResult.
-			glm::vec3 castVector = to - from;
-			glm::vec3 relativePosition = castVector * p_rayResult.m_hitFraction;
-			RootForce::CollisionInfo info;
-			info.m_collisionPosition = from + relativePosition;
-			CustomUserPointer* objectHit = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
-			m_caster->m_collisions->insert(std::make_pair(objectHit->m_entity, info));
+			
+			m_hit = (CustomUserPointer*)(p_rayResult.m_collisionObject->getUserPointer());
+			
 			return btCollisionWorld::ClosestRayResultCallback::addSingleResult(p_rayResult, p_normalInWorldSpace);
 			//return 1.0f;
 		}
@@ -1464,7 +1461,11 @@ namespace Physics
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
-
+		glm::vec3 castVector = end - p_startPos;
+		glm::vec3 relativePosition = castVector * rayResult.m_closestHitFraction;
+		RootForce::CollisionInfo info;
+		info.m_collisionPosition = p_startPos + relativePosition;
+		rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
 	}
 
 	void RootPhysics::RadiusCheck( int p_objectHandle, glm::vec3 p_pos, float p_radius )
@@ -1482,6 +1483,21 @@ namespace Physics
 				m_userPointer.at(p_objectHandle)->m_collisions->insert(std::make_pair(((CustomUserPointer*)(m_playerObjects.at(i)->GetUserPointer()))->m_entity, info));
 			}
 		}
+	}
+
+	void* RootPhysics::GetPlayerAtAim( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
+	{
+		RayAbilityCast rayResult;
+		rayResult.m_caster = m_userPointer.at(p_objectHandle);
+		rayResult.from = p_startPos;
+		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
+		rayResult.to = end;
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+		if (rayResult.m_hit->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			return rayResult.m_hit->m_entity;
+		}
+		return nullptr;
 	}
 
 	void RootPhysics::AddRigidBody( int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld )
