@@ -24,8 +24,6 @@ namespace RootForce
 
 		// Put the static entities into a spatial quad tree.
 		m_quadTree.Initialize(m_engineContext, m_world, "Static");		
-
-		CreateSun();
 	}
 #endif
 
