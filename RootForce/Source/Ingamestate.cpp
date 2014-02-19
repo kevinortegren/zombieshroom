@@ -151,6 +151,7 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;
+		m_displayDebugHUD = true;
 	}
 
 	void IngameState::Enter()
@@ -253,7 +254,8 @@ namespace RootForce
 			else
 			{
 				g_engineContext.m_gui->Render(m_hud->GetView());
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				if(m_displayDebugHUD)
+					g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -319,7 +321,20 @@ namespace RootForce
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
-
+		if(RootServer::MatchAny(event.EventType, 2, "PROFILER", "PR"))
+		{
+			m_displayDebugHUD = m_displayDebugHUD ? false : true;
+		}
+		if(RootServer::MatchAny(event.EventType, 2, "PHYSICSDEBUG", "PD"))
+		{
+			m_displayPhysicsDebug = m_displayPhysicsDebug ? false : true;
+			g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+		}
+		if(RootServer::MatchAny(event.EventType, 2, "NORMALSDEBUG", "ND"))
+		{
+			m_displayNormals = m_displayNormals ? false : true;
+			g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+		}
 		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
 		{
 			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
@@ -350,48 +365,6 @@ namespace RootForce
 		}
 
 #ifdef _DEBUG
-		
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			if(m_displayWorldDebug)
-			{
-				m_displayWorldDebug = false;
-				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
-			}
-			else
-			{
-				m_displayWorldDebug = true;
-				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
-			}
-		}
-
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			if(m_displayPhysicsDebug)
-			{
-				m_displayPhysicsDebug = false;
-				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-			}
-			else
-			{
-				m_displayPhysicsDebug = true;
-				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-			}
-		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			if(m_displayNormals)
-			{
-				m_displayNormals = false;
-				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
-			}
-			else
-			{
-				m_displayNormals = true;
-				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
-			}
-		}
 #endif
 		
 		{

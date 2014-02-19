@@ -19,7 +19,7 @@
         - Entity: 11
           Model: colorCube1Shape
           Material:
-            Name: lambert2
+            Name: ColorCube2:lambert2
             Effect: Mesh
             Diffuse: ColorGrid
         - Entity: 12
