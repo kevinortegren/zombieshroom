@@ -184,6 +184,10 @@ namespace RootForce
 							std::string message = senderPlayerComponent->Name + ": " + m.Message.C_String();
 							m_chatSystem->JSAddMessage(message);
 						}
+						else
+						{
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Chat received from unknown sender. User: %u. Message: \"%s\".", m.Sender, m.Message.C_String());
+						}
 					}
 					else
 					{
