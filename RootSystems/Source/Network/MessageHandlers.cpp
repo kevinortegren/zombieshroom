@@ -336,6 +336,9 @@ namespace RootForce
 								movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 							playerTransform->m_position += movement;
+
+							// Log the action (debug)
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
 						}
 						else
 						{
@@ -366,6 +369,9 @@ namespace RootForce
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(action != nullptr);
 								action->JumpTime = halfPing;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
 							}
 							else
 							{
@@ -403,6 +409,9 @@ namespace RootForce
 								action->JumpTime = 0.0f;
 
 								// TODO: Maybe consider the time passed along with the message.
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
 							}
 							else
 							{
@@ -444,6 +453,9 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart received from user %d", m.User);
 							}
 							else
 							{
@@ -485,6 +497,9 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone received from user %d", m.User);
 							}
 							else
 							{
@@ -526,6 +541,9 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone received from user %d", m.User);
 							}
 							else
 							{
@@ -567,6 +585,9 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone received from user %d", m.User);
 							}
 							else
 							{
@@ -604,6 +625,9 @@ namespace RootForce
 
 								playerComponent->AbilityScripts[m.AbilityIndex].Cooldown = 0.0f;
 								playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
+
+								// Log the action (debug)
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
 							}
 							else
 							{
