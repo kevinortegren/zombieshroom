@@ -7,7 +7,7 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f)
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f))
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -164,6 +164,9 @@ namespace RootForce
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
+
+		//Water options
+		m_renderable->m_params[Render::Semantic::COLOR] = &m_waterOptions;
 
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
@@ -327,6 +330,30 @@ namespace RootForce
 		m_pause = m_pause ? false : true;
 	}
 
+	void WaterSystem::ToggleReflections()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water reflections toggled!");
+		m_waterOptions.x = (m_waterOptions.x == 0.0f) ? 1.0f : 0.0f;
+	}
+
+	void WaterSystem::ToggleRefractions()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water refractions toggled!");
+		m_waterOptions.w = (m_waterOptions.w == 0.0f) ? 1.0f : 0.0f;
+	}
+
+	void WaterSystem::ToggleDepth()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water depth toggled!");
+		m_waterOptions.z = (m_waterOptions.z == 0.0f) ? 1.0f : 0.0f;
+	}
+
+	void WaterSystem::ToggleNormalMaps()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water normalmaps toggled!");
+		m_waterOptions.y = (m_waterOptions.y == 0.0f) ? 1.0f : 0.0f;
+	}
+
 	void WaterSystem::IncreaseSpeed()
 	{
 		m_speed += 2.0f;
@@ -432,6 +459,22 @@ namespace RootForce
 		{	
 			ResetWater();
 		}
+		if(module == "refl")
+		{	
+			ToggleReflections();
+		}
+		if(module == "norm")
+		{	
+			ToggleNormalMaps();
+		}
+		if(module == "deep")
+		{	
+			ToggleDepth();
+		}
+		if(module == "refr")
+		{	
+			ToggleRefractions();
+		}
 
 		if(module == "damping" || module == "d")
 		{	
@@ -500,6 +543,10 @@ namespace RootForce
 			p_chat->JSAddMessage("[WATER COMMANDS]");
 			p_chat->JSAddMessage("/W[ATER] p[ause]		 - Toggle water simulation pause");
 			p_chat->JSAddMessage("/W[ATER] w[ire]f[rame] - Toggle water wireframe mode");
+			p_chat->JSAddMessage("/W[ATER] refl			 - Toggle reflections");
+			p_chat->JSAddMessage("/W[ATER] refr			 - Toggle refractions");
+			p_chat->JSAddMessage("/W[ATER] norm			 - Toggle normal maps");
+			p_chat->JSAddMessage("/W[ATER] deep			 - Toggle deep water");
 			p_chat->JSAddMessage("/W[ATER] r[eset]		 - Reset the water simulation");
 			p_chat->JSAddMessage("/W[ATER] dis[turb]	 - Disturb water at player position");
 			p_chat->JSAddMessage("/W[ATER] h[eight] X	 - Set water height to X(float)");
@@ -507,4 +554,7 @@ namespace RootForce
 			p_chat->JSAddMessage("/W[ATER] s[peed]		 - Speed settings");
 		}
 	}
+
+	
+
 }
