@@ -45,6 +45,7 @@ void main()
     // Calculate area.
     float area = length(cross(ab, ac)) / 2;
     
+    // Calculate number of plants per triangle.
     int nrPlants = int(gs_density_in[0] * area * 4.0);
     
     int i;

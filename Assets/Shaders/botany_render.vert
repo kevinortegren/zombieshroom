@@ -20,11 +20,11 @@ void main()
 
     float dist = length(in_position - g_PlayerPosition);
     
-    if(dist < 15.0)
+    if(dist < 30.0)
     {
         gs_lod_in = 0.0;
     }
-    else if(dist < 60.0)
+    else if(dist < 90.0)
     {
         gs_lod_in = 1.0;
     }

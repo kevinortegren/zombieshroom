@@ -13,6 +13,7 @@ namespace RootForce
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("ugotaflatgrass2", Render::TextureType::TEXTURE_2D);
+		m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_engineContext->m_resourceManager->LoadTexture("grass_n_titties", Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 
 		// Divide painted meshes into chunks of 500 polygons.

@@ -36,7 +36,8 @@
       textures:
         - name: g_Diffuse
           slot: 0
-
+        - name: g_Specular
+          slot: 1
       programs:
         - name: Botany_Render
           shaders:
