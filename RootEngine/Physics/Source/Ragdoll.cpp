@@ -439,31 +439,31 @@ namespace Ragdoll
  		 		return constraint;
  		 	}
  		 	//Spine - Left upper arm
- 		//	else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
-			//{
-			//	CalculateConstraintTransform(p_bodyA, p_bodyB, 
-			//		0, 0.0f , 0,
-			//		-0, 0.0f * OFFSET, 0,
-			//		0 , 0, 1, 0, &localA, &localB); 	
-			// 	btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			// 	constraint->setLimit(-PI_2, 0, PI_2);
-			// 	m_dynamicWorld->addConstraint(constraint);
-			// 	constraint->setDbgDrawSize(0.5f);
-			// 	return constraint;
-			//}
-			//////Spine - Right upper arm
-			//else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
-			//{
-			//	CalculateConstraintTransform(p_bodyA, p_bodyB, 
-			//		0, 0.0f , 0,
-			//		-0, 0.0f * OFFSET, 0,
-			//		0 , 0, 1, 0, &localA, &localB); 	
-			//	btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
-			//	constraint->setLimit(-PI_2, 0, PI_2);
-			//	m_dynamicWorld->addConstraint(constraint);
-			//	constraint->setDbgDrawSize(0.5f);
-			//	return constraint;
-			//}
+ 			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_LeftArm") == 0 )
+			{
+				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+					0, 0.0f , 0,
+					-0, 0.0f * OFFSET, 0,
+					0 , 0, 1, 0, &localA, &localB); 	
+			 	btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
+			 	constraint->setLimit(-PI_2, 0, PI_2);
+			 	m_dynamicWorld->addConstraint(constraint);
+			 	constraint->setDbgDrawSize(0.5f);
+			 	return constraint;
+			}
+			////Spine - Right upper arm
+			else if(p_nameA.compare("Character1_Spine") == 0 && p_nameB.compare("Character1_RightArm") == 0 )
+			{
+				CalculateConstraintTransform(p_bodyA, p_bodyB, 
+					0, 0.0f , 0,
+					-0, 0.0f * OFFSET, 0,
+					0 , 0, 1, 0, &localA, &localB); 	
+				btConeTwistConstraint* constraint = new btConeTwistConstraint(*p_bodyA, *p_bodyB, localA, localB);
+				constraint->setLimit(-PI_2, 0, PI_2);
+				m_dynamicWorld->addConstraint(constraint);
+				constraint->setDbgDrawSize(0.5f);
+				return constraint;
+			}
  		// 	////Left upper arm - Left lower arm
  		 	else if(p_nameA.compare("Character1_LeftArm") == 0 && p_nameB.compare("Character1_LeftForeArm") == 0 )
  		 	{
