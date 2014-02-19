@@ -361,6 +361,16 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
+
+		/*
+			Sent by the server when a timer component reaches 0. 
+		*/
+		struct TimeUp 
+		{
+			Network::NetworkEntityID ID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 		struct AbilitySpawn
 		{
 			Network::NetworkEntityID ID;

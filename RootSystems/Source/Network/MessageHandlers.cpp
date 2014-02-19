@@ -972,18 +972,33 @@ namespace RootForce
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "ServerInformation received in an invalid state (%d).", clientComponent->State);
 					}
 				} return true;
+				case NetworkMessage::MessageType::TimeUp:
+				{
+					NetworkMessage::TimeUp m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = g_networkEntityMap[m.ID];
+					if(entity != nullptr)
+					{
+						TimerComponent* timer = m_world->GetEntityManager()->GetComponent<TimerComponent>(entity);
+						if(timer != nullptr)
+							timer->TimeUp = true;
+
+					}
+
+				} return true;
 
 				case NetworkMessage::MessageType::AbilitySpawn:
-					{
-						NetworkMessage::AbilitySpawn m;
-						m.Serialize(false, p_bs);
+				{
+					NetworkMessage::AbilitySpawn m;
+					m.Serialize(false, p_bs);
 
-						ECS::Entity* point = g_networkEntityMap[m.ID];
+					ECS::Entity* point = g_networkEntityMap[m.ID];
 
-						RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
-						component->AbilityReceived = m.AbilityName;
+					RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
+					component->AbilityReceived = m.AbilityName;
 
-					} return true;
+				} return true;
 			}
 
 			return false;
