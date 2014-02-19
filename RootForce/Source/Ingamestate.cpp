@@ -330,7 +330,7 @@ namespace RootForce
 			m_displayPhysicsDebug = m_displayPhysicsDebug ? false : true;
 			g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
 		}
-		if(RootServer::MatchAny(event.EventType, 2, "normalsdebug", "nd"))
+		if(RootServer::MatchAny(event.EventType, 2, "NORMALSDEBUG", "ND"))
 		{
 			m_displayNormals = m_displayNormals ? false : true;
 			g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
