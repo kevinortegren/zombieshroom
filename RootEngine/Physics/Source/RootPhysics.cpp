@@ -354,7 +354,8 @@ namespace Physics
 		pos.setY( p_position[1]);
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		btTransform trans = btTransform(quat, pos );
+		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_type = PhysicsShape::SHAPE_SPHERE;
@@ -378,7 +379,7 @@ namespace Physics
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld);
+			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
 		}
 	}
 
@@ -389,7 +390,8 @@ namespace Physics
 		pos.setY( p_position[1]);
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		btTransform trans = btTransform(quat, pos );
+		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -412,7 +414,7 @@ namespace Physics
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld);
+			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
 		}
 	}
 
@@ -423,7 +425,8 @@ namespace Physics
 		pos.setY( p_position[1]);
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
+		btTransform trans = btTransform(quat, pos );
+		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -446,7 +449,7 @@ namespace Physics
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld);
+			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
 		}
 	}
 
@@ -481,7 +484,7 @@ namespace Physics
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld);
+			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
 		}
 	}
 
@@ -1491,21 +1494,17 @@ namespace Physics
 		p_body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 	}
 
-	void RootPhysics::AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld)
+	void RootPhysics::AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, const btTransform& p_transform)
 	{
 		btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 		ghostObject->setCollisionShape(p_collisionShape);
-		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
-			ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK || btCollisionObject::CF_KINEMATIC_OBJECT);
-		else
-		{
-			ghostObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-		}
+		ghostObject->setWorldTransform(p_transform);
+		ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_CHARACTER_OBJECT);
 		if(!p_collideWithWorld)
 			ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		ObjectController* controller = new ObjectController();
 		controller->Init(ghostObject, (btConvexShape*)p_collisionShape, m_dynamicWorld);
-		m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter | btBroadphaseProxy::DefaultFilter);
+		m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter);
 		m_externallyControlled.push_back(controller);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
 		ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));

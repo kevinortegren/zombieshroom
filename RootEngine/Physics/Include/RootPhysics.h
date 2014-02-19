@@ -240,7 +240,7 @@ namespace RootEngine
 			bool DoesObjectExist(int p_objectHandle);
 			bool DoesUserPointerExist( int p_objectHandle );
 			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld);
-			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld);
+			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, const btTransform& p_transform);
 			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
 			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
