@@ -1,11 +1,12 @@
 AbilityBall = {};
 AbilityBall.damage = 20;
-AbilityBall.knockback = 10;
-AbilityBall.cooldown = 2;
+AbilityBall.knockback = 20;
+AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
 AbilityBall.duration = 0;
+AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);

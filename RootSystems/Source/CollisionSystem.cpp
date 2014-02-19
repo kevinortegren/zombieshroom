@@ -14,7 +14,7 @@ namespace RootForce
 
 	void CollisionSystem::Begin()
 	{
-
+		int i = 0;
 	}
 
 	void CollisionSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -24,6 +24,8 @@ namespace RootForce
 		for(auto itr = cr->m_collisions.begin(); itr != cr->m_collisions.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
+			if(script->Name.compare("AbilitySpawnPoint") == 0)
+				int i = 0;
 			
 			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
 			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");

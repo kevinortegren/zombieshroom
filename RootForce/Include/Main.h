@@ -16,6 +16,7 @@
 #include <RootForce/Include/MenuState.h>
 #include <RootForce/Include/ConnectingState.h>
 #include <RootForce/Include/IngameState.h>
+#include <RootForce/Include/Keymapper.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -45,6 +46,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::MenuState> m_menuState;
 		std::shared_ptr<RootForce::ConnectingState> m_connectingState;
 		std::shared_ptr<RootForce::IngameState> m_ingameState;
+		RootForce::Keymapper* m_keymapper;
 
 
 		void HandleEvents();

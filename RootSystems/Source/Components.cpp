@@ -33,6 +33,8 @@ namespace RootForce
 			RootForce::Network::ClientComponent::SetTypeId(RootForce::ComponentType::CLIENT);
 			RootForce::Ragdoll::SetTypeId(RootForce::ComponentType::RAGDOLL);
 			RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
+			RootForce::AbilityRespawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
+			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
 			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
 		}
@@ -54,6 +56,8 @@ namespace RootForce
             RootForce::StateComponent::SetTypeId(RootForce::ComponentType::ENTITYSTATE);
 			RootForce::Network::ServerInformationComponent::SetTypeId(RootForce::ComponentType::SERVERINFORMATION);
 			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
+			RootForce::AbilityRespawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
+			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 		}
 #endif
 	}

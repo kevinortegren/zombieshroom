@@ -50,6 +50,40 @@ namespace RootForce
 			}
 		}
 
+
+
+		bool ClientState::IsConnecting(ClientState p_state)
+		{
+			return p_state == ClientState::AWAITING_CONNECTION_ACCEPT ||
+				   p_state == ClientState::SERVER_AWAITING_USER_INFO ||
+				   p_state == ClientState::AWAITING_SERVER_INFO ||
+				   p_state == ClientState::SERVER_AWAITING_MAP_LOAD_STATUS ||
+				   p_state == ClientState::AWAITING_USER_CONNECT ||
+				   p_state == ClientState::AWAITING_FIRST_GAMESTATE_DELTA ||
+				   p_state == ClientState::AWAITING_SPAWN_POINT;
+		}
+
+		bool ClientState::IsConnected(ClientState p_state)
+		{
+			return p_state == ClientState::CONNECTED;
+		}
+
+		bool ClientState::IsDisconnected(ClientState p_state)
+		{
+			return p_state == ClientState::DISCONNECTED_TIMEOUT ||
+				   p_state == ClientState::DISCONNECTED_REFUSED ||
+				   p_state == ClientState::DISCONNECTED_REFUSED_TOO_MANY_PLAYERS ||
+				   p_state == ClientState::DISCONNECTED_REFUSED_INVALID_PASSWORD ||
+				   p_state == ClientState::DISCONNECTED_SERVER_SHUTDOWN;
+		}
+
+		bool ClientState::IsUnconnected(ClientState p_state)
+		{
+			return p_state == ClientState::UNCONNECTED;
+		}
+
+
+
 		ClientComponent::ClientComponent()
 			: State(ClientState::UNCONNECTED)
 			, IsRemote(false) {}

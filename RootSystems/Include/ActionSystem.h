@@ -1,7 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
-#include <RakNet/RakPeerInterface.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility\ECS\Include\Component.h>
 #include <Utility\ECS\Include\EntitySystem.h>

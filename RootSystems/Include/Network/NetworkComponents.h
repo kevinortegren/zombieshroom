@@ -53,15 +53,40 @@ namespace RootForce
 			enum ClientState
 			{
 				UNCONNECTED,
+				AWAITING_CONNECTION_ACCEPT,
+				SERVER_AWAITING_USER_INFO,
 				AWAITING_SERVER_INFO,
+				SERVER_AWAITING_MAP_LOAD_STATUS,
 				AWAITING_USER_CONNECT,
 				AWAITING_FIRST_GAMESTATE_DELTA,
+				AWAITING_SPAWN_POINT,
 				CONNECTED,
 				DISCONNECTED_TIMEOUT,
 				DISCONNECTED_REFUSED,
 				DISCONNECTED_REFUSED_TOO_MANY_PLAYERS,
+				DISCONNECTED_REFUSED_INVALID_PASSWORD,
 				DISCONNECTED_SERVER_SHUTDOWN
 			};
+
+			/*
+				True if the client is currently in the connection sequence.
+			*/
+			bool IsConnecting(ClientState p_state);
+
+			/*
+				True if the client is in a fully connected state.
+			*/
+			bool IsConnected(ClientState p_state);
+
+			/*
+				True if the client has been disconnected from the server.
+			*/
+			bool IsDisconnected(ClientState p_state);
+
+			/*
+				True if the client has not connected yet (Connect() has not been called).
+			*/
+			bool IsUnconnected(ClientState p_state);
 		}
 
 

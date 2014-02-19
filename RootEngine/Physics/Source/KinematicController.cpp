@@ -76,12 +76,11 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject->setContactProcessingThreshold(0.f);
 	
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 3.0f);
-	
 	m_kinController->setJumpSpeed(20.0f);
 	m_kinController->setFallSpeed(200.0f);
 	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
@@ -89,8 +88,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_kinController->setMaxSlope(btRadians(45.0f));
 	
 	m_hasBeenKnockbacked = false;
-	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter );
 	//m_dynamicWorld->addAction(m_kinController);
 
 }
@@ -149,7 +147,15 @@ void KinematicController::Update(float p_dt)
 void KinematicController::Jump()
 {
 	if(m_kinController->canJump())
+	{
+		m_kinController->StopKnockback();
 		m_kinController->jump();
+	}
+}
+
+void KinematicController::JumpBoost( float p_boostPower )
+{
+	m_kinController->JumpBoost(p_boostPower);
 }
 
 void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
@@ -224,6 +230,7 @@ void KinematicController::Deactivate()
 void KinematicController::Activate()
 {
 	m_activated = true;
+	m_kinController->StopKnockback();
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
-	m_kinController->Knockback(btVector3(1,1,1),0);
+	
 }

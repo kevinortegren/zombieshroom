@@ -167,9 +167,9 @@ namespace Render
 		void ProcessRenderJobs();
 
 		void Sorting();
-		void GeometryPass(int p_layer);
 		void ShadowPass();
-		void LightingPass();
+		void GeometryPass(int p_layer);	
+		void LightingPass(int p_layer);
 		void ForwardPass();
 		void PostProcessPass();
 		void Output();

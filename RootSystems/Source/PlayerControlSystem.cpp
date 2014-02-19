@@ -128,19 +128,15 @@ namespace RootForce
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-			case PlayerAction::MOVE_BACKWARDS_STOP:
 					action->MovePower += 1;
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-			case PlayerAction::MOVE_FORWARDS_STOP:
 					action->MovePower -= 1;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-			case PlayerAction::STRAFE_LEFT_STOP:
 					action->StrafePower += 1;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-			case PlayerAction::STRAFE_RIGHT_STOP:
 					action->StrafePower -= 1;
 				break;
 			case PlayerAction::ORIENTATE:
@@ -203,6 +199,7 @@ namespace RootForce
 						std::string abilityName = playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name;
 						if (abilityName != "")
 						{
+							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Ability %s charge timer %f, charge state %d", abilityName.c_str(), action->AbilityTime, (int) playerComponent->AbilityState);
 
 							float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
 							float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
@@ -479,6 +476,20 @@ namespace RootForce
 							}
 						}
 					}
+				}
+				break;
+			case PlayerAction::PICK_UP_ABILITY:
+				{
+					RootForce::NetworkMessage::AbilityTryClaim m;
+					m.User = network->ID.UserID;
+
+					RakNet::BitStream bs;
+					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+					bs.Write(RakNet::GetTime());
+					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+					m.Serialize(true, &bs);
+
+					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
 				break;
 			default:

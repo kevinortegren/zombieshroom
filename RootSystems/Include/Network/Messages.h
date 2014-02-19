@@ -29,6 +29,7 @@ namespace RootForce
 	struct PlayerComponent;
 	struct TDMRuleSet;
 	struct PlayerPhysics;
+	struct AbilityRespawnComponent;
 
 	namespace Network
 	{
@@ -55,7 +56,10 @@ namespace RootForce
 				AbilityChannelingDone,
 				AbilityChargeAndChannelingDone,
 				AbilityCooldownOff,
+				AbilityTryClaim,
+				AbilityClaimedBy,
 				RespawnRequest,
+				Suicide,
 				DestroyEntities,
 				SpawnUser,
 				LoadMap,
@@ -65,7 +69,8 @@ namespace RootForce
 				SetMatchTime,
 				SetKillCount,
 				ServerInformation,
-				TimeUp
+				TimeUp,
+				AbilitySpawn,
 			};
 		}
 
@@ -213,6 +218,27 @@ namespace RootForce
 		};
 
 		/*
+			Sent to the server when a player wants to pick up an ability
+		*/		
+		struct AbilityTryClaim
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
+			Sent to all clients when a player has successfully picked up an ability
+		*/
+		struct AbilityClaimedBy
+		{
+			Network::UserID_t User;
+			Network::NetworkEntityID AbilitySpawnPointID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		/*
 			Sent by the client to the server when a respawn is request. Server will respond with a spawn user if the request is approved.
 		*/
 		struct RespawnRequest
@@ -222,6 +248,13 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 		
+		struct Suicide
+		{
+			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
 		/*
 			Sent by the server to destroy a set of entities matching the given ID on a client.
 		*/
@@ -327,12 +360,20 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
+
 		/*
 			Sent by the server when a timer component reaches 0. 
 		*/
 		struct TimeUp 
 		{
 			Network::NetworkEntityID ID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+		struct AbilitySpawn
+		{
+			Network::NetworkEntityID ID;
+			RakNet::RakString AbilityName;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -349,6 +390,7 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilityRespawnComponent* p_c);
 
 
 		/*

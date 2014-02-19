@@ -32,7 +32,8 @@ public:
 		if (normalInWorldSpace)
 		{
 			hitNormalWorld = convexResult.m_hitNormalLocal;
-		} else
+		} 
+		else
 		{
 			///need to transform normal into worldspace
 			hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
@@ -66,6 +67,29 @@ BulletCharacter::~BulletCharacter( void )
 void BulletCharacter::Init()
 {
 	
+}
+
+void BulletCharacter::preStep (  btCollisionWorld* collisionWorld)
+{
+
+	int numPenetrationLoops = 0;
+	m_touchingContact = false;
+	while (recoverFromPenetration (collisionWorld))
+	{
+		numPenetrationLoops++;
+		m_touchingContact = true;
+		if (numPenetrationLoops > 4)
+		{
+			//printf("character could not recover from penetration = %d\n", numPenetrationLoops);
+			break;
+		}
+	}
+
+	m_currentPosition = m_ghostObject->getWorldTransform().getOrigin();
+	m_targetPosition = m_currentPosition;
+	//	printf("m_targetPosition=%f,%f,%f\n",m_targetPosition[0],m_targetPosition[1],m_targetPosition[2]);
+
+
 }
 
 void BulletCharacter::playerStep( btCollisionWorld* collisionWorld, btScalar dt )
@@ -388,7 +412,8 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 				//test a double fall height, to see if the character should interpolate it's fall (full) or not (partial)
 				m_ghostObject->convexSweepTest (m_convexShape, start, end_double, callback2, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 			}
-		} else
+		} 
+		else
 		{
 			collisionWorld->convexSweepTest (m_convexShape, start, end, callback, collisionWorld->getDispatchInfo().m_allowedCcdPenetration);
 
@@ -426,7 +451,6 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	if (callback.hasHit() || runonce == true)
 	{
 		// we dropped a fraction of the height -> hit floor
-
 		//////////////////////////////////////////////////////////////////////////
 		float asdf = callback.m_hitNormalWorld.dot(getUpAxisDirections()[m_upAxis]);
 		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Normal dot Up: %f", asdf);
@@ -476,7 +500,77 @@ void BulletCharacter::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 	}
 
 }
+bool BulletCharacter::recoverFromPenetration ( btCollisionWorld* collisionWorld)
+{
+	// Here we must refresh the overlapping paircache as the penetrating movement itself or the
+	// previous recovery iteration might have used setWorldTransform and pushed us into an object
+	// that is not in the previous cache contents from the last timestep, as will happen if we
+	// are pushed into a new AABB overlap. Unhandled this means the next convex sweep gets stuck.
+	//
+	// Do this by calling the broadphase's setAabb with the moved AABB, this will update the broadphase
+	// paircache and the ghostobject's internal paircache at the same time.    /BW
 
+	btVector3 minAabb, maxAabb;
+	m_convexShape->getAabb(m_ghostObject->getWorldTransform(), minAabb,maxAabb);
+	collisionWorld->getBroadphase()->setAabb(m_ghostObject->getBroadphaseHandle(), 
+		minAabb, 
+		maxAabb, 
+		collisionWorld->getDispatcher());
+
+	bool penetration = false;
+
+	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(m_ghostObject->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher());
+
+	m_currentPosition = m_ghostObject->getWorldTransform().getOrigin();
+
+	btScalar maxPen = btScalar(0.0);
+	for (int i = 0; i < m_ghostObject->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
+	{
+		m_manifoldArray.resize(0);
+
+		btBroadphasePair* collisionPair = &m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray()[i];
+		if (!static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject)->hasContactResponse() ||
+			!static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject)->hasContactResponse())
+			continue;
+
+		if (collisionPair->m_algorithm)
+			collisionPair->m_algorithm->getAllContactManifolds(m_manifoldArray);
+
+
+		for (int j=0;j<m_manifoldArray.size();j++)
+		{
+			btPersistentManifold* manifold = m_manifoldArray[j];
+			btScalar directionSign = manifold->getBody0() == m_ghostObject ? btScalar(-1.0) : btScalar(1.0);
+			for (int p=0;p<manifold->getNumContacts();p++)
+			{
+				const btManifoldPoint&pt = manifold->getContactPoint(p);
+
+				btScalar dist = pt.getDistance();
+
+				if (dist < 0.0)
+				{
+					if (dist < maxPen)
+					{
+						maxPen = dist;
+						m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+
+					}
+					m_currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
+					penetration = true;
+				} else {
+					//printf("touching %f\n", dist);
+				}
+			}
+
+			//manifold->clearManifold();
+		}
+	}
+	btTransform newTrans = m_ghostObject->getWorldTransform();
+	newTrans.setOrigin(m_currentPosition);
+	m_ghostObject->setWorldTransform(newTrans);
+	//	printf("m_touchingNormal = %f,%f,%f\n",m_touchingNormal[0],m_touchingNormal[1],m_touchingNormal[2]);
+	return penetration;
+}
 float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, btCollisionWorld* world )
 {
 	btTransform start, end;
@@ -489,4 +583,15 @@ float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, bt
 	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
 	m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
 	return callback.m_closestHitFraction;
+}
+
+void BulletCharacter::StopKnockback()
+{
+	m_knockbackVelocity.setZero();
+	m_hasBeenKnockbacked = false;
+}
+
+void BulletCharacter::JumpBoost( float p_boostPower )
+{
+	m_verticalVelocity += p_boostPower;
 }

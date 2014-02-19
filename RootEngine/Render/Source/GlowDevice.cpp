@@ -5,16 +5,6 @@
 
 namespace Render
 {
-	struct BufferData
-		{
-			int halfWidth;
-			int halfHeight;
-			float blurFactor;
-			float blurStrength;
-			float blurRadius;
-
-		};
-
 	GlowDevice::~GlowDevice()
 	{
 		glDeleteFramebuffers(1, &m_glowFramebuffer);
@@ -36,8 +26,15 @@ namespace Render
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		
-		BufferData data;
+		struct
+		{
+			int halfWidth;
+			int halfHeight;
+			float blurFactor;
+			float blurStrength;
+			float blurRadius;
+		} data;
+
 		data.halfWidth = p_width / 2;
 		data.halfHeight = p_height / 2;
 		data.blurRadius = 1.0f;
@@ -45,6 +42,21 @@ namespace Render
 		data.blurStrength = 0.2f;
 
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
+	}
+
+	void GlowDevice::SetGlowFactor(float p_factor)
+	{
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(8, sizeof(float), &p_factor);
+	}
+
+	void GlowDevice::SetGlowStrength(float p_strength)
+	{
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &p_strength);
+	}
+
+	void GlowDevice::SetGlowRadius(float p_radius)
+	{
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &p_radius);
 	}
 
 	void GlowDevice::Process(GLRenderer* p_renderer, Mesh* m_mesh)
@@ -84,35 +96,7 @@ namespace Render
 		m_height = p_height;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
-
-		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glowTexture->GetHandle(), 0);
+		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);	
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		BufferData data;
-		data.halfWidth = p_width / 2;
-		data.halfHeight = p_height / 2;
-		data.blurRadius = 1.0f;
-		data.blurFactor = 9.0f;
-		data.blurStrength = 0.2f;
-
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
 	}
-
-	void SetGlowFactor(float p_factor)
-	{
-
-	}
-
-	void SetGlowStrength(float p_strength)
-	{
-
-	}
-
-	void SetGlowRadius(float p_radius)
-	{
-
-	}
-
 }

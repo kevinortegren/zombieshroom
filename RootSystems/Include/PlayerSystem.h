@@ -54,15 +54,14 @@ namespace RootForce
 		bool WantRespawn;
 
 		PlayerActionComponent() 
-		{
-			ActionID = Network::ReservedActionID::NONE;
-			MovePower = 0.0f;
-			StrafePower = 0.0f;
-			JumpTime = 0.0f;
-			AbilityTime = 0.0f;
-			SelectedAbility = 1;
-			WantRespawn = false;
-		}
+			: ActionID(Network::ReservedActionID::NONE)
+			, MovePower(0.0f)
+			, StrafePower(0.0f)
+			, JumpTime(0.0f)
+			, AbilityTime(0.0f)
+			, SelectedAbility(1)
+			, WantRespawn(false)
+		{}
 	};
 #endif
 
@@ -70,6 +69,7 @@ namespace RootForce
 	{
 		float MovementSpeed;
 		float JumpForce;
+		float JumpBoostForce;
 	};
 
 	struct StateComponent : public ECS::Component<StateComponent>
@@ -91,6 +91,19 @@ namespace RootForce
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
+		int SpawnIndex;
+		bool SpawnPointReceived;
+
+		HealthComponent()
+		{
+			Health = 0;
+			LastDamageSourceID = 0;
+			IsDead = true;
+			WantsRespawn = true;
+			RespawnDelay = 0.0f;
+			SpawnIndex = -1;
+			SpawnPointReceived = false;
+		}
 	};
 #endif
 
@@ -102,11 +115,8 @@ namespace RootForce
 		int Charges;
 
 		AbilityInfo()
-		{
-			Cooldown = 0.0f;
-			OnCooldown = false;
-			Charges = -1;
-		}
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1)
+		{}
 	};
 
 	struct PlayerComponent : public ECS::Component<PlayerComponent>
@@ -130,5 +140,17 @@ namespace RootForce
 			Score = 0;
 			Deaths = 0;
 		}
+	};
+
+	struct TryPickupComponent : public ECS::Component<TryPickupComponent>
+	{
+		union
+		{
+			bool TryPickup;
+			int Padding[2]; // world's most handsome code (components need to have size >= 8?)
+		};
+
+		TryPickupComponent()
+			: TryPickup(false) {}
 	};
 }

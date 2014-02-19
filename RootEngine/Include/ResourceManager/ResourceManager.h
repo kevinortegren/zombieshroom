@@ -112,6 +112,7 @@ namespace RootEngine
 		std::map<std::string, std::vector<ParticleSystemStruct*>> m_particles;
 		std::map<std::string, Sound::SoundAudioInterface*> m_soundAudios;
 
+		Render::TextureInterface* m_defaultTexture;
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR
 		std::shared_ptr<ModelImporter>		m_modelImporter;
@@ -124,5 +125,7 @@ namespace RootEngine
 		//Other
 		GameSharedContext* m_context;
 		std::string m_workingDirectory;
+
+		void SetupDefaultResources();
 	};
 }

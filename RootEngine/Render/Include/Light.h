@@ -18,6 +18,7 @@ namespace Render
 		glm::vec3 m_attenuation;
 		float m_range;
 		glm::vec4 m_color; 
+		glm::mat4 m_transform;
 	};
 }
 
