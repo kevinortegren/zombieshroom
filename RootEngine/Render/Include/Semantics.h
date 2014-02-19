@@ -42,6 +42,9 @@ namespace Render
 		enum TextureSemantic
 		{
 			DIFFUSE,
+			DIFFUSE1,
+			DIFFUSE2,
+			DIFFUSE3,
 			SPECULAR,
 			NORMAL,
 			DEPTH,

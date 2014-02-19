@@ -13,15 +13,17 @@ namespace RootForce
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
 		
-		// Diffuse texture.
+		// Diffuse texture for geometric grass blades.
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("ugotaflatgrass2", Render::TextureType::TEXTURE_2D);
 		
-		// Transluency texture.
+		// Transluency texture for geometric grass blades.
 		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture("grass_translucency", Render::TextureType::TEXTURE_2D);
 
-		// LOD2 imposter diffuse.
-		m_material->m_textures[Render::TextureSemantic::SPECULAR] = m_engineContext->m_resourceManager->LoadTexture("grass_n_titties", Render::TextureType::TEXTURE_2D);
-		
+		// Imposter diffuse.
+		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture("grass_n_titties", Render::TextureType::TEXTURE_2D);
+
+		// Terrain grass texture.
+		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture("customGrass2", Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 
 		// Divide painted meshes into chunks of 500 polygons.
@@ -52,22 +54,26 @@ namespace RootForce
 
 		delete[] data;
 		m_meshCount = 0;
+
+		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
+		{
+			m_cellDirectory[i] = 0;
+		}
 	}
 
 	void BotanySystem::Construct(QuadNode* p_node)
 	{
-		if(m_meshCount >= BOTANY_MESHES_SIZE)
-		{
-			m_meshCount = 0;
-			std::cout << "Cache flush" << std::endl;
-		}
-
 		glEnable(GL_RASTERIZER_DISCARD); 
 		for(auto entity = p_node->m_indices.begin(); entity != p_node->m_indices.end(); ++entity)
 		{
+			// Reset mesh counter to resuse old meshes.
+			if(m_meshCount >= BOTANY_MESHES_SIZE)
+			{
+				m_meshCount = 0;
+			}
+
 			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*entity)]);
-			renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]->Bind(6);		
-				
+			renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]->Bind(6);				
 			renderable->m_model->m_meshes[0]->Bind();
 
 			// Fetch an empty mesh to output data into.
@@ -76,8 +82,14 @@ namespace RootForce
 			// If a cell already uses this mesh, remove it.
 			if(m_cells[m_cellDirectory[m_meshCount]].m_meshSize != 0)
 			{
+				for(int i = 0; i < m_cells[m_cellDirectory[m_meshCount]].m_meshSize; i++)
+				{
+					m_cells[m_cellDirectory[m_meshCount]].m_meshIndices[i] = -1;
+				}
 				m_cells[m_cellDirectory[m_meshCount]].m_meshSize = 0;
 			}
+
+			// Store which cell this mesh belong to.
 			m_cellDirectory[m_meshCount] = p_node->m_id;
 
 			mesh->BindTransformFeedback();
@@ -131,17 +143,23 @@ namespace RootForce
 		for(auto itr = m_quadTree.m_culledNodes.begin(); itr != m_quadTree.m_culledNodes.end(); ++itr)
 		{			
 			int id = (*itr)->m_id;
+			assert(id < BOTANY_MAX_CELLS && "Botany terrain chunk id exceeds max botany cells.");
+
+			// Bug in quad tree culling, returning nodes with id -1.
+			if(id == -1)
+				continue;
 
 			// If mesh is not constructed.
 			if(m_cells[id].m_meshSize == 0)
 			{
 				Construct((*itr));
-				std::cout << "Constructing" << std::endl;
 			}
 
 			// Render result.
 			for(int j = 0; j < m_cells[id].m_meshSize; j++)
 			{
+				assert(m_cells[id].m_meshIndices[j] != -1 && "Attempting to render botany cell with mesh index -1.");
+
 				Render::RenderJob job;
 				job.m_mesh = m_meshes[m_cells[id].m_meshIndices[j]];
 				job.m_mesh->SetNoCulling(true);

@@ -3166,7 +3166,7 @@
     - Type: 21
       Data:
         - Entity: 0
-          Color: [0.927, 0.773527, 0.536733, 1]
+          Color: [0.7, 0.7, 0.5, 1]
     - Type: 22
       Data:
         []
@@ -3939,6 +3939,6 @@
       Group: Water
 - Storage:
     - Key: Ambient
-      Value: 0 0 0 1
+      Value: 0.3 0.3 0.3 1
     - Key: WaterHeight
       Value: 0.2

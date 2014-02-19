@@ -388,7 +388,6 @@ namespace RootForce
 		}
 		else
 		{
-
 			p_node->m_id = m_idCounter++;
 
 			std::vector<Triangle> triangles = Trianglulate(p_polygons);

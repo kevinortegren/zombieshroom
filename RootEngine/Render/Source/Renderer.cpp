@@ -358,6 +358,7 @@ namespace Render
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
 		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 2;
 		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
 		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
@@ -369,7 +370,9 @@ namespace Render
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
 		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 10;
-
+		s_textureSlots[TextureSemantic::DIFFUSE1]		= 11;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 12;
+		s_textureSlots[TextureSemantic::DIFFUSE3]		= 13;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
