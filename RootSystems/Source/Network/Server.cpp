@@ -51,7 +51,7 @@ namespace RootForce
 		{
 			// Load the map
 			p_worldSystem->LoadWorld(p_config.MapName);
-			p_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
+			p_abilitySpawnSystem->LoadAbilities(p_config.AbilityPack.c_str());
 			p_abilitySpawnSystem->AttatchComponentToPoints();
 
 			// Create a server info entity
@@ -60,6 +60,7 @@ namespace RootForce
 
 			serverInfo->Information.ServerName = p_config.ServerName.c_str();
 			serverInfo->Information.MapName = p_config.MapName.c_str();
+			serverInfo->Information.AbilityPack = p_config.AbilityPack.c_str();
 			serverInfo->Information.CurrentPlayers = 0;
 			serverInfo->Information.MaxPlayers = p_config.MaxPlayers;
 			serverInfo->Information.PasswordProtected = p_config.Password != "";

@@ -48,6 +48,7 @@ namespace RootForce
 				m.Serialize(true, &bs);
 
 				m_serverPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				
 			}
 			
 			//Give the ability to the correct player
@@ -57,7 +58,6 @@ namespace RootForce
 			id.SequenceID = 0;
 			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, id));
 			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
-
 			//Remove the collision and renderable component as well as clean out the current ability
 			HideSpawnpoint(p_entity);
 			
@@ -115,7 +115,7 @@ namespace RootForce
 			script->Name = "AbilitySpawnPoint";
 		
 			//Create a random current ability from the ability pack
-			NewCurrentAbility(itr->second);
+			//NewCurrentAbility(itr->second);
 
 
 		}

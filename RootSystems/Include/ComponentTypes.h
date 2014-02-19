@@ -35,6 +35,7 @@ namespace RootForce
 			ABILITYSPAWN,
 			TRYPICKUPCOMPONENT,
 			SOUND,
+			TIMER,
 		};
 	}
 }

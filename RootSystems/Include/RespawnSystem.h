@@ -23,6 +23,7 @@ namespace RootSystems
 			SetUsage<RootForce::Collision>();
 			SetUsage<RootForce::Transform>();
 			SetUsage<RootForce::Network::NetworkComponent>();
+			SetUsage<RootForce::PlayerComponent>();
 		}
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
@@ -41,6 +42,7 @@ namespace RootSystems
 		ECS::ComponentMapper<RootForce::Collision> m_collision;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
+		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
 
 		RakNet::RakPeerInterface* m_serverPeer;
 		RakNet::RakPeerInterface* m_clientPeer;

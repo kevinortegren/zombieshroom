@@ -19,6 +19,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootSystems/Include/AbilityRespawnSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
+#include <RootSystems/Include/TimerSystem.h>
 
 namespace RootForce
 {

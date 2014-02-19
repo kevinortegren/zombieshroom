@@ -20,6 +20,7 @@ namespace RootSystems
 		m_collision.Init(m_world->GetEntityManager());
 		m_transform.Init(m_world->GetEntityManager());
 		m_network.Init(m_world->GetEntityManager());
+		m_player.Init(m_world->GetEntityManager());
 	}
 
 
@@ -47,6 +48,7 @@ namespace RootSystems
 			
 			Respawn(health->SpawnIndex, p_entity);
 			health->SpawnPointReceived = false;
+			
 
 			// Check whether this is the connection spawn message, and if so, set the client state to connected.
 			RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(m_world->GetTagManager()->GetEntityByTag("Client"));
@@ -177,6 +179,7 @@ namespace RootSystems
 		RootForce::Collision* collision = m_collision.Get(p_player);
 		RootForce::Transform* transform = m_transform.Get(p_player);
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_player);
+		RootForce::PlayerComponent* player = m_player.Get(p_player);
 
 		// Set the spawn position
 		RootForce::Transform* spawnpoint = GetSpawnpointTransform(index);
@@ -197,6 +200,11 @@ namespace RootSystems
 		health->RespawnDelay = 0.0f;
 		health->IsDead = false;
 		g_engineContext.m_physics->DeactivateRagdoll(*(collision->m_handle));
+		
+
+		player->AbilityScripts[0] = RootForce::AbilityInfo();
+		player->AbilityScripts[1] = RootForce::AbilityInfo();
+		player->AbilityScripts[2] = RootForce::AbilityInfo();
 	}
 }
 #endif

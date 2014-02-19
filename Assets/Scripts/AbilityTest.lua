@@ -1,21 +1,20 @@
-AbilityBall = {};
-AbilityBall.damage = 20;
-AbilityBall.knockback = 20;
-AbilityBall.cooldown = 3;
-AbilityBall.charges = 0;
-AbilityBall.chargeTime = 0;
-AbilityBall.channelingTime = 0;
-AbilityBall.duration = 0;
-AbilityBall.charges = -1;
+AbilityTest = {};
+AbilityTest.damage = 5;
+AbilityTest.knockback = 5;
+AbilityTest.cooldown = 1;
+AbilityTest.charges = 5;
+AbilityTest.chargeTime = 0;
+AbilityTest.channelingTime = 0;
+AbilityTest.duration = 5;
 
-function AbilityBall.ChargeDone (time, userId, actionId)
-	AbilityBall.OnCreate(userId, actionId);
+function AbilityTest.ChargeDone (time, userId, actionId)
+	AbilityTest.OnCreate(userId, actionId);
 end
 
-function AbilityBall.ChannelingDone (time, userId, actionId)
+function AbilityTest.ChannelingDone (time, userId, actionId)
 end
 
-function AbilityBall.OnCreate (userId, actionId)
+function AbilityTest.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -25,16 +24,22 @@ function AbilityBall.OnCreate (userId, actionId)
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
-	local scriptComp = Script.New(self, "AbilityBall");
+	local scriptComp = Script.New(self, "AbilityTest");
+	local timerComp = Timer.New(self, AbilityTest.duration);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
+	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();
 	local tempPos = casterEnt:GetTransformation():GetPos();
-	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3))
-	
+	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
+	local entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);
+	if entityAtAim:DoesExist() then
+		if entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
+			startPos = entityAtAim:GetTransformation():GetPos();
+		end
+	end
 	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
+	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 1, dirVec.y * 1, dirVec.z * 1));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
 
@@ -50,7 +55,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	end
 end
 
-function AbilityBall.OnCollide (self, entity)
+function AbilityTest.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
@@ -60,7 +65,7 @@ function AbilityBall.OnCollide (self, entity)
 		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
 				local network = entity:GetNetwork();
@@ -68,13 +73,13 @@ function AbilityBall.OnCollide (self, entity)
 				health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
 			end
 		end
-		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
 			local hitPos = entity:GetTransformation():GetPos();
 			local selfPos = self:GetTransformation():GetPos();
-			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback);
+			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityTest.knockback);
 		end
 	end
 end
 
-function AbilityBall.OnDestroy (self)
+function AbilityTest.OnDestroy (self)
 end

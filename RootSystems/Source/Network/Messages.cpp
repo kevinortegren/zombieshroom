@@ -175,6 +175,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, ServerName);
 			p_bs->Serialize(p_writeToBitstream, MapName);
+			p_bs->Serialize(p_writeToBitstream, AbilityPack);
 			p_bs->Serialize(p_writeToBitstream, CurrentPlayers);
 			p_bs->Serialize(p_writeToBitstream, MaxPlayers);
 			p_bs->Serialize(p_writeToBitstream, PasswordProtected);
@@ -184,6 +185,10 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, KillCount);
 		}
 
+		void TimeUp::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		{
+			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);
+		}
 		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID);

@@ -130,6 +130,17 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityDoesExist(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			bool exists = false;
+			if(*e != nullptr)
+				exists = true;
+			lua_pushboolean(p_luaState, exists);
+			return 1;
+		}
+
 		static int EntityGetTransformation(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -721,6 +732,16 @@ namespace RootForce
 			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
 			return 1;
 		}
+		static int PhysicsGetPlayerAtAim(lua_State* p_luaState)
+		{
+			NumberOfArgs(5);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			ECS::Entity **s = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*s = (ECS::Entity*)g_engineContext.m_physics->GetPlayerAtAim((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
+		//RootPhysics::GetPlayerAtAim( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
 		static int PhysicsSetGravity(lua_State* p_luaState)
 		{
 			NumberOfArgs(3);
@@ -2052,6 +2073,24 @@ namespace RootForce
 			(*s)->m_play = true;
 			return 0;
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//Timer
+		//////////////////////////////////////////////////////////////////////////
+		static int TimerCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::TimerComponent **s = (RootForce::TimerComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::TimerComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TimerComponent>(*e);
+
+			(*s)->TimeLeft = (float)luaL_checknumber(p_luaState, 2);
+			//(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
+
+			luaL_setmetatable(p_luaState, "Timer");
+			return 1;
+		}
+
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{NULL, NULL}
@@ -2075,6 +2114,7 @@ namespace RootForce
 
 		static const struct luaL_Reg entity_m [] = {
 			{"GetId", EntityGetId},
+			{"DoesExist", EntityDoesExist},
 			{"GetTransformation", EntityGetTransformation},
 			{"GetRenderable", EntityGetRenderable},
 			{"GetPhysics", EntityGetPhysics},
@@ -2172,6 +2212,7 @@ namespace RootForce
 			{"CheckRadius", PhysicsCheckRadius},
 			{"ShootRay", PhysicsShootRay},
 			{"GetType", PhysicsGetType},
+			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
 			{NULL, NULL}
 		};
@@ -2518,6 +2559,15 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg timercomponent_f [] = {
+			{"New", TimerCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg timercomponent_m [] = {
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2572,6 +2622,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::timercomponent_f, RootForce::LuaAPI::timercomponent_m, "Timer");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec3_f, RootForce::LuaAPI::vec3_m, "Vec3");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");

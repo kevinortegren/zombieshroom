@@ -39,6 +39,11 @@ private slots:
 		void BrowseName();
 		void ChangeAbilityName();
 		void SetCooldown(double p_cooldown);
+		void SetCharges(int p_cooldown);
+		void SetChargeTime(double p_cooldown);
+		void SetChannelingTime(double p_cooldown);
+		void SetDuration(double p_duration);
+
 private:
 	Ui::AbilityEditorClass ui;
 	QtTreePropertyBrowser* m_propBrows;

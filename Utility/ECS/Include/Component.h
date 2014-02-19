@@ -6,9 +6,9 @@ namespace ECS
 {
 	static unsigned int s_numComponents;
 
-	class ComponentInterface 
+	struct ComponentInterface 
 	{
-
+		virtual ~ComponentInterface() {}
 	};
 
 	template<class T>

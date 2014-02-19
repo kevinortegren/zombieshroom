@@ -657,9 +657,11 @@ namespace RootForce
 				{
 					NetworkMessage::AbilityClaimedBy m;
 					m.Serialize(false, p_bs);
-
-					AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
-					spawnPoint->Claimed = m.User;
+					if(clientComponent->IsRemote)
+					{
+						AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						spawnPoint->Claimed = m.User;
+					}
 
 					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
 					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
@@ -785,6 +787,7 @@ namespace RootForce
 						clientComponent->State == ClientState::AWAITING_SPAWN_POINT ||
 						ClientState::IsConnected(clientComponent->State))
 					{
+						
 						if (clientComponent->IsRemote)
 						{
 							// Update server information
@@ -794,10 +797,9 @@ namespace RootForce
 
 							// Load the map
 							m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
-                            m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
-                            m_abilitySpawnSystem->AttatchComponentToPoints();
+							m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String()); 
+							m_abilitySpawnSystem->AttatchComponentToPoints();
 						}
-
 						// Send load map status
 						NetworkMessage::LoadMapStatus n;
 						n.Status = NetworkMessage::LoadMapStatus::STATUS_COMPLETED;
@@ -953,8 +955,8 @@ namespace RootForce
 
 							// Load the map
 							m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
-                            m_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
-                            m_abilitySpawnSystem->AttatchComponentToPoints();
+							m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String());
+							m_abilitySpawnSystem->AttatchComponentToPoints();
 						}
 
 						// Send load map status
@@ -977,18 +979,33 @@ namespace RootForce
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "ServerInformation received in an invalid state (%d).", clientComponent->State);
 					}
 				} return true;
+				case NetworkMessage::MessageType::TimeUp:
+				{
+					NetworkMessage::TimeUp m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* entity = g_networkEntityMap[m.ID];
+					if(entity != nullptr)
+					{
+						TimerComponent* timer = m_world->GetEntityManager()->GetComponent<TimerComponent>(entity);
+						if(timer != nullptr)
+							timer->TimeUp = true;
+
+					}
+
+				} return true;
 
 				case NetworkMessage::MessageType::AbilitySpawn:
-					{
-						NetworkMessage::AbilitySpawn m;
-						m.Serialize(false, p_bs);
+				{
+					NetworkMessage::AbilitySpawn m;
+					m.Serialize(false, p_bs);
 
-						ECS::Entity* point = g_networkEntityMap[m.ID];
+					ECS::Entity* point = g_networkEntityMap[m.ID];
 
-						RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
-						component->AbilityReceived = m.AbilityName;
+					RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
+					component->AbilityReceived = m.AbilityName;
 
-					} return true;
+				} return true;
 			}
 
 			return false;

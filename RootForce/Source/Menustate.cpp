@@ -109,6 +109,7 @@ namespace RootForce
 				m_playData.ServerInfo.MatchTime = event.data[4].ToInteger();
 				m_playData.ServerInfo.KillCount = event.data[5].ToInteger();
 				m_playData.ServerInfo.MapName = Awesomium::ToString(event.data[6].ToString());
+				m_playData.ServerInfo.AbilityPack = Awesomium::ToString(event.data[7].ToString());
 
 				result = GameStates::Connecting;
 			} break;
