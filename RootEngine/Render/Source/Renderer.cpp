@@ -116,6 +116,11 @@ namespace Render
 			{
 				m_lighting.ShowBackgroundBlend((atoi(value.c_str()) == 1));
 			}
+			else if(param == "setambient" || param == "sa")
+			{
+				float v = (float)atof(value.c_str());
+				m_lighting.SetAmbientLight(glm::vec4(v, v, v, 1.0f));
+			}
 		}
 		else if(module == "layer" || module == "la")
 		{
