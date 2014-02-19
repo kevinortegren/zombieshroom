@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV0.16.mb</source_data>
+      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV1.8.mb</source_data>
     </contributor>
-    <created>2014-02-17T16:31:48</created>
-    <modified>2014-02-17T16:31:48</modified>
+    <created>2014-02-19T13:54:37</created>
+    <modified>2014-02-19T13:54:37</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -224,13 +224,13 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="TortugaCoveV0.16">
+    <visual_scene id="VisualSceneNode" name="TortugaCoveV1.8">
       <node id="Palm2Mesh" name="Palm2Mesh" type="NODE">
-        <translate sid="translate">35.00612 18.082 -85.76818</translate>
+        <translate sid="translate">29.7552 15.3697 -72.90295</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">1.375202 1.375202 1.375202</scale>
+        <scale sid="scale">1.168921 1.168921 1.168921</scale>
         <instance_geometry url="#Palm2MeshShape">
           <bind_material>
             <technique_common>
