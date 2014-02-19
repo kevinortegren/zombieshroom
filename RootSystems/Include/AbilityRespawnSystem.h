@@ -17,9 +17,9 @@ namespace RootForce
 		float Timer;
 		AbilityInfo CurrentAbility;
 		Network::UserID_t Claimed;
-
+		std::string AbilityReceived;
 		AbilityRespawnComponent()
-			: Timer(0), Claimed(Network::ReservedUserID::NONE)
+			: Timer(0), Claimed(Network::ReservedUserID::NONE), AbilityReceived("")
 		{}
 	};
 
@@ -44,6 +44,7 @@ namespace RootForce
 		void RevealSpawnpoint(ECS::Entity* p_entity);
 
 		void NewCurrentAbility(ECS::Entity* p_entity);
+		void SetClientCurrentAbility(ECS::Entity* p_entity);
 		void CreateRenderComponent(ECS::Entity* p_entity);
 		void CreateCollisionComponents(ECS::Entity* p_entity);
 		void CreateParticleEmitter(ECS::Entity* p_entity);

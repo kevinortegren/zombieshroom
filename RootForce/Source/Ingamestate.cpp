@@ -167,19 +167,16 @@ namespace RootForce
 		
 		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
 		// Set the server peer to the action and abilityspawn system, if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
 			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}
-		if (m_networkContext.m_client != nullptr)
-		{
-			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-			m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-		}
+		}	
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -221,6 +218,9 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_engineContext.m_physics->RemoveAll();
+
+		// Set server peers to null
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)

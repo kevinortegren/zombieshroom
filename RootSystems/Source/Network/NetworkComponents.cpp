@@ -55,7 +55,9 @@ namespace RootForce
 		bool ClientState::IsConnecting(ClientState p_state)
 		{
 			return p_state == ClientState::AWAITING_CONNECTION_ACCEPT ||
+				   p_state == ClientState::SERVER_AWAITING_USER_INFO ||
 				   p_state == ClientState::AWAITING_SERVER_INFO ||
+				   p_state == ClientState::SERVER_AWAITING_MAP_LOAD_STATUS ||
 				   p_state == ClientState::AWAITING_USER_CONNECT ||
 				   p_state == ClientState::AWAITING_FIRST_GAMESTATE_DELTA ||
 				   p_state == ClientState::AWAITING_SPAWN_POINT;
