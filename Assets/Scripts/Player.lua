@@ -1,7 +1,7 @@
 Player = {}
 
 function Player.OnCreate(userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player (userId: "..tostring(userId)..", actionId: "..tostring(actionId)..")");
 	
 	local player = Entity.New();
 	local transform = Transformation.New(player);
