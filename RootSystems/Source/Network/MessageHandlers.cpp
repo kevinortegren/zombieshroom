@@ -1826,7 +1826,7 @@ namespace RootForce
 												ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
 												assert(otherClientComponent != nullptr);
 
-												if (ClientState::IsConnected(otherClientComponent->State) || clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
+												if (ClientState::IsConnected(otherClientComponent->State) || otherClientComponent->State == ClientState::AWAITING_SPAWN_POINT)
 												{
 													RakNet::BitStream bs;
 													bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -1852,7 +1852,7 @@ namespace RootForce
 
 											// Make sure the client is either connected or is the client in question who is connecting.
 											if (ClientState::IsConnected(otherClientComponent->State) || 
-												clientComponent->State == ClientState::AWAITING_SPAWN_POINT ||
+												otherClientComponent->State == ClientState::AWAITING_SPAWN_POINT ||
 												addresses[i] == p_packet->systemAddress)
 											{
 												PlayerComponent* otherPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(otherPlayerEntity);
