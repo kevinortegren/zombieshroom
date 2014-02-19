@@ -235,7 +235,10 @@ namespace RootForce
 						else
 						{
 							// For a local client, just set the client state. The server has already created the entities for us.
-							clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+							if (m.IsYou)
+							{
+								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+							}
 						}
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "User connected (%d): %s", m.User, m.Name.C_String());
