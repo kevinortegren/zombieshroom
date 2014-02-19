@@ -51,7 +51,6 @@ namespace ECS
 
 	protected:
 		int64_t m_flag;
-		std::vector<Entity*> m_entitiesToRemove;
 		std::set<Entity*> m_activeEntities;
 	};
 
