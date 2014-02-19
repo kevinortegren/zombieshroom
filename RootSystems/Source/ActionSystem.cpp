@@ -303,24 +303,18 @@ namespace RootSystems
 		{
 			if (it->first.ActionID == RootForce::Network::ReservedActionID::CONNECT)
 			{
-
-				RootForce::Network::NetworkEntityID id;
-				id.UserID = it->first.UserID;
-				id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
-				id.SequenceID = 0;
-				ECS::Entity* playerEntity = g_networkEntityMap[id];
+				ECS::Entity* playerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
 				if (playerEntity == nullptr)
 					continue;
 
-				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
-				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(g_networkEntityMap[id]);
+				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
+				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(playerEntity);
 
-				id.SequenceID = 1;
-				ECS::Entity* aimingDeviceEntity = g_networkEntityMap[id];
+				ECS::Entity* aimingDeviceEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_AIMING_DEVICE_ENTITY));
 				if (aimingDeviceEntity == nullptr)
 					continue;
 
-				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
+				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(aimingDeviceEntity);
 
 				if(!m_inMenu)
 				{
@@ -331,8 +325,8 @@ namespace RootSystems
 					aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 				}
-				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 			}
 		}
 	}

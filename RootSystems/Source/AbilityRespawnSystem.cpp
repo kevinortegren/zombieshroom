@@ -56,7 +56,7 @@ namespace RootForce
 			id.UserID = respawn->Claimed;
 			id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
 			id.SequenceID = 0;
-			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[id]);
+			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, id));
 			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
 			//Remove the collision and renderable component as well as clean out the current ability
 			HideSpawnpoint(p_entity);
