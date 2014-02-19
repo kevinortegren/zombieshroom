@@ -68,10 +68,11 @@ namespace RootForce
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;
 
-		bool	m_wireFrame, m_pause;
-		int		m_texSize, m_gridSize;	
-		float	m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
-		float*	m_textureData;
+		bool		m_wireFrame, m_pause;
+		int			m_texSize, m_gridSize;	
+		float		m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
+		float*		m_textureData;
+		glm::vec4	m_waterOptions;
 
 		bool ValidValues();
 		void CreateWaterMesh();
@@ -88,6 +89,10 @@ namespace RootForce
 
 		void TogglePause();
 		void ToggleWireFrame();
+		void ToggleReflections();
+		void ToggleRefractions();
+		void ToggleDepth();
+		void ToggleNormalMaps();
 
 		void ResetWater();
 	};
