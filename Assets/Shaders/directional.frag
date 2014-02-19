@@ -28,6 +28,7 @@ in vec3 sunPosition;
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
+uniform sampler2D g_GlowTrans;
 uniform sampler2DArrayShadow g_ShadowDepthPCF;
 uniform sampler2DArray g_ShadowDepth;
 
@@ -146,12 +147,13 @@ float PCSS(vec3 coord, float fragmentZLightSpace, int useCascade)
 void main() {
 
 	vec4 rt0 = texture(g_Diffuse, ex_TexCoord);
-
+    float translucency = texture(g_GlowTrans, ex_TexCoord).a;
+    
 	vec3 diffuse = rt0.xyz;
 	float specTerm = rt0.w;
 
     vec3 normal = GetDecodedNormal(ex_TexCoord);
-
+    
 	vec3 position = GetVSPositionFromDepth();
 
 	vec4 worldPosition = invView * vec4(position, 1.0);
@@ -185,7 +187,6 @@ void main() {
 		}
 	}
 
-
 	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
 	occluderDepth = shadowCoord.z - occluderDepth;
 	
@@ -193,18 +194,24 @@ void main() {
 	float distanceFromFragmentToLight = length(position - sunPosition);
 
 	visibility = PCSS(shadowCoord.xyz, distanceFromFragmentToLight, useCascade);
-
-	
 	//shadowCoord /= shadowCoord.w; //unnecessary because orthographic
+    
+    // Lighting.
 
 	vec3 vert_lightVec = normalize( -ex_Light.LightDirection );
-
 	vec3 viewDir = -normalize(position);
 	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
-	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
+    // Translucency.
+    float EdotL = max(0.0, dot(-viewDir, vert_lightVec)); // 1 if facing the light.
+    float LdotN = max(0.0, dot( vert_lightVec, -normal)); // Light contribution.   
     
+    float transFactor = max(0.0, EdotL * LdotN * translucency);
+    float diffuseFactor = max(0.0, dot( normalize( vert_lightVec ), normal ));
+    
+	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
+	vec3 diffuse_color = max(translucency * 0.5, (diffuseFactor + transFactor)) * diffuse * ex_Light.Color.xyz;
+
 	out_Color = vec4(diffuse_color + spec_color, 1.0);
 
 	if(shadowCoord.x <= 0 || shadowCoord.x >= 1 || shadowCoord.y <= 0 || shadowCoord.y >= 1)

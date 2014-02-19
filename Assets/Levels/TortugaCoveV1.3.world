@@ -1,5 +1,4 @@
 - Entities:
-    - 0
     - 3
     - 4
     - 5
@@ -1728,10 +1727,6 @@
         - Entity: 231
     - Type: 1
       Data:
-        - Entity: 0
-          Position: [-1.77636e-015, 337.372, 52.0472]
-          Rotation: [-0.378735, 0.630266, -0.170899, -0.655834]
-          Scale: [1, 1, 1]
         - Entity: 3
           Position: [257.46, 24.8452, 172.039]
           Rotation: [0, 0, 0, 1]
@@ -3161,12 +3156,8 @@
         []
     - Type: 20
       Data:
-        - Entity: 0
-          LightSlot: 0
     - Type: 21
       Data:
-        - Entity: 0
-          Color: [0.927, 0.773527, 0.536733, 1]
     - Type: 22
       Data:
         []
@@ -3294,8 +3285,6 @@
       Data:
         []
 - Tags:
-    - Id: 0
-      Tag: Sun
     - Id: 11
       Tag: Water
 - Groups:

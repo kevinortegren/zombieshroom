@@ -26,8 +26,8 @@ namespace Render
 
 		Render::TextureInterface* m_depthTexture; // 32bit Depth.
 		Render::TextureInterface* m_diffuseTexture; // 24bit Diffuse 8bit Specular;
-		Render::TextureInterface* m_normalsTexture; // 24bit ViewSpaceNormals 8bit Empty.
-		Render::TextureInterface* m_glowTexture; // 24bit Glow RGB 8bit Empty.
+		Render::TextureInterface* m_normalsTexture; // 16bit normals-xy.
+		Render::TextureInterface* m_glowTexture; // 24bit Glow RGB 8bit Translucency.
 		Render::TextureInterface* m_backgroundTexture; 
 
 	};

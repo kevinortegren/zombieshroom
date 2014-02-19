@@ -14,6 +14,7 @@ layout(std140) uniform PerFrame
 
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Specular;
+uniform sampler2D g_Translucency;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec2 normals;
@@ -22,10 +23,12 @@ layout (location = 3) out vec4 background;
 
 void main()
 {
-    vec4 color;
+    vec4 color = vec4(1.0);
+    float trans = 0.0;
     if(vert_texture1 == 0)
     {
         color = texture(g_Diffuse, vert_texcoord1);
+        trans = texture(g_Translucency, vert_texcoord1).r;  
     }
     else
     {
@@ -42,6 +45,7 @@ void main()
     float p = sqrt(normal.z*8+8);
     normals = normal.xy/p + 0.5;
     
-	glow = vec4(vec3(0.0), 0.0f);     
+    // Output translucency.
+	glow = vec4(vec3(0.0), trans);     
     background = vec4(0,0,0,0);
 }

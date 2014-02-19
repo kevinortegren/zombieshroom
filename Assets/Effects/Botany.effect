@@ -38,6 +38,8 @@
           slot: 0
         - name: g_Specular
           slot: 1
+        - name: g_Translucency
+          slot: 10
       programs:
         - name: Botany_Render
           shaders:

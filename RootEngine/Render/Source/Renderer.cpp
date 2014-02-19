@@ -354,9 +354,9 @@ namespace Render
 		s_sizes[Semantic::DX]			= sizeof(float);
 
 		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
 		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
@@ -364,10 +364,11 @@ namespace Render
 		s_textureSlots[TextureSemantic::DEPTH]			= 4;
 		s_textureSlots[TextureSemantic::RANDOM]			= 5;
 		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
-		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH]	= 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
+		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 10;
 
 	}
 
