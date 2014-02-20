@@ -1,8 +1,10 @@
-#include <RootEngine\Include\ConfigManager.h>
+#include <RootEngine/Include/ConfigManager.h>
 #include <sstream>
 #include <fstream>
+#include <SDL2/SDL_scancode.h>
+#include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 
-#include <RootEngine\Include\Logging\Logging.h>
 extern Logging g_logger;
 
 namespace RootEngine
@@ -68,8 +70,11 @@ namespace RootEngine
 		m_values["settings-key-Select_Ability1"] = "30";
 		m_values["settings-key-Select_Ability2"] = "31";
 		m_values["settings-key-Select_Ability3"] = "32";
+		m_values["settings-key-Pick_up_Ability"] = std::to_string(SDL_SCANCODE_LSHIFT);
+		m_values["settings-key-Activate_Push_Ability"] = std::to_string(RootEngine::InputManager::MouseButton::RIGHT);
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
+		m_values["AbilityPack"] = "Standard.txt";
 		m_values["ServerPort"] = "5567";
 		m_values["ServerPassword"] = "";
 		m_values["ServerMaxPlayers"] = "12";

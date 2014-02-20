@@ -30,7 +30,8 @@ namespace RootEngine
 				TYPE_ABILITY,
 				TYPE_DYNAMIC,
 				TYPE_PLAYER,
-				TYPE_RAGDOLL
+				TYPE_RAGDOLL,
+				TYPE_ABILITYSPAWN,
 			};
 		}
 		namespace PhysicsShape	
@@ -96,11 +97,12 @@ namespace RootEngine
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual void RemoveAll() = 0;
-			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
+			
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
 			//Not final?
-			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
+			virtual void PlayerJumpBoost(int p_objectHandle, float p_boostPower) = 0;
 			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
 
@@ -108,6 +110,7 @@ namespace RootEngine
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
 			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 			virtual void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius) = 0;
+			virtual void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 
 			//Legacy functions
 			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
@@ -118,8 +121,11 @@ namespace RootEngine
 
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
-
-			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20] ) = 0;
+			
+			//Ragdoll affecting functions
+			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20], glm::vec3 p_right ) = 0;
+			virtual bool IsRagdoll(int p_objecthandle) = 0;
+			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
 
 			//Binds a shape to a handle
 			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld) = 0;
@@ -141,6 +147,8 @@ namespace RootEngine
 			virtual glm::mat4* GetBones(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
+			virtual glm::vec3 GetPlayerKnockbackVector(int p_objectHandle) = 0;
+			virtual float GetPlayerVerticalVelocity(int p_objectHandle) = 0;
 			//Setters
 			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
@@ -171,18 +179,22 @@ namespace RootEngine
 			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
+			void PlayerJumpBoost(int p_objectHandle, float p_boostPower);
 			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
 			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
 			void EnableDebugDraw(bool p_enabled);
-			void DeactivateRagdoll(int p_objectHandle);
+
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 			void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius);
+			void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
-			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int> p_nameToIndex , glm::mat4 p_boneOffset[20] );
+			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int> p_nameToIndex , glm::mat4 p_boneOffset[20], glm::vec3 p_right );
+			bool IsRagdoll(int p_objecthandle);
+			void DeactivateRagdoll(int p_objectHandle);
 
 			//Binds
 			void BindSphereShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld);
@@ -209,6 +221,8 @@ namespace RootEngine
 			std::map<void*, RootForce::CollisionInfo>* GetCollisionVector(int p_objectHandle);
 			std::string GetPhysicsModelHandle(int p_objectHandle);
 			glm::quat GetOrientation(int p_objectHandle);
+			glm::vec3 GetPlayerKnockbackVector(int p_objectHandle);
+			float GetPlayerVerticalVelocity(int p_objectHandle);
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
@@ -233,6 +247,8 @@ namespace RootEngine
 			void Init();
 			bool DoesObjectExist(int p_objectHandle);
 			bool DoesUserPointerExist( int p_objectHandle );
+			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld);
+			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, const btTransform& p_transform);
 			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
 			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);

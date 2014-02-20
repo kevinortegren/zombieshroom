@@ -33,6 +33,12 @@ namespace RootEngine
 #endif
 		std::string m_textureHandles[3];
 		glm::mat4x4 m_transform;
+
+		Model::Model()
+#ifndef COMPILE_LEVEL_EDITOR
+			: m_animation(nullptr)
+#endif
+		{ }
 	};
 
 	struct VertexBoneData
@@ -77,7 +83,7 @@ namespace RootEngine
 		~ModelImporter();
 
 
-		Model* LoadModel(const std::string p_fileName);
+		Model* LoadModel(const std::string p_fileName, bool p_noRender);
 		
 	private:
 
@@ -87,6 +93,7 @@ namespace RootEngine
 
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
+		void InitPhysicsMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
 		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
 		void LoadBones(const aiMesh* p_aiMesh);
 		void LoadAnimation(unsigned int p_index, const aiScene* p_scene);
@@ -95,6 +102,7 @@ namespace RootEngine
 		std::vector<VertexBoneData> m_boneData;
 		GameSharedContext*			m_context;
 		Model*						m_model; 
+		bool						m_noRender;
 	
 	};
 #endif

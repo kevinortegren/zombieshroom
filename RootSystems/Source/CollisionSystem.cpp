@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 
 namespace RootForce
@@ -13,7 +14,7 @@ namespace RootForce
 
 	void CollisionSystem::Begin()
 	{
-
+		int i = 0;
 	}
 
 	void CollisionSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -23,11 +24,16 @@ namespace RootForce
 		for(auto itr = cr->m_collisions.begin(); itr != cr->m_collisions.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
+			if(script->Name.compare("AbilitySpawnPoint") == 0)
+				int i = 0;
 			
 			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
 			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->ExecuteScript();
+
+			if(p_entity->GetId() == -1)
+				return;
 		}
 
 		cr->m_collisions.clear();
@@ -37,5 +43,11 @@ namespace RootForce
 	{
 
 	}
+
+	Collision::~Collision()
+	{
+		g_engineContext.m_physics->RemoveObject(*m_handle);
+	}
+
 }
 #endif

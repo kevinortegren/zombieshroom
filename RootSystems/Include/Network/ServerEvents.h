@@ -29,5 +29,6 @@ namespace RootServer
 	};
 
 	EventData EventFromString(std::string p_string);
+	//Input is converted to CAPS
 	bool MatchAny(std::string p_input, unsigned p_numValues, ...);
 }

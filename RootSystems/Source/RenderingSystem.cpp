@@ -5,9 +5,7 @@ namespace RootForce
 {
 	Renderable::~Renderable()
 	{
-		std::cout << "Removing entity." << std::endl;
-		g_engineContext.m_renderer->ReleaseBuffer(m_model->m_meshes[0]->GetVertexBuffer());
-		g_engineContext.m_renderer->ReleaseBuffer(m_model->m_meshes[0]->GetElementBuffer());
+		std::cout << "Renderable destruct." << std::endl;
 	}
 
 	void RenderingSystem::Init()

@@ -79,94 +79,9 @@ namespace RootSystems
 
 
 
-
 			// Activate ability! Pew pew!
-			player->SelectedAbility = action->SelectedAbility - 1;
-			std::string abilityName = player->AbilityScripts[player->SelectedAbility].Name;
-			if (abilityName != "")
-			{
-				if (player->AbilityScripts[player->SelectedAbility].OnCooldown)
-					player->AbilityState = RootForce::AbilityState::OFF;
-
-				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
-				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
-
-				switch (player->AbilityState)
-				{
-					case RootForce::AbilityState::START_CHARGING:
-					{
-						player->AbilityState = RootForce::AbilityState::CHARGING;
-
-						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
-					} break;
-
-					case RootForce::AbilityState::START_CHANNELING:
-					{
-						player->AbilityState = RootForce::AbilityState::CHANNELING;
-
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
-						g_engineContext.m_script->ExecuteScript();
-
-						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
-					} break;
-
-					case RootForce::AbilityState::STOP_CHANNELING:
-					{
-						player->AbilityState = RootForce::AbilityState::OFF;
-
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
-						g_engineContext.m_script->ExecuteScript();
-
-						action->AbilityTime = 0.0f;
-
-						// Put ability on cooldown and decrease charges.
-						player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
-						player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
-
-						player->AbilityScripts[player->SelectedAbility].Charges--;
-						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
-							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
-
-						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
-					} break;
-
-					case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
-					{
-						player->AbilityState = RootForce::AbilityState::OFF;
-
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
-						g_engineContext.m_script->ExecuteScript();
-
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
-						g_engineContext.m_script->ExecuteScript();
-
-						action->AbilityTime = 0.0f;
-
-						// Put ability on cooldown and decrease charges.
-						player->AbilityScripts[player->SelectedAbility].OnCooldown = true;
-						player->AbilityScripts[player->SelectedAbility].Cooldown = abilityCooldownTime;
-
-						player->AbilityScripts[player->SelectedAbility].Charges--;
-						if(player->AbilityScripts[player->SelectedAbility].Charges == 0)
-							player->AbilityScripts[player->SelectedAbility] = RootForce::AbilityInfo();
-
-						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
-					} break;
-				}
-			}
+			AbilitySwitch(p_entity, false);
+			AbilitySwitch(p_entity, true);
 
 			// Count down cooldown on all abilities.
 			for (unsigned int i = 0; i < PLAYER_NUM_ABILITIES; ++i)
@@ -254,15 +169,128 @@ namespace RootSystems
 					}
 					else
 					{
+						m_engineContext->m_physics->PlayerJumpBoost(*(collision->m_handle), playphys->JumpBoostForce);
 						// TODO: Apply booster jump force
 					}
 				}
 			}
 		}
 
-		//action->MovePower = 0;
-		//action->StrafePower = 0;
-		//UpdateAimingDevice();
+	}
+
+	void ActionSystem::AbilitySwitch(ECS::Entity* p_entity, bool p_isPush)
+	{
+		RootForce::PlayerComponent* player = m_player.Get(p_entity);
+		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
+		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
+		RootForce::AbilityState::AbilityState state;
+		int abil;
+		if (p_isPush)
+		{
+			state = player->PushAbilityState;
+			abil = 3;
+		}
+		else
+		{
+			state = player->AbilityState;
+			abil = action->SelectedAbility - 1;
+			player->SelectedAbility = abil;
+		}
+
+		std::string abilityName = player->AbilityScripts[abil].Name;
+		if (abilityName != "")
+		{
+			if (player->AbilityScripts[abil].OnCooldown)
+				state = RootForce::AbilityState::OFF;
+
+			float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
+			float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
+			float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
+
+		
+			switch (state)
+			{
+			case RootForce::AbilityState::START_CHARGING:
+				{
+					state = RootForce::AbilityState::CHARGING;
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+				} break;
+
+			case RootForce::AbilityState::START_CHANNELING:
+				{
+					state = RootForce::AbilityState::CHANNELING;
+
+					g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+					g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+					g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+					g_engineContext.m_script->AddParameterNumber(action->ActionID);
+					g_engineContext.m_script->ExecuteScript();
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+				} break;
+
+			case RootForce::AbilityState::STOP_CHANNELING:
+				{
+					state = RootForce::AbilityState::OFF;
+
+					g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+					g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+					g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+					g_engineContext.m_script->AddParameterNumber(action->ActionID);
+					g_engineContext.m_script->ExecuteScript();
+
+					action->AbilityTime = 0.0f;
+
+					// Put ability on cooldown and decrease charges.
+					player->AbilityScripts[abil].OnCooldown = true;
+					player->AbilityScripts[abil].Cooldown = abilityCooldownTime;
+
+					player->AbilityScripts[abil].Charges--;
+					if(player->AbilityScripts[abil].Charges == 0)
+						player->AbilityScripts[abil] = RootForce::AbilityInfo();
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+				} break;
+
+			case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
+				{
+					state = RootForce::AbilityState::OFF;
+
+					g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
+					g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+					g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+					g_engineContext.m_script->AddParameterNumber(action->ActionID);
+					g_engineContext.m_script->ExecuteScript();
+
+					g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
+					g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+					g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+					g_engineContext.m_script->AddParameterNumber(action->ActionID);
+					g_engineContext.m_script->ExecuteScript();
+
+					action->AbilityTime = 0.0f;
+
+					// Put ability on cooldown and decrease charges.
+					player->AbilityScripts[abil].OnCooldown = true;
+					player->AbilityScripts[abil].Cooldown = abilityCooldownTime;
+
+					player->AbilityScripts[abil].Charges--;
+					if(player->AbilityScripts[abil].Charges == 0)
+						player->AbilityScripts[abil] = RootForce::AbilityInfo();
+
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+				} break;
+			}
+			if (p_isPush)
+			{
+				player->PushAbilityState = state;
+			}
+			else
+			{
+				player->AbilityState = state;
+			}
+		}
 	}
 
 	void ActionSystem::UpdateAimingDevice(bool m_inMenu)
@@ -271,24 +299,18 @@ namespace RootSystems
 		{
 			if (it->first.ActionID == RootForce::Network::ReservedActionID::CONNECT)
 			{
-
-				RootForce::Network::NetworkEntityID id;
-				id.UserID = it->first.UserID;
-				id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
-				id.SequenceID = 0;
-				ECS::Entity* playerEntity = g_networkEntityMap[id];
+				ECS::Entity* playerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
 				if (playerEntity == nullptr)
 					continue;
 
-				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
-				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(g_networkEntityMap[id]);
+				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
+				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(playerEntity);
 
-				id.SequenceID = 1;
-				ECS::Entity* aimingDeviceEntity = g_networkEntityMap[id];
+				ECS::Entity* aimingDeviceEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_AIMING_DEVICE_ENTITY));
 				if (aimingDeviceEntity == nullptr)
 					continue;
 
-				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(g_networkEntityMap[id]);
+				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(aimingDeviceEntity);
 
 				if(!m_inMenu)
 				{
@@ -299,8 +321,8 @@ namespace RootSystems
 					aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
 					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 				}
-				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 
+				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 			}
 		}
 	}

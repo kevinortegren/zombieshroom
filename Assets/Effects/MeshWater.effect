@@ -13,11 +13,15 @@
             offset: 64
           - sem: EYEWORLDPOS
             offset: 128
+          - sem: LIFETIMEMIN
+            offset: 140
+          - sem: COLOR
+            offset: 144
       textures:
           - name: g_Diffuse
             slot: 0
           - name: g_Specular
-            slot: 1
+            slot: 8
           - name: g_Normal
             slot: 2
           - name: g_CubeMap
@@ -26,6 +30,10 @@
             slot: 10
           - name: g_LA
             slot: 5
+          - name: g_NormalMap
+            slot: 9
+          - name: g_SceneNormals
+            slot: 1
       flags:
           - name: Forward
       programs:
@@ -42,7 +50,7 @@
           # Blend Mode:
           # None = 0
           # AlphaBlend = 1
-          # Addative = 2
+          # Additive = 2
           blend: 0
           
           # Depth settings.

@@ -1,14 +1,19 @@
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
+#include <vector>
 
 void ECS::EntitySystem::Process()
 {
+	for(auto itr = m_entitiesToRemove.begin(); itr != m_entitiesToRemove.end(); ++itr)
+	{
+		m_activeEntities.erase((*itr));
+	}
+	m_entitiesToRemove.clear();
+
 	Begin();
 
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-	{
 		ProcessEntity((*itr));
-	}
 
 	End();	
 }
@@ -33,10 +38,14 @@ void ECS::IntervalEntitySystem::Process()
 {
 	while(CheckProcessing())
 	{
+		
+
 		Begin();
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 		{
+			if((*itr)->GetId() == -1)
+				continue;
 			ProcessEntity((*itr));
 		}	
 
@@ -61,6 +70,8 @@ void ECS::ConcurrentSystem::Process()
 
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 			{
+				if((*itr)->GetId() == -1)
+					continue;
 				ProcessEntity((*itr));
 			}
 

@@ -4,6 +4,7 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 Explosion.chargeTime = 0.0;
 Explosion.channelingTime = 0.0;
+Explosion.duration = 1;
 
 function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
@@ -21,6 +22,7 @@ function Explosion.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "Explosion");
+	local timerComp = Timer.New(self, Explosion.duration);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
 	colRespComp:SetContainer(collisionComp);
@@ -29,7 +31,7 @@ function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "fireball");
+		local particleComp = ParticleEmitter.New(self, "explosion");
 	end
 	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end

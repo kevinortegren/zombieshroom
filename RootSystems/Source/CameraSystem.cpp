@@ -48,13 +48,20 @@ namespace RootForce
 				{
 					//Move the entity
 					glm::vec3 targetPosition = targetTransform->m_position;
-					Orientation tOrientation = targetTransform->m_orientation;
-					glm::vec3 localDisplacement(0.0f);
-					localDisplacement.z = -thirdPersonBehavior->m_distance;
-					glm::vec3 worldDisplacement;
-					worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-					float distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
-					transform->m_position = targetPosition + worldDisplacement*distFrac;
+					if(thirdPersonBehavior->m_rotateWithTarget)
+					{
+						Orientation tOrientation = targetTransform->m_orientation;
+						glm::vec3 localDisplacement(0.0f);
+						localDisplacement.z = -thirdPersonBehavior->m_distance;
+						glm::vec3 worldDisplacement;
+						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
+						float distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
+						transform->m_position = targetPosition + worldDisplacement*distFrac;
+					}
+					else
+					{
+						transform->m_position = targetPosition + glm::vec3(0,8.0f,8.0f);
+					}
 				}
 				else
 				{

@@ -124,13 +124,13 @@ TEST(MatchStateSystem, GetScoreList)
 	g_engineContext.m_script->ExecuteScript();
 
 	RootForce::PlayerComponent* thirdPlayerComponent = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(
-		g_networkEntityMap[
+		RootForce::Network::FindEntity(g_networkEntityMap,
 			RootForce::Network::NetworkEntityID(
 				2,
 				RootForce::Network::ReservedActionID::CONNECT,
 				0
 			)
-		]
+		)
 	);
 	thirdPlayerComponent->Name = "Test3";
 	thirdPlayerComponent->TeamID = 1;

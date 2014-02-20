@@ -19,11 +19,14 @@ namespace Render
 
 	bool Texture::Load(const std::string filepath)
 	{
-		gli::texture2D texture(gli::loadStorageDDS(filepath));
+		gli::storage texStore = gli::loadStorageDDS(filepath);
+		if(texStore.empty())
+			return false;
+
+		gli::texture2D texture(texStore);
 
 		if(texture.empty())
 		{
-			g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::INIT_PRINT, "Failed to load %s", filepath);
 			return false;
 		}
 

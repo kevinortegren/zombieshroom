@@ -67,6 +67,7 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
 	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
 	connect(ui.bgColorComboBox,		SIGNAL(currentIndexChanged(int)),			this, SLOT(BackgroundColorChanged(int)));
+	connect(ui.removeObjectButton,	SIGNAL(clicked()),							this, SLOT(RemoveObjectButton()));
 }
 
 void ParticleEditor::Init()
@@ -1066,6 +1067,11 @@ void ParticleEditor::ResetTemplates()
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITSPEED);
 	if(pe->m_particleSystems[m_selectedEmitterIndex]->m_params.find(Render::Semantic::ORBITRADIUS) != pe->m_particleSystems[m_selectedEmitterIndex]->m_params.end())
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_params.erase(Render::Semantic::ORBITRADIUS);
+}
+
+void ParticleEditor::RemoveObjectButton()
+{
+	m_modelTrans->m_scale = glm::vec3(0.0f);
 }
 
 

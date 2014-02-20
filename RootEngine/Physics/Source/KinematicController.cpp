@@ -76,12 +76,11 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_ghostObject->setContactProcessingThreshold(0.f);
 	
 	m_ghostObject->setActivationState(DISABLE_DEACTIVATION);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT /*|btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK  |btCollisionObject::CF_CHARACTER_OBJECT/* |btCollisionObject::CF_NO_CONTACT_RESPONSE*/ );
 
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 3.0f);
-	
 	m_kinController->setJumpSpeed(20.0f);
 	m_kinController->setFallSpeed(200.0f);
 	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
@@ -89,8 +88,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_kinController->setMaxSlope(btRadians(45.0f));
 	
 	m_hasBeenKnockbacked = false;
-	
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter );
 	//m_dynamicWorld->addAction(m_kinController);
 
 }
@@ -117,21 +115,24 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 {
 	if(!m_activated)
 		return;
-	btVector3 from,to,traveldist;
-	from = m_ghostObject->getWorldTransform().getOrigin();
-	to = btVector3(p_target[0], p_target[1], p_target[2]);
-	
-	traveldist = to - from;
-	//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Distance: %f. Delta movement: %f, %f, %f", traveldist.length(), traveldist.x(), traveldist.y(), traveldist.z());
-	/*if(traveldist.length() > 100 )
+	if(!m_hasBeenKnockbacked) //Don't allow movement when a player is knockbacked
 	{
-		m_kinController->warp(to);
-		return;
-	}*/
-	//float temp = m_kinController->test(from, to, m_dynamicWorld);
-	//m_kinController->warp(to + traveldist * temp);
-	m_kinController->setVelocityForTimeInterval(traveldist, p_dt);
-	//m_kinController->playerStep(m_dynamicWorld, p_dt);
+		btVector3 from,to,traveldist;
+		from = m_ghostObject->getWorldTransform().getOrigin();
+		to = btVector3(p_target[0], p_target[1], p_target[2]);
+	
+		traveldist = to - from;
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Distance: %f. Delta movement: %f, %f, %f", traveldist.length(), traveldist.x(), traveldist.y(), traveldist.z());
+		/*if(traveldist.length() > 100 )
+		{
+			m_kinController->warp(to);
+			return;
+		}*/
+		//float temp = m_kinController->test(from, to, m_dynamicWorld);
+		//m_kinController->warp(to + traveldist * temp);
+		m_kinController->setVelocityForTimeInterval(traveldist, p_dt);
+		//m_kinController->playerStep(m_dynamicWorld, p_dt);
+	}
 }
 
 void KinematicController::Update(float p_dt)
@@ -141,7 +142,7 @@ void KinematicController::Update(float p_dt)
 	//m_hasStepped = false;
 	m_kinController->updateAction(m_dynamicWorld, p_dt);
 	m_kinController->setWalkDirection(btVector3(0,0,0));
-
+	
 	
 	
 }
@@ -149,7 +150,15 @@ void KinematicController::Update(float p_dt)
 void KinematicController::Jump()
 {
 	if(m_kinController->canJump())
+	{
+		m_kinController->StopKnockback();
 		m_kinController->jump();
+	}
+}
+
+void KinematicController::JumpBoost( float p_boostPower )
+{
+	m_kinController->JumpBoost(p_boostPower);
 }
 
 void KinematicController::Knockback(const btVector3& p_velocity, float p_power )
@@ -224,6 +233,7 @@ void KinematicController::Deactivate()
 void KinematicController::Activate()
 {
 	m_activated = true;
+	m_kinController->StopKnockback();
 	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
-	m_kinController->Knockback(btVector3(1,1,1),0);
+	
 }

@@ -32,6 +32,10 @@ namespace Render
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
 
+		void SSAO();
+		void Clear();
+		void Process(Mesh& p_fullscreenQuad);
+		void Resize(int p_width, int p_height);
 		void BufferLights();
 		void Ambient();
 		void Directional();
@@ -42,15 +46,10 @@ namespace Render
 		void ShowPointLights(bool p_value);
 		void ShowBackgroundBlend(bool p_value);
 
-
-		
 		void BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode);
 
-		void Clear();
 		void ResetLights();
 
-		void Resize(int p_width, int p_height);
-		
 	private:
 
 		void PointLightStencil();
@@ -71,8 +70,18 @@ namespace Render
 		size_t m_numDirectionalLights;
 		size_t m_numPointLights;
 
+		std::shared_ptr<TechniqueInterface> m_deferredTech;
+		std::shared_ptr<TechniqueInterface> m_ssaoTech;
+
 		GLuint m_fbo;
 		TextureInterface* m_la;
+		TextureInterface* m_ssaoTex;
+		TextureInterface* m_noiseSSAOTex;
+		glm::vec4 m_kernel[16];
+		float Random(float p_low, float p_high);
+		void SetupSSAO();
+		void BeginSSAO();
+
 
 		// Meshes.
 		MeshInterface* m_fullscreenQuad;

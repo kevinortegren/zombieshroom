@@ -1,7 +1,7 @@
 Player = {}
 
 function Player.OnCreate(userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player (userId: "..tostring(userId)..", actionId: "..tostring(actionId)..")");
 	
 	local player = Entity.New();
 	local transform = Transformation.New(player);
@@ -15,6 +15,7 @@ function Player.OnCreate(userId, actionId)
 	local playerAction = PlayerAction.New(player);
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
+	local tryPickup = TryPickupComponent.New(player);
 	--local waterCollider = WaterCollider.New(player);
 	--waterCollider:SetDisturbPower(0.0);
 	--waterCollider:SetDisturbInterval(0.5);
@@ -35,13 +36,12 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall");
-	playerComponent:SetAbility(1, "AbilityDash");
-	playerComponent:SetAbility(2, "MagicMissile");
+	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(20);
+	playerPhysics:SetMovementSpeed(25);
 	playerPhysics:SetJumpForce(20);
+	playerPhysics:SetJumpBoostForce(0.1);
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
@@ -66,7 +66,7 @@ function Player.OnCreate(userId, actionId)
 	if Global.IsClient then
 		local renderable = Renderable.New(player);
 		local animation = Animation.New(player);
-		--local ragdoll = Ragdoll.New(player);
+		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
@@ -86,7 +86,9 @@ function Player.OnCreate(userId, actionId)
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 
+
 		playerControl:SetMouseSensitivity(0.2);
+
 
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
@@ -95,6 +97,22 @@ end
 
 function Player.OnCollide (self, entity)
 	-- Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
+ 	local hitCol = entity:GetCollision();
+ 	local hitPhys = entity:GetPhysics();
+	local type = hitPhys:GetType(hitCol);
+  if  type == PhysicsType.TYPE_ABILITYSPAWN then
+    --Logging.Log(LogLevel.DEBUG_PRINT, "collided with ability spawn!");
+    --local action = self:GetPlayerAction();
+    --local playerComponent = self:GetPlayerComponent();
+    --if action:TryPickup() then
+    --  local abilitySpawn = entity:GetAbilitySpawn();
+    --  playerComponent:SetAbility(playerComponent:GetSelectedAbility(), abilitySpawn:GetCurrentName(), abilitySpawn:GetCurrentCharges());
+    --  action:SetTryPickup(false);
+    --  abilitySpawn:SetClaimed(true);
+    --  Logging.Log(LogLevel.DEBUG_PRINT, "pick up successful!");
+    --end
+  end
+  
 end
 
 function Player.OnDestroy (self)

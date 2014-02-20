@@ -46,9 +46,10 @@ namespace RootForce
 		void ConnectEvent(const Awesomium::JSArray& p_array);
 		void RefreshEvent(const Awesomium::JSArray& p_array);
 		Awesomium::JSValue GetMapListEvent(const Awesomium::JSArray& p_array);
+		Awesomium::JSValue GetAbilityListEvent(const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(const Awesomium::JSArray& p_array);
 
-		std::string GetMapList();
+		std::string GetDirectoryList(std::string p_subfolder, std::string p_extension);
 		SettingsMenu* m_settingsMenu;
 
 		RootEngine::GUISystem::WebView* m_view;

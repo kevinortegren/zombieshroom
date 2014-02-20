@@ -100,7 +100,8 @@ $(document).ready(function() {
     $("#lan-host-overlay").css("display", "none");
   } );
   $("#lan-host-submit").click(function() {
-    var selectedIndex = $("#lan-host-map")[0].selectedIndex;
+    var selectedMapIndex = $("#lan-host-map")[0].selectedIndex;
+    var selectedAbilityIndex = $("#lan-host-abilitypack")[0].selectedIndex;
 		
 		if(parseFloat($("#lan-host-maxplayers").val()) < parseFloat($("#lan-host-maxplayers").attr("min")))
 			$("#lan-host-maxplayers").val($("#lan-host-maxplayers").attr("min"));
@@ -111,7 +112,8 @@ $(document).ready(function() {
 		
     var settings = {};
     settings["ServerName"] = $("#lan-host-name").val();
-    settings["ServerMapfile"] = $("#lan-host-map")[0].options[selectedIndex].text;
+    settings["ServerMapfile"] = $("#lan-host-map")[0].options[selectedMapIndex].text;
+    settings["ServerAbilityfile"] = $("#lan-host-abilitypack")[0].options[selectedAbilityIndex].text;
     settings["ServerPort"] = $("#lan-host-port").val();
     settings["ServerPassword"] = $("#lan-host-password").val();
     settings["ServerMaxPlayers"] = $("#lan-host-maxplayers").val();
@@ -119,7 +121,8 @@ $(document).ready(function() {
     settings["ServerKillVictory"] = $("#lan-host-killvictory").val();
     Menu.SaveSettings(settings);
 		
-    var map = $("#lan-host-map")[0].options[selectedIndex].text;
+    var map = $("#lan-host-map")[0].options[selectedMapIndex].text;
+    var ability = $("#lan-host-abilitypack")[0].options[selectedAbilityIndex].text;
 
     $("#lan-host-close").click();
     Menu.Host($("#lan-host-name").val(), 
@@ -128,7 +131,8 @@ $(document).ready(function() {
               $("#lan-host-maxplayers").val(), 
               $("#lan-host-matchlength").val() * 60, 
               $("#lan-host-killvictory").val(),
-              map
+              map,
+              ability
               );
   } );
 } );
@@ -142,13 +146,17 @@ function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
     $(this).attr("id", "selected");
   } );
 }
-function SetDefaults(name,mapfile,port,password,maxplayers,matchlength,killvictory,maplist)
+function SetDefaults(name,mapfile,abilitypack,port,password,maxplayers,matchlength,killvictory,maplist,abilitylist)
 {
   maplist.forEach(function(map) {
     $("#lan-host-map").append("<option value='"+map+"'>"+map+"</option>");
   });
+  abilitylist.forEach(function(ability) {
+    $("#lan-host-abilitypack").append("<option value='"+ability+"'>"+ability+"</option>");
+  });
   $("#lan-host-name").val(name);
   $("#lan-host-map").val(mapfile);
+  $("#lan-host-abilitypack").val(abilitypack);
   $("#lan-host-port").val(port);
   $("#lan-host-password").val(password);
   $("#lan-host-maxplayers").val(maxplayers);
