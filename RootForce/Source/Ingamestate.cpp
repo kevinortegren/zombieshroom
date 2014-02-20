@@ -227,7 +227,9 @@ namespace RootForce
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
+		g_world->GetSystemManager()->Clear();
 		g_engineContext.m_physics->RemoveAll();
+
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
