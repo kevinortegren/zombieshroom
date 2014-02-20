@@ -527,56 +527,7 @@ namespace Physics
 		planeBody->setUserPointer((void*)userPointer);
 
 	}
-	btRigidBody* RootPhysics::CreateSphere( float p_radius, float p_mass, glm::vec3 p_position)
-	{
-		btCollisionShape* sphere = new btSphereShape(p_radius);
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), pos ));
-		btVector3 fallinertia(0,0,0);
-		sphere->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo sphereCI(p_mass,motionstate,sphere,fallinertia);
-		btRigidBody* body = new btRigidBody(sphereCI);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		return body;
-	}
-	btRigidBody* RootPhysics::CreateCylinder( float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
-	{
-		btCollisionShape* cylinder = new btCylinderShape(btVector3(p_radius, p_height, p_radius));
-		
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
-		btVector3 fallinertia(0,0,0);
-		cylinder->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo cylinderCI(p_mass,motionstate,cylinder,fallinertia);
-		btRigidBody* body = new btRigidBody(cylinderCI);
-		//body->setContactProcessingThreshold(0);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		return body;
-	}
-	btRigidBody* RootPhysics::CreateCone(float p_radius, float p_height, glm::vec3 p_position,glm::quat p_rotation, float p_mass)
-	{
-		btCollisionShape* cone = new btConeShape(p_radius, p_height);
-		btVector3 pos;
-		pos.setX( p_position[0]);
-		pos.setY( p_position[1]);
-		pos.setZ( p_position[2]);
-		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
-		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(quat, pos ));
-		btVector3 fallinertia(0,0,0);
-		cone->calculateLocalInertia(p_mass,fallinertia);
-		btRigidBody::btRigidBodyConstructionInfo coneCI(p_mass,motionstate,cone,fallinertia);
-		btRigidBody* body = new btRigidBody(coneCI);
-		body->setActivationState(DISABLE_DEACTIVATION);
-		body->setContactProcessingThreshold(0);
-		return body;
-	}
+
 
 	btRigidBody* RootPhysics::CreateMesh( std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass )
 	{
