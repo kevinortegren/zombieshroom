@@ -4,7 +4,13 @@
 
 namespace RootForce
 {
-	void BotanySystem::Initialize()
+	void BotanySystem::Divide()
+	{
+		// Divide painted meshes into chunks.
+		m_quadTree.BeginDivide(BOTANY_VERTICES_PER_TERRAIN_CHUNK, true, false);
+	}
+
+	void BotanySystem::Initialize(BotanyTextures& m_textures)
 	{
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
@@ -15,22 +21,21 @@ namespace RootForce
 		
 		// Diffuse texture for geometric grass blades.
 		// R
-		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("ugotaflatgrass2", Render::TextureType::TEXTURE_2D);
+		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_diffuse, Render::TextureType::TEXTURE_2D);
 		
 		// Transluency texture for geometric grass blades.
 		// R
-		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture("grass_translucency", Render::TextureType::TEXTURE_2D);
+		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_translucency, Render::TextureType::TEXTURE_2D);
 
 		// Imposter diffuse.
-		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture("grass_billboard", Render::TextureType::TEXTURE_2D);
+		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_billboard, Render::TextureType::TEXTURE_2D);
 
 		// Terrain grass texture.
-		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture("customGrass2", Render::TextureType::TEXTURE_2D);
+		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
-
-		// Divide painted meshes into chunks of 500 polygons.
+	
 		m_quadTree.Initialize(m_engineContext, m_world, "Painted");
-		m_quadTree.BeginDivide(BOTANY_VERTICES_PER_TERRAIN_CHUNK, true, false);
+		Divide();
 
 		// Allocate mesh memory.
 		char* data = new char[BOTANY_CELL_SIZE];
@@ -142,7 +147,6 @@ namespace RootForce
 		m_quadTree.m_culledNodes.clear();
 		m_quadTree.Cull(&frustum, m_quadTree.GetRoot());
 
-		std::cout << m_quadTree.m_culledNodes.size() << std::endl;
 		for(auto itr = m_quadTree.m_culledNodes.begin(); itr != m_quadTree.m_culledNodes.end(); ++itr)
 		{			
 			int id = (*itr)->m_id;

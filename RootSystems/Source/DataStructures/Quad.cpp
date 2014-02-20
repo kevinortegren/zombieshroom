@@ -141,6 +141,12 @@ namespace RootForce
 
 	void QuadTree::BeginDivide(unsigned int p_polygonsPerNode, bool p_splitPolygons, bool p_removeOrigionalEntities)
 	{		
+		for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
+		{
+			m_world->GetEntityManager()->RemoveAllComponents((*itr));
+			m_world->GetEntityManager()->RemoveEntity((*itr));
+		}
+
 		m_polygonsPerNode = p_polygonsPerNode;
 		m_splitPolygons = p_splitPolygons;
 

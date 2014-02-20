@@ -28,14 +28,23 @@ namespace RootForce
 		int m_meshIndices[BOTANY_MESHES_PER_CELL];
 	};
 
+	struct BotanyTextures
+	{
+		std::string m_diffuse;
+		std::string m_translucency;
+		std::string m_billboard;
+		std::string m_terrainTexture;
+	};
+
 	class BotanySystem : public ECS::VoidSystem
 	{
 	public:
 		BotanySystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
 
-		void Initialize();
+		void Initialize(BotanyTextures& m_textures);
 		void Process();
+		void Divide();
 
 	private:
 		void Construct(QuadNode* p_node);

@@ -1,7 +1,15 @@
 #include <RenderingSystem.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootForce
 {
+	Renderable::~Renderable()
+	{
+		std::cout << "Removing entity." << std::endl;
+		g_engineContext.m_renderer->ReleaseBuffer(m_model->m_meshes[0]->GetVertexBuffer());
+		g_engineContext.m_renderer->ReleaseBuffer(m_model->m_meshes[0]->GetElementBuffer());
+	}
+
 	void RenderingSystem::Init()
 	{
 		m_renderables.Init(m_world->GetEntityManager());

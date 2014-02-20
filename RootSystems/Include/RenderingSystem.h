@@ -6,6 +6,9 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	namespace RenderPass
@@ -23,6 +26,7 @@ namespace RootForce
 	{
 		Renderable()
 			: m_model(nullptr), m_material(nullptr), m_pass(0), m_renderFlags(1) {}
+		~Renderable();
 
 		RootEngine::Model* m_model;
 		Render::Material* m_material;

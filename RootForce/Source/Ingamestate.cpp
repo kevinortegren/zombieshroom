@@ -144,9 +144,16 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-#ifndef DEBUG
+#ifndef _DEBUG
+
+		BotanyTextures textures;
+		textures.m_diffuse = "ugotaflatgrass2";
+		textures.m_translucency = "grass_translucency";
+		textures.m_billboard = "grass_billboard";
+		textures.m_terrainTexture = "customGrass2";
+
 		// Init.
-		m_botanySystem->Initialize();
+		m_botanySystem->Initialize(textures);
 		m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 		// Lock the mouse
@@ -316,6 +323,7 @@ namespace RootForce
 		if(RootServer::MatchAny(event.EventType, 3, "R", "render", "Render"))
 		{
 			g_engineContext.m_renderer->ParseCommands(&event.Data);
+			m_botanySystem->Divide();
 		}
 
 		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
@@ -436,8 +444,6 @@ namespace RootForce
 			m_respawnSystem->Process();
 		}
 
-
-
 		{
 			PROFILE("Ragdoll system", g_engineContext.m_profiler);
 			m_ragdollSystem->Process();
@@ -450,8 +456,7 @@ namespace RootForce
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
 		}
-
-		
+	
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
 			m_collisionSystem->Process();
@@ -488,12 +493,13 @@ namespace RootForce
 			m_sharedSystems.m_worldSystem->Process();
 		}
 
-#ifndef DEBUG
+#ifndef _DEBUG
 		{
 			PROFILE("Botany System", g_engineContext.m_profiler);
 			m_botanySystem->Process();
 		}
 #endif
+
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
 			m_directionlLightSystem->Process();
