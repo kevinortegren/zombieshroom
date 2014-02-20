@@ -4,6 +4,7 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 Explosion.chargeTime = 0.0;
 Explosion.channelingTime = 0.0;
+Explosion.duration = 0.3;
 
 function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
@@ -21,6 +22,7 @@ function Explosion.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "Explosion");
+	local timerComp = Timer.New(self, Explosion.duration);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
 	colRespComp:SetContainer(collisionComp);
