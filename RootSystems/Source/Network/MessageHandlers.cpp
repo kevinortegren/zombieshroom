@@ -657,15 +657,34 @@ namespace RootForce
 				{
 					NetworkMessage::AbilityClaimedBy m;
 					m.Serialize(false, p_bs);
+
+					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
 						AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						assert(spawnPoint);
 						spawnPoint->Claimed = m.User;
-					}
 
-					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
-					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
-					tryPickup->TryPickup = false;
+						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					
+						// Don't set stuff on entities that don't exist.
+						if (player)
+						{
+							TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+							assert(tryPickup);
+							tryPickup->TryPickup = false;
+							
+						}
+						else
+						{
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Tried to set TryPickup on a null player.");
+						}
+					}
+					else
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityClaimedBy received as a local client.");
+					}
+					
 				} return true;
 
 				case NetworkMessage::MessageType::DestroyEntities:
@@ -1002,8 +1021,17 @@ namespace RootForce
 
 					ECS::Entity* point = g_networkEntityMap[m.ID];
 
-					RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
-					component->AbilityReceived = m.AbilityName;
+					// Entity needs to exist.
+					if (point)
+					{
+						RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
+						assert(component);
+						component->AbilityReceived = m.AbilityName;
+					}
+					else
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilitySpawn message received but no spawn point exists.");
+					}
 
 				} return true;
 			}
@@ -1709,8 +1737,16 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
-					TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
-					tryPickup->TryPickup = true;
+					if (player)
+					{
+						TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+						assert(tryPickup);
+						tryPickup->TryPickup = true;
+					}
+					else
+					{
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityTryClaim received but the player entity doesn't exist.");
+					}
 				} return true;
 
 				case NetworkMessage::MessageType::RespawnRequest:

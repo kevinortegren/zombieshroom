@@ -208,6 +208,11 @@ namespace RootEngine
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 						m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
 					break;
+					
+				case SDL_MOUSEWHEEL:
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						m_viewBuffer.at(i)->InjectMouseWheel(p_event.wheel.x, p_event.wheel.y);
+					break;
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
 			}
@@ -232,6 +237,18 @@ namespace RootEngine
 				return Awesomium::KeyCodes::AK_TAB;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_ESCAPE)
 				return Awesomium::KeyCodes::AK_ESCAPE;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_PAGEUP)
+				return Awesomium::KeyCodes::AK_PRIOR;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_PAGEDOWN)
+				return Awesomium::KeyCodes::AK_NEXT;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_UP)
+				return Awesomium::KeyCodes::AK_UP;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_DOWN)
+				return Awesomium::KeyCodes::AK_DOWN;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_LEFT)
+				return Awesomium::KeyCodes::AK_LEFT;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_RIGHT)
+				return Awesomium::KeyCodes::AK_RIGHT;
 			else if(p_key == InputManager::MouseButton::LEFT)
 				return Awesomium::kMouseButton_Left;
 			else if(p_key == InputManager::MouseButton::RIGHT)

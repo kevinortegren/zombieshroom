@@ -4,15 +4,15 @@
 
 void ECS::EntitySystem::Process()
 {
+	for(auto itr = m_entitiesToRemove.begin(); itr != m_entitiesToRemove.end(); ++itr)
+	{
+		m_activeEntities.erase((*itr));
+	}
+	m_entitiesToRemove.clear();
+
 	Begin();
 
-	std::vector<ECS::Entity*> tempActiveEntities;
-	tempActiveEntities.resize(m_activeEntities.size());
-	tempActiveEntities.clear();
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-		tempActiveEntities.push_back(*itr);
-
-	for(auto itr = tempActiveEntities.begin(); itr != tempActiveEntities.end(); ++itr)
 		ProcessEntity((*itr));
 
 	End();	
@@ -20,11 +20,15 @@ void ECS::EntitySystem::Process()
 
 bool ECS::IntervalEntitySystem::CheckProcessing()
 {
+	if(m_ticks >= m_ticksPerFrame)
+		return false;
+
 	float dt = m_world->GetDelta();
 	m_time += dt;
 	if(m_time >= m_interval)
 	{
-		m_time = 0.0f;
+		m_time -= m_interval;
+		m_ticks++;
 		return true;
 	}
 	return false;
@@ -32,8 +36,10 @@ bool ECS::IntervalEntitySystem::CheckProcessing()
 
 void ECS::IntervalEntitySystem::Process()
 {
-	if(CheckProcessing())
+	while(CheckProcessing())
 	{
+		
+
 		Begin();
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
@@ -41,10 +47,17 @@ void ECS::IntervalEntitySystem::Process()
 			if((*itr)->GetId() == -1)
 				continue;
 			ProcessEntity((*itr));
-		}
+		}	
 
 		End();
 	}
+
+	m_ticks = 0;
+}
+
+float ECS::IntervalEntitySystem::GetSystemInterval()
+{
+	return m_interval;
 }
 
 void ECS::ConcurrentSystem::Process()

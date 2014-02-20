@@ -1148,6 +1148,33 @@ namespace Physics
 		}
 		//return glm::vec3(0,0,0);
 	}
+	glm::vec3 RootPhysics::GetPlayerKnockbackVector( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return glm::vec3(0,0,0);
+
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			btVector3 temp = m_playerObjects.at(index)->GetKnockbackVector();
+			return glm::vec3(temp.x(), temp.y() , temp.z());
+		}
+		return glm::vec3(0, 0, 0);  //Only players have a knockbackvector
+	}
+
+	float RootPhysics::GetPlayerVerticalVelocity( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return 0;
+
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			return m_playerObjects.at(index)->GetVerticalVelocity();			
+		}
+		return 0;
+	}
+
 	RootPhysics* RootPhysics::GetInstance()
 	{
 		if(!s_physicsInstance)

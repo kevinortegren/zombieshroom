@@ -180,8 +180,8 @@ namespace Ragdoll
 			body = new btRigidBody(mass, motionstate, shape, inertia);
 			body->setDamping(0.05f,0.85f);
 			m_dynamicWorld->addRigidBody(body);
-			body->setCcdMotionThreshold(0.6f);
-			body->setCcdSweptSphereRadius(0.4f);
+		//	body->setCcdMotionThreshold(0.6f);
+			body->setCcdSweptSphereRadius(0.5f);
 			body->setRestitution(1.0f);
 			body->setActivationState(DISABLE_DEACTIVATION);
 			//This is supposed to stop collision  with abilities and other players, doesn't work atm

@@ -9,6 +9,15 @@ body, input
   padding: 0;
   margin: 0;
   font-family: Sherwood;
+	background: rgba(255,255,255,0.3);
+	border-width: 1px;
+	border-color: rgb(128,128,128);
+}
+select
+{
+	font-size: 10px;
+	background: rgba(255,255,255,0.3);
+	border-color: rgb(128,128,128);
 }
 #main-body
 {
@@ -273,7 +282,7 @@ a
 }
 #lan-list-wrapper
 {
-  height: 623px;
+  height: 622px;
   overflow: auto;
 }
 #lan-direct-popup

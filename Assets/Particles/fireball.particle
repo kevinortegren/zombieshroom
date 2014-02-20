@@ -1,5 +1,6 @@
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 1
+<<<<<<< HEAD
   LIFETIMEMAX: 1
   SPEEDMIN: 0.2
   SPEEDMAX: 0.3
@@ -17,4 +18,4 @@
   TEMPLATE: 0
   TEXTURE: smoke
   EFFECT: Particle/Particle
-  NAME: fire
+  NAME: Fire
