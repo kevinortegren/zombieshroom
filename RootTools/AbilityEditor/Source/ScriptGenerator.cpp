@@ -384,7 +384,7 @@ namespace AbilityEditorNameSpace
 		//float dmg = 0.0f, knockb = 0.0f;
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
-		
+		m_file << "if entity:DoesExist()\n";
 		// TODO : Knockback, do damage, change stat
 
 		for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
@@ -455,6 +455,7 @@ namespace AbilityEditorNameSpace
 
 		WriteNewAbilities(p_onCollide);
 
+		m_file << "end\n";
 		m_file << "end\n";
 	}
 
