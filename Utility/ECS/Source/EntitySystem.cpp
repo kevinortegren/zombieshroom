@@ -1,5 +1,6 @@
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
+#include <vector>
 
 void ECS::EntitySystem::Process()
 {
@@ -12,10 +13,7 @@ void ECS::EntitySystem::Process()
 	Begin();
 
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-	{
-		//if((*itr)->GetId() != -1)
 		ProcessEntity((*itr));
-	}
 
 	End();	
 }
@@ -46,6 +44,8 @@ void ECS::IntervalEntitySystem::Process()
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 		{
+			if((*itr)->GetId() == -1)
+				continue;
 			ProcessEntity((*itr));
 		}	
 
@@ -70,6 +70,8 @@ void ECS::ConcurrentSystem::Process()
 
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 			{
+				if((*itr)->GetId() == -1)
+					continue;
 				ProcessEntity((*itr));
 			}
 

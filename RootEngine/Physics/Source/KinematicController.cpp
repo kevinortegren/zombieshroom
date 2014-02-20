@@ -115,21 +115,24 @@ void KinematicController::Move( glm::vec3 p_target, float p_dt )
 {
 	if(!m_activated)
 		return;
-	btVector3 from,to,traveldist;
-	from = m_ghostObject->getWorldTransform().getOrigin();
-	to = btVector3(p_target[0], p_target[1], p_target[2]);
-	
-	traveldist = to - from;
-	//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Distance: %f. Delta movement: %f, %f, %f", traveldist.length(), traveldist.x(), traveldist.y(), traveldist.z());
-	/*if(traveldist.length() > 100 )
+	if(!m_hasBeenKnockbacked) //Don't allow movement when a player is knockbacked
 	{
-		m_kinController->warp(to);
-		return;
-	}*/
-	//float temp = m_kinController->test(from, to, m_dynamicWorld);
-	//m_kinController->warp(to + traveldist * temp);
-	m_kinController->setVelocityForTimeInterval(traveldist, p_dt);
-	//m_kinController->playerStep(m_dynamicWorld, p_dt);
+		btVector3 from,to,traveldist;
+		from = m_ghostObject->getWorldTransform().getOrigin();
+		to = btVector3(p_target[0], p_target[1], p_target[2]);
+	
+		traveldist = to - from;
+		//RootEngine::Physics::g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Distance: %f. Delta movement: %f, %f, %f", traveldist.length(), traveldist.x(), traveldist.y(), traveldist.z());
+		/*if(traveldist.length() > 100 )
+		{
+			m_kinController->warp(to);
+			return;
+		}*/
+		//float temp = m_kinController->test(from, to, m_dynamicWorld);
+		//m_kinController->warp(to + traveldist * temp);
+		m_kinController->setVelocityForTimeInterval(traveldist, p_dt);
+		//m_kinController->playerStep(m_dynamicWorld, p_dt);
+	}
 }
 
 void KinematicController::Update(float p_dt)

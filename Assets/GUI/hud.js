@@ -115,6 +115,7 @@ function Set(p_id, p_value)
     var newHealth = parseInt(value);
 		SetDeathScreen(newHealth <= 0);
     DamageIndicator(oldHealth-newHealth);
+    value = newHealth;
 	}
 	if(p_id == "EndGame")
 	{

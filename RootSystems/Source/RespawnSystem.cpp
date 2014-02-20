@@ -34,8 +34,8 @@ namespace RootSystems
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
 		
 
-		// If the player has 0 health and is not already dead, kill him
-		if(health->Health <= 0 && !health->IsDead)
+		// If the player has less than 1 health and is not already dead, kill him
+		if(health->Health < 1 && !health->IsDead)
 		{
 			health->IsDead = true;
 			health->RespawnDelay = 3.0f;
@@ -120,6 +120,10 @@ namespace RootSystems
 
 		if(health->IsDead)
 			health->RespawnDelay -= dt;
+		if(health->Health > 200.0f)
+			health->Health = 200.0f;
+		if(health->Health > 100.0f)
+			health->Health -= dt;
 	}
 
 	int RespawnSystem::GetRandomSpawnpoint()

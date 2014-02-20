@@ -64,6 +64,23 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityRemove(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveAllComponents(*e);
+			g_world->GetEntityManager()->RemoveEntity(*e);
+			for (auto itr = g_networkEntityMap.begin(); itr != g_networkEntityMap.end(); ++itr)
+			{
+				// If the entity has a script component, call its OnDestroy script.
+				if(itr->second != *e)
+					continue;
+				itr = g_networkEntityMap.erase(itr);
+			}
+
+			return 0;
+		}
+
 		static int EntityGetByTag(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1499,7 +1516,7 @@ namespace RootForce
 			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
-			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
+			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 
 			if((*s)->Health <= 0)
 			{
@@ -1512,7 +1529,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
-			(*s)->Health = (int)luaL_checknumber(p_luaState, 2);
+			(*s)->Health = (float)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int HealthSetIsDead(lua_State* p_luaState)
@@ -2102,6 +2119,7 @@ namespace RootForce
 
 		static const struct luaL_Reg entity_f [] = {
 			{"New", EntityCreate},
+			{"Remove", EntityRemove},
 			{"GetEntityByTag", EntityGetByTag},
 			{"GetEntityByID", EntityGetByID},
 			{"GetEntityByNetworkID", EntityGetByNetworkID},
