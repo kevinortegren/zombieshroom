@@ -65,6 +65,14 @@ $(document).keydown(function(event)
 	{
 		$('#chatinput').blur();
 	}
+	else if(event.keyCode == 33) // PgUp
+	{
+		$('#chatlog').scrollTop($('#chatlog').scrollTop() - $('#chatlog').height()/2);
+	}
+	else if(event.keyCode == 34) // PgDown
+	{
+		$('#chatlog').scrollTop($('#chatlog').scrollTop() + $('#chatlog').height()/2);
+	}
 	else
 		return true;
 });

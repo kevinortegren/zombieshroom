@@ -31,6 +31,7 @@ namespace RootEngine
 			virtual void InjectMouseDown(Awesomium::MouseButton p_mousebutton) = 0;
 			virtual void InjectMouseUp(Awesomium::MouseButton p_mousebutton) = 0;
 			virtual void InjectMouseMove(int p_x, int p_y) = 0;
+			virtual void InjectMouseWheel(int p_x, int p_y) = 0;
 		};
 
 		// Used by the guiSystem to establish communications between Awesomium::WebView and the program
@@ -76,6 +77,7 @@ namespace RootEngine
 			void InjectMouseDown(Awesomium::MouseButton p_mousebutton);
 			void InjectMouseUp(Awesomium::MouseButton p_mousebutton);
 			void InjectMouseMove(int p_x, int p_y);
+			void InjectMouseWheel(int p_x, int p_y);
 
 			Awesomium::WebView* m_webView;
 			Awesomium::JSObject* m_callbackObject;
@@ -91,6 +93,7 @@ namespace RootEngine
 			std::vector<Awesomium::MouseButton> m_injectMouseDown;
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;
 			std::vector<std::pair<int,int>> m_injectMouseMove;
+			std::vector<std::pair<int,int>> m_injectMouseWheel;
 		};
 	}
 }
