@@ -25,6 +25,8 @@ namespace ECS
 			m_systems.push_back(p_system);
 		}
 
+		void Clear();
+
 	private:
 
 		void AddEntityToSystems(Entity* p_entity);

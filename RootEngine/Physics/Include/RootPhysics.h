@@ -147,6 +147,8 @@ namespace RootEngine
 			virtual glm::mat4* GetBones(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
+			virtual glm::vec3 GetPlayerKnockbackVector(int p_objectHandle) = 0;
+			virtual float GetPlayerVerticalVelocity(int p_objectHandle) = 0;
 			//Setters
 			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
@@ -219,6 +221,8 @@ namespace RootEngine
 			std::map<void*, RootForce::CollisionInfo>* GetCollisionVector(int p_objectHandle);
 			std::string GetPhysicsModelHandle(int p_objectHandle);
 			glm::quat GetOrientation(int p_objectHandle);
+			glm::vec3 GetPlayerKnockbackVector(int p_objectHandle);
+			float GetPlayerVerticalVelocity(int p_objectHandle);
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
