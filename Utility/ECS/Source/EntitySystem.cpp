@@ -1,14 +1,19 @@
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
+#include <vector>
 
 void ECS::EntitySystem::Process()
 {
 	Begin();
 
+	std::vector<ECS::Entity*> tempActiveEntities;
+	tempActiveEntities.resize(m_activeEntities.size());
+	tempActiveEntities.clear();
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-	{
+		tempActiveEntities.push_back(*itr);
+
+	for(auto itr = tempActiveEntities.begin(); itr != tempActiveEntities.end(); ++itr)
 		ProcessEntity((*itr));
-	}
 
 	End();	
 }
@@ -33,6 +38,8 @@ void ECS::IntervalEntitySystem::Process()
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 		{
+			if((*itr)->GetId() == -1)
+				continue;
 			ProcessEntity((*itr));
 		}
 
@@ -50,6 +57,8 @@ void ECS::ConcurrentSystem::Process()
 
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 			{
+				if((*itr)->GetId() == -1)
+					continue;
 				ProcessEntity((*itr));
 			}
 

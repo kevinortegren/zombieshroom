@@ -31,6 +31,9 @@ namespace RootForce
 			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->ExecuteScript();
+
+			if(p_entity->GetId() == -1)
+				return;
 		}
 
 		cr->m_collisions.clear();
