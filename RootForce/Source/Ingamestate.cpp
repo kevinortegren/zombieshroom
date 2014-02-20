@@ -166,17 +166,18 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-#ifndef _DEBUG
-
 		BotanyTextures textures;
 		textures.m_diffuse = "ugotaflatgrass2";
 		textures.m_translucency = "grass_translucency";
 		textures.m_billboard = "grass_billboard";
 		textures.m_terrainTexture = "customGrass2";
 
-		// Init.
+		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
 
+#ifndef _DEBUG
+
+		// Subdivide world.
 		m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 		// Lock the mouse
@@ -432,12 +433,10 @@ namespace RootForce
 			m_sharedSystems.m_worldSystem->Process();
 		}
 
-#ifndef _DEBUG
 		{
 			PROFILE("Botany System", g_engineContext.m_profiler);
 			m_botanySystem->Process();
 		}
-#endif
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);

@@ -31,7 +31,6 @@ namespace RootForce
 			auto mesh = renderable->m_model->m_meshes[0];
 
 			unsigned materialIndex = m_materials.size();
-
 			m_materials.push_back(material);
 			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
 
@@ -60,7 +59,6 @@ namespace RootForce
 				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
 
 				m_vertices.push_back(std::move(v));
-
 				offset++;
 			}
 
@@ -603,7 +601,8 @@ namespace RootForce
 		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());	
 		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&p_vertices[0], p_vertices.size());
 
-		renderable->m_material = m_materials[p_materialIndex];
+		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(modelNameStringStream.str());
+		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
 
 		// Add tile factor for blended meshes.
 		if(renderable->m_material->m_tileFactor != 0)

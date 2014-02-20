@@ -66,6 +66,8 @@ namespace RootForce
 		{
 			m_cellDirectory[i] = 0;
 		}
+
+		m_initialized = true;
 	}
 
 	void BotanySystem::Construct(QuadNode* p_node)
@@ -124,55 +126,58 @@ namespace RootForce
 
 	void BotanySystem::Process()
 	{
-		// Get player position.
-		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
-		RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
+		if(m_initialized)
+		{
+			// Get player position.
+			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+			RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
 
-		// Buffer player position.
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &ptransform->m_position);
+			// Buffer player position.
+			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &ptransform->m_position);
 
-		// Get eye camera.
-		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
-		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity);
-		RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+			// Get eye camera.
+			ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
+			RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity);
+			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 
-		float farPlane = BOTANY_CULL_RANGE;
-		glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(),
-			(float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, farPlane);
+			float farPlane = BOTANY_CULL_RANGE;
+			glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(),
+				(float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, farPlane);
 
-		RootForce::Frustum frustum;
-		frustum.RecalculatePlanesEx(camera->m_viewMatrix, projectionMatrix);
+			RootForce::Frustum frustum;
+			frustum.RecalculatePlanesEx(camera->m_viewMatrix, projectionMatrix);
 
-		// Cull nodes.
-		m_quadTree.m_culledNodes.clear();
-		m_quadTree.Cull(&frustum, m_quadTree.GetRoot());
+			// Cull nodes.
+			m_quadTree.m_culledNodes.clear();
+			m_quadTree.Cull(&frustum, m_quadTree.GetRoot());
 
-		for(auto itr = m_quadTree.m_culledNodes.begin(); itr != m_quadTree.m_culledNodes.end(); ++itr)
-		{			
-			int id = (*itr)->m_id;
-			assert(id < BOTANY_MAX_CELLS && "Botany terrain chunk id exceeds max botany cells.");
+			for(auto itr = m_quadTree.m_culledNodes.begin(); itr != m_quadTree.m_culledNodes.end(); ++itr)
+			{			
+				int id = (*itr)->m_id;
+				assert(id < BOTANY_MAX_CELLS && "Botany terrain chunk id exceeds max botany cells.");
 
-			// Bug in quad tree culling, returning nodes with id -1.
-			if(id == -1)
-				continue;
+				// Bug in quad tree culling, returning nodes with id -1.
+				if(id == -1)
+					continue;
 
-			// If mesh is not constructed.
-			if(m_cells[id].m_meshSize == 0)
-			{
-				Construct((*itr));
-			}
+				// If mesh is not constructed.
+				if(m_cells[id].m_meshSize == 0)
+				{
+					Construct((*itr));
+				}
 
-			// Render result.
-			for(int j = 0; j < m_cells[id].m_meshSize; j++)
-			{
-				assert(m_cells[id].m_meshIndices[j] != -1 && "Attempting to render botany cell with mesh index -1.");
+				// Render result.
+				for(int j = 0; j < m_cells[id].m_meshSize; j++)
+				{
+					assert(m_cells[id].m_meshIndices[j] != -1 && "Attempting to render botany cell with mesh index -1.");
 
-				Render::RenderJob job;
-				job.m_mesh = m_meshes[m_cells[id].m_meshIndices[j]];
-				job.m_mesh->SetNoCulling(true);
-				job.m_material = m_material;
-				job.m_flags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-				m_engineContext->m_renderer->AddRenderJob(job);
+					Render::RenderJob job;
+					job.m_mesh = m_meshes[m_cells[id].m_meshIndices[j]];
+					job.m_mesh->SetNoCulling(true);
+					job.m_material = m_material;
+					job.m_flags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
+					m_engineContext->m_renderer->AddRenderJob(job);
+				}
 			}
 		}
 	}

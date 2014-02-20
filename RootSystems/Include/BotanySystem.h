@@ -40,7 +40,7 @@ namespace RootForce
 	{
 	public:
 		BotanySystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext) {}
+			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_initialized(false) {}
 
 		void Initialize(BotanyTextures& m_textures);
 		void Process();
@@ -61,6 +61,7 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_engineContext;	
 		Render::EffectInterface* m_effect;
 		Render::Material* m_material;
-		
+		bool m_initialized;
+
 	};
 }

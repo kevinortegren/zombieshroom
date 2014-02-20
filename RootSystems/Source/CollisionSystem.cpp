@@ -46,6 +46,7 @@ namespace RootForce
 
 	Collision::~Collision()
 	{
+		std::string a = m_meshHandle;
 		g_engineContext.m_physics->RemoveObject(*m_handle);
 	}
 
