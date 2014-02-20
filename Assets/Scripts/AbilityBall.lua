@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 0;
+AbilityBall.duration = 7;
 AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone (time, userId, actionId)
@@ -26,6 +26,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
+	local timerComp = Timer.New(self, AbilityBall.duration);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -46,7 +47,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialSpecular("fireballSpecular");
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "fireball");
+		local particleComp = ParticleEmitter.New(self, "AbilityBallFire");
 	end
 end
 
