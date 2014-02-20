@@ -13,7 +13,7 @@ namespace RootForce
 
 		void PacketLogger::WriteLog(const char* p_string)
 		{
-			g_engineContext.m_logger->LogText(m_tag, LogLevel::DEBUG_PRINT, "Packet: %s", p_string);
+			g_engineContext.m_logger->LogText(m_tag, LogLevel::PACKET_PRINT, "Packet: %s", p_string);
 		}
 	}
 }

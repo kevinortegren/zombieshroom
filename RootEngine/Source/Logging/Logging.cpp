@@ -1,42 +1,40 @@
 #include "Logging/Logging.h"
 #include <ctime>
 #include <RootEngine/Include/Logging/CMDColor.h>
-#include <iostream>
 
 Logging::Logging()
-	:m_verboseLevel(LogLevel::PINK_PRINT), m_defaultVerbose(LogLevel::DEBUG_PRINT)
 {
 	ColorCMD::ConsoleColorInit();
 	SetConsoleTitle(L"RootLog");
+	
+	m_tagInfo[LogTag::RENDER]		= TagLevelInfo("RENDER ", true);
+	m_tagInfo[LogTag::NETWORK]		= TagLevelInfo("NETWORK", true);
+	m_tagInfo[LogTag::CLIENT]		= TagLevelInfo("CLIENT ", true);
+	m_tagInfo[LogTag::SERVER]		= TagLevelInfo("SERVER ", true);
+	m_tagInfo[LogTag::GENERAL]		= TagLevelInfo("GENERAL", true);
+	m_tagInfo[LogTag::NOTAG]		= TagLevelInfo("NOTAG  ", true);
+	m_tagInfo[LogTag::PHYSICS]		= TagLevelInfo("PHYSICS", true);
+	m_tagInfo[LogTag::TOOLS]		= TagLevelInfo("TOOLS  ", true);
+	m_tagInfo[LogTag::SOUND]		= TagLevelInfo("SOUND  ", true);
+	m_tagInfo[LogTag::GAME]			= TagLevelInfo("GAME   ", true);
+	m_tagInfo[LogTag::COMPONENT]	= TagLevelInfo("COMPSYS", true);
+	m_tagInfo[LogTag::GUI]			= TagLevelInfo("GUI    ", true);
+	m_tagInfo[LogTag::INPUT]		= TagLevelInfo("INPUT  ", true);
+	m_tagInfo[LogTag::RESOURCE]		= TagLevelInfo("RESSYS ", true);
+	m_tagInfo[LogTag::SCRIPT]		= TagLevelInfo("SCRIPT ", true);
+	m_tagInfo[LogTag::ANIMATION]	= TagLevelInfo("ANIM   ", true);
+	m_tagInfo[LogTag::WATER]		= TagLevelInfo("WATER  ", true);
 
-	m_stringTagList.push_back("RENDER ");
-	m_stringTagList.push_back("NETWORK");
-	m_stringTagList.push_back("CLIENT ");
-	m_stringTagList.push_back("SERVER ");
-	m_stringTagList.push_back("GENERAL");
-	m_stringTagList.push_back("NOTAG  ");
-	m_stringTagList.push_back("PHYSICS");
-	m_stringTagList.push_back("TOOLS  ");
-	m_stringTagList.push_back("SOUND  ");
-	m_stringTagList.push_back("GAME   ");
-	m_stringTagList.push_back("COMPSYS");
-	m_stringTagList.push_back("GUI    ");
-	m_stringTagList.push_back("INPUT  ");
-	m_stringTagList.push_back("RESSYS ");
-	m_stringTagList.push_back("SCRIPT ");
-	m_stringTagList.push_back("ANIM   ");
-	m_stringTagList.push_back("WATER  ");
-
-	m_stringLevelList.push_back("FATAL_ERR  ");
-	m_stringLevelList.push_back("NON_FAT_ERR");
-	m_stringLevelList.push_back("WARNING    ");
-	m_stringLevelList.push_back("SUCCESS    ");
-	m_stringLevelList.push_back("DEBUG_PRINT");
-	m_stringLevelList.push_back("INIT_PRINT ");
-	m_stringLevelList.push_back("START_PRINT");
-	m_stringLevelList.push_back("PINK_PRINT ");
-	m_stringLevelList.push_back("PACKET     ");
-	m_stringLevelList.push_back("DATA_PRINT ");
+	m_levelInfo[LogLevel::FATAL_ERROR]		= TagLevelInfo("FATAL_ERR  ", true);
+	m_levelInfo[LogLevel::NON_FATAL_ERROR]	= TagLevelInfo("NON_FAT_ERR", true);
+	m_levelInfo[LogLevel::WARNING]			= TagLevelInfo("WARNING    ", true);
+	m_levelInfo[LogLevel::SUCCESS]			= TagLevelInfo("SUCCESS    ", true);
+	m_levelInfo[LogLevel::DEBUG_PRINT]		= TagLevelInfo("DEBUG_PRINT", true);
+	m_levelInfo[LogLevel::INIT_PRINT]		= TagLevelInfo("INIT_PRINT ", true);
+	m_levelInfo[LogLevel::START_PRINT]		= TagLevelInfo("START_PRINT", true);
+	m_levelInfo[LogLevel::PINK_PRINT]		= TagLevelInfo("PINK_PRINT ", true);
+	m_levelInfo[LogLevel::PACKET_PRINT]		= TagLevelInfo("PACKET     ", false);
+	m_levelInfo[LogLevel::MASS_DATA_PRINT]	= TagLevelInfo("DATA_PRINT ", false);
 
 	OpenLogStream();
 }
@@ -60,7 +58,6 @@ bool Logging::OpenLogStream()
 	std::string commaName = fileName + ".rlog";
 	//Open log file stream
 	fopen_s(&m_logFile, logName.c_str(), "w");
-	//fopen_s(&m_commaFile, commaName.c_str(), "w");
 
 	return true;
 }
@@ -72,12 +69,6 @@ bool Logging::CloseLogStream()
 		fclose(m_logFile);
 		return true;
 	}
-	//if(m_commaFile)
-	//{   //Close stream
-	//	fclose(m_commaFile);
-	//	return true;
-	//}
-
 	return false;
 }
 
@@ -96,7 +87,7 @@ void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel
 {
 	va_list args;
 	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+	if(CheckLevel(p_vLevel) && CheckTag(p_tag))
 	{
 		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
 		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
@@ -113,7 +104,7 @@ void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_t
 
 	va_list args;
 	va_start (args, p_format);
-	if(p_vLevel <= m_verboseLevel && CheckTag(p_tag))
+	if(CheckLevel(p_vLevel) && CheckTag(p_tag))
 	{
 		WriteToConsole(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args, true);
 		WriteToFile(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args);
@@ -126,23 +117,19 @@ void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_t
 //////////////////////////////////////////////////////////////////////////
 void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel,std::string p_format, va_list p_args )
 {
-	
-	std::string output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
-	//std::string commaOutput = GetTimeFormatString() + ";;" + GetStringFromTag(p_tag) + ";;" + GetStringFromLevel(p_vLevel) +  ";;" + p_format + ";;" + p_func + ";;" + std::to_string(p_line) + "\n";
+	std::string output = GetTimeFormatString() + "    " + m_tagInfo[p_tag].Name + "    " + m_levelInfo[p_vLevel].Name +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
-	//vfprintf (m_commaFile, commaOutput.c_str(), p_args);
 	fflush(m_logFile);
-	//fflush(m_commaFile);
 }
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine )
 {
 	std::string output;
 	if (!writeFileLine)
-		output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format  +"\n";
+		output = GetTimeFormatString() + "    " + m_tagInfo[p_tag].Name + "    " + m_levelInfo[p_vLevel].Name +  "    " + p_format  +"\n";
 	else
-		output = GetTimeFormatString() + "    " + GetStringFromTag(p_tag) + "    " + GetStringFromLevel(p_vLevel) +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
+		output = GetTimeFormatString() + "    " + m_tagInfo[p_tag].Name + "    " + m_levelInfo[p_vLevel].Name +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	switch (p_vLevel)
 	{
@@ -194,6 +181,12 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 			std::cout<<"";
 			break;
 		}
+	case LogLevel::PACKET_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::DARK_PURPLE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
 	case LogLevel::MASS_DATA_PRINT:
 		{
 			ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
@@ -233,31 +226,17 @@ std::string Logging::GetTimeFormatString()
 //////////////////////////////////////////////////////////////////////////
 bool Logging::CheckTag(LogTag::LogTag p_tag)
 {
-	if(m_exTagList.size() == 0)
-		return true;
+	return m_tagInfo[p_tag].Enabled;
+}
 
-	for (LogTag::LogTag s : m_exTagList ) 
-	{
-		if(p_tag == s)
-			return true;
-	}
-
-	return false;
+bool Logging::CheckLevel( LogLevel::LogLevel p_level )
+{
+	return m_levelInfo[p_level].Enabled;
 }
 
 //////////////////////////////////////////////////////////////////////////
-//Enum-to-string converters CHANGE THIS TO MAP
+//Help methods
 //////////////////////////////////////////////////////////////////////////
-std::string Logging::GetStringFromTag( LogTag::LogTag p_tag )
-{
-	return m_stringTagList.at(p_tag);
-}
-
-std::string Logging::GetStringFromLevel( LogLevel::LogLevel p_level )
-{
-	return m_stringLevelList.at(p_level);
-}
-
 std::string Logging::GetNameFromPath( std::string p_path )
 {
 	std::string cutPath;
@@ -274,3 +253,52 @@ std::string Logging::GetNameFromPath( std::string p_path )
 	return cutPath;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//Parse console commands
+//////////////////////////////////////////////////////////////////////////
+void Logging::ParseCommand( std::stringstream* p_data )
+{
+	std::string module;
+	std::string value;
+
+	std::getline(*p_data, module, ' ');
+	std::getline(*p_data, module, ' ');
+	
+	for(auto itr = m_levelInfo.begin(); itr != m_levelInfo.end(); itr++)
+	{
+		std::string checkName = itr->second.Name;
+		std::size_t found = checkName.find_last_not_of(" ");
+
+		if (found != std::string::npos)
+			checkName.erase(found+1);
+		else
+			checkName.clear(); // checkName is all whitespace
+
+		if(module == checkName)
+		{	
+			std::getline(*p_data, value, ' ');
+			itr->second.Enabled = (atoi(value.c_str()) == 1);
+			LogText(LogTag::NOTAG, LogLevel::PINK_PRINT, "Set %s to %s", checkName.c_str(), value.c_str());
+			return;
+		}
+	}
+
+	for(auto itr = m_tagInfo.begin(); itr != m_tagInfo.end(); itr++)
+	{
+		std::string checkName = itr->second.Name;
+		std::size_t found = checkName.find_last_not_of(" ");
+
+		if (found != std::string::npos)
+			checkName.erase(found+1);
+		else
+			checkName.clear(); // checkName is all whitespace
+
+		if(module == checkName)
+		{	
+			std::getline(*p_data, value, ' ');
+			itr->second.Enabled = (atoi(value.c_str()) == 1);
+			LogText(LogTag::NOTAG, LogLevel::PINK_PRINT, "Set %s to %s", checkName.c_str(), value.c_str());
+			return;
+		}
+	}
+}
