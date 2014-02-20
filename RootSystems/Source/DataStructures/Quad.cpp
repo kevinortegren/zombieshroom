@@ -589,6 +589,7 @@ namespace RootForce
 
 		m_entities.push_back(entity);
 
+		// Model name.
 		std::stringstream modelNameStringStream;
 		modelNameStringStream << m_groupName << p_entityId;
 
@@ -601,7 +602,10 @@ namespace RootForce
 		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());	
 		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&p_vertices[0], p_vertices.size());
 
-		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(modelNameStringStream.str());
+		std::stringstream materialStringStream;
+		materialStringStream << m_groupName << p_materialIndex;
+
+		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialStringStream.str());
 		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
 
 		// Add tile factor for blended meshes.
