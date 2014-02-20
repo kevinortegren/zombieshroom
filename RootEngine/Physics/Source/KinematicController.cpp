@@ -139,7 +139,7 @@ void KinematicController::Update(float p_dt)
 	//m_hasStepped = false;
 	m_kinController->updateAction(m_dynamicWorld, p_dt);
 	m_kinController->setWalkDirection(btVector3(0,0,0));
-
+	
 	
 	
 }
