@@ -121,22 +121,31 @@ namespace RootForce
 
 		glm::vec3 movement(0.0f);
 
-		action->MovePower = 0;
-		action->StrafePower = 0;
+		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
+		if(onGround)
+		{
+			action->MovePower = 0;
+			action->StrafePower = 0;
+		}
+		
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
+				if(onGround)
 					action->MovePower += 1;
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
+				if(onGround)
 					action->MovePower -= 1;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
+				if(onGround)
 					action->StrafePower += 1;
 				break;
 			case PlayerAction::STRAFE_LEFT:
+				if(onGround)
 					action->StrafePower -= 1;
 				break;
 			case PlayerAction::ORIENTATE:

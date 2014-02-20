@@ -176,10 +176,6 @@ namespace RootSystems
 			}
 		}
 
-		
-		//action->MovePower = 0;
-		//action->StrafePower = 0;
-		//UpdateAimingDevice();
 	}
 
 	void ActionSystem::AbilitySwitch(ECS::Entity* p_entity, bool p_isPush)
