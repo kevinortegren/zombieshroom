@@ -840,7 +840,7 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
-	locatorEntities.push_back(entity);
+	//locatorEntities.push_back(entity);
 
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
