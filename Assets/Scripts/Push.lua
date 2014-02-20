@@ -1,6 +1,6 @@
 Push = {};
 Push.knockback = 10;
-Push.cooldown = 3;
+Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
 Push.channelingTime = 0;

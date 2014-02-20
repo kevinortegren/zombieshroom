@@ -1488,10 +1488,13 @@ namespace Physics
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+		if(!rayResult.hasHit())
+			return;
 		glm::vec3 castVector = end - p_startPos;
 		glm::vec3 relativePosition = castVector * rayResult.m_closestHitFraction;
 		RootForce::CollisionInfo info;
 		info.m_collisionPosition = p_startPos + relativePosition;
+		
 		rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
 	}
 
