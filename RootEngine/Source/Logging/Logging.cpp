@@ -35,6 +35,7 @@ Logging::Logging()
 	m_stringLevelList.push_back("INIT_PRINT ");
 	m_stringLevelList.push_back("START_PRINT");
 	m_stringLevelList.push_back("PINK_PRINT ");
+	m_stringLevelList.push_back("PACKET     ");
 	m_stringLevelList.push_back("DATA_PRINT ");
 
 	OpenLogStream();

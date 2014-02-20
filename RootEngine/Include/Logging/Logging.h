@@ -42,6 +42,7 @@ namespace LogLevel
 		INIT_PRINT,
 		START_PRINT,
 		PINK_PRINT,
+		PACKET_PRINT,
 		MASS_DATA_PRINT,
 	};
 }

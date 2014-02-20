@@ -6,6 +6,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootSystems/Include/Network/PacketLogger.h>
 #include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
@@ -39,6 +40,7 @@ namespace RootForce
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
 			RootForce::ChatSystem* m_chatSystem;
+			PacketLogger m_packetLogger;
 		};
 	}
 }
