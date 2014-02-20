@@ -7,16 +7,15 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <random>
 
-// Cell defines.
+
 #define BOTANY_MAX_CELLS 1000
-
 #define BOTANY_VERTEX_SIZE 28
-#define BOTANY_MAX_POINTS_PER_CELL 100000
+#define BOTANY_MAX_POINTS_PER_CELL 50000
 #define BOTANY_CELL_SIZE BOTANY_VERTEX_SIZE * BOTANY_MAX_POINTS_PER_CELL
-
-// Mesh defines.
-#define BOTANY_MESHES_SIZE 100
+#define BOTANY_MESHES_SIZE 30
 #define BOTANY_MESHES_PER_CELL 5
+#define BOTANY_VERTICES_PER_TERRAIN_CHUNK 500
+#define BOTANY_CULL_RANGE 100
 
 namespace RootForce
 {

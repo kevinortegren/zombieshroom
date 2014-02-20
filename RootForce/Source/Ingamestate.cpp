@@ -144,11 +144,11 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
+#ifndef DEBUG
 		// Init.
 		m_botanySystem->Initialize();
-
 		m_sharedSystems.m_worldSystem->SubdivideTree();
-
+#endif
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
 
@@ -488,11 +488,12 @@ namespace RootForce
 			m_sharedSystems.m_worldSystem->Process();
 		}
 
+#ifndef DEBUG
 		{
 			PROFILE("Botany System", g_engineContext.m_profiler);
 			m_botanySystem->Process();
 		}
-
+#endif
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
 			m_directionlLightSystem->Process();

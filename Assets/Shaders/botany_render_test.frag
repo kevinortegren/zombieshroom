@@ -26,19 +26,19 @@ layout (location = 3) out vec4 background;
 void main()
 {
     vec4 color = vec4(1.0);
+    float diffuse = 0.0;
     float trans = 0.0;
-    
-    
     
     // Geometry based fragment.
     if(vert_texture1 == 0) 
     {
         vec4 dif = texture(g_Diffuse, vert_texcoord1);
     
-        color = texture(g_TerrainGrass, vert_texcoord1);
-        trans = texture(g_Translucency, vert_texcoord1).r;
+        diffuse = texture(g_Diffuse, vert_texcoord1).r;  
+        color = texture(g_TerrainGrass, vert_texcoord1);  
+        trans = texture(g_Diffuse, vert_texcoord1).r;  
         
-        color.rgb = mix(dif.rgb*0.5, color.xyz, vert_intensity1) * trans;
+        color.rgb *= diffuse;
     }
     
     // Billboarded fragment.

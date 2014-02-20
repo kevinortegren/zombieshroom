@@ -28,10 +28,11 @@ void main()
     float trans = 0.0;
     if(vert_texture1 == 0) // Geometry based fragment.
     {
-        color = texture(g_TerrainGrass, vert_texcoord1);
-        trans = texture(g_Translucency, vert_texcoord1).r;  
-        
-        color.rgb *= trans;
+        float dif = texture(g_Diffuse, vert_texcoord1).r;
+        trans = texture(g_Translucency, vert_texcoord1).r;      
+        color = texture(g_TerrainGrass, vert_texcoord1);  
+                
+        color.rgb *= dif;
     }
     else // Billboarded fragment.
     {
