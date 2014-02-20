@@ -1499,7 +1499,7 @@ namespace RootForce
 			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
-			(*s)->Health -= (int) luaL_checknumber(p_luaState, 3);
+			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 
 			if((*s)->Health <= 0)
 			{
@@ -1512,7 +1512,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
-			(*s)->Health = (int)luaL_checknumber(p_luaState, 2);
+			(*s)->Health = (float)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int HealthSetIsDead(lua_State* p_luaState)

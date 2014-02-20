@@ -86,7 +86,7 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
-		int Health;
+		float Health;
 		Network::UserID_t LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
@@ -96,7 +96,7 @@ namespace RootForce
 
 		HealthComponent()
 		{
-			Health = 0;
+			Health = 0.0f;
 			LastDamageSourceID = 0;
 			IsDead = true;
 			WantsRespawn = true;
