@@ -47,7 +47,7 @@ public:
     QAction *actionNew_Ability;
     QWidget *centralWidget;
     QWidget *layoutWidget;
-    QGridLayout *gridLayout;
+    QGridLayout *mainLayout;
     CustomCompListWidget *listAbilityComponents;
     QTabWidget *toolBoxWidget;
     QWidget *tabComponents;
@@ -71,7 +71,7 @@ public:
     CustomTreeWidget *treeOnDestroy;
     QWidget *propertyWidget;
     QWidget *layoutWidget1;
-    QHBoxLayout *horizontalLayout;
+    QHBoxLayout *variableLayout;
     QLabel *chargesLable;
     QSpinBox *chargesSpinbox;
     QLabel *chargingLable;
@@ -117,15 +117,15 @@ public:
         layoutWidget = new QWidget(centralWidget);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
         layoutWidget->setGeometry(QRect(10, 69, 771, 631));
-        gridLayout = new QGridLayout(layoutWidget);
-        gridLayout->setSpacing(6);
-        gridLayout->setContentsMargins(11, 11, 11, 11);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        gridLayout->setContentsMargins(0, 0, 0, 0);
+        mainLayout = new QGridLayout(layoutWidget);
+        mainLayout->setSpacing(6);
+        mainLayout->setContentsMargins(11, 11, 11, 11);
+        mainLayout->setObjectName(QStringLiteral("mainLayout"));
+        mainLayout->setContentsMargins(0, 0, 0, 0);
         listAbilityComponents = new CustomCompListWidget(layoutWidget);
         listAbilityComponents->setObjectName(QStringLiteral("listAbilityComponents"));
 
-        gridLayout->addWidget(listAbilityComponents, 0, 0, 1, 1);
+        mainLayout->addWidget(listAbilityComponents, 0, 0, 1, 1);
 
         toolBoxWidget = new QTabWidget(layoutWidget);
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
@@ -166,7 +166,7 @@ public:
 
         toolBoxWidget->addTab(tabConditions, QString());
 
-        gridLayout->addWidget(toolBoxWidget, 0, 1, 1, 1);
+        mainLayout->addWidget(toolBoxWidget, 0, 1, 1, 1);
 
         OnTabWidget = new QTabWidget(layoutWidget);
         OnTabWidget->setObjectName(QStringLiteral("OnTabWidget"));
@@ -207,70 +207,70 @@ public:
 
         OnTabWidget->addTab(tabOnDestroy, QString());
 
-        gridLayout->addWidget(OnTabWidget, 1, 0, 1, 1);
+        mainLayout->addWidget(OnTabWidget, 1, 0, 1, 1);
 
         propertyWidget = new QWidget(layoutWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
 
-        gridLayout->addWidget(propertyWidget, 1, 1, 1, 1);
+        mainLayout->addWidget(propertyWidget, 1, 1, 1, 1);
 
         layoutWidget1 = new QWidget(centralWidget);
         layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
         layoutWidget1->setGeometry(QRect(10, 40, 771, 25));
-        horizontalLayout = new QHBoxLayout(layoutWidget1);
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        variableLayout = new QHBoxLayout(layoutWidget1);
+        variableLayout->setSpacing(6);
+        variableLayout->setContentsMargins(11, 11, 11, 11);
+        variableLayout->setObjectName(QStringLiteral("variableLayout"));
+        variableLayout->setContentsMargins(0, 0, 0, 0);
         chargesLable = new QLabel(layoutWidget1);
         chargesLable->setObjectName(QStringLiteral("chargesLable"));
 
-        horizontalLayout->addWidget(chargesLable, 0, Qt::AlignRight);
+        variableLayout->addWidget(chargesLable, 0, Qt::AlignRight);
 
         chargesSpinbox = new QSpinBox(layoutWidget1);
         chargesSpinbox->setObjectName(QStringLiteral("chargesSpinbox"));
 
-        horizontalLayout->addWidget(chargesSpinbox);
+        variableLayout->addWidget(chargesSpinbox);
 
         chargingLable = new QLabel(layoutWidget1);
         chargingLable->setObjectName(QStringLiteral("chargingLable"));
 
-        horizontalLayout->addWidget(chargingLable, 0, Qt::AlignRight);
+        variableLayout->addWidget(chargingLable, 0, Qt::AlignRight);
 
         chargingSpinbox = new QDoubleSpinBox(layoutWidget1);
         chargingSpinbox->setObjectName(QStringLiteral("chargingSpinbox"));
 
-        horizontalLayout->addWidget(chargingSpinbox);
+        variableLayout->addWidget(chargingSpinbox);
 
         channelingLable = new QLabel(layoutWidget1);
         channelingLable->setObjectName(QStringLiteral("channelingLable"));
 
-        horizontalLayout->addWidget(channelingLable, 0, Qt::AlignRight);
+        variableLayout->addWidget(channelingLable, 0, Qt::AlignRight);
 
         channelingSpingbox = new QDoubleSpinBox(layoutWidget1);
         channelingSpingbox->setObjectName(QStringLiteral("channelingSpingbox"));
 
-        horizontalLayout->addWidget(channelingSpingbox);
+        variableLayout->addWidget(channelingSpingbox);
 
         durationLable = new QLabel(layoutWidget1);
         durationLable->setObjectName(QStringLiteral("durationLable"));
 
-        horizontalLayout->addWidget(durationLable, 0, Qt::AlignRight);
+        variableLayout->addWidget(durationLable, 0, Qt::AlignRight);
 
         durationSpinbox = new QDoubleSpinBox(layoutWidget1);
         durationSpinbox->setObjectName(QStringLiteral("durationSpinbox"));
 
-        horizontalLayout->addWidget(durationSpinbox);
+        variableLayout->addWidget(durationSpinbox);
 
         cooldownLabel = new QLabel(layoutWidget1);
         cooldownLabel->setObjectName(QStringLiteral("cooldownLabel"));
 
-        horizontalLayout->addWidget(cooldownLabel, 0, Qt::AlignRight);
+        variableLayout->addWidget(cooldownLabel, 0, Qt::AlignRight);
 
         cooldownSpinbox = new QDoubleSpinBox(layoutWidget1);
         cooldownSpinbox->setObjectName(QStringLiteral("cooldownSpinbox"));
 
-        horizontalLayout->addWidget(cooldownSpinbox);
+        variableLayout->addWidget(cooldownSpinbox);
 
         abilityNameEdit = new QLineEdit(centralWidget);
         abilityNameEdit->setObjectName(QStringLiteral("abilityNameEdit"));

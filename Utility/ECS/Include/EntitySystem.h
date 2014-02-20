@@ -49,9 +49,12 @@ namespace ECS
 		virtual void ProcessEntity(Entity* p_entity) = 0;
 		virtual void End(){}
 
+
+
 	protected:
 		int64_t m_flag;
 		std::set<Entity*> m_activeEntities;
+		std::vector<Entity*> m_entitiesToRemove;
 	};
 
 	// System to process a set of entities at a set time interval.
