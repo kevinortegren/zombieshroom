@@ -47,6 +47,7 @@ namespace LogLevel
 		PINK_PRINT,
 		PACKET_PRINT,
 		MASS_DATA_PRINT,
+		NOLEVEL,
 	};
 }
 
@@ -85,6 +86,8 @@ class Logging : public LoggingInterface
 			bool		Enabled;
 		};
 
+		bool m_enableLogging;
+
 		bool OpenLogStream();
 		bool CloseLogStream();
 
@@ -103,6 +106,12 @@ class Logging : public LoggingInterface
 
 		std::map<LogTag::LogTag, TagLevelInfo> m_tagInfo;
 		std::map<LogLevel::LogLevel, TagLevelInfo> m_levelInfo;
+
+		void PrintStatus();
+
+		void ClearLog();
+
+
 
 };
 //(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)

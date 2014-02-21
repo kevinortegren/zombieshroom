@@ -2,7 +2,7 @@
 #include <ctime>
 #include <RootEngine/Include/Logging/CMDColor.h>
 
-Logging::Logging()
+Logging::Logging() : m_enableLogging(true)
 {
 	ColorCMD::ConsoleColorInit();
 	SetConsoleTitle(L"RootLog");
@@ -35,6 +35,7 @@ Logging::Logging()
 	m_levelInfo[LogLevel::PINK_PRINT]		= TagLevelInfo("PINK_PRINT ", true);
 	m_levelInfo[LogLevel::PACKET_PRINT]		= TagLevelInfo("PACKET     ", false);
 	m_levelInfo[LogLevel::MASS_DATA_PRINT]	= TagLevelInfo("DATA_PRINT ", false);
+	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 
 	OpenLogStream();
 }
@@ -125,6 +126,9 @@ void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, 
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine )
 {
+	if(!m_enableLogging)
+		return;
+
 	std::string output;
 	if (!writeFileLine)
 		output = GetTimeFormatString() + "    " + m_tagInfo[p_tag].Name + "    " + m_levelInfo[p_vLevel].Name +  "    " + p_format  +"\n";
@@ -190,6 +194,12 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 	case LogLevel::MASS_DATA_PRINT:
 		{
 			ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::NOLEVEL:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::GRAY, ColorCMD::defbackcol);
 			std::cout<<"";
 			break;
 		}
@@ -263,42 +273,86 @@ void Logging::ParseCommand( std::stringstream* p_data )
 
 	std::getline(*p_data, module, ' ');
 	std::getline(*p_data, module, ' ');
-	
+
+	if(module == "clear")
+	{
+		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Cleared console log!");
+		ClearLog();
+	}
+	else if(module == "on")
+	{
+		m_enableLogging = true;
+		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Enabled console logging");
+	}
+	else if(module == "off")
+	{
+		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Disabled console logging");
+		m_enableLogging = false;
+	}
+	else if(module == "status" || module == "s")
+	{
+		PrintStatus();
+	}
+	else if(module == "NOLEVEL" || module == "NOTAG")
+	{
+	}
+	else
+	{
+		for(auto itr = m_levelInfo.begin(); itr != m_levelInfo.end(); itr++)
+		{
+			std::string checkName = itr->second.Name;
+			std::size_t found = checkName.find_last_not_of(" ");
+
+			if (found != std::string::npos)
+				checkName.erase(found+1);
+			else
+				checkName.clear(); // checkName is all whitespace
+
+			if(module == checkName)
+			{	
+				std::getline(*p_data, value, ' ');
+				itr->second.Enabled = (atoi(value.c_str()) == 1);
+				LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Set %s to %s", checkName.c_str(), value.c_str());
+				return;
+			}
+		}
+
+		for(auto itr = m_tagInfo.begin(); itr != m_tagInfo.end(); itr++)
+		{
+			std::string checkName = itr->second.Name;
+			std::size_t found = checkName.find_last_not_of(" ");
+
+			if (found != std::string::npos)
+				checkName.erase(found+1);
+			else
+				checkName.clear(); // checkName is all whitespace
+
+			if(module == checkName)
+			{	
+				std::getline(*p_data, value, ' ');
+				itr->second.Enabled = (atoi(value.c_str()) == 1);
+				LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Set %s to %s", checkName.c_str(), value.c_str());
+				return;
+			}
+		}
+	}
+}
+
+void Logging::PrintStatus()
+{
+	LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "LogLevel status");
 	for(auto itr = m_levelInfo.begin(); itr != m_levelInfo.end(); itr++)
 	{
-		std::string checkName = itr->second.Name;
-		std::size_t found = checkName.find_last_not_of(" ");
-
-		if (found != std::string::npos)
-			checkName.erase(found+1);
-		else
-			checkName.clear(); // checkName is all whitespace
-
-		if(module == checkName)
-		{	
-			std::getline(*p_data, value, ' ');
-			itr->second.Enabled = (atoi(value.c_str()) == 1);
-			LogText(LogTag::NOTAG, LogLevel::PINK_PRINT, "Set %s to %s", checkName.c_str(), value.c_str());
-			return;
-		}
+		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "\t\t[%s] : %d", itr->second.Name.c_str(), (int)itr->second.Enabled);
 	}
-
+	LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "LogTag status");
 	for(auto itr = m_tagInfo.begin(); itr != m_tagInfo.end(); itr++)
 	{
-		std::string checkName = itr->second.Name;
-		std::size_t found = checkName.find_last_not_of(" ");
-
-		if (found != std::string::npos)
-			checkName.erase(found+1);
-		else
-			checkName.clear(); // checkName is all whitespace
-
-		if(module == checkName)
-		{	
-			std::getline(*p_data, value, ' ');
-			itr->second.Enabled = (atoi(value.c_str()) == 1);
-			LogText(LogTag::NOTAG, LogLevel::PINK_PRINT, "Set %s to %s", checkName.c_str(), value.c_str());
-			return;
-		}
+		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "\t\t[%s] : %d", itr->second.Name.c_str(), (int)itr->second.Enabled);
 	}
+}
+
+void Logging::ClearLog()
+{
+	system("cls");
 }
