@@ -530,7 +530,7 @@ namespace RootForce
 		m.Serialize(true, &bs);
 
 		if (m_clientPeer != nullptr)
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE_SEQUENCED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 
