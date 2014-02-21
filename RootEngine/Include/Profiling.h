@@ -91,6 +91,9 @@ namespace RootEngine
 		__int64		m_startTime;
 		ProfilingInterface* m_profiling;
 	};
-
-	#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
+//#ifdef _DEBUG
+#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
+//#else
+//#define PROFILE(name, profiler) 
+//#endif
 }
