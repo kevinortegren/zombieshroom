@@ -122,31 +122,33 @@ namespace RootForce
 		glm::vec3 movement(0.0f);
 
 		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
+		float power = 0;
 		if(onGround)
 		{
 			action->MovePower = 0;
 			action->StrafePower = 0;
+			power = 1;
 		}
-		
+		else
+		{
+			power = 0.1f;
+		}
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-				if(onGround)
-					action->MovePower += 1;
+					action->MovePower += power;
+				
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-				if(onGround)
-					action->MovePower -= 1;
+					action->MovePower -= power;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-				if(onGround)
-					action->StrafePower += 1;
+					action->StrafePower += power;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-				if(onGround)
-					action->StrafePower -= 1;
+					action->StrafePower -= power;
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -528,7 +530,7 @@ namespace RootForce
 		m.Serialize(true, &bs);
 
 		if (m_clientPeer != nullptr)
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE_SEQUENCED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 
