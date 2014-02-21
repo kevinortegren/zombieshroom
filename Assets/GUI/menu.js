@@ -160,6 +160,7 @@ function SetDefaults(name,mapfile,abilitypack,port,password,maxplayers,matchleng
   });
   $("#lan-host-name").val(name);
   $("#lan-host-map").val(mapfile);
+  $("#lan-host-map > option[value='" + mapfile + "']").click();
   $("#lan-host-abilitypack").val(abilitypack);
   $("#lan-host-port").val(port);
   $("#lan-host-password").val(password);
