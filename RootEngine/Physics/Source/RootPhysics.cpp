@@ -1081,7 +1081,7 @@ namespace Physics
 		{
 			m_playerObjects.at(index)->SetGravity(p_gravity[1]);		
 		}
-		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled && m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			
 			btVector3 gravity;
@@ -1091,10 +1091,20 @@ namespace Physics
 			m_dynamicObjects.at(index)->setGravity(gravity);
 			m_dynamicObjects.at(index)->applyGravity();
 		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			//Gravity doesn't exist in objectcontroller now, add if needed
 			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Changing gravity is not supported for externally controlled objects");
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			btVector3 gravity;	
+			gravity.setX(p_gravity[0]);
+			gravity.setY(p_gravity[1]);
+			gravity.setZ(p_gravity[2]);
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			if(index != -1)
+				m_ragdolls.at(index)->SetGravity(gravity);
 		}
 	}
 
