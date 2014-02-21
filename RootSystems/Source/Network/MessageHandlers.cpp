@@ -1294,7 +1294,7 @@ namespace RootForce
 										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::PlayerCommand);
 										m.Serialize(true, &bs);
 
-										m_peer->Send(&bs, MEDIUM_PRIORITY, UNRELIABLE, 0, addresses[i], false);
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE_SEQUENCED, 0, addresses[i], false);
 									}
 								}
 							}

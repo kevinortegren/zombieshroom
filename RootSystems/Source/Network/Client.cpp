@@ -7,6 +7,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RakNet/MessageIdentifiers.h>
 #include <RakNet/BitStream.h>
+#include <RakNet/PacketLogger.h>
 #include <stdexcept>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -21,8 +22,10 @@ namespace RootForce
 			, m_peer(nullptr)
 			, m_messageHandler(nullptr)
 			, m_chatSystem(nullptr)
+			, m_packetLogger(LogTag::CLIENT)
 		{
 			m_peer = RakNet::RakPeerInterface::GetInstance();
+			m_peer->AttachPlugin(&m_packetLogger);
 
 			RakNet::SocketDescriptor sd;
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)

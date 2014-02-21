@@ -21,9 +21,11 @@ namespace RootForce
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
 			, m_worldDeltaTimer(0)
+			, m_packetLogger(LogTag::SERVER)
 		{
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
+			m_peer->AttachPlugin(&m_packetLogger);
 
 			RakNet::StartupResult r;
 			RakNet::SocketDescriptor sd(p_config.Port, nullptr);
