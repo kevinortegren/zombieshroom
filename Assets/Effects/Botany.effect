@@ -3,6 +3,9 @@
   
     # Update technique for tesselating terrain patches and outputting into to point clouds.
     - name: Botany_Update
+      bindings:
+        - name: PerTech
+          slot: 3
       textures:
         - name: g_Density
           slot: 6

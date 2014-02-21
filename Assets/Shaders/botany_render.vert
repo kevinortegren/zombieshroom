@@ -7,6 +7,8 @@ layout(location = 2) in float in_density;
 layout(std140) uniform PerTech
 {
     vec3 g_PlayerPosition;
+    float g_Lod1Distance;
+    float g_Lod2Distance;
 };
 
 out vec3 gs_normal_in;
@@ -20,11 +22,11 @@ void main()
 
     float dist = length(in_position - g_PlayerPosition);
     
-    if(dist < 30.0)
+    if(dist < g_Lod1Distance)
     {
         gs_lod_in = 0.0;
     }
-    else if(dist < 90.0)
+    else if(dist < g_Lod2Distance)
     {
         gs_lod_in = 1.0;
     }

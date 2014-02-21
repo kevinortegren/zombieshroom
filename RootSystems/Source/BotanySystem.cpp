@@ -12,9 +12,19 @@ namespace RootForce
 
 	void BotanySystem::Initialize(BotanyTextures& m_textures)
 	{
+		m_renderUniforms.m_lod1Distance = 25.0f;
+		m_renderUniforms.m_lod2Distance = 80.0f;
+
+		m_updateUniforms.m_grassFactor = 2.0f;
+
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferData(1, sizeof(glm::vec3), &glm::vec3(0));
+
+		// Buffer botany update uniforms.
+		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(m_updateUniforms), &m_updateUniforms);
+
+		// Buffer botany rendering uniforms.
+		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferData(1, sizeof(m_renderUniforms), &m_renderUniforms);
 
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
@@ -59,6 +69,7 @@ namespace RootForce
 		}
 
 		m_initialized = true;
+		m_show = false;
 	}
 
 	void BotanySystem::Construct(QuadNode* p_node)
@@ -117,7 +128,7 @@ namespace RootForce
 
 	void BotanySystem::Process()
 	{
-		if(m_initialized)
+		if(m_initialized && m_show)
 		{
 			// Get player position.
 			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
@@ -141,6 +152,8 @@ namespace RootForce
 			// Cull nodes.
 			m_quadTree.m_culledNodes.clear();
 			m_quadTree.Cull(&frustum, m_quadTree.GetRoot());
+
+			m_effect->GetTechniques()[0]->Apply();
 
 			for(auto itr = m_quadTree.m_culledNodes.begin(); itr != m_quadTree.m_culledNodes.end(); ++itr)
 			{			
@@ -182,13 +195,33 @@ namespace RootForce
 		std::getline(*p_ss, module, ' ');
 		std::getline(*p_ss, module, ' ');
 
-		if(module == "glow" || module == "g")
+		if(module == "factor" || module == "f")
 		{	
-			std::getline(*p_ss, param, ' ');
 			std::getline(*p_ss, value, ' ');
-
-
+			SetGrassFactor((float)atof(value.c_str()));
+		}
+		else if(module == "show" || module == "s")
+		{	
+			std::getline(*p_ss, value, ' ');
+			m_show = (atoi(value.c_str()) == 1) ? true : false;
 		}
 	}
 
+	void BotanySystem::SetGrassFactor(float p_grassFactor)
+	{
+		m_updateUniforms.m_grassFactor = p_grassFactor;
+		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &m_updateUniforms.m_grassFactor);
+	}
+
+	void BotanySystem::SetLOD1Distance(float p_distance)
+	{
+		m_renderUniforms.m_lod1Distance = p_distance;
+		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &m_renderUniforms.m_lod1Distance);
+	}
+
+	void BotanySystem::SetLOD2Distance(float p_distance)
+	{
+		m_renderUniforms.m_lod2Distance = p_distance;
+		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &m_renderUniforms.m_lod2Distance);
+	}
 }

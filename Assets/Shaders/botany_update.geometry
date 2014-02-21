@@ -9,9 +9,15 @@ layout(points, max_vertices = VERTICES_OUTPUT) out;
 in vec3 gs_normal_in[];
 in float gs_density_in[];
 
+layout(std140) uniform PerTech
+{
+    float g_BotanyScaleFactor;
+};
+
 out vec3 vert_pos;
 out vec3 vert_normal;
 out float vert_density;
+
 
 float random(vec3 seed, int i){
      vec4 seed4 = vec4(seed, i);
@@ -46,7 +52,7 @@ void main()
     float area = length(cross(ab, ac)) / 2;
     
     // Calculate number of plants per triangle.
-    int nrPlants = int(gs_density_in[0] * area * 4.0);
+    int nrPlants = int(gs_density_in[0] * area * g_BotanyScaleFactor);
     
     int i;
     for(i = 0; i < VERTICES_OUTPUT; i++)

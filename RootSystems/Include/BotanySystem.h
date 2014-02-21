@@ -44,6 +44,12 @@ namespace RootForce
 		void Initialize(BotanyTextures& m_textures);
 		void Process();
 		void Divide();
+
+		void SetGrassFactor(float p_grassFactor);
+		void SetLOD1Distance(float p_distance);
+		void SetLOD2Distance(float p_distance);
+
+
 		void ParseCommands(std::stringstream* p_ss);
 
 	private:
@@ -62,6 +68,23 @@ namespace RootForce
 		Render::EffectInterface* m_effect;
 		Render::Material* m_material;
 		bool m_initialized;
+
+		bool m_show;
+
+		struct
+		{
+			float m_grassFactor;
+
+		} m_updateUniforms;
+
+		struct
+		{
+			glm::vec3 m_playerPosition;
+			float m_padd0;
+			float m_lod1Distance;
+			float m_lod2Distance;
+		} m_renderUniforms;
+
 
 	};
 }
