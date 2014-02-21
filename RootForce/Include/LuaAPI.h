@@ -152,7 +152,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			bool exists = false;
-			if(*e != nullptr)
+			if(*e != nullptr && (*e)->GetId() != -1)
 				exists = true;
 			lua_pushboolean(p_luaState, exists);
 			return 1;

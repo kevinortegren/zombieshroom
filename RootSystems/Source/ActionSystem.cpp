@@ -64,22 +64,22 @@ namespace RootSystems
 			}
 
 			// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
-			glm::vec3 movement;
 			glm::vec3 facing = transform->m_orientation.GetFront();
 			glm::vec3 right = transform->m_orientation.GetRight();
 			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 			{
-				action->JumpDir = movement = facing * action->MovePower + right * action->StrafePower;
+				action->JumpDir = facing * action->MovePower + right * action->StrafePower;
 			}
 			else
 			{
-				movement = action->JumpDir += facing * action->MovePower + right * action->StrafePower;
+				action->JumpDir += facing * action->MovePower + right * action->StrafePower;
 			}
 				
-
-			if(movement != glm::vec3(0))
+			if(action->JumpDir != glm::vec3(0))
 			{
-				movement = glm::normalize(movement) * playphys->MovementSpeed;
+				if(glm::length2(action->JumpDir) > 1)
+					action->JumpDir = glm::normalize(action->JumpDir);
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 			}
 
