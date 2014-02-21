@@ -277,9 +277,9 @@ namespace RootForce
 		static int EntityGetAbilitySpawn(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilityRespawnComponent *));
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilitySpawnComponent *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(*e);
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilitySpawnComponent>(*e);
 			luaL_setmetatable(p_luaState, "AbilitySpawn");
 			return 1;
 		}
@@ -1478,7 +1478,7 @@ namespace RootForce
 		static int AbilitySpawnGetCurrentName(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			lua_pushstring(p_luaState, (*s)->CurrentAbility.Name.c_str());
 			return 1;
 		}
@@ -1486,7 +1486,7 @@ namespace RootForce
 		static int AbilitySpawnGetCurrentCharges(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			lua_pushnumber(p_luaState, (*s)->CurrentAbility.Charges);
 			return 1;
 		}
@@ -1494,7 +1494,7 @@ namespace RootForce
 		static int AbilitySpawnSetClaimed(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			(*s)->Claimed = (uint16_t)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}

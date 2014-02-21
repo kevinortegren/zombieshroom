@@ -21,7 +21,7 @@ namespace RootForce
 			~Server();
 
 			// For initializing server components on an existing server socket
-			void Initialize( WorldSystem* p_worldSystem, AbilityRespawnSystem* p_abilitySpawnSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated );
+			void Initialize( WorldSystem* p_worldSystem, AbilitySpawnSystem* p_abilitySpawnSystem, const RootSystems::ServerConfig& p_config, bool p_isDedicated );
 
 			const NetworkMessage::ServerInformation& GetServerInformation() const;
 			void SetServerInformation(const NetworkMessage::ServerInformation& p_information);

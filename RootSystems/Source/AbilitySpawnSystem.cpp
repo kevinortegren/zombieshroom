@@ -1,5 +1,5 @@
 #ifndef COMPILE_LEVEL_EDITOR
-#include "AbilityRespawnSystem.h"
+#include "AbilitySpawnSystem.h"
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
@@ -16,7 +16,7 @@ extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 namespace RootForce
 {
-	void AbilityRespawnSystem::Init()
+	void AbilitySpawnSystem::Init()
 	{
 		m_respawn.Init(m_world->GetEntityManager());
 		m_transform.Init(m_world->GetEntityManager());
@@ -25,10 +25,10 @@ namespace RootForce
 		m_particle.Init(m_world->GetEntityManager());
 	}
 
-	void AbilityRespawnSystem::ProcessEntity( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::ProcessEntity( ECS::Entity* p_entity )
 	{
 		float dt = m_world->GetDelta();
-		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+		AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
 		Network::NetworkComponent* network = m_network.Get(p_entity);
 		Transform* transform = m_transform.Get(p_entity);
 
@@ -58,6 +58,7 @@ namespace RootForce
 			id.SequenceID = 0;
 			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, id));
 			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
+
 			//Remove the collision and renderable component as well as clean out the current ability
 			HideSpawnpoint(p_entity);
 			
@@ -67,14 +68,15 @@ namespace RootForce
 			
 			//Add new components to the spawnpoint and give it a new current ability
 			if(respawn->AbilityReceived.compare("") == 0)
-				NewCurrentAbility(p_entity);
+				NewServerAbility(p_entity); //We have not received a new ability yet
 			else
-				RevealSpawnpoint(p_entity);
+				RevealSpawnpoint(p_entity); //We have received the ability and can now reveal the point
 
 		}
 		respawn->Timer -= dt;
 		transform->m_orientation.Rotate(0 , dt * 50.0f , 0);
 
+		//Ugly fix which makes sure that clients that join the server get render and collision components on their spawn points, should only happen once
 		Renderable* render = m_world->GetEntityManager()->GetComponent<Renderable>(p_entity);
 		if(respawn->CurrentAbility.Name.compare("") != 0 && render == nullptr)
 		{
@@ -83,7 +85,7 @@ namespace RootForce
 		}
 	}
 
-	void AbilityRespawnSystem::LoadAbilities(std::string p_abilityPack)
+	void AbilitySpawnSystem::LoadAbilities(std::string p_abilityPack)
 	{
 		std::ifstream file(m_workingDir + "Assets/AbilityPacks/" + p_abilityPack + ".txt");
 		if(file.is_open())
@@ -99,13 +101,13 @@ namespace RootForce
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::NON_FATAL_ERROR, "Ability pack not found");
 	}
 
-	void AbilityRespawnSystem::AttatchComponentToPoints()
+	void AbilitySpawnSystem::AttachComponentToPoints()
 	{
 		ECS::GroupManager::GroupRange points = m_world->GetGroupManager()->GetEntitiesInGroup("AbilitySpawnPoint"); //Get all the entities that are Ability spawn points
 
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
 		{
-			m_world->GetEntityManager()->CreateComponent<AbilityRespawnComponent>(itr->second);
+			m_world->GetEntityManager()->CreateComponent<AbilitySpawnComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Network::NetworkComponent>(itr->second);
 			m_world->GetEntityManager()->CreateComponent<Script>(itr->second);
 
@@ -113,17 +115,13 @@ namespace RootForce
 			network->SetID(itr->second,Network::ReservedUserID::NONE, Network::ReservedActionID::ABILITYSPAWN);
 			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
 			script->Name = "AbilitySpawnPoint";
-		
-			//Create a random current ability from the ability pack
-			//NewCurrentAbility(itr->second);
-
 
 		}
 	}
 
-	void AbilityRespawnSystem::HideSpawnpoint( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::HideSpawnpoint( ECS::Entity* p_entity )
 	{
-		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+		AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
 
 		respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 
@@ -135,13 +133,12 @@ namespace RootForce
 		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
 		m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
 		m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
-		//m_world->GetEntityManager()->RemoveComponent<ParticleEmitter>(p_entity);
 
 		respawn->Timer = 30.0f; //30 second timer until a new ability respawns
 		respawn->Claimed = Network::ReservedUserID::NONE; //no current claimiant
 	}
 
-	void AbilityRespawnSystem::RevealSpawnpoint( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::RevealSpawnpoint( ECS::Entity* p_entity )
 	{
 		
 		SetClientCurrentAbility(p_entity);
@@ -150,16 +147,17 @@ namespace RootForce
 
 		CreateCollisionComponents(p_entity);
 
-		//CreateParticleEmitter(p_entity);
 	}
 
 
-	void AbilityRespawnSystem::NewCurrentAbility( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::NewServerAbility( ECS::Entity* p_entity )
 	{
+		//Only do this if we are a server
 		if(m_serverPeer != nullptr)
 		{
 			Network::NetworkComponent* network = m_network.Get(p_entity);
 
+			//Get a new random ability from the pack
 			unsigned chosenSpawn = rand()%m_levelAbilities.size();
 
 			RootForce::NetworkMessage::AbilitySpawn m;
@@ -172,16 +170,18 @@ namespace RootForce
 			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilitySpawn);
 			m.Serialize(true, &bs);
 
+			//Send it to all the clients
 			m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 		}
 	}
 
 
-	void AbilityRespawnSystem::SetClientCurrentAbility( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::SetClientCurrentAbility( ECS::Entity* p_entity )
 	{
+		//Only set if we are a client
 		if(m_clientPeer != nullptr)
 		{
-			AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+			AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
 
 			respawn->CurrentAbility.Name = respawn->AbilityReceived;
 			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
@@ -192,9 +192,9 @@ namespace RootForce
 	}
 
 
-	void AbilityRespawnSystem::CreateRenderComponent(ECS::Entity* p_entity)
+	void AbilitySpawnSystem::CreateRenderComponent(ECS::Entity* p_entity)
 	{
-		AbilityRespawnComponent* respawn = m_respawn.Get(p_entity);
+		AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
 
 		Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
 		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
@@ -204,7 +204,7 @@ namespace RootForce
 		renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
 	}
 
-	void AbilityRespawnSystem::CreateCollisionComponents(ECS::Entity* p_entity)
+	void AbilitySpawnSystem::CreateCollisionComponents(ECS::Entity* p_entity)
 	{
 		Transform* transform = m_transform.Get(p_entity);
 
@@ -216,7 +216,7 @@ namespace RootForce
 		m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 	}
 
-	void AbilityRespawnSystem::CreateParticleEmitter( ECS::Entity* p_entity )
+	void AbilitySpawnSystem::CreateParticleEmitter( ECS::Entity* p_entity )
 	{
 		ParticleEmitter* emitter = m_world->GetEntityManager()->CreateComponent<ParticleEmitter>(p_entity);
 

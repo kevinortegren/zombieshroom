@@ -5,7 +5,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -28,8 +28,8 @@ namespace RootForce
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
 
 		//AbilitySpawnSystem to create new abilities across the map
-		m_sharedSystems.m_abilitySpawnSystem = new AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
-		g_world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(m_sharedSystems.m_abilitySpawnSystem);
+		m_sharedSystems.m_abilitySpawnSystem = new AbilitySpawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+		g_world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(m_sharedSystems.m_abilitySpawnSystem);
 
 		m_loadingScreen = g_engineContext.m_gui->LoadURL("Loading", "loading.html");
 	}

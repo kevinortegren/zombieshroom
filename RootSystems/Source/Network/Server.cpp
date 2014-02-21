@@ -49,12 +49,12 @@ namespace RootForce
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
-		void Server::Initialize( WorldSystem* p_worldSystem, AbilityRespawnSystem* p_abilitySpawnSystem , const RootSystems::ServerConfig& p_config, bool p_isDedicated )
+		void Server::Initialize( WorldSystem* p_worldSystem, AbilitySpawnSystem* p_abilitySpawnSystem , const RootSystems::ServerConfig& p_config, bool p_isDedicated )
 		{
 			// Load the map
 			p_worldSystem->LoadWorld(p_config.MapName);
 			p_abilitySpawnSystem->LoadAbilities(p_config.AbilityPack.c_str());
-			p_abilitySpawnSystem->AttatchComponentToPoints();
+			p_abilitySpawnSystem->AttachComponentToPoints();
 
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
