@@ -34,8 +34,10 @@ namespace AbilityEditorNameSpace
 				KNOCKBACK, //done
 				STATCHANGECASTER, //Still needs script implementation
 				STATCHANGETARGET, //Still needs script implementation
-				PHYSICS, //add collide w/ world
+				PHYSICS, //done
 				CHARGEVARIABLES, //done
+				WATER, //done
+				SOUND, //done
 				END_OF_ENUM //TODO : EntityChange
 			};
 		}
@@ -45,16 +47,18 @@ namespace AbilityEditorNameSpace
 			ComponentNameList()
 			{
 				m_compNames.append("Start Position");
-				m_compNames.append("Target Position");
+				m_compNames.append("Target Position [WIP]");
 				m_compNames.append("Velocity");
 				m_compNames.append("Ability Model");
 				m_compNames.append("Collision Shape");
 				m_compNames.append("Ability Particle");
 				m_compNames.append("Damage");
 				m_compNames.append("Knockback");
-				m_compNames.append("Stat Change (Caster)");
-				m_compNames.append("Stat Change (Target)");
+				m_compNames.append("Stat Change (Caster) [WIP]");
+				m_compNames.append("Stat Change (Target) [WIP]");
 				m_compNames.append("Physics");
+				m_compNames.append("Water Disturb");
+				m_compNames.append("Sound");
 				m_compNames.append("Charge Variables"); 
 			}
 		} static g_componentNameList;
@@ -751,6 +755,87 @@ namespace AbilityEditorNameSpace
 				m_chargeFactor = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
 		};	
+
+		struct Water : MainComponent
+		{
+			float m_power, m_interval, m_radius;
+			Water(float p_power = 1.0f, float p_interval = 0.3f, float p_radius = 4.0f) : MainComponent(ComponentType::WATER)
+			{
+				m_power = p_power;
+				m_interval = p_interval;
+				m_radius = p_radius;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* power, *interval, *radius;
+
+				power = p_propMan->addProperty(QVariant::Double, "Disturb Power");
+				p_propMan->setValue(power, m_power);
+				interval = p_propMan->addProperty(QVariant::Double, "Disturb Interval");
+				p_propMan->setValue(interval, m_interval);
+				radius = p_propMan->addProperty(QVariant::Double, "Radius");
+				p_propMan->setValue(radius, m_radius);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(power);
+				p_propBrows->addProperty(interval);
+				p_propBrows->addProperty(radius);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_power = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_interval = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_radius = p_propMan->variantProperty(props.at(2))->value().toFloat();
+			}
+		};
+
+		struct Sound : MainComponent
+		{
+			std::string m_soundName;
+			float m_volume, m_rangeMin, m_rangeMax;
+			bool m_loop;
+			Sound(float p_volume = 0.5f, float p_rangeMin = 1.0f, float p_rangeMax = 10000.0f, bool p_loop = true) : MainComponent(ComponentType::SOUND)
+			{
+				m_soundName = "";
+				m_volume = p_volume;
+				m_rangeMin = p_rangeMin;
+				m_rangeMax = p_rangeMax;
+				m_loop = p_loop;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* soundName, *volume, *rangeMin, *rangeMax, *loop;
+
+				soundName = p_propMan->addProperty(QVariant::String, "ParticleName" );
+				p_propMan->setValue(soundName, m_soundName.c_str());
+				volume = p_propMan->addProperty(QVariant::Double, "Volume");
+				p_propMan->setValue(volume, m_volume);
+				rangeMin = p_propMan->addProperty(QVariant::Double, "Min Range");
+				p_propMan->setValue(rangeMin, m_rangeMin);
+				rangeMax = p_propMan->addProperty(QVariant::Double, "Max Range");
+				p_propMan->setValue(rangeMax, m_rangeMax);
+				loop = p_propMan->addProperty(QVariant::Bool, "Loop");
+				p_propMan->setValue(loop, m_loop);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(soundName);
+				p_propBrows->addProperty(volume);
+				p_propBrows->addProperty(rangeMin);
+				p_propBrows->addProperty(rangeMax);
+				p_propBrows->addProperty(loop);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_soundName = props.at(0)->valueText().toStdString();
+				m_volume = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_rangeMin = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_rangeMax = p_propMan->variantProperty(props.at(3))->value().toFloat();
+				m_loop = p_propMan->variantProperty(props.at(4))->value().toBool();
+			}
+		};
 	}
 	
 }
