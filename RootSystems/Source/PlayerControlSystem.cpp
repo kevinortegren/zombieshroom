@@ -131,7 +131,7 @@ namespace RootForce
 		}
 		else
 		{
-			power = 0.1f;
+			power = 0.05f;
 		}
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
