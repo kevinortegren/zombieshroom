@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/ServerInfo.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/Network/ServerConfig.h>
+#include <RootSystems/Include/Network/PacketLogger.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <string>
 
@@ -38,6 +39,7 @@ namespace RootForce
 			RakNet::RakPeerInterface* m_peer;
 			MessageHandler* m_messageHandler;
 			float m_worldDeltaTimer;
+			PacketLogger m_packetLogger;
 
 			void UpdatePingResponse();
 		};

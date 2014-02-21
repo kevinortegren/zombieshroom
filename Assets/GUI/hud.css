@@ -89,8 +89,13 @@ img
 #chatlog
 {
 	height: 180px;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	font-family: Comic Sans MS;
+}
+::-webkit-scrollbar
+{
+	display: none;
 }
 #chatinput
 {

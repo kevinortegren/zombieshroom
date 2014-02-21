@@ -47,6 +47,8 @@ namespace RootForce
 		glm::vec2 Angle;
 
 		float JumpTime;
+		glm::vec3 JumpDir;
+		glm::vec3 JumpRight;
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
@@ -58,6 +60,8 @@ namespace RootForce
 			, MovePower(0.0f)
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
+			, JumpDir(glm::vec3(0))
+			, JumpRight(glm::vec3(0))
 			, AbilityTime(0.0f)
 			, SelectedAbility(1)
 			, WantRespawn(false)
@@ -86,7 +90,7 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
-		int Health;
+		float Health;
 		Network::UserID_t LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
@@ -96,7 +100,7 @@ namespace RootForce
 
 		HealthComponent()
 		{
-			Health = 0;
+			Health = 0.0f;
 			LastDamageSourceID = 0;
 			IsDead = true;
 			WantsRespawn = true;

@@ -81,5 +81,8 @@ namespace RootForce
 		RootForce::TimerSystem*							m_timerSystem;
 
 		Keymapper* m_keymapper;
+
+		GameStates::GameStates UpdateConsole();
+		void UpdateHUD();
 	};
 }

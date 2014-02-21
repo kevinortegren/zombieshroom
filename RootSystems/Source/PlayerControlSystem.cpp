@@ -119,25 +119,34 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 
-		glm::vec3 movement(0.0f);
-
-		action->MovePower = 0;
-		action->StrafePower = 0;
+		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
+		float power = 0;
+		if(onGround)
+		{
+			action->MovePower = 0;
+			action->StrafePower = 0;
+			power = 1;
+		}
+		else
+		{
+			power = 0.03f;
+		}
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-					action->MovePower += 1;
+					action->MovePower += power;
+				
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-					action->MovePower -= 1;
+					action->MovePower -= power;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-					action->StrafePower += 1;
+					action->StrafePower += power;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-					action->StrafePower -= 1;
+					action->StrafePower -= power;
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -519,7 +528,7 @@ namespace RootForce
 		m.Serialize(true, &bs);
 
 		if (m_clientPeer != nullptr)
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE_SEQUENCED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 
