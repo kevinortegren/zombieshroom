@@ -1203,10 +1203,10 @@ namespace Physics
 			return;
 		int index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 		int indexplayer = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		m_playerObjects.at(indexplayer)->Deactivate();
+		
 		if(index  == -1)
 		{
-			
+			m_playerObjects.at(indexplayer)->Deactivate();
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
@@ -1254,7 +1254,7 @@ namespace Physics
 		int index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
 		//Ragdoll
 		
-		if(index != -1)
+		if(index != -1 && m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
 			
 			delete m_ragdolls.at(index);

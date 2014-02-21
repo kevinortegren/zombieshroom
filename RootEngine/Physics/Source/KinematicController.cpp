@@ -232,8 +232,11 @@ void KinematicController::Deactivate()
 
 void KinematicController::Activate()
 {
-	m_activated = true;
-	m_kinController->StopKnockback();
-	m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	if(m_activated == false)
+	{
+		m_activated = true;
+		m_kinController->StopKnockback();
+		m_dynamicWorld->addCollisionObject(m_ghostObject, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	}
 	
 }
