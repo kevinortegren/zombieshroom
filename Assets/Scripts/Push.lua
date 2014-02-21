@@ -2,9 +2,9 @@ Push = {};
 Push.knockback = 20;
 Push.cooldown = 1;
 Push.charges = -1;
-Push.chargeTime = 0;
+Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 5;
+Push.duration = 0.2;
 
 function Push.ChargeDone (time, userId, actionId)
 	if time >= Push.chargeTime * 0.5 then

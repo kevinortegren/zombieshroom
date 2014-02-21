@@ -45,19 +45,21 @@ function FireBall.OnCreate (userId, actionId)
 end
 
 function FireBall.OnCollide (self, entity)
-	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local network = self:GetNetwork();
-	local transComp = self:GetTransformation();
-	transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));
-	if self ~= entity then
- 		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
-		FireBall.OnDestroy(self);
+	if entity:DoesExist() then
+		local hitCol = entity:GetCollision();
+		local hitPhys = entity:GetPhysics();
+		local network = self:GetNetwork();
+		local transComp = self:GetTransformation();
+		transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));
+		if self ~= entity then
+	 		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+			FireBall.OnDestroy(self);
+		end
 	end
 end
 
 function FireBall.OnDestroy (self)
 	local collision = self:GetCollision();
 	Collision.RemoveObjectFromWorld(collision);
-  Entity.Remove(self);
+	Entity.Remove(self);
 end
