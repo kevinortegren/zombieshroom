@@ -66,11 +66,13 @@ namespace AbilityEditorNameSpace
 			{
 				m_damage = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(j))->m_damage;
 				m_file << m_name << ".damage = " << m_damage << ";\n";
+				m_file << m_name << ".damageNew = " << m_damage << ";\n";
 			}
 			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
 			{
 				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(j))->m_knockback;
 				m_file << m_name << ".knockback = " << m_knockback << ";\n";
+				m_file << m_name << ".knockbackNew = " << m_knockback << ";\n";
 			}
 		}
 		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
@@ -93,14 +95,14 @@ namespace AbilityEditorNameSpace
 				chargeFac = ((AbilityComponents::ChargeVariables*)m_entity->GetComponents()->at(i))->m_chargeFactor;
 			}
 		}
-		if (chargeFac >= 1.0f)
-		{
-			m_file << "\t" << m_name << ".damage = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
-			m_file << "\t" << m_name << ".knockback = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
-		}
 		if (chargeReq > 0.0f)
 		{
 			m_file << "\tif time >= " << m_name << ".chargeTime * " << chargeReq << " then\n\t";
+		}
+		if (chargeFac >= 1.0f && m_entity->GetChargeTime() > 0.0f)
+		{
+			m_file << "\t" << m_name << ".damageNew = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
+			m_file << "\t" << m_name << ".knockbackNew = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
 		}
 		m_file << "\t" << m_name << ".OnCreate(userId, actionId);\n";
 		if (chargeReq > 0.0f)
@@ -369,6 +371,26 @@ namespace AbilityEditorNameSpace
 			{
 				m_file << "\t\tlocal particleComp = ParticleEmitter.New(self, \"" << ((AbilityComponents::AbilityParticle*)m_entity->GetComponents()->at(j))->m_particleName << "\");\n";
 			}
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::WATER)
+			{
+				m_file << "\t\tlocal waterComp = WaterCollider.New(self);\n";
+				m_file << "\t\twaterComp:SetDisturbPower(" << ((AbilityComponents::Water*)m_entity->GetComponents()->at(j))->m_power << ");\n";
+				m_file << "\t\twaterComp:SetDisturbInterval(" << ((AbilityComponents::Water*)m_entity->GetComponents()->at(j))->m_interval << ");\n";
+				m_file << "\t\twaterComp:SetRadius(" << ((AbilityComponents::Water*)m_entity->GetComponents()->at(j))->m_radius << ");\n";
+			}
+			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::SOUND)
+			{
+				if(((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_loop)
+					m_file << "\t\SoundSystem.PlayOnce(" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_soundName << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_volume << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMin << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMax << ", startPos);\n";
+				else
+				{
+					m_file << "\t\tlocal soundComp = Soundable.New(self);\n";
+					m_file << "\t\tlocal soundComp:SetSound(\"" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_soundName << "\", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));\n";
+					m_file << "\t\tlocal soundComp:SetVolume(" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_volume << ");\n";
+					m_file << "\t\tlocal soundComp:SetRange(" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMin << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMax << ");\n";
+					m_file << "\t\tlocal soundComp:Play();\n";
+				}
+			}
 		}
 			m_file << "\tend\n";
 
@@ -428,7 +450,7 @@ namespace AbilityEditorNameSpace
 						m_file << "\t\t\tif not health:IsDead() then\n";
 							m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
 							m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, AbilityBall.damage, receiverId);\n";
+							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, " << m_name << ".damageNew, receiverId);\n";
 						m_file << "\t\t\tend\n";
 					if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
 						m_file << "\t\tend\n";
@@ -445,7 +467,7 @@ namespace AbilityEditorNameSpace
 
 						m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
 						m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".knockback);\n";
+						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".knockbackNew);\n";
 
 					if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
 						m_file << "\t\tend\n";

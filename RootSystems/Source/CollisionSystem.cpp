@@ -43,7 +43,8 @@ namespace RootForce
 
 	Collision::~Collision()
 	{
-		g_engineContext.m_physics->RemoveObject(*m_handle);
+		if(m_handle != NULL)
+			g_engineContext.m_physics->RemoveObject(*m_handle);
 	}
 
 }

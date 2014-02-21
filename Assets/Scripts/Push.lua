@@ -1,5 +1,5 @@
 Push = {};
-Push.knockback = 10;
+Push.knockback = 20;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 0;
@@ -27,7 +27,7 @@ function Push.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
 	local timerComp = Timer.New(self, Push.duration);
-	local followComp = Follower.New(self);
+	Follower.New(self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
@@ -49,7 +49,7 @@ function Push.OnCreate (userId, actionId)
 end
 
 function Push.OnCollide (self, entity)
-	if entity:DoesExist()
+	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
 		local hitPhys = entity:GetPhysics();
 		local type = hitPhys:GetType(hitCol);

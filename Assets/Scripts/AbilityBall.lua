@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 0;
+AbilityBall.duration = 7;
 AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone (time, userId, actionId)
@@ -51,7 +51,7 @@ function AbilityBall.OnCreate (userId, actionId)
 end
 
 function AbilityBall.OnCollide (self, entity)
-	if entity:DoesExist()
+	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
 		local hitPhys = entity:GetPhysics();
 		local type = hitPhys:GetType(hitCol);
