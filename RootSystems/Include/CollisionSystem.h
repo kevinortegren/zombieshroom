@@ -13,6 +13,7 @@ namespace RootForce
 {
 	struct Collision : public ECS::Component<Collision>
 	{
+		Collision();
 		~Collision();
 		
 		int* m_handle;

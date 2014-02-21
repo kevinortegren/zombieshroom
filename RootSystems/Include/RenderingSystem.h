@@ -66,5 +66,6 @@ namespace RootForce
 	private:
 		Render::RendererInterface* m_renderer;
 		Logging::LoggingInterface* m_logger;
+		int a;
 	};
 }

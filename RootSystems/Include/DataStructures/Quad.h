@@ -12,7 +12,7 @@
 #include <vector>
 
 //#define QUADTREE_VERBOSE
-#define QUADTREE_DRAWLINES
+//#define QUADTREE_DRAWLINES
 
 namespace RootForce
 {
@@ -58,7 +58,7 @@ namespace RootForce
 	public:
 		
 		// Create a quad tree bound by an entity group.
-		void Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName);
+		void Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName);
 
 		// Divide the polygons and create the tree.
 		void BeginDivide(unsigned int p_polygonsPerNode, bool p_splitPolygons, bool p_removeOrigionalEntities);
@@ -103,6 +103,8 @@ namespace RootForce
 
 		// Name of entity group contained.
 		std::string m_groupName;
+
+		std::string m_newGroupName;
 
 		// Polygon bound by the tree.
 		std::vector<Polygon> m_boundsPolygons;

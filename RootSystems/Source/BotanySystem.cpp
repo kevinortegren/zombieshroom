@@ -34,7 +34,7 @@ namespace RootForce
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
-		m_quadTree.Initialize(m_engineContext, m_world, "Painted");
+		m_quadTree.Initialize(m_engineContext, m_world, "Painted", "Painted_Split");
 		Divide();
 
 		// Allocate mesh memory.

@@ -19,11 +19,9 @@ namespace RootForce
 		CreateSkyBox();
 		CreatePlayerCamera();
 
-		// Add collisions shapes for the group "Static".
-		AddStaticEntitiesToPhysics();
-
 		// Put the static entities into a spatial quad tree.
-		m_quadTree.Initialize(m_engineContext, m_world, "Static");		
+		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
+		AddStaticEntitiesToPhysics();
 	}
 #endif
 

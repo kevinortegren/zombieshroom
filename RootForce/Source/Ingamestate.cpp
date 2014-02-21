@@ -175,11 +175,9 @@ namespace RootForce
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
 
-#ifndef _DEBUG
-
 		// Subdivide world.
 		m_sharedSystems.m_worldSystem->SubdivideTree();
-#endif
+
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
 
@@ -322,9 +320,7 @@ namespace RootForce
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			m_displayGuiHUD = m_displayGuiHUD ? false : true;
-			}
-
-
+		}
 		
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);

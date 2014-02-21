@@ -7,7 +7,7 @@
 
 namespace RootForce
 {
-	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName)
+	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
 	{
 		m_idCounter = 0;
 		m_groupName = p_groupName;
@@ -16,6 +16,7 @@ namespace RootForce
 		m_boundsPolygons.clear();
 		m_context = p_context;
 		m_world = p_world;
+		m_newGroupName = p_newName;
 
 		// Get working set.
 		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup(p_groupName);
@@ -148,13 +149,13 @@ namespace RootForce
 		m_polygonsPerNode = p_polygonsPerNode;
 		m_splitPolygons = p_splitPolygons;
 
+
 		if(p_removeOrigionalEntities)
 		{
 			auto a = m_world->GetGroupManager()->GetEntitiesInGroup(m_groupName);
 			for(auto b = a.first; b != a.second; ++b)
 			{
-				m_world->GetEntityManager()->RemoveAllComponents(b->second);
-				m_world->GetEntityManager()->RemoveEntity(b->second);
+				m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>((*b).second);
 			}
 		}
 
@@ -551,7 +552,7 @@ namespace RootForce
 		m_entities.push_back(entity);
 
 		std::stringstream modelNameStringStream;
-		modelNameStringStream << m_groupName << p_entityId;
+		modelNameStringStream << m_newGroupName << p_entityId;
 
 		// Create renderable.
 		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
@@ -574,7 +575,7 @@ namespace RootForce
 			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
 		}
 	
-		m_world->GetGroupManager()->RegisterEntity(m_groupName + "_Split", entity);
+		m_world->GetGroupManager()->RegisterEntity(m_newGroupName, entity);
 
 		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&p_indices[0], p_indices.size());		
 	}
@@ -591,7 +592,7 @@ namespace RootForce
 
 		// Model name.
 		std::stringstream modelNameStringStream;
-		modelNameStringStream << m_groupName << p_entityId;
+		modelNameStringStream << m_newGroupName << p_entityId;
 
 		// Create renderable.
 		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
@@ -603,10 +604,12 @@ namespace RootForce
 		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&p_vertices[0], p_vertices.size());
 
 		std::stringstream materialStringStream;
-		materialStringStream << m_groupName << p_materialIndex;
-
+		materialStringStream << m_newGroupName << p_materialIndex;
+		
 		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialStringStream.str());
 		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
+		renderable->m_material->m_tileFactor = m_materials[p_materialIndex]->m_tileFactor;
+
 
 		// Add tile factor for blended meshes.
 		if(renderable->m_material->m_tileFactor != 0)
@@ -619,7 +622,7 @@ namespace RootForce
 			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
 		}
 	
-		m_world->GetGroupManager()->RegisterEntity(m_groupName + "_Split", entity);
+		m_world->GetGroupManager()->RegisterEntity(m_newGroupName, entity);
 
 		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&p_indices[0], p_indices.size());		
 	}
