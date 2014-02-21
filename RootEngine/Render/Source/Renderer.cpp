@@ -121,6 +121,10 @@ namespace Render
 				float v = (float)atof(value.c_str());
 				m_lighting.SetAmbientLight(glm::vec4(v, v, v, 1.0f));
 			}
+			else if(param == "ssao")
+			{
+				m_lighting.ShowSSAO((atoi(value.c_str()) == 1));
+			}
 		}
 		else if(module == "layer" || module == "la")
 		{

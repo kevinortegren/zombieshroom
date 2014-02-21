@@ -27,7 +27,7 @@ namespace RootForce
 
 	void WorldSystem::SubdivideTree()
 	{
-		m_quadTree.BeginDivide(2500, true, true);
+		m_quadTree.BeginDivide(25000, true, true);
 	}
 
 	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)

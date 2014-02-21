@@ -7,7 +7,6 @@
 #include <RootSystems/Include/CameraSystem.h>
 #include <random>
 
-
 #define BOTANY_MAX_CELLS 1000
 #define BOTANY_VERTEX_SIZE 28
 #define BOTANY_MAX_POINTS_PER_CELL 50000
@@ -45,6 +44,7 @@ namespace RootForce
 		void Initialize(BotanyTextures& m_textures);
 		void Process();
 		void Divide();
+		void ParseCommands(std::stringstream* p_ss);
 
 	private:
 		void Construct(QuadNode* p_node);

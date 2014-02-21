@@ -45,6 +45,7 @@ namespace Render
 		void ShowDirectional(bool p_value);
 		void ShowPointLights(bool p_value);
 		void ShowBackgroundBlend(bool p_value);
+		void ShowSSAO(bool p_value);
 
 		void BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode);
 
@@ -101,5 +102,6 @@ namespace Render
 		bool m_showDirectional;
 		bool m_showPointlights;
 		bool m_showBackgroundBlend;
+		bool m_showSSAO;
 	};
 }

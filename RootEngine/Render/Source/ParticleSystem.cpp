@@ -106,7 +106,7 @@ namespace Render
 
 		CreateRandom1DTexture();
 
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::RANDOM);
+		glActiveTexture(GL_TEXTURE0 + Render::GLRenderer::s_textureSlots[Render::TextureSemantic::RANDOM]);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);

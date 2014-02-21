@@ -478,6 +478,11 @@ namespace RootForce
 	{
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 2, "R", "RENDER"))
+		{
+			g_engineContext.m_renderer->ParseCommands(&event.Data);
+		}
+
 		if(RootServer::MatchAny(event.EventType, 2, "SORTED", "SO"))
 		{
 			g_engineContext.m_profiler->ToggleSorted();
@@ -503,6 +508,11 @@ namespace RootForce
 		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
 		{
 			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "B", "BOTANY"))
+		{
+			m_botanySystem->ParseCommands(&event.Data);
 		}
 
 		if(RootServer::MatchAny(event.EventType, 2, "RS", "RELOADSCRIPTS"))

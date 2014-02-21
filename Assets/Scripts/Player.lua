@@ -24,8 +24,6 @@ function Player.OnCreate(userId, actionId)
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
-	
-
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 

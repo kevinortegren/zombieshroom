@@ -53,6 +53,12 @@ namespace Render
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		SetupSSAO();
+
+		m_showAmbient = true;
+		m_showDirectional = true;
+		m_showPointlights = true;
+		m_showSSAO = true;
+		m_showBackgroundBlend = true;
 	}
 
 	void LightingDevice::SetAmbientLight(const glm::vec4& p_color)
@@ -85,34 +91,43 @@ namespace Render
 
 	void LightingDevice::SSAO()
 	{
-		m_fullscreenQuad->Bind();
-		//SSAO
-		BeginSSAO();
-		glDisable(GL_STENCIL_TEST);
-		auto ssao = m_ssaoTech->GetPrograms()[0];
-		m_noiseSSAOTex->Bind(7);
-		m_ssaoTech->Apply();
-		ssao->Apply();
-		m_fullscreenQuad->Draw();
-		glEnable(GL_STENCIL_TEST);
+		if(m_showSSAO)
+		{
+			m_fullscreenQuad->Bind();
+			//SSAO
+			BeginSSAO();
+			glDisable(GL_STENCIL_TEST);
+			auto ssao = m_ssaoTech->GetPrograms()[0];
+			m_noiseSSAOTex->Bind(7);
+			m_ssaoTech->Apply();
+			ssao->Apply();
+			m_fullscreenQuad->Draw();
+			glEnable(GL_STENCIL_TEST);
+		}
 	}
 
 	void LightingDevice::Ambient()
 	{
-		m_fullscreenQuad->Bind();
-		m_ambient->Apply();
-		m_ssaoTex->Bind(7);
-		m_fullscreenQuad->Draw();
-		m_ssaoTex->Unbind(7);
-		m_fullscreenQuad->Unbind();
+		if(m_showAmbient)
+		{
+			m_fullscreenQuad->Bind();
+			m_ambient->Apply();
+			m_ssaoTex->Bind(7);
+			m_fullscreenQuad->Draw();
+			m_ssaoTex->Unbind(7);
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::Directional()
 	{
-		m_fullscreenQuad->Bind();
-		m_directional->Apply();
-		m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
-		m_fullscreenQuad->Unbind();
+		if(m_showDirectional)
+		{
+			m_fullscreenQuad->Bind();
+			m_directional->Apply();
+			m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::PointLightStencil()
@@ -159,8 +174,11 @@ namespace Render
 
 	void LightingDevice::Point()
 	{
-		PointLightStencil();
-		PointLightRender();
+		if(m_showPointlights)
+		{
+			PointLightStencil();
+			PointLightRender();
+		}
 	}
 
 	void LightingDevice::PointLightFSQ()
@@ -170,23 +188,26 @@ namespace Render
 
 	void LightingDevice::BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode)
 	{
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-		m_fullscreenQuad->Bind();
-		
-		switch(p_mode)
+		if(m_showBackgroundBlend)
 		{
-		case BackgroundBlend::ADDATIVE:
-			m_backgroundAddative->Apply();
-			break;
-		case BackgroundBlend::ALPHABLEND:
-		default:
-			m_backgroundAlphaBlend->Apply();
-			break;
-		}
+			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 
-		m_fullscreenQuad->Draw();
-		m_fullscreenQuad->Unbind();
+			m_fullscreenQuad->Bind();
+		
+			switch(p_mode)
+			{
+			case BackgroundBlend::ADDATIVE:
+				m_backgroundAddative->Apply();
+				break;
+			case BackgroundBlend::ALPHABLEND:
+			default:
+				m_backgroundAlphaBlend->Apply();
+				break;
+			}
+
+			m_fullscreenQuad->Draw();
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::SetupSSAO()
@@ -227,6 +248,11 @@ namespace Render
 
 		m_noiseSSAOTex->BufferData(&noise[0]);
 	};
+
+	void LightingDevice::ShowSSAO(bool p_value)
+	{
+		m_showSSAO = p_value;
+	}
 
 	void LightingDevice::BeginSSAO()
 	{

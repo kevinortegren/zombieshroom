@@ -18,23 +18,14 @@ namespace RootForce
 
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
-		
-		// Diffuse texture for geometric grass blades.
-		// R
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_diffuse, Render::TextureType::TEXTURE_2D);
-		
-		// Transluency texture for geometric grass blades.
-		// R
 		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_translucency, Render::TextureType::TEXTURE_2D);
-
-		// Imposter diffuse.
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_billboard, Render::TextureType::TEXTURE_2D);
-
-		// Terrain grass texture.
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
 		m_quadTree.Initialize(m_engineContext, m_world, "Painted", "Painted_Split");
+
 		Divide();
 
 		// Allocate mesh memory.
@@ -181,4 +172,23 @@ namespace RootForce
 			}
 		}
 	}
+
+	void BotanySystem::ParseCommands( std::stringstream* p_ss )
+	{
+		std::string module;
+		std::string param;
+		std::string value;
+
+		std::getline(*p_ss, module, ' ');
+		std::getline(*p_ss, module, ' ');
+
+		if(module == "glow" || module == "g")
+		{	
+			std::getline(*p_ss, param, ' ');
+			std::getline(*p_ss, value, ' ');
+
+
+		}
+	}
+
 }
