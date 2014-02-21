@@ -348,6 +348,36 @@ namespace AbilityEditorNameSpace
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
+		case AbilityComponents::ComponentType::WATER:
+			{
+				AbilityComponents::Water* tempcomp = new AbilityComponents::Water();
+				if(p_node.FindValue("WaterPower"))
+					p_node["WaterPower"] >> tempcomp->m_power;
+				if(p_node.FindValue("WaterInterval"))
+					p_node["WaterInterval"] >> tempcomp->m_interval;
+				if(p_node.FindValue("WaterRadius"))
+					p_node["WaterRadius"] >> tempcomp->m_radius;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::SOUND:
+			{
+				AbilityComponents::Sound* tempcomp = new AbilityComponents::Sound();
+				if(p_node.FindValue("SoundName"))
+					p_node["SoundName"] >> tempcomp->m_soundName;
+				if(p_node.FindValue("SoundVolume"))
+					p_node["SoundVolume"] >> tempcomp->m_volume;
+				if(p_node.FindValue("SoundRangeMin"))
+					p_node["SoundRangeMin"] >> tempcomp->m_rangeMin;
+				if(p_node.FindValue("SoundRangeMax"))
+					p_node["SoundRangeMax"] >> tempcomp->m_rangeMax;
+				if(p_node.FindValue("SoundLoop"))
+					p_node["SoundLoop"] >> tempcomp->m_loop;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
 		default:
 			break;
 		}

@@ -1,5 +1,5 @@
 #include "UnitTesting.h"
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 
@@ -10,8 +10,8 @@ TEST(AbilitySpawn, ProcessEmptyEntity)
 	g_networkEntityMap.clear();
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
-	RootForce::AbilityRespawnSystem* system = new RootForce::AbilityRespawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
-	world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(system);
+	RootForce::AbilitySpawnSystem* system = new RootForce::AbilitySpawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+	world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(system);
 	// Will test that an empty entity (an entity missing the necessary components does not crash the system
 	system->Process();
 	world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -29,8 +29,8 @@ TEST(AbilitySpawn, LoadAndAttatch)
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", testity);
-	RootForce::AbilityRespawnSystem* system = new RootForce::AbilityRespawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
-	world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(system);
+	RootForce::AbilitySpawnSystem* system = new RootForce::AbilitySpawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+	world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(system);
 	g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 	g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 	//Test so that loading an ability pack works
@@ -41,9 +41,9 @@ TEST(AbilitySpawn, LoadAndAttatch)
 	}
 
 	{
-		system->AttatchComponentToPoints();
+		system->AttachComponentToPoints();
 
-		RootForce::AbilityRespawnComponent* component = world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(testity);
+		RootForce::AbilitySpawnComponent* component = world->GetEntityManager()->GetComponent<RootForce::AbilitySpawnComponent>(testity);
 		EXPECT_NE(component, nullptr); //Make sure that the component was attached correctly by checking so that it is not null
 	}
 
@@ -62,22 +62,22 @@ TEST(AbilitySpawn, ProcessEntity)
 
 	ECS::Entity* testity = world->GetEntityManager()->CreateEntity();
 	world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", testity);
-	RootForce::AbilityRespawnSystem* system = new RootForce::AbilityRespawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
-	world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(system);
+	RootForce::AbilitySpawnSystem* system = new RootForce::AbilitySpawnSystem(world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+	world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(system);
 
 	g_engineContext.m_resourceManager->LoadScript("AbilityBall");
 	g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 
 	system->LoadAbilities("Standard"); //Load existing pack
-	system->AttatchComponentToPoints();
+	system->AttachComponentToPoints();
 
 	RootForce::Renderable* rendcomp;
-	RootForce::AbilityRespawnComponent* spawncomp;
+	RootForce::AbilitySpawnComponent* spawncomp;
 
 	{
 		system->Process();
 		rendcomp = world->GetEntityManager()->GetComponent<RootForce::Renderable>(testity);
-		spawncomp = world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(testity);
+		spawncomp = world->GetEntityManager()->GetComponent<RootForce::AbilitySpawnComponent>(testity);
 		EXPECT_NE(rendcomp, nullptr); //Make sure that a new render component was created in the process since the point had no active ability
 
 		EXPECT_NE(spawncomp->CurrentAbility.Name, ""); //Check that we got an ability to spawn, if the name is empty there is no ability

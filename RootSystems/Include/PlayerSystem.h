@@ -48,7 +48,6 @@ namespace RootForce
 
 		float JumpTime;
 		glm::vec3 JumpDir;
-		glm::vec3 JumpRight;
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
@@ -61,7 +60,6 @@ namespace RootForce
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
 			, JumpDir(glm::vec3(0))
-			, JumpRight(glm::vec3(0))
 			, AbilityTime(0.0f)
 			, SelectedAbility(1)
 			, WantRespawn(false)

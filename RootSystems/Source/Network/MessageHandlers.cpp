@@ -7,7 +7,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Script/Include/RootScript.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -661,7 +661,7 @@ namespace RootForce
 					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
-						AbilityRespawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilityRespawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
 						assert(spawnPoint);
 						spawnPoint->Claimed = m.User;
 
@@ -817,7 +817,7 @@ namespace RootForce
 							// Load the map
 							m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
 							m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String()); 
-							m_abilitySpawnSystem->AttatchComponentToPoints();
+							m_abilitySpawnSystem->AttachComponentToPoints();
 						}
 						// Send load map status
 						NetworkMessage::LoadMapStatus n;
@@ -975,7 +975,7 @@ namespace RootForce
 							// Load the map
 							m_worldSystem->LoadWorld(serverInfo->Information.MapName.C_String());
 							m_abilitySpawnSystem->LoadAbilities(serverInfo->Information.AbilityPack.C_String());
-							m_abilitySpawnSystem->AttatchComponentToPoints();
+							m_abilitySpawnSystem->AttachComponentToPoints();
 						}
 
 						// Send load map status
@@ -1024,7 +1024,7 @@ namespace RootForce
 					// Entity needs to exist.
 					if (point)
 					{
-						RootForce::AbilityRespawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(point);
+						RootForce::AbilitySpawnComponent* component = m_world->GetEntityManager()->GetComponent<RootForce::AbilitySpawnComponent>(point);
 						assert(component);
 						component->AbilityReceived = m.AbilityName;
 					}

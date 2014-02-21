@@ -12,46 +12,52 @@
 
 namespace RootForce
 {
-	struct AbilityRespawnComponent : public ECS::Component<AbilityRespawnComponent>
+	struct AbilitySpawnComponent : public ECS::Component<AbilitySpawnComponent>
 	{
 		float Timer;
 		AbilityInfo CurrentAbility;
 		Network::UserID_t Claimed;
 		std::string AbilityReceived;
-		AbilityRespawnComponent()
+		AbilitySpawnComponent()
 			: Timer(0), Claimed(Network::ReservedUserID::NONE), AbilityReceived("")
 		{}
 	};
 
-	class AbilityRespawnSystem : public ECS::EntitySystem
+	class AbilitySpawnSystem : public ECS::EntitySystem
 	{
 	public:
-		AbilityRespawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext, std::string p_workingDir)
+		AbilitySpawnSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext, std::string p_workingDir)
 			: ECS::EntitySystem(p_world)
 			, m_engineContext(p_engineContext), m_workingDir(p_workingDir), m_serverPeer(nullptr), m_clientPeer(nullptr)
 		{ 
-			SetUsage<RootForce::AbilityRespawnComponent>();
+			SetUsage<RootForce::AbilitySpawnComponent>();
 		}
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void LoadAbilities(std::string p_abilityPack);
-		void AttatchComponentToPoints();
+
+		//Attach the correct components at the start of a game
+		void AttachComponentToPoints(); 
 		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
 	private:
+		//Removes all the components used to interact with the spawnpoint ingame
+		void HideSpawnpoint(ECS::Entity* p_entity); 
+		//Creates those components again
+		void RevealSpawnpoint(ECS::Entity* p_entity); 
 
-		void HideSpawnpoint(ECS::Entity* p_entity);
-		void RevealSpawnpoint(ECS::Entity* p_entity);
+		//Lets the server choose the new ability to be used by the spawnpoint
+		void NewServerAbility(ECS::Entity* p_entity); 
+		//The client sets the new ability recieved from the server
+		void SetClientCurrentAbility(ECS::Entity* p_entity); 
 
-		void NewCurrentAbility(ECS::Entity* p_entity);
-		void SetClientCurrentAbility(ECS::Entity* p_entity);
 		void CreateRenderComponent(ECS::Entity* p_entity);
 		void CreateCollisionComponents(ECS::Entity* p_entity);
 		void CreateParticleEmitter(ECS::Entity* p_entity);
 
 		RootEngine::GameSharedContext* m_engineContext;
 
-		ECS::ComponentMapper<RootForce::AbilityRespawnComponent> m_respawn;
+		ECS::ComponentMapper<RootForce::AbilitySpawnComponent> m_respawn;
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::Script> m_script;

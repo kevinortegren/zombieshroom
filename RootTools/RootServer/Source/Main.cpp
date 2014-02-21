@@ -109,7 +109,7 @@ void Main::Start()
 	m_world.GetTagManager()->RegisterEntity("ServerInformation", serverInfoEntity);
 
 	m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(&m_world, &g_engineContext));
-	m_abilityRespawnSystem = new RootForce::AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+	m_abilityRespawnSystem = new RootForce::AbilitySpawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
 
 	// Initialize the server
 	m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, &m_world, conf));

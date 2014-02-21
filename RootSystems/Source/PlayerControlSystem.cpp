@@ -121,10 +121,10 @@ namespace RootForce
 
 		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
 		float power = 0;
+		action->MovePower = 0;
+		action->StrafePower = 0;
 		if(onGround)
 		{
-			action->MovePower = 0;
-			action->StrafePower = 0;
 			power = 1;
 		}
 		else

@@ -909,7 +909,12 @@ namespace Physics
 		}
 		else //Todo: return externallycontrolled orientation if needed.
 		{
-			return glm::quat(0,0,0,1);
+			btQuaternion temp = m_externallyControlled.at(index)->GetOrientation();
+			
+			retVal[0] = temp.w();
+			retVal[1] = temp.x();
+			retVal[2] = temp.y();
+			retVal[3] = temp.z();
 		}
 		return retVal;
 	}
@@ -959,7 +964,7 @@ namespace Physics
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			//No, player doesn't have a constant velocity, and i'm gonna go ahead and guess that ability controllers won't either
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Player don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
@@ -971,7 +976,7 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL && m_userPointer.at(p_objectHandle)->m_shape != PhysicsShape::SHAPE_NONE)
 		{
-			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
+			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Externally controlled objects don't have a velocity in physics engine");
 			return glm::vec3(0,0,0);
 		}
 		//return glm::vec3(0,0,0);
@@ -1060,9 +1065,11 @@ namespace Physics
 		{
 			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetOrientation(p_objectOrientation);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation);
+			glm::quat rot = glm::angleAxis(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+			
+			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation*rot);
 		}
 		else
 		{
@@ -1182,9 +1189,13 @@ namespace Physics
 		{
 			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetPos(p_position);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY && !m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
+		{
+			m_externallyControlled.at(index)->SetPosition(p_position);
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
@@ -1307,11 +1318,14 @@ namespace Physics
 		rayResult.from = p_startPos;
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
-		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(end[0], end[1], end[2]), rayResult);
+		if(!rayResult.hasHit())
+			return;
 		glm::vec3 castVector = end - p_startPos;
 		glm::vec3 relativePosition = castVector * rayResult.m_closestHitFraction;
 		RootForce::CollisionInfo info;
 		info.m_collisionPosition = p_startPos + relativePosition;
+		
 		rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
 	}
 

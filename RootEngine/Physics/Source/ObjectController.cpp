@@ -86,3 +86,19 @@ void ObjectController::SetOrientation( glm::quat p_orientation )
 	m_ghostObject->getWorldTransform().setRotation(btquat);
 }
 
+btQuaternion ObjectController::GetOrientation()
+{
+	return m_ghostObject->getWorldTransform().getRotation();
+}
+
+
+void ObjectController::SetPosition( glm::vec3 p_position )
+{
+	m_ghostObject->getWorldTransform().setOrigin(btVector3(p_position.x, p_position.y, p_position.z));
+}
+
+glm::vec3 ObjectController::GetPos()
+{
+	btVector3 retVal = m_ghostObject->getWorldTransform().getOrigin();
+	return glm::vec3(retVal.x(), retVal.y(), retVal.z());
+}

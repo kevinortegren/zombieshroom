@@ -152,7 +152,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			bool exists = false;
-			if(*e != nullptr)
+			if(*e != nullptr && (*e)->GetId() != -1)
 				exists = true;
 			lua_pushboolean(p_luaState, exists);
 			return 1;
@@ -277,9 +277,9 @@ namespace RootForce
 		static int EntityGetAbilitySpawn(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilityRespawnComponent *));
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::AbilitySpawnComponent *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilityRespawnComponent>(*e);
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::AbilitySpawnComponent>(*e);
 			luaL_setmetatable(p_luaState, "AbilitySpawn");
 			return 1;
 		}
@@ -1478,7 +1478,7 @@ namespace RootForce
 		static int AbilitySpawnGetCurrentName(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			lua_pushstring(p_luaState, (*s)->CurrentAbility.Name.c_str());
 			return 1;
 		}
@@ -1486,7 +1486,7 @@ namespace RootForce
 		static int AbilitySpawnGetCurrentCharges(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			lua_pushnumber(p_luaState, (*s)->CurrentAbility.Charges);
 			return 1;
 		}
@@ -1494,7 +1494,7 @@ namespace RootForce
 		static int AbilitySpawnSetClaimed(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::AbilityRespawnComponent **s = (RootForce::AbilityRespawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
+			RootForce::AbilitySpawnComponent **s = (RootForce::AbilitySpawnComponent**)luaL_checkudata(p_luaState, 1, "AbilitySpawn");
 			(*s)->Claimed = (uint16_t)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
@@ -2012,6 +2012,30 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "ParticleEmitter");
 			return 1;
 		}
+
+
+		//////////////////////////////////////////////////////////////////////////
+		//Follower
+		//////////////////////////////////////////////////////////////////////////
+		static int FollowerCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			RootForce::ThirdPersonBehavior *s = g_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(*e);
+			s->m_checkWithRay = false;
+			s->m_rotateWithTarget = true;
+			s->m_targetTag = "AimingDevice";
+			s->m_distance = -3.0f;
+
+			RootForce::LookAtBehavior *c = g_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(*e);
+			
+			c->m_targetTag = "AimingDevice";
+
+			//luaL_setmetatable(p_luaState, "Follower");
+			return 0;
+		}
+		
 
 		//////////////////////////////////////////////////////////////////////////
 		//WaterCollider
@@ -2541,6 +2565,15 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg followercomponent_f [] = {
+			{"New", FollowerCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg followercomponent_m [] = {
+			{NULL, NULL}
+		};
+
 		static const struct luaL_Reg watercollider_f [] = {
 			{"New", WaterColliderCreate},
 			{NULL, NULL}
@@ -2638,6 +2671,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f, RootForce::LuaAPI::playercontrol_m, "PlayerControl");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f, RootForce::LuaAPI::followercomponent_m, "Follower");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::timercomponent_f, RootForce::LuaAPI::timercomponent_m, "Timer");

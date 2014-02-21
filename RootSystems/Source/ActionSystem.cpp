@@ -64,27 +64,22 @@ namespace RootSystems
 			}
 
 			// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
-			glm::vec3 facing;
-			glm::vec3 right;
+			glm::vec3 facing = transform->m_orientation.GetFront();
+			glm::vec3 right = transform->m_orientation.GetRight();
 			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 			{
-				facing = transform->m_orientation.GetFront();
-				right = transform->m_orientation.GetRight();
-				action->JumpDir = transform->m_orientation.GetFront();
-				action->JumpRight = transform->m_orientation.GetRight();
+				action->JumpDir = facing * action->MovePower + right * action->StrafePower;
 			}
 			else
 			{
-				facing = action->JumpDir;
-				right = action->JumpRight;
+				action->JumpDir += facing * action->MovePower + right * action->StrafePower;
 			}
-			
-
-			// Calculate movement vector based on input values, the player's speed
-			glm::vec3 movement = facing * action->MovePower + right * action->StrafePower;
-			if(movement != glm::vec3(0))
+				
+			if(action->JumpDir != glm::vec3(0))
 			{
-				movement = glm::normalize(movement) * playphys->MovementSpeed;
+				if(glm::length2(action->JumpDir) > 1)
+					action->JumpDir = glm::normalize(action->JumpDir);
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 			}
 
@@ -106,7 +101,7 @@ namespace RootSystems
 
 				if (m_serverPeer != nullptr && player->AbilityScripts[i].OnCooldown && player->AbilityScripts[i].Cooldown <= 0.0f)
 				{
-					// Cooldown has finished on the server.
+					// Cooldown has finished on the server. 
 					player->AbilityScripts[i].OnCooldown = false;
 					player->AbilityScripts[i].Cooldown = 0.0f;
 

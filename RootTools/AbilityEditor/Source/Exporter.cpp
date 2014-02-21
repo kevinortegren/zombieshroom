@@ -20,18 +20,6 @@ namespace AbilityEditorNameSpace
 	void Exporter::Export(const std::string& p_filepath, Entity* p_entity, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
 		
-		/*NEW FORMAT WOOOO!!
-		-Name
-		-Components
-			--Values
-		-OnClass
-			--Condition
-				---Entities
-		-OnClass
-			--Condition
-				---Entities
-		...
-		*/
 
 		YAML::Emitter out;
 		out << YAML::BeginSeq;
@@ -257,6 +245,24 @@ namespace AbilityEditorNameSpace
 					AbilityComponents::ChargeVariables* chargeVar = static_cast<AbilityComponents::ChargeVariables*>(p_component);
 					p_emitter << YAML::Key << "ChargeRequired" << YAML::Value << chargeVar->m_chargeReq;
 					p_emitter << YAML::Key << "ChargeFactor" << YAML::Value << chargeVar->m_chargeFactor;
+				}
+				break;
+			case AbilityComponents::ComponentType::WATER:
+				{
+					AbilityComponents::Water* water = static_cast<AbilityComponents::Water*>(p_component);
+					p_emitter << YAML::Key << "WaterPower" << YAML::Value << water->m_power;
+					p_emitter << YAML::Key << "WaterInterval" << YAML::Value << water->m_interval;
+					p_emitter << YAML::Key << "WaterRadius" << YAML::Value << water->m_radius;
+				}
+				break;
+			case AbilityComponents::ComponentType::SOUND:
+				{
+					AbilityComponents::Sound* sound = static_cast<AbilityComponents::Sound*>(p_component);
+					p_emitter << YAML::Key << "SoundName" << YAML::Value << sound->m_soundName;
+					p_emitter << YAML::Key << "SoundVolume" << YAML::Value << sound->m_volume;
+					p_emitter << YAML::Key << "SoundRangeMin" << YAML::Value << sound->m_rangeMin;
+					p_emitter << YAML::Key << "SoundRangeMax" << YAML::Value << sound->m_rangeMax;
+					p_emitter << YAML::Key << "SoundLoop" << YAML::Value << sound->m_loop;
 				}
 				break;
 			default:
