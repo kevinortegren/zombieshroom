@@ -119,8 +119,6 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 
-		glm::vec3 movement(0.0f);
-
 		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
 		float power = 0;
 		if(onGround)
@@ -131,7 +129,7 @@ namespace RootForce
 		}
 		else
 		{
-			power = 0.1f;
+			power = 0.03f;
 		}
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
@@ -530,7 +528,7 @@ namespace RootForce
 		m.Serialize(true, &bs);
 
 		if (m_clientPeer != nullptr)
-			m_clientPeer->Send(&bs, HIGH_PRIORITY, UNRELIABLE, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE_SEQUENCED, 0, m_clientPeer->GetSystemAddressFromIndex(0), false);
 
 
 

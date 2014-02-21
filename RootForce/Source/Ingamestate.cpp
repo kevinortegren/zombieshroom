@@ -464,6 +464,11 @@ namespace RootForce
 	{
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 2, "LOGGER", "L"))
+		{
+			g_engineContext.m_logger->ParseCommand(&event.Data);
+		}
+
 		if(RootServer::MatchAny(event.EventType, 2, "SORTED", "SO"))
 		{
 			g_engineContext.m_profiler->ToggleSorted();

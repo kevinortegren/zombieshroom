@@ -64,8 +64,21 @@ namespace RootSystems
 			}
 
 			// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
-			glm::vec3 facing = transform->m_orientation.GetFront();
-			glm::vec3 right = transform->m_orientation.GetRight();
+			glm::vec3 facing;
+			glm::vec3 right;
+			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
+			{
+				facing = transform->m_orientation.GetFront();
+				right = transform->m_orientation.GetRight();
+				action->JumpDir = transform->m_orientation.GetFront();
+				action->JumpRight = transform->m_orientation.GetRight();
+			}
+			else
+			{
+				facing = action->JumpDir;
+				right = action->JumpRight;
+			}
+			
 
 			// Calculate movement vector based on input values, the player's speed
 			glm::vec3 movement = facing * action->MovePower + right * action->StrafePower;
@@ -161,6 +174,7 @@ namespace RootSystems
 					{
 						// Apply jump force and go into jump animation
 						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+
 						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 						{
 							animation->m_animClip = RootForce::AnimationClip::JUMP_START;
