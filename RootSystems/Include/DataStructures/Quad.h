@@ -12,7 +12,7 @@
 #include <vector>
 
 //#define QUADTREE_VERBOSE
-//#define QUADTREE_DRAWLINES
+#define QUADTREE_DRAWLINES
 
 namespace RootForce
 {

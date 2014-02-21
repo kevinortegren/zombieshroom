@@ -136,7 +136,7 @@ namespace Render
 	}
 
 	GLRenderer::GLRenderer()
-		: m_allocator(10000 * sizeof(RenderJob))
+		: m_allocator(10000 * sizeof(RenderJob)), m_shadowJobAllocator(10000 * sizeof(ShadowJob))
 	{
 		
 	}
@@ -287,9 +287,10 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Load default forward rendering effect.
-		Render::EffectInterface* renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
+		//TODO: Load Shadow effect.
+		m_renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
 
-		m_fullscreenQuadTech = renderEffect->GetTechniques()[0];
+		m_fullscreenQuadTech = m_renderEffect->GetTechniques()[0];
 
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
@@ -416,6 +417,11 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void GLRenderer::AddShadowJob(Render::ShadowJob& p_shadowJob)
+	{
+		m_shadowJobs.push_back(new (m_shadowJobAllocator.Alloc(sizeof(ShadowJob))) ShadowJob(p_shadowJob));
+	}
+
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
 		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
@@ -535,6 +541,11 @@ namespace Render
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
 	}
 
+	static bool SortShadowJobs(ShadowJob* a, ShadowJob* b)
+	{
+		return a->m_technique < b->m_technique;
+	};
+
 	void GLRenderer::ShadowPass()
 	{
 		m_shadowDevice.Process();
@@ -552,44 +563,40 @@ namespace Render
 			glCullFace(GL_FRONT);
 			glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
-			for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+			std::sort(m_shadowJobs.begin(), m_shadowJobs.end(), SortShadowJobs);
+
+			ShadowTechnique::ShadowTechnique currentTechnique = ShadowTechnique::SHADOW_OPAQUE;
+		
+			m_renderEffect->GetTechniques()[ShadowTechnique::SHADOW_OPAQUE+1]->GetPrograms()[0]->Apply();
+
+			for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
 			{
-				glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-				glDrawBuffers(0, NULL);
-				m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
-
-				for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+				if((*itr)->m_technique != currentTechnique)
 				{
-					if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-						continue;
-
-					if((*job)->m_shadowMesh == nullptr)
-						continue;
-
-					(*job)->m_shadowMesh->Bind();
-
-					for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
-					{
-						if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
-						{
-							for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
-							{	
-								m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-							}
-
-							(*tech)->GetPrograms()[0]->Apply();
-
-							(*job)->m_shadowMesh->Draw();	
-						}
-					}
-
-					(*job)->m_shadowMesh->Unbind();
+					currentTechnique = (*itr)->m_technique;
+					m_renderEffect->GetTechniques()[currentTechnique+1]->GetPrograms()[0]->Apply();
 				}
+
+				(*itr)->m_mesh->Bind();
+
+				for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+				{
+					glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
+					glDrawBuffers(0, NULL);
+					m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
+
+					(*itr)->m_mesh->Draw();
+				}
+	
+				(*itr)->m_mesh->Unbind();
 			}
 
 			glCullFace(GL_BACK);
 			glViewport(0, 0, m_width, m_height);
 		}
+		
+		m_shadowJobAllocator.Clear();
+		m_shadowJobs.clear();	
 	}
 
 	void GLRenderer::GeometryPass(int p_layer)

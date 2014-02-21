@@ -39,7 +39,7 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
 
-#define RENDER_USE_COMPUTE
+//#define RENDER_USE_COMPUTE
 
 namespace Render
 {
@@ -60,9 +60,10 @@ namespace Render
 
 		// Shadows
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
-		
+		virtual void AddShadowJob(Render::ShadowJob& p_shadowJob) = 0;
+
 		// Rendering
-		virtual void AddRenderJob(RenderJob& p_job) = 0;
+		virtual void AddRenderJob(RenderJob& p_job) = 0;	
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
@@ -120,6 +121,7 @@ namespace Render
 
 		// Shadows
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
+		void AddShadowJob(Render::ShadowJob& p_shadowJob);
 
 		// Rendering
 		void Clear();
@@ -190,7 +192,10 @@ namespace Render
 
 		unsigned m_renderFlags;
 
+		std::vector<ShadowJob*> m_shadowJobs;
 		std::vector<RenderJob*> m_jobs;
+
+		LinearAllocator m_shadowJobAllocator;
 		LinearAllocator m_allocator;
 
 		int m_sjobCount[RENDER_SHADOW_CASCADES];
@@ -222,7 +227,8 @@ namespace Render
 		BufferInterface* m_cameraBuffer;
 		BufferInterface* m_uniforms;
 
-		std::shared_ptr<TechniqueInterface> m_earlyZTech;
+		Render::EffectInterface* m_renderEffect;
+
 		std::shared_ptr<TechniqueInterface> m_fullscreenQuadTech;
 
 		bool m_layers[2];

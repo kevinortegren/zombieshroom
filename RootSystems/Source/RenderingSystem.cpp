@@ -5,7 +5,7 @@ namespace RootForce
 {
 	Renderable::~Renderable()
 	{
-		std::cout << "Renderable destruct." << std::endl;
+		
 	}
 
 	void RenderingSystem::Init()
