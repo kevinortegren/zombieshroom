@@ -135,6 +135,7 @@ $(document).ready(function() {
               ability
               );
   } );
+	//SetDefaults('','','','','','','','',['ColorCube2.1'],[]);
 } );
 
 function AddServer(addr,name,mapfile,players,maxplayers,ping,password)
@@ -151,6 +152,9 @@ function SetDefaults(name,mapfile,abilitypack,port,password,maxplayers,matchleng
   maplist.forEach(function(map) {
     $("#lan-host-map").append("<option value='"+map+"'>"+map+"</option>");
   });
+	$("#lan-host-map > option").click(function(){
+		$("#lan-host-mapimage > div").css('background-image', "url('../Levels/"+$(this).val()+".gif'),url('../Levels/"+$(this).val()+".jpg'),url('../Levels/"+$(this).val()+".png')");
+	});
   abilitylist.forEach(function(ability) {
     $("#lan-host-abilitypack").append("<option value='"+ability+"'>"+ability+"</option>");
   });
