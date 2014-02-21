@@ -381,7 +381,7 @@ namespace AbilityEditorNameSpace
 			else if (m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::SOUND)
 			{
 				if(((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_loop)
-					m_file << "\t\SoundSystem.PlayOnce(" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_soundName << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_volume << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMin << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMax << ", startPos);\n";
+					m_file << "\t\tSoundSystem.PlayOnce(\"" << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_soundName << "\", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_volume << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMin << ", " << ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_rangeMax << ", startPos);\n";
 				else
 				{
 					m_file << "\t\tlocal soundComp = Soundable.New(self);\n";
