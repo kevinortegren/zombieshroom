@@ -40,8 +40,8 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(25);
-	playerPhysics:SetJumpForce(20);
-	playerPhysics:SetJumpBoostForce(0.1);
+	playerPhysics:SetJumpForce(15);
+	playerPhysics:SetJumpBoostForce(0.5);
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
