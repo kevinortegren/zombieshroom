@@ -98,11 +98,12 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 	struct ThirdPersonBehavior : ECS::Component<ThirdPersonBehavior>
 	{
-		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 4.0f; m_rotateWithTarget = true;}
+		ThirdPersonBehavior(){ m_targetTag = ""; m_distance = 4.0f; m_rotateWithTarget = true; m_checkWithRay = true;}
 		std::string m_targetTag;
 		glm::vec3 m_displacement;
 		float m_distance;
 		bool m_rotateWithTarget;
+		bool m_checkWithRay;
 	};
 
 	class ThirdPersonBehaviorSystem : public ECS::EntitySystem
