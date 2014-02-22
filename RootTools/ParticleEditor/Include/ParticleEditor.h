@@ -46,6 +46,7 @@ private:
 	//METHODS
 	void closeEvent(QCloseEvent *event);
 	void DrawGridX(float p_spacing, glm::vec4 p_color);
+	void DrawPositionAxis();
 	void ClearScene();
 	void ShowMessageBox(QString p_msg);
 	void ExportParticle(QString p_fullFilePath);
@@ -79,6 +80,7 @@ private:
 	int m_samples;
 
 	bool m_showGrid;
+	bool m_showAxis;
 	bool m_running;
 
 	float m_gridSpace;

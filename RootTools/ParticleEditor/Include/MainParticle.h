@@ -26,6 +26,8 @@ public:
 private:
 	void UpdateInput();
 	void UpdateThirdPerson();
+	void CreateSkyBox();
+
 	bool m_running;
 	std::string m_workingDirectory;
 	void* m_engineModule;
@@ -47,6 +49,8 @@ private:
 	float m_focusIntTime;
 	glm::vec3 m_toPosition;
 	glm::vec3 m_fromPosition;
+
+
 };
 
 

@@ -1,7 +1,7 @@
 #include "ParticleEditor.h"
 
 ParticleEditor::ParticleEditor(QWidget *parent)
-	: QMainWindow(parent), m_running(true), m_showGrid(true)
+	: QMainWindow(parent), m_running(true), m_showGrid(true), m_showAxis(true)
 {
 	ui.setupUi(this);
 	ui.aboutWidget->hide();
@@ -180,7 +180,10 @@ void ParticleEditor::Update( float p_dt )
 	}
 
 	if(m_showGrid)
-		DrawGridX(m_gridSpace, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+		DrawGridX(m_gridSpace, glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+
+	if(m_showAxis)
+		DrawPositionAxis();
 }
 
 #pragma region File menu actions
@@ -1121,6 +1124,17 @@ void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos
 		EmitterSelected(ui.listWidget->item(closestEmitter));
 		ui.listWidget->setCurrentItem(ui.listWidget->item(closestEmitter));
 	}
+}
+
+void ParticleEditor::DrawPositionAxis()
+{
+	glm::vec3 position = FocusButtonClicked();
+	//X
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.5f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	//Y
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	//Z
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.0f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
 
