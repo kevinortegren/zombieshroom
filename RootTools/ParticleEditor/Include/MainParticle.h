@@ -24,7 +24,7 @@ public:
 	void HandleEvents();
 	void Update(float p_delta);
 private:
-	void UpdateAimingDevice();
+	void UpdateInput();
 	void UpdateThirdPerson();
 	bool m_running;
 	std::string m_workingDirectory;
@@ -42,6 +42,11 @@ private:
 
 	ECS::Entity*							m_cameraEntity;
 	ECS::Entity*							m_aimingDevice;
+
+	bool m_focusInterpolation;
+	float m_focusIntTime;
+	glm::vec3 m_toPosition;
+	glm::vec3 m_fromPosition;
 };
 
 

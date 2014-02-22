@@ -38,7 +38,8 @@ public:
 	void Update(float p_dt);
 	void Init();
 	void ConnectSignalsAndSlots();
-
+	void CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	glm::vec3 FocusButtonClicked();
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
@@ -52,6 +53,7 @@ private:
 	void Changed();
 	void Saved();
 	void ResetTemplates();
+	
 
 	QMessageBox::StandardButton SaveWarningDialog();
 
@@ -85,6 +87,9 @@ private:
 	std::string m_savePath;
 
 	bool m_changed;
+
+	glm::mat4 m_inverseProjection;
+
 
 private slots:
 	void MenuNew();
@@ -124,7 +129,6 @@ private slots:
 	void TextureDoubleClicked(const QModelIndex& p_index);
 	void GridToggled();
 	void GridSizeChanged(double p_val);
-	void FocusButtonClicked();
 	void colorAlphaSliderChanged(int p_val);
 	void endColorAlphaSliderChanged(int p_val);
 	void TemplateChanged(int p_val);
