@@ -25,6 +25,9 @@ namespace Render
 
 		bool m_display;
 	private:
+
+		float Gaussian(float x, float deviation);
+
 		GLuint m_glowFramebuffer;
 		EffectInterface* m_glowEffect;
 		TextureInterface* m_glowTexture;

@@ -41,6 +41,9 @@ namespace Render
 		bool m_showShadows;
 
 	private:
+
+
+
 		int m_width;
 		int m_height;
 		size_t m_numberOfShadowcasters;	

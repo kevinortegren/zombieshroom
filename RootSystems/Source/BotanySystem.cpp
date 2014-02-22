@@ -81,6 +81,7 @@ namespace RootForce
 			if(m_meshCount >= BOTANY_MESHES_SIZE)
 			{
 				m_meshCount = 0;
+				std::cout << "cflush" << std::endl;
 			}
 
 			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*entity)]);

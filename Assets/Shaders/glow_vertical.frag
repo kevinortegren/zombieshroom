@@ -1,5 +1,7 @@
 #version 400
 
+#define TEXTURE_TAPS 10
+
 in vec2 vert_texCoord;
 
 // Uniforms
@@ -10,6 +12,7 @@ layout(std140) uniform PerTech
 	float g_BlurFactor;
 	float g_BlurStrength;
 	float g_BlurRadius;
+    float g_Gauss[11];    
 };
 
 // Textures
@@ -30,25 +33,22 @@ float Gaussian (float x, float deviation)
 
 void main()
 {
-	float blurS = 2.2f;
-    float blurF = 2.0f;
-
-    float deviation = g_BlurFactor * 0.35;
+    /*float deviation = g_BlurFactor * 0.35;
 	deviation *= deviation;
-	float strength = 1.0 - g_BlurStrength;
+	float strength = 1.0 - g_BlurStrength;*/
 
     vec2 TexelCoord = gl_FragCoord.xy / textureSize(g_Scene, 0);
 
     // Inverse size of Blur Sampler.
     float dx = 1.0f / textureSize(g_Input, 0).x;
 
-    vec4 blur = texture(g_Input, TexelCoord) * Gaussian(blurF * strength, deviation);
+    vec4 blur = texture(g_Input, TexelCoord) * g_Gauss[0];
     vec4 glow = texture(g_Glow, TexelCoord);
     
-    for( int i = 1; i < 10; i++ )
+    for( int i = 1; i < TEXTURE_TAPS; i++ )
 	{
-		blur += texture(g_Input, TexelCoord + vec2( PixelOffset[i], 0.0) * dx * g_BlurRadius) * Gaussian(i * strength, deviation);
-		blur += texture(g_Input, TexelCoord - vec2( PixelOffset[i], 0.0) * dx * g_BlurRadius) * Gaussian(i * strength, deviation);
+		blur += texture(g_Input, TexelCoord + vec2( PixelOffset[i], 0.0) * dx * g_BlurRadius) * g_Gauss[i+1];
+		blur += texture(g_Input, TexelCoord - vec2( PixelOffset[i], 0.0) * dx * g_BlurRadius) * g_Gauss[i+1];
 	}
     
     blur.w = 1.0;

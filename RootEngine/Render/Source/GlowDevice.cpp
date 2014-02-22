@@ -33,6 +33,7 @@ namespace Render
 			float blurFactor;
 			float blurStrength;
 			float blurRadius;
+			float gauss[11];
 		} data;
 
 		data.halfWidth = p_width / 2;
@@ -41,9 +42,20 @@ namespace Render
 		data.blurFactor = 9.0f;
 		data.blurStrength = 0.2f;
 
+		data.gauss[0] = Gaussian(data.blurFactor * (1.0f - data.blurStrength), (float)pow(data.blurFactor * 0.35, 2));
+		for(int i = 0; i < 10; i++)
+		{
+			data.gauss[i+1] = Gaussian(i * (1.0f - data.blurStrength), (float)pow(data.blurFactor * 0.35, 2));
+		}
+
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
 
 		m_display = true;
+	}
+
+	float GlowDevice::Gaussian(float x, float deviation)
+	{
+		return (float)((1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation))));	
 	}
 
 	void GlowDevice::SetGlowFactor(float p_factor)

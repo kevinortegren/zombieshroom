@@ -588,7 +588,7 @@ namespace Render
 			}
 
 			(*job)->m_mesh->Bind();
-
+			
 			// Itterate techniques.
 			for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 			{

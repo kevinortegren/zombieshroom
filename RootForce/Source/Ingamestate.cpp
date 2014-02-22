@@ -170,7 +170,7 @@ namespace RootForce
 		textures.m_diffuse = "ugotaflatgrass2";
 		textures.m_translucency = "grass_translucency";
 		textures.m_billboard = "grass_billboard";
-		textures.m_terrainTexture = "customGrass2";
+		textures.m_terrainTexture = "grass";
 
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);

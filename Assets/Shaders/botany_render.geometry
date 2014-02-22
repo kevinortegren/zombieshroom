@@ -1,15 +1,10 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
-//#define SHOW_LOD
-//#define SHOW_NORMALS
+#define USE_TERRAIN_NORMAL;
 
 layout(points) in;
-#ifdef SHOW_NORMALS
-layout(line_strip, max_vertices = 10) out;
-#else
-layout(triangle_strip, max_vertices = 80) out;
-#endif
+layout(triangle_strip, max_vertices = 29) out;
 
 layout(std140) uniform PerFrame
 {
@@ -95,8 +90,13 @@ void CreateMediumBlade3LOD(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBlade3LOD[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
         vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -130,8 +130,12 @@ void CreateMediumBladeLOD(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBladeLOD[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(mediumBladeNormalsLOD[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -165,8 +169,12 @@ void CreateMediumBlade2LOD(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBlade2LOD[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(mediumBlade2NormalsLOD[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -212,8 +220,12 @@ void CreateTallBlade2LOD(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + tallBlade2[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(tallBlade2NormalsLOD[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = tallBladeTCLOD[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -251,8 +263,12 @@ void CreateTallBladeLOD(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + tallBlade[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(tallBladeNormalsLOD[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = tallBladeTCLOD[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -302,8 +318,12 @@ void CreateMediumBlade3(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBlade3[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -341,8 +361,12 @@ void CreateMediumBlade(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBlade[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(mediumBladeNormals[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -380,8 +404,12 @@ void CreateMediumBlade2(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + mediumBlade2[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(mediumBlade2Normals[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -434,8 +462,12 @@ void CreateTallBlade2(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + TallBlade2[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(TallBlade2Normals[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = TallBladeTC[i];
         vert_texture1 = 0;
         EmitVertex();
@@ -477,8 +509,12 @@ void CreateTallBlade(vec3 position, vec3 cameraPosition)
     {
         vec4 pos = vec4(position + TallBlade[i], 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
-        vec3 normal = normalize(TallBladeNormals[i].xyz);   
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
         vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
         vert_texcoord1 = TallBladeTC[i];
         vert_texture1 = 0;
         EmitVertex();
