@@ -80,7 +80,6 @@ namespace RootForce
 		struct
 		{
 			glm::vec3 m_playerPosition;
-			float m_padd0;
 			float m_lod1Distance;
 			float m_lod2Distance;
 		} m_renderUniforms;

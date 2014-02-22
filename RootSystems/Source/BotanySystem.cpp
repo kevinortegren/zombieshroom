@@ -12,8 +12,8 @@ namespace RootForce
 
 	void BotanySystem::Initialize(BotanyTextures& m_textures)
 	{
-		m_renderUniforms.m_lod1Distance = 25.0f;
-		m_renderUniforms.m_lod2Distance = 80.0f;
+		m_renderUniforms.m_lod1Distance = 20.0f;
+		m_renderUniforms.m_lod2Distance = 60.0f;
 
 		m_updateUniforms.m_grassFactor = 2.0f;
 

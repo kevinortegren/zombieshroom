@@ -37,6 +37,7 @@ void main()
     else // Billboarded fragment.
     {
         color = texture(g_Billboard, vert_texcoord1);
+        color.rgb *= 0.8;
         
         // Alpha-Testing.
         if(color.a < 0.5)

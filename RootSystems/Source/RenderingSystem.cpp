@@ -50,6 +50,7 @@ namespace RootForce
 		job.m_shadowMesh = renderable->m_model->m_meshes[0];
 		job.m_material = renderable->m_material;	
 		job.m_params = renderable->m_params;
+		job.m_forward = renderable->m_forward;
 		job.m_params[Render::Semantic::MODEL] = &m_matrices[p_entity].m_model;
 		job.m_params[Render::Semantic::NORMAL] = &m_matrices[p_entity].m_normal;
 		job.m_renderPass = renderable->m_pass;

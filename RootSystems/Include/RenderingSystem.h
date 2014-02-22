@@ -25,13 +25,14 @@ namespace RootForce
 	struct Renderable : public ECS::Component<Renderable>
 	{
 		Renderable()
-			: m_model(nullptr), m_material(nullptr), m_pass(0), m_renderFlags(1), m_shadowTech(0) {}
+			: m_model(nullptr), m_material(nullptr), m_pass(0), m_renderFlags(1), m_shadowTech(0), m_forward(false) {}
 		~Renderable();
 
 		RootEngine::Model* m_model;
 		Render::Material* m_material;
 		std::map<Render::Semantic::Semantic, void*> m_params;
 		unsigned m_pass;
+		bool m_forward;
 		unsigned m_renderFlags;
 		unsigned m_shadowTech;
 	};

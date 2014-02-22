@@ -164,6 +164,7 @@ namespace RootForce
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
 		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+		m_renderable->m_forward = false;
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
