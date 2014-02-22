@@ -419,7 +419,12 @@ namespace Render
 
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
-		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
+		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
+
+		if(job->m_forward)
+			m_forwardJobs.push_back(job);
+		else
+			m_jobs.push_back(job);
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -494,6 +499,11 @@ namespace Render
 		}
 
 		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
+
+		{
 			PROFILE("Render Lines", g_context.m_profiler);
 			m_lineRenderer.RenderLines();
 		}
@@ -509,8 +519,14 @@ namespace Render
 			(*itr)->~RenderJob();
 		}
 
+		for(auto itr = m_forwardJobs.begin(); itr != m_forwardJobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
+		}
+
 		m_allocator.Clear();
 		m_jobs.clear();
+		m_forwardJobs.clear();
 	}
 
 	void GLRenderer::Clear()
@@ -563,13 +579,13 @@ namespace Render
 
 		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
 
-		ProcessRenderJobs();
+		ProcessRenderJobs(m_jobs);
 	}
 
-	void GLRenderer::ProcessRenderJobs()
+	void GLRenderer::ProcessRenderJobs(std::vector<RenderJob*>& p_jobs)
 	{
 		int currentMaterialID = -1;
-		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+		for(auto job = p_jobs.begin(); job != p_jobs.end(); ++job)
 		{
 			if((*job)->m_material->m_id != currentMaterialID)
 			{
@@ -669,7 +685,7 @@ namespace Render
 		// Bind gbuffer for reading in post processes.
 		// 0 - Diffuse
 		// 1 - Normals
-		// 2 - Depths
+		// 2 - Depth
 		// 3 - LA
 		// 4 - Glow
 		// 5 - Input.
@@ -680,6 +696,14 @@ namespace Render
 		BindForwardFramebuffer();
 		m_glowDevice.VerticalPass(&m_fullscreenQuad);
 		m_fullscreenQuad.Unbind();
+	}
+
+	void GLRenderer::ForwardPass()
+	{
+		m_gbuffer.BindTextures();
+		m_lighting.m_la->Bind(3);
+
+		ProcessRenderJobs(m_forwardJobs);
 	}
 
 	void GLRenderer::Output()

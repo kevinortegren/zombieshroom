@@ -171,7 +171,7 @@ namespace Render
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
-		void ProcessRenderJobs();
+		void ProcessRenderJobs(std::vector<RenderJob*>& p_jobs);
 
 		void Sorting();
 		void ShadowPass();
@@ -191,6 +191,7 @@ namespace Render
 
 		unsigned m_renderFlags;
 	
+		std::vector<RenderJob*> m_forwardJobs;
 		std::vector<RenderJob*> m_jobs;
 		LinearAllocator m_allocator;
 

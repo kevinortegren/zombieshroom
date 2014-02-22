@@ -180,7 +180,6 @@ namespace RootForce
 					job.m_mesh = m_meshes[m_cells[id].m_meshIndices[j]];
 					job.m_mesh->SetNoCulling(true);
 					job.m_material = m_material;
-					job.m_flags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 					m_engineContext->m_renderer->AddRenderJob(job);
 				}
 			}

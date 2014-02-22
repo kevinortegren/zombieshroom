@@ -153,6 +153,7 @@ namespace RootForce
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
+		
 
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
