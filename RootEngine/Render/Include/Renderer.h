@@ -5,7 +5,6 @@
 #include <RootEngine/Render/Include/Camera.h>
 
 #include <RootEngine/Render/Include/RenderJob.h>
-#include <RootEngine/Render/Include/ShadowJob.h>
 #include <RootEngine/Render/Include/ComputeJob.h>
 
 #include <RootEngine/Render/Include/RenderResourceManager.h>
@@ -191,11 +190,8 @@ namespace Render
 		int m_height;
 
 		unsigned m_renderFlags;
-
-		std::vector<ShadowJob*> m_shadowJobs;
+	
 		std::vector<RenderJob*> m_jobs;
-
-		LinearAllocator m_shadowJobAllocator;
 		LinearAllocator m_allocator;
 
 		int m_sjobCount[RENDER_SHADOW_CASCADES];
@@ -232,9 +228,7 @@ namespace Render
 		std::shared_ptr<TechniqueInterface> m_fullscreenQuadTech;
 
 		bool m_layers[2];
-
 		bool m_displayNormals;
-		bool m_shadowsOn;
 	};
 }
 

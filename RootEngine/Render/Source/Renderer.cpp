@@ -93,7 +93,7 @@ namespace Render
 		else if(module == "shadow" || module == "s")
 		{
 			std::getline(*p_ss, value, ' ');
-			m_shadowsOn = (atoi(value.c_str()) == 1) ? true : false;
+			m_shadowDevice.m_showShadows = (atoi(value.c_str()) == 1) ? true : false;
 		}
 		else if(module == "light" || module == "l")
 		{
@@ -136,7 +136,7 @@ namespace Render
 	}
 
 	GLRenderer::GLRenderer()
-		: m_allocator(10000 * sizeof(RenderJob)), m_shadowJobAllocator(10000 * sizeof(ShadowJob))
+		: m_allocator(10000 * sizeof(RenderJob))
 	{
 		
 	}
@@ -263,35 +263,6 @@ namespace Render
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
-
-		// Setup geometry buffer.
-		m_gbuffer.Init(this, width, height);
-
-		// Setup shadow device.
-		m_shadowDevice.Init(this, 2048, 2048);
-
-		// Setup lighting device.
-		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
-	
-		// Setup render target for forward renderer and post processes to use.
-		glGenFramebuffers(1, &m_fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		m_color0 = CreateTexture();
-		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
-
-		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Load default forward rendering effect.
-		//TODO: Load Shadow effect.
-		m_renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
-
-		m_fullscreenQuadTech = m_renderEffect->GetTechniques()[0];
-
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
 
@@ -312,6 +283,32 @@ namespace Render
 		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 
+		// Setup geometry buffer.
+		m_gbuffer.Init(this, width, height);
+
+		// Setup shadow device.
+		m_shadowDevice.Init(this, 2048, 2048, m_cameraBuffer, m_uniforms);
+
+		// Setup lighting device.
+		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
+	
+		// Setup render target for forward renderer and post processes to use.
+		glGenFramebuffers(1, &m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		m_color0 = CreateTexture();
+		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+
+		// Share depth attachment between gbuffer and forward.
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
+
+		m_fullscreenQuadTech = m_renderEffect->GetTechniques()[0];
+
 		InitializeSemanticSizes();
 
 		// Initialize subsystems.
@@ -319,8 +316,6 @@ namespace Render
 		m_lineRenderer.Init(this);
 
 		InitialziePostProcesses();
-
-		m_shadowsOn = true;
 
 		m_layers[0] = true;
 		m_layers[1] = true;
@@ -419,7 +414,7 @@ namespace Render
 
 	void GLRenderer::AddShadowJob(Render::ShadowJob& p_shadowJob)
 	{
-		m_shadowJobs.push_back(new (m_shadowJobAllocator.Alloc(sizeof(ShadowJob))) ShadowJob(p_shadowJob));
+		m_shadowDevice.m_shadowJobs.push_back(new (m_shadowDevice.m_shadowJobAllocator.Alloc(sizeof(ShadowJob))) ShadowJob(p_shadowJob));
 	}
 
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
@@ -541,62 +536,15 @@ namespace Render
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
 	}
 
-	static bool SortShadowJobs(ShadowJob* a, ShadowJob* b)
-	{
-		return a->m_technique < b->m_technique;
-	};
-
 	void GLRenderer::ShadowPass()
 	{
+		glCullFace(GL_FRONT);
+		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
+
 		m_shadowDevice.Process();
-
-		// Clear framebuffers.
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		}
-
-		if(m_shadowsOn)
-		{
-			glCullFace(GL_FRONT);
-			glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
-
-			std::sort(m_shadowJobs.begin(), m_shadowJobs.end(), SortShadowJobs);
-
-			ShadowTechnique::ShadowTechnique currentTechnique = ShadowTechnique::SHADOW_OPAQUE;
-		
-			m_renderEffect->GetTechniques()[ShadowTechnique::SHADOW_OPAQUE+1]->GetPrograms()[0]->Apply();
-
-			for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
-			{
-				if((*itr)->m_technique != currentTechnique)
-				{
-					currentTechnique = (*itr)->m_technique;
-					m_renderEffect->GetTechniques()[currentTechnique+1]->GetPrograms()[0]->Apply();
-				}
-
-				(*itr)->m_mesh->Bind();
-
-				for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-				{
-					glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-					glDrawBuffers(0, NULL);
-					m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
-
-					(*itr)->m_mesh->Draw();
-				}
 	
-				(*itr)->m_mesh->Unbind();
-			}
-
-			glCullFace(GL_BACK);
-			glViewport(0, 0, m_width, m_height);
-		}
-		
-		m_shadowJobAllocator.Clear();
-		m_shadowJobs.clear();	
+		glCullFace(GL_BACK);
+		glViewport(0, 0, m_width, m_height);
 	}
 
 	void GLRenderer::GeometryPass(int p_layer)

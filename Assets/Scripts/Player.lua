@@ -66,6 +66,7 @@ function Player.OnCreate(userId, actionId)
 		local animation = Animation.New(player);
 		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
+		renderable:SetShadowTechnique(ShadowTechnique.SHADOW_ANIMATED);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
 			renderable:SetMaterial("BlueSpirit");

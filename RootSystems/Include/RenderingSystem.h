@@ -25,7 +25,7 @@ namespace RootForce
 	struct Renderable : public ECS::Component<Renderable>
 	{
 		Renderable()
-			: m_model(nullptr), m_material(nullptr), m_pass(0), m_renderFlags(1) {}
+			: m_model(nullptr), m_material(nullptr), m_pass(0), m_renderFlags(1), m_shadowTech(0) {}
 		~Renderable();
 
 		RootEngine::Model* m_model;
@@ -33,6 +33,7 @@ namespace RootForce
 		std::map<Render::Semantic::Semantic, void*> m_params;
 		unsigned m_pass;
 		unsigned m_renderFlags;
+		unsigned m_shadowTech;
 	};
 
 	struct MatrixData

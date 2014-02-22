@@ -55,6 +55,21 @@ namespace RootForce
 		job.m_flags = renderable->m_renderFlags;
 		job.m_renderPass = renderable->m_pass;
 		m_renderer->AddRenderJob(job);
+
+		if(renderable->m_shadowTech != Render::ShadowTechnique::SHADOW_NONE)
+		{
+			Render::ShadowJob sjob;
+			sjob.m_technique = (Render::ShadowTechnique::ShadowTechnique)renderable->m_shadowTech;
+			sjob.m_mesh = renderable->m_model->m_meshes[1];
+			sjob.m_params = job.m_params;
+			
+			if(renderable->m_shadowTech == Render::ShadowTechnique::SHADOW_ANIMATED)
+			{
+				sjob.m_mesh = renderable->m_model->m_meshes[0];
+			}
+
+			m_renderer->AddShadowJob(sjob);			
+		}
 	}
 
 	void RenderingSystem::End()
