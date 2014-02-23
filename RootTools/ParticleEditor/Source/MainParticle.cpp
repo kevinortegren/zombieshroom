@@ -302,7 +302,7 @@ void MainParticle::UpdateInput()
 	{
 		m_focusInterpolation = true;
 		m_focusIntTime = 0.0f;
-		m_toPosition = m_particleEditorQt->FocusButtonClicked();
+		m_toPosition = m_particleEditorQt->GetSelectedPosition();
 		m_fromPosition = trans->m_position;
 	}
 
