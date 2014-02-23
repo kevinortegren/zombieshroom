@@ -52,7 +52,6 @@ namespace RootForce
 			transformMatrix = glm::scale(transformMatrix, transform->m_scale);
 
 			unsigned offset = vertices.size();
-			std::cout << offset << std::endl;
 
 			// Parse vertex data.
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
