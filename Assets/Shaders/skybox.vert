@@ -11,7 +11,6 @@ layout(std140) uniform PerFrame
 layout(std140) uniform PerObject
 {
 	mat4 modelMatrix;
-	mat4 normalMatrix;
 };
 
 out vec3 vert_texcoord;

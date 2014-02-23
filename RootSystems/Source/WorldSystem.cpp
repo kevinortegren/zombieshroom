@@ -109,7 +109,21 @@ namespace RootForce
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
 		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
-		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+		
+		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
+		RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
+		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
+
+		struct sunstruct
+		{
+			glm::vec4 direction;
+			glm::vec4 color;
+		};
+		sunstruct sundata;
+		sundata.direction = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
+		sundata.color = sunLight->m_color;
+
+		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata);
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);

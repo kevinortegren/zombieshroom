@@ -33,7 +33,7 @@ namespace Render
 			XMAX,
 			YMAX,
 			EYEWORLDPOS,
-			DX,
+			DX
 		};
 	}
 
