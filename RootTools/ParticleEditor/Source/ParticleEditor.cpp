@@ -1,7 +1,7 @@
 #include "ParticleEditor.h"
 
 ParticleEditor::ParticleEditor(QWidget *parent)
-	: QMainWindow(parent), m_running(true), m_showGrid(true)
+	: QMainWindow(parent), m_running(true), m_showGrid(true), m_showAxis(true)
 {
 	ui.setupUi(this);
 	ui.aboutWidget->hide();
@@ -59,7 +59,6 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.actionColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorTriangle()));
 	connect(ui.actionEndColor_Triangle,SIGNAL(triggered()),						this, SLOT(MenuViewColorEndTriangle()));
 	connect(ui.gridSpaceSpinBox,	SIGNAL(valueChanged(double)),				this, SLOT(GridSizeChanged(double)));
-	connect(ui.focusButton,			SIGNAL(clicked()),							this, SLOT(FocusButtonClicked()));
 	connect(ui.colorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(colorAlphaSliderChanged(int)));
 	connect(ui.endcolorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(endColorAlphaSliderChanged(int)));
 	connect(ui.templateComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(TemplateChanged(int)));
@@ -146,6 +145,8 @@ void ParticleEditor::Init()
 	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	m_model->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 
+	m_inverseProjection = glm::inverse(glm::perspectiveFov<float>(45.0f, (float)ui.frame->width(), (float)ui.frame->height(), 0.1f, 100.0f));
+
 	Saved();
 
 }
@@ -179,7 +180,10 @@ void ParticleEditor::Update( float p_dt )
 	}
 
 	if(m_showGrid)
-		DrawGridX(m_gridSpace, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+		DrawGridX(m_gridSpace, glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+
+	if(m_showAxis)
+		DrawPositionAxis();
 }
 
 #pragma region File menu actions
@@ -843,17 +847,10 @@ void ParticleEditor::ModelTexDoubleClicked( const QModelIndex& p_index )
 	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
 }
 
-void ParticleEditor::FocusButtonClicked()
+glm::vec3 ParticleEditor::FocusButtonClicked()
 {
-	m_aimingDeviceTransform->m_position.x = (float)ui.posSpinBoxX->value();
-	m_aimingDeviceTransform->m_position.y = (float)ui.posSpinBoxY->value();
-	m_aimingDeviceTransform->m_position.z = (float)ui.posSpinBoxZ->value();
-	ui.lookAtSpinBoxX->setValue((float)ui.posSpinBoxX->value());
-	ui.lookAtSpinBoxY->setValue((float)ui.posSpinBoxY->value());
-	ui.lookAtSpinBoxZ->setValue((float)ui.posSpinBoxZ->value());
+	return glm::vec3((float)ui.posSpinBoxX->value(), (float)ui.posSpinBoxY->value(), (float)ui.posSpinBoxZ->value());
 }
-
-
 
 void ParticleEditor::ShowMessageBox( QString p_msg )
 {
@@ -1072,6 +1069,72 @@ void ParticleEditor::ResetTemplates()
 void ParticleEditor::RemoveObjectButton()
 {
 	m_modelTrans->m_scale = glm::vec3(0.0f);
+}
+
+void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix)
+{
+	if(m_selectedEntityIndex == -1)
+		return;
+
+	ECS::Entity* entity = m_emitterEntities.at(0);
+	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
+
+	float radius = 0.2f;
+	float radiusSphere2 = radius*radius;
+
+	float closestDist = 999999.0f;
+	int closestEmitter = -1;
+
+	//Calculate NDC coords
+	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
+	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
+	//View space coords
+	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);
+	//World space coords
+	glm::vec4 rW = (glm::inverse(p_viewMatrix) * rayView);
+	glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+	for(unsigned i = 0; i < e->m_particleSystems.size(); ++i)
+	{
+		//Test ray vs shpere
+		glm::vec3 L = e->m_particleSystems.at(i)->m_position - p_camPos;
+		float tca = glm::dot(L, rayWorld);
+		if(tca < 0)
+		{
+			continue;
+		}
+		float d2 = glm::dot(L, L) - tca * tca;
+		if(d2 > radiusSphere2)
+		{
+			continue;
+		}
+		float thc = glm::sqrt(radiusSphere2 - d2);
+		float t0 = tca - thc;
+
+		if(t0 < closestDist)
+		{
+			closestEmitter = (int)i;
+			closestDist = t0;
+		}
+	}
+
+	if(closestEmitter > -1)
+	{
+		EmitterSelected(ui.listWidget->item(closestEmitter));
+		ui.listWidget->setCurrentItem(ui.listWidget->item(closestEmitter));
+	}
+}
+
+void ParticleEditor::DrawPositionAxis()
+{
+	glm::vec3 position = FocusButtonClicked();
+	//X
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.5f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	//Y
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	//Z
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.0f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
 

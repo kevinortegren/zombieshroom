@@ -38,13 +38,15 @@ public:
 	void Update(float p_dt);
 	void Init();
 	void ConnectSignalsAndSlots();
-
+	void CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	glm::vec3 FocusButtonClicked();
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
 	//METHODS
 	void closeEvent(QCloseEvent *event);
 	void DrawGridX(float p_spacing, glm::vec4 p_color);
+	void DrawPositionAxis();
 	void ClearScene();
 	void ShowMessageBox(QString p_msg);
 	void ExportParticle(QString p_fullFilePath);
@@ -52,6 +54,7 @@ private:
 	void Changed();
 	void Saved();
 	void ResetTemplates();
+	
 
 	QMessageBox::StandardButton SaveWarningDialog();
 
@@ -77,6 +80,7 @@ private:
 	int m_samples;
 
 	bool m_showGrid;
+	bool m_showAxis;
 	bool m_running;
 
 	float m_gridSpace;
@@ -85,6 +89,9 @@ private:
 	std::string m_savePath;
 
 	bool m_changed;
+
+	glm::mat4 m_inverseProjection;
+
 
 private slots:
 	void MenuNew();
@@ -124,7 +131,6 @@ private slots:
 	void TextureDoubleClicked(const QModelIndex& p_index);
 	void GridToggled();
 	void GridSizeChanged(double p_val);
-	void FocusButtonClicked();
 	void colorAlphaSliderChanged(int p_val);
 	void endColorAlphaSliderChanged(int p_val);
 	void TemplateChanged(int p_val);

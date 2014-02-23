@@ -194,6 +194,11 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	p_particleEditorQt->SetAimingDevice(m_aimingDevice);
 	p_particleEditorQt->Init();
 	p_particleEditorQt->ConnectSignalsAndSlots();
+
+	m_focusInterpolation = false;
+	m_focusIntTime = 0.0f;
+
+	CreateSkyBox();
 }
 
 MainParticle::~MainParticle()
@@ -220,7 +225,7 @@ void MainParticle::Update( float p_delta )
 	g_world->SetDelta(p_delta);
 	g_engineContext.m_renderer->Clear();
 	HandleEvents();
-	UpdateAimingDevice();
+	UpdateInput();
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
 	UpdateThirdPerson();
@@ -232,38 +237,82 @@ void MainParticle::Update( float p_delta )
 	
 }
 
-void MainParticle::UpdateAimingDevice()
+void MainParticle::UpdateInput()
 {
 	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera");
 	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->GetComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+	RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
+	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_aimingDevice);
+	//Set camera distance to aiming device by mouse scroll with a speed factor depending on distance from aiming device position
 	float speedZoomFac = cameraThirdPerson->m_distance/50.0f;
 	cameraThirdPerson->m_distance -= (g_engineContext.m_inputSys->GetScroll() * 4 * speedZoomFac);
 
+	//If ALT is being pressed
 	if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT) == RootEngine::InputManager::KeyState::DOWN)
 	{
+		//Get mouse movement since last frame
 		glm::ivec2 m_deltaMouseMovement = g_engineContext.m_inputSys->GetDeltaMousePos();
-		RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_aimingDevice);
-		RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
+		
+		//If left mouse button is being pressed
 		if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN)
 		{
+			//Adjust yaw and pitch with delta mouse movement
 			trans->m_orientation.YawGlobal(m_deltaMouseMovement.x * 0.3f);
 			trans->m_orientation.Pitch(-m_deltaMouseMovement.y * 0.3f);
 		}
 		else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::MIDDLE) == RootEngine::InputManager::KeyState::DOWN)
 		{
+			//Stop interpolation movement
+			m_focusInterpolation = false;
+
+			//Pan camera position
 			trans->m_position += cameraTrans->m_orientation.GetUp() * -(float)m_deltaMouseMovement.y * 0.005f;
 			trans->m_position += cameraTrans->m_orientation.GetRight() * (float)m_deltaMouseMovement.x * 0.005f;
 			m_particleEditorQt->SetLookAtSpinBox(trans->m_position);
 		}
 		else if (g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::RIGHT) == RootEngine::InputManager::KeyState::DOWN)
 		{
-			
+			//Zoom in or out depending by moving mouse when pressing ALT+RMB
 			if(glm::abs(m_deltaMouseMovement.y) > glm::abs(m_deltaMouseMovement.x))
 				cameraThirdPerson->m_distance += m_deltaMouseMovement.y * 0.3f * speedZoomFac;
 			else
 				cameraThirdPerson->m_distance += m_deltaMouseMovement.x * 0.3f * speedZoomFac;
 		}
 	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
+		//Send mouse coords to ray-sphere intersection test
+		m_particleEditorQt->CheckRayVsObject(g_engineContext.m_inputSys->GetGlobalMousePos(), cameraTrans->m_position, camera->m_viewMatrix);
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN)
+	{
+		//Get screen coordinates of mouse when pressing down LMB first time
+		glm::ivec2 mousePos = g_engineContext.m_inputSys->GetGlobalMousePos();
+	}
+
+	//Check if focus button is pressed
+	if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F) == RootEngine::InputManager::KeyState::DOWN_EDGE )
+	{
+		m_focusInterpolation = true;
+		m_focusIntTime = 0.0f;
+		m_toPosition = m_particleEditorQt->FocusButtonClicked();
+		m_fromPosition = trans->m_position;
+	}
+
+	if(m_focusInterpolation)
+	{
+		//0.2 sec interpolation
+		m_focusIntTime += g_world->GetDelta()*10.0f;
+		if(m_focusIntTime >= 1.0f)
+		{
+			m_focusInterpolation = false;
+			m_focusIntTime = 1.0f;
+		}
+		trans->m_position = glm::mix(m_fromPosition, m_toPosition , m_focusIntTime);
+		m_particleEditorQt->SetLookAtSpinBox(trans->m_position);
+	}
+
 }
 
 void MainParticle::UpdateThirdPerson()
@@ -280,4 +329,66 @@ void MainParticle::UpdateThirdPerson()
 	glm::vec3 worldDisplacement;
 	worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
 	cameraTransform->m_position = targetPosition + worldDisplacement;
+}
+
+void MainParticle::CreateSkyBox()
+{
+	// Setup skybox entity.
+	ECS::Entity* skybox = g_world->GetEntityManager()->CreateEntity();
+
+	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
+	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
+
+	t->m_scale = glm::vec3(-100);
+	t->m_orientation.Roll(180);
+
+	static glm::vec3 positions[8] = 
+	{
+		glm::vec3( -0.500000, -0.500000, 0.500000),
+		glm::vec3(0.500000, -0.500000, 0.500000),
+		glm::vec3(-0.500000, 0.500000, 0.500000),
+		glm::vec3(0.500000, 0.500000, 0.500000),
+		glm::vec3(-0.500000, 0.500000, -0.500000),
+		glm::vec3(0.500000, 0.500000, -0.500000),
+		glm::vec3(-0.500000, -0.500000, -0.500000),
+		glm::vec3(0.500000, -0.500000, -0.500000)
+	};
+
+	static unsigned int indices[36] =
+	{
+		0, 1, 2, 
+		2, 1, 3, 
+		2, 3, 4, 
+		4, 3, 5, 
+		4, 5, 6, 
+		6, 5, 7,
+		6, 7, 0, 
+		0, 7, 1, 
+		1, 7, 3, 
+		3, 7, 5, 
+		6, 0, 4, 
+		4, 0, 2
+	};
+
+	Render::Vertex1P vertices[8];
+	for(int i = 0; i < 8; ++i)
+	{
+		vertices[i].m_pos = positions[i];
+	}
+
+	r->m_model = g_engineContext.m_resourceManager->CreateModel("skybox");
+	r->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+	r->m_model->m_meshes[0]->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+	r->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+	r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
+	r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
+
+	r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
+	r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
+	r->m_material = g_engineContext.m_renderer->CreateMaterial("skybox");
+	r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
+	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
+	g_world->GetTagManager()->RegisterEntity("Skybox", skybox);
+	g_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 }
