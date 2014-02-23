@@ -55,7 +55,7 @@ void main() {
 
 	//normal *= 2.0 - 1.0;
 
-	vec3 rvec = texture(g_Noise, texCoord * vec2(1280/4, 720/4)).xyz * 2.0 - 1.0;
+	vec3 rvec = texture(g_Noise, texCoord * textureSize(g_Depth, 0) * 0.25).xyz * 2.0 - 1.0;
 	vec3 tangent = normalize(rvec - normal * dot(rvec, normal));
 	vec3 bitangent = cross(normal, tangent);
 	mat3 tbn = mat3(tangent, bitangent, normal);

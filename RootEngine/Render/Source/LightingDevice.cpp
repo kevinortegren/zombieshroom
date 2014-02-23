@@ -291,6 +291,7 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_ssaoTex->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
 
