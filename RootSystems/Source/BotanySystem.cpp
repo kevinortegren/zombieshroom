@@ -69,7 +69,7 @@ namespace RootForce
 		}
 
 		m_initialized = true;
-		m_show = false;
+		m_show = true;
 	}
 
 	void BotanySystem::Construct(QuadNode* p_node)

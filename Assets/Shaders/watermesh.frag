@@ -3,10 +3,7 @@
 in vec3 WorldPos_FS_in;                                                                        
 in vec2 TexCoord_FS_in;                                                                        
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec2 normals;
-layout (location = 2) out vec4 glow;
-layout (location = 3) out vec4 background;
+out vec4 out_color;
 
 uniform sampler2D g_Specular;
 uniform samplerCube g_CubeMap;
@@ -247,11 +244,6 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
-	diffuse					= vec4(0.0f, 0.0f, 0.0f, 0.6f);
-    
-    float p = sqrt(viewNormal.z*8+8);
-    normals = viewNormal.xy/p + 0.5;
 
-	glow					= vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	background				= result;
+    out_color = result;
 }

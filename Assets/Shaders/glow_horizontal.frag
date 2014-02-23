@@ -16,9 +16,7 @@ layout(std140) uniform PerTech
 };
 
 // Textures
-uniform sampler2D g_Scene;
 uniform sampler2D g_Glow;
-uniform sampler2D g_Input;
 
 // Constants
 const float PixelOffset[10] =

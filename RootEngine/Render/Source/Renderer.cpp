@@ -477,31 +477,30 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		PROFILE("Deferred Pass", g_context.m_profiler);
 		{
-			// Loop through layers.
-			for(int i = 0; i < 2; i++)
-			{
-				if(m_layers[i])
-				{
-					GeometryPass(i);
-					LightingPass(i);	
-				}
-			}
+			PROFILE("Deferred Pass", g_context.m_profiler);
+			GeometryPass(0);
+		}
+	
+		{
+			PROFILE("Lighting Pass", g_context.m_profiler);
+			LightingPass(0);	
 		}
 
 		m_lighting.ResetLights();
 		glDisable(GL_STENCIL_TEST);
 
 		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
+
+
+		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
 			PostProcessPass();
 		}
 
-		{
-			PROFILE("Forward Pass", g_context.m_profiler);
-			ForwardPass();
-		}
 
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
@@ -550,6 +549,7 @@ namespace Render
 	void GLRenderer::Sorting()
 	{	
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortRenderJobs);
 	}
 
 	void GLRenderer::ShadowPass()
@@ -577,7 +577,7 @@ namespace Render
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
-		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED0;
 
 		ProcessRenderJobs(m_jobs);
 	}
@@ -671,11 +671,17 @@ namespace Render
 		m_lighting.Ambient();
 		m_lighting.Directional();
 		m_lighting.Point();
-		
-		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
-
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
+
+	void GLRenderer::ForwardPass()
+	{
+		m_gbuffer.BindTextures();
+
+		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
+
+		ProcessRenderJobs(m_forwardJobs);
 	}
 
 	void GLRenderer::PostProcessPass()
@@ -698,13 +704,6 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 	}
 
-	void GLRenderer::ForwardPass()
-	{
-		m_gbuffer.BindTextures();
-		m_lighting.m_la->Bind(3);
-
-		ProcessRenderJobs(m_forwardJobs);
-	}
 
 	void GLRenderer::Output()
 	{

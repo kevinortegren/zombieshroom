@@ -108,7 +108,9 @@ namespace RootForce
 
 	void WorldSystem::SubdivideTree()
 	{
+#ifndef _DEBUG
 		m_quadTree.BeginDivide(1000, true, true);
+#endif
 	}
 
 	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
@@ -189,6 +191,7 @@ namespace RootForce
 	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
+		r->m_forward = true;
 		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);

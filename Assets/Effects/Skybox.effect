@@ -9,6 +9,8 @@
           slot: 0
         - name: PerObject
           slot: 1
+      flags:
+        - name: Forward
       programs:
         - name: skybox
           shaders:

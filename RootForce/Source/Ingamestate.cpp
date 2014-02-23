@@ -166,12 +166,13 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
+#ifndef _DEBUG
 		BotanyTextures textures;
 		textures.m_diffuse = "ugotaflatgrass2";
 		textures.m_translucency = "grass_translucency";
 		textures.m_billboard = "grass_billboard";
 		textures.m_terrainTexture = "grass";
-
+#endif
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
 

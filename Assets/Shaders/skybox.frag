@@ -4,10 +4,7 @@ in vec3 vert_texcoord;
 
 uniform samplerCube CubeMap;
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
-layout (location = 2) out vec4 glow;
-layout (location = 3) out vec4 background;
+out vec4 out_color;
 
 void main()
 {
@@ -19,8 +16,5 @@ void main()
 	float d = abs(dot(vec3(0.0, 1.0, 0.0), normalize(vert_texcoord)));
 	frag_color = vec3(mix(blue.r, blue2.r, d), mix(blue.g, blue2.g, d), mix(blue.g, blue2.g, d));
 
-    diffuse = vec4(vec3(0), 0);
-	normals = vec3(0);
-	glow = vec4(vec3(0), 0.0f);
-	background = vec4(frag_color, 1.0f);
+    out_color = vec4(frag_color, 1.0f);
 }

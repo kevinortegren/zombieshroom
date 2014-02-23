@@ -38,8 +38,6 @@ void ECS::IntervalEntitySystem::Process()
 {
 	while(CheckProcessing())
 	{
-		
-
 		Begin();
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
