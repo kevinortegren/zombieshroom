@@ -190,7 +190,7 @@ namespace RootForce
 	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-		r->m_forward = true;
+		r->m_forward = false;
 		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_engineContext->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);

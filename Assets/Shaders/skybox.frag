@@ -4,7 +4,7 @@ in vec3 vert_texcoord;
 
 uniform samplerCube CubeMap;
 
-out vec4 out_color;
+layout (location = 3) out vec4 background;
 
 void main()
 {
@@ -16,5 +16,5 @@ void main()
 	float d = abs(dot(vec3(0.0, 1.0, 0.0), normalize(vert_texcoord)));
 	frag_color = vec3(mix(blue.r, blue2.r, d), mix(blue.g, blue2.g, d), mix(blue.g, blue2.g, d));
 
-    out_color = vec4(frag_color, 1.0f);
+    background = vec4(frag_color, 1.0);
 }

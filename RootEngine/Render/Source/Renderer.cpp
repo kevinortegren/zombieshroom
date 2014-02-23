@@ -672,6 +672,8 @@ namespace Render
 		m_lighting.Directional();
 		m_lighting.Point();
 
+		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
