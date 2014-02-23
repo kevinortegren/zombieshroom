@@ -149,6 +149,12 @@ void ParticleEditor::Init()
 
 	Saved();
 
+	m_xAxisLower = glm::vec3(0.1f, -0.1f, -0.1f);
+	m_xAxisUpper = glm::vec3(0.5f, 0.1f, 0.1f);
+	m_yAxisLower = glm::vec3(-0.1f, 0.1f, -0.1f);
+	m_yAxisUpper = glm::vec3(0.1f, 0.5f, 0.1f);
+	m_zAxisLower = glm::vec3(-0.1f, -0.1f, 0.1f);
+	m_zAxisUpper = glm::vec3(0.1f, 0.1f, 0.5f);
 }
 
 bool ParticleEditor::CheckExit()
@@ -1071,10 +1077,10 @@ void ParticleEditor::RemoveObjectButton()
 	m_modelTrans->m_scale = glm::vec3(0.0f);
 }
 
-void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix)
+int ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix)
 {
 	if(m_selectedEntityIndex == -1)
-		return;
+		return 0;
 
 	ECS::Entity* entity = m_emitterEntities.at(0);
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
@@ -1095,6 +1101,25 @@ void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos
 	glm::vec4 rW = (glm::inverse(p_viewMatrix) * rayView);
 	glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
 
+	//Test Axis selection
+	
+	if(CheckRayVsAABB(rayWorld, p_camPos, FocusButtonClicked() + m_xAxisLower, FocusButtonClicked() + m_xAxisUpper))
+	{
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "X axis selected");
+		return 1;
+	}
+	if(CheckRayVsAABB(rayWorld, p_camPos, FocusButtonClicked() + m_yAxisLower, FocusButtonClicked() + m_yAxisUpper))
+	{
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Y axis selected");
+		return 2;
+	}
+	if(CheckRayVsAABB(rayWorld, p_camPos, FocusButtonClicked() + m_zAxisLower, FocusButtonClicked() + m_zAxisUpper))
+	{
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Z axis selected");
+		return 3;
+	}
+
+	//Test emitter selection
 	for(unsigned i = 0; i < e->m_particleSystems.size(); ++i)
 	{
 		//Test ray vs shpere
@@ -1124,17 +1149,130 @@ void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos
 		EmitterSelected(ui.listWidget->item(closestEmitter));
 		ui.listWidget->setCurrentItem(ui.listWidget->item(closestEmitter));
 	}
+
+
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Nothing selected");
+	return 0;
 }
 
 void ParticleEditor::DrawPositionAxis()
 {
 	glm::vec3 position = FocusButtonClicked();
 	//X
-	m_context->m_renderer->AddLine(position, position + glm::vec3(0.5f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.2f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	//Y
-	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.2f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	//Z
-	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.0f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.0f, 0.2f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+}
+
+void ParticleEditor::DragEmitter( int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix )
+{
+	//Calculate NDC coords
+	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
+	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
+	//View space coords
+	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);
+	//World space coords
+	glm::vec4 rW = (glm::inverse(p_viewMatrix) * rayView);
+	glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+	float t;
+
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+
+	switch (p_axis)
+	{
+	case 1: //x
+		{
+		
+			glm::vec3 normalFlip = glm::vec3(0.0f, 0.0f, 1.0f);
+			if(glm::dot(normalFlip, rayWorld) < 0)
+				normalFlip = glm::vec3(0.0f, 0.0f, -1.0f); // Flip normal if viewing plane from other side
+
+			float denom = glm::dot(normalFlip, (FocusButtonClicked() - p_camPos));
+
+			if(denom > 1e-6)
+			{
+				t = denom / glm::dot(normalFlip, rayWorld);
+				if(t < 0.0f)
+					return; //Return if behind
+			}
+			else
+				return; //return if perpendicular
+			glm::vec3 pointInPlane = p_camPos + (rayWorld * t);
+			//PositionXChanged((double)pointInPlane.x);
+			ui.posSpinBoxX->setValue((double)pointInPlane.x);
+		}
+		break;
+	case 2: //Y
+		{
+			glm::vec3 normalFlip = glm::vec3(1.0f, 0.0f, 0.0f);
+			if(glm::dot(normalFlip, rayWorld) < 0)
+				normalFlip = glm::vec3(-1.0f, 0.0f, 0.0f); // Flip normal if viewing plane from other side
+
+			float denom = glm::dot(normalFlip, (FocusButtonClicked() - p_camPos));
+
+			if(denom > 1e-6)
+			{
+				t = denom / glm::dot(normalFlip, rayWorld);
+				if(t < 0.0f)
+					return; //Return if behind
+			}
+			else
+				return; //return if perpendicular
+			glm::vec3 pointInPlane = p_camPos + (rayWorld * t);
+			//PositionYChanged((double)pointInPlane.y);
+			ui.posSpinBoxY->setValue((double)pointInPlane.y);
+		}
+		break;
+	case 3: //Z
+		{
+			glm::vec3 normalFlip = glm::vec3(1.0f, 0.0f, 0.0f);
+			if(glm::dot(normalFlip, rayWorld) < 0)
+				normalFlip = glm::vec3(-1.0f, 0.0f, 0.0f); // Flip normal if viewing plane from other side
+
+			float denom = glm::dot(normalFlip, (FocusButtonClicked() - p_camPos));
+
+			if(denom > 1e-6)
+			{
+				t = denom / glm::dot(normalFlip, rayWorld);
+				if(t < 0.0f)
+					return; //Return if behind
+			}
+			else
+				return; //return if perpendicular
+			glm::vec3 pointInPlane = p_camPos + (rayWorld * t);
+			//PositionZChanged((double)pointInPlane.z);
+			ui.posSpinBoxZ->setValue((double)pointInPlane.z);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+bool ParticleEditor::CheckRayVsAABB( glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2 )
+{
+	glm::vec3 invdir = 1.0f / p_rayDir;
+
+	float t1 = (p_bound1.x - p_rayOrigin.x)*invdir.x;
+	float t2 = (p_bound2.x - p_rayOrigin.x)*invdir.x;
+	float t3 = (p_bound1.y - p_rayOrigin.y)*invdir.y;
+	float t4 = (p_bound2.y - p_rayOrigin.y)*invdir.y;
+	float t5 = (p_bound1.z - p_rayOrigin.z)*invdir.z;
+	float t6 = (p_bound2.z - p_rayOrigin.z)*invdir.z;
+
+	float tmin = glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6));
+	float tmax = glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6));
+
+	if(tmax < 0)
+		return false;
+	if(tmin > tmax)
+		return false;
+
+	return true;
 }
 
 

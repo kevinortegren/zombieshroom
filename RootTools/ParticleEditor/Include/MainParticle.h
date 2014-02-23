@@ -46,6 +46,7 @@ private:
 	ECS::Entity*							m_aimingDevice;
 
 	bool m_focusInterpolation;
+	int m_dragging;
 	float m_focusIntTime;
 	glm::vec3 m_toPosition;
 	glm::vec3 m_fromPosition;

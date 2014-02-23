@@ -38,7 +38,9 @@ public:
 	void Update(float p_dt);
 	void Init();
 	void ConnectSignalsAndSlots();
-	void CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	int CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	bool CheckRayVsAABB(glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2);
+	void DragEmitter(int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
 	glm::vec3 FocusButtonClicked();
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
@@ -54,6 +56,7 @@ private:
 	void Changed();
 	void Saved();
 	void ResetTemplates();
+	
 	
 
 	QMessageBox::StandardButton SaveWarningDialog();
@@ -91,6 +94,13 @@ private:
 	bool m_changed;
 
 	glm::mat4 m_inverseProjection;
+
+	glm::vec3 m_xAxisLower;
+	glm::vec3 m_xAxisUpper;
+	glm::vec3 m_yAxisLower;
+	glm::vec3 m_yAxisUpper;
+	glm::vec3 m_zAxisLower;
+	glm::vec3 m_zAxisUpper;
 
 
 private slots:
