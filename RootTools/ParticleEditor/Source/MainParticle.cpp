@@ -198,6 +198,8 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_focusInterpolation = false;
 	m_focusIntTime = 0.0f;
 
+	m_dragging = 0;
+
 	CreateSkyBox();
 }
 
@@ -243,6 +245,7 @@ void MainParticle::UpdateInput()
 	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->GetComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
 	RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
 	RootForce::Transform* trans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_aimingDevice);
+	RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
 	//Set camera distance to aiming device by mouse scroll with a speed factor depending on distance from aiming device position
 	float speedZoomFac = cameraThirdPerson->m_distance/50.0f;
 	cameraThirdPerson->m_distance -= (g_engineContext.m_inputSys->GetScroll() * 4 * speedZoomFac);
@@ -281,14 +284,17 @@ void MainParticle::UpdateInput()
 	}
 	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
-		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
 		//Send mouse coords to ray-sphere intersection test
-		m_particleEditorQt->CheckRayVsObject(g_engineContext.m_inputSys->GetGlobalMousePos(), cameraTrans->m_position, camera->m_viewMatrix);
+		m_dragging = m_particleEditorQt->CheckRayVsObject(g_engineContext.m_inputSys->GetGlobalMousePos(), cameraTrans->m_position, camera->m_viewMatrix);
 	}
-	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN)
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN && m_dragging > 0)
 	{
-		//Get screen coordinates of mouse when pressing down LMB first time
-		glm::ivec2 mousePos = g_engineContext.m_inputSys->GetGlobalMousePos();
+		m_particleEditorQt->DragEmitter(m_dragging, g_engineContext.m_inputSys->GetGlobalMousePos(), cameraTrans->m_position, camera->m_viewMatrix);
+	}
+	else
+	{
+		//Reset draggin if not dragging anymore
+		m_dragging = 0;
 	}
 
 	//Check if focus button is pressed
@@ -296,7 +302,7 @@ void MainParticle::UpdateInput()
 	{
 		m_focusInterpolation = true;
 		m_focusIntTime = 0.0f;
-		m_toPosition = m_particleEditorQt->FocusButtonClicked();
+		m_toPosition = m_particleEditorQt->GetSelectedPosition();
 		m_fromPosition = trans->m_position;
 	}
 
@@ -312,7 +318,6 @@ void MainParticle::UpdateInput()
 		trans->m_position = glm::mix(m_fromPosition, m_toPosition , m_focusIntTime);
 		m_particleEditorQt->SetLookAtSpinBox(trans->m_position);
 	}
-
 }
 
 void MainParticle::UpdateThirdPerson()

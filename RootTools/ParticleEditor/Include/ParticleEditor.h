@@ -38,11 +38,29 @@ public:
 	void Update(float p_dt);
 	void Init();
 	void ConnectSignalsAndSlots();
-	void CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
-	glm::vec3 FocusButtonClicked();
+	int CheckRayVsObject(glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	float CheckRayVsAABB(glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2);
+	void DragEmitter(int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
+	glm::vec3 GetSelectedPosition();
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
+	struct AxisBoundingBox
+	{
+		AxisBoundingBox(){}
+		AxisBoundingBox(glm::vec3 p_lower, glm::vec3 p_upper) : m_lower(p_lower), m_upper(p_upper)
+		{}
+		glm::vec3 m_lower;
+		glm::vec3 m_upper;
+	};
+	struct PointOnPlane
+	{
+		PointOnPlane(){}
+		PointOnPlane(glm::vec3 p_point, bool p_hit) : Point(p_point), Hit(p_hit){}
+		
+		glm::vec3 Point;
+		bool Hit;
+	};
 	//METHODS
 	void closeEvent(QCloseEvent *event);
 	void DrawGridX(float p_spacing, glm::vec4 p_color);
@@ -54,8 +72,9 @@ private:
 	void Changed();
 	void Saved();
 	void ResetTemplates();
+	float GetDragOffset(float p_pointOnAxis, float p_pointOfEmitter);
+	PointOnPlane GetPointOnPlane(glm::vec3 p_camPos, glm::vec3 p_worldCamPos, glm::vec3 p_rayDir);
 	
-
 	QMessageBox::StandardButton SaveWarningDialog();
 
 	//MEMBERS
@@ -82,7 +101,9 @@ private:
 	bool m_showGrid;
 	bool m_showAxis;
 	bool m_running;
+	bool m_firstDrag;
 
+	float m_dragOffset;
 	float m_gridSpace;
 	float m_collectedTime;
 
@@ -92,6 +113,7 @@ private:
 
 	glm::mat4 m_inverseProjection;
 
+	AxisBoundingBox m_axisAABB[3];
 
 private slots:
 	void MenuNew();

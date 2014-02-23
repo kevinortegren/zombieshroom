@@ -1,7 +1,7 @@
 #include "ParticleEditor.h"
 
 ParticleEditor::ParticleEditor(QWidget *parent)
-	: QMainWindow(parent), m_running(true), m_showGrid(true), m_showAxis(true)
+	: QMainWindow(parent), m_running(true), m_showGrid(true), m_showAxis(true), m_firstDrag(true)
 {
 	ui.setupUi(this);
 	ui.aboutWidget->hide();
@@ -149,6 +149,9 @@ void ParticleEditor::Init()
 
 	Saved();
 
+	m_axisAABB[0] = AxisBoundingBox(glm::vec3(0.1f, -0.1f, -0.1f), glm::vec3(0.5f, 0.1f, 0.1f));//X
+	m_axisAABB[1] = AxisBoundingBox(glm::vec3(-0.1f, 0.1f, -0.1f), glm::vec3(0.1f, 0.5f, 0.1f));//Y
+	m_axisAABB[2] = AxisBoundingBox(glm::vec3(-0.1f, -0.1f, 0.1f), glm::vec3(0.1f, 0.1f, 0.5f));//Z
 }
 
 bool ParticleEditor::CheckExit()
@@ -847,7 +850,7 @@ void ParticleEditor::ModelTexDoubleClicked( const QModelIndex& p_index )
 	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
 }
 
-glm::vec3 ParticleEditor::FocusButtonClicked()
+glm::vec3 ParticleEditor::GetSelectedPosition()
 {
 	return glm::vec3((float)ui.posSpinBoxX->value(), (float)ui.posSpinBoxY->value(), (float)ui.posSpinBoxZ->value());
 }
@@ -1071,10 +1074,10 @@ void ParticleEditor::RemoveObjectButton()
 	m_modelTrans->m_scale = glm::vec3(0.0f);
 }
 
-void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix)
+int ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix)
 {
 	if(m_selectedEntityIndex == -1)
-		return;
+		return 0;
 
 	ECS::Entity* entity = m_emitterEntities.at(0);
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
@@ -1095,6 +1098,31 @@ void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos
 	glm::vec4 rW = (glm::inverse(p_viewMatrix) * rayView);
 	glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
 
+	//Test Axis selection
+	for(int i = 1; i <= 3; ++i)
+	{
+		float collisionDistance = CheckRayVsAABB(rayWorld, p_camPos, GetSelectedPosition() + m_axisAABB[i-1].m_lower, GetSelectedPosition() + m_axisAABB[i-1].m_upper);
+		if(collisionDistance < closestDist && collisionDistance >= 0.0f)
+		{
+			closestEmitter = (int)i;
+			closestDist = collisionDistance;
+		}
+	}
+	if(closestEmitter > -1)
+	{
+		if(closestEmitter == 1)
+			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "X axis selected");
+		if(closestEmitter == 2)
+			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Y axis selected");
+		if(closestEmitter == 3)
+			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Z axis selected");
+		m_firstDrag = true;
+		return closestEmitter;
+	}
+	
+	//Test emitter selection
+	closestDist = 999999.0f;
+	closestEmitter = -1;
 	for(unsigned i = 0; i < e->m_particleSystems.size(); ++i)
 	{
 		//Test ray vs shpere
@@ -1124,17 +1152,122 @@ void ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos
 		EmitterSelected(ui.listWidget->item(closestEmitter));
 		ui.listWidget->setCurrentItem(ui.listWidget->item(closestEmitter));
 	}
+
+	return 0;
 }
 
 void ParticleEditor::DrawPositionAxis()
 {
-	glm::vec3 position = FocusButtonClicked();
+	glm::vec3 position = GetSelectedPosition();
 	//X
 	m_context->m_renderer->AddLine(position, position + glm::vec3(0.5f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	//Y
 	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	//Z
 	m_context->m_renderer->AddLine(position, position + glm::vec3(0.0f, 0.0f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+}
+
+void ParticleEditor::DragEmitter( int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix )
+{
+	//Calculate NDC coords
+	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
+	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
+	//View space coords
+	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);
+	//World space coords
+	glm::vec4 rW = (glm::inverse(p_viewMatrix) * rayView);
+	glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+
+	switch (p_axis)
+	{
+	case 1: //x
+		{
+			glm::vec3 camPos = glm::vec3(GetSelectedPosition().x, p_camPos.y, p_camPos.z);
+			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, rayWorld);
+			if(pointOnPlane.Hit)
+				ui.posSpinBoxX->setValue((double)pointOnPlane.Point.x - (double)GetDragOffset(pointOnPlane.Point.x, ui.posSpinBoxX->value()));
+		}
+		break;
+	case 2: //Y
+		{
+			glm::vec3 camPos = glm::vec3(p_camPos.x, GetSelectedPosition().y, p_camPos.z);
+			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, rayWorld);
+			if(pointOnPlane.Hit)
+				ui.posSpinBoxY->setValue((double)pointOnPlane.Point.y - (double)GetDragOffset(pointOnPlane.Point.y, ui.posSpinBoxY->value()));
+		}
+		break;
+	case 3: //Z
+		{
+			glm::vec3 camPos = glm::vec3(p_camPos.x, p_camPos.y, GetSelectedPosition().z);
+			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, rayWorld);
+			if(pointOnPlane.Hit)
+				ui.posSpinBoxZ->setValue((double)pointOnPlane.Point.z - (double)GetDragOffset(pointOnPlane.Point.z, ui.posSpinBoxZ->value()));
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+float ParticleEditor::CheckRayVsAABB( glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2 )
+{
+	glm::vec3 invdir = 1.0f / p_rayDir;
+
+	float t1 = (p_bound1.x - p_rayOrigin.x)*invdir.x;
+	float t2 = (p_bound2.x - p_rayOrigin.x)*invdir.x;
+	float t3 = (p_bound1.y - p_rayOrigin.y)*invdir.y;
+	float t4 = (p_bound2.y - p_rayOrigin.y)*invdir.y;
+	float t5 = (p_bound1.z - p_rayOrigin.z)*invdir.z;
+	float t6 = (p_bound2.z - p_rayOrigin.z)*invdir.z;
+
+	float tmin = glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6));
+	float tmax = glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6));
+
+	if(tmax < 0)
+		return -1.0f;
+	if(tmin > tmax)
+		return -1.0f;
+
+	return tmin;
+}
+
+float ParticleEditor::GetDragOffset( float p_pointOnAxis, float p_pointOfEmitter )
+{
+	if(m_firstDrag)
+	{
+		m_dragOffset = p_pointOnAxis - p_pointOfEmitter;
+		m_firstDrag = false;
+	}
+	return m_dragOffset;
+	
+}
+
+ParticleEditor::PointOnPlane ParticleEditor::GetPointOnPlane( glm::vec3 p_camPos, glm::vec3 p_worldCamPos, glm::vec3 p_rayDir )
+{
+	float t;
+	bool hit = true;
+
+	glm::vec3 normalFlip = glm::normalize(GetSelectedPosition() - p_camPos);
+
+	float denom = glm::dot(normalFlip, (GetSelectedPosition() - p_worldCamPos));
+
+	if(denom > 1e-6)
+	{
+		t = denom / glm::dot(normalFlip, p_rayDir);
+		if(t < 0.0f)
+		{
+			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "t < 0.0f");
+			hit = false; 
+		}
+	}
+	else
+		hit = false; 
+
+	return PointOnPlane(p_worldCamPos + (p_rayDir * t), hit);
 }
 
 
