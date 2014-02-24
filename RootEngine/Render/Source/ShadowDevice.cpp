@@ -11,6 +11,7 @@ namespace Render
 		m_depthTexture = nullptr;
 		m_numberOfShadowcasters = 0;
 		m_showShadows = true;
+		m_depthTextureArray = 0;
 	}
 
 	ShadowDevice::~ShadowDevice()
@@ -154,4 +155,27 @@ namespace Render
 		m_shadowJobs.clear();	
 	}
 
+	void ShadowDevice::Resize(int p_width, int p_height)
+	{
+		if(m_depthTextureArray)
+		{
+			glDeleteTextures(1, &m_depthTextureArray);
+			m_depthTextureArray = 0;
+		}
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			if(m_framebuffers[i])
+			{
+				glDeleteFramebuffers(1, &m_framebuffers[i]);
+				m_framebuffers[i] = 0;
+			}
+		}
+
+		glDeleteSamplers(1, &m_samplerObjectPCF);
+		glDeleteSamplers(1, &m_samplerObjectFloat);
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_depthTextureArray);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32F, m_width, m_height, RENDER_SHADOW_CASCADES);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
 }

@@ -107,7 +107,6 @@ public:
     QLabel *label_6;
     QDoubleSpinBox *sizeEndSpinBoxX;
     QDoubleSpinBox *lifeTimeMinSpinBox;
-    QPushButton *focusButton;
     QDoubleSpinBox *lifeTimeMaxSpinBox;
     QDoubleSpinBox *speedMaxSpinBox;
     QSlider *spreadSlider;
@@ -519,11 +518,6 @@ public:
         lifeTimeMinSpinBox->setValue(0.1);
 
         gridLayout->addWidget(lifeTimeMinSpinBox, 13, 4, 1, 1);
-
-        focusButton = new QPushButton(gridLayoutWidget);
-        focusButton->setObjectName(QStringLiteral("focusButton"));
-
-        gridLayout->addWidget(focusButton, 0, 7, 1, 1);
 
         lifeTimeMaxSpinBox = new QDoubleSpinBox(gridLayoutWidget);
         lifeTimeMaxSpinBox->setObjectName(QStringLiteral("lifeTimeMaxSpinBox"));
@@ -958,7 +952,6 @@ public:
         label_3->setText(QApplication::translate("ParticleEditorClass", "SizeEnd:", 0));
         label_13->setText(QApplication::translate("ParticleEditorClass", "Spread:", 0));
         label_6->setText(QApplication::translate("ParticleEditorClass", "Gravity:", 0));
-        focusButton->setText(QApplication::translate("ParticleEditorClass", "Look At", 0));
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Textures", 0));

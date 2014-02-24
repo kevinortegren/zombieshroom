@@ -58,6 +58,16 @@ namespace Render
 		return (float)((1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation))));	
 	}
 
+	void GlowDevice::SetHalfWidth(int p_halfWidth)
+	{
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(int), &p_halfWidth);
+	}
+
+	void GlowDevice::SetHalfHeight(int p_halfHeight)
+	{
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(4, sizeof(int), &p_halfHeight);
+	}
+
 	void GlowDevice::SetGlowFactor(float p_factor)
 	{
 		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow factor to %f", p_factor);
@@ -122,6 +132,8 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
 		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);	
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		SetHalfWidth(p_width/2);
+		SetHalfHeight(p_height/2);
 	}
 
 	void GlowDevice::Display(bool p_value)

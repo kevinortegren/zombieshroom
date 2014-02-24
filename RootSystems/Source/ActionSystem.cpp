@@ -66,12 +66,20 @@ namespace RootSystems
 			// Get the facing and calculate the right direction. Facing is assumed to be normalized, and up is assumed to be (0, 1, 0).
 			glm::vec3 facing = transform->m_orientation.GetFront();
 			glm::vec3 right = transform->m_orientation.GetRight();
-
-			// Calculate movement vector based on input values, the player's speed
-			glm::vec3 movement = facing * action->MovePower + right * action->StrafePower;
-			if(movement != glm::vec3(0))
+			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 			{
-				movement = glm::normalize(movement) * playphys->MovementSpeed;
+				action->JumpDir = facing * action->MovePower + right * action->StrafePower;
+			}
+			else
+			{
+				action->JumpDir += facing * action->MovePower + right * action->StrafePower;
+			}
+				
+			if(action->JumpDir != glm::vec3(0))
+			{
+				if(glm::length2(action->JumpDir) > 1)
+					action->JumpDir = glm::normalize(action->JumpDir);
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
 			}
 
@@ -93,7 +101,7 @@ namespace RootSystems
 
 				if (m_serverPeer != nullptr && player->AbilityScripts[i].OnCooldown && player->AbilityScripts[i].Cooldown <= 0.0f)
 				{
-					// Cooldown has finished on the server.
+					// Cooldown has finished on the server. 
 					player->AbilityScripts[i].OnCooldown = false;
 					player->AbilityScripts[i].Cooldown = 0.0f;
 
@@ -161,6 +169,7 @@ namespace RootSystems
 					{
 						// Apply jump force and go into jump animation
 						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+
 						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 						{
 							animation->m_animClip = RootForce::AnimationClip::JUMP_START;

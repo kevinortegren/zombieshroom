@@ -37,29 +37,30 @@ function Explosion.OnCreate (userId, actionId)
 end
 
 function Explosion.OnCollide (self, entity)
-	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
-	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
-	local network = entity:GetNetwork();
-	local targetPlayerComponent = entity:GetPlayerComponent();
-	local abilityOwnerNetwork = self:GetNetwork();
-	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-	local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
-	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-	if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-		local hitPos = entity:GetTransformation():GetPos();
-		local selfPos = self:GetTransformation():GetPos();
-		hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback);
-		local health = entity:GetHealth();
-		if not health:IsDead() then
-			local receiverId = network:GetUserId();
-			health:Damage(abilityOwnerId, Explosion.damage, receiverId);
-		end
-	end
-	--Logging.Log(LogLevel.DEBUG_PRINT, "End of OnCollide");
+	if entity:DoesExist() then
+    local hitCol = entity:GetCollision();
+    local hitPhys = entity:GetPhysics();
+    local type = hitPhys:GetType(hitCol);
+    if type == PhysicsType.TYPE_PLAYER then
+      local abilityOwnerNetwork = self:GetNetwork();
+      local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+      local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+      local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+      local targetPlayerComponent = entity:GetPlayerComponent();
+      if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+        local network = entity:GetNetwork();
+        local hitPos = entity:GetTransformation():GetPos();
+        local selfPos = self:GetTransformation():GetPos();
+        hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback);
+        local health = entity:GetHealth();
+        if not health:IsDead() then
+          local receiverId = network:GetUserId();
+          health:Damage(abilityOwnerId, Explosion.damage, receiverId);
+        end
+      end
+     end
+  end
 end
-
 function Explosion.OnDestroy (self)
 	local network = self:GetNetwork();
 	local collision = self:GetCollision();

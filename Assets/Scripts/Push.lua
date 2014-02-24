@@ -1,10 +1,10 @@
 Push = {};
-Push.knockback = 10;
-Push.cooldown = 3;
+Push.knockback = 20;
+Push.cooldown = 1;
 Push.charges = -1;
-Push.chargeTime = 1;
+Push.chargeTime = 0;
 Push.channelingTime = 0;
-Push.duration = 0.2;
+Push.duration = 5;
 
 function Push.ChargeDone (time, userId, actionId)
 	if time >= Push.chargeTime * 0.5 then
@@ -27,8 +27,9 @@ function Push.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
 	local timerComp = Timer.New(self, Push.duration);
+	Follower.New(self);
 	--Setting stuff
-	collisionComp:CreateHandle(self, 1, false);
+	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();
@@ -48,9 +49,23 @@ function Push.OnCreate (userId, actionId)
 end
 
 function Push.OnCollide (self, entity)
-	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	if entity:DoesExist() then
+		local hitCol = entity:GetCollision();
+		local hitPhys = entity:GetPhysics();
+		local type = hitPhys:GetType(hitCol);
+		if type == PhysicsType.TYPE_PLAYER then
+			local targetPlayerComponent = entity:GetPlayerComponent();
+			local abilityOwnerNetwork = self:GetNetwork();
+			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+				local hitPos = entity:GetTransformation():GetPos();
+				local selfPos = self:GetTransformation():GetPos();
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.knockback);
+			end
+		end
+	end
 end
 
 function Push.OnDestroy (self)

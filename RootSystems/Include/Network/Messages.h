@@ -29,7 +29,7 @@ namespace RootForce
 	struct PlayerComponent;
 	struct TDMRuleSet;
 	struct PlayerPhysics;
-	struct AbilityRespawnComponent;
+	struct AbilitySpawnComponent;
 
 	namespace Network
 	{
@@ -391,7 +391,7 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
-		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilityRespawnComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilitySpawnComponent* p_c);
 
 
 		/*

@@ -44,16 +44,10 @@ namespace RootForce
 
 	}
 
-	Collision::Collision()
-	{
-		m_meshHandle = "";
-		m_handle = nullptr;
-	}
-
 	Collision::~Collision()
 	{
-		if(m_handle != nullptr)
-		g_engineContext.m_physics->RemoveObject(*m_handle);
+		if(m_handle != NULL)
+			g_engineContext.m_physics->RemoveObject(*m_handle);
 	}
 
 }

@@ -20,7 +20,7 @@
 #include <RootSystems/Include/Components.h>
 #include <RootSystems/Include/ConcurrentTest.h>
 #include <RootSystems/Include/WaterSystem.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/TryPickupResetSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/BotanySystem.h>

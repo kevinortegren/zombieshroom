@@ -634,7 +634,6 @@ namespace Ragdoll
 		p_bones[myIndex] = (glm::inverse(m_prevPos[myIndex]) *  ( glm::make_mat4(data))); 	
 		p_bones[myIndex] *= rotatedTranslation;
 		p_bones[myIndex] *= m_boneOffset[myIndex];
-		
 	
 
 		for(unsigned int i = 0; i < p_rootNode->mNumChildren; i++)
@@ -643,4 +642,11 @@ namespace Ragdoll
 			FixPosition(p_bones, p_rootNode->mChildren[i]);
 		}
 	}
+
+	void Ragdoll::SetGravity( const btVector3& p_gravity )
+	{
+		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT; i++)
+			i[m_bodies]->setGravity(p_gravity);
+	}
+
 }

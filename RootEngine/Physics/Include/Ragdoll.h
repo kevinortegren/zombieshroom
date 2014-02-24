@@ -42,6 +42,7 @@ namespace Ragdoll
 		btQuaternion GetOrientation();
 		void SetOrientation(glm::quat p_orientation);
 		void SetVelocity(const btVector3& p_velocity);
+		void SetGravity(const btVector3& p_gravity);
 	private:
 		btDiscreteDynamicsWorld* m_dynamicWorld;
 		btRigidBody* CreateBody(glm::mat4 p_bones[20], aiNode* p_rootNode,  glm::mat4 p_transform , int p_massFactor, const btVector3& p_parentBodyOffset, glm::mat4 p_boneOffset[20]);

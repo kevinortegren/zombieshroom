@@ -59,7 +59,7 @@ vec3 GetDecodedNormal(vec2 TexCoord)
 
 void main() {
 
-    vec2 TexCoord = gl_FragCoord.xy / textureSize(g_Diffuse, 0);
+    vec2 TexCoord = vec2(gl_FragCoord.st)/textureSize(g_Diffuse, 0);
 
     // Position.
     vec3 position = GetVSPositionFromDepth(TexCoord);
