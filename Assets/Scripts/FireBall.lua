@@ -4,7 +4,7 @@ FireBall.knockback = 20;
 FireBall.cooldown = 3;
 FireBall.charges = 0;
 FireBall.chargeTime = 0;
-FireBall.channelingTime = 5;
+FireBall.channelingTime = 0;
 FireBall.duration = 0;
 FireBall.charges = -1;
 

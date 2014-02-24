@@ -585,7 +585,7 @@ namespace RootForce
 				if(entity == nullptr)
 				{
 					Network::NetworkEntityID tempId = id;
-					tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)];
+					tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
 					
 					// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
 					if(id.SequenceID > tempId.SequenceID)
