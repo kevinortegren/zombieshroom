@@ -697,6 +697,17 @@ namespace Physics
 		}
 	}
 
+	void RootPhysics::StopPlayerKnockback( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->Knockback(btVector3(0,0,0), 0);
+		}
+	}
+
 	bool RootPhysics::DoesObjectExist( int p_objectHandle )
 	{
 		if(m_userPointer.size() == 0 || (unsigned int)p_objectHandle >= m_userPointer.size() || p_objectHandle < 0)
