@@ -11,6 +11,7 @@
 #include <fstream>
 #include <RakNet/RakPeerInterface.h>
 #include <RakNet/BitStream.h>
+#include <RootSystems/Include/LightSystem.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
@@ -131,6 +132,7 @@ namespace RootForce
 
 		//Remove all components used for rendering and collision
 		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
+		m_world->GetEntityManager()->RemoveComponent<PointLight>(p_entity);
 		m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
 		m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
 
@@ -202,6 +204,11 @@ namespace RootForce
 		renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("AbilityBackground", Render::TextureType::TEXTURE_2D);
 		renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
+
+		PointLight* pl = m_world->GetEntityManager()->CreateComponent<PointLight>(p_entity);
+		pl->m_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+		pl->m_attenuation = glm::vec3(0.0f, 0.3f, 0.0f);
+
 	}
 
 	void AbilitySpawnSystem::CreateCollisionComponents(ECS::Entity* p_entity)
