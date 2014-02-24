@@ -595,10 +595,10 @@ namespace RootForce
 					assert(entity != nullptr);
 
 					Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
-					netcomp->ID = tempId;
+					netcomp->ID = id;
 
-					p_map[tempId] = entity;
-					p_map[id] = nullptr;
+					p_map[id] = entity;
+					p_map.erase(p_map.find(tempId));
 				}
 			}
 			else
