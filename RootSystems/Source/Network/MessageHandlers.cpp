@@ -1048,6 +1048,7 @@ namespace RootForce
 							health->Health = 0;
 							health->IsDead = true;
 							health->RespawnDelay = 3.0f;
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 						}
 
 					} return true;

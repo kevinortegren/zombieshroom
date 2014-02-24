@@ -82,11 +82,11 @@ namespace RootForce
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
 		{	
 			//Check if player and kill
-			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
-			if(player == p_entity)
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity))
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
 			}
+		
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
