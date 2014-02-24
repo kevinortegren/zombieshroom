@@ -16,6 +16,8 @@ namespace Render
 		void Process(GLRenderer* p_renderer, Mesh* m_mesh);
 		void Resize(int p_width, int p_height);
 
+		void SetHalfWidth(int p_halfWidth);
+		void SetHalfHeight(int p_halfHeight);
 		void SetGlowFactor(float p_factor);
 		void SetGlowStrength(float p_strength);
 		void SetGlowRadius(float p_radius);

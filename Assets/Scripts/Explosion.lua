@@ -61,9 +61,7 @@ function Explosion.OnCollide (self, entity)
 			end
 		end
 	end
-	--Logging.Log(LogLevel.DEBUG_PRINT, "End of OnCollide");
 end
-
 function Explosion.OnDestroy (self)
 	local network = self:GetNetwork();
 	local collision = self:GetCollision();

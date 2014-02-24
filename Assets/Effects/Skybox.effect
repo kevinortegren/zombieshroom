@@ -1,14 +1,16 @@
 - name: Skybox
   techniques:
     - name: Skybox
-      textures:
-        - name: CubeMap
-          slot: 0
       bindings:
         - name: PerFrame
           slot: 0
         - name: PerObject
           slot: 1
+        - name: PerTech
+          slot: 3
+      uniforms:
+        - sem: MODEL
+          offset: 0
       programs:
         - name: skybox
           shaders:

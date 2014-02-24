@@ -12,7 +12,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -312,7 +312,7 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->JumpForce);
 		}
 
-		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, RootForce::AbilityRespawnComponent* p_c)
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, RootForce::AbilitySpawnComponent* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->Claimed);
 			if (p_writeToBitstream)
@@ -397,7 +397,7 @@ namespace RootForce
 				return true;
 
 				case ComponentType::ABILITYSPAWN:
-					Serialize(true, p_bs, (RootForce::AbilityRespawnComponent*) p_component);
+					Serialize(true, p_bs, (RootForce::AbilitySpawnComponent*) p_component);
 				return true;
 			}
 
@@ -471,7 +471,7 @@ namespace RootForce
 				break;
 
 				case ComponentType::ABILITYSPAWN:
-					component = CreateOrGetDeserializedComponent<RootForce::AbilityRespawnComponent>(p_bs, p_entity, p_entityManager, false);
+					component = CreateOrGetDeserializedComponent<RootForce::AbilitySpawnComponent>(p_bs, p_entity, p_entityManager, false);
 				break;
 				
 				default:

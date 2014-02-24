@@ -3,18 +3,18 @@
   LIFETIMEMAX: 2.5
   SPEEDMIN: 1
   SPEEDMAX: 3
-  SIZEMIN: [4, 4]
-  SIZEMAX: [8, 8]
+  SIZEMIN: [5, 5]
+  SIZEMAX: [5, 5]
   SIZEEND: [0, 0]
   COLOR: [0.992157, 1, 0.309804, 1]
   COLOREND: [1, 0.129412, 0, 0.603922]
-  GRAVITY: [0, 8, 0]
+  GRAVITY: [0, 5, 0]
   DIRECTION: [0, 1, 0]
   SPREAD: 0.541052
-  SPAWNTIME: 0.01
+  SPAWNTIME: 0.2
   ORBITSPEED: 10
   ORBITRADIUS: 0
-  TEMPLATE: 1
-  TEXTURE: Fireparticle
-  EFFECT: Particle/ParticleOrbit
+  TEMPLATE: 0
+  TEXTURE: particle
+  EFFECT: Particle/Particle
   NAME: Fire

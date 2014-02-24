@@ -104,6 +104,7 @@ namespace RootEngine
 
 	void Profiling::Update( float p_dt )
 	{
+//#ifdef _DEBUG
 		m_time += p_dt;
 		m_frames += 1;
 
@@ -118,6 +119,7 @@ namespace RootEngine
 		{
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
+//#endif
 #endif
 	}
 

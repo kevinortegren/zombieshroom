@@ -46,15 +46,9 @@ end
 
 function FireBall.OnCollide (self, entity)
 	if entity:DoesExist() then
-		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
 		local network = self:GetNetwork();
-		local transComp = self:GetTransformation();
-		transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));
-		if self ~= entity then
-	 		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
-			FireBall.OnDestroy(self);
-		end
+		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+		FireBall.OnDestroy(self);
 	end
 end
 

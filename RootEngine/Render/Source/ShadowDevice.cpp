@@ -9,6 +9,7 @@ namespace Render
 	{
 		m_depthTexture = nullptr;
 		m_numberOfShadowcasters = 0;
+		m_depthTextureArray = 0;
 	}
 
 	ShadowDevice::~ShadowDevice()
@@ -94,4 +95,25 @@ namespace Render
 		m_numberOfShadowcasters = 0;
 	}
 
+	void ShadowDevice::Resize(int p_width, int p_height)
+	{
+		if(m_depthTextureArray)
+		{
+			glDeleteTextures(1, &m_depthTextureArray);
+			m_depthTextureArray = 0;
+		}
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			if(m_framebuffers[i])
+			{
+				glDeleteFramebuffers(1, &m_framebuffers[i]);
+				m_framebuffers[i] = 0;
+			}
+		}
+
+		glDeleteSamplers(1, &m_samplerObjectPCF);
+		glDeleteSamplers(1, &m_samplerObjectFloat);
+
+		Init(0, p_width, p_height);
+	}
 }

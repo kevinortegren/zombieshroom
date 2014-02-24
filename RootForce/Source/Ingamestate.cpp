@@ -44,7 +44,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);

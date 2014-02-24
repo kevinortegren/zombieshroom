@@ -37,12 +37,16 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::MASS_DATA_PRINT]	= TagLevelInfo("DATA_PRINT ", false);
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 
+#ifdef _DEBUG
 	OpenLogStream();
+#endif // _DEBUG
 }
 
 Logging::~Logging()
 {
+#ifdef _DEBUG
 	CloseLogStream();
+#endif // _DEBUG
 }
 
 bool Logging::OpenLogStream()
@@ -56,7 +60,6 @@ bool Logging::OpenLogStream()
 	//Generate file name from date and time
 	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec);
 	std::string logName = fileName + ".txt";
-	std::string commaName = fileName + ".rlog";
 	//Open log file stream
 	fopen_s(&m_logFile, logName.c_str(), "w");
 
@@ -118,10 +121,12 @@ void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_t
 //////////////////////////////////////////////////////////////////////////
 void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel,std::string p_format, va_list p_args )
 {
+#ifdef _DEBUG
 	std::string output = GetTimeFormatString() + "    " + m_tagInfo[p_tag].Name + "    " + m_levelInfo[p_vLevel].Name +  "    " + p_format + "    [" + p_func + ", Line: " + std::to_string(p_line) + "]" + "\n";
 
 	vfprintf (m_logFile, output.c_str(), p_args);
 	fflush(m_logFile);
+#endif // _DEBUG
 }
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine )

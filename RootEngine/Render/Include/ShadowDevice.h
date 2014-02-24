@@ -26,7 +26,7 @@ namespace Render
 
 		int GetWidth(){ return m_width; }
 		int GetHeight(){ return m_height; }
-
+		void Resize(int p_width, int p_height);
 		std::shared_ptr<Technique> m_technique;
 		Shadowcaster m_shadowcasters[RENDER_MAX_SHADOWCASTERS];
 		TextureInterface* m_depthTexture;
