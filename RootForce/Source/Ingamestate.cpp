@@ -228,7 +228,7 @@ namespace RootForce
 		m_animationSystem->Terminate();
 
 		// Remove all networked entities and reset the entity map and sequence map.
-		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
+		//Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -370,6 +370,11 @@ namespace RootForce
 		}
 
 		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
+		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
 		}
@@ -379,10 +384,7 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		{
-			PROFILE("Ragdoll system", g_engineContext.m_profiler);
-			m_ragdollSystem->Process();
-		}
+		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
