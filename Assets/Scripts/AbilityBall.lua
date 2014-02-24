@@ -46,6 +46,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialDiffuse("fireballDiffuse");
 		renderComp:SetMaterialSpecular("fireballSpecular");
 		renderComp:SetMaterialNormal("fireballNormal");
+		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 		local particleComp = ParticleEmitter.New(self, "AbilityBallFire");
 	end
