@@ -98,7 +98,7 @@ namespace Render
 			BeginSSAO();
 			glDisable(GL_STENCIL_TEST);
 			auto ssao = m_ssaoTech->GetPrograms()[0];
-			m_noiseSSAOTex->Bind(7);
+			m_noiseSSAOTex->Bind(GLRenderer::s_textureSlots[TextureSemantic::SSAO]);
 			m_ssaoTech->Apply();
 			ssao->Apply();
 			m_fullscreenQuad->Draw();
@@ -112,9 +112,9 @@ namespace Render
 		{
 			m_fullscreenQuad->Bind();
 			m_ambient->Apply();
-			m_ssaoTex->Bind(7);
+			m_ssaoTex->Bind(GLRenderer::s_textureSlots[TextureSemantic::SSAO]);
 			m_fullscreenQuad->Draw();
-			m_ssaoTex->Unbind(7);
+			m_ssaoTex->Unbind(GLRenderer::s_textureSlots[TextureSemantic::SSAO]);
 			m_fullscreenQuad->Unbind();
 		}
 	}
