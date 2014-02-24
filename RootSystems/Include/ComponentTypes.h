@@ -36,6 +36,7 @@ namespace RootForce
 			TRYPICKUPCOMPONENT,
 			SOUND,
 			TIMER,
+			FOLLOW,
 		};
 	}
 }

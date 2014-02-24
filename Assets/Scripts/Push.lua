@@ -4,7 +4,7 @@ Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 0.2;
+Push.duration = 5;
 
 function Push.ChargeDone (time, userId, actionId)
 	if time >= Push.chargeTime * 0.5 then
@@ -27,7 +27,7 @@ function Push.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
 	local timerComp = Timer.New(self, Push.duration);
-	Follower.New(self);
+	Follower.New(self, casterEnt, 3);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);

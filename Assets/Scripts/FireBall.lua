@@ -53,7 +53,7 @@ function FireBall.OnCollide (self, entity)
 end
 
 function FireBall.OnDestroy (self)
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
+	--local collision = self:GetCollision();
+	--Collision.RemoveObjectFromWorld(collision);
 	Entity.Remove(self);
 end

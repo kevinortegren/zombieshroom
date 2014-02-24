@@ -23,6 +23,7 @@
 #include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/TryPickupResetSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
+#include <RootSystems/Include/FollowSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -79,6 +80,7 @@ namespace RootForce
 		RootForce::TryPickupResetSystem* 				m_tryPickupResetSystem;
 		RootForce::SoundSystem*							m_soundSystem;
 		RootForce::TimerSystem*							m_timerSystem;
+		RootForce::FollowSystem*						m_followSystem;
 
 		Keymapper* m_keymapper;
 

@@ -48,6 +48,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -150,8 +151,13 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		// Initialize the timer system.
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+		// Initialize the follow system.
+		m_followSystem = new RootForce::FollowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
 
 		// Set debug visualization flags.
@@ -381,6 +387,10 @@ namespace RootForce
 			m_physicsSystem->Process();
 		}
 
+		{
+			PROFILE("Follow system", g_engineContext.m_profiler);
+			m_followSystem->Process();
+		}
 		
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);

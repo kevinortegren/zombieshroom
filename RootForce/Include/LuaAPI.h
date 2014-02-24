@@ -2019,18 +2019,13 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int FollowerCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(1);
+			NumberOfArgs(3);
 			
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			RootForce::ThirdPersonBehavior *s = g_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(*e);
-			s->m_checkWithRay = false;
-			s->m_rotateWithTarget = true;
-			s->m_targetTag = "AimingDevice";
-			s->m_distance = -3.0f;
-
-			RootForce::LookAtBehavior *c = g_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(*e);
-			
-			c->m_targetTag = "AimingDevice";
+			ECS::Entity** f = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
+			RootForce::FollowComponent *s = g_world->GetEntityManager()->CreateComponent<RootForce::FollowComponent>(*e);
+			s->Target = *f;
+			s->Offset = (float)luaL_checknumber(p_luaState, 3);
 
 			//luaL_setmetatable(p_luaState, "Follower");
 			return 0;
