@@ -38,8 +38,6 @@ void ECS::IntervalEntitySystem::Process()
 {
 	while(CheckProcessing())
 	{
-		
-
 		Begin();
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
@@ -66,6 +64,12 @@ void ECS::ConcurrentSystem::Process()
 	{
 		if(m_run)
 		{
+			for(auto itr = m_entitiesToRemove.begin(); itr != m_entitiesToRemove.end(); ++itr)
+			{
+				m_activeEntities.erase((*itr));
+			}
+			m_entitiesToRemove.clear();
+
 			Begin();
 
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)

@@ -27,6 +27,7 @@
               type: vertex
             - name: mesh_normal
               type: fragment
+              
     -  name: Mesh_Normal_Shadow
        bindings:
          - name: PerFrame

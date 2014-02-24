@@ -1,0 +1,43 @@
+#version 410 core                                                                               
+                                                                                                
+layout (vertices = 3) in;                                                
+layout (vertices = 3) out;   
+
+uniform sampler2D g_Density;
+                                                              
+in vec3 cs_normal_in[];                                                                  
+in vec2 cs_texcoord_in[];       
+
+out vec3 es_normal_in[];                                                                  
+out float es_density_in[];
+
+void main()                                                                                     
+{            
+    // Sample triangle density.
+    float v0d = texture(g_Density, cs_texcoord_in[0]).g;
+    float v1d = texture(g_Density, cs_texcoord_in[1]).g;
+    float v2d = texture(g_Density, cs_texcoord_in[2]).g;
+    
+    // Average density 0 - 1.
+    float avgDensity = (v0d + v1d + v2d) / 3;
+
+    if(avgDensity < 0.2)
+    {                                                    
+        gl_TessLevelOuter[0] = 1;        
+        gl_TessLevelOuter[1] = 1;        
+        gl_TessLevelOuter[2] = 1;
+        gl_TessLevelInner[0] = 0;   
+    }
+    else
+    {                                                     
+        gl_TessLevelOuter[0] = 2;         
+        gl_TessLevelOuter[1] = 2;          
+        gl_TessLevelOuter[2] = 2;             
+        gl_TessLevelInner[0] = 2;           
+    }
+                                                                                            
+    es_normal_in[gl_InvocationID] = cs_normal_in[gl_InvocationID];      
+    es_density_in[gl_InvocationID] = avgDensity;
+           
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;                                                                                                                               
+}  

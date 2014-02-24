@@ -80,7 +80,14 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{	//Disturb
+		{	
+			//Check if player and kill
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity))
+			{
+				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
+			}
+		
+			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
 			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
@@ -153,6 +160,7 @@ namespace RootForce
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
+		
 
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
@@ -163,6 +171,7 @@ namespace RootForce
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
 		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+		m_renderable->m_forward = true;
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;

@@ -10,7 +10,7 @@
 #include <assert.h>
 
 #define ECS_MAX_COMPONENTS 64
-#define ECS_MAX_ENTITIES 1024
+#define ECS_MAX_ENTITIES 10000
 
 namespace ECS
 {

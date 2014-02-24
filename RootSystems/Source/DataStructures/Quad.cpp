@@ -7,37 +7,178 @@
 
 namespace RootForce
 {
-	QuadNode::QuadNode(const AABB& p_bounds)
-		: m_bounds(p_bounds) {}
-
-	void QuadNode::AddChild(QuadNode* p_child)
+	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
 	{
-		assert(m_childs.size() < QUADTREE_MAX_CHILDS);
-		m_childs.push_back(p_child);
+		m_idCounter = 0;
+		m_groupName = p_groupName;
+		m_vertices.clear();
+		m_materials.clear();
+		m_boundsPolygons.clear();
+		m_context = p_context;
+		m_world = p_world;
+		m_newGroupName = p_newName;
+
+		// Get working set.
+		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup(p_groupName);
+
+		unsigned indexOffset = 0;
+		unsigned matPtr = 0;
+		for(auto itr = range.first; itr != range.second; ++itr)
+		{
+			ECS::Entity* entity = (*itr).second;
+
+			RootForce::Renderable* renderable = p_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+			auto material = renderable->m_material;
+			auto mesh = renderable->m_model->m_meshes[0];
+
+			unsigned materialIndex = m_materials.size();
+			m_materials.push_back(material);
+			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
+
+			RootForce::Transform* transform = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+
+			glm::mat4x4 transformMatrix;
+			transformMatrix = glm::translate(glm::mat4(1.0f), transform->m_position);
+			transformMatrix = glm::rotate(transformMatrix, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+			transformMatrix = glm::scale(transformMatrix, transform->m_scale);
+
+			// Parse vertex data.
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
+			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+			int offset = 0;
+			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
+			{
+				Render::Vertex1P1N1UV1T1BT v;
+				v.m_tangent = glm::vec3(0);
+				v.m_bitangent = glm::vec3(0);
+
+				memcpy(&v, &data[i], mesh->GetVertexBuffer()->GetElementSize());
+
+				// Transform vertex to world space.
+				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
+				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
+
+				m_vertices.push_back(std::move(v));
+				offset++;
+			}
+
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+
+			// Parse index data.
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
+			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+
+			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+			{
+				Polygon p;
+				int i0, i1, i2;
+
+				memcpy(&i0, &data[i], sizeof(int));
+				memcpy(&i1, &data[i + 4], sizeof(int));
+				memcpy(&i2, &data[i + 8], sizeof(int));
+
+				p.m_indices.push_back(i0 + indexOffset);
+				p.m_indices.push_back(i1 + indexOffset);
+				p.m_indices.push_back(i2 + indexOffset);
+
+				p.m_materialIndex = materialIndex;
+
+				m_boundsPolygons.push_back(std::move(p));
+			}
+
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+			indexOffset += offset;
+		}
+		
+		// Create an AABB for the quad tree structure.
+		AABB quadTreeBounds;
+		int maxX, maxY, maxZ, minX, minY, minZ;
+		maxX = maxY = maxZ = -99999;
+		minX = minY = minZ = 99999;
+
+		for(auto itr = m_boundsPolygons.begin(); itr != m_boundsPolygons.end(); ++itr)
+		{
+			Render::Vertex1P1N1UV1T1BT ps[3];
+
+			ps[0] = m_vertices[(*itr).m_indices[0]];
+			ps[1] = m_vertices[(*itr).m_indices[1]];
+			ps[2] = m_vertices[(*itr).m_indices[2]];
+
+			for(int i = 0; i < 3; i++)
+			{
+				float tx = ps[i].m_pos.x;
+				float ty = ps[i].m_pos.y;
+				float tz = ps[i].m_pos.z;
+
+				if(tx > maxX) maxX = (int)tx;
+				if(tx < minX) minX = (int)tx;
+				
+				if(ty > maxY) maxY = (int)ty;
+				if(ty < minY) minY = (int)ty;
+
+				if(tz > maxZ) maxZ = (int)tz;
+				if(tz < minZ) minZ = (int)tz;	
+			}
+		}
+		
+		m_maxY = maxY;
+		m_minY = minY;
+
+		quadTreeBounds.m_maxX = (float)RoundToPow2(maxX);
+		quadTreeBounds.m_minX = (float)-RoundToPow2(abs(minX));
+
+		quadTreeBounds.m_maxY = (float)maxY;
+		quadTreeBounds.m_minY = (float)minY;
+
+		quadTreeBounds.m_maxZ = (float)RoundToPow2(maxZ);
+		quadTreeBounds.m_minZ = (float)-RoundToPow2(abs(minZ));
+
+		m_root = new QuadNode(quadTreeBounds);
 	}
 
-	const AABB& QuadNode::GetBounds() const
-	{
-		return m_bounds;
+	void QuadTree::BeginDivide(unsigned int p_polygonsPerNode, bool p_splitPolygons, bool p_removeOrigionalEntities)
+	{		
+		for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
+		{
+			m_world->GetEntityManager()->RemoveAllComponents((*itr));
+			m_world->GetEntityManager()->RemoveEntity((*itr));
+		}
+
+		m_polygonsPerNode = p_polygonsPerNode;
+		m_splitPolygons = p_splitPolygons;
+
+
+		if(p_removeOrigionalEntities)
+		{
+			auto a = m_world->GetGroupManager()->GetEntitiesInGroup(m_groupName);
+			for(auto b = a.first; b != a.second; ++b)
+			{
+				m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>((*b).second);
+			}
+		}
+
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", m_boundsPolygons.size());
+		Subdivide(m_root, m_boundsPolygons);
+
+		// ???
+		m_culledEntities.reserve(m_entities.size() * 4);
 	}
 
-	const std::vector<QuadNode*>& QuadNode::GetChilds()
+
+	void QuadTree::RenderDebug(const glm::vec3& p_color)
 	{
-		return m_childs;
+		RenderNodeDebug(m_root, p_color);
 	}
 
-	void QuadTree::RenderDebug()
+	void QuadTree::RenderNodeDebug(QuadNode* p_node, const glm::vec3& p_color)
 	{
-		RenderNode(m_root);
-	}
-
-	void QuadTree::RenderNode(QuadNode* p_node)
-	{
-		p_node->m_bounds.DebugDraw(m_context->m_renderer, glm::vec3(1,0,0), glm::mat4(1.0f));
+		p_node->m_bounds.DebugDraw(m_context->m_renderer, p_color, glm::mat4(1.0f));
 
 		for(unsigned i = 0; i < p_node->m_childs.size(); ++i)
 		{
-			RenderNode(p_node->m_childs[i]);
+			RenderNodeDebug(p_node->m_childs[i], p_color);
 		}
 	}
 
@@ -81,6 +222,7 @@ namespace RootForce
 			if(p_node->GetChilds().size() == 0)
 			{
 				// Insert range.
+				m_culledNodes.push_back(p_node);
 				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
 #ifdef QUADTREE_DRAWLINES
 				p_node->GetBounds().DebugDraw(m_context->m_renderer, glm::vec3(0,1,1), glm::mat4(1.0f));
@@ -103,6 +245,7 @@ namespace RootForce
 			if(p_node->GetChilds().size() == 0)
 			{
 				// Insert range.
+				m_culledNodes.push_back(p_node);
 				m_culledEntities.insert(m_culledEntities.end(), p_node->m_indices.begin(), p_node->m_indices.end());
 			}
 			else
@@ -116,226 +259,83 @@ namespace RootForce
 
 	}
 
-	void QuadTree::Init(RootEngine::GameSharedContext* p_context, ECS::World* p_world)
-	{
-		m_vertices.clear();
-		m_materials.clear();
-
-		m_context = p_context;
-		m_world = p_world;
-
-		// Get working set.
-		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup("Static");
-
-		unsigned indexOffset = 0;
-		unsigned matPtr = 0;
-
-		std::vector<Polygon> polygons;
-
-		for(auto itr = range.first; itr != range.second; ++itr)
-		{
-			ECS::Entity* entity = (*itr).second;
-
-			RootForce::Renderable* renderable = p_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-			auto material = renderable->m_material;
-			auto mesh = renderable->m_model->m_meshes[0];
-
-			unsigned materialIndex = m_materials.size();
-
-			m_materials.push_back(material);
-			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
-
-			RootForce::Transform* transform = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
-
-			glm::mat4x4 transformMatrix;
-			transformMatrix = glm::translate(glm::mat4(1.0f), transform->m_position);
-			transformMatrix = glm::rotate(transformMatrix, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
-			transformMatrix = glm::scale(transformMatrix, transform->m_scale);
-
-			// Parse vertex data.
-			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
-			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-
-			int offset = 0;
-			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
-			{
-				Render::Vertex1P1N1UV1T1BT v;
-				v.m_tangent = glm::vec3(0);
-				v.m_bitangent = glm::vec3(0);
-
-				memcpy(&v, &data[i], mesh->GetVertexBuffer()->GetElementSize());
-
-				// Transform vertex to world space.
-				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
-				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
-
-				m_vertices.push_back(std::move(v));
-
-				offset++;
-			}
-
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-
-			// Parse index data.
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
-			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-
-			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
-			{
-				Polygon p;
-				int i0, i1, i2;
-
-				memcpy(&i0, &data[i], sizeof(int));
-				memcpy(&i1, &data[i + 4], sizeof(int));
-				memcpy(&i2, &data[i + 8], sizeof(int));
-
-				p.m_indices.push_back(i0 + indexOffset);
-				p.m_indices.push_back(i1 + indexOffset);
-				p.m_indices.push_back(i2 + indexOffset);
-
-				p.m_materialIndex = materialIndex;
-
-				polygons.push_back(std::move(p));
-			}
-
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-
-			indexOffset += offset;
-		}
-		
-		// Create an AABB for the quad tree structure.
-
-		AABB quadTreeBounds;
-		int maxX, maxY, maxZ, minX, minY, minZ;
-		maxX = maxY = maxZ = -99999;
-		minX = minY = minZ = 99999;
-
-		for(auto itr = polygons.begin(); itr != polygons.end(); ++itr)
-		{
-			Render::Vertex1P1N1UV1T1BT ps[3];
-
-			ps[0] = m_vertices[(*itr).m_indices[0]];
-			ps[1] = m_vertices[(*itr).m_indices[1]];
-			ps[2] = m_vertices[(*itr).m_indices[2]];
-
-			for(int i = 0; i < 3; i++)
-			{
-				float tx = ps[i].m_pos.x;
-				float ty = ps[i].m_pos.y;
-				float tz = ps[i].m_pos.z;
-
-				if(tx > maxX) maxX = (int)tx;
-				if(tx < minX) minX = (int)tx;
-				
-				if(ty > maxY) maxY = (int)ty;
-				if(ty < minY) minY = (int)ty;
-
-				if(tz > maxZ) maxZ = (int)tz;
-				if(tz < minZ) minZ = (int)tz;	
-			}
-		}
-		
-		m_maxY = maxY;
-		m_minY = minY;
-
-		quadTreeBounds.m_maxX = (float)RoundToPow2(maxX);
-		quadTreeBounds.m_minX = (float)-RoundToPow2(abs(minX));
-
-		quadTreeBounds.m_maxY = (float)maxY;
-		quadTreeBounds.m_minY = (float)minY;
-
-		quadTreeBounds.m_maxZ = (float)RoundToPow2(maxZ);
-		quadTreeBounds.m_minZ = (float)-RoundToPow2(abs(minZ));
-
-		m_root = new QuadNode(quadTreeBounds);
-
-
-#ifdef QUADTREE_SUBDIVIDE
-		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Begin subdividing %d", polygons.size());
-
-		auto a = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
-		for(auto b = a.first; b != a.second; ++b)
-		{
-			m_world->GetEntityManager()->RemoveAllComponents(b->second);
-			m_world->GetEntityManager()->RemoveEntity(b->second);
-		}
-
-		Subdivide(m_root, polygons);
-
-		m_culledEntities.reserve(m_entities.size() * 4);
-#endif
-
-	}
-
 	int QuadTree::RoundToPow2(int p_value) const
 	{
 		return (int)pow(2, ceil(log(p_value)/log(2)));
 	}
 
-	void QuadTree::Subdivide( QuadNode* p_node,  std::vector<Polygon> p_polygons  )
+	void QuadTree::Subdivide( QuadNode* p_node,  std::vector<Polygon> p_polygons )
 	{
 		if(p_polygons.size() == 0)
 		{
 			return;
 		}
-		else if(p_polygons.size() > QUADTREE_POLYGONS_PER_NODE)
+		else if(p_polygons.size() > m_polygonsPerNode)
 		{
-#ifdef QUADTREE_VERBOSE
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Polygons: %d", p_polygons.size());
-#endif
 			const AABB* aabb = &p_node->m_bounds;
 
 			// Calculate center of the aabb.
 			glm::vec3 center = aabb->GetCenter();
 
-			// Define splitting planes.
-			static glm::vec3 splittingNormals[2] = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 0) };
-
-			PlaneEx zp;
-			zp.a = splittingNormals[0].x;
-			zp.b = splittingNormals[0].y;
-			zp.c = splittingNormals[0].z;
-			zp.d = -glm::dot(center, splittingNormals[0]);
-
-			PlaneEx xp;
-			xp.a = splittingNormals[1].x;
-			xp.b = splittingNormals[1].y;
-			xp.c = splittingNormals[1].z;
-			xp.d = -glm::dot(center, splittingNormals[1]);
+			#ifdef QUADTREE_VERBOSE
+				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Generating 4 children. - Polygons: %d", p_polygons.size());
+			#endif
 			
-			// Create a new polygon list.
-			std::vector<Polygon> polygonsAfterZSplit;
-
-			// Split all polygons with the x-plane.
-			for(unsigned i = 0; i < p_polygons.size(); ++i)
+			if(m_splitPolygons)
 			{
-				PolygonSplit result = SplitPolygon(zp, p_polygons[i]);
+				// Define splitting planes.
+				static glm::vec3 splittingNormals[2] = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 0) };
 
-				if(result.m_back.m_indices.size() > 0)
-					polygonsAfterZSplit.push_back(result.m_back);
+				PlaneEx zp;
+				zp.a = splittingNormals[0].x;
+				zp.b = splittingNormals[0].y;
+				zp.c = splittingNormals[0].z;
+				zp.d = -glm::dot(center, splittingNormals[0]);
 
-				if(result.m_front.m_indices.size() > 0)
-					polygonsAfterZSplit.push_back(result.m_front);
-			}
+				PlaneEx xp;
+				xp.a = splittingNormals[1].x;
+				xp.b = splittingNormals[1].y;
+				xp.c = splittingNormals[1].z;
+				xp.d = -glm::dot(center, splittingNormals[1]);
+			
+				// Create a new polygon list.
+				std::vector<Polygon> polygonsAfterZSplit;
+
+				// Split all polygons with the x-plane.
+				for(unsigned i = 0; i < p_polygons.size(); ++i)
+				{
+					PolygonSplit result = SplitPolygon(zp, p_polygons[i]);
+
+					if(result.m_back.m_indices.size() > 0)
+						polygonsAfterZSplit.push_back(result.m_back);
+
+					if(result.m_front.m_indices.size() > 0)
+						polygonsAfterZSplit.push_back(result.m_front);
+				}
 #ifdef QUADTREE_VERBOSE
-			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after ZSplit: %d", polygonsAfterZSplit.size());
+				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after ZSplit: %d", polygonsAfterZSplit.size());
 #endif
-			std::vector<Polygon> polygonsAfterXSplit;
+				std::vector<Polygon> polygonsAfterXSplit;
 
-			// Split all polygons with the z-plane.
-			for(unsigned i = 0; i < polygonsAfterZSplit.size(); ++i)
-			{
-				PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
+				// Split all polygons with the z-plane.
+				for(unsigned i = 0; i < polygonsAfterZSplit.size(); ++i)
+				{
+					PolygonSplit result = SplitPolygon(xp, polygonsAfterZSplit[i]);
 
-				if(result.m_back.m_indices.size() > 0)
-					polygonsAfterXSplit.push_back(result.m_back);
+					if(result.m_back.m_indices.size() > 0)
+						polygonsAfterXSplit.push_back(result.m_back);
 
-				if(result.m_front.m_indices.size() > 0)
-					polygonsAfterXSplit.push_back(result.m_front);
-			}
+					if(result.m_front.m_indices.size() > 0)
+						polygonsAfterXSplit.push_back(result.m_front);
+				}
+
 #ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Polygons after XSplit: %d", polygonsAfterXSplit.size());
 #endif
+				// Set the splitted polygon list.
+				p_polygons = polygonsAfterXSplit;
+			}
+
 			float halfwidth = aabb->GetLengthX() / 2;
 			float halfheight = aabb->GetLengthZ() / 2;
 
@@ -354,25 +354,25 @@ namespace RootForce
 			std::vector<Polygon> br;
 			std::vector<Polygon> bl;
 
-			for(unsigned i = 0; i < polygonsAfterXSplit.size(); ++i)
+			for(unsigned i = 0; i < p_polygons.size(); ++i)
 			{
-				glm::vec2 polygonCenter = CalcXZCenter(polygonsAfterXSplit[i]);
+				glm::vec2 polygonCenter = CalcXZCenter(p_polygons[i]);
 
 				if(polygonCenter.x >= center.x && polygonCenter.y >= center.z)
 				{
-					tr.push_back(polygonsAfterXSplit[i]);
+					tr.push_back(p_polygons[i]);
 				}
 				else if(polygonCenter.x >= center.x && polygonCenter.y <= center.z)
 				{
-					br.push_back(polygonsAfterXSplit[i]);
+					br.push_back(p_polygons[i]);
 				}
 				else if(polygonCenter.x <= center.x && polygonCenter.y <= center.z)
 				{
-					bl.push_back(polygonsAfterXSplit[i]);
+					bl.push_back(p_polygons[i]);
 				}
 				else if(polygonCenter.x <= center.x && polygonCenter.y >= center.z)
 				{
-					tl.push_back(polygonsAfterXSplit[i]);
+					tl.push_back(p_polygons[i]);
 				}
 			}
 
@@ -393,12 +393,14 @@ namespace RootForce
 		}
 		else
 		{
+			p_node->m_id = m_idCounter++;
+
+			std::vector<Triangle> triangles = Trianglulate(p_polygons);
+			p_node->m_indices = CreateEntities(triangles);
+
 #ifdef QUADTREE_VERBOSE
 			m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Adding data node. - Polygons: %d", p_polygons.size());
 #endif
-			std::vector<Triangle> triangles = Trianglulate(p_polygons);
-
-			p_node->m_indices = CreateEntities(triangles);
 		}
 	}
 
@@ -538,8 +540,96 @@ namespace RootForce
 		return triangles;
 	}
 
+	void QuadTree::CreatePNUVEntity(unsigned int p_entityId, unsigned int p_materialIndex, std::vector<Render::Vertex1P1N1UV>& p_vertices, std::vector<unsigned>& p_indices)
+	{
+		
+#ifdef QUADTREE_VERBOSE
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating PNUV entity %d triangles", p_indices.size() / 3);
+#endif
+		// Create entity.
+		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+
+		m_entities.push_back(entity);
+
+		std::stringstream modelNameStringStream;
+		modelNameStringStream << m_newGroupName << p_entityId;
+
+		// Create renderable.
+		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+		renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
+		renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());	
+		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&p_vertices[0], p_vertices.size());
+
+		renderable->m_material = m_materials[p_materialIndex];
+
+		// Add tile factor for blended meshes.
+		if(renderable->m_material->m_tileFactor != 0)
+		{
+			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+			renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+		}
+		else
+		{
+			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
+		}
+	
+		m_world->GetGroupManager()->RegisterEntity(m_newGroupName, entity);
+
+		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&p_indices[0], p_indices.size());		
+	}
+
+	void QuadTree::CreatePNUVTBTEntity(unsigned int p_entityId, unsigned int p_materialIndex, std::vector<Render::Vertex1P1N1UV1T1BT>& p_vertices, std::vector<unsigned>& p_indices)
+	{
+		#ifdef QUADTREE_VERBOSE
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating PNUVTBT entity %d triangles id: %d", p_indices.size() / 3, p_entityId);
+#endif
+		// Create entity.
+		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
+
+		m_entities.push_back(entity);
+
+		// Model name.
+		std::stringstream modelNameStringStream;
+		modelNameStringStream << m_newGroupName << p_entityId;
+
+		// Create renderable.
+		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+
+		renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
+		renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());	
+		renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&p_vertices[0], p_vertices.size());
+
+		std::stringstream materialStringStream;
+		materialStringStream << m_newGroupName << p_materialIndex;
+		
+		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialStringStream.str());
+		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
+		renderable->m_material->m_tileFactor = m_materials[p_materialIndex]->m_tileFactor;
+
+
+		// Add tile factor for blended meshes.
+		if(renderable->m_material->m_tileFactor != 0)
+		{
+			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
+			renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
+		}
+		else
+		{
+			renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
+		}
+	
+		m_world->GetGroupManager()->RegisterEntity(m_newGroupName, entity);
+
+		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&p_indices[0], p_indices.size());		
+	}
+
 	std::vector<unsigned> QuadTree::CreateEntities(std::vector<Triangle>& p_triangles)
 	{
+		// Sort by material.
 		std::sort(p_triangles.begin(), p_triangles.end(), [](Triangle& a, Triangle& b)->bool{ return a.m_materialIndex < b.m_materialIndex; });
 
 		std::vector<unsigned> indices;
@@ -550,71 +640,24 @@ namespace RootForce
 		
 		unsigned currentMaterialIndex = p_triangles[0].m_materialIndex;
 		unsigned entityId = 0;
-
 		for(unsigned i = 0; i < p_triangles.size(); i++)
 		{
 			if(p_triangles[i].m_materialIndex != currentMaterialIndex)
 			{
-#ifdef QUADTREE_VERBOSE
-				m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-#endif
-				// Create entity.
-				ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
-
 				entityId = m_entities.size();
-				m_entities.push_back(entity);
-
-				std::stringstream modelNameStringStream;
-				modelNameStringStream << "static" << entityId;
-
-				// Create renderable.
-				RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-				renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
-				renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-				renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-				renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-
-				renderable->m_material = m_materials[currentMaterialIndex];
-
-				// But at what type?? <=(*~*<=)
 
 				if(m_sizes[currentMaterialIndex] == 32)
 				{
-					renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&verticesPNUV[0], verticesPNUV.size());
-
-					if(renderable->m_material->m_tileFactor != 0)
-					{
-						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
-						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
-					}
-					else
-					{
-						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
-					}
-	
-					verticesPNUV.clear();
+					// Create PNUV-entity.
+					CreatePNUVEntity(entityId, currentMaterialIndex, verticesPNUV, indices);
 				}
 				else if(m_sizes[currentMaterialIndex] == 56)
-				{	
-					renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&verticesPNUVTBT[0], verticesPNUVTBT.size());
-
-					if(renderable->m_material->m_tileFactor != 0)
-					{
-						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
-						renderable->m_params[Render::Semantic::SIZEMIN] = &renderable->m_material->m_tileFactor;
-					}
-					else
-					{
-						renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
-					}
-
-					verticesPNUVTBT.clear();
+				{
+					// Create PNUVTBT-entity.
+					CreatePNUVTBTEntity(entityId, currentMaterialIndex, verticesPNUVTBT, indices);
 				}
 
-				renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-
 				currentMaterialIndex = p_triangles[i].m_materialIndex;
-
 				indices.clear();
 				entitiesIds.push_back(entityId);
 			}
@@ -674,62 +717,20 @@ namespace RootForce
 				}
 			}
 		}
-#ifdef QUADTREE_VERBOSE
-		m_context->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating entity %d triangles", indices.size() / 3);
-#endif
-		// Create entity.
-		ECS::Entity* entity = m_world->GetEntityManager()->CreateEntity();
 
 		entityId = m_entities.size();
-		m_entities.push_back(entity);
-
-		std::stringstream modelNameStringStream;
-		modelNameStringStream << "static" << entityId;
-
-		// Create renderable.
-		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-		renderable->m_model = m_context->m_resourceManager->CreateModel(modelNameStringStream.str());
-		renderable->m_model->m_meshes[0]->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-		renderable->m_model->m_meshes[0]->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-		renderable->m_model->m_meshes[0]->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		
-		renderable->m_material = m_materials[currentMaterialIndex];
-
-		// But at what type?? <=(*~*<=)
 
 		if(m_sizes[currentMaterialIndex] == 32)
 		{
-			renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&verticesPNUV[0], verticesPNUV.size());
-
-			if(renderable->m_material->m_tileFactor != 0)
-			{
-				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
-			}
-			else
-			{
-				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static");
-			}
-	
-			verticesPNUV.clear();
+			// Create PNUV-entity.
+			CreatePNUVEntity(entityId, currentMaterialIndex, verticesPNUV, indices);
 		}
 		else if(m_sizes[currentMaterialIndex] == 56)
-		{	
-			renderable->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(&verticesPNUVTBT[0], verticesPNUVTBT.size());
-
-			if(renderable->m_material->m_tileFactor != 0)
-			{
-				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_Blend");
-			}
-			else
-			{
-				renderable->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Mesh_Static_NormalMap");
-			}
-
-			verticesPNUVTBT.clear();
+		{
+			// Create PNUVTBT-entity.
+			CreatePNUVTBTEntity(entityId, currentMaterialIndex, verticesPNUVTBT, indices);
 		}
 
-		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
-				
 		indices.clear();
 		entitiesIds.push_back(entityId);
 

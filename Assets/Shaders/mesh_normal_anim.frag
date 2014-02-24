@@ -29,7 +29,8 @@ void main()
 
 	vec3 bumpNormal = normalize(TBNmatrix * normalT);
 
-	diffuse = vec4(frag_color.xyz, specTerm);
-	normals = bumpNormal.xy;
+	diffuse = vec4(frag_color, specTerm);
+    float p = sqrt(bumpNormal.z*8+8);
+    normals = bumpNormal.xy/p + 0.5;
 	glow = vec4(vec3(glow_color.xyz), 0.0f);
 }

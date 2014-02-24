@@ -1,7 +1,13 @@
 #include <RenderingSystem.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace RootForce
 {
+	Renderable::~Renderable()
+	{
+		
+	}
+
 	void RenderingSystem::Init()
 	{
 		m_renderables.Init(m_world->GetEntityManager());
@@ -10,7 +16,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-		
+
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -44,11 +50,26 @@ namespace RootForce
 		job.m_shadowMesh = renderable->m_model->m_meshes[0];
 		job.m_material = renderable->m_material;	
 		job.m_params = renderable->m_params;
+		job.m_forward = renderable->m_forward;
 		job.m_params[Render::Semantic::MODEL] = &m_matrices[p_entity].m_model;
 		job.m_params[Render::Semantic::NORMAL] = &m_matrices[p_entity].m_normal;
-		job.m_flags = renderable->m_renderFlags;
 		job.m_renderPass = renderable->m_pass;
 		m_renderer->AddRenderJob(job);
+
+		if(renderable->m_shadowTech != Render::ShadowTechnique::SHADOW_NONE)
+		{
+			Render::ShadowJob sjob;
+			sjob.m_technique = (Render::ShadowTechnique::ShadowTechnique)renderable->m_shadowTech;
+			sjob.m_mesh = renderable->m_model->m_meshes[1];
+			sjob.m_params = job.m_params;
+			
+			if(renderable->m_shadowTech == Render::ShadowTechnique::SHADOW_ANIMATED)
+			{
+				sjob.m_mesh = renderable->m_model->m_meshes[0];
+			}
+
+			m_renderer->AddShadowJob(sjob);			
+		}
 	}
 
 	void RenderingSystem::End()

@@ -9,6 +9,7 @@ namespace RootForce
 	{
 		Shadowcaster() : m_directionalLightSlot(0) {}
 
+		// padd.
 		int m_directionalLightSlot;
 	};
 }

@@ -50,8 +50,8 @@ namespace RootForce
 			Render::RenderJob job;
 			job.m_mesh = emitter->m_systems[i]->GetMesh();
 			job.m_material = emitter->m_particleSystems[i]->m_material;
-			job.m_flags = Render::RenderFlags::RENDER_TRANSFORMFEEDBACK;
 			job.m_renderPass = RenderPass::RENDERPASS_PARTICLES;
+			job.m_forward = true;
 
 			g_engineContext.m_renderer->AddRenderJob(job);
 		}

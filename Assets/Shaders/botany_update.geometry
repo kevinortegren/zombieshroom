@@ -1,0 +1,69 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+#define VERTICES_OUTPUT 80
+
+layout(triangles) in;
+layout(points, max_vertices = VERTICES_OUTPUT) out;
+
+in vec3 gs_normal_in[];
+in float gs_density_in[];
+
+layout(std140) uniform PerTech
+{
+    float g_BotanyScaleFactor;
+};
+
+out vec3 vert_pos;
+out vec3 vert_normal;
+out float vert_density;
+
+
+float random(vec3 seed, int i){
+     vec4 seed4 = vec4(seed, i);
+     float dot_product = dot(seed4, vec4(12.9898,78.233,45.164,94.673));
+     return fract(sin(dot_product) * 43758.5453);
+}
+
+vec3 GetRandomPosition(vec3 a, vec3 b, vec3 ab, vec3 ac, int i)
+{
+   float r = random(a, i);
+   float s = random(b, i);
+   if(r + s >= 1)
+    {
+        r = 1 - r;
+        s = 1 - s;
+    }  
+    return a + r*ab + s*ac;
+}
+
+void main() 
+{
+    // Triangle points.
+    vec3 a = gl_in[0].gl_Position.xyz;
+    vec3 b = gl_in[1].gl_Position.xyz;
+    vec3 c = gl_in[2].gl_Position.xyz;
+    
+    // Calculate triangle vectors.
+    vec3 ab = b-a;
+    vec3 ac = c-a;
+    
+    // Calculate area.
+    float area = length(cross(ab, ac)) / 2;
+    
+    // Calculate number of plants per triangle.
+    int nrPlants = int(gs_density_in[0] * area * g_BotanyScaleFactor);
+    
+    int i;
+    for(i = 0; i < VERTICES_OUTPUT; i++)
+    {
+        if(i < nrPlants)
+        {   
+            vert_pos = GetRandomPosition(a, b, ab, ac, i);
+            vert_normal	= gs_normal_in[0];
+            vert_density = gs_density_in[0];
+            EmitVertex();
+            EndPrimitive();
+        }
+    }    
+}
