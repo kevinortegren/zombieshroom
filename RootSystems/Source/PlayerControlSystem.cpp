@@ -213,6 +213,13 @@ namespace RootForce
 							float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
 							float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
 							float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
+							
+							if(action->AbilityTime <= abilityChargeTime)
+								m_hud->SetValue("ChargeBarValue", std::to_string(action->AbilityTime/abilityChargeTime));
+							else if(abilityChannelingTime > 0)
+								m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->AbilityTime)/abilityChannelingTime));
+							else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
+								m_hud->SetValue("ChargeBarValue", "1");
 
 							if (action->AbilityTime >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
 							{
@@ -235,6 +242,7 @@ namespace RootForce
 							if (action->AbilityTime >= abilityChargeTime + abilityChannelingTime && playerComponent->AbilityState == AbilityState::CHANNELING)
 							{
 								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+								m_hud->SetValue("ChargeBarValue", "0");
 
 								NetworkMessage::AbilityChannelingDone m;
 								m.User = network->ID.UserID;
@@ -259,6 +267,7 @@ namespace RootForce
 				break;
 			case PlayerAction::ACTIVATE_ABILITY_RELEASED:
 				{
+					m_hud->SetValue("ChargeBarValue", "0");
 					if (!health->IsDead && playerComponent->AbilityState != AbilityState::OFF)
 					{
 						std::string abilityName = playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name;

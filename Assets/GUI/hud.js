@@ -125,6 +125,21 @@ function Set(p_id, p_value)
 	{
 		SetScoreScreen(p_value == "true");
 	}
+	if(p_id == "ChargeBarValue")
+	{
+		if(value == 0)
+		{
+			$("#chargebar>div").fadeOut(500); // fade out
+		}
+		else
+		{
+			$("#chargebar div").stop(); // stop any ongoing animations
+			$("#chargebar div").css("display", "block"); // ensure the bar is visible
+			//$("#chargebar>div>div").animate({width: ($("#chargebar>div").width()*value)+"px"},2000,"linear",function(){$(this).parent().fadeOut(500);});
+			$("#chargebar>div>div").css("width", ($("#chargebar>div").width()*value)+"px"); // resize the charge bar
+			// If charge reaches end in either direction, start a fadeout - it'll be aborted if a channel is initiated after charge
+		}
+	}
 	$("#"+p_id).html(value);
 }
 
@@ -166,8 +181,9 @@ $(document).ready(function(){
 	// SetAbility(1, "TestBall");
 	// StartCooldown(1, 3);
 	//UpdateScoreScreen(2, "doqunbop", [[2,"doqunbop",1,11],[1,"The Enemy",11,2],[1,"The Enemy2",0,2],[2,"The Ally",3,0]]);
-	//Set("ShowScore", "true");
+	//Set("ShowScore", "false");
 	//UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
   // DamageIndicator(40);
   // setTimeout("DamageIndicator(40);", 2000);
+	//Set("ChargeBarValue", 1);
 });
