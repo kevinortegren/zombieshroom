@@ -253,7 +253,7 @@ namespace RootEngine
 			m_meshes[p_path + "0"] = m_context->m_renderer->CreateMesh();
 			model->m_meshes[0] = m_meshes[p_path + "0"];
 			model->m_meshes[1] = nullptr;
-			
+
 			if(model)
 			{
 				m_models[p_path] = model;

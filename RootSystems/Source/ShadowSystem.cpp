@@ -174,55 +174,6 @@ namespace RootForce
 		sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
 
 		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
-
-		// Cull quad tree with orthographic projection obb.
-		std::vector<glm::vec4> points;
-		points.resize(8);
-
-		glm::vec3 colors[4];
-		colors[0] = glm::vec3(1,0,0);
-		colors[1] = glm::vec3(0,1,0);
-		colors[2] = glm::vec3(0,0,1);
-		colors[3] = glm::vec3(0,1,1);
-
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-#ifdef SHADOWSYSTEM_CULL
-			glm::mat4 invViewProj = glm::inverse(sc.m_viewMatrices[i]) * glm::inverse(sc.m_projectionMatrices[i]);
-
-#ifdef SHADOWSYSTEM_DEBUG
-			OBB obb = OBB(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, invViewProj);
-			obb.DebugDraw(g_engineContext.m_renderer, colors[i], glm::mat4(1.0f));
-#endif
-			for(int j = 0; j < 8; ++j)
-			{
-				points[j] = invViewProj * localOBB[j];
-			}
-
-			m_quadTree->m_culledEntities.clear();
-			m_quadTree->Cull(points, m_quadTree->GetRoot());
-
-			std::vector<Render::ShadowJob> jobs;
-			for(auto itr = m_quadTree->m_culledEntities.begin(); itr != m_quadTree->m_culledEntities.end(); ++itr)
-			{
-				Render::ShadowJob job;
-				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_model->m_meshes[0];
-				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree->m_entities[(*itr)])->m_material->m_effect;
-				jobs.push_back(std::move(job));
-			}
-
-#else
-			std::vector<Render::ShadowJob> jobs;
-			for(auto itr = m_quadTree->m_entities.begin(); itr != m_quadTree->m_entities.end(); ++itr)
-			{
-				Render::ShadowJob job;
-				job.m_mesh = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_model->m_meshes[0];
-				job.m_effect = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*itr))->m_material->m_effect;
-				jobs.push_back(std::move(job));
-			}
-
-#endif
-		}
 	}
 
 	void ShadowSystem::End()

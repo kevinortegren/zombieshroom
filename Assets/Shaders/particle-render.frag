@@ -16,37 +16,36 @@ in vec4 gs_color;
 
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Depth;
-uniform sampler2D g_LA;
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec3 normals;
-layout (location = 2) out vec4 glow;
-layout (location = 3) out vec4 background;
+out vec4 out_color;
+
+vec3 GetVSPositionFromDepth(vec2 texcoord)
+{
+	float z = texture(g_Depth, texcoord).r;
+
+	z = z * 2 - 1;
+
+	float x = texcoord.x * 2 - 1;
+	float y = texcoord.y * 2 - 1;
+
+	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 sPos = invProj * vProjectedPos;
+
+	return (sPos.xyz / sPos.w);
+}
 
 void main(void) {
 
-    vec2 TexCoord = gl_FragCoord.xy / vec2(1280,720);   
+    vec2 TexCoord = gl_FragCoord.xy / textureSize(g_Depth, 0);   
 
 	vec4 frag_color = texture(g_Diffuse, gs_TexCoord);
-    vec3 la = texture(g_LA, TexCoord).xyz;
-    
-    float depth = gs_Depth;   
-    float depthSample = texture(g_Depth, gs_ScreenCoord).x;
-    
-    vec4 depthViewSample = invProj * vec4(gs_ScreenCoord.x, gs_ScreenCoord.y, depthSample, 1.0f);
 
-    float a = (depthViewSample.z/depthViewSample.w);
-    a *= -1.0f;
+    float depth = gs_Depth * -1.0f;   
+    float depthViewSample = GetVSPositionFromDepth(TexCoord).z * -1.0f;
+
+    float depthDiff = depthViewSample - depth;
     
-    float b = depth;
-    b *= -1.0f;
-  
-    float depthDiff = a - b;
-    
-	depthDiff = clamp(depthDiff / 30.0f, 0.0f, 1.0f);
-    
-    diffuse = vec4(vec3(0), 0);
-	normals = vec3(0);
-	glow = vec4(vec3(0), 0.0f);
-	background = vec4(la + frag_color.xyz, frag_color.a) * gs_color;
+	depthDiff = clamp(depthDiff * 0.1f, 0.0f, 1.0f);
+
+	out_color = vec4(frag_color.xyz, frag_color.a * depthDiff) * gs_color;
 }

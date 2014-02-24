@@ -10,6 +10,8 @@ namespace RootForce
 		// Import entities, groups, tags and storage.
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
+		BuildStaticShadowMesh();
+
 		// Parse ambient data.
 		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
 		//glm::vec4 ambient = glm::vec4(0.1f);
@@ -19,13 +21,96 @@ namespace RootForce
 		CreateSkyBox();
 		CreatePlayerCamera();
 
-		// Add collisions shapes for the group "Static".
-		AddStaticEntitiesToPhysics();
+		// Put the static entities into a spatial quad tree.
+		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
 
-		// Spatial divide world and split the meshes.
-		m_quadTree.Init(m_engineContext, m_world);
+		// Adds static entities.
+		AddStaticEntitiesToPhysics();
 	}
 #endif
+
+	void WorldSystem::BuildStaticShadowMesh()
+	{
+		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
+
+		std::vector<Render::Vertex1P> vertices;
+		std::vector<unsigned int> indices;
+		
+		for(auto itr = range.first; itr != range.second; ++itr)
+		{
+			ECS::Entity* entity = (*itr).second;
+			
+			// Render data.
+			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+			auto mesh = renderable->m_model->m_meshes[1];
+
+			// Transform.
+			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+			glm::mat4x4 transformMatrix;
+			transformMatrix = glm::translate(glm::mat4(1.0f), transform->m_position);
+			transformMatrix = glm::rotate(transformMatrix, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+			transformMatrix = glm::scale(transformMatrix, transform->m_scale);
+
+			unsigned offset = vertices.size();
+
+			// Parse vertex data.
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
+			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
+			{
+				Render::Vertex1P v;
+				memcpy(&v, &data[i], mesh->GetVertexBuffer()->GetElementSize());
+
+				// Transform vertex to world space.
+				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
+				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
+
+				vertices.push_back(std::move(v));
+			}
+
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+
+			// Parse index data.
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
+			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+
+			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+			{
+				int i0, i1, i2;
+
+				memcpy(&i0, &data[i], sizeof(int));
+				memcpy(&i1, &data[i + 4], sizeof(int));
+				memcpy(&i2, &data[i + 8], sizeof(int));
+
+				indices.push_back(i0 + offset);
+				indices.push_back(i1 + offset);
+				indices.push_back(i2 + offset);
+
+			}
+
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		}
+
+		m_staticMesh = g_engineContext.m_renderer->CreateMesh();
+		m_staticMesh->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		m_staticMesh->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		m_staticMesh->CreateVertexBuffer1P(&vertices[0], vertices.size());
+		m_staticMesh->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+		m_staticMesh->CreateIndexBuffer(&indices[0], indices.size());
+
+		unsigned* ptr = &indices[0];
+		m_staticMesh->SetPrimitiveType(GL_TRIANGLES);
+
+		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Creating static mesh vertices: %d indices %d", vertices.size(), indices.size());
+	}
+
+	void WorldSystem::SubdivideTree()
+	{
+#ifndef _DEBUG
+		m_quadTree.BeginDivide(2500, true, true);
+#endif
+	}
 
 	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
 	{
@@ -49,9 +134,7 @@ namespace RootForce
 		sunShadowcaster->m_directionalLightSlot = 0;
 
 		m_world->GetTagManager()->RegisterEntity("Sun", sun);
-		//m_world->GetGroupManager()->RegisterEntity("NonExport", sun);
 	}
-
 
 	void WorldSystem::CreateSkyBox()
 	{
@@ -107,6 +190,7 @@ namespace RootForce
 	
 		r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
 		r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
+		r->m_forward = false;
 		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		
@@ -192,6 +276,12 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{	
+		Render::ShadowJob job;
+		job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
+		job.m_mesh = m_staticMesh;
+
+		g_engineContext.m_renderer->AddShadowJob(job);
+
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
@@ -206,8 +296,8 @@ namespace RootForce
 
 			Render::RenderJob job;
 			job.m_mesh = renderable->m_model->m_meshes[0];
+			job.m_shadowMesh = renderable->m_model->m_meshes[0];
 			job.m_material = renderable->m_material;
-			job.m_flags = renderable->m_renderFlags;
 			job.m_renderPass = renderable->m_pass;
 			job.m_params = renderable->m_params;
 

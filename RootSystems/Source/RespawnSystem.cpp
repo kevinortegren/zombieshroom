@@ -37,8 +37,23 @@ namespace RootSystems
 		// If the player has less than 1 health and is not already dead, kill him
 		if(health->Health < 1 && !health->IsDead)
 		{
-			health->IsDead = true;
-			health->RespawnDelay = 3.0f;
+			if(m_serverPeer != nullptr)
+			{
+				health->IsDead = true;
+				health->RespawnDelay = 3.0f;
+
+				//Broadcast death
+				RootForce::NetworkMessage::Death m;
+				m.User = network->ID.UserID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::Death);
+				m.Serialize(true, &bs);
+				m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
+			
 		}
 
 		// Check if a spawn point has been received from the server. Always respawn when the server tells us to.

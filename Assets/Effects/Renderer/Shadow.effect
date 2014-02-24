@@ -1,39 +1,69 @@
 - name: Shadow
   techniques:
-    - name: Shadow_depth
-      bindings:
-        - name: PerFrame
-          slot: 0
-        - name: PerObject
-          slot: 1
-      uniforms:
-        - sem: MODEL
-          offset: 0
-      programs:
-        - name: output
-          shaders:
-            - name: shadow
-              type: vertex
-          depth:
-            write: 1
-            test: 1
-            
-    - name: Shadow_depth_anim
-      bindings:
-        - name: PerFrame
-          slot: 0
-        - name: PerObject
-          slot: 1
-      uniforms:
-        - sem: MODEL
-          offset: 0
-        - sem: BONES
-          offset: 64
-      programs:
-        - name: output
-          shaders:
-            - name: shadow_anim
-              type: vertex
-          depth:
-            write: 1
-            test: 1
+  
+    # Opaque technique for static objects.
+    -  name: Shadow_Opaque
+       programs:
+         - name: Shadow
+           shaders:
+             - name: shadow
+               type: vertex
+           depth:
+             write: 1
+             test: 1
+        
+    # Transparant Technique for static objects.
+    # TODO: Add texture bindings.
+    -  name: Shadow_Transparant
+       programs:
+         - name: Shadow
+           shaders:
+             - name: shadow_trans
+               type: vertex
+           depth:
+             write: 1
+             test: 1
+             
+     # Transparant Technique for static objects.
+    -  name: Shadow_Dynamic
+       bindings:
+         - name: PerFrame
+           slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+       programs:
+         - name: Shadow
+           shaders:
+             - name: shadow_dynamic
+               type: vertex
+           depth:
+             write: 1
+             test: 1
+             
+     # Opaque technique for animated objects.
+    -  name: Shadow_Animated
+       bindings:
+         - name: PerFrame
+           slot: 0
+         - name: PerObject
+           slot: 1
+       uniforms:
+         - sem: MODEL
+           offset: 0
+         - sem: NORMAL
+           offset: 64
+         - sem: BONES
+           offset: 128
+       flags:
+         - name: Shadow
+       programs:
+         - name: Shadow_Anim
+           shaders:
+             - name: shadow_anim
+               type: vertex
+           depth:
+             write: 1
+             test: 1

@@ -178,7 +178,7 @@ namespace Physics
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
-
+		
 		CustomUserPointer* userPointer = m_userPointer.at(p_objectHandle);
 		if(userPointer->m_type == PhysicsType::TYPE_PLAYER || userPointer->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
@@ -225,7 +225,6 @@ namespace Physics
 
 				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 				{
-
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
 					{

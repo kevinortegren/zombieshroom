@@ -58,6 +58,88 @@ namespace Render
 
 	RootEngine::SubsystemSharedContext g_context;
 
+	void GLRenderer::ParseCommands(std::stringstream* p_ss)
+	{
+		std::string module;
+		std::string param;
+		std::string value;
+
+		std::getline(*p_ss, module, ' ');
+		std::getline(*p_ss, module, ' ');
+
+		if(module == "glow" || module == "g")
+		{	
+			std::getline(*p_ss, param, ' ');
+			std::getline(*p_ss, value, ' ');
+
+			if(param == "factor" || param == "f")
+			{
+				m_glowDevice.SetGlowFactor((float)atof(value.c_str()));
+			}
+			else if(param == "strength" || param == "s")
+			{
+				m_glowDevice.SetGlowStrength((float)atof(value.c_str()));
+			}
+			else if(param == "radius" || param == "r")
+			{
+				m_glowDevice.SetGlowRadius((float)atof(value.c_str()));
+			}
+			else if(param == "display" || param == "d")
+			{
+				m_glowDevice.Display((atoi(value.c_str()) == 1));
+			}
+			
+		}
+		else if(module == "shadow" || module == "s")
+		{
+			std::getline(*p_ss, value, ' ');
+			m_shadowDevice.m_showShadows = (atoi(value.c_str()) == 1) ? true : false;
+		}
+		else if(module == "light" || module == "l")
+		{
+			std::getline(*p_ss, param, ' ');
+			std::getline(*p_ss, value, ' ');
+
+			if(param == "ambient" || param == "a")
+			{
+				m_lighting.ShowAmbient((atoi(value.c_str()) == 1));
+			}
+			else if(param == "directional" || param == "d")
+			{
+				m_lighting.ShowDirectional((atoi(value.c_str()) == 1));
+			}
+			else if(param == "point" || param == "p")
+			{
+				m_lighting.ShowPointLights((atoi(value.c_str()) == 1));
+			}
+			else if(param == "background" || param == "b")
+			{
+				m_lighting.ShowBackgroundBlend((atoi(value.c_str()) == 1));
+			}
+			else if(param == "setambient" || param == "sa")
+			{
+				float v = (float)atof(value.c_str());
+				m_lighting.SetAmbientLight(glm::vec4(v, v, v, 1.0f));
+			}
+			else if(param == "ssao")
+			{
+				m_lighting.ShowSSAO((atoi(value.c_str()) == 1));
+			}
+		}
+		else if(module == "layer" || module == "la")
+		{
+			std::getline(*p_ss, param, ' ');
+			std::getline(*p_ss, value, ' ');
+
+			m_layers[atoi(param.c_str())] = (atoi(value.c_str()) == 1);
+		}
+		else if(module == "forward" || module == "f")
+		{
+			std::getline(*p_ss, value, ' ');
+			m_showForward = (atoi(value.c_str()) == 1);
+		}
+	}
+
 	GLRenderer::GLRenderer()
 		: m_allocator(10000 * sizeof(RenderJob))
 	{
@@ -128,8 +210,6 @@ namespace Render
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glEnable(GL_DEPTH_TEST);
-		
-
 		glCullFace(GL_BACK);	
 		glFrontFace(GL_CCW);
 
@@ -188,34 +268,6 @@ namespace Render
 		m_fullscreenQuad.CreateIndexBuffer(indices, 6);
 		m_fullscreenQuad.CreateVertexBuffer1P1UV(verts, 4);
 
-
-		// Setup geometry buffer.
-		m_gbuffer.Init(this, width, height);
-
-		// Setup shadow device.
-		m_shadowDevice.Init(this, 2048, 2048);
-
-		// Setup lighting device.
-		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
-	
-		// Setup render target for forward renderer and post processes to use.
-		glGenFramebuffers(1, &m_fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		m_color0 = CreateTexture();
-		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
-
-		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Load default forward rendering effect.
-		Render::EffectInterface* renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
-
-		m_fullscreenQuadTech = renderEffect->GetTechniques()[0];
-
 		m_cameraVars.m_view = glm::mat4(1.0f);
 		m_cameraVars.m_projection = glm::perspectiveFov<float>(45.0f, (float)width, (float)height, 0.1f, 100.0f);
 
@@ -236,6 +288,32 @@ namespace Render
 		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 
+		// Setup geometry buffer.
+		m_gbuffer.Init(this, width, height);
+
+		// Setup shadow device.
+		m_shadowDevice.Init(this, 2048, 2048, m_cameraBuffer, m_uniforms);
+
+		// Setup lighting device.
+		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
+	
+		// Setup render target for forward renderer and post processes to use.
+		glGenFramebuffers(1, &m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		m_color0 = CreateTexture();
+		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+
+		// Share depth attachment between gbuffer and forward.
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
+
+		m_fullscreenQuadTech = m_renderEffect->GetTechniques()[0];
+
 		InitializeSemanticSizes();
 
 		// Initialize subsystems.
@@ -244,13 +322,13 @@ namespace Render
 
 		InitialziePostProcesses();
 
-		m_sjobCount[0] = 0;
-		m_sjobCount[1] = 0;
-		m_sjobCount[2] = 0;
-		m_sjobCount[3] = 0;
+		m_layers[0] = true;
+		m_layers[1] = true;
 
 		//Generate query for gpu timer
 		g_context.m_profiler->InitQuery();
+
+		m_showForward = true;
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -283,21 +361,25 @@ namespace Render
 		s_sizes[Semantic::DX]			= sizeof(float);
 
 		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEIN] = 0;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
 		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTEOUT] = 1;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
 		s_textureSlots[TextureSemantic::NORMAL]			= 2;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 2;
 		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
 		s_textureSlots[TextureSemantic::GLOW]			= 3;
 		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
 		s_textureSlots[TextureSemantic::DEPTH]			= 4;
 		s_textureSlots[TextureSemantic::RANDOM]			= 5;
 		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
-		s_textureSlots[TextureSemantic::SHADOWDEPTH] = 6;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH]	= 6;
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-
+		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 10;
+		s_textureSlots[TextureSemantic::DIFFUSE1]		= 11;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 12;
+		s_textureSlots[TextureSemantic::DIFFUSE3]		= 13;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -337,9 +419,19 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void GLRenderer::AddShadowJob(Render::ShadowJob& p_shadowJob)
+	{
+		m_shadowDevice.m_shadowJobs.push_back(new (m_shadowDevice.m_shadowJobAllocator.Alloc(sizeof(ShadowJob))) ShadowJob(p_shadowJob));
+	}
+
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
-		m_jobs.push_back(new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job));
+		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
+
+		if(job->m_forward)
+			m_forwardJobs.push_back(job);
+		else
+			m_jobs.push_back(job);
 	}
 
 	void GLRenderer::SetAmbientLight(const glm::vec4& p_color)
@@ -392,23 +484,29 @@ namespace Render
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		PROFILE("Deferred Pass", g_context.m_profiler);
 		{
-			// Loop through layers.
-			for(int i = 0; i < 2; i++)
-			{
-				GeometryPass(i);
-				LightingPass(i);	
-			}
+			PROFILE("Deferred Pass", g_context.m_profiler);
+			GeometryPass(0);
+		}
+	
+		{
+			PROFILE("Lighting Pass", g_context.m_profiler);
+			LightingPass(0);	
 		}
 
 		m_lighting.ResetLights();
 		glDisable(GL_STENCIL_TEST);
 
 		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
+
+		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
 			PostProcessPass();
 		}
+
 
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
@@ -426,8 +524,14 @@ namespace Render
 			(*itr)->~RenderJob();
 		}
 
+		for(auto itr = m_forwardJobs.begin(); itr != m_forwardJobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
+		}
+
 		m_allocator.Clear();
 		m_jobs.clear();
+		m_forwardJobs.clear();
 	}
 
 	void GLRenderer::Clear()
@@ -451,58 +555,16 @@ namespace Render
 	void GLRenderer::Sorting()
 	{	
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortRenderJobs);
 	}
 
 	void GLRenderer::ShadowPass()
 	{
-		m_shadowDevice.Process();
-
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, m_shadowDevice.GetWidth(), m_shadowDevice.GetHeight());
 
-		// Clear framebuffers.
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		}
-
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowDevice.m_framebuffers[i]);
-			glDrawBuffers(0, NULL);
-			m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowDevice.m_shadowcasters[0].m_viewProjections[i]);
-
-			for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
-			{
-				if(((*job)->m_flags & Render::RenderFlags::RENDER_IGNORE_CASTSHADOW) == Render::RenderFlags::RENDER_IGNORE_CASTSHADOW)
-					continue;
-
-				if((*job)->m_shadowMesh == nullptr)
-					continue;
-
-				(*job)->m_shadowMesh->Bind();
-
-				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
-				{
-					if(((*tech)->m_flags & Render::TechniqueFlags::RENDER_SHADOW) ==  Render::TechniqueFlags::RENDER_SHADOW)
-					{
-						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
-						{	
-							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
-						}
-
-						(*tech)->GetPrograms()[0]->Apply();
-
-						(*job)->m_shadowMesh->Draw();	
-					}
-				}
-
-				(*job)->m_shadowMesh->Unbind();
-			}
-		}
-
+		m_shadowDevice.Process();
+	
 		glCullFace(GL_BACK);
 		glViewport(0, 0, m_width, m_height);
 	}
@@ -521,15 +583,15 @@ namespace Render
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
-		m_renderFlags = (p_layer == 0) ? Render::TechniqueFlags::RENDER_DEFERRED0 : Render::TechniqueFlags::RENDER_DEFERRED1; 
+		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED0;
 
-		ProcessRenderJobs();
+		ProcessRenderJobs(m_jobs);
 	}
 
-	void GLRenderer::ProcessRenderJobs()
+	void GLRenderer::ProcessRenderJobs(std::vector<RenderJob*>& p_jobs)
 	{
 		int currentMaterialID = -1;
-		for(auto job = m_jobs.begin(); job != m_jobs.end(); ++job)
+		for(auto job = p_jobs.begin(); job != p_jobs.end(); ++job)
 		{
 			if((*job)->m_material->m_id != currentMaterialID)
 			{
@@ -548,7 +610,7 @@ namespace Render
 			}
 
 			(*job)->m_mesh->Bind();
-
+			
 			// Itterate techniques.
 			for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 			{
@@ -613,32 +675,45 @@ namespace Render
 		// Apply lighting.
 		m_lighting.Ambient();
 		m_lighting.Directional();
-		m_lighting.PointLightStencil();
-		m_lighting.PointLightRender();
-		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+		m_lighting.Point();
 
+		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 
+	void GLRenderer::ForwardPass()
+	{
+		if(m_showForward)
+		{
+			m_gbuffer.BindTextures();
+
+			m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
+
+			ProcessRenderJobs(m_forwardJobs);
+		}
+	}
+
 	void GLRenderer::PostProcessPass()
 	{
+		m_gbuffer.BindTextures();
+		m_lighting.m_la->Bind(3);
 		// Bind gbuffer for reading in post processes.
 		// 0 - Diffuse
 		// 1 - Normals
-		// 2 - Depths
-		// 3 - Scene
+		// 2 - Depth
+		// 3 - LA
 		// 4 - Glow
 		// 5 - Input.
-		m_gbuffer.BindTextures();
 
-		m_lighting.m_la->Bind(3);
-
-		// Glow Pass.
+		// Glow pass.
 		m_fullscreenQuad.Bind();
-		m_glowDevice.Process(this, &m_fullscreenQuad);
+		m_glowDevice.HorizontalPass(&m_fullscreenQuad);
+		BindForwardFramebuffer();
+		m_glowDevice.VerticalPass(&m_fullscreenQuad);
 		m_fullscreenQuad.Unbind();
 	}
+
 
 	void GLRenderer::Output()
 	{
@@ -646,6 +721,9 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		m_color0->Bind(5);
+
+		if(!m_glowDevice.m_display)
+			m_lighting.m_la->Bind(5);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
@@ -792,6 +870,7 @@ namespace Render
 
 	void GLRenderer::Compute( ComputeJob* p_job )
 	{
+#ifdef RENDER_USE_COMPUTE
 		for(auto texture = p_job->m_textures.begin(); texture != p_job->m_textures.end(); ++texture)
 		{
 				if((*texture).second != nullptr)
@@ -825,6 +904,7 @@ namespace Render
 				(*texture).second->UnBindImage((*texture).first);
 			}
 		}
+#endif
 	}
 
 	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )
