@@ -21,7 +21,7 @@ namespace RootForce
 		bool Collide(const AABB& p_aabb);
 
 
-		void DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const;
+		void DebugDraw(Render::RendererInterface* p_renderer, const glm::vec3& p_color, glm::mat4 p_space) const;
 
 		float m_minX, m_maxX, m_minY, m_maxY, m_minZ, m_maxZ;
 	};

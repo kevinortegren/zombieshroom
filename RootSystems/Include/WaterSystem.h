@@ -11,6 +11,8 @@
 #include <RootSystems/Include/Transform.h>
 #include "glm/glm.hpp"
 #include <RootSystems/Include/ChatSystem.h>
+#include <RootSystems/Include/PlayerSystem.h>
+
 namespace RootForce
 {
 	namespace WaterState

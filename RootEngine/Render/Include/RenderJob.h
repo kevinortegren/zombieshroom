@@ -21,13 +21,13 @@ namespace Render
 	struct RenderJob
 	{
 		RenderJob()
-			: m_flags(0), m_renderPass(2), m_shadowMesh(nullptr) {}
+			: m_forward(0), m_renderPass(2) {}
 
 		MeshInterface* m_mesh;
 		MeshInterface* m_shadowMesh;
 		Material* m_material;	
 		std::map<Semantic::Semantic, void*> m_params;
-		unsigned m_flags;
+		bool m_forward;
 		unsigned m_renderPass;
 	};
 }

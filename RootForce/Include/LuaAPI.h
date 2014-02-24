@@ -791,6 +791,13 @@ namespace RootForce
 			(*rtemp)->m_material = g_engineContext.m_renderer->CreateMaterial(handle);
 			return 0;
 		}
+		static int RenderableSetShadowTechnique(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_shadowTech = luaL_checkint(p_luaState, 2);
+			return 0;
+		}
 		static int RenderableSetPass(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -2176,6 +2183,7 @@ namespace RootForce
 			{"SetPass",				RenderableSetPass},
 			{"SetModel",			RenderableSetModel},
 			{"SetMaterial",			RenderableSetMaterial},
+			{"SetShadowTechnique",	RenderableSetShadowTechnique},
 			{"SetMaterialDiffuse",	RenderableSetDiffuse},
 			{"SetMaterialSpecular", RenderableSetSpecular},
 			{"SetMaterialNormal",	RenderableSetNormal},

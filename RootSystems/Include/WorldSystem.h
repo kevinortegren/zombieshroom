@@ -5,6 +5,7 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/Frustum.h>
+#include <RootEngine/Render/Include/Mesh.h>
 #include <array>
 
 namespace RootForce
@@ -20,10 +21,13 @@ namespace RootForce
 		void CreatePlayerCamera();
 #endif
 
+		void SubdivideTree();
+
 		void SetAmbientLight(glm::vec4 p_ambient);
 		void CreateSun();
 		void CreateSkyBox();
 		
+		void BuildStaticShadowMesh();
 		void AddStaticEntitiesToPhysics();
 		
 		void Process();
@@ -36,5 +40,7 @@ namespace RootForce
 		QuadTree m_quadTree;
 		bool m_showDebug;
 		unsigned m_culledNodes;
+
+		Render::MeshInterface* m_staticMesh;
 	};
 }

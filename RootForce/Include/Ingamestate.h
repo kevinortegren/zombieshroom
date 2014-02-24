@@ -24,6 +24,7 @@
 #include <RootSystems/Include/TryPickupResetSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
+#include <RootSystems/Include/BotanySystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -79,6 +80,7 @@ namespace RootForce
 		RootForce::DirectionalLightSystem* 				m_directionlLightSystem;
 		RootForce::TryPickupResetSystem* 				m_tryPickupResetSystem;
 		RootForce::SoundSystem*							m_soundSystem;
+		RootForce::BotanySystem*						m_botanySystem;
 		RootForce::TimerSystem*							m_timerSystem;
 		RootForce::FollowSystem*						m_followSystem;
 

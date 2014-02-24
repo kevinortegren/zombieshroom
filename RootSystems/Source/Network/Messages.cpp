@@ -195,6 +195,11 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, AbilityName);
 		}
 
+		void Death::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
+		{
+			p_bs->Serialize(p_writeToBitstream, User);
+		}
+
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{
 			for (int i = 0; i < 3; ++i)

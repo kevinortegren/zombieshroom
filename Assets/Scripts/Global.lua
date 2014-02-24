@@ -34,6 +34,14 @@ RenderPass = {
 	RENDERPASS_SKYBOX = 1;
 }
 
+ShadowTechnique = {
+	SHADOW_NONE = 0;
+	SHADOW_OPAQUE = 1;
+	SHADOW_TRANSPARANT = 2;
+	SHADOW_DYNAMIC = 3;
+	SHADOW_ANIMATED = 4;
+}
+
 LogLevel = {
 	FATAL_ERROR = 0;
 	NON_FATAL_ERROR = 1;

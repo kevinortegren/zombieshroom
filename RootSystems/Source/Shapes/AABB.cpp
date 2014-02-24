@@ -71,7 +71,7 @@ namespace RootForce
 		return false;
 	}
 
-	void AABB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const
+	void AABB::DebugDraw(Render::RendererInterface* p_renderer, const glm::vec3& p_color, glm::mat4 p_space) const
 	{
 		glm::vec4 positions[8];
 		positions[0] = p_space * glm::vec4(m_minX, m_minY, m_minZ, 1.0f);
