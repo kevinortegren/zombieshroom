@@ -10,6 +10,7 @@
 namespace RootForce
 {
 	const float JUMP_TIME_LIMIT = 1.0f;
+	const uint8_t PUSH_ABILITY_INDEX = 3;
 
 	namespace EntityState
 	{
@@ -51,6 +52,7 @@ namespace RootForce
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
+		bool UsingPush;
 
 		bool WantRespawn;
 
@@ -62,6 +64,7 @@ namespace RootForce
 			, JumpDir(glm::vec3(0))
 			, AbilityTime(0.0f)
 			, SelectedAbility(1)
+			, UsingPush(false)
 			, WantRespawn(false)
 		{}
 	};

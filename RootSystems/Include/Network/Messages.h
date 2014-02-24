@@ -165,6 +165,7 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			Network::ActionID_t Action;
+			bool IsPush;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
