@@ -45,9 +45,11 @@ function FireBall.OnCreate (userId, actionId)
 end
 
 function FireBall.OnCollide (self, entity)
-  local network = self:GetNetwork();
-  Explosion.OnCreate(network:GetUserId(), network:GetActionId());
-  FireBall.OnDestroy(self);
+	if entity:DoesExist() then
+		local network = self:GetNetwork();
+		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+		FireBall.OnDestroy(self);
+	end
 end
 
 function FireBall.OnDestroy (self)
