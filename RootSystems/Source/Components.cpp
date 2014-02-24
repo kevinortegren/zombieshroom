@@ -37,6 +37,7 @@ namespace RootForce
 			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
 			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
+			RootForce::FollowComponent::SetTypeId(RootForce::ComponentType::FOLLOW);
 		}
 
 		void InitializeServerComponents()
