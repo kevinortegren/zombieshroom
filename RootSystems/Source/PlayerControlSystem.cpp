@@ -165,13 +165,13 @@ namespace RootForce
 				}
 				break;
 			case PlayerAction::SELECT_ABILITY1:
-				action->SelectedAbility = 1;
+				action->SelectedAbility = 0;
 				break;
 			case PlayerAction::SELECT_ABILITY2:
-				action->SelectedAbility = 2;
+				action->SelectedAbility = 1;
 				break;
 			case PlayerAction::SELECT_ABILITY3:
-				action->SelectedAbility = 3;
+				action->SelectedAbility = 2;
 				break;
 			case PlayerAction::ACTIVATE_ABILITY_PRESSED:
 				{
@@ -179,7 +179,7 @@ namespace RootForce
 					{
 						action->WantRespawn = true;
 					}
-					else if (playerComponent->AbilityState == AbilityState::OFF) 
+					else
 					{
 						action->UsingPush = false;
 						HandleAbilityPressed(dt);

@@ -192,8 +192,8 @@ namespace RootSystems
 		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
 		
-		uint8_t abilityIndex = action->UsingPush ? RootForce::PUSH_ABILITY_INDEX : action->SelectedAbility - 1;
-		player->SelectedAbility = action->SelectedAbility - 1;
+		uint8_t abilityIndex = action->UsingPush ? RootForce::PUSH_ABILITY_INDEX : action->SelectedAbility;
+		player->SelectedAbility = action->SelectedAbility;
 
 		std::string abilityName = player->AbilityScripts[abilityIndex].Name;
 		if (abilityName != "")
@@ -212,7 +212,7 @@ namespace RootSystems
 				{
 					player->AbilityState = RootForce::AbilityState::CHARGING;
 
-					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 				} break;
 
 			case RootForce::AbilityState::START_CHANNELING:
@@ -225,7 +225,7 @@ namespace RootSystems
 					g_engineContext.m_script->AddParameterNumber(action->ActionID);
 					g_engineContext.m_script->ExecuteScript();
 
-					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 				} break;
 
 			case RootForce::AbilityState::STOP_CHANNELING:
@@ -249,7 +249,7 @@ namespace RootSystems
 					if(player->AbilityScripts[abilityIndex].Charges == 0)
 						player->AbilityScripts[abilityIndex] = RootForce::AbilityInfo();
 
-					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 				} break;
 
 			case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
@@ -279,7 +279,7 @@ namespace RootSystems
 					if(player->AbilityScripts[abilityIndex].Charges == 0)
 						player->AbilityScripts[abilityIndex] = RootForce::AbilityInfo();
 
-					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
 				} break;
 			}
 		}

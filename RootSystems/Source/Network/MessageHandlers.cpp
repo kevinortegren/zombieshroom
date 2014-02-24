@@ -1474,6 +1474,7 @@ namespace RootForce
 
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->AbilityTime = halfPing;
+								action->UsingPush = m.IsPush;
 							}
 
 							// Broadcast the action to all other connected clients.
