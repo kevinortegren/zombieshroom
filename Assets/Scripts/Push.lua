@@ -17,6 +17,7 @@ function Push.ChannelingDone (time, userId, actionId)
 end
 
 function Push.OnCreate (userId, actionId)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
