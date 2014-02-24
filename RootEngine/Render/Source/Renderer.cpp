@@ -133,6 +133,11 @@ namespace Render
 
 			m_layers[atoi(param.c_str())] = (atoi(value.c_str()) == 1);
 		}
+		else if(module == "forward" || module == "f")
+		{
+			std::getline(*p_ss, value, ' ');
+			m_showForward = (atoi(value.c_str()) == 1);
+		}
 	}
 
 	GLRenderer::GLRenderer()
@@ -322,6 +327,8 @@ namespace Render
 
 		//Generate query for gpu timer
 		g_context.m_profiler->InitQuery();
+
+		m_showForward = true;
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -494,7 +501,6 @@ namespace Render
 			PROFILE("Forward Pass", g_context.m_profiler);
 			ForwardPass();
 		}
-
 
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
@@ -679,11 +685,14 @@ namespace Render
 
 	void GLRenderer::ForwardPass()
 	{
-		m_gbuffer.BindTextures();
+		if(m_showForward)
+		{
+			m_gbuffer.BindTextures();
 
-		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
+			m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
 
-		ProcessRenderJobs(m_forwardJobs);
+			ProcessRenderJobs(m_forwardJobs);
+		}
 	}
 
 	void GLRenderer::PostProcessPass()

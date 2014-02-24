@@ -230,6 +230,7 @@ namespace Render
 
 		bool m_layers[2];
 		bool m_displayNormals;
+		bool m_showForward;
 	};
 }
 

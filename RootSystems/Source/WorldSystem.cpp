@@ -108,7 +108,7 @@ namespace RootForce
 	void WorldSystem::SubdivideTree()
 	{
 #ifndef _DEBUG
-		m_quadTree.BeginDivide(1000, true, true);
+		m_quadTree.BeginDivide(2500, true, true);
 #endif
 	}
 
