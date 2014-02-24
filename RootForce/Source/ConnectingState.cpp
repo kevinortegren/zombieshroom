@@ -5,7 +5,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -28,8 +28,8 @@ namespace RootForce
 		m_sharedSystems.m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
 
 		//AbilitySpawnSystem to create new abilities across the map
-		m_sharedSystems.m_abilitySpawnSystem = new AbilityRespawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
-		g_world->GetSystemManager()->AddSystem<RootForce::AbilityRespawnSystem>(m_sharedSystems.m_abilitySpawnSystem);
+		m_sharedSystems.m_abilitySpawnSystem = new AbilitySpawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+		g_world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(m_sharedSystems.m_abilitySpawnSystem);
 
 		m_loadingScreen = g_engineContext.m_gui->LoadURL("Loading", "loading.html");
 	}
@@ -61,6 +61,12 @@ namespace RootForce
 		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
 		
+		// Reset all network peers
+		m_networkContext.m_client.reset();
+		m_networkContext.m_clientMessageHandler.reset();
+		m_networkContext.m_server.reset();
+		m_networkContext.m_serverMessageHandler.reset();
+
 		// Create a new client.
 		m_networkContext.m_client = std::shared_ptr<RootForce::Network::Client>(new RootForce::Network::Client(g_engineContext.m_logger, g_world));
 		m_networkContext.m_clientMessageHandler = std::shared_ptr<RootForce::Network::ClientMessageHandler>(new RootForce::Network::ClientMessageHandler(m_networkContext.m_client->GetPeerInterface(), g_world));
@@ -69,7 +75,6 @@ namespace RootForce
 		if (p_playData.Host)
 		{
 			// Setup the server and connect a local client. Reset the server before creating a new one, since the server must be destructed before a new one can be created.
-			m_networkContext.m_server.reset();
 			m_networkContext.m_server = std::shared_ptr<RootForce::Network::Server>(new RootForce::Network::Server(g_engineContext.m_logger, g_world, p_playData.ServerInfo));
 			m_networkContext.m_serverMessageHandler = std::shared_ptr<RootForce::Network::ServerMessageHandler>(new RootForce::Network::ServerMessageHandler(m_networkContext.m_server->GetPeerInterface(), g_world));
 			

@@ -49,9 +49,12 @@ namespace ECS
 		virtual void ProcessEntity(Entity* p_entity) = 0;
 		virtual void End(){}
 
+
+
 	protected:
 		int64_t m_flag;
 		std::set<Entity*> m_activeEntities;
+		std::vector<Entity*> m_entitiesToRemove;
 	};
 
 	// System to process a set of entities at a set time interval.
@@ -60,13 +63,18 @@ namespace ECS
 	public:
 		friend class EntitySystemManager;
 
-		IntervalEntitySystem(World* p_world, float p_interval)
-			: EntitySystem(p_world), m_interval(p_interval), m_time(0.0f) {}
+		IntervalEntitySystem(World* p_world, float p_interval, int p_ticksPerFrame)
+			: EntitySystem(p_world), m_interval(p_interval), m_ticksPerFrame(p_ticksPerFrame), m_time(0.0f), m_ticks(0) {}
 
 		bool CheckProcessing();
 		void Process();
 
+	protected:
+		float GetSystemInterval();
+
 	private:
+		unsigned int m_ticks;
+		unsigned int m_ticksPerFrame;
 		float m_interval;
 		float m_time;
 	};

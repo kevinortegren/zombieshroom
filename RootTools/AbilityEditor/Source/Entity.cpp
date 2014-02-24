@@ -4,6 +4,11 @@ namespace AbilityEditorNameSpace
 {
 	Entity::Entity(QString p_name)
 	{
+		m_charges = 0;
+		m_cooldown = 0.0f;
+		m_chargeTime = 0.0f;
+		m_channelingTime = 0.0f;
+		m_duration = 0.0f;
 		for(int i = 0 ; i < AbilityComponents::ComponentType::END_OF_ENUM; i++)
 		{
 			m_nameToEnumMapper[AbilityComponents::g_componentNameList.m_compNames.at(i)] = (AbilityComponents::ComponentType::ComponentType)i;
@@ -32,15 +37,21 @@ namespace AbilityEditorNameSpace
 		switch (p_type)
 		{
 
-		case AbilityComponents::ComponentType::TRANSFORM:
+		case AbilityComponents::ComponentType::STARTPOS:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Transform();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StartPos();
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::COLLISION:			
+		case AbilityComponents::ComponentType::TARGPOS:			
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Collision();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::TargetPos();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::VELOCITY:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Velocity();
 				AddComponent(temp);
 			}
 			break;
@@ -56,27 +67,45 @@ namespace AbilityEditorNameSpace
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
-			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::PhysicsControlled();
-				AddComponent(temp);
-			}
-			break;
 		case AbilityComponents::ComponentType::ABILITYPARTICLE:
 			{
 				AbilityComponents::MainComponent* temp = new AbilityComponents::AbilityParticle();
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::OFFENSIVEABILITY:
+		case AbilityComponents::ComponentType::DAMAGE:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::OffensiveAbility();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Damage();
 				AddComponent(temp);
 			}
 			break;
-		case AbilityComponents::ComponentType::EXPLOSIVE:
+		case AbilityComponents::ComponentType::KNOCKBACK:
 			{
-				AbilityComponents::MainComponent* temp = new AbilityComponents::Explosive();
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Knockback();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGECASTER:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StatChangeCaster();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGETARGET:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::StatChangeTarget();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::PHYSICS:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Physics();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::CHARGEVARIABLES:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::ChargeVariables();
 				AddComponent(temp);
 			}
 			break;

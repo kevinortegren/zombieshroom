@@ -23,13 +23,15 @@ namespace RootEngine
 		virtual void StoreSample(std::string p_name, __int64 p_elapsedTime) = 0;
 		virtual void SetMemoryTracker(MemoryTracker* p_memTracker) = 0;
 		virtual void SetRenderInterface(Render::RendererInterface* p_renderer) = 0;
-#ifndef COMPILE_LEVEL_EDITOR
 		virtual void BeginGPUTimer() = 0;
 		virtual double EndGPUTimer() = 0;
 		virtual void InitQuery() = 0;
+		virtual void ToggleSorted() = 0;
+#ifndef COMPILE_LEVEL_EDITOR
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
 #endif
 	private:
+		
 	};
 
 	class Profiling : public ProfilingInterface
@@ -45,6 +47,7 @@ namespace RootEngine
 		void BeginGPUTimer();
 		double EndGPUTimer();
 		void InitQuery();
+		void ToggleSorted();
 #ifndef COMPILE_LEVEL_EDITOR
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
 #endif
@@ -60,6 +63,7 @@ namespace RootEngine
 		float m_time;
 		int m_frames;
 		GLuint m_queryID;
+		bool m_sort;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -87,6 +91,9 @@ namespace RootEngine
 		__int64		m_startTime;
 		ProfilingInterface* m_profiling;
 	};
-
-	#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
+//#ifdef _DEBUG
+#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
+//#else
+//#define PROFILE(name, profiler) 
+//#endif
 }

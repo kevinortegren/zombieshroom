@@ -14,10 +14,7 @@ namespace RootForce
 		, m_keymapper(p_keymapper)
 	{	
 		ComponentType::Initialize();
-		
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
@@ -44,9 +41,10 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(100);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -57,15 +55,17 @@ namespace RootForce
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
+		g_engineContext.m_resourceManager->LoadScript("Push");
 		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
+		g_engineContext.m_resourceManager->LoadScript("FireBall");
 		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
+		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
 		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
-		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
-
+		
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -147,15 +147,37 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+
+		m_timerSystem = new RootForce::TimerSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
+		m_displayWorldDebug = false;		
 		m_displayWorldDebug = false;
+		m_displayDebugHUD = true;
+		m_displayGuiHUD = true;
 	}
 
 	void IngameState::Enter()
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+#ifndef _DEBUG
+		BotanyTextures textures;
+		textures.m_diffuse = "ugotaflatgrass2";
+		textures.m_translucency = "grass_translucency";
+		textures.m_billboard = "grass_billboard";
+		textures.m_terrainTexture = "grass";
+
+		// Subdivide terrain for grass chunk rendering.
+		m_botanySystem->Initialize(textures);
+#endif
+		// Subdivide world.
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -166,19 +188,16 @@ namespace RootForce
 		
 		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
 		// Set the server peer to the action and abilityspawn system, if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
 			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}
-		if (m_networkContext.m_client != nullptr)
-		{
-			m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-			m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
-		}
+		}	
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -194,6 +213,9 @@ namespace RootForce
 		m_animationSystem->Start();
 
 		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+
+		if(m_networkContext.m_server != nullptr)
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	}
@@ -219,7 +241,12 @@ namespace RootForce
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
+		g_world->GetSystemManager()->Clear();
 		g_engineContext.m_physics->RemoveAll();
+
+
+		// Set server peers to null
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -233,9 +260,7 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
 
-		m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
-		m_sharedSystems.m_matchStateSystem->Process();
-		
+
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
@@ -252,26 +277,24 @@ namespace RootForce
 			}
 			else
 			{
+				if(m_displayGuiHUD)
 				g_engineContext.m_gui->Render(m_hud->GetView());
+				if(m_displayDebugHUD)
 				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
 
+		// Check for disconnection from the server
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
 
-		ECS::Entity* debugEntity = g_world->GetTagManager()->GetEntityByTag("LatestBall");
-		Transform* debugTransform = nullptr;
-		if (debugEntity != nullptr)
-			debugTransform = g_world->GetEntityManager()->GetComponent<Transform>(debugEntity);
-
-		// Check for disconnection from the server
 		if (clientComponent->State == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN || clientComponent->State == Network::ClientState::DISCONNECTED_TIMEOUT)
 		{
 			return GameStates::Menu;
 		}
 		
+		// Check for time for reset
 		if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() <= -10)
 		{
 			// Do a reconnect, this should force the server to rehost the game (thus starting a new one) and the clients should reconnect automagically
@@ -279,120 +302,26 @@ namespace RootForce
 		}
 
 		// If game is over, set gameover to true and wait for the restart
-		bool isGameOver = false;
 		if(m_sharedSystems.m_matchStateSystem->IsMatchOver())
 		{
-			isGameOver = true;
-			m_hud->SetValue("EndGame", "true" );
 			// If kill victory, set the time to 0 so restart will activate correctly
 			if(m_sharedSystems.m_matchStateSystem->GetTimeLeft() > 0)
 				g_world->GetEntityManager()->GetComponent<TDMRuleSet>( g_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft = 0;
 		}
-		if(isGameOver || g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			m_hud->SetValue("ShowScore", "true" );
-			m_hud->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
-		}
-		else if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
-			m_hud->SetValue("ShowScore", "false" );
-		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-		if(!isGameOver)
-		{
-		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
-			//Update all the data that is displayed in the HUD
-		m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
-		m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
-		m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-		m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
-		m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
-		m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
-		m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
-		m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-		if(playerComponent->AbilityScripts[0].Cooldown > 0)
-			m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-		if(playerComponent->AbilityScripts[1].Cooldown > 0)
-			m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-		if(playerComponent->AbilityScripts[2].Cooldown > 0)
-			m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-		m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
-		}
-		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
-		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
-		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
-
-		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
-		{
-			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
-		}
-		if(RootServer::MatchAny(event.EventType, 2, "RS", "RELOADSCRIPTS"))
-		{
-			g_engineContext.m_resourceManager->ReloadAllScripts();
-		}
-		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
-			return GameStates::Menu;
-		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
-		{
-			// Kill ourselves.
-			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
-
-			// Notify the server of our suicide.
-			NetworkMessage::Suicide m;
-			m.User = Network::ReservedUserID::NONE;
-
-			RakNet::BitStream bs;
-			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-			bs.Write(RakNet::GetTime());
-			bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
-			m.Serialize(true, &bs);
-
-			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-		}
-
-#ifdef _DEBUG
 		
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F10) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			if(m_displayWorldDebug)
-			{
-				m_displayWorldDebug = false;
-				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
-			}
-			else
-			{
-				m_displayWorldDebug = true;
-				m_sharedSystems.m_worldSystem->ShowDebug(m_displayWorldDebug);	
-			}
-		}
+		// Update the HUD values.
+		UpdateHUD();
+		
+		// Update the console commands.
+		GameStates::GameStates consoleGameState = UpdateConsole();
+		if (consoleGameState != GameStates::Ingame)
+			return consoleGameState;
 
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F11) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		// Check for special keypress events.
+		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			if(m_displayPhysicsDebug)
-			{
-				m_displayPhysicsDebug = false;
-				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-			}
-			else
-			{
-				m_displayPhysicsDebug = true;
-				g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
-			}
+			m_displayGuiHUD = m_displayGuiHUD ? false : true;
 		}
-
-		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F9) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			if(m_displayNormals)
-			{
-				m_displayNormals = false;
-				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
-			}
-			else
-			{
-				m_displayNormals = true;
-				g_engineContext.m_renderer->DisplayNormals(m_displayNormals);	
-			}
-		}
-#endif
 		
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
@@ -424,11 +353,22 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
+				m_actionSystem->Process();
+		}
+
+		{
+			PROFILE("Timer system", g_engineContext.m_profiler);
+			m_timerSystem->Process();
 		}
 
 		m_animationSystem->Run();
 		
+		{
+			PROFILE("Match State System", g_engineContext.m_profiler);
+			m_sharedSystems.m_matchStateSystem->UpdateDeltatime(p_deltaTime);
+			m_sharedSystems.m_matchStateSystem->Process();
+		}
+
 		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
@@ -451,8 +391,7 @@ namespace RootForce
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
 		}
-
-		
+	
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
 			m_collisionSystem->Process();
@@ -470,10 +409,12 @@ namespace RootForce
 			m_lookAtSystem->Process();
 			m_cameraSystem->Process();
 		}
+
 		{
 			PROFILE("Sound System", g_engineContext.m_profiler);
 			m_soundSystem->Process();
 		}
+
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
@@ -487,6 +428,11 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
+		}
+
+		{
+			PROFILE("Botany System", g_engineContext.m_profiler);
+			m_botanySystem->Process();
 		}
 
 		{
@@ -527,5 +473,129 @@ namespace RootForce
 		}
 		g_engineContext.m_sound->Update();
 		return GameStates::Ingame;
+	}
+
+	GameStates::GameStates IngameState::UpdateConsole()
+	{
+		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
+
+		if(RootServer::MatchAny(event.EventType, 2, "R", "RENDER"))
+		{
+			g_engineContext.m_renderer->ParseCommands(&event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "LOGGER", "L"))
+		{
+			g_engineContext.m_logger->ParseCommand(&event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "SORTED", "SO"))
+		{
+			g_engineContext.m_profiler->ToggleSorted();
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "PROFILER", "PR"))
+		{
+			m_displayDebugHUD = m_displayDebugHUD ? false : true;
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "PHYSICSDEBUG", "PD"))
+		{
+			m_displayPhysicsDebug = m_displayPhysicsDebug ? false : true;
+			g_engineContext.m_physics->EnableDebugDraw(m_displayPhysicsDebug);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "NORMALSDEBUG", "ND"))
+		{
+			m_displayNormals = m_displayNormals ? false : true;
+			g_engineContext.m_renderer->DisplayNormals(m_displayNormals);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
+		{
+			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "B", "BOTANY"))
+		{
+			m_botanySystem->ParseCommands(&event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "RS", "RELOADSCRIPTS"))
+		{
+			g_engineContext.m_resourceManager->ReloadAllScripts();
+		}
+
+		if(RootServer::MatchAny(event.EventType, 3, "Q", "QUIT", "RAGEQUIT"))
+		{
+			return GameStates::Menu;
+		}
+
+		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
+		{
+			// Kill ourselves.
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+
+			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
+			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+
+			// Notify the server of our suicide.
+			NetworkMessage::Suicide m;
+			m.User = Network::ReservedUserID::NONE;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) NetworkMessage::MessageType::Suicide);
+			m.Serialize(true, &bs);
+
+			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+		}
+
+		return GameStates::Ingame;
+	}
+
+	void IngameState::UpdateHUD()
+	{
+		if (m_sharedSystems.m_matchStateSystem->IsMatchOver())
+		{
+			m_hud->SetValue("EndGame", "true" );
+		}
+
+		if (m_sharedSystems.m_matchStateSystem->IsMatchOver() || g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::DOWN)
+		{
+			m_hud->SetValue("ShowScore", "true" );
+			m_hud->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
+		}
+		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
+		{
+			m_hud->SetValue("ShowScore", "false" );
+		}
+
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver())
+		{
+			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+			//Update all the data that is displayed in the HUD
+			m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
+			m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
+			m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
+			m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+			m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+			m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+			m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+			m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+			if(playerComponent->AbilityScripts[0].Cooldown > 0)
+				m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+			if(playerComponent->AbilityScripts[1].Cooldown > 0)
+				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+			if(playerComponent->AbilityScripts[2].Cooldown > 0)
+				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+		}
+
+		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
+		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 	}
 }

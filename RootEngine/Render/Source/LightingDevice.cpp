@@ -55,6 +55,12 @@ namespace Render
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		SetupSSAO();
+
+		m_showAmbient = true;
+		m_showDirectional = true;
+		m_showPointlights = true;
+		m_showSSAO = true;
+		m_showBackgroundBlend = true;
 	}
 
 	void LightingDevice::SetAmbientLight(const glm::vec4& p_color)
@@ -87,34 +93,43 @@ namespace Render
 
 	void LightingDevice::SSAO()
 	{
-		m_fullscreenQuad->Bind();
-		//SSAO
-		BeginSSAO();
-		glDisable(GL_STENCIL_TEST);
-		auto ssao = m_ssaoTech->GetPrograms()[0];
-		m_noiseSSAOTex->Bind(7);
-		m_ssaoTech->Apply();
-		ssao->Apply();
-		m_fullscreenQuad->Draw();
-		glEnable(GL_STENCIL_TEST);
+		if(m_showSSAO)
+		{
+			m_fullscreenQuad->Bind();
+			//SSAO
+			BeginSSAO();
+			glDisable(GL_STENCIL_TEST);
+			auto ssao = m_ssaoTech->GetPrograms()[0];
+			m_noiseSSAOTex->Bind(7);
+			m_ssaoTech->Apply();
+			ssao->Apply();
+			m_fullscreenQuad->Draw();
+			glEnable(GL_STENCIL_TEST);
+		}
 	}
 
 	void LightingDevice::Ambient()
 	{
-		m_fullscreenQuad->Bind();
-		m_ambient->Apply();
-		m_ssaoTex->Bind(7);
-		m_fullscreenQuad->Draw();
-		m_ssaoTex->Unbind(7);
-		m_fullscreenQuad->Unbind();
+		if(m_showAmbient)
+		{
+			m_fullscreenQuad->Bind();
+			m_ambient->Apply();
+			m_ssaoTex->Bind(7);
+			m_fullscreenQuad->Draw();
+			m_ssaoTex->Unbind(7);
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::Directional()
 	{
-		m_fullscreenQuad->Bind();
-		m_directional->Apply();
-		m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
-		m_fullscreenQuad->Unbind();
+		if(m_showDirectional)
+		{
+			m_fullscreenQuad->Bind();
+			m_directional->Apply();
+			m_fullscreenQuad->DrawInstanced(m_numDirectionalLights);
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::PointLightStencil()
@@ -159,6 +174,14 @@ namespace Render
 		glCullFace(GL_BACK);
 	}
 
+	void LightingDevice::Point()
+	{
+		if(m_showPointlights)
+		{
+			PointLightFSQ();
+		}
+	}
+
 	void LightingDevice::PointLightFSQ()
 	{
 		m_fullscreenQuad->Bind();
@@ -169,23 +192,26 @@ namespace Render
 
 	void LightingDevice::BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode)
 	{
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-		m_fullscreenQuad->Bind();
-		
-		switch(p_mode)
+		if(m_showBackgroundBlend)
 		{
-		case BackgroundBlend::ADDATIVE:
-			m_backgroundAddative->Apply();
-			break;
-		case BackgroundBlend::ALPHABLEND:
-		default:
-			m_backgroundAlphaBlend->Apply();
-			break;
-		}
+			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 
-		m_fullscreenQuad->Draw();
-		m_fullscreenQuad->Unbind();
+			m_fullscreenQuad->Bind();
+		
+			switch(p_mode)
+			{
+			case BackgroundBlend::ADDATIVE:
+				m_backgroundAddative->Apply();
+				break;
+			case BackgroundBlend::ALPHABLEND:
+			default:
+				m_backgroundAlphaBlend->Apply();
+				break;
+			}
+
+			m_fullscreenQuad->Draw();
+			m_fullscreenQuad->Unbind();
+		}
 	}
 
 	void LightingDevice::SetupSSAO()
@@ -227,6 +253,11 @@ namespace Render
 		m_noiseSSAOTex->BufferData(&noise[0]);
 	};
 
+	void LightingDevice::ShowSSAO(bool p_value)
+	{
+		m_showSSAO = p_value;
+	}
+
 	void LightingDevice::BeginSSAO()
 	{
 		// Bind la-buffer.
@@ -242,32 +273,6 @@ namespace Render
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
-
-	/*void LightingDevice::Process(Mesh& p_fullscreenQuad, int p_backgroundEffect)
-	{
-
-		GLuint64 startTime, stopTime;
-		unsigned int queryID[2];
-
-		glGenQueries(2, queryID);
-		glQueryCounter(queryID[0], GL_TIMESTAMP);
-
-
-
-
-		glQueryCounter(queryID[1], GL_TIMESTAMP);
-
-		GLint stopTimerAvailable = 0;
-		while (!stopTimerAvailable) {
-			glGetQueryObjectiv(queryID[1], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable);
-		}
-
-		glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
-		glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
-
-		printf("Time spent on the GPU: %f ms\n", (stopTime - startTime) / 1000000.0);
-
-	} */
 
 	void LightingDevice::Clear()
 	{
@@ -296,6 +301,7 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 		m_la->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		m_ssaoTex->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_la->GetHandle(), 0);
 
@@ -307,4 +313,23 @@ namespace Render
 		return p_low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(p_high-p_low)));
 	}
 
+	void LightingDevice::ShowAmbient(bool p_value)
+	{
+		m_showAmbient = p_value;
+	}
+
+	void LightingDevice::ShowDirectional(bool p_value)
+	{
+		m_showDirectional = p_value;
+	}
+
+	void LightingDevice::ShowPointLights(bool p_value)
+	{
+		m_showPointlights = p_value;
+	}
+
+	void LightingDevice::ShowBackgroundBlend(bool p_value)
+	{
+		m_showBackgroundBlend = p_value;
+	}
 }

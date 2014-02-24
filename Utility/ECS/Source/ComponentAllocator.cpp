@@ -22,6 +22,8 @@ namespace ECS
 
 	void ComponentAllocator::FreePtrFromList(void* p_ptr, int p_id)
 	{
+		static_cast<ComponentInterface*>(p_ptr)->~ComponentInterface();
+
 		m_lists[p_id].first.Free(p_ptr);
 	}
 }

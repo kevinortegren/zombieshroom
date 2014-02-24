@@ -19,27 +19,30 @@ public:
 	//Assumes the float* is a float[3]
 	void Walk(glm::vec3 p_dir, float p_dt);
 	void Jump();
+	void JumpBoost(float p_boostPower);
 	void Knockback(const btVector3& p_velocity, float p_dt);
 	void Update(float p_dt);
-	void SetOrientation(glm::quat p_orientation);
 	void RemovePlayer();
+	void Move(glm::vec3 p_target, float p_dt);
+	bool IsOnGround();
 	void SetUserPointer(void* p_userPointer);
 	void SetDebugDrawer(DebugDrawer* p_drawer) const {m_kinController->debugDraw(p_drawer);}
 	void SetMass(float p_mass);
 	void SetGravity(float p_gravity);
 	void SetPosition(const btVector3& p_position);
 	void SetJumpForce(float p_jumpForce);
+	void SetOrientation(glm::quat p_orientation);
 	float GetMass() const {return m_mass;}
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}
 	float GetModelHeight() const {return m_heightOffset;}
 	void* GetUserPointer() const {return m_ghostObject->getUserPointer();}
-	void Move(glm::vec3 p_target, float p_dt);
-	bool IsOnGround();
+	
 	btVector3 GetPosition() const {return m_kinController->getGhostObject()->getWorldTransform().getOrigin();}
 	btQuaternion GetOrientation() const {return m_kinController->getGhostObject()->getWorldTransform().getRotation();}
 	btTransform GetTransform() const {return m_kinController->getGhostObject()->getWorldTransform();}
 	btVector3 GetKnockbackVector() const {return m_kinController->GetKnockbackVector();}
+	float GetVerticalVelocity() const {return m_kinController->GetVerticalVelocity();}
 
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;

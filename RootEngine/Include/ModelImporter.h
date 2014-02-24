@@ -82,14 +82,12 @@ namespace RootEngine
 		ModelImporter(GameSharedContext* p_context);
 		~ModelImporter();
 
-
 		Model* LoadModel(const std::string p_fileName, bool p_noRender);
 		
 	private:
 
 		void TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_filename );
 		void Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename );
-
 
 		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
 		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );

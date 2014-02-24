@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>783</width>
+    <width>791</width>
     <height>738</height>
    </rect>
   </property>
@@ -20,29 +20,16 @@
    <string>Ability Editor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="buttonNameBrowser">
-    <property name="geometry">
-     <rect>
-      <x>585</x>
-      <y>9</y>
-      <width>189</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Browse name for property manager...</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>39</y>
+      <y>69</y>
       <width>771</width>
-      <height>661</height>
+      <height>631</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="mainLayout">
      <item row="0" column="0">
       <widget class="CustomCompListWidget" name="listAbilityComponents"/>
      </item>
@@ -143,37 +130,57 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget1">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>371</width>
-      <height>22</height>
+      <x>10</x>
+      <y>40</y>
+      <width>771</width>
+      <height>25</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLineEdit" name="abilityNameEdit">
+    <layout class="QHBoxLayout" name="variableLayout">
+     <item alignment="Qt::AlignRight">
+      <widget class="QLabel" name="chargesLable">
        <property name="text">
-        <string>AbilityName</string>
+        <string>Charges</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QSpinBox" name="chargesSpinbox"/>
+     </item>
+     <item alignment="Qt::AlignRight">
+      <widget class="QLabel" name="chargingLable">
+       <property name="text">
+        <string>Charging Time</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
      <item>
+      <widget class="QDoubleSpinBox" name="chargingSpinbox"/>
+     </item>
+     <item alignment="Qt::AlignRight">
+      <widget class="QLabel" name="channelingLable">
+       <property name="text">
+        <string>Channeling Time</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="channelingSpingbox"/>
+     </item>
+     <item alignment="Qt::AlignRight">
+      <widget class="QLabel" name="durationLable">
+       <property name="text">
+        <string>Duration</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="durationSpinbox"/>
+     </item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLabel" name="cooldownLabel">
        <property name="text">
         <string>Cooldown</string>
@@ -185,13 +192,39 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLineEdit" name="abilityNameEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AbilityName</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonNameBrowser">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>10</y>
+      <width>189</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Browse name for property manager...</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>783</width>
+     <width>791</width>
      <height>21</height>
     </rect>
    </property>
@@ -199,10 +232,15 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew_Ability"/>
+    <addaction name="separator"/>
     <addaction name="actionSave_As"/>
     <addaction name="actionSave"/>
+    <addaction name="separator"/>
     <addaction name="actionLoad"/>
+    <addaction name="separator"/>
     <addaction name="actionGenerate_Script"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -236,6 +274,11 @@
   <action name="actionEntity">
    <property name="text">
     <string>Entity</string>
+   </property>
+  </action>
+  <action name="actionNew_Ability">
+   <property name="text">
+    <string>New Ability</string>
    </property>
   </action>
  </widget>

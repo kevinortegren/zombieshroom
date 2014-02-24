@@ -15,7 +15,7 @@ public:
 	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
-
+	void JumpBoost(float p_boostPower);
 	void StopKnockback();
 
 
@@ -29,6 +29,7 @@ public:
 
 	float test(const btVector3& start,const btVector3& end, btCollisionWorld* world );
 	btVector3 GetKnockbackVector() const {return m_knockbackVelocity;}
+	float GetVerticalVelocity() const {return m_verticalVelocity;}
 private:
 	bool m_hasBeenKnockbacked;
 	btVector3 m_knockbackVelocity;

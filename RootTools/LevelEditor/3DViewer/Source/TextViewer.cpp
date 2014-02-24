@@ -14,6 +14,7 @@
 #include <RootSystems\Include\WorldSystem.h>
 #include <RootSystems\Include\ShadowSystem.h>
 #include <RootSystems\Include\WaterSystem.h>
+#include <RootSystems\Include\BotanySystem.h>
 
 
 #include <Utility\ECS\Include\World.h>
@@ -50,6 +51,7 @@ RootForce::ParticleSystem* particleSystem;
 RootForce::WorldSystem* worldSystem;
 RootForce::ShadowSystem* shadowSystem;
 RootForce::WaterSystem* waterSystem;
+RootForce::BotanySystem* botanySystem;
 
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
@@ -135,6 +137,15 @@ int main(int argc, char* argv[])
 			Initialize(g_engineContext);
 
 			LoadSceneFromMaya();
+
+
+			RootForce::BotanyTextures textures;
+			textures.m_diffuse = "ugotaflatgrass2";
+			textures.m_translucency = "grass_translucency";
+			textures.m_billboard = "grass_billboard";
+			textures.m_terrainTexture = "customGrass3";
+
+			//botanySystem->Initialize(textures);
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,6 +254,7 @@ int main(int argc, char* argv[])
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
+				botanySystem->Process();
 				waterSystem->Process();
 				cameraSystem->Process();
 				directionalLightSystem->Process();
@@ -385,6 +397,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
 	waterSystem->Init();
 
+	botanySystem = new RootForce::BotanySystem(&m_world, &g_engineContext);
 }
 
 void LoadSceneFromMaya()
@@ -637,6 +650,8 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		else if(normalMap != "" && normalMap != "NONE" && transparent)
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture("LeafTranslucencyTest", Render::TextureType::TEXTURE_2D);
+
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
 		}
 		else

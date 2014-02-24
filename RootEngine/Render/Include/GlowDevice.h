@@ -13,14 +13,23 @@ namespace Render
 	public:
 		~GlowDevice();
 		void Init(GLRenderer* p_renderer, int p_width, int p_height);
-		void Process(GLRenderer* p_renderer, Mesh* m_mesh);
 		void Resize(int p_width, int p_height);
 
+		void SetHalfWidth(int p_halfWidth);
+		void SetHalfHeight(int p_halfHeight);
 		void SetGlowFactor(float p_factor);
 		void SetGlowStrength(float p_strength);
 		void SetGlowRadius(float p_radius);
+		void Display(bool p_value);
 
+		void HorizontalPass(Mesh* m_mesh);
+		void VerticalPass(Mesh* m_mesh);
+
+		bool m_display;
 	private:
+
+		float Gaussian(float x, float deviation);
+
 		GLuint m_glowFramebuffer;
 		EffectInterface* m_glowEffect;
 		TextureInterface* m_glowTexture;

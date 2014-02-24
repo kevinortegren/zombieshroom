@@ -1,13 +1,15 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <iostream>
+#include <fstream>
 
 extern RootEngine::GameSharedContext g_engineContext;
 namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f))
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f))
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -151,6 +153,7 @@ namespace RootForce
 		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
+		
 
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
@@ -161,6 +164,7 @@ namespace RootForce
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
 		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+		m_renderable->m_forward = true;
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
@@ -173,12 +177,11 @@ namespace RootForce
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
 
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
-		m_world->GetGroupManager()->RegisterEntity("NonExport", waterEnt);
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
 		//Start with some init disturbs
-		InitDisturb();
+		LoadWater();
 
 		//Run water simulation
 		m_pause = false;
@@ -343,12 +346,6 @@ namespace RootForce
 		m_waterOptions.w = (m_waterOptions.w == 0.0f) ? 1.0f : 0.0f;
 	}
 
-	void WaterSystem::ToggleDepth()
-	{
-		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water depth toggled!");
-		m_waterOptions.z = (m_waterOptions.z == 0.0f) ? 1.0f : 0.0f;
-	}
-
 	void WaterSystem::ToggleNormalMaps()
 	{
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water normalmaps toggled!");
@@ -452,33 +449,40 @@ namespace RootForce
 		if(module == "wireframe" || module == "wf")
 		{	
 			ToggleWireFrame();
+
 		}
-		if(module == "pause" || module == "p")
+		else if(module == "pause" || module == "p")
 		{	
 			TogglePause();
 		}
-		if(module == "reset" || module == "r")
+		else if(module == "reset" || module == "r")
 		{	
 			ResetWater();
 		}
-		if(module == "refl")
+		else if(module == "refl")
 		{	
 			ToggleReflections();
 		}
-		if(module == "norm")
+		else if(module == "norm")
 		{	
 			ToggleNormalMaps();
 		}
-		if(module == "deep")
+		else if(module == "depth")
 		{	
-			ToggleDepth();
+			std::getline(*p_data, param, ' ');
+			float depthFactor = (float)atof(param.c_str());
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water depth factor to %f", depthFactor);
+			m_waterOptions.z = depthFactor;
 		}
-		if(module == "refr")
+		else if(module == "refr")
 		{	
 			ToggleRefractions();
 		}
-
-		if(module == "damping" || module == "d")
+		else if(module == "init")
+		{
+			LoadWater();
+		}
+		else if(module == "damping" || module == "d")
 		{	
 			std::getline(*p_data, param, ' ');
 			std::getline(*p_data, value, ' ');
@@ -548,15 +552,65 @@ namespace RootForce
 			p_chat->JSAddMessage("/W[ATER] refl			 - Toggle reflections");
 			p_chat->JSAddMessage("/W[ATER] refr			 - Toggle refractions");
 			p_chat->JSAddMessage("/W[ATER] norm			 - Toggle normal maps");
-			p_chat->JSAddMessage("/W[ATER] deep			 - Toggle deep water");
+			p_chat->JSAddMessage("/W[ATER] depth X		 - Set water depth factor X(float)");
 			p_chat->JSAddMessage("/W[ATER] r[eset]		 - Reset the water simulation");
+			p_chat->JSAddMessage("/W[ATER] init 		 - Init water movement with default values");
 			p_chat->JSAddMessage("/W[ATER] dis[turb]	 - Disturb water at player position");
 			p_chat->JSAddMessage("/W[ATER] h[eight] X	 - Set water height to X(float)");
 			p_chat->JSAddMessage("/W[ATER] d[amping]	 - Damping settings");
 			p_chat->JSAddMessage("/W[ATER] s[peed]		 - Speed settings");
 		}
+		else if(module == "save")
+		{
+			SaveWater();
+		}
+		
 	}
 
-	
 #endif
+	void WaterSystem::SaveWater()
+	{
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Saving water movements...");
+
+		m_computeJob.m_textures[0]->Bind(0);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, m_textureData);
+		std::ofstream fout0 (g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/Other/water0.init", std::ios::binary);
+		fout0.write ((char*)&m_textureData[0], m_texSize*m_texSize*sizeof(float));
+		m_computeJob.m_textures[0]->Unbind(0);
+
+		m_computeJob.m_textures[1]->Bind(0);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, m_textureData);
+		std::ofstream fout1 (g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/Other/water1.init", std::ios::binary);
+		fout1.write ((char*)&m_textureData[0], m_texSize*m_texSize*sizeof(float));
+		m_computeJob.m_textures[1]->Unbind(0);
+
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is saved!");
+	}
+
+	void WaterSystem::LoadWater()
+	{
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Loading water movements...");
+
+		std::ifstream textureFile0 (g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/Other/water0.init", std::ios::in|std::ios::binary);
+		if (textureFile0.is_open())
+		{
+			textureFile0.read ((char*)&m_textureData[0], m_texSize*m_texSize*sizeof(float));
+			textureFile0.close();
+			m_computeJob.m_textures[0]->BufferData((void*)&m_textureData[0]);
+		}
+		else 
+			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::NON_FATAL_ERROR, "Init texture 0 not loaded!"); 
+
+		std::ifstream textureFile1 (g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/Other/water1.init", std::ios::in|std::ios::binary);
+		if (textureFile1.is_open())
+		{
+			textureFile1.read ((char*)&m_textureData[0], m_texSize*m_texSize*sizeof(float));
+			textureFile1.close();
+			m_computeJob.m_textures[1]->BufferData((void*)&m_textureData[0]);
+		}
+		else 
+			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::NON_FATAL_ERROR, "Init texture 1 not loaded!");
+
+		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is moving!");
+	}
 }

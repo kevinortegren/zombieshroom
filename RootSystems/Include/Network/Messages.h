@@ -29,6 +29,7 @@ namespace RootForce
 	struct PlayerComponent;
 	struct TDMRuleSet;
 	struct PlayerPhysics;
+	struct AbilitySpawnComponent;
 
 	namespace Network
 	{
@@ -67,7 +68,9 @@ namespace RootForce
 				SetGameMode,
 				SetMatchTime,
 				SetKillCount,
-				ServerInformation
+				ServerInformation,
+				TimeUp,
+				AbilitySpawn,
 			};
 		}
 
@@ -346,6 +349,7 @@ namespace RootForce
 		{
 			RakNet::RakString ServerName;
 			RakNet::RakString MapName;
+			RakNet::RakString AbilityPack;
 			Network::UserID_t CurrentPlayers;
 			Network::UserID_t MaxPlayers;
 			bool PasswordProtected;
@@ -358,6 +362,22 @@ namespace RootForce
 		};
 
 
+		/*
+			Sent by the server when a timer component reaches 0. 
+		*/
+		struct TimeUp 
+		{
+			Network::NetworkEntityID ID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+		struct AbilitySpawn
+		{
+			Network::NetworkEntityID ID;
+			RakNet::RakString AbilityName;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 
 		/*
 			Serialize functions for components
@@ -371,6 +391,7 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerComponent* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilitySpawnComponent* p_c);
 
 
 		/*

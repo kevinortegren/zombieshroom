@@ -21,9 +21,11 @@ namespace RootForce
 			, m_world(p_world)
 			, m_messageHandler(nullptr)
 			, m_worldDeltaTimer(0)
+			, m_packetLogger(LogTag::SERVER)
 		{
 			// Setup the server
 			m_peer = RakNet::RakPeerInterface::GetInstance();
+			m_peer->AttachPlugin(&m_packetLogger);
 
 			RakNet::StartupResult r;
 			RakNet::SocketDescriptor sd(p_config.Port, nullptr);
@@ -47,12 +49,12 @@ namespace RootForce
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
 		}
 
-		void Server::Initialize( WorldSystem* p_worldSystem, AbilityRespawnSystem* p_abilitySpawnSystem , const RootSystems::ServerConfig& p_config, bool p_isDedicated )
+		void Server::Initialize( WorldSystem* p_worldSystem, AbilitySpawnSystem* p_abilitySpawnSystem , const RootSystems::ServerConfig& p_config, bool p_isDedicated )
 		{
 			// Load the map
 			p_worldSystem->LoadWorld(p_config.MapName);
-			p_abilitySpawnSystem->LoadAbilities("Standard"); //TODO: read from serverInfo
-			p_abilitySpawnSystem->AttatchComponentToPoints();
+			p_abilitySpawnSystem->LoadAbilities(p_config.AbilityPack.c_str());
+			p_abilitySpawnSystem->AttachComponentToPoints();
 
 			// Create a server info entity
 			ECS::Entity* serverInfoEntity = m_world->GetTagManager()->GetEntityByTag("ServerInformation");
@@ -60,6 +62,7 @@ namespace RootForce
 
 			serverInfo->Information.ServerName = p_config.ServerName.c_str();
 			serverInfo->Information.MapName = p_config.MapName.c_str();
+			serverInfo->Information.AbilityPack = p_config.AbilityPack.c_str();
 			serverInfo->Information.CurrentPlayers = 0;
 			serverInfo->Information.MaxPlayers = p_config.MaxPlayers;
 			serverInfo->Information.PasswordProtected = p_config.Password != "";

@@ -11,8 +11,10 @@ public:
 	~ObjectController();
 	void Init(btPairCachingGhostObject* p_ghostObject, btConvexShape* p_convexShape, btDiscreteDynamicsWorld* p_dynamicWorld);
 	void Move( glm::vec3 p_targetPos, btDiscreteDynamicsWorld* p_world );
-	glm::vec3 GetPos() const{return m_currentPos;}
+	glm::vec3 GetPos();
+	void SetPosition(glm::vec3 p_position);
 	void SetOrientation(glm::quat p_orientation);
+	btQuaternion GetOrientation();
 	//float GetMass() const {return }
 private:
 	glm::vec3 m_currentPos;

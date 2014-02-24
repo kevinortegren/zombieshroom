@@ -1,7 +1,7 @@
 Player = {}
 
 function Player.OnCreate(userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player");
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating player (userId: "..tostring(userId)..", actionId: "..tostring(actionId)..")");
 	
 	local player = Entity.New();
 	local transform = Transformation.New(player);
@@ -24,8 +24,6 @@ function Player.OnCreate(userId, actionId)
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
-	
-
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
 
@@ -36,13 +34,12 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetAbilityTime(0.0);
 	playerAction:SelectAbility(1);
 
-	playerComponent:SetAbility(0, "AbilityBall", -1);
-	playerComponent:SetAbility(1, "AbilityDash", -1);
-	playerComponent:SetAbility(2, "AbilityRay" ,-1);
+	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
 
-	playerPhysics:SetMovementSpeed(20);
+	playerPhysics:SetMovementSpeed(25);
 	playerPhysics:SetJumpForce(20);
+	playerPhysics:SetJumpBoostForce(0.1);
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
@@ -69,6 +66,7 @@ function Player.OnCreate(userId, actionId)
 		local animation = Animation.New(player);
 		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
+		renderable:SetShadowTechnique(ShadowTechnique.SHADOW_ANIMATED);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
 			renderable:SetMaterial("BlueSpirit");

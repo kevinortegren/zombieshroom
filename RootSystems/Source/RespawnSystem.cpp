@@ -20,6 +20,7 @@ namespace RootSystems
 		m_collision.Init(m_world->GetEntityManager());
 		m_transform.Init(m_world->GetEntityManager());
 		m_network.Init(m_world->GetEntityManager());
+		m_player.Init(m_world->GetEntityManager());
 	}
 
 
@@ -33,8 +34,8 @@ namespace RootSystems
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
 		
 
-		// If the player has 0 health and is not already dead, kill him
-		if(health->Health <= 0 && !health->IsDead)
+		// If the player has less than 1 health and is not already dead, kill him
+		if(health->Health < 1 && !health->IsDead)
 		{
 			health->IsDead = true;
 			health->RespawnDelay = 3.0f;
@@ -47,6 +48,7 @@ namespace RootSystems
 			
 			Respawn(health->SpawnIndex, p_entity);
 			health->SpawnPointReceived = false;
+			
 
 			// Check whether this is the connection spawn message, and if so, set the client state to connected.
 			RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(m_world->GetTagManager()->GetEntityByTag("Client"));
@@ -101,7 +103,7 @@ namespace RootSystems
 					m_serverPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 
 					// Check whether this is the connection spawn message, and if so, set the client state to connected.
-					ECS::Entity* clientEntity = g_networkEntityMap[RootForce::Network::NetworkEntityID(network->ID.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY)];
+					ECS::Entity* clientEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY));
 					RootForce::Network::ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<RootForce::Network::ClientComponent>(clientEntity);
 					if (clientComponent != nullptr && clientComponent->State == RootForce::Network::ClientState::AWAITING_SPAWN_POINT)
 					{
@@ -118,6 +120,10 @@ namespace RootSystems
 
 		if(health->IsDead)
 			health->RespawnDelay -= dt;
+		if(health->Health > 200.0f)
+			health->Health = 200.0f;
+		if(health->Health > 100.0f)
+			health->Health -= dt;
 	}
 
 	int RespawnSystem::GetRandomSpawnpoint()
@@ -177,6 +183,7 @@ namespace RootSystems
 		RootForce::Collision* collision = m_collision.Get(p_player);
 		RootForce::Transform* transform = m_transform.Get(p_player);
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_player);
+		RootForce::PlayerComponent* player = m_player.Get(p_player);
 
 		// Set the spawn position
 		RootForce::Transform* spawnpoint = GetSpawnpointTransform(index);
@@ -197,6 +204,11 @@ namespace RootSystems
 		health->RespawnDelay = 0.0f;
 		health->IsDead = false;
 		g_engineContext.m_physics->DeactivateRagdoll(*(collision->m_handle));
+		
+
+		player->AbilityScripts[0] = RootForce::AbilityInfo();
+		player->AbilityScripts[1] = RootForce::AbilityInfo();
+		player->AbilityScripts[2] = RootForce::AbilityInfo();
 	}
 }
 #endif

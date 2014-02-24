@@ -3,10 +3,7 @@
 in vec3 WorldPos_FS_in;                                                                        
 in vec2 TexCoord_FS_in;                                                                        
 
-layout (location = 0) out vec4 diffuse;
-layout (location = 1) out vec2 normals;
-layout (location = 2) out vec4 glow;
-layout (location = 3) out vec4 background;
+out vec4 out_color;
 
 uniform sampler2D g_Specular;
 uniform samplerCube g_CubeMap;
@@ -185,7 +182,7 @@ void main()
 				numRefinements++;
 				if(numRefinements >= maxRefinements)
 				{
-					 vec2 normalAtPos = texture(g_SceneNormals, samplePos).xy;
+					 /*vec2 normalAtPos = texture(g_SceneNormals, samplePos).xy;
 					 vec3 normal;
 					 normal.xy = normalAtPos.xy;
     				 normal.z = sqrt(1-dot(normal.xy, normal.xy));
@@ -196,8 +193,8 @@ void main()
 					 	cosAngIncidence = clamp(1-cosAngIncidence,0.0,1.0);
 					 	//Get the color and end the loop
 						finalResult =  texture(g_LA, samplePos).rgb * (1.0 - float(count)/float(loops)) * cosAngIncidence;
-					}
-					
+					}*/
+					finalResult =  texture(g_LA, samplePos).rgb * (1.0 - float(count)/float(loops));// * cosAngIncidence;
 					break;
 				}
 			}
@@ -227,12 +224,9 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
-	float distFac = 0;
-	if(gOptions.z == 0.0)
-	{
-		float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
-		distFac = clamp(0.01f*vdist, 0.0f, 1.0f);
-	}
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
+	
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
 
 	////////////////////////////////////////////////////////////////////////////
@@ -250,8 +244,6 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
-	diffuse					= vec4(0.0f, 0.0f, 0.0f, 0.6f);
-	normals					= vec2(viewNormal.xy);
-	glow					= vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	background				= result;
+
+    out_color = result;
 }
