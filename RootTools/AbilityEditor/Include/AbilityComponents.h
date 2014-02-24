@@ -57,9 +57,9 @@ namespace AbilityEditorNameSpace
 				m_compNames.append("Stat Change (Caster) [WIP]");
 				m_compNames.append("Stat Change (Target) [WIP]");
 				m_compNames.append("Physics");
+				m_compNames.append("Charge Variables"); 
 				m_compNames.append("Water Disturb");
 				m_compNames.append("Sound");
-				m_compNames.append("Charge Variables"); 
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -378,7 +378,7 @@ namespace AbilityEditorNameSpace
 			float m_radius;
 			float m_height;
 			std::string m_collisionModelShapeName;
-			CollisionShape(shape p_collisionShape = shape::CONE, float p_radius = 0.0f, float p_height = 0.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
+			CollisionShape(shape p_collisionShape = shape::CONE, float p_radius = 1.0f, float p_height = 1.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
 			{
 				m_CollisionShape = p_collisionShape;
 				m_radius = p_radius;
