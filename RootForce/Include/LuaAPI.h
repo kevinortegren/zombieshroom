@@ -735,13 +735,13 @@ namespace RootForce
 			g_engineContext.m_physics->RadiusCheck((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
-		static int PhysicsShootRay(lua_State* p_luaState)
-		{
-			NumberOfArgs(5);
-			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			g_engineContext.m_physics->CastRay((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
-			return 0;
-		}
+// 		static int PhysicsShootRay(lua_State* p_luaState)
+// 		{
+// 			NumberOfArgs(5);
+// 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+// 			g_engineContext.m_physics->CastRay((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
+// 			return 0;
+// 		}
 		static int PhysicsGetType(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -2068,6 +2068,49 @@ namespace RootForce
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		//Ray
+		//////////////////////////////////////////////////////////////////////////
+		static int RayCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(7);
+			RootForce::RayComponent **s = (RootForce::RayComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::RayComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::RayComponent>(*e);
+
+			int Handle = (int)luaL_checknumber(p_luaState, 2);
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
+			(*s)->StartPosition = *v1;
+			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3");
+			(*s)->Direction = *v2;
+			(*s)->Distance = (float)luaL_checknumber(p_luaState, 5);
+			(*s)->Render = lua_toboolean(p_luaState, 6) != 0;
+			bool IsAbility = lua_toboolean(p_luaState, 7) != 0;
+
+			(*s)->HitEntity = (ECS::Entity*)g_engineContext.m_physics->CastRay(Handle, (*s)->StartPosition, (*s)->Direction, (*s)->Distance, &(*s)->HitPos, IsAbility);
+
+			luaL_setmetatable(p_luaState, "Ray");
+			return 1;
+		}
+		static int RayGetHitPos(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::RayComponent** s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "RayComponent");
+			glm::vec3 *e = (glm::vec3*)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*e = (*s)->HitPos;
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+		static int RayGetHitEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity **e = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			RootForce::RayComponent **s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "RayComponent");
+			*e = (*s)->HitEntity;
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//WaterCollider
 		//////////////////////////////////////////////////////////////////////////
 		static int WaterColliderCreate(lua_State* p_luaState)
@@ -2283,7 +2326,7 @@ namespace RootForce
 			{"SetVelocity", PhysicsSetVelocity},
 			{"KnockBack", PhysicsKnockBack},
 			{"CheckRadius", PhysicsCheckRadius},
-			{"ShootRay", PhysicsShootRay},
+			//{"ShootRay", PhysicsShootRay},
 			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
@@ -2597,22 +2640,33 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg followercomponent_f [] = {
+			{"New", FollowerCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg followercomponent_m [] = {
-			{"New", FollowerCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg homingcomponent_f [] = {
 			{"New", HomingCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg homingcomponent_m [] = {
 			{"SetTargetEntity", HomingSetTargetEntity},
 			{"SetTargetPosition", HomingSetTargetPosition},
 			{NULL, NULL}
 		};
 
-		static const struct luaL_Reg homingcomponent_m [] = {
+		static const struct luaL_Reg raycomponent_f [] = {
+			{"New", RayCreate},
+			{"GetHitPos", RayGetHitPos},
+			{"GetHitEntity", RayGetHitEntity},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg raycomponent_m [] = {
 			{NULL, NULL}
 		};
 
@@ -2715,6 +2769,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f, RootForce::LuaAPI::followercomponent_m, "Follower");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f, RootForce::LuaAPI::homingcomponent_m, "Homing");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::raycomponent_f, RootForce::LuaAPI::raycomponent_m, "Ray");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::timercomponent_f, RootForce::LuaAPI::timercomponent_m, "Timer");

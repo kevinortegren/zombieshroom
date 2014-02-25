@@ -1310,7 +1310,7 @@ namespace Physics
 		return rayResult.m_closestHitFraction;
 	}
 
-	void RootPhysics::CastRay( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
+	void* RootPhysics::CastRay( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length, glm::vec3* p_hitPos, bool p_isAbility )
 	{
 		RayAbilityCast rayResult;
 		rayResult.m_caster = m_userPointer.at(p_objectHandle);
@@ -1318,14 +1318,35 @@ namespace Physics
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(end[0], end[1], end[2]), rayResult);
+
 		if(!rayResult.hasHit())
-			return;
+			return nullptr;
+
 		glm::vec3 castVector = end - p_startPos;
 		glm::vec3 relativePosition = castVector * rayResult.m_closestHitFraction;
-		RootForce::CollisionInfo info;
-		info.m_collisionPosition = p_startPos + relativePosition;
+		*p_hitPos = p_startPos + relativePosition;
+		glm::vec3 hitPos = p_startPos + relativePosition;
 		
-		rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
+
+		if(p_isAbility)
+		{
+			RootForce::CollisionInfo info;
+			info.m_collisionPosition = hitPos;
+			rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
+
+			return rayResult.m_hit->m_entity;
+		}
+		else
+		{
+			if (rayResult.m_hit->m_type == PhysicsType::TYPE_PLAYER)
+			{
+				return rayResult.m_hit->m_entity;
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
 	}
 
 	void RootPhysics::RadiusCheck( int p_objectHandle, glm::vec3 p_pos, float p_radius )
@@ -1352,7 +1373,7 @@ namespace Physics
 		rayResult.from = p_startPos;
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
 		rayResult.to = end;
-		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(p_startPos[0] + end[0], p_startPos[1] + end[1], p_startPos[2] + end[2]), rayResult);
+		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(end[0], end[1], end[2]), rayResult);
 		if (rayResult.m_hit->m_type == PhysicsType::TYPE_PLAYER)
 		{
 			return rayResult.m_hit->m_entity;

@@ -47,6 +47,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -159,9 +160,13 @@ namespace RootForce
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
-		// Initialize the hominh system.
+		// Initialize the homing system.
 		m_homingSystem = new RootForce::HomingSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::HomingSystem>(m_homingSystem);
+
+		// Initialize the ray system.
+		m_raySystem = new RootForce::RaySystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
 
 
 		// Set debug visualization flags.
@@ -411,6 +416,11 @@ namespace RootForce
 		{
 			PROFILE("Homing system", g_engineContext.m_profiler);
 			m_homingSystem->Process();
+		}
+
+		{
+			PROFILE("Ray system", g_engineContext.m_profiler);
+			m_raySystem->Process();
 		}
 		
 		{

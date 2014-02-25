@@ -23,9 +23,8 @@ namespace RootForce
 	class HomingSystem : public ECS::EntitySystem
 	{
 	public:
-		HomingSystem(ECS::World* p_world/*, RootEngine::GameSharedContext* p_engineContext, std::string p_workingDir*/)
+		HomingSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
-			//, m_engineContext(p_engineContext)
 		{ 
 			SetUsage<RootForce::HomingComponent>();
 			SetUsage<RootForce::Collision>();

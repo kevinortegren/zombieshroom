@@ -111,7 +111,7 @@ namespace RootEngine
 
 			//Instant methods
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
-			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
+			virtual void* CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length, glm::vec3* p_hitPos, bool p_isAbility) = 0;
 			virtual void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius) = 0;
 			virtual void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 
@@ -184,7 +184,7 @@ namespace RootEngine
 			void EnableDebugDraw(bool p_enabled);
 
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
-			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
+			void* CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length, glm::vec3* p_hitPos, bool p_isAbilitys);
 			void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius);
 			void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 

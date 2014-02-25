@@ -38,6 +38,7 @@ namespace RootForce
 			TIMER,
 			FOLLOW,
 			HOMING,
+			RAY,
 		};
 	}
 }

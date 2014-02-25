@@ -22,6 +22,7 @@
 #include <RootSystems/Include/TimerSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
 #include <RootSystems/Include/HomingSystem.h>
+#include <RootSystems/Include/RaySystem.h>
 
 namespace RootForce
 {
