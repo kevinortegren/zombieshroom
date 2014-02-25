@@ -128,7 +128,7 @@ namespace RootForce
 
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
 
-		m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
+		//m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
 
 		//Remove all components used for rendering and collision
 		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
