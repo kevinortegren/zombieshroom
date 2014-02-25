@@ -8,17 +8,17 @@
           slot: 1
       textures:
         - name: g_Specular
-          slot: 1
-        - name: g_BlendMap
-          slot: 6
-        - name: g_DiffuseR
           slot: 7
+        - name: g_BlendMap
+          slot: 12
+        - name: g_DiffuseR
+          slot: 14
         - name: g_DiffuseG
-          slot: 8
+          slot: 15
         - name: g_DiffuseB
-          slot: 9
+          slot: 16
         - name: g_Glow
-          slot: 3
+          slot: 9
       uniforms:
         - sem: MODEL
           offset: 0
