@@ -166,7 +166,7 @@ namespace Render
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-			glTexImage2D(m_target, 0, GL_RGBA, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
+			glTexImage2D(m_target, 0, GL_RGBA8, p_width, p_height, 0, m_textureFormat, m_textureType, NULL);
 		}
 		else if(p_format == TextureFormat::TEXTURE_RGB || p_format == TextureFormat::TEXTURE_BGR)
 		{
