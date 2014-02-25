@@ -250,6 +250,7 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -601,7 +602,7 @@ namespace RootForce
 				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
 			if(playerComponent->AbilityScripts[2].Cooldown > 0)
 				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility + 1);
 		}
 
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));

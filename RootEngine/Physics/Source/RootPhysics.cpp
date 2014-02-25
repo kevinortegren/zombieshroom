@@ -1204,7 +1204,7 @@ namespace Physics
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled && m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->SetPosition(p_position);
 		}
@@ -1311,6 +1311,7 @@ namespace Physics
 
 	bool RootPhysics::IsRagdoll( int p_objecthandle )
 	{
+		assert(DoesObjectExist(p_objecthandle));
 		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
 	}
 

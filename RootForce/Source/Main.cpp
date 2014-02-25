@@ -16,11 +16,14 @@ int main(int argc, char* argv[])
 	std::string path(argv[0]);
 	std::string rootforcename = "Rootforce.exe";
 	path = path.substr(0, path.size() - rootforcename.size());
+#ifndef _DEBUG
 	try 
+#endif
 	{
 		RootForce::Main m(path);
 		m.Start();
-	} 
+	}
+#ifndef _DEBUG
 	catch (std::exception& e) 
 	{
 		std::cout << e.what() << std::endl;
@@ -33,6 +36,7 @@ int main(int argc, char* argv[])
 		std::cin.get();
 		return 1;
 	}
+#endif
 	
 	return 0;
 }
