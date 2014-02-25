@@ -144,6 +144,7 @@ struct Material
 	char normalPath[g_maxPathLength];
 	char specularPath[g_maxPathLength];
 	char glowPath[g_maxPathLength];
+	char translucencePath[g_maxPathLength];
 };
 
 struct Camera

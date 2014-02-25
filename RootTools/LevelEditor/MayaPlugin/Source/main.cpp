@@ -48,7 +48,7 @@ void MayaCameraToList(MObject node, int id);
 void MayaLocatorToList(MObject object);
 void DuplicationCb(void *clientData);
 void checkForDuplicatedMeshes(MObject node);
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path);
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path, MString &out_translucence_path);
 MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle );
 void Export();
 int exportMaya;
@@ -59,6 +59,7 @@ void ExtractRGBTextures(MFnDependencyNode &material_node, MString &Red, MString 
 MString cleanFullPathName(const char * str);
 std::string GetNameFromPath( std::string p_path );
 void UpdateTransformation(Transform& destination, MObject transObject);
+void ExtractTranslucence(MFnDependencyNode &material_node, MString &out_translucence_path);
 
 PaintTexture myTextures[g_maxPaintTextures];
 MSpace::Space g_space_world = MSpace::kPostTransform;
@@ -1339,6 +1340,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		MString materialName = "";
 		MString specularName = "";
 		MString glowName = "";
+		MString translucenceName = "";
 		float bumpdepth;
 		MFnDependencyNode material_node;
 		MFnDependencyNode texture_node;
@@ -1347,7 +1349,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		if(mesh.numPolygons()*3 > g_maxVerticesPerMesh)
 		{
 			ItsAmegaMesh = true;
-			Print(mesh.fullPathName(), " isaMEGAMESH---------------------------------------------------------------------------------------------------------");
+			//Print(mesh.fullPathName(), " isaMEGAMESH---------------------------------------------------------------------------------------------------------");
 		}
 
 		//Get the name of the transformation and the model name for the exporter.
@@ -1375,7 +1377,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 		if(doMaterial)
 		{/////////////////////  GET MATERIALS AND ADD TO LIST /////////////////////////////////////////////
 
-		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node, glowName);
+		ExtractMaterialData(mesh, texturepath, normalpath, bumpdepth, material_node, specularName, texture_node, glowName, translucenceName);
 		materialName = material_node.name();
 		string texPath = texturepath.asChar();		
 
@@ -1472,6 +1474,8 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 			memcpy(SM.materialList[currNrMaterials].specularPath, specularName.asChar(),specularName.numChars());
 			memset(SM.materialList[currNrMaterials].glowPath, NULL, sizeof(SM.materialList[currNrMaterials].glowPath));
 			memcpy(SM.materialList[currNrMaterials].glowPath, glowName.asChar(),glowName.numChars());
+			memset(SM.materialList[currNrMaterials].translucencePath, NULL, sizeof(SM.materialList[currNrMaterials].translucencePath));
+			memcpy(SM.materialList[currNrMaterials].translucencePath, translucenceName.asChar(),translucenceName.numChars());
 
 			if(ItsAmegaMesh)
 			{
@@ -1497,6 +1501,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 				SM.meshList[meshIndex].MaterialID = materialID;
 			}
 
+			//Is this needed? and in that case copy all info?
 			memset(SM.materialList[materialID].texturePath, NULL, sizeof(SM.materialList[materialID].texturePath));
 			memcpy(SM.materialList[materialID].texturePath, texturepath.asChar(), texturepath.numChars());
 			memset(SM.materialList[materialID].normalPath, NULL, sizeof(SM.materialList[materialID].normalPath));
@@ -2036,7 +2041,7 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 
 			out_textureNode.setObject(connections[n].node(&status));
 
-			Print("DEEP NAME ", out_textureNode.name());
+			//Print("DEEP NAME ", out_textureNode.name());
 
 			MPlug ftn = texture_node.findPlug("ftn", &status);
 			out_color_path = ftn.asString(MDGContext::fsNormal);
@@ -2058,13 +2063,47 @@ void ExtractColor(MFnDependencyNode &material_node, MString &out_color_path, MFn
 
 void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 {
-		MStatus status = MS::kSuccess;;
+	MStatus status = MS::kSuccess;;
 	
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("glowIntensity", true, &status);
+	//if(status == true)
+	//Print("GLOW");
+
+	MPlugArray bv_connections;
+	normal_plug.connectedTo(bv_connections, true, false, &status);
+
+	bool found_glow = false;
+
+	for(unsigned int j=0; j<bv_connections.length(); ++j)
+	{
+		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
+		{
+			//Print("FoundTexture!");
+			MFnDependencyNode test1(bv_connections[j].node(&status));
+			MPlug ftn = test1.findPlug("ftn", &status);
+			out_glow_path = ftn.asString(MDGContext::fsNormal);
+			//Print(out_glow_path);
+			found_glow = true;
+		}
+	}
+
+	if (!found_glow)
+	{
+		out_glow_path = "NONE";
+	}
+}
+
+void ExtractTranslucence(MFnDependencyNode &material_node, MString &out_translucence_path)
+{
+	MStatus status = MS::kSuccess;;
+
+	MPlug normal_plug;
+	MPlugArray connections;
+	normal_plug = material_node.findPlug("translucence", true, &status);
 	if(status == true)
-	Print("GLOW");
+		Print("Translucence");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -2078,15 +2117,15 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 			Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
-			out_glow_path = ftn.asString(MDGContext::fsNormal);
-			Print(out_glow_path);
+			out_translucence_path = ftn.asString(MDGContext::fsNormal);
+			Print(out_translucence_path);
 			found_glow = true;
 		}
 	}
 
 	if (!found_glow)
 	{
-		out_glow_path = "NONE";
+		out_translucence_path = "NONE";
 	}
 }
 
@@ -2151,8 +2190,8 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("specularColor", true, &status);
-	if(status == true)
-	Print("This Is TRUEEE");
+	//if(status == true)
+	//Print("This Is TRUEEE");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -2163,7 +2202,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
-			Print("FoundTexture!");
+			//Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_specular_path = ftn.asString(MDGContext::fsNormal);
@@ -2177,7 +2216,7 @@ void ExtractSpecular(MFnDependencyNode &material_node, MString &out_specular_pat
 	}
 
 }
-void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path)
+void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bump_path, float &out_bump_depth, MFnDependencyNode &material_node, MString &out_specular_path, MFnDependencyNode &out_textureNode, MString &out_glow_path, MString &out_translucence_path)
 {
 	//get the shaders and goes through the functions extracting textures.
 	MStatus status = MS::kSuccess;;
@@ -2195,10 +2234,11 @@ void ExtractMaterialData(MFnMesh &mesh, MString &out_color_path, MString &out_bu
 		{
 			GetMaterialNode(shaders[j], material_node);
 			ExtractColor(material_node, out_color_path, out_textureNode);
-			Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
+			//Print("IN MATERIAL DATA NAME = ", out_textureNode.name());
 			ExtractBump(material_node, out_bump_path, out_bump_depth);
 			ExtractSpecular(material_node, out_specular_path);
 			ExtractGlow(material_node, out_glow_path);
+			ExtractTranslucence(material_node, out_translucence_path);
 		}
 	}
 }

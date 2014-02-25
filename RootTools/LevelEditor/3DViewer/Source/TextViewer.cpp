@@ -65,7 +65,7 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID, bool itsAmegaMesh);
+void CopyMayaMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, string translucenceMap, int meshID, bool itsAmegaMesh);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
 ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
@@ -419,7 +419,7 @@ void LoadSceneFromMaya()
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
 		//ITS a Mega Mesh false here correct?
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1, false);
+		CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath),GetNameFromPath(RM.PmaterialList[i]->translucencePath), -1, false);
 	}
 
 	/////////////////////// LOAD MESHES ////////////////////////////////
@@ -495,7 +495,7 @@ bool fexists(const std::string& filename)
   return Exists;
 }
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID, bool itsAmegaMesh)
+void CopyMayaMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, string translucenceMap, int meshID, bool itsAmegaMesh)
 {
 	bool painted = false;
 	bool painting = false;
@@ -647,10 +647,10 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 		}
-		else if(normalMap != "" && normalMap != "NONE" && transparent)
+		else if(translucenceMap != "" && translucenceMap != "NONE" && transparent)
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
-			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture("LeafTranslucencyTest", Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture(translucenceMap, Render::TextureType::TEXTURE_2D);
 
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
 		}
@@ -1022,7 +1022,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 
 			////Update material list
 			if(RM.PmeshList[MeshIndex]->MaterialID >= 0 && RM.PmeshList[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex, false);
+				CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->translucencePath), MeshIndex, false);
 			
 
 
@@ -1148,7 +1148,7 @@ void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool
 
 			////Update material list
 			if(RM.PmegaMeshes[MeshIndex]->MaterialID >= 0 && RM.PmegaMeshes[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
-				CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->glowPath), MeshIndex, true);
+				CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->glowPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->translucencePath), MeshIndex, true);
 
 			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex]);
 
