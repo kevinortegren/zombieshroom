@@ -313,11 +313,13 @@ namespace RootForce
 							assert(aimingEntity != nullptr);
 
 
-							// Set the actions for the client, to be parsed by the action system later.
+							// Set the actions for the client, to be parsed by the action system later. Preserve UsingPush.
 							PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 							assert(playerAction != nullptr);
 
+							bool usingPush = m.Action.UsingPush;
 							*playerAction = m.Action;
+							playerAction->UsingPush = usingPush;
 
 
 							// Set the position of the player, as given by the other client.
@@ -1265,10 +1267,13 @@ namespace RootForce
 							// TODO: Let the extrapolation be done by the action system and physics instead.
 							if (clientComponent->IsRemote)
 							{
-								// Update the action for the user
+								// Update the action for the user (preserve UsingPush).
 								PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(playerAction != nullptr);
+								
+								bool usingPush = m.Action.UsingPush;
 								*playerAction = m.Action;
+								playerAction->UsingPush = usingPush;
 
 								// Set the position of the player
 								playerTransform->m_position = m.Position;
