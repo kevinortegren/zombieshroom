@@ -2031,7 +2031,8 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			ECS::Entity** f = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
 			RootForce::FollowComponent *s = g_world->GetEntityManager()->CreateComponent<RootForce::FollowComponent>(*e);
-			s->Target = *f;
+			RootForce::Network::NetworkComponent *n = g_world->GetEntityManager()->CreateComponent<RootForce::Network::NetworkComponent>(*f);
+			s->TargetID = n->ID;
 			s->Offset = (float)luaL_checknumber(p_luaState, 3);
 
 			//luaL_setmetatable(p_luaState, "Follower");

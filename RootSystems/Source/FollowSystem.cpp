@@ -1,5 +1,7 @@
 #include "FollowSystem.h"
 
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+
 namespace RootForce
 {
 	void FollowSystem::Init()
@@ -12,10 +14,11 @@ namespace RootForce
 	{
 		Transform* transform = m_transform.Get(p_entity);
 		FollowComponent* target = m_target.Get(p_entity);
+		ECS::Entity* targ = FindEntity(g_networkEntityMap, target->TargetID);
 		
-		if (target->Target)
+		if (targ != nullptr)
 		{
-			Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(target->Target);
+			Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(targ);
 
 			transform->m_orientation = targetTransform->m_orientation;
 			transform->m_position = targetTransform->m_position + target->Offset * targetTransform->m_orientation.GetFront();

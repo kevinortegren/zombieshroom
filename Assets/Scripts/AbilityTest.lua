@@ -1,5 +1,5 @@
 AbilityTest = {};
-AbilityTest.damage = 5;
+AbilityTest.damage = 100;
 AbilityTest.knockback = 5;
 AbilityTest.cooldown = 1;
 AbilityTest.charges = 5;
@@ -26,7 +26,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
 	local timerComp = Timer.New(self, AbilityTest.duration);
-	local homingComp = Homing.New(self, 0.01);
+	local homingComp = Homing.New(self, 0.1);
 	--local rayComp = Ray.New()
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -39,7 +39,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
-		if entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
+		if entityAtAim:GetPhysics():GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
 			homingComp:SetTargetEntity(entityAtAim);
 		end
 	else
