@@ -661,11 +661,11 @@ namespace RootForce
 					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
-						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
 						assert(spawnPoint);
 						spawnPoint->Claimed = m.User;
 
-						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 					
 						// Don't set stuff on entities that don't exist.
 						if (player)
@@ -1003,7 +1003,7 @@ namespace RootForce
 					NetworkMessage::TimeUp m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* entity = g_networkEntityMap[m.ID];
+					ECS::Entity* entity = FindEntity(g_networkEntityMap, m.ID);
 					if(entity != nullptr)
 					{
 						TimerComponent* timer = m_world->GetEntityManager()->GetComponent<TimerComponent>(entity);
@@ -1019,7 +1019,7 @@ namespace RootForce
 					NetworkMessage::AbilitySpawn m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* point = g_networkEntityMap[m.ID];
+					ECS::Entity* point = FindEntity(g_networkEntityMap, m.ID);
 
 					// Entity needs to exist.
 					if (point)
@@ -1755,7 +1755,7 @@ namespace RootForce
 					NetworkMessage::AbilityTryClaim m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 					if (player)
 					{
 						TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);

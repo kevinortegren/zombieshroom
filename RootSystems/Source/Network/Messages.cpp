@@ -592,6 +592,7 @@ namespace RootForce
 			else
 			{
 				entity = it->second;
+				assert(entity != nullptr);
 			}
 
 			// Read the number of components
