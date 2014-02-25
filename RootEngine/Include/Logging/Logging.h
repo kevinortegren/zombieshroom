@@ -30,6 +30,7 @@ namespace LogTag
 		SCRIPT,
 		ANIMATION,
 		WATER,
+		PARTICLE
 	};
 }
 
