@@ -201,6 +201,7 @@ namespace Render
 		// Default framebuffer.
 		GLuint m_fbo;
 		Render::TextureInterface* m_color0;
+		Render::TextureInterface* m_color1;
 
 		RenderResourceManager m_resources;
 		GeometryBuffer m_gbuffer;
