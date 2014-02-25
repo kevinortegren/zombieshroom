@@ -167,6 +167,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Transformation");
 			return 1;
 		}
+		static int EntityRemoveTransformation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(*e);
+			return 0;
+		}
 
 		static int EntityGetRenderable(lua_State* p_luaState)
 		{
@@ -177,6 +184,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Renderable");
 			return 1;
 		}
+		static int EntityRemoveRenderable(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>(*e);
+			return 0;
+		}
 
 		static int EntityGetPhysics(lua_State* p_luaState)
 		{
@@ -186,6 +200,14 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Physics>(*e);
 			luaL_setmetatable(p_luaState, "Physics");
 			return 1;
+		}
+
+		static int EntityRemovePhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(*e);
+			return 0;
 		}
 
 		static int EntityGetCollision(lua_State* p_luaState)
@@ -227,8 +249,15 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Health");
 			return 1;
 		}
+		static int EntityRemoveHealth(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::HealthComponent>(*e);
+			return 0;
+		}
 
-		static int GetPlayerComponent(lua_State* p_luaState)
+		static int EntityGetPlayerComponent(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
@@ -236,6 +265,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerComponent");
 			return 1;
+		}
+		static int EntityRemovePlayerComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerComponent>(*e);
+			return 0;
 		}
 
 		static int EntityGetPlayerPhysics(lua_State* p_luaState)
@@ -247,15 +283,6 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
-		/*static int EntityGetPlayer(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
-			luaL_setmetatable(p_luaState, "Player");
-			return 1;
-		}*/
 		static int EntityGetPlayerAction(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -264,6 +291,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
 			return 1;
+		}
+		static int EntityRemovePlayerAction(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerActionComponent>(*e);
+			return 0;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
 		{
@@ -291,6 +325,62 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::TryPickupComponent>(*e);
 			luaL_setmetatable(p_luaState, "TryPickupComponent");
 			return 1;
+		}
+		static int EntityRemoveTryPickupComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::TryPickupComponent>(*e);
+			return 0;
+		}
+		static int EntityRemovePlayerPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerPhysics>(*e);
+			return 0;
+		}
+		static int EntityRemoveScript(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Script>(*e);
+			return 0;
+		}
+		static int EntityRemoveAnimation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Animation>(*e);
+			return 0;
+		}
+		static int EntityRemoveRagdoll(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Ragdoll>(*e);
+			return 0;
+		}
+		static int EntityRemoveStateComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::StateComponent>(*e);
+			return 0;
+		}
+		static int EntityRemovePlayerControl(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerControl>(*e);
+			return 0;
+		}
+		static int EntityRemoveWaterCollider(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(*e);
+			return 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -2160,23 +2250,36 @@ namespace RootForce
 			{"GetId", EntityGetId},
 			{"DoesExist", EntityDoesExist},
 			{"GetTransformation", EntityGetTransformation},
+			{"RemoveTransformation", EntityRemoveTransformation},
 			{"GetRenderable", EntityGetRenderable},
+			{"RemoveRenderable", EntityRemoveRenderable},
 			{"GetPhysics", EntityGetPhysics},
+			{"RemovePhysics", EntityRemovePhysics},
 			{"GetCollision", EntityGetCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
-			{"GetPlayerComponent", GetPlayerComponent},
+			{"RemoveHealth", EntityRemoveHealth},
+			{"GetPlayerComponent", EntityGetPlayerComponent},
+			{"RemovePlayercomponent", EntityRemovePlayerComponent},
 			{"GetPlayerAction", EntityGetPlayerAction},
+			{"RemovePlayerAction", EntityRemovePlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{"GetTryPickupComponent", EntityGetTryPickupComponent},
+			{"RemoveTryPickupComponent", EntityRemoveTryPickupComponent},
+			{"RemovePlayerPhysics", EntityRemovePlayerPhysics},
+			{"RemoveScript", EntityRemoveScript},
+			{"RemoveAnimation", EntityRemoveAnimation},
+			{"RemoveRagdoll", EntityRemoveRagdoll},
+			{"RemoveStateComponent", EntityRemoveStateComponent},
+			{"RemovePlayerControl", EntityRemovePlayerControl},
+			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{NULL, NULL}
 		};
 
 		//Renderable functions&methods
 		static const struct luaL_Reg renderable_f [] = {
 			{"New", RenderableCreate},
-			{"Remove", RenderableRemove},
 			{NULL, NULL}
 		};
 
@@ -2212,7 +2315,6 @@ namespace RootForce
 		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {
 			{"New", TransformationCreate},
-			{"Remove", TransformationRemove},
 			{NULL, NULL}
 		};
 		
@@ -2243,7 +2345,6 @@ namespace RootForce
 		//Physics function & methods
 		static const struct luaL_Reg physicsaccessor_f [] = {
 			{"New", PhysicsCreate},
-			{"Remove", PhysicsRemove},
 			{NULL, NULL}
 		};
 
@@ -2383,7 +2484,6 @@ namespace RootForce
 
 		static const struct luaL_Reg script_f [] = {
 			{"New", ScriptCreate},
-			{"Remove", ScriptRemove},
 			{NULL, NULL}
 		};
 
@@ -2410,7 +2510,6 @@ namespace RootForce
 
 		static const struct luaL_Reg playerphysics_f [] = {
 			{"New", PlayerPhysicsCreate},
-			{"Remove", PlayerPhysicsRemove},
 			{NULL, NULL}
 		};
 
@@ -2426,7 +2525,6 @@ namespace RootForce
 
 		static const struct luaL_Reg health_f [] = {
 			{"New", HealthCreate},
-			{"Remove", HealthRemove},
 			{NULL, NULL}
 		};
 
@@ -2443,7 +2541,6 @@ namespace RootForce
 
 		static const struct luaL_Reg playercomponent_f [] = {
 			{"New", PlayerComponentCreate},
-			{"Remove", PlayerComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2466,7 +2563,6 @@ namespace RootForce
 
 		static const struct luaL_Reg playeraction_f [] = {
 			{"New", PlayerActionCreate},
-			{"Remove", PlayerActionRemove},
 			{NULL, NULL}
 		};
 
@@ -2488,7 +2584,6 @@ namespace RootForce
 
 		static const struct luaL_Reg trypickupcomponent_f [] = {
 			{"New", TryPickupComponentCreate},
-			{"Remove", TryPickupComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2511,7 +2606,6 @@ namespace RootForce
 
 		static const struct luaL_Reg animation_f [] = {
 			{"New", AnimationCreate},
-			{"Remove", AnimationRemove},
 			{NULL, NULL}
 		};
 
@@ -2521,7 +2615,6 @@ namespace RootForce
 
 		static const struct luaL_Reg ragdoll_f [] = {
 			{"New", RagdollCreate},
-			{"Remove", RagdollRemove},
 			{NULL, NULL}
 		};
 
@@ -2532,7 +2625,6 @@ namespace RootForce
 		
 		static const struct luaL_Reg statecomponent_f [] = {
 			{"New", StateComponentCreate},
-			{"Remove", StateComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2546,7 +2638,6 @@ namespace RootForce
 
 		static const struct luaL_Reg playercontrol_f [] = {
 			{"New", PlayerControlCreate},
-			{"Remove", PlayerControlRemove},
 			{NULL, NULL}
 		};
 
@@ -2592,7 +2683,6 @@ namespace RootForce
 
 		static const struct luaL_Reg watercollider_f [] = {
 			{"New", WaterColliderCreate},
-			{"Remove", WaterColliderRemove},
 			{NULL, NULL}
 		};
 

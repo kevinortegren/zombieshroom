@@ -321,7 +321,7 @@ namespace RootSystems
 
 				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(aimingDeviceEntity);
 
-				if(!m_inMenu)
+				if(!m_inMenu && action && transform)
 				{
 					// Rotate the model and reset the angle
 					transform->m_orientation.YawGlobal(action->Angle.x);
@@ -331,7 +331,8 @@ namespace RootSystems
 					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 				}
 
-				aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+				if(transform)
+					aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
 			}
 		}
 	}

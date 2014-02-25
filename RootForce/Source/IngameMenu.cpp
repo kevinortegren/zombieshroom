@@ -1,4 +1,10 @@
 #include "IngameMenu.h"
+#include <Utility/ECS/Include/World.h>
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Script/Include/RootScript.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -14,6 +20,7 @@ namespace RootForce
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &IngameMenu::Exit));
 		m_view->RegisterJSCallback("Return", JSDelegate1(this, &IngameMenu::Return));
+		m_view->RegisterJSCallback("SelectTeam", JSDelegate1(this, &IngameMenu::ChangeTeam));
 
 		m_settingsMenu->BindEvents(m_view);
 		m_view->Focus();
@@ -32,6 +39,22 @@ namespace RootForce
 	void IngameMenu::Exit( const Awesomium::JSArray& p_array )
 	{
 		m_exit = true;
+	}
+	void IngameMenu::ChangeTeam(const Awesomium::JSArray& p_array)
+	{
+		if(p_array[0].IsInteger())
+		{
+			// TODO: Instead, send a message to server, handle team change on response
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			
+			// Call the OnCreate script
+			g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+			g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+			g_engineContext.m_script->AddParameterNumber(p_array[0].ToInteger());
+			g_engineContext.m_script->ExecuteScript();
+
+			m_return = true;
+		}
 	}
 
 	void IngameMenu::Reset()

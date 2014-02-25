@@ -579,28 +579,40 @@ namespace RootForce
 		{
 			m_hud->SetValue("ShowScore", "false" );
 		}
+		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::UP)
+		{
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+			m_displayIngameMenu = !m_displayIngameMenu;
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
 
 		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver())
 		{
 			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+			HealthComponent* healthComponent = g_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+			PlayerActionComponent* playerActionComponent = g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 
 			//Update all the data that is displayed in the HUD
-			m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
 			m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 			m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-			m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
+			m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
 			m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
-			m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
-			m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
-			m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-			if(playerComponent->AbilityScripts[0].Cooldown > 0)
-				m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-			if(playerComponent->AbilityScripts[1].Cooldown > 0)
-				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-			if(playerComponent->AbilityScripts[2].Cooldown > 0)
-				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+			if(healthComponent && playerActionComponent)
+			{
+				m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
+				m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+				m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+				m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+				if(playerComponent->AbilityScripts[0].Cooldown > 0)
+					m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+				if(playerComponent->AbilityScripts[1].Cooldown > 0)
+					m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+				if(playerComponent->AbilityScripts[2].Cooldown > 0)
+					m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+				m_hud->SetSelectedAbility(playerActionComponent->SelectedAbility);
+			}
 		}
 
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));

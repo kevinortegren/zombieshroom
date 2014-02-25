@@ -6,31 +6,36 @@ function Player.OnCreate(userId, actionId)
 	local player = Entity.New();
 	local playerComponent = PlayerComponent.New(player);
  	local network = Network.New(player, userId, actionId);
+	local transform = Transformation.New(player);
 	
+	transform:SetPos(Vec3.New(100,10,0));
+			
  	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
 	playerComponent:SetTeamId(3);
-
+	
   Entity.RegisterGroup("NonExport", player);
 
   -- Create an aiming device
   local aimingEntity = Entity.New();
   local aimingTransform = Transformation.New(aimingEntity);
   local aimingNetwork = Network.New(aimingEntity, userId, actionId);
+
+	Entity.RegisterGroup("NonExport", aimingEntity);
   
 	if Global.UserID == userId then
 		local playerControl = PlayerControl.New(player);
 		playerControl:SetMouseSensitivity(0.2);
+		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
 	end
 end
 
 function Player.OnTeamSelect(self, teamId)
-  local playerComp = self:GetPlayerComponent();
-  if playerComp:GetTeamId() == 3 then
-    local transform = Transformation.New(self);
+  local playerComponent = self:GetPlayerComponent();
+  if playerComponent:GetTeamId() == 3 then
     local playerPhysics = PlayerPhysics.New(self);
     local health = Health.New(self);
     local physics = Physics.New(self);
@@ -40,8 +45,8 @@ function Player.OnTeamSelect(self, teamId)
     local playerAction = PlayerAction.New(self);
     local stateComponent = StateComponent.New(self);
     local tryPickup = TryPickupComponent.New(self);
-    
-      transform:SetPos(Vec3.New(100,10,0));
+		
+		local transform = self:GetTransformation();
 
     stateComponent:SetPreviousPosition(transform:GetPos());
     stateComponent:SetCurrentState(EntityState.DESCENDING);
@@ -58,18 +63,16 @@ function Player.OnTeamSelect(self, teamId)
     playerPhysics:SetJumpBoostForce(0.9); --See comment above //Kim
 
     collision:SetMeshHandle("testchar0");
-    Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
+    Collision.AddPlayerObjectToWorld(self, collision, transform, playerPhysics, collisionResponder);
 
     health:SetHealth(100);
     health:SetIsDead(false);
-    health:SetWantsRespawn(false);
-
-    Entity.RegisterGroup("NonExport", aimingEntity);
+    health:SetWantsRespawn(true);
     
     if Global.IsClient then
-      local renderable = Renderable.New(player);
-      local animation = Animation.New(player);
-      local ragdoll = Ragdoll.New(player);
+      local renderable = Renderable.New(self);
+      local animation = Animation.New(self);
+      local ragdoll = Ragdoll.New(self);
       renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
       renderable:SetShadowTechnique(ShadowTechnique.SHADOW_ANIMATED);
       renderable:SetModel("testchar");
@@ -85,7 +88,7 @@ function Player.OnTeamSelect(self, teamId)
       renderable:SetMaterialNormal("WSNormal");
       renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
       renderable:SetAnimation(animation);
-      local waterCollider = WaterCollider.New(player);
+      local waterCollider = WaterCollider.New(self);
       waterCollider:SetDisturbPower(0.5);
       waterCollider:SetDisturbInterval(0.5);
       waterCollider:SetRadius(5);

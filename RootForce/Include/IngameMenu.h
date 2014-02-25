@@ -23,6 +23,7 @@ namespace RootForce
 	private:
 		void Return(const Awesomium::JSArray& p_array);
 		void Exit(const Awesomium::JSArray& p_array);
+		void ChangeTeam(const Awesomium::JSArray& p_array);
 
 		SettingsMenu* m_settingsMenu;
 		RootEngine::GUISystem::WebView* m_view;

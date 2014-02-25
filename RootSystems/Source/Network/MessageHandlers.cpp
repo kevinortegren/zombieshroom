@@ -154,7 +154,7 @@ namespace RootForce
 
 							if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 							{
-								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+								clientComponent->State = ClientState::CONNECTED;
 							}
 						}
 						else
@@ -237,7 +237,7 @@ namespace RootForce
 							// For a local client, just set the client state. The server has already created the entities for us.
 							if (m.IsYou)
 							{
-								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+								clientComponent->State = ClientState::CONNECTED;
 							}
 						}
 
@@ -2004,12 +2004,12 @@ namespace RootForce
 									}
 
 									// Make sure the player will be spawned at a spawn point.
-									HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+									/*HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
 									assert(health != nullptr);
 									health->WantsRespawn = true;
-									health->RespawnDelay = 0.0f;
+									health->RespawnDelay = 0.0f;*/ //TODO: This must happen when selecting team instead!
 
-									clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+									clientComponent->State = ClientState::CONNECTED;
 								}
 								else
 								{
