@@ -84,7 +84,7 @@ namespace RootEngine
 			~CustomUserPointer()
 			{
 				delete m_id;
-				m_id = NULL;
+				m_id= nullptr;
 			}
 		};
 

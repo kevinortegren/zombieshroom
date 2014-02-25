@@ -2,13 +2,14 @@ Push = {};
 Push.knockback = 20;
 Push.cooldown = 1;
 Push.charges = -1;
-Push.chargeTime = 0;
+Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 5;
+Push.duration = 0.2;
 
 function Push.ChargeDone (time, userId, actionId)
 	if time >= Push.chargeTime * 0.5 then
 		Push.OnCreate(userId, actionId);
+		Push.knockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
 	end
 end
 
@@ -16,6 +17,7 @@ function Push.ChannelingDone (time, userId, actionId)
 end
 
 function Push.OnCreate (userId, actionId)
+	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -27,14 +29,14 @@ function Push.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
 	local timerComp = Timer.New(self, Push.duration);
-	Follower.New(self);
+	Follower.New(self, casterEnt, 3);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();
 	transformComp:GetOrient():SetOrientation(rotQuat);
-	transformComp:GetOrient():Pitch(-90);
+	--transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));

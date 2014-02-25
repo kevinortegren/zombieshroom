@@ -45,6 +45,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -149,8 +150,13 @@ namespace RootForce
 
 		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
 
+		// Initialize the timer system.
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+		// Initialize the follow system.
+		m_followSystem = new RootForce::FollowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
 
 		// Set debug visualization flags.
@@ -228,7 +234,7 @@ namespace RootForce
 		m_animationSystem->Terminate();
 
 		// Remove all networked entities and reset the entity map and sequence map.
-		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
+		//Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -370,6 +376,11 @@ namespace RootForce
 		}
 
 		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
+		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
 		}
@@ -379,10 +390,7 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		{
-			PROFILE("Ragdoll system", g_engineContext.m_profiler);
-			m_ragdollSystem->Process();
-		}
+		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
@@ -391,7 +399,12 @@ namespace RootForce
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
 		}
-	
+
+		{
+			PROFILE("Follow system", g_engineContext.m_profiler);
+			m_followSystem->Process();
+		}
+		
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
 			m_collisionSystem->Process();

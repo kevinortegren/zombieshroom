@@ -101,8 +101,8 @@ namespace AbilityEditorNameSpace
 		}
 		if (chargeFac >= 1.0f && m_entity->GetChargeTime() > 0.0f)
 		{
-			m_file << "\t" << m_name << ".damageNew = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
-			m_file << "\t" << m_name << ".knockbackNew = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
+			m_file << "\t" << m_name << ".damage = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
+			m_file << "\t" << m_name << ".knockback = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
 		}
 		m_file << "\t" << m_name << ".OnCreate(userId, actionId);\n";
 		if (chargeReq > 0.0f)
@@ -450,7 +450,7 @@ namespace AbilityEditorNameSpace
 						m_file << "\t\t\tif not health:IsDead() then\n";
 							m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
 							m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, " << m_name << ".damageNew, receiverId);\n";
+							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, " << m_name << ".damage, receiverId);\n";
 						m_file << "\t\t\tend\n";
 					if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
 						m_file << "\t\tend\n";
@@ -467,7 +467,7 @@ namespace AbilityEditorNameSpace
 
 						m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
 						m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".knockbackNew);\n";
+						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), " << m_name << ".knockback);\n";
 
 					if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
 						m_file << "\t\tend\n";
