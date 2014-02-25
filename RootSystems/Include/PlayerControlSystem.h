@@ -11,6 +11,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RakNet/RakPeerInterface.h>
+#include <RootForce/Include/HUD.h>
 
 namespace RootForce
 {
@@ -68,6 +69,7 @@ namespace RootForce
 		void SetLoggingInterface(Logging* p_logger);
 		void SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager);
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
+		void SetHUD(HUD* p_hud) {m_hud = p_hud;}
 		
 		void Process();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
@@ -87,6 +89,8 @@ namespace RootForce
 		RootEngine::InputManager::InputInterface* m_inputManager;
 		RootEngine::Physics::PhysicsInterface* m_physics;
 		RakNet::RakPeerInterface* m_clientPeer;
+		
+		HUD* m_hud;
 	};
 }
 

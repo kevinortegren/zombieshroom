@@ -347,6 +347,13 @@ namespace RootForce
 				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
 				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
 
+                if(action->AbilityTime <= abilityChargeTime)
+                    m_hud->SetValue("ChargeBarValue", std::to_string(action->AbilityTime/abilityChargeTime));
+                else if(abilityChannelingTime > 0)
+                    m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->AbilityTime)/abilityChannelingTime));
+                else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
+                    m_hud->SetValue("ChargeBarValue", "1");
+                
 				if (action->AbilityTime >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
 				{
 					playerComponent->AbilityState = AbilityState::START_CHANNELING;
@@ -402,6 +409,7 @@ namespace RootForce
 
 		uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : action->SelectedAbility; 
 
+        m_hud->SetValue("ChargeBarValue", "0");
 		if (!health->IsDead && playerComponent->AbilityState != AbilityState::OFF)
 		{
 			std::string abilityName = playerComponent->AbilityScripts[abilityIndex].Name;
