@@ -38,7 +38,7 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
 
-#define RENDER_USE_COMPUTE
+//#define RENDER_USE_COMPUTE
 
 namespace Render
 {
@@ -201,6 +201,7 @@ namespace Render
 		// Default framebuffer.
 		GLuint m_fbo;
 		Render::TextureInterface* m_color0;
+		Render::TextureInterface* m_color1;
 
 		RenderResourceManager m_resources;
 		GeometryBuffer m_gbuffer;

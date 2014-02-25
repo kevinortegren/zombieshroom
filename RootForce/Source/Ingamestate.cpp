@@ -57,11 +57,6 @@ namespace RootForce
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
-		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
-		g_engineContext.m_resourceManager->LoadScript("FireBall");
-		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
@@ -195,6 +190,7 @@ namespace RootForce
 		
 		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
@@ -266,7 +262,6 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
-
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
