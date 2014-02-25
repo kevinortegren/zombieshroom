@@ -42,6 +42,9 @@ namespace Render
 		enum TextureSemantic
 		{
 			DIFFUSE,
+			DIFFUSE1,
+			DIFFUSE2,
+			DIFFUSE3,
 			SPECULAR,
 			NORMAL,
 			DEPTH,
@@ -58,8 +61,8 @@ namespace Render
 			COMPUTENORMAL,
 			TEXTURE_RN,
 			TEXTURE_GN,
-			TEXTURE_BN
-
+			TEXTURE_BN,
+			TRANSLUCENCY
 		};
 	}
 }

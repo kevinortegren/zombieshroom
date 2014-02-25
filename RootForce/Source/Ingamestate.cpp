@@ -14,10 +14,7 @@ namespace RootForce
 		, m_keymapper(p_keymapper)
 	{	
 		ComponentType::Initialize();
-		
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(1000);
+
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
@@ -48,6 +45,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -150,13 +148,21 @@ namespace RootForce
 		m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
 
+		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+
+		// Initialize the timer system.
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+		// Initialize the follow system.
+		m_followSystem = new RootForce::FollowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
+		m_displayWorldDebug = false;		
 		m_displayWorldDebug = false;
 		m_displayDebugHUD = true;
 		m_displayGuiHUD = true;
@@ -165,6 +171,19 @@ namespace RootForce
 	void IngameState::Enter()
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+
+#ifndef _DEBUG
+		BotanyTextures textures;
+		textures.m_diffuse = "ugotaflatgrass2";
+		textures.m_translucency = "grass_translucency";
+		textures.m_billboard = "grass_billboard";
+		textures.m_terrainTexture = "grass";
+
+		// Subdivide terrain for grass chunk rendering.
+		m_botanySystem->Initialize(textures);
+#endif
+		// Subdivide world.
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -215,7 +234,7 @@ namespace RootForce
 		m_animationSystem->Terminate();
 
 		// Remove all networked entities and reset the entity map and sequence map.
-		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
+		//Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -265,9 +284,9 @@ namespace RootForce
 			else
 			{
 				if(m_displayGuiHUD)
-					g_engineContext.m_gui->Render(m_hud->GetView());
+				g_engineContext.m_gui->Render(m_hud->GetView());
 				if(m_displayDebugHUD)
-					g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -309,8 +328,6 @@ namespace RootForce
 		{
 			m_displayGuiHUD = m_displayGuiHUD ? false : true;
 		}
-
-
 		
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
@@ -342,7 +359,7 @@ namespace RootForce
 
 		{
 			PROFILE("Action system", g_engineContext.m_profiler);
-			m_actionSystem->Process();
+				m_actionSystem->Process();
 		}
 
 		{
@@ -359,6 +376,11 @@ namespace RootForce
 		}
 
 		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
+		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
 		}
@@ -368,10 +390,7 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		{
-			PROFILE("Ragdoll system", g_engineContext.m_profiler);
-			m_ragdollSystem->Process();
-		}
+		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
@@ -381,6 +400,10 @@ namespace RootForce
 			m_physicsSystem->Process();
 		}
 
+		{
+			PROFILE("Follow system", g_engineContext.m_profiler);
+			m_followSystem->Process();
+		}
 		
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
@@ -418,6 +441,11 @@ namespace RootForce
 		{
 			PROFILE("World System", g_engineContext.m_profiler);
 			m_sharedSystems.m_worldSystem->Process();
+		}
+
+		{
+			PROFILE("Botany System", g_engineContext.m_profiler);
+			m_botanySystem->Process();
 		}
 
 		{
@@ -464,6 +492,11 @@ namespace RootForce
 	{
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 2, "R", "RENDER"))
+		{
+			g_engineContext.m_renderer->ParseCommands(&event.Data);
+		}
+
 		if(RootServer::MatchAny(event.EventType, 2, "LOGGER", "L"))
 		{
 			g_engineContext.m_logger->ParseCommand(&event.Data);
@@ -494,6 +527,11 @@ namespace RootForce
 		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
 		{
 			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+		}
+
+		if(RootServer::MatchAny(event.EventType, 2, "B", "BOTANY"))
+		{
+			m_botanySystem->ParseCommands(&event.Data);
 		}
 
 		if(RootServer::MatchAny(event.EventType, 2, "RS", "RELOADSCRIPTS"))

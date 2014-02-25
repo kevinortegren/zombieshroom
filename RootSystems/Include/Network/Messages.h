@@ -71,6 +71,7 @@ namespace RootForce
 				ServerInformation,
 				TimeUp,
 				AbilitySpawn,
+				Death,
 			};
 		}
 
@@ -379,7 +380,12 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+		struct Death
+		{
+			Network::UserID_t User;
 
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 		/*
 			Serialize functions for components
 		*/

@@ -43,6 +43,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
+		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_DYNAMIC);
 		renderComp:SetMaterialDiffuse("fireballDiffuse");
 		renderComp:SetMaterialSpecular("fireballSpecular");
 		renderComp:SetMaterialNormal("fireballNormal");
@@ -85,4 +86,5 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	Entity.Remove(self);
 end

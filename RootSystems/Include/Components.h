@@ -20,6 +20,7 @@
 #include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/TimerSystem.h>
+#include <RootSystems/Include/FollowSystem.h>
 
 namespace RootForce
 {

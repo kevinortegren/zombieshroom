@@ -791,6 +791,13 @@ namespace RootForce
 			(*rtemp)->m_material = g_engineContext.m_renderer->CreateMaterial(handle);
 			return 0;
 		}
+		static int RenderableSetShadowTechnique(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Renderable** rtemp = (RootForce::Renderable**)luaL_checkudata(p_luaState, 1, "Renderable");
+			(*rtemp)->m_shadowTech = luaL_checkint(p_luaState, 2);
+			return 0;
+		}
 		static int RenderableSetPass(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -2019,18 +2026,13 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int FollowerCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(1);
+			NumberOfArgs(3);
 			
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			RootForce::ThirdPersonBehavior *s = g_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(*e);
-			s->m_checkWithRay = false;
-			s->m_rotateWithTarget = true;
-			s->m_targetTag = "AimingDevice";
-			s->m_distance = -3.0f;
-
-			RootForce::LookAtBehavior *c = g_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(*e);
-			
-			c->m_targetTag = "AimingDevice";
+			ECS::Entity** f = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
+			RootForce::FollowComponent *s = g_world->GetEntityManager()->CreateComponent<RootForce::FollowComponent>(*e);
+			s->Target = *f;
+			s->Offset = (float)luaL_checknumber(p_luaState, 3);
 
 			//luaL_setmetatable(p_luaState, "Follower");
 			return 0;
@@ -2181,6 +2183,7 @@ namespace RootForce
 			{"SetPass",				RenderableSetPass},
 			{"SetModel",			RenderableSetModel},
 			{"SetMaterial",			RenderableSetMaterial},
+			{"SetShadowTechnique",	RenderableSetShadowTechnique},
 			{"SetMaterialDiffuse",	RenderableSetDiffuse},
 			{"SetMaterialSpecular", RenderableSetSpecular},
 			{"SetMaterialNormal",	RenderableSetNormal},

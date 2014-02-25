@@ -48,9 +48,9 @@ namespace RootForce
 				}
 
 				// Remove the entity from the world
-				p_entityManager->RemoveAllComponents(destroy[i]->second);
-				p_entityManager->RemoveEntity(destroy[i]->second);
-				p_map.erase(destroy[i]);
+				//p_entityManager->RemoveAllComponents(destroy[i]->second);
+				//p_entityManager->RemoveEntity(destroy[i]->second);
+				//p_map.erase(destroy[i]);
 			}
 		}
 

@@ -71,8 +71,12 @@ namespace RootEngine
 					}
 					else if(type == "compute")
 					{
+#ifdef RENDER_USE_COMPUTE
 						glType = GL_COMPUTE_SHADER;
 						extension = ".compute";
+#else
+						return;
+#endif
 					}
 					else if(type == "tess_evaluation")
 					{

@@ -1034,6 +1034,24 @@ namespace RootForce
 					}
 
 				} return true;
+
+				case NetworkMessage::MessageType::Death:
+					{
+						NetworkMessage::Death m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+						if(player)
+						{
+							RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(player);
+							assert(health);
+							health->Health = 0;
+							health->IsDead = true;
+							health->RespawnDelay = 3.0f;
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
+						}
+
+					} return true;
 			}
 
 			return false;

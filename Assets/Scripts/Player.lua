@@ -16,15 +16,9 @@ function Player.OnCreate(userId, actionId)
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
 	local tryPickup = TryPickupComponent.New(player);
-	--local waterCollider = WaterCollider.New(player);
-	--waterCollider:SetDisturbPower(0.0);
-	--waterCollider:SetDisturbInterval(0.5);
-	--waterCollider:SetRadius(5);
-
+	
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
-
-	
 
 	stateComponent:SetPreviousPosition(transform:GetPos());
 	stateComponent:SetCurrentState(EntityState.DESCENDING);
@@ -40,8 +34,8 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(25);
-	playerPhysics:SetJumpForce(20);
-	playerPhysics:SetJumpBoostForce(0.1);
+	playerPhysics:SetJumpForce(15);
+	playerPhysics:SetJumpBoostForce(0.5);
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
@@ -68,6 +62,7 @@ function Player.OnCreate(userId, actionId)
 		local animation = Animation.New(player);
 		local ragdoll = Ragdoll.New(player);
 		renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
+		renderable:SetShadowTechnique(ShadowTechnique.SHADOW_ANIMATED);
 		renderable:SetModel("testchar");
 		if playerComponent:GetTeamId() == 1 then
 			renderable:SetMaterial("BlueSpirit");
@@ -81,6 +76,11 @@ function Player.OnCreate(userId, actionId)
 		renderable:SetMaterialNormal("WSNormal");
 		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
 		renderable:SetAnimation(animation);
+		local waterCollider = WaterCollider.New(player);
+		waterCollider:SetDisturbPower(0.5);
+		waterCollider:SetDisturbInterval(0.5);
+		waterCollider:SetRadius(5);
+
 	end
   
 	if Global.UserID == userId then
