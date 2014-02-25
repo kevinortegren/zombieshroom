@@ -95,6 +95,7 @@ namespace RootForce
 			while(std::getline(file, temp))
 			{
 				m_levelAbilities.push_back(temp);
+				m_engineContext->m_resourceManager->LoadScript(temp);
 			}
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Succesfully loaded the ability pack");
 		}
