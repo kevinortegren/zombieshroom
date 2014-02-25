@@ -533,18 +533,15 @@ namespace Render
 		m_lighting.ResetLights();
 		glDisable(GL_STENCIL_TEST);
 
-
-
-		{
-			PROFILE("Forward Pass", g_context.m_profiler);
-			ForwardPass();
-		}
-
 		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
 			PostProcessPass();
 		}
 
+		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
 
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
@@ -710,30 +707,8 @@ namespace Render
 
 	void GLRenderer::ForwardPass()
 	{
-		// Clear forward framebuffer 1.
-		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		if(m_showForward)
 		{
-			m_activeForwardFramebuffer = 0;
-
-			// Bind forward framebuffer.
-			BindForwardFramebuffer();
-
-			// Output la to forward buffer.
-			m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::FORWARD_COLOR]);
-
-			m_fullscreenQuadTech->GetPrograms()[0]->Apply();
-			m_fullscreenQuad.Bind();
-			m_fullscreenQuad.Draw();
-			m_fullscreenQuad.Unbind();
-
-			// Bind textures from gbuffer for reads.
-			m_gbuffer.BindTextures();
-
 			m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
 
 			int currentMaterialID = -1;
@@ -746,6 +721,11 @@ namespace Render
 					SwapForwardFramebuffer();
 					CopyDepthAndColor();	
 					BindForwardFramebuffer();
+
+					m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+					m_fullscreenQuad.Bind();
+					m_fullscreenQuad.Draw();
+					m_fullscreenQuad.Unbind();
 				}
 
 				if((*job)->m_material->m_id != currentMaterialID)
@@ -796,12 +776,33 @@ namespace Render
 
 	void GLRenderer::PostProcessPass()
 	{
+		// Clear framebuffer 1.
+		m_activeForwardFramebuffer = 1;
+		BindForwardFramebuffer();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Bind framebuffer 0.
+		m_activeForwardFramebuffer = 0;
+		BindForwardFramebuffer();
+
+		// Bind GBuffer for read.
 		m_gbuffer.BindTextures();
+
+		// Bind LA.
+		m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::LIGHTING_ACCUMULATION]);
+
+		// Output LA to framebuffer 0.
+		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
+
+		// Bind framebuffer 0 for read.
 		BindForwardDepthAndColor();
 
+		// Do Glow pass.
 		m_fullscreenQuad.Bind();
 		m_glowDevice.HorizontalPass(&m_fullscreenQuad);
-		SwapForwardFramebuffer();
 		BindForwardFramebuffer();
 		m_glowDevice.VerticalPass(&m_fullscreenQuad);
 		m_fullscreenQuad.Unbind();
@@ -809,6 +810,7 @@ namespace Render
 
 	void GLRenderer::Output()
 	{
+		// Bind active framebuffer for read.
 		BindForwardDepthAndColor();
 
 		// Restore backbuffer.
@@ -843,13 +845,13 @@ namespace Render
 	void GLRenderer::CopyDepthAndColor()
 	{
 		glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
-		//glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
-		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
+		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glBindTexture(GL_TEXTURE_2D, m_forwardColors[m_activeForwardFramebuffer]->GetHandle());
+		//glReadBuffer(GL_COLOR_ATTACHMENT0);
+		//glBindTexture(GL_TEXTURE_2D, m_forwardColors[m_activeForwardFramebuffer]->GetHandle());
 		//glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
-		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, m_width, m_height, 0);
+		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, m_width, m_height, 0);
 		
 	}
 
