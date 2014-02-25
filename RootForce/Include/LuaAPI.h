@@ -2176,6 +2176,7 @@ namespace RootForce
 		//Renderable functions&methods
 		static const struct luaL_Reg renderable_f [] = {
 			{"New", RenderableCreate},
+			{"Remove", RenderableRemove},
 			{NULL, NULL}
 		};
 
@@ -2211,6 +2212,7 @@ namespace RootForce
 		//Transform functions & methods
 		static const struct luaL_Reg transformation_f [] = {
 			{"New", TransformationCreate},
+			{"Remove", TransformationRemove},
 			{NULL, NULL}
 		};
 		
@@ -2241,6 +2243,7 @@ namespace RootForce
 		//Physics function & methods
 		static const struct luaL_Reg physicsaccessor_f [] = {
 			{"New", PhysicsCreate},
+			{"Remove", PhysicsRemove},
 			{NULL, NULL}
 		};
 
@@ -2380,6 +2383,7 @@ namespace RootForce
 
 		static const struct luaL_Reg script_f [] = {
 			{"New", ScriptCreate},
+			{"Remove", ScriptRemove},
 			{NULL, NULL}
 		};
 
@@ -2406,6 +2410,7 @@ namespace RootForce
 
 		static const struct luaL_Reg playerphysics_f [] = {
 			{"New", PlayerPhysicsCreate},
+			{"Remove", PlayerPhysicsRemove},
 			{NULL, NULL}
 		};
 
@@ -2421,6 +2426,7 @@ namespace RootForce
 
 		static const struct luaL_Reg health_f [] = {
 			{"New", HealthCreate},
+			{"Remove", HealthRemove},
 			{NULL, NULL}
 		};
 
@@ -2437,6 +2443,7 @@ namespace RootForce
 
 		static const struct luaL_Reg playercomponent_f [] = {
 			{"New", PlayerComponentCreate},
+			{"Remove", PlayerComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2459,6 +2466,7 @@ namespace RootForce
 
 		static const struct luaL_Reg playeraction_f [] = {
 			{"New", PlayerActionCreate},
+			{"Remove", PlayerActionRemove},
 			{NULL, NULL}
 		};
 
@@ -2480,6 +2488,7 @@ namespace RootForce
 
 		static const struct luaL_Reg trypickupcomponent_f [] = {
 			{"New", TryPickupComponentCreate},
+			{"Remove", TryPickupComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2502,6 +2511,7 @@ namespace RootForce
 
 		static const struct luaL_Reg animation_f [] = {
 			{"New", AnimationCreate},
+			{"Remove", AnimationRemove},
 			{NULL, NULL}
 		};
 
@@ -2511,6 +2521,7 @@ namespace RootForce
 
 		static const struct luaL_Reg ragdoll_f [] = {
 			{"New", RagdollCreate},
+			{"Remove", RagdollRemove},
 			{NULL, NULL}
 		};
 
@@ -2521,6 +2532,7 @@ namespace RootForce
 		
 		static const struct luaL_Reg statecomponent_f [] = {
 			{"New", StateComponentCreate},
+			{"Remove", StateComponentRemove},
 			{NULL, NULL}
 		};
 
@@ -2534,6 +2546,7 @@ namespace RootForce
 
 		static const struct luaL_Reg playercontrol_f [] = {
 			{"New", PlayerControlCreate},
+			{"Remove", PlayerControlRemove},
 			{NULL, NULL}
 		};
 
@@ -2579,6 +2592,7 @@ namespace RootForce
 
 		static const struct luaL_Reg watercollider_f [] = {
 			{"New", WaterColliderCreate},
+			{"Remove", WaterColliderRemove},
 			{NULL, NULL}
 		};
 
