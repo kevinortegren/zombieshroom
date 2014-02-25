@@ -1472,7 +1472,7 @@ namespace RootForce
 					NetworkMessage::AbilityChargeStart m;
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-
+					
 					// Make sure we have a client entity associated with this peer.
 					ECS::Entity* clientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
 					if (clientEntity != nullptr)
@@ -1495,9 +1495,15 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
+								// TODO: Use ActionID here?
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->AbilityTime = halfPing;
 								action->UsingPush = m.IsPush;
+
+								// DEBUG
+								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1570,6 +1576,11 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1639,9 +1650,20 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
-								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+								if (playerComponent->AbilityState == AbilityState::START_CHANNELING || playerComponent->AbilityState == AbilityState::CHARGING)
+									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+								else
+									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u) (stop charging as well)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								else
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1714,6 +1736,11 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop charge and channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
