@@ -25,7 +25,7 @@ namespace RootForce
 			, m_packetLogger(LogTag::CLIENT)
 		{
 			m_peer = RakNet::RakPeerInterface::GetInstance();
-			//m_peer->AttachPlugin(&m_packetLogger);
+			m_peer->AttachPlugin(&m_packetLogger);
 
 			RakNet::SocketDescriptor sd;
 			if (m_peer->Startup(1, &sd, 1) != RakNet::RAKNET_STARTED)
