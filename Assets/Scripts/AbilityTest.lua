@@ -1,5 +1,5 @@
 AbilityTest = {};
-AbilityTest.damage = 5;
+AbilityTest.damage = 100;
 AbilityTest.knockback = 5;
 AbilityTest.cooldown = 1;
 AbilityTest.charges = 5;
@@ -26,7 +26,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
 	local timerComp = Timer.New(self, AbilityTest.duration);
-	local homingComp = Homing.New(self, 0.01);
+	local homingComp = Homing.New(self, 0.1);
 	--local rayComp = Ray.New()
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -39,8 +39,17 @@ function AbilityTest.OnCreate (userId, actionId)
 	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
-		if entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
-			homingComp:SetTargetEntity(entityAtAim);
+		local targetColl = entityAtAim:GetCollision();
+		local type = entityAtAim:GetPhysics():GetType(targetColl);
+		
+		if type == PhysicsType.TYPE_PLAYER then
+			local abilityOwnerNetwork = self:GetNetwork();
+			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
+				homingComp:SetTargetEntity(entityAtAim);
+			end
 		end
 	else
 		--local pos = rayComp:GetHitPos();
@@ -73,7 +82,7 @@ function AbilityTest.OnCollide (self, entity)
 		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
+		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
 				local network = entity:GetNetwork();
