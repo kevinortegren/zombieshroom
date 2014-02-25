@@ -38,7 +38,7 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
 
-#define RENDER_USE_COMPUTE
+//#define RENDER_USE_COMPUTE
 
 namespace Render
 {
