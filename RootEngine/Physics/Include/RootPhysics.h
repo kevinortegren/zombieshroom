@@ -106,6 +106,7 @@ namespace RootEngine
 			virtual void PlayerJumpBoost(int p_objectHandle, float p_boostPower) = 0;
 			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
+			virtual void StopPlayerKnockback(int p_objectHandle) = 0;
 			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions) = 0;
 			virtual glm::vec3 GetPlayerKnockbackVector(int p_objectHandle) = 0;
 			virtual float GetPlayerVerticalVelocity(int p_objectHandle) = 0;
@@ -181,7 +182,7 @@ namespace RootEngine
 			void PlayerJumpBoost(int p_objectHandle, float p_boostPower);
 			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
-			
+			void StopPlayerKnockback(int p_objectHandle);
 			void EnableDebugDraw(bool p_enabled);
 
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);

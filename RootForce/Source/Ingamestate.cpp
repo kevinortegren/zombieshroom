@@ -57,11 +57,6 @@ namespace RootForce
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
-		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
-		g_engineContext.m_resourceManager->LoadScript("FireBall");
-		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
@@ -266,7 +261,6 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
-
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();

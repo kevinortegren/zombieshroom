@@ -34,8 +34,8 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(25);
-	playerPhysics:SetJumpForce(15);
-	playerPhysics:SetJumpBoostForce(0.5);
+	playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
+	playerPhysics:SetJumpBoostForce(0.9); --See comment above //Kim
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);

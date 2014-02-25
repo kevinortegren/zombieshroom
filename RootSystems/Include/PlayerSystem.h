@@ -9,8 +9,8 @@
 
 namespace RootForce
 {
-	const float JUMP_TIME_LIMIT = 1.0f;
 	const uint8_t PUSH_ABILITY_INDEX = 3;
+	const float JUMP_TIME_LIMIT = 0.5f; //Do not fucking change without good reason, I know where you live //Kim
 
 	namespace EntityState
 	{

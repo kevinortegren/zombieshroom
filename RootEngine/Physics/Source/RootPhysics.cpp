@@ -183,17 +183,17 @@ namespace Physics
 		if(userPointer->m_type == PhysicsType::TYPE_PLAYER || userPointer->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
 			//Player object
-			unsigned int removedIndex = userPointer->m_vectorIndex;
+			int removedIndex = userPointer->m_vectorIndex;
 			m_playerObjects.at(removedIndex)->RemovePlayer();
 			delete m_playerObjects.at(removedIndex);
 			m_playerObjects.erase(m_playerObjects.begin() + removedIndex);
 			//Ragdoll
-			removedIndex = userPointer->m_ragdollIndex;
-			if(removedIndex != -1)
+			int ragdollRemovedIndex = userPointer->m_ragdollIndex;
+			if(ragdollRemovedIndex != -1)
 			{
 				
-				delete m_ragdolls.at(removedIndex);
-				m_ragdolls.erase(m_ragdolls.begin() + removedIndex);
+				delete m_ragdolls.at(ragdollRemovedIndex);
+				m_ragdolls.erase(m_ragdolls.begin() + ragdollRemovedIndex);
 			}
 			delete userPointer;
 			m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
@@ -202,10 +202,11 @@ namespace Physics
 			{
 				m_userPointer.at(i)->m_id[0] --;
 				if(m_userPointer.at(i)->m_type == PhysicsType::TYPE_PLAYER ||m_userPointer.at(i)->m_type == PhysicsType::TYPE_RAGDOLL)
-				{
+				{					
+					if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
 						m_userPointer.at(i)->m_vectorIndex--;
-						if(m_userPointer.at(i)->m_ragdollIndex != -1)
-							m_userPointer.at(i)->m_ragdollIndex--;
+					if(m_userPointer.at(i)->m_ragdollIndex > ragdollRemovedIndex)
+						m_userPointer.at(i)->m_ragdollIndex--;
 				}
 				
 			}
@@ -693,6 +694,17 @@ namespace Physics
 		else 
 		{
 			return; //Controlled object, how to knockback? Velocity variable?
+		}
+	}
+
+	void RootPhysics::StopPlayerKnockback( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			m_playerObjects.at(index)->Knockback(btVector3(0,0,0), 0);
 		}
 	}
 

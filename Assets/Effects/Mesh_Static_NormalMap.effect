@@ -6,13 +6,13 @@
           slot: 0
       textures:
         - name: g_Diffuse
-          slot: 0
+          slot: 6
         - name: g_Specular
-          slot: 1
+          slot: 7
         - name: g_Normal
-          slot: 2
+          slot: 8
         - name: g_Glow
-          slot: 3
+          slot: 9
       programs:
         - name: staticmesh
           shaders:
@@ -20,21 +20,6 @@
               type: vertex
             - name: mesh_normal
               type: fragment
-              
-    -  name: Mesh_Normal_Shadow
-       bindings:
-         - name: PerFrame
-           slot: 0
-       flags:
-         - name: Shadow
-       programs:
-         - name: Shadow
-           shaders:
-             - name: staticmesh_shadow
-               type: vertex
-           depth:
-             write: 1
-             test: 1
 
               
 
