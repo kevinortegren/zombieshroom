@@ -266,7 +266,6 @@ namespace RootForce
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
 
-
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
