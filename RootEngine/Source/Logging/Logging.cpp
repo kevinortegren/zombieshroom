@@ -24,7 +24,7 @@ Logging::Logging() : m_enableLogging(true)
 	m_tagInfo[LogTag::SCRIPT]		= TagLevelInfo("SCRIPT  ", true);
 	m_tagInfo[LogTag::ANIMATION]	= TagLevelInfo("ANIM    ", true);
 	m_tagInfo[LogTag::WATER]		= TagLevelInfo("WATER   ", true);
-	m_tagInfo[LogTag::PARTICLE]		= TagLevelInfo("PARTICLE", true);
+	m_tagInfo[LogTag::PARTICLE]		= TagLevelInfo("PARTICLE", false);
 
 	m_levelInfo[LogLevel::FATAL_ERROR]		= TagLevelInfo("FATAL_ERR  ", true);
 	m_levelInfo[LogLevel::NON_FATAL_ERROR]	= TagLevelInfo("NON_FAT_ERR", true);
