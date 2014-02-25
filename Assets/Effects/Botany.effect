@@ -38,13 +38,13 @@
           slot: 4
       textures:
         - name: g_Diffuse
-          slot: 0
+          slot: 6
         - name: g_Translucency
-          slot: 10
+          slot: 17
         - name: g_Billboard
-          slot: 11
+          slot: 18
         - name: g_TerrainGrass
-          slot: 12
+          slot: 19
       programs:
         - name: Botany_Render
           shaders:

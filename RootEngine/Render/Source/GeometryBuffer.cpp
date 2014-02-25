@@ -51,10 +51,10 @@ namespace Render
 		switch (status)
 		{
 		case GL_FRAMEBUFFER_COMPLETE:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good framebuffer support.");
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::SUCCESS, "Good Geometry framebuffer.");
 			break;
 		default:
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Bad framebuffer support!");
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::WARNING, "Good Geometry framebuffer!");
 			break;
 		}
 	}
@@ -70,27 +70,23 @@ namespace Render
 
 		GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
 		glDrawBuffers(4, buffers);	
-
-		// Enable depth for reads during geometry pass.
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, m_depthTexture->GetHandle());
 	}
 
 	void GeometryBuffer::BindTextures()
 	{
-		glActiveTexture(GL_TEXTURE0 + 0);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]);
 		glBindTexture(GL_TEXTURE_2D, m_diffuseTexture->GetHandle());
 
-		glActiveTexture(GL_TEXTURE0 + 1);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_NORMALS]);
 		glBindTexture(GL_TEXTURE_2D, m_normalsTexture->GetHandle());
 
-		glActiveTexture(GL_TEXTURE0 + 2);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_DEPTH]);
 		glBindTexture(GL_TEXTURE_2D, m_depthTexture->GetHandle());
 
-		glActiveTexture(GL_TEXTURE0 + 4);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_GLOW_TRANSLUCENCY]);
 		glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
 
-		glActiveTexture(GL_TEXTURE0 + 5);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_BACKGROUND_AMBIENT]);
 		glBindTexture(GL_TEXTURE_2D, m_backgroundTexture->GetHandle());
 	}
 
@@ -98,19 +94,19 @@ namespace Render
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glActiveTexture(GL_TEXTURE0 + 0);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE0 + 1);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_NORMALS]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE0 + 2);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_DEPTH]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE0 + 4);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_GLOW_TRANSLUCENCY]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE0 + 5);
+		glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::GBUFFER_BACKGROUND_AMBIENT]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
