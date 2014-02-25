@@ -1238,7 +1238,7 @@ namespace Physics
 		
 		if(index  == -1)
 		{
-			m_playerObjects.at(indexplayer)->Deactivate();
+			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
@@ -1257,10 +1257,12 @@ namespace Physics
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+			m_playerObjects.at(indexplayer)->Deactivate();
+			index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
 			
 		}	
-		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-		m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
+		
 	}
 
 	glm::mat4* RootPhysics::GetBones( int p_objectHandle)
