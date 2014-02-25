@@ -5,12 +5,12 @@
         - name: PerTech
           slot: 3
       textures:
-        - name: g_Scene
-          slot: 3
         - name: g_Glow
-          slot: 4
+          slot: 3
+        - name: g_Scene
+          slot: 5
         - name: g_Input
-          slot: 5        
+          slot: 6        
       programs:
       - name: glow_horizontal
         shaders:

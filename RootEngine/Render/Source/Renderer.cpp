@@ -333,6 +333,7 @@ namespace Render
 
 	void GLRenderer::InitializeSemanticSizes()
 	{
+		// Sizes for common semantics for use in render jobs uniform params.
 		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
 		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
 		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
@@ -360,26 +361,40 @@ namespace Render
 		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
 		s_sizes[Semantic::DX]			= sizeof(float);
 
-		s_textureSlots[TextureSemantic::DIFFUSE]		= 0;
-		s_textureSlots[TextureSemantic::COMPUTEIN]		= 0;
-		s_textureSlots[TextureSemantic::SPECULAR]		= 1;
-		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 1;
-		s_textureSlots[TextureSemantic::NORMAL]			= 2;
-		s_textureSlots[TextureSemantic::DIFFUSE2]		= 2;
-		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 2;
-		s_textureSlots[TextureSemantic::GLOW]			= 3;
-		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 3;
-		s_textureSlots[TextureSemantic::DEPTH]			= 4;
-		s_textureSlots[TextureSemantic::RANDOM]			= 5;
-		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 6;
-		s_textureSlots[TextureSemantic::SHADOWDEPTH]	= 6;
-		s_textureSlots[TextureSemantic::TEXTURE_R]		= 7;
-		s_textureSlots[TextureSemantic::TEXTURE_G]		= 8;
-		s_textureSlots[TextureSemantic::TEXTURE_B]		= 9;
-		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 10;
-		s_textureSlots[TextureSemantic::DIFFUSE1]		= 11;
-		s_textureSlots[TextureSemantic::DIFFUSE2]		= 12;
-		s_textureSlots[TextureSemantic::DIFFUSE3]		= 13;
+		// Slots reserved for geometry buffer and lighting.
+		s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]	= 0;
+		s_textureSlots[TextureSemantic::GBUFFER_NORMALS]			= 1;
+		s_textureSlots[TextureSemantic::GBUFFER_DEPTH]				= 2;		
+		s_textureSlots[TextureSemantic::GBUFFER_GLOW_TRANSLUCENCY]	= 3;
+		s_textureSlots[TextureSemantic::GBUFFER_BACKGROUND_AMBIENT] = 4;
+	
+		// Slot reserved for lighting.
+		s_textureSlots[TextureSemantic::LIGHTING_ACCUMULATION] = 5;
+		
+
+		// Various texture semantics for render jobs.
+		s_textureSlots[TextureSemantic::SHADER_INPUT]   = 6;
+		s_textureSlots[TextureSemantic::DIFFUSE]		= 6;
+		s_textureSlots[TextureSemantic::COMPUTEIN]		= 6;
+		s_textureSlots[TextureSemantic::SPECULAR]		= 7;
+		s_textureSlots[TextureSemantic::COMPUTEOUT]		= 7;
+		s_textureSlots[TextureSemantic::SSAO]			= 7;
+		s_textureSlots[TextureSemantic::NORMAL]			= 8;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 8;
+		s_textureSlots[TextureSemantic::COMPUTENORMAL]	= 8;
+		s_textureSlots[TextureSemantic::GLOW]			= 9;
+		s_textureSlots[TextureSemantic::SHADOWDEPTHPCF] = 9;
+		s_textureSlots[TextureSemantic::DEPTH]			= 10;
+		s_textureSlots[TextureSemantic::RANDOM]			= 11;
+		s_textureSlots[TextureSemantic::TEXTUREMAP]		= 12;
+		s_textureSlots[TextureSemantic::SHADOWDEPTH]	= 13;
+		s_textureSlots[TextureSemantic::TEXTURE_R]		= 14;
+		s_textureSlots[TextureSemantic::TEXTURE_G]		= 15;
+		s_textureSlots[TextureSemantic::TEXTURE_B]		= 16;
+		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 17;
+		s_textureSlots[TextureSemantic::DIFFUSE1]		= 18;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 19;
+		s_textureSlots[TextureSemantic::DIFFUSE3]		= 20;
 	}
 
 	void GLRenderer::InitialziePostProcesses()
@@ -572,10 +587,6 @@ namespace Render
 	void GLRenderer::GeometryPass(int p_layer)
 	{
 		m_gbuffer.UnbindTextures();	
-
-		// Bind lighting for blending.
-		m_lighting.m_la->Bind(5);
-
 		m_gbuffer.Enable();
 		m_gbuffer.Clear(GL_STENCIL_BUFFER_BIT);
 
@@ -664,19 +675,11 @@ namespace Render
 			m_uniforms->BufferSubData(i * sizeof(glm::mat4), sizeof(glm::mat4), &lvp);
 		}
 
-		// Bind background as Input.
-		m_gbuffer.m_backgroundTexture->Bind(5);
-
 		m_lighting.SSAO();
-		// Clear previous la result.
-		m_gbuffer.m_depthTexture->Bind(10); //Bind depth texture from gbuffer to get rid of geometry ghosting when refracting water.
 		m_lighting.Clear();
-
-		// Apply lighting.
 		m_lighting.Ambient();
 		m_lighting.Directional();
 		m_lighting.Point();
-
 		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -697,16 +700,8 @@ namespace Render
 	void GLRenderer::PostProcessPass()
 	{
 		m_gbuffer.BindTextures();
-		m_lighting.m_la->Bind(3);
-		// Bind gbuffer for reading in post processes.
-		// 0 - Diffuse
-		// 1 - Normals
-		// 2 - Depth
-		// 3 - LA
-		// 4 - Glow
-		// 5 - Input.
+		m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::LIGHTING_ACCUMULATION]);
 
-		// Glow pass.
 		m_fullscreenQuad.Bind();
 		m_glowDevice.HorizontalPass(&m_fullscreenQuad);
 		BindForwardFramebuffer();
@@ -720,10 +715,10 @@ namespace Render
 		// Restore backbuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		m_color0->Bind(5);
+		m_color0->Bind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
 
 		if(!m_glowDevice.m_display)
-			m_lighting.m_la->Bind(5);
+			m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
@@ -731,7 +726,7 @@ namespace Render
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
 
-		m_color0->Unbind(5);
+		m_color0->Unbind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
 	}
 
 	void GLRenderer::BindForwardFramebuffer()

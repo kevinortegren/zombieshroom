@@ -5,7 +5,7 @@
     - name: Forward
       textures:
         - name: g_Input
-          slot: 5
+          slot: 6
       programs:
         - name: output
           shaders:

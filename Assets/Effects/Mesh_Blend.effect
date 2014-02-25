@@ -8,17 +8,17 @@
           slot: 1
       textures:
         - name: g_Specular
-          slot: 1
-        - name: g_BlendMap
-          slot: 6
-        - name: g_DiffuseR
           slot: 7
+        - name: g_BlendMap
+          slot: 12
+        - name: g_DiffuseR
+          slot: 14
         - name: g_DiffuseG
-          slot: 8
+          slot: 15
         - name: g_DiffuseB
-          slot: 9
+          slot: 16
         - name: g_Glow
-          slot: 3
+          slot: 9
       uniforms:
         - sem: MODEL
           offset: 0
@@ -33,26 +33,3 @@
               type: vertex
             - name: mesh_blend
               type: fragment
-    - name: Mesh_Blend_Shadow
-      bindings:
-        - name: PerFrame
-          slot: 0
-        - name: PerObject
-          slot: 1
-      uniforms:
-        - sem: MODEL
-          offset: 0
-        - sem: NORMAL
-          offset: 64
-        - sem: SIZEMIN
-          offset: 128
-      flags:
-        - name: Shadow
-      programs:
-        - name: Shadow
-          shaders:
-            - name: shadow
-              type: vertex
-          depth:
-            write: 1
-            test: 1
