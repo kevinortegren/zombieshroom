@@ -37,6 +37,7 @@ namespace RootForce
 			SOUND,
 			TIMER,
 			FOLLOW,
+			HOMING,
 		};
 	}
 }

@@ -46,6 +46,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -157,6 +158,10 @@ namespace RootForce
 		// Initialize the follow system.
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
+
+		// Initialize the hominh system.
+		m_homingSystem = new RootForce::HomingSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::HomingSystem>(m_homingSystem);
 
 
 		// Set debug visualization flags.
@@ -401,6 +406,11 @@ namespace RootForce
 		{
 			PROFILE("Follow system", g_engineContext.m_profiler);
 			m_followSystem->Process();
+		}
+
+		{
+			PROFILE("Homing system", g_engineContext.m_profiler);
+			m_homingSystem->Process();
 		}
 		
 		{

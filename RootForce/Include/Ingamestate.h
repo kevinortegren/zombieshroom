@@ -24,6 +24,7 @@
 #include <RootSystems/Include/TryPickupResetSystem.h>
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
+#include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/BotanySystem.h>
 
 #include <RootForce/Include/GameStates.h>
@@ -83,6 +84,7 @@ namespace RootForce
 		RootForce::BotanySystem*						m_botanySystem;
 		RootForce::TimerSystem*							m_timerSystem;
 		RootForce::FollowSystem*						m_followSystem;
+		RootForce::HomingSystem*						m_homingSystem;
 
 		Keymapper* m_keymapper;
 

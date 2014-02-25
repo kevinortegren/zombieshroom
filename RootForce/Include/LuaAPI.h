@@ -2038,6 +2038,34 @@ namespace RootForce
 			return 0;
 		}
 		
+		//////////////////////////////////////////////////////////////////////////
+		//Homing
+		//////////////////////////////////////////////////////////////////////////
+		static int HomingCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::HomingComponent*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HomingComponent>(*e);
+			luaL_setmetatable(p_luaState, "Homing");
+			return 1;
+		}
+		static int HomingSetTargetEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
+			(*s)->TargetPlayer = *e;
+			return 0;
+		}
+		static int HomingSetTargetPosition(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			(*s)->TargetPosition = *v1;
+			return 0;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//WaterCollider
@@ -2569,11 +2597,22 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg followercomponent_f [] = {
-			{"New", FollowerCreate},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg followercomponent_m [] = {
+			{"New", FollowerCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg homingcomponent_f [] = {
+			{"New", HomingCreate},
+			{"SetTargetEntity", HomingSetTargetEntity},
+			{"SetTargetPosition", HomingSetTargetPosition},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg homingcomponent_m [] = {
 			{NULL, NULL}
 		};
 
@@ -2675,6 +2714,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f, RootForce::LuaAPI::followercomponent_m, "Follower");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f, RootForce::LuaAPI::homingcomponent_m, "Homing");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::timercomponent_f, RootForce::LuaAPI::timercomponent_m, "Timer");

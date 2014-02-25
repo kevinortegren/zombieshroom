@@ -21,6 +21,7 @@
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/TimerSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
+#include <RootSystems/Include/HomingSystem.h>
 
 namespace RootForce
 {
