@@ -4,6 +4,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Render/Include/RenderExtern.h>
 #include <RootEngine/Render/Include/Semantics.h>
+#include <RootEngine/Include/Logging/Logging.h>
 
 namespace Render
 {
@@ -126,15 +127,22 @@ namespace Render
 
 	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer)
 	{
+		int recycled = m_emptyParticleSlots.size();
+
 		unsigned slot = m_particleSystemsCount;
+
 		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
 		{
-			unsigned slot = m_emptyParticleSlots.top();
+			slot = m_emptyParticleSlots.top();
 			m_emptyParticleSlots.pop();
 			m_particleSystemsCount--;
 		}
 
+		m_particleSystems[slot].m_slot = slot;
+
 		m_particleSystemsCount++;
+		
+		g_context.m_logger->LogText(LogTag::PARTICLE, LogLevel::DEBUG_PRINT, "Creating particle system %d count %d recylced count %d", slot, m_particleSystemsCount, recycled);
 
 		return &m_particleSystems[slot++];
 	}
@@ -152,6 +160,16 @@ namespace Render
 
 	void ParticleSystemHandler::Free(ParticleSystem* p_system)
 	{
+		ParticleVertex particles[RENDER_NUM_PARTCILES];
+		memset(particles, 0, RENDER_NUM_PARTCILES * sizeof(ParticleVertex));
+
+		p_system->m_meshes[0]->GetVertexBuffer()->BufferSubData(0, RENDER_NUM_PARTCILES * sizeof(ParticleVertex), particles);
+		p_system->m_meshes[1]->GetVertexBuffer()->BufferSubData(0, RENDER_NUM_PARTCILES * sizeof(ParticleVertex), particles);
+		p_system->m_currentVB = 0;
+		p_system->m_currentTFB = 1;
+		p_system->m_first = true;
+
+		g_context.m_logger->LogText(LogTag::PARTICLE, LogLevel::DEBUG_PRINT, "Free %d", p_system->m_slot);
 		m_emptyParticleSlots.push(p_system->m_slot);
 	}
 

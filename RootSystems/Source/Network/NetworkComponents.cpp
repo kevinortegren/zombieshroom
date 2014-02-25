@@ -15,7 +15,7 @@ namespace RootForce
 			ID.UserID = p_userID;
 			ID.ActionID = p_actionID;
 
-			UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
+			UserActionKey_t key = GetUserActionKey(ID.UserID, ID.ActionID);
 			ID.SequenceID = s_sequenceIDMap[key]++;
 
 			g_networkEntityMap[ID] = p_entity;
@@ -26,7 +26,7 @@ namespace RootForce
 			ID.UserID = p_parent->ID.UserID;
 			ID.ActionID = p_parent->ID.ActionID;
 				
-			UserActionKey_t key = (((UserActionKey_t) ID.UserID) << 48) | (((UserActionKey_t) ID.ActionID) << 16);
+			UserActionKey_t key = GetUserActionKey(ID.UserID, ID.ActionID);
 			ID.SequenceID = s_sequenceIDMap[key]++;
 
 			g_networkEntityMap[ID] = p_entity;
@@ -48,6 +48,11 @@ namespace RootForce
 			{
 				s_sequenceIDMap.erase(it);
 			}
+		}
+
+		UserActionKey_t NetworkComponent::GetUserActionKey(UserID_t p_user, ActionID_t p_action)
+		{
+			return (((UserActionKey_t) p_user) << 48) | (((UserActionKey_t) p_action) << 16);
 		}
 
 
