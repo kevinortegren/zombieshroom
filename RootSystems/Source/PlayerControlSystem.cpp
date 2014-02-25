@@ -181,7 +181,7 @@ namespace RootForce
 					}
 					else
 					{
-						action->UsingPush = false;
+						action->ActiveAbility = playerComponent->SelectedAbility;
 						HandleAbilityPressed(dt);
 					}
 				}
@@ -244,7 +244,7 @@ namespace RootForce
 					}
 					else 
 					{
-						action->UsingPush = true;
+						action->ActiveAbility = PUSH_ABILITY_INDEX;
 						HandleAbilityPressed(dt);
 					}
 				}
@@ -310,9 +310,7 @@ namespace RootForce
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
 
-		uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : action->SelectedAbility; 
-
-		if ( !playerComponent->AbilityScripts[abilityIndex].OnCooldown)
+		if (action->ActiveAbility != ABILITY_INDEX_NONE && !playerComponent->AbilityScripts[action->ActiveAbility].OnCooldown)
 		{
 			if (playerComponent->AbilityState == AbilityState::OFF)
 			{
@@ -325,7 +323,7 @@ namespace RootForce
 				RootForce::NetworkMessage::AbilityChargeStart m;
 				m.User = network->ID.UserID;
 				m.Action = action->ActionID;
-				m.IsPush = action->UsingPush;
+				m.IsPush = action->ActiveAbility == PUSH_ABILITY_INDEX;
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -340,7 +338,7 @@ namespace RootForce
 			if (playerComponent->AbilityState != AbilityState::OFF)
 				action->AbilityTime += dt;
 
-			std::string abilityName = playerComponent->AbilityScripts[abilityIndex].Name;
+			std::string abilityName = playerComponent->AbilityScripts[action->ActiveAbility].Name;
 			if (abilityName != "")
 			{
 
@@ -397,7 +395,7 @@ namespace RootForce
 		else
 		{
 			playerComponent->AbilityState = AbilityState::OFF;
-			action->UsingPush = false;
+			action->ActiveAbility = ABILITY_INDEX_NONE;
 		} 
 	}
 
@@ -410,12 +408,10 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
 		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
-		uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : action->SelectedAbility; 
-
         m_hud->SetValue("ChargeBarValue", "0");
-		if (!health->IsDead && playerComponent->AbilityState != AbilityState::OFF)
+		if (!health->IsDead && playerComponent->AbilityState != AbilityState::OFF && action->ActiveAbility != ABILITY_INDEX_NONE)
 		{
-			std::string abilityName = playerComponent->AbilityScripts[abilityIndex].Name;
+			std::string abilityName = playerComponent->AbilityScripts[action->ActiveAbility].Name;
 			if (abilityName != "")
 			{
 

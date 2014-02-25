@@ -313,14 +313,13 @@ namespace RootForce
 							assert(aimingEntity != nullptr);
 
 
-							// Set the actions for the client, to be parsed by the action system later. Preserve UsingPush.
+							// Set the actions for the client, to be parsed by the action system later. Preserve ActiveAbility.
 							PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 							assert(playerAction != nullptr);
 
-							bool usingPush = m.Action.UsingPush;
+							uint8_t activeAbility = playerAction->ActiveAbility;
 							*playerAction = m.Action;
-							playerAction->UsingPush = usingPush;
-
+							playerAction->ActiveAbility = activeAbility;
 
 							// Set the position of the player, as given by the other client.
 							PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(playerEntity);
@@ -463,6 +462,7 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
+								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
 								// Log the action (debug)
 								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart received from user %d", m.User);
@@ -1267,13 +1267,13 @@ namespace RootForce
 							// TODO: Let the extrapolation be done by the action system and physics instead.
 							if (clientComponent->IsRemote)
 							{
-								// Update the action for the user (preserve UsingPush).
+								// Update the action for the user (preserve ActiveAbility).
 								PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(playerAction != nullptr);
 								
-								bool usingPush = m.Action.UsingPush;
+								uint8_t activeAbility = playerAction->ActiveAbility;
 								*playerAction = m.Action;
-								playerAction->UsingPush = usingPush;
+								playerAction->ActiveAbility = activeAbility;
 
 								// Set the position of the player
 								playerTransform->m_position = m.Position;
@@ -1497,12 +1497,12 @@ namespace RootForce
 
 								// TODO: Use ActionID here?
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
+								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
-								action->UsingPush = m.IsPush;
+								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
 								// DEBUG
-								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
 								// /DEBUG
 							}
 
@@ -1578,8 +1578,7 @@ namespace RootForce
 								action->AbilityTime = m.Time;
 
 								// DEBUG
-								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
 								// /DEBUG
 							}
 
@@ -1658,11 +1657,10 @@ namespace RootForce
 								action->AbilityTime = m.Time;
 
 								// DEBUG
-								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
-									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u) (stop charging as well)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u) (stop charging as well)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
 								else
-									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
 								// /DEBUG
 							}
 
@@ -1738,8 +1736,7 @@ namespace RootForce
 								action->AbilityTime = m.Time;
 
 								// DEBUG
-								uint8_t abilityIndex = action->UsingPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop charge and channeling ability %s (User: %u)", playerComponent->AbilityScripts[abilityIndex].Name.c_str(), m.User);
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop charge and channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
 								// /DEBUG
 							}
 
