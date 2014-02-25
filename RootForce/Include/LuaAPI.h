@@ -2043,17 +2043,18 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int HomingCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(1);
+			NumberOfArgs(2);
 			RootForce::HomingComponent **s = (RootForce::HomingComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::HomingComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HomingComponent>(*e);
+			(*s)->Controllability = (float)luaL_checknumber(p_luaState, 2);
 			luaL_setmetatable(p_luaState, "Homing");
 			return 1;
 		}
 		static int HomingSetTargetEntity(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
 			(*s)->TargetPlayer = *e;
 			return 0;
@@ -2061,9 +2062,9 @@ namespace RootForce
 		static int HomingSetTargetPosition(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
+			RootForce::HomingComponent** ptemp = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
-			(*s)->TargetPosition = *v1;
+			(*ptemp)->TargetPosition = (*v1);
 			return 0;
 		}
 
@@ -2094,7 +2095,7 @@ namespace RootForce
 		static int RayGetHitPos(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::RayComponent** s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "RayComponent");
+			RootForce::RayComponent** s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "Ray");
 			glm::vec3 *e = (glm::vec3*)lua_newuserdata(p_luaState, sizeof(glm::vec3));
 			*e = (*s)->HitPos;
 			luaL_setmetatable(p_luaState, "Vec3");
@@ -2104,7 +2105,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			ECS::Entity **e = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
-			RootForce::RayComponent **s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "RayComponent");
+			RootForce::RayComponent **s = (RootForce::RayComponent**)luaL_checkudata(p_luaState, 1, "Ray");
 			*e = (*s)->HitEntity;
 			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
@@ -2661,12 +2662,12 @@ namespace RootForce
 
 		static const struct luaL_Reg raycomponent_f [] = {
 			{"New", RayCreate},
-			{"GetHitPos", RayGetHitPos},
-			{"GetHitEntity", RayGetHitEntity},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg raycomponent_m [] = {
+			{"GetHitPos", RayGetHitPos},
+			{"GetHitEntity", RayGetHitEntity},
 			{NULL, NULL}
 		};
 

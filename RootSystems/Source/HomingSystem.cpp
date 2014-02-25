@@ -4,14 +4,16 @@ namespace RootForce
 {
 	void HomingSystem::Init()
 	{
-		m_physics.Init(m_world->GetEntityManager());
+		//m_collision.Init(m_world->GetEntityManager());
 		m_target.Init(m_world->GetEntityManager());
+		m_physics.Init(m_world->GetEntityManager());
 	}
 
 	void HomingSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		Collision* physics = m_physics.Get(p_entity);
+		//Collision* collision = m_collision.Get(p_entity);
 		HomingComponent* target = m_target.Get(p_entity);
+		Physics* physics = m_physics.Get(p_entity);
 		
 		if (target->TargetPlayer != nullptr)
 		{
@@ -21,13 +23,13 @@ namespace RootForce
 			
 		}
 		Transform* abilityTransform = m_world->GetEntityManager()->GetComponent<Transform>(p_entity);
-		glm::vec3 currentVelocity = g_engineContext.m_physics->GetVelocity(*physics->m_handle);
+		glm::vec3 currentVelocity = physics->m_velocity;//g_engineContext.m_physics->GetVelocity(*collision->m_handle);
 		float speed = glm::length(currentVelocity);
 		glm::vec3 targetVelocity = glm::normalize(target->TargetPosition - abilityTransform->m_position) * speed;
 
-		glm::vec3 changeVel = targetVelocity - currentVelocity * target->Controllability;
+		glm::vec3 changeVel = (targetVelocity - currentVelocity) * target->Controllability;
 
-		g_engineContext.m_physics->SetVelocity(*physics->m_handle, glm::normalize(currentVelocity * changeVel) * speed);
+		physics->m_velocity = glm::normalize(currentVelocity + changeVel) * speed;
 	}
 
 }

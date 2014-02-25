@@ -5,7 +5,7 @@ AbilityTest.cooldown = 1;
 AbilityTest.charges = 5;
 AbilityTest.chargeTime = 0;
 AbilityTest.channelingTime = 0;
-AbilityTest.duration = 5;
+AbilityTest.duration = 50;
 
 function AbilityTest.ChargeDone (time, userId, actionId)
 	AbilityTest.OnCreate(userId, actionId);
@@ -26,7 +26,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
 	local timerComp = Timer.New(self, AbilityTest.duration);
-	local homingComp = Homing.New(self);
+	local homingComp = Homing.New(self, 0.01);
 	--local rayComp = Ray.New()
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -36,13 +36,14 @@ function AbilityTest.OnCreate (userId, actionId)
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rayComp = Ray.New(self, collisionComp:GetHandle(), startPos, dirVecForward, 10000, false, false);
-
+	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
 		if entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
 			homingComp:SetTargetEntity(entityAtAim);
 		end
 	else
+		--local pos = rayComp:GetHitPos();
 		homingComp:SetTargetPosition(rayComp:GetHitPos());
 	end
 	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true);

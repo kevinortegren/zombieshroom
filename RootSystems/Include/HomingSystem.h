@@ -27,7 +27,8 @@ namespace RootForce
 			: ECS::EntitySystem(p_world)
 		{ 
 			SetUsage<RootForce::HomingComponent>();
-			SetUsage<RootForce::Collision>();
+			//SetUsage<RootForce::Collision>();
+			SetUsage<RootForce::Physics>();
 		}
 		void Init();
 		void ProcessEntity(ECS::Entity* p_entity);
@@ -36,7 +37,8 @@ namespace RootForce
 
 
 		RootEngine::GameSharedContext* m_engineContext;
-		ECS::ComponentMapper<RootForce::Collision> m_physics;
+		//ECS::ComponentMapper<RootForce::Collision> m_collision;
+		ECS::ComponentMapper<RootForce::Physics> m_physics;
 		ECS::ComponentMapper<RootForce::HomingComponent> m_target;
 	};
 }
