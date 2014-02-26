@@ -14,8 +14,6 @@
       textures:
         - name: g_Diffuse
           slot: 6
-        - name: g_Glow
-          slot: 9
       flags:
         - name: Forward
       programs:
@@ -31,7 +29,7 @@
           # None = 0
           # AlphaBlend = 1
           # Additive = 2
-          blend: 1
+          blend: 2
           
           # Depth settings.
           depth:

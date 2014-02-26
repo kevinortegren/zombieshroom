@@ -2098,15 +2098,19 @@ namespace RootForce
 
 			r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
 			r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
+			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
+			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 			r->m_model = g_engineContext.m_resourceManager->CreateModel("rayModel");
 			r->m_forward = true;
 			r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
 			r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
-			r->m_pass = 1;
+			r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES;
 
 			luaL_setmetatable(p_luaState, "Ray");
 			return 1;
 		}
+
 		static int RayGetHitPos(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);

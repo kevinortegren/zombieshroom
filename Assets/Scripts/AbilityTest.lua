@@ -17,6 +17,7 @@ end
 function AbilityTest.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
+	local rayEnt = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local networkEnt = Network.New(self, userId, actionId);
 	--Components
@@ -26,6 +27,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
 	local timerComp = Timer.New(self, AbilityTest.duration);
+	--local rayTimerComp = Timer.New(rayEnt, 2);
 	local homingComp = Homing.New(self, 0.1, 50);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -34,7 +36,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
-	local rayComp = Ray.New(self, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, true, false);
+	local rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, true, false);
 	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then

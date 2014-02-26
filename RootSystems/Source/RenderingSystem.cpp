@@ -1,6 +1,10 @@
 #include <RenderingSystem.h>
 #include <RootEngine/Render/Include/Renderer.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	Renderable::~Renderable()
@@ -26,18 +30,23 @@ namespace RootForce
 
 		if(!renderable->m_material)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
 			return;
 		}
 		if(renderable->m_material->m_effect == nullptr)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
 			return;
 		}
 		if(renderable->m_model == nullptr)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no model", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no model", p_entity->GetId());
 			return;
+		}
+
+		if(renderable->m_material->m_effect == g_engineContext.m_resourceManager->GetEffect("Ray"))
+		{
+			int i = 0;
 		}
 
 		m_matrices[p_entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_position);
