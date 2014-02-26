@@ -72,7 +72,7 @@ namespace RootForce
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 				bs.Write(RakNet::GetTime());
-				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityClaimedBy);
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
