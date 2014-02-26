@@ -20,6 +20,8 @@ namespace RootForce
 		bool GetExit() { return m_exit; }
 		void Reset();
 		void Update();
+		void SetScoreList(std::string p_score);
+
 	private:
 		void Return(const Awesomium::JSArray& p_array);
 		void Exit(const Awesomium::JSArray& p_array);

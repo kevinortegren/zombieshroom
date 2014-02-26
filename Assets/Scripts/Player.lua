@@ -14,7 +14,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
-	playerComponent:SetTeamId(3);
+	playerComponent:SetTeamId(0);
 	
   Entity.RegisterGroup("NonExport", player);
 
@@ -53,6 +53,9 @@ function Player.OnTeamSelect(self, teamId)
 
     stateComponent:SetPreviousPosition(transform:GetPos());
     stateComponent:SetCurrentState(EntityState.DESCENDING);
+		
+		playerComponent:SetDeaths(0);
+		playerComponent:SetScore(0);
 
     playerAction:SetJumpTime(0.0);
     playerAction:SetMovePower(0);
@@ -107,8 +110,20 @@ function Player.OnTeamSelect(self, teamId)
 		self:RemovePlayerAction();
 		self:RemoveStateComponent();
 		self:RemoveTryPickupComponent();
-  else
+		self:RemoveRenderable();
+		self:RemoveAnimation();
+		self:RemoveRagdoll();
+		self:RemoveWaterCollider();
+  elseif teamId ~= prevTeamId then
 		local renderable = self:GetRenderable();
+		local health = self:GetHealth();
+		
+		playerComponent:SetDeaths(0);
+		playerComponent:SetScore(0);
+		
+    health:SetHealth(0);
+    health:SetIsDead(true);
+		
 		if teamId == 1 then
 			renderable:SetMaterial("BlueSpirit");
 			renderable:SetMaterialGlow("WSGlowBlue");

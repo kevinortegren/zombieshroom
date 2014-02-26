@@ -74,5 +74,13 @@ namespace RootForce
 		}
 	}
 
+	void IngameMenu::SetScoreList(std::string p_score)
+	{
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+		m_view->BufferJavascript("UpdateScoreScreen(" + std::to_string(playerComponent->TeamID) + ",'" + playerComponent->Name + "'," + p_score + ");");
+	}
+
 }
 

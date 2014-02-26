@@ -1243,10 +1243,14 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (ClientState::IsConnected(clientComponent->State))
+						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+						assert(playerEntity != nullptr);
+
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+						assert(playerComponent != nullptr);
+
+						if (ClientState::IsConnected(clientComponent->State) && playerComponent->TeamID != 0)
 						{
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							assert(playerEntity != nullptr);
 
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
