@@ -93,6 +93,9 @@ namespace RootEngine
 			for(auto event : m_injectMouseMove)
 				m_webView->InjectMouseMove(event.first, event.second);
 			m_injectMouseMove.clear();
+			for(auto event : m_injectMouseWheel)
+				m_webView->InjectMouseWheel(event.second*12, event.first*12);
+			m_injectMouseWheel.clear();
 			m_injectMutex.unlock();
 		}
 
@@ -118,6 +121,12 @@ namespace RootEngine
 		{
 			m_injectMutex.lock();
 			m_injectMouseMove.push_back(std::pair<int,int>(p_x,p_y));
+			m_injectMutex.unlock();
+		}
+		void WebViewImpl::InjectMouseWheel(int p_x, int p_y)
+		{
+			m_injectMutex.lock();
+			m_injectMouseWheel.push_back(std::pair<int,int>(p_x,p_y));
 			m_injectMutex.unlock();
 		}
 	}

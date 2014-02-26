@@ -95,9 +95,11 @@ namespace RootForce
 		void ToggleWireFrame();
 		void ToggleReflections();
 		void ToggleRefractions();
-		void ToggleDepth();
 		void ToggleNormalMaps();
 
 		void ResetWater();
+
+		void SaveWater();
+		void LoadWater();
 	};
 }

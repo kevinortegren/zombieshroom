@@ -64,7 +64,7 @@ namespace Render
 
 	void VertexAttributes::SetVertexAttribPointer(GLuint p_bufferId, GLuint p_location, GLint p_size, GLenum p_type, GLboolean p_normalized, GLsizei p_stride, GLvoid* p_pointer)
 	{
-		assert(p_location < m_numAttribs);
+		assert(p_location < m_numAttribs && "Location is above the set number of attribs.");
 
 		Bind();
 		glBindBuffer(GL_ARRAY_BUFFER,p_bufferId);

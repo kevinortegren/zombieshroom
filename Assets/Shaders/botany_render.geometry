@@ -1,0 +1,635 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+#define USE_TERRAIN_NORMAL;
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 29) out;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+    mat4 invView;
+};
+
+layout(std140) uniform Time
+{
+	float g_dt;
+	float g_time;
+};
+
+layout(std140) uniform PerTech
+{
+    vec3 g_PlayerPosition;
+};
+
+in vec3 gs_normal_in[];
+in float gs_density_in[];
+in float gs_lod_in[];
+
+out vec2 vert_texcoord1;
+out vec3 vert_normal1;
+out vec3 vert_color1;
+out float vert_texture1;
+
+float FlipNormal(vec3 position, vec3 normal, vec3 cameraPosition)
+{
+    // Flip normals if camera is aligned with normals.
+    float flipped = 1.0;
+    vec3 n = normalize(normal); 
+    vec3 direction = normalize(vec3(position - cameraPosition));
+    if(dot(direction, n) > 0)
+        flipped = -1.0;
+    return flipped;
+}
+
+float FlipNormal(vec3 normal)
+{
+    // Flip normals if camera is aligned with normals.
+    float flipped = 1.0;
+    vec3 n = normalize(normal); 
+    vec3 normalV = (viewMatrix * vec4(normal, 0.0)).xyz;
+    if(normalV.z > 0)
+        flipped = -1.0;
+    return flipped;
+}
+
+// LOD 1 cluster.
+
+// DENSITY 1
+
+// Positions.
+vec3 mediumBlade3LOD[3] = vec3[](
+    vec3(-0.146905, 0.000000, 0.033582),
+    vec3(-0.027772, 0.000000, -0.096591),
+    vec3(-0.406822, 0.590890, -0.323893)
+);
+
+// Texcoords.
+vec2 mediumBladeTCLOD[3] = vec2[](
+    vec2(0.000008, -0.000006),
+    vec2(0.999992, -0.000006),
+    vec2(0.500000, -1.000000)
+);
+
+// Normals.
+vec3 mediumBlade3NormalsLOD[3] = vec3[](
+    vec3(-0.594995, -0.591154, -0.544535),
+    vec3(-0.594995, -0.591154, -0.544535),
+    vec3(-0.594995, -0.591154, -0.544535)
+);
+
+// Output medium blade 3.
+void CreateMediumBlade3LOD(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBlade3NormalsLOD[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 3; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade3LOD[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        
+        vert_texcoord1 = mediumBladeTCLOD[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 2
+
+// Positions.
+vec3 mediumBladeLOD[3] = vec3[](
+    vec3(0.128215, 0.000000, -0.046116),
+    vec3(0.044285, 0.000000, 0.109105),
+    vec3(0.467208, 0.590890, 0.237484)
+);
+
+// Normals.
+vec3 mediumBladeNormalsLOD[3] = vec3[](
+    vec3(0.709483, -0.591154, 0.383628),
+    vec3(0.709483, -0.591154, 0.383628),
+    vec3(0.709483, -0.591154, 0.383628)
+);
+
+// Output medium blade 3.
+void CreateMediumBladeLOD(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBladeNormalsLOD[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 3; i++)
+    {
+        vec4 pos = vec4(position + mediumBladeLOD[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = mediumBladeTCLOD[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 3
+
+// Positions.
+vec3 mediumBlade2LOD[3] = vec3[](
+    vec3(-0.050567, 0.000000, -0.100489),
+    vec3(0.125892, 0.000000, -0.100489),
+    vec3(0.037662, 0.590890, -0.533572)
+);
+
+// Normals.
+vec3 mediumBlade2NormalsLOD[3] = vec3[](
+    vec3(0.000000, -0.591154, -0.806559),
+    vec3(0.000000, -0.591154, -0.806559),
+    vec3(0.000000, -0.591154, -0.806559)
+);
+
+// Output medium blade 3.
+void CreateMediumBlade2LOD(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBlade2NormalsLOD[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 3; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade2LOD[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = mediumBladeTCLOD[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 4
+
+// Positions.
+vec3 tallBlade2[5] = vec3[](
+    vec3(-0.031536, 0.000000, 0.121842),
+    vec3(-0.180250, 0.000000, 0.026857),
+    vec3(-0.056069, 0.486083, 0.148819),
+    vec3(-0.194410, 0.486083, 0.060459),
+    vec3(-0.227791, 0.999042, 0.265198)
+);
+
+// Texcoords.
+vec2 tallBladeTCLOD[5] = vec2[](
+    vec2(0.999982, -0.000091),
+    vec2(0.000018, -0.000091),
+    vec2(0.040306, -0.517223),
+    vec2(0.959694, -0.517223),
+    vec2(0.500000, -0.999993)
+);
+// Normals.
+vec3 tallBlade2NormalsLOD[5] = vec3[](
+    vec3(-0.536818, -0.073739, 0.840470),
+    vec3(-0.536818, -0.073739, 0.840470),
+    vec3(-0.526782, -0.205611, 0.824757),
+    vec3(-0.526782, -0.205611, 0.824757),
+    vec3(-0.504604, -0.348166, 0.790034)
+);
+
+// Output medium blade 3.
+void CreateTallBlade2LOD(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, tallBlade2NormalsLOD[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + tallBlade2[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = tallBladeTCLOD[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 4
+
+// Positions.
+vec3 tallBlade[5] = vec3[](
+    vec3(-0.012083, 0.000000, -0.092030),
+    vec3(-0.004985, 0.000000, 0.084286),
+    vec3(0.024077, 0.486083, -0.087327),
+    vec3(0.030679, 0.486083, 0.076692),
+    vec3(0.217739, 0.999042, -0.012981)
+);
+
+// Normals.
+vec3 tallBladeNormalsLOD[5] = vec3[](
+    vec3(0.996470, -0.073739, -0.040114),
+    vec3(0.996470, -0.073739, -0.040114),
+    vec3(0.977842, -0.205611, -0.039364),
+    vec3(0.977842, -0.205611, -0.039364),
+    vec3(0.936674, -0.348166, -0.037707)
+);
+
+// Output medium blade 3.
+void CreateTallBladeLOD(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, tallBladeNormalsLOD[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + tallBlade[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = tallBladeTCLOD[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+
+// LOD 0 cluster.
+
+// DENSITY 0
+
+// Positions.
+vec3 mediumBlade3[5] = vec3[](
+    vec3(-0.146905, 0, 0.033582),
+    vec3(-0.027772, 0, -0.096591),
+    vec3(-0.220092, 0.341586, -0.050081),
+    vec3(-0.117577, 0.341586, -0.162096),
+    vec3(-0.406822, 0.590890, -0.323893)
+);
+
+// Texcoords.
+vec2 mediumBladeTC[5] = vec2[](
+    vec2(0.999992, -0.000006),
+    vec2(0.000008, -0.000006),
+    vec2(0.930247, -0.578085),
+    vec2(0.069754, -0.578085),
+    vec2(0.500000, -0.999991)
+);
+
+// Normals.
+vec3 mediumBlade3Normals[5] = vec3[](
+    vec3(-0.701900, -0.307720, -0.642374),
+    vec3(-0.701900, -0.307720, -0.642374),
+    vec3(-0.612875, -0.556576, -0.560899),
+    vec3(-0.612875, -0.556576, -0.560899),
+    vec3(-0.451078, -0.791268, -0.412824)
+);
+
+// Output medium blade 3.
+void CreateMediumBlade3(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBlade3Normals[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade3[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = mediumBladeTC[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 2
+
+// Positions.
+vec3 mediumBlade[5] = vec3[](
+    vec3(0.128215, 0, -0.046116),
+    vec3(0.044285, 0, 0.109105),
+    vec3(0.219538, 0.341586, 0.017255),
+    vec3(0.147316, 0.341586, 0.150824),
+    vec3(0.467208, 0.590890, 0.237484)
+);
+
+// Normals.
+vec3 mediumBladeNormals[5] = vec3[](
+    vec3(0.836959, -0.307720, 0.452557),
+    vec3(0.836959, -0.307720, 0.452557),
+    vec3(0.730803, -0.556576, 0.395157),
+    vec3(0.730803, -0.556576, 0.395157),
+    vec3(0.537875, -0.791268, 0.290837)
+);
+
+// Output medium blade 3.
+void CreateMediumBlade(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBladeNormals[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = mediumBladeTC[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 3
+
+// Positions.
+vec3 mediumBlade2[5] = vec3[](
+    vec3(-0.050567, 0, -0.100489),
+    vec3(0.125892, 0, -0.100489),
+    vec3(-0.038260, 0.341586, -0.210962),
+    vec3(0.113584, 0.341586, -0.210962),
+    vec3(0.037662, 0.590890, -0.533572)
+);
+
+// Normals.
+vec3 mediumBlade2Normals[5] = vec3[](
+    vec3(0.000000, -0.307720, -0.951477),
+    vec3(0.000000, -0.307720, -0.951477),
+    vec3(0.000000, -0.556576, -0.830796),
+    vec3(0.000000, -0.556576, -0.830796),
+    vec3(0.000000, -0.791268, -0.611470)
+);
+
+// Output medium blade 2.
+void CreateMediumBlade2(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, mediumBlade2Normals[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 5; i++)
+    {
+        vec4 pos = vec4(position + mediumBlade2[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = mediumBladeTC[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 4
+
+// Positions.
+vec3 TallBlade2[7] = vec3[](    
+    vec3(-0.031536, 0.000000, 0.121842),
+    vec3(-0.180250, 0.000000, 0.026857),
+    vec3(-0.036540, 0.341586, 0.129676),
+    vec3(-0.185254, 0.341586, 0.0346916),
+    vec3(-0.075598, 0.630581, 0.167962),
+    vec3(-0.203567, 0.630581, 0.086227),
+    vec3(-0.227791, 0.999042, 0.265198)
+);
+
+// Texcoords.
+vec2 TallBladeTC[7] = vec2[](
+    vec2(0.999982, -0.000091),
+    vec2(0.000018, -0.000091),
+    vec2(0.998363, -0.367846),
+    vec2(0.001637, -0.367846),
+    vec2(0.921025, -0.666601),
+    vec2(0.078975, -0.666601),
+    vec2(0.500000, -0.999993)
+);
+
+// Normals.
+vec3 TallBlade2Normals[7] = vec3[](
+    vec3(-0.538084, -0.027204, 0.842452),
+    vec3(-0.538084, -0.027204, 0.842452),
+    vec3(-0.535390, -0.103544, 0.838234),
+    vec3(-0.535390, -0.103544, 0.838234),
+    vec3(-0.515592, -0.287285, 0.807237),
+    vec3(-0.515592, -0.287285, 0.807237),
+    vec3(-0.491835, -0.406365, 0.770043)
+);
+
+// Output tall blade 2.
+void CreateTallBlade2(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, TallBlade2Normals[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 7; i++)
+    {
+        vec4 pos = vec4(position + TallBlade2[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = TallBladeTC[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+// DENSITY 5
+
+// Positions.
+vec3 TallBlade[7] = vec3[](    
+    vec3(-0.012083, 0.000000, -0.092030),
+    vec3(-0.004985, 0.000000, 0.084286),
+    vec3(-0.002794, 0.341586, -0.092404),
+    vec3(0.004303, 0.341586, 0.083912),
+    vec3(0.050948, 0.630581, -0.082250),
+    vec3(0.057056, 0.630581, 0.069471),
+    vec3(0.217739, 0.999042, -0.012981)
+);
+
+// Normals.
+vec3 TallBladeNormals[7] = vec3[](
+    vec3(0.998821, -0.027204, -0.040208),
+    vec3(0.998821, -0.027204, -0.040208),
+    vec3(0.993820, -0.103544, -0.040007),
+    vec3(0.993820, -0.103544, -0.040007),
+    vec3(0.957070, -0.287285, -0.038527),
+    vec3(0.957070, -0.287285, -0.038527),
+    vec3(0.912972, -0.406365, -0.036752)
+);
+
+// Output tall blade 2.
+void CreateTallBlade(vec3 position, vec3 cameraPosition)
+{
+    float flip = FlipNormal(position, TallBladeNormals[2], cameraPosition);
+       
+    int i;
+    for(i = 0; i < 7; i++)
+    {
+        vec4 pos = vec4(position + TallBlade[i], 1.0);
+        gl_Position = projectionMatrix * viewMatrix * pos;  
+#ifndef USE_TERRAIN_NORMAL
+        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
+        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+#else
+        vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
+#endif
+        vert_texcoord1 = TallBladeTC[i];
+        vert_texture1 = 0;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+
+void CreateQuad(vec3 position, vec3 cameraPosition)
+{
+    // Scale.
+    vec2 scale = vec2(1.0, 1.0);
+    
+    // Local vertices.
+	vec4 vertices[4];  
+	vertices[0] = vec4(-scale.x, scale.y, 0, 1.0f);  
+	vertices[1] = vec4(scale.x, scale.y, 0, 1.0f);   
+	vertices[2] = vec4(-scale.x, -scale.y, 0, 1.0f);  
+	vertices[3] = vec4(scale.x, -scale.y, 0, 1.0f);
+
+    // Billboard basis.
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    vec3 direction = normalize(position - cameraPosition);
+    vec3 side = normalize(cross(up, direction));
+    
+    mat4 billboardTransform;
+    billboardTransform[0] = vec4(side, 0);
+    billboardTransform[1] = vec4(up, 0);
+    billboardTransform[2] = vec4(direction, 0);
+    billboardTransform[3] = vec4(position, 1.0);
+    
+    vec2 texCoords[4];
+	texCoords[0] = vec2(0,0);
+	texCoords[1] = vec2(1,0);
+	texCoords[2] = vec2(0,1);
+	texCoords[3] = vec2(1,1);
+
+    // Output four vertices.
+    int i;
+    for(i = 0; i < 4; i++)
+    {
+        gl_Position = projectionMatrix * viewMatrix * billboardTransform * vertices[i];
+        vert_texcoord1 = texCoords[i];
+        vert_normal1 = gs_normal_in[0];
+        vert_texture1 = 1;
+        EmitVertex();
+    }
+    
+    EndPrimitive();   
+}
+
+void main() 
+{
+    // Average density.
+    float avgDensity = gs_density_in[0];
+    
+    // Camera position.
+    vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
+    
+    if(gs_lod_in[0] == 0)
+    {
+        if(avgDensity > 0.1)
+        {
+            CreateMediumBlade3(gl_in[0].gl_Position.xyz, cameraPos);
+        } 
+
+        if(avgDensity > 0.3)
+        {
+            CreateMediumBlade(gl_in[0].gl_Position.xyz, cameraPos);
+        }   
+
+        if(avgDensity > 0.4)
+        {
+            CreateMediumBlade2(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+        
+        if( avgDensity > 0.6)
+        {
+            CreateTallBlade2(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+        
+        if( avgDensity > 0.8)
+        {
+            CreateTallBlade(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+    }
+    else if(gs_lod_in[0] == 1)
+    {
+        if(avgDensity > 0.1)
+        {
+            CreateMediumBlade3LOD(gl_in[0].gl_Position.xyz, cameraPos);
+        } 
+        
+        if(avgDensity > 0.3)
+        {
+            CreateMediumBladeLOD(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+        
+        if(avgDensity > 0.4)
+        {
+            CreateMediumBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+        
+        if(avgDensity > 0.6)
+        {
+            CreateTallBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+        
+        if(avgDensity > 0.8)
+        {
+            CreateTallBladeLOD(gl_in[0].gl_Position.xyz, cameraPos);
+        }
+    }
+    else
+    {
+        CreateQuad(gl_in[0].gl_Position.xyz, cameraPos);
+    }
+}

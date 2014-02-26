@@ -6,9 +6,12 @@
 namespace Render
 {
 	ShadowDevice::ShadowDevice()
+		: m_shadowJobAllocator(10000 * sizeof(ShadowJob))
 	{
 		m_depthTexture = nullptr;
 		m_numberOfShadowcasters = 0;
+		m_showShadows = true;
+		m_depthTextureArray = 0;
 	}
 
 	ShadowDevice::~ShadowDevice()
@@ -23,10 +26,12 @@ namespace Render
 		}
 	}
 
-	void ShadowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height)
+	void ShadowDevice::Init(GLRenderer* p_renderer, int p_width, int p_height, BufferInterface* p_cameraBuffer, BufferInterface* p_uniforms)
 	{
 		m_width = p_width;
 		m_height = p_height;
+		m_cameraBuffer = p_cameraBuffer;
+		m_uniforms = p_uniforms;
 
 		glGenTextures(1, &m_depthTextureArray);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_depthTextureArray);
@@ -61,8 +66,7 @@ namespace Render
 		glDrawBuffer(GL_BACK);
 		glReadBuffer(GL_BACK);
 
-		auto effect = g_context.m_resourceManager->LoadEffect("Renderer/Shadow");
-		m_technique = effect->GetTechniques()[0];
+		m_shadowEffect = g_context.m_resourceManager->LoadEffect("Renderer/Shadow");
 
 		glGenSamplers(1, &m_samplerObjectPCF);
 		glGenSamplers(1, &m_samplerObjectFloat);
@@ -89,9 +93,89 @@ namespace Render
 		m_numberOfShadowcasters++;
 	}
 
+	static bool SortShadowJobs(ShadowJob* a, ShadowJob* b)
+	{
+		return a->m_technique < b->m_technique;
+	};
+
 	void ShadowDevice::Process()
 	{
 		m_numberOfShadowcasters = 0;
+
+		// Clear framebuffers.
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers[i]);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		}
+	
+		if(m_showShadows)
+		{
+			std::sort(m_shadowJobs.begin(), m_shadowJobs.end(), SortShadowJobs);
+
+			ShadowTechnique::ShadowTechnique currentTechnique = ShadowTechnique::SHADOW_NONE;
+
+			for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
+			{
+				if((*itr)->m_technique != currentTechnique)
+				{
+					currentTechnique = (*itr)->m_technique;
+
+					std::shared_ptr<Technique> tech = m_shadowEffect->GetTechniques()[currentTechnique-1];
+					tech->GetPrograms()[0]->Apply();
+
+					for(auto param = (*itr)->m_params.begin(); param != (*itr)->m_params.end(); ++param)
+					{	
+						m_uniforms->BufferSubData(tech->m_uniformsParams[param->first], Render::GLRenderer::s_sizes[param->first], param->second);
+					}
+				}
+
+				(*itr)->m_mesh->Bind();
+
+				for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+				{
+					glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers[i]);
+					glDrawBuffers(0, NULL);
+					m_cameraBuffer->BufferSubData(0, sizeof(glm::mat4), &m_shadowcasters[0].m_viewProjections[i]);
+
+					(*itr)->m_mesh->Draw();
+				}
+	
+				(*itr)->m_mesh->Unbind();
+			}
+		}
+
+		// Deconstruct the job batch.
+		for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
+		{
+			(*itr)->~ShadowJob();
+		}
+
+		m_shadowJobAllocator.Clear();
+		m_shadowJobs.clear();	
 	}
 
+	void ShadowDevice::Resize(int p_width, int p_height)
+	{
+		if(m_depthTextureArray)
+		{
+			glDeleteTextures(1, &m_depthTextureArray);
+			m_depthTextureArray = 0;
+		}
+		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		{
+			if(m_framebuffers[i])
+			{
+				glDeleteFramebuffers(1, &m_framebuffers[i]);
+				m_framebuffers[i] = 0;
+			}
+		}
+
+		glDeleteSamplers(1, &m_samplerObjectPCF);
+		glDeleteSamplers(1, &m_samplerObjectFloat);
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_depthTextureArray);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32F, m_width, m_height, RENDER_SHADOW_CASCADES);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
 }

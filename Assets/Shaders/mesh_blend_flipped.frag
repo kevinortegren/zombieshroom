@@ -37,6 +37,7 @@ void main()
 	vec3 normal = normalize(vert_normal);	
 
 	diffuse = vec4(blendedColor.xyz, specTerm);
-	normals = normal.xy;
+    float p = sqrt(normal.z*8+8);
+    normals = normal.xy/p + 0.5;
 	glow = vec4(vec3(glow_color.xyz), 0.0f);
 }

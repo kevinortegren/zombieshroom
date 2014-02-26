@@ -106,7 +106,7 @@ namespace Render
 
 		CreateRandom1DTexture();
 
-		glActiveTexture(GL_TEXTURE0 + Render::TextureSemantic::RANDOM);
+		glActiveTexture(GL_TEXTURE0 + Render::GLRenderer::s_textureSlots[Render::TextureSemantic::RANDOM]);
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
@@ -117,6 +117,11 @@ namespace Render
 		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
 
 		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
+
+		for(int i = 0; i < RENDER_NUM_PARTICLESYSTEMS; ++i)
+		{
+			m_particleSystems[i].Init(p_renderer, i);
+		}
 	}
 
 	ParticleSystem* ParticleSystemHandler::Create(GLRenderer* p_renderer)
@@ -125,10 +130,10 @@ namespace Render
 		if(m_emptyParticleSlots.size() > 0) // Recycling of particle system slots.
 		{
 			unsigned slot = m_emptyParticleSlots.top();
-			m_emptyParticleSlots.pop();	
+			m_emptyParticleSlots.pop();
+			m_particleSystemsCount--;
 		}
 
-		m_particleSystems[slot].Init( p_renderer, slot );
 		m_particleSystemsCount++;
 
 		return &m_particleSystems[slot++];

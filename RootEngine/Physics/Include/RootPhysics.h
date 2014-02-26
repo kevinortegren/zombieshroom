@@ -100,22 +100,23 @@ namespace RootEngine
 			
 			virtual std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() = 0;
 
-			//Not final?
-			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0; 
+			//Player only related funcs
+			virtual void PlayerJump(int p_objectHandle, float p_jumpForce) = 0;
+			virtual void PlayerJumpBoost(int p_objectHandle, float p_boostPower) = 0;
 			virtual bool IsOnGround(int p_objectHandle) = 0;
 			virtual void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce) = 0;
+			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions) = 0;
+			virtual glm::vec3 GetPlayerKnockbackVector(int p_objectHandle) = 0;
+			virtual float GetPlayerVerticalVelocity(int p_objectHandle) = 0;
 
 			//Instant methods
 			virtual float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos) = 0;
 			virtual void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 			virtual void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius) = 0;
+			virtual void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length) = 0;
 
-			//Legacy functions
-			virtual void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0; ///Legacy func, will be removed before release
-			virtual int* AddStaticObjectToWorld( void* p_entity) = 0; ///Legacy func, will be removed before release
-			virtual int* AddDynamicObjectToWorld(std::string p_modelHandle, void* p_entity,  glm::vec3 p_position, glm::quat p_rotation, float p_mass) = 0;///Legacy func, will be removed before release
-			virtual int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions) = 0;///Legacy func, will be removed before release
-			virtual int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo) = 0;///Legacy func, will be removed before release
+			
+			
 
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
@@ -145,6 +146,7 @@ namespace RootEngine
 			virtual glm::mat4* GetBones(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
+			
 			//Setters
 			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
@@ -172,17 +174,19 @@ namespace RootEngine
 			
 			void Update(float p_dt);
 			
-			void PlayerMoveXZ(int p_objectHandle, glm::vec3 p_direction);
+			
 		
 			void PlayerJump(int p_objectHandle, float p_jumpForce); 
+			void PlayerJumpBoost(int p_objectHandle, float p_boostPower);
 			bool IsOnGround(int p_objectHandle);
 			void KnockbackObject(int p_objectHandle, glm::vec3 p_pushDirection, float p_pushForce); 
-			void SetDynamicObjectVelocity(int p_objectHandle, glm::vec3 p_velocity); 
+			
 			void EnableDebugDraw(bool p_enabled);
 
 			float RayTest(glm::vec3 p_startPos, glm::vec3 p_endPos);
 			void CastRay(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 			void RadiusCheck(int p_objectHandle, glm::vec3 p_pos, float p_radius);
+			void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
 
@@ -198,10 +202,9 @@ namespace RootEngine
 			void BindHullShape(int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld);
 			void BindNoShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation);
 
-			int* AddStaticObjectToWorld( void* p_entityId);
-			int* AddDynamicObjectToWorld(std::string p_modelHandle,void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			
 			int* AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions);
-			int* AddAbilityToWorld(AbilityPhysicsInfo p_abilityInfo);
+
 
 			//Getters
 			glm::vec3 GetPos(int p_objectHandle);	
@@ -215,6 +218,8 @@ namespace RootEngine
 			std::map<void*, RootForce::CollisionInfo>* GetCollisionVector(int p_objectHandle);
 			std::string GetPhysicsModelHandle(int p_objectHandle);
 			glm::quat GetOrientation(int p_objectHandle);
+			glm::vec3 GetPlayerKnockbackVector(int p_objectHandle);
+			float GetPlayerVerticalVelocity(int p_objectHandle);
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
@@ -240,10 +245,7 @@ namespace RootEngine
 			bool DoesObjectExist(int p_objectHandle);
 			bool DoesUserPointerExist( int p_objectHandle );
 			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld);
-			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld);
-			btRigidBody* CreateSphere(float p_radius, float p_mass, glm::vec3 p_position);
-			btRigidBody* CreateCone(float p_radius, float p_height, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
-			btRigidBody* CreateCylinder(float p_radius, float p_height,  glm::vec3 p_position, glm::quat p_rotation, float p_mass);
+			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, const btTransform& p_transform);
 			btRigidBody* CreateMesh(std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btCollisionShape* CreateShape(ShapeStruct p_shapeStruct);
 			RootPhysics();

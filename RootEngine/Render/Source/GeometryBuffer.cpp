@@ -36,6 +36,8 @@ namespace Render
 
 		m_diffuseTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 		m_normalsTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RG16);
+		m_normalsTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		m_normalsTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		m_glowTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 		m_backgroundTexture->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 

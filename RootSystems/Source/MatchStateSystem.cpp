@@ -59,7 +59,7 @@ namespace RootForce
 		std::string scoreString = "[";
 		for(auto pair : g_networkEntityMap)
 		{
-			if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != 0 || !pair.second)
+			if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY || !pair.second)
 				continue;
 
 			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
@@ -110,7 +110,7 @@ namespace RootForce
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
 		}
-		g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[deadNetworkID])->Deaths ++;
+		g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Deaths ++;
 	}
 
 	

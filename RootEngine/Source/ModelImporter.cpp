@@ -103,8 +103,6 @@ namespace RootEngine
 			return;
 		}
 
-		
-
 		Render::MeshInterface* mesh = m_context->m_renderer->CreateMesh();
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
@@ -202,9 +200,6 @@ namespace RootEngine
 			mesh->CreateVertexBuffer1P1UV(&vertices[0], vertices.size());	
 		}
 
-		
-		
-
 		if(p_aiMesh->HasFaces())
 		{
 			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
@@ -239,11 +234,19 @@ namespace RootEngine
 		mesh->SetPrimitiveType(GL_TRIANGLES);
 
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::MASS_DATA_PRINT, "Mesh created with %d faces ", p_aiMesh->mNumFaces);
-
 		m_context->m_resourceManager->m_meshes[handle] = mesh;
 
 		m_model->m_meshes[0] = mesh;
-		m_model->m_meshes[1] = nullptr;
+		
+		// Create 1P mesh for shadows.
+		Render::MeshInterface* mesh1P = m_context->m_renderer->CreateMesh();
+		mesh1P->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
+		mesh1P->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
+		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&positions[0]), positions.size());
+		mesh1P->SetElementBuffer(mesh->GetElementBuffer());
+		mesh1P->SetPrimitiveType(GL_TRIANGLES);
+
+		m_model->m_meshes[1] = mesh1P;
 	}
 
 	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )

@@ -39,6 +39,30 @@ namespace AbilityEditorNameSpace
 			p_entity->SetName(QString::fromStdString(abilityName));
 			//Entity* entity = new Entity(abilityName.c_str());
 			
+			//Charges
+			int charges;
+			doc[counter]["Charges"] >> charges;
+			counter++;
+			p_entity->SetCharges(charges);
+
+			//Charging Time
+			float chargingTime;
+			doc[counter]["ChargeTime"] >> chargingTime;
+			counter++;
+			p_entity->SetChargeTime(chargingTime);
+
+			//Channeling Time
+			float channelingTime;
+			doc[counter]["ChannelingTime"] >> channelingTime;
+			counter++;
+			p_entity->SetChannelingTime(channelingTime);
+
+			//Duration
+			float duration;
+			doc[counter]["Duration"] >> duration;
+			counter++;
+			p_entity->SetDuration(duration);
+
 			//Cooldown
 			float cooldown;
 			doc[counter]["Cooldown"] >> cooldown;
@@ -134,38 +158,63 @@ namespace AbilityEditorNameSpace
 
 	AbilityComponents::MainComponent* Importer::ImportComponents(const YAML::Node& p_node, unsigned int p_type)
 	{
-		//Todo, to make it slightly more simple, aka easier to put data into the components, fix their constructors to take arguments and that cool stuff
 
-		
 		switch (p_type)
 		{
-		case AbilityComponents::ComponentType::TRANSFORM:
+		case AbilityComponents::ComponentType::STARTPOS:
 			{
-				AbilityComponents::Transform* tempcomp = new AbilityComponents::Transform();
-				if(p_node.FindValue("Rotation"))
+				AbilityComponents::StartPos* tempcomp = new AbilityComponents::StartPos();
+				if(p_node.FindValue("StartPos"))
 				{
-					float x,y,z;
-					p_node["Rotation"][0] >> x;
-					p_node["Rotation"][1] >> y;
-					p_node["Rotation"][2] >> z;
-					tempcomp->m_rotation = QVector3D(x,y,z);
+					int temp;
+					p_node["StartPos"] >> temp;
+					tempcomp->m_startPos = (AbilityComponents::StartPos::pos)temp;
 				}
-				if(p_node.FindValue("scale"))
+				if(p_node.FindValue("AbsoluteStartPos"))
 				{
 					float x,y,z;
-					p_node["scale"][0] >> x;
-					p_node["scale"][1] >> y;
-					p_node["scale"][2] >> z;
-					tempcomp->m_scale = QVector3D(x,y,z);
+					p_node["AbsoluteStartPos"][0] >> x;
+					p_node["AbsoluteStartPos"][1] >> y;
+					p_node["AbsoluteStartPos"][2] >> z;
+					tempcomp->m_absolutePos = QVector3D(x,y,z);
 				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
-		case AbilityComponents::ComponentType::COLLISION:			
+		case AbilityComponents::ComponentType::TARGPOS:
 			{
-				AbilityComponents::Collision* tempcomp = new AbilityComponents::Collision();
+				AbilityComponents::TargetPos* tempcomp = new AbilityComponents::TargetPos();
+				if(p_node.FindValue("TargetPos"))
+				{
+					int temp;
+					p_node["TargetPos"] >> temp;
+					tempcomp->m_targPos = (AbilityComponents::TargetPos::pos)temp;
+				}
+				if(p_node.FindValue("AbsoluteTargetPos"))
+				{
+					float x,y,z;
+					p_node["AbsoluteTargetPos"][0] >> x;
+					p_node["AbsoluteTargetPos"][1] >> y;
+					p_node["AbsoluteTargetPos"][2] >> z;
+					tempcomp->m_absolutePos = QVector3D(x,y,z);
+				}
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
-				//Nothing in this one yet, might never be, might be removed, who knows
+			}
+			break;
+		case AbilityComponents::ComponentType::VELOCITY:
+			{
+				AbilityComponents::Velocity* tempcomp = new AbilityComponents::Velocity();
+				if(p_node.FindValue("Direction"))
+				{
+					int temp;
+					p_node["Direction"] >> temp;
+					tempcomp->m_direction = (AbilityComponents::Velocity::dir)temp;
+				}
+				if(p_node.FindValue("Speed"))
+				{
+					p_node["Speed"] >> tempcomp->m_speed;
+				}
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
 		case AbilityComponents::ComponentType::ABILITYMODEL:
@@ -215,40 +264,116 @@ namespace AbilityEditorNameSpace
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
-		case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+		case AbilityComponents::ComponentType::DAMAGE:
 			{
-				AbilityComponents::PhysicsControlled* tempcomp = new AbilityComponents::PhysicsControlled();
-				if(p_node.FindValue("Speed"))
-					p_node["Speed"] >> tempcomp->m_speed;
-				if(p_node.FindValue("Mass"))
-					p_node["Mass"] >> tempcomp->m_mass;
-				if(p_node.FindValue("Gravity"))
+				AbilityComponents::Damage* tempcomp = new AbilityComponents::Damage();
+				if(p_node.FindValue("DamagePlayers"))
 				{
-					float x,y,z;
-					p_node["Gravity"][0] >> x;
-					p_node["Gravity"][1] >> y;
-					p_node["Gravity"][2] >> z;
-					tempcomp->m_gravity = QVector3D(x,y,z);
+					int temp;
+					p_node["DamagePlayers"] >> temp;
+					tempcomp->m_affectedPlayers = (AbilityComponents::Damage::affected)temp;
 				}
+				if(p_node.FindValue("Damage"))
+					p_node["Damage"] >> tempcomp->m_damage;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
-			break;		
-		case AbilityComponents::ComponentType::OFFENSIVEABILITY:
+			break;
+		case AbilityComponents::ComponentType::KNOCKBACK:
 			{
-				AbilityComponents::OffensiveAbility* tempcomp = new AbilityComponents::OffensiveAbility();
-				if(p_node.FindValue("Damage"))
-					p_node["Damage"] >> tempcomp->m_damage;
-				if(p_node.FindValue("KnockbackPower"))
-					p_node["KnockbackPower"] >> tempcomp->m_knockbackPower;
+				AbilityComponents::Knockback* tempcomp = new AbilityComponents::Knockback();
+				if(p_node.FindValue("KnockbackPlayers"))
+				{
+					int temp;
+					p_node["KnockbackPlayers"] >> temp;
+					tempcomp->m_affectedPlayers = (AbilityComponents::Knockback::affected)temp;
+				}
+				if(p_node.FindValue("Knockback"))
+					p_node["Knockback"] >> tempcomp->m_knockback;
+
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
-		case AbilityComponents::ComponentType::EXPLOSIVE:
+		case AbilityComponents::ComponentType::STATCHANGECASTER:
 			{
-				AbilityComponents::Explosive* tempcomp = new AbilityComponents::Explosive();
-				if(p_node.FindValue("Radius"))
-					p_node["Radius"] >> tempcomp->m_radius;
+				AbilityComponents::StatChangeCaster* tempcomp = new AbilityComponents::StatChangeCaster();
+				if(p_node.FindValue("CasterSpeed"))
+					p_node["CasterSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("CasterJumpHeight"))
+					p_node["CasterJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("CasterKnockbackResistance"))
+					p_node["CasterKnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::STATCHANGETARGET:
+			{
+				AbilityComponents::StatChangeTarget* tempcomp = new AbilityComponents::StatChangeTarget();
+				if(p_node.FindValue("TargetSpeed"))
+					p_node["TargetSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("TargetJumpHeight"))
+					p_node["TargetJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("TargetKnockbackResistance"))
+					p_node["TargetKnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::PHYSICS:
+			{
+				AbilityComponents::Physics* tempcomp = new AbilityComponents::Physics();
+				if(p_node.FindValue("PhysicsMass"))
+					p_node["PhysicsMass"] >> tempcomp->m_mass;
+				if(p_node.FindValue("PhysicsGravity"))
+				{
+					float x,y,z;
+					p_node["PhysicsGravity"][0] >> x;
+					p_node["PhysicsGravity"][1] >> y;
+					p_node["PhysicsGravity"][2] >> z;
+					tempcomp->m_gravity = QVector3D(x,y,z);
+				}
+				if(p_node.FindValue("PhysicsCollide"))
+					p_node["PhysicsCollide"] >> tempcomp->m_collide;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;	
+		case AbilityComponents::ComponentType::CHARGEVARIABLES:
+			{
+				AbilityComponents::ChargeVariables* tempcomp = new AbilityComponents::ChargeVariables();
+				if(p_node.FindValue("ChargeRequired"))
+					p_node["ChargeRequired"] >> tempcomp->m_chargeReq;
+				if(p_node.FindValue("ChargeFactor"))
+					p_node["ChargeFactor"] >> tempcomp->m_chargeFactor;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::WATER:
+			{
+				AbilityComponents::Water* tempcomp = new AbilityComponents::Water();
+				if(p_node.FindValue("WaterPower"))
+					p_node["WaterPower"] >> tempcomp->m_power;
+				if(p_node.FindValue("WaterInterval"))
+					p_node["WaterInterval"] >> tempcomp->m_interval;
+				if(p_node.FindValue("WaterRadius"))
+					p_node["WaterRadius"] >> tempcomp->m_radius;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::SOUND:
+			{
+				AbilityComponents::Sound* tempcomp = new AbilityComponents::Sound();
+				if(p_node.FindValue("SoundName"))
+					p_node["SoundName"] >> tempcomp->m_soundName;
+				if(p_node.FindValue("SoundVolume"))
+					p_node["SoundVolume"] >> tempcomp->m_volume;
+				if(p_node.FindValue("SoundRangeMin"))
+					p_node["SoundRangeMin"] >> tempcomp->m_rangeMin;
+				if(p_node.FindValue("SoundRangeMax"))
+					p_node["SoundRangeMax"] >> tempcomp->m_rangeMax;
+				if(p_node.FindValue("SoundLoop"))
+					p_node["SoundLoop"] >> tempcomp->m_loop;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

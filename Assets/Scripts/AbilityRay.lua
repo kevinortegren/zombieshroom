@@ -29,10 +29,10 @@ function AbilityRay.OnCreate (userId, actionId)
 	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Missile handle: "..collisionComp:GetHandle());
 	physicsComp:ShootRay(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), Vec3.New(frontVec.x, frontVec.y, frontVec.z), 1000);
- 	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
+	physicsComp:SetVelocity(collisionComp, Vec3.New(frontVec.x * 50, frontVec.y * 50, frontVec.z * 50));
 	transformComp:SetPos(posVec);
 	if Global.IsClient then
-  	local particleComp = ParticleEmitter.New(self, "AbilityRay");
+		local particleComp = ParticleEmitter.New(self, "AbilityRay");
 	end
 	local playerComponent = playerEnt:GetPlayerComponent();
 	playerComponent:StartCooldown(playerComponent:GetSelectedAbility(), AbilityRay.cooldown);

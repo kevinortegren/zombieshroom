@@ -17,7 +17,7 @@
           slot: 2
         - name: g_ShadowDepthPCF
           slot: 3
-        - name: g_Glow
+        - name: g_GlowTrans
           slot: 4
         - name: g_Input
           slot: 5

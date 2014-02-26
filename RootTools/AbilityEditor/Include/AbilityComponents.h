@@ -24,15 +24,21 @@ namespace AbilityEditorNameSpace
 		{
 			enum ComponentType
 			{
-				TRANSFORM,
-				COLLISION,
-				ABILITYMODEL,
-				COLLISIONSHAPE,
-				ABILITYPARTICLE,
-				PHYSICSCONTROLLED,
-				OFFENSIVEABILITY,
-				EXPLOSIVE,
-				END_OF_ENUM
+				STARTPOS, //done
+				TARGPOS, //Needs system
+				VELOCITY, //done
+				ABILITYMODEL, //done
+				COLLISIONSHAPE, //done
+				ABILITYPARTICLE, //done
+				DAMAGE, //done
+				KNOCKBACK, //done
+				STATCHANGECASTER, //Still needs script implementation
+				STATCHANGETARGET, //Still needs script implementation
+				PHYSICS, //done
+				CHARGEVARIABLES, //done
+				WATER, //done
+				SOUND, //done
+				END_OF_ENUM //TODO : EntityChange
 			};
 		}
 		const struct ComponentNameList
@@ -40,14 +46,20 @@ namespace AbilityEditorNameSpace
 			QStringList m_compNames;
 			ComponentNameList()
 			{
-				m_compNames.append("Transform");
-				m_compNames.append("Collision");
+				m_compNames.append("Start Position");
+				m_compNames.append("Target Position [WIP]");
+				m_compNames.append("Velocity");
 				m_compNames.append("Ability Model");
 				m_compNames.append("Collision Shape");
 				m_compNames.append("Ability Particle");
-				m_compNames.append("Physics Controlled");
-				m_compNames.append("Offensive Ability");
-				m_compNames.append("Explosive");
+				m_compNames.append("Damage");
+				m_compNames.append("Knockback");
+				m_compNames.append("Stat Change (Caster) [WIP]");
+				m_compNames.append("Stat Change (Target) [WIP]");
+				m_compNames.append("Physics");
+				m_compNames.append("Water Disturb");
+				m_compNames.append("Sound");
+				m_compNames.append("Charge Variables"); 
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -58,105 +70,239 @@ namespace AbilityEditorNameSpace
 			{
 				m_type = p_type;
 			}
-			virtual void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;			
+			virtual void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;
 			virtual void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) = 0;
 		};
 	
-		////////////////////////////////////////////////////////On create components ////////////////////////////////////////////////////////
-		struct Transform: MainComponent
+
+		struct StartPos: MainComponent
 		{ 
-			QVector3D m_rotation;
-			QVector3D m_scale;
-			Transform(QVector3D p_rotation = QVector3D(0,0,0), QVector3D p_scale = QVector3D(1,1,1)): MainComponent(ComponentType::TRANSFORM)
+			enum pos
 			{
-				m_rotation = p_rotation;
-				m_scale = p_scale;
+				ONCASTER,
+				UNDERCASTER,
+				ENEMYPLAYER,
+				FRIENDPLAYER,
+				ABSOLUTE,
+				END_OF_ENUM
+			};
+
+			std::map<pos, QString> m_enumToText;
+			pos m_startPos;
+			QVector3D m_absolutePos;
+			StartPos(pos p_pos = pos::ONCASTER, QVector3D p_startPos = QVector3D(0,0,0)): MainComponent(ComponentType::STARTPOS)
+			{
+				m_enumToText[ONCASTER] = "On Caster";
+				m_enumToText[UNDERCASTER] = "Under Caster";
+				m_enumToText[ENEMYPLAYER] = "Enemy Player";
+				m_enumToText[FRIENDPLAYER] = "Friendly Player";
+				m_enumToText[ABSOLUTE] = "Absolute";
+				m_absolutePos = p_startPos;
 			}
-			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
-				QtVariantProperty* rotation, *scale , *x, *y, *z;
+				QtVariantProperty* position, *x, *y, *z; 
 				QList<QtProperty*> list;
 				QString combinedValue;
-				//Show rotation vector
-				rotation = p_propMan->addProperty(QVariant::String, "Rotation");
-				x = p_propMan->addProperty(QVariant::Double, "x");
-				y = p_propMan->addProperty(QVariant::Double, "y");
-				z = p_propMan->addProperty(QVariant::Double, "z");
-				p_propMan->setValue(x, m_rotation.x());
-				p_propMan->setValue(y, m_rotation.y());
-				p_propMan->setValue(z, m_rotation.z());
-				rotation->addSubProperty(x);
-				rotation->addSubProperty(y);
-				rotation->addSubProperty(z);
-				list = rotation->subProperties();
-				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
-				p_propMan->setValue(rotation,combinedValue);
 
-				//show Scale vector
-				scale = p_propMan->addProperty(QVariant::String, "Scale");
+				QtProperty* enumPos;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(pos)i];
+				}
+				enumPos = enumMan->addProperty("Start position");
+				enumMan->setEnumNames(enumPos,enumTypes);
+				enumMan->setValue(enumPos, m_startPos);
+
+				position = p_propMan->addProperty(QVariant::String, "Absolute (if selected)");
 				x = p_propMan->addProperty(QVariant::Double, "x");
 				y = p_propMan->addProperty(QVariant::Double, "y");
 				z = p_propMan->addProperty(QVariant::Double, "z");
-				p_propMan->setValue(x, m_scale.x());
-				p_propMan->setValue(y, m_scale.y());
-				p_propMan->setValue(z, m_scale.z());		
-				scale->addSubProperty(x);
-				scale->addSubProperty(y);
-				scale->addSubProperty(z);
-				list = scale->subProperties();
+				p_propMan->setValue(x, m_absolutePos.x());
+				p_propMan->setValue(y, m_absolutePos.y());
+				p_propMan->setValue(z, m_absolutePos.z());
+				position->addSubProperty(x);
+				position->addSubProperty(y);
+				position->addSubProperty(z);
+				list = position->subProperties();
 				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
-				p_propMan->setValue(scale,combinedValue);
+				p_propMan->setValue(position,combinedValue);
 
 				//Add to browser widget
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(rotation);
-				p_propBrows->addProperty(scale);
+				p_propBrows->addProperty(enumPos);
+				p_propBrows->addProperty(position);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				
-				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7
-				subprops = props.at(0)->subProperties();
-				for(int i = 0; i < subprops.size(); i++)
+				std::map<pos, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
 				{
-					m_rotation[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+					if(it->second == props.at(0)->valueText())
+					{
+						m_startPos = it->first;
+					}
 				}
 				subprops = props.at(1)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
-					m_scale[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+					m_absolutePos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
-			
-
 			}
 		};
 
-		struct Collision : MainComponent
-		{
-			bool m_collidesWithWorld;
-			Collision(bool p_colWithWorld = true) : MainComponent(ComponentType::COLLISION)
+		struct TargetPos: MainComponent
+		{ 
+			enum pos
 			{
-				m_collidesWithWorld = p_colWithWorld;
-			}
-			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
-			{
-				QtVariantProperty* collidesWithWorld;
+				ENEMYPLAYER,
+				FRIENDLYPLAYER,
+				ONAIM,
+				ABSOLUTE,
+				END_OF_ENUM
+			};
 
-				collidesWithWorld = p_propMan->addProperty(QVariant::Bool, "Collides with world" );
-				p_propMan->setValue(collidesWithWorld, m_collidesWithWorld);
+			std::map<pos, QString> m_enumToText;
+			pos m_targPos;
+			QVector3D m_absolutePos;
+			TargetPos(pos p_pos = pos::ENEMYPLAYER, QVector3D p_targPos = QVector3D(0,0,0)): MainComponent(ComponentType::TARGPOS)
+			{
+				m_enumToText[ENEMYPLAYER] = "Enemy Player";
+				m_enumToText[FRIENDLYPLAYER] = "Friendly Player";
+				m_enumToText[ONAIM] = "On Aim";
+				m_enumToText[ABSOLUTE] = "Absolute";
+				m_absolutePos = p_targPos;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
+			{
+				QtVariantProperty* position, *x, *y, *z; 
+				QList<QtProperty*> list;
+				QString combinedValue;
+
+				QtProperty* enumPos;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(pos)i];
+				}
+				enumPos = enumMan->addProperty("Target position");
+				enumMan->setEnumNames(enumPos,enumTypes);
+				enumMan->setValue(enumPos, m_targPos);
+
+				position = p_propMan->addProperty(QVariant::String, "Absolute (if selected)");
+				x = p_propMan->addProperty(QVariant::Double, "x");
+				y = p_propMan->addProperty(QVariant::Double, "y");
+				z = p_propMan->addProperty(QVariant::Double, "z");
+				p_propMan->setValue(x, m_absolutePos.x());
+				p_propMan->setValue(y, m_absolutePos.y());
+				p_propMan->setValue(z, m_absolutePos.z());
+				position->addSubProperty(x);
+				position->addSubProperty(y);
+				position->addSubProperty(z);
+				list = position->subProperties();
+				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
+				p_propMan->setValue(position,combinedValue);
+
+				//Add to browser widget
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(collidesWithWorld);
+				p_propBrows->addProperty(enumPos);
+				p_propBrows->addProperty(position);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_collidesWithWorld = props.at(0)->valueText().compare("True") == 0 ? true : false;
+				std::map<pos, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
+				{
+					if(it->second == props.at(0)->valueText())
+					{
+						m_targPos = it->first;
+					}
+				}
+				subprops = props.at(1)->subProperties();
+				for(int i = 0; i < subprops.size(); i++)
+				{
+					m_absolutePos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
+				}
 			}
 		};
 
+		struct Velocity: MainComponent
+		{ 
+			enum dir
+			{
+				FORWARD,
+				BACKWARD,
+				UP,
+				DOWN,
+				LEFT,
+				RIGHT,
+				END_OF_ENUM
+			};
+
+			std::map<dir, QString> m_enumToText;
+			dir m_direction;
+			float m_speed;
+			Velocity(dir p_dir = dir::FORWARD, float p_speed = 1.0f): MainComponent(ComponentType::VELOCITY)
+			{
+				m_enumToText[FORWARD] = "Forward";
+				m_enumToText[BACKWARD] = "Backward";
+				m_enumToText[UP] = "Up";
+				m_enumToText[DOWN] = "Down";
+				m_enumToText[LEFT] = "Left";
+				m_enumToText[RIGHT] = "Right";
+				m_speed = p_speed;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
+			{
+				QtVariantProperty* speed;
+
+				QtProperty* enumDir;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(dir)i];
+				}
+				enumDir = enumMan->addProperty("Direction");
+				enumMan->setEnumNames(enumDir,enumTypes);
+				enumMan->setValue(enumDir, m_direction);
+
+				speed = p_propMan->addProperty(QVariant::Double, "Speed");
+				p_propMan->setValue(speed, m_speed);
+
+				//Add to browser widget
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(enumDir);
+				p_propBrows->addProperty(speed);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				std::map<dir, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
+				{
+					if(it->second == props.at(0)->valueText())
+					{
+						m_direction = it->first;
+					}
+				}
+				m_speed = p_propMan->variantProperty(props.at(1))->value().toFloat();
+			}
+		};
 
 		struct AbilityModel : MainComponent
 		{
@@ -325,29 +471,220 @@ namespace AbilityEditorNameSpace
 			}
 		};
 
-		struct PhysicsControlled : MainComponent
+		struct Damage : MainComponent
 		{
-			float m_speed;
-			float m_mass;
-			QVector3D m_gravity;
-			PhysicsControlled(float p_speed = 0.0f, float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f)) : MainComponent(ComponentType::PHYSICSCONTROLLED)
+			enum affected
 			{
-				m_speed = p_speed;
-				m_mass = p_mass;
-				m_gravity =	p_gravity;
+				ENEMIES,
+				FRIENDLIES,
+				EVERYONE,
+				END_OF_ENUM
+			};
+
+			std::map<affected, QString> m_enumToText;
+			affected m_affectedPlayers;
+			float m_damage;
+			Damage(affected p_collisionShape = affected::ENEMIES, float p_damage = 1.0f) : MainComponent(ComponentType::DAMAGE)
+			{
+				m_affectedPlayers = p_collisionShape;
+				m_damage = p_damage;
+				m_enumToText[ENEMIES] = "Enemies";
+				m_enumToText[FRIENDLIES] = "Friendlies";
+				m_enumToText[EVERYONE] = "Everyone";
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *mass, *gravity, *x, *y, *z;
-				QList<QtProperty*> list;
-				QString combinedValue;
+				QtVariantProperty* damage;
+				QtProperty* affectedPlayers;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(affected)i];
+				}
+				affectedPlayers = enumMan->addProperty("Affected Players");
+				enumMan->setEnumNames(affectedPlayers,enumTypes);
+				enumMan->setValue(affectedPlayers, m_affectedPlayers);
+
+				damage = p_propMan->addProperty(QVariant::Double, "Damage");
+				p_propMan->setValue(damage, m_damage);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
+				p_propBrows->addProperty(affectedPlayers);
+				p_propBrows->addProperty(damage);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				bool foundShape = false;
+				std::map<affected, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
+				{
+					if(it->second == props.at(0)->valueText())
+					{
+						m_affectedPlayers = it->first;
+					}
+				}
+				m_damage = p_propMan->variantProperty(props.at(1))->value().toFloat();
+			}
+		};
+
+		struct Knockback : MainComponent
+		{
+			enum affected
+			{
+				ENEMIES,
+				FRIENDLIES,
+				EVERYONE,
+				END_OF_ENUM
+			};
+
+			std::map<affected, QString> m_enumToText;
+			affected m_affectedPlayers;
+			float m_knockback;
+			Knockback(affected p_collisionShape = affected::ENEMIES, float p_knockback = 1.0f) : MainComponent(ComponentType::KNOCKBACK)
+			{
+				m_affectedPlayers = p_collisionShape;
+				m_knockback = p_knockback;
+				m_enumToText[ENEMIES] = "Enemies";
+				m_enumToText[FRIENDLIES] = "Friendlies";
+				m_enumToText[EVERYONE] = "Everyone";
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* knockback;
+				QtProperty* affectedPlayers;
+				QStringList enumTypes;
+				QtEnumPropertyManager* enumMan = new QtEnumPropertyManager;
+				QtEnumEditorFactory* enumFac = new QtEnumEditorFactory;
+				for(unsigned int i = 0; i < m_enumToText.size(); i++)
+				{
+					enumTypes << m_enumToText[(affected)i];
+				}
+				affectedPlayers = enumMan->addProperty("Affected Players");
+				enumMan->setEnumNames(affectedPlayers,enumTypes);
+				enumMan->setValue(affectedPlayers, m_affectedPlayers);
+
+				knockback = p_propMan->addProperty(QVariant::Double, "Knockback");
+				p_propMan->setValue(knockback, m_knockback);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->setFactoryForManager(enumMan, enumFac);
+				p_propBrows->addProperty(affectedPlayers);
+				p_propBrows->addProperty(knockback);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				bool foundShape = false;
+				std::map<affected, QString>::const_iterator it;
+				for(it = m_enumToText.begin(); it != m_enumToText.end(); ++it)
+				{
+					if(it->second == props.at(0)->valueText())
+					{
+						m_affectedPlayers = it->first;
+					}
+				}
+				m_knockback = p_propMan->variantProperty(props.at(1))->value().toFloat();
+			}
+		};
+
+		struct StatChangeCaster : MainComponent
+		{
+			float m_speed, m_jumpHeight, m_knockbackResistance;
+			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
+			{
+				m_speed = p_speed;
+				m_jumpHeight = p_jumpHeight;
+				m_knockbackResistance = p_knockbackResistance;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+
 				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
 				p_propMan->setValue(speed, m_speed);
+
+				jumpHeight = p_propMan->addProperty(QVariant::Double, "JumpHeight" );
+				p_propMan->setValue(jumpHeight, m_jumpHeight);
+
+				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
+				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(speed);
+				p_propBrows->addProperty(jumpHeight);
+				p_propBrows->addProperty(knockbackResistance);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+			}
+		};
+
+		struct StatChangeTarget : MainComponent
+		{
+			float m_speed, m_jumpHeight, m_knockbackResistance;
+			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
+			{
+				m_speed = p_speed;
+				m_jumpHeight = p_jumpHeight;
+				m_knockbackResistance = p_knockbackResistance;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+
+				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
+				p_propMan->setValue(speed, m_speed);
+
+				jumpHeight = p_propMan->addProperty(QVariant::Double, "JumpHeight" );
+				p_propMan->setValue(jumpHeight, m_jumpHeight);
+
+				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
+				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(speed);
+				p_propBrows->addProperty(jumpHeight);
+				p_propBrows->addProperty(knockbackResistance);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+			}
+		};
+
+		struct Physics : MainComponent
+		{
+			float m_mass;
+			QVector3D m_gravity;
+			bool m_collide;
+			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true) : MainComponent(ComponentType::PHYSICS)
+			{
+				m_mass = p_mass;
+				m_gravity =	p_gravity;
+				m_collide = p_collide;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide;
+				QList<QtProperty*> list;
+				QString combinedValue;
 				mass = p_propMan->addProperty(QVariant::Double, "Mass");
 				p_propMan->setValue(mass, m_mass);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(mass);
-				p_propBrows->addProperty(speed);
 
 				//Show gravity vector
 				gravity = p_propMan->addProperty(QVariant::String, "Gravity");
@@ -364,83 +701,141 @@ namespace AbilityEditorNameSpace
 				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
 				p_propMan->setValue(gravity,combinedValue);
 				p_propBrows->addProperty(gravity);
+
+				collide = p_propMan->addProperty(QVariant::Bool, "Collide with world");
+				p_propMan->setValue(collide, m_collide);
+				p_propBrows->addProperty(collide);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
-				//QList<QVariant*> props, subprops;
 
 				props = p_propBrows->properties();
-				//m_mass = atof(props.at(0)->valueText().toStdString().c_str());
-				//m_speed = atof(props.at(1)->valueText().toStdString().c_str());
 				m_mass = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				m_speed = p_propMan->variantProperty(props.at(1))->value().toFloat();
 				
-				//0 skräp 1 2 3 x y z, 4 SKRÄP. 5 6 7    <---- SKRÄPKommentar
-				subprops = props.at(2)->subProperties();
+				subprops = props.at(1)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
 					m_gravity[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
+
+				m_collide = p_propMan->variantProperty(props.at(2))->value().toBool();
 			}
 		};
 
-		//////////////////////////////////////////////On collide components////////////////////////////////////////////////////////
-		struct OffensiveAbility: MainComponent
+		struct ChargeVariables : MainComponent
 		{
-			float m_damage;
-			float m_knockbackPower;
-			OffensiveAbility(float p_damage = 0.0f, float p_knockbackPower = 0.0f) : MainComponent(ComponentType::OFFENSIVEABILITY)
+			float m_chargeReq, m_chargeFactor;
+			ChargeVariables(float p_chargeReq = 1.0f, float p_chargeFactor = 1.0f) : MainComponent(ComponentType::CHARGEVARIABLES)
 			{
-				m_damage = p_damage;
-				m_knockbackPower = p_knockbackPower;
+				m_chargeReq = p_chargeReq;
+				m_chargeFactor = p_chargeFactor;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* damage, *knockbackpower;
+				QtVariantProperty* chargeReq, *chargeFactor;
 
-				damage = p_propMan->addProperty(QVariant::Double, "Damage" );
-				p_propMan->setValue(damage, m_damage);
-				knockbackpower = p_propMan->addProperty(QVariant::Double, "KnockbackPower" );
-				p_propMan->setValue(knockbackpower, m_knockbackPower);
+				chargeReq = p_propMan->addProperty(QVariant::Double, "Charge Required" );
+				p_propMan->setValue(chargeReq, m_chargeReq);
+				chargeReq->setToolTip("Factor of charge time required for the ability to activate [0.0 : 1.0]");
+				
+				chargeFactor = p_propMan->addProperty(QVariant::Double, "Charge Effect Factor" );
+				p_propMan->setValue(chargeFactor, m_chargeFactor);
+				chargeFactor->setToolTip("Increase in effect over time [1.0 : 2.0]");
+			
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
-				p_propBrows->addProperty(damage);
-				p_propBrows->addProperty(knockbackpower);
-
+				p_propBrows->addProperty(chargeReq);
+				p_propBrows->addProperty(chargeFactor);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_damage = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				m_knockbackPower = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_chargeReq = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_chargeFactor = p_propMan->variantProperty(props.at(1))->value().toFloat();
 			}
-		};
+		};	
 
-		struct Explosive : MainComponent
+		struct Water : MainComponent
 		{
-			float m_radius;
-			Explosive(float p_radius = 0.0f) : MainComponent(ComponentType::EXPLOSIVE)
+			float m_power, m_interval, m_radius;
+			Water(float p_power = 1.0f, float p_interval = 0.3f, float p_radius = 4.0f) : MainComponent(ComponentType::WATER)
 			{
+				m_power = p_power;
+				m_interval = p_interval;
 				m_radius = p_radius;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* radius;
+				QtVariantProperty* power, *interval, *radius;
 
-				radius = p_propMan->addProperty(QVariant::String, "Radius" );
+				power = p_propMan->addProperty(QVariant::Double, "Disturb Power");
+				p_propMan->setValue(power, m_power);
+				interval = p_propMan->addProperty(QVariant::Double, "Disturb Interval");
+				p_propMan->setValue(interval, m_interval);
+				radius = p_propMan->addProperty(QVariant::Double, "Radius");
 				p_propMan->setValue(radius, m_radius);
-			
+
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(power);
+				p_propBrows->addProperty(interval);
 				p_propBrows->addProperty(radius);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_radius = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_power = p_propMan->variantProperty(props.at(0))->value().toFloat();
+				m_interval = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_radius = p_propMan->variantProperty(props.at(2))->value().toFloat();
 			}
-		};	
+		};
+
+		struct Sound : MainComponent
+		{
+			std::string m_soundName;
+			float m_volume, m_rangeMin, m_rangeMax;
+			bool m_loop;
+			Sound(float p_volume = 0.5f, float p_rangeMin = 1.0f, float p_rangeMax = 10000.0f, bool p_loop = true) : MainComponent(ComponentType::SOUND)
+			{
+				m_soundName = "";
+				m_volume = p_volume;
+				m_rangeMin = p_rangeMin;
+				m_rangeMax = p_rangeMax;
+				m_loop = p_loop;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* soundName, *volume, *rangeMin, *rangeMax, *loop;
+
+				soundName = p_propMan->addProperty(QVariant::String, "ParticleName" );
+				p_propMan->setValue(soundName, m_soundName.c_str());
+				volume = p_propMan->addProperty(QVariant::Double, "Volume");
+				p_propMan->setValue(volume, m_volume);
+				rangeMin = p_propMan->addProperty(QVariant::Double, "Min Range");
+				p_propMan->setValue(rangeMin, m_rangeMin);
+				rangeMax = p_propMan->addProperty(QVariant::Double, "Max Range");
+				p_propMan->setValue(rangeMax, m_rangeMax);
+				loop = p_propMan->addProperty(QVariant::Bool, "Loop");
+				p_propMan->setValue(loop, m_loop);
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(soundName);
+				p_propBrows->addProperty(volume);
+				p_propBrows->addProperty(rangeMin);
+				p_propBrows->addProperty(rangeMax);
+				p_propBrows->addProperty(loop);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_soundName = props.at(0)->valueText().toStdString();
+				m_volume = p_propMan->variantProperty(props.at(1))->value().toFloat();
+				m_rangeMin = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_rangeMax = p_propMan->variantProperty(props.at(3))->value().toFloat();
+				m_loop = p_propMan->variantProperty(props.at(4))->value().toBool();
+			}
+		};
 	}
 	
 }

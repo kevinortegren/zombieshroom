@@ -13,7 +13,7 @@
           slot: 1
       textures:
         - name: g_Random
-          slot: 4
+          slot: 5
       
       uniforms:
         - sem: POSITION
@@ -81,7 +81,7 @@
         - name: g_Diffuse
           slot: 0
         - name: g_Depth
-          slot: 3
+          slot: 10
           
       flags:
         - name: Forward

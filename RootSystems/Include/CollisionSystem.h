@@ -5,11 +5,19 @@
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/CollisionInfo.h>
 #include <set>
+#include <iostream>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
 	struct Collision : public ECS::Component<Collision>
 	{
+		Collision(){m_handle = NULL;}
+		#ifndef COMPILE_LEVEL_EDITOR
+		~Collision();
+		#endif
+		
 		int* m_handle;
 		std::string m_meshHandle;
 	};

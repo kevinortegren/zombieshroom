@@ -44,18 +44,27 @@ float linearizeDepth(in float depth) {
 	return projectionMatrix[3][2] / (depth - projectionMatrix[2][2]);
 }
 
+vec3 GetDecodedNormal(vec2 TexCoord)
+{
+	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	    
+    vec2 fenc = vert_normal*4-2;
+    float f = dot(fenc,fenc);
+    float g = sqrt(1-f/4);
+    vec3 normal;
+    normal.xy = fenc*g;
+    normal.z = 1-f/2;
+    return normal;
+}
+
 void main() {
 	vec2 texCoord = vec2(gl_FragCoord.st)/textureSize(g_Depth, 0);
 	vec3 origin = GetVSPositionFromDepth(texCoord);
-	vec2 vert_normal = texture(g_Normals, texCoord).xy;
-	vec3 normal;
-	normal.xy = vert_normal.xy;
-    normal.z = sqrt(1-dot(normal.xy, normal.xy));
+	vec3 normal = GetDecodedNormal(texCoord);
     //normal = normalize(normal);
 
 	//normal *= 2.0 - 1.0;
 
-	vec3 rvec = texture(g_Noise, texCoord * vec2(1280/4, 720/4)).xyz * 2.0 - 1.0;
+	vec3 rvec = texture(g_Noise, texCoord * textureSize(g_Depth, 0) * 0.25).xyz * 2.0 - 1.0;
 	vec3 tangent = normalize(rvec - normal * dot(rvec, normal));
 	vec3 bitangent = cross(normal, tangent);
 	mat3 tbn = mat3(tangent, bitangent, normal);

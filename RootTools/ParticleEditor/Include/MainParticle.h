@@ -24,8 +24,10 @@ public:
 	void HandleEvents();
 	void Update(float p_delta);
 private:
-	void UpdateAimingDevice();
+	void UpdateInput();
 	void UpdateThirdPerson();
+	void CreateSkyBox();
+
 	bool m_running;
 	std::string m_workingDirectory;
 	void* m_engineModule;
@@ -42,6 +44,14 @@ private:
 
 	ECS::Entity*							m_cameraEntity;
 	ECS::Entity*							m_aimingDevice;
+
+	bool m_focusInterpolation;
+	int m_dragging;
+	float m_focusIntTime;
+	glm::vec3 m_toPosition;
+	glm::vec3 m_fromPosition;
+
+
 };
 
 

@@ -15,9 +15,21 @@ namespace Render
 
 	RenderResourceManager::~RenderResourceManager()
 	{
+		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
+			delete (*itr);
 
+		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+			delete (*itr);
+
+		for(auto itr = m_meshes.begin(); itr != m_meshes.end(); ++itr)
+			delete (*itr);
+
+		for(auto itr = m_vaos.begin(); itr != m_vaos.end(); ++itr)
+			delete (*itr);
+
+		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
+			delete (*itr);
 	}
-
 
 	void RenderResourceManager::PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
 	{

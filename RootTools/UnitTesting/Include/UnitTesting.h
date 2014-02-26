@@ -43,7 +43,7 @@ inline ECS::World* CreateWorld()
 	world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DirectionalLight>(100);
 	world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(100);
 	world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(100);
-	world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilityRespawnComponent>(1);
+	world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(1);
 
 	return world;
 }

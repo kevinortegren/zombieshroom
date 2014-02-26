@@ -5,7 +5,7 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
 
-#define PLAYER_NUM_ABILITIES 3
+#define PLAYER_NUM_ABILITIES 4
 
 namespace RootForce
 {
@@ -47,6 +47,7 @@ namespace RootForce
 		glm::vec2 Angle;
 
 		float JumpTime;
+		glm::vec3 JumpDir;
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
@@ -58,6 +59,7 @@ namespace RootForce
 			, MovePower(0.0f)
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
+			, JumpDir(glm::vec3(0))
 			, AbilityTime(0.0f)
 			, SelectedAbility(1)
 			, WantRespawn(false)
@@ -69,6 +71,7 @@ namespace RootForce
 	{
 		float MovementSpeed;
 		float JumpForce;
+		float JumpBoostForce;
 	};
 
 	struct StateComponent : public ECS::Component<StateComponent>
@@ -85,7 +88,7 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
-		int Health;
+		float Health;
 		Network::UserID_t LastDamageSourceID;
 		bool IsDead;
 		bool WantsRespawn;
@@ -95,7 +98,7 @@ namespace RootForce
 
 		HealthComponent()
 		{
-			Health = 0;
+			Health = 0.0f;
 			LastDamageSourceID = 0;
 			IsDead = true;
 			WantsRespawn = true;
@@ -126,7 +129,7 @@ namespace RootForce
 		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
 		AbilityState::AbilityState AbilityState;
-
+		AbilityState::AbilityState PushAbilityState;
 		int Score;
 		int Deaths;
 
@@ -135,6 +138,7 @@ namespace RootForce
 			TeamID = 0;
 			SelectedAbility = 0;
 			AbilityState = AbilityState::OFF;
+			PushAbilityState = AbilityState::OFF;
 			Score = 0;
 			Deaths = 0;
 		}

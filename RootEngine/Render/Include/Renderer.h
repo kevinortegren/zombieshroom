@@ -5,7 +5,6 @@
 #include <RootEngine/Render/Include/Camera.h>
 
 #include <RootEngine/Render/Include/RenderJob.h>
-#include <RootEngine/Render/Include/ShadowJob.h>
 #include <RootEngine/Render/Include/ComputeJob.h>
 
 #include <RootEngine/Render/Include/RenderResourceManager.h>
@@ -39,6 +38,8 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
 
+#define RENDER_USE_COMPUTE
+
 namespace Render
 {
 	class RendererInterface : public RootEngine::SubsystemInterface
@@ -58,9 +59,10 @@ namespace Render
 
 		// Shadows
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
-		
+		virtual void AddShadowJob(Render::ShadowJob& p_shadowJob) = 0;
+
 		// Rendering
-		virtual void AddRenderJob(RenderJob& p_job) = 0;
+		virtual void AddRenderJob(RenderJob& p_job) = 0;	
 		virtual void AddLine(glm::vec3 p_fromPoint, glm::vec3 p_toPoint, glm::vec4 p_color) = 0;
 		virtual void Clear() = 0;
 		virtual void Render() = 0;
@@ -92,6 +94,8 @@ namespace Render
 		virtual void AddPointLight(const PointLight& p_light, int index) = 0;
 
 		virtual void Compute(ComputeJob* p_job) = 0;
+
+		virtual void ParseCommands(std::stringstream* p_ss) = 0;
 	};
 
 	class GLRenderer : public RendererInterface
@@ -116,6 +120,7 @@ namespace Render
 
 		// Shadows
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
+		void AddShadowJob(Render::ShadowJob& p_shadowJob);
 
 		// Rendering
 		void Clear();
@@ -160,11 +165,13 @@ namespace Render
 		static std::map<Semantic::Semantic, unsigned> s_sizes;
 		static std::map<TextureSemantic::TextureSemantic, unsigned> s_textureSlots;
 
+		void ParseCommands(std::stringstream* p_ss);
+
 	private:
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
-		void ProcessRenderJobs();
+		void ProcessRenderJobs(std::vector<RenderJob*>& p_jobs);
 
 		void Sorting();
 		void ShadowPass();
@@ -183,7 +190,8 @@ namespace Render
 		int m_height;
 
 		unsigned m_renderFlags;
-
+	
+		std::vector<RenderJob*> m_forwardJobs;
 		std::vector<RenderJob*> m_jobs;
 		LinearAllocator m_allocator;
 
@@ -216,10 +224,13 @@ namespace Render
 		BufferInterface* m_cameraBuffer;
 		BufferInterface* m_uniforms;
 
-		std::shared_ptr<TechniqueInterface> m_earlyZTech;
+		Render::EffectInterface* m_renderEffect;
+
 		std::shared_ptr<TechniqueInterface> m_fullscreenQuadTech;
 
+		bool m_layers[2];
 		bool m_displayNormals;
+		bool m_showForward;
 	};
 }
 

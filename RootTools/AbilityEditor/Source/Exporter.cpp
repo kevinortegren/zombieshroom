@@ -20,18 +20,6 @@ namespace AbilityEditorNameSpace
 	void Exporter::Export(const std::string& p_filepath, Entity* p_entity, OnCreate* p_onCreate, OnCollide* p_onCollide, OnDestroy* p_onDestroy )
 	{
 		
-		/*NEW FORMAT WOOOO!!
-		-Name
-		-Components
-			--Values
-		-OnClass
-			--Condition
-				---Entities
-		-OnClass
-			--Condition
-				---Entities
-		...
-		*/
 
 		YAML::Emitter out;
 		out << YAML::BeginSeq;
@@ -39,6 +27,26 @@ namespace AbilityEditorNameSpace
 		//Name
 		out << YAML::BeginMap;
 		out << YAML::Key << "Name" << YAML::Value << p_entity->GetName().toStdString(); 
+		out << YAML::EndMap;
+
+		//Charges
+		out << YAML::BeginMap;
+		out << YAML::Key << "Charges" << YAML::Value << p_entity->GetCharges(); 
+		out << YAML::EndMap;
+
+		//Charge Time
+		out << YAML::BeginMap;
+		out << YAML::Key << "ChargeTime" << YAML::Value << p_entity->GetChargeTime(); 
+		out << YAML::EndMap;
+
+		//Channeling Time
+		out << YAML::BeginMap;
+		out << YAML::Key << "ChannelingTime" << YAML::Value << p_entity->GetChannelingTime(); 
+		out << YAML::EndMap;
+
+		//Duration
+		out << YAML::BeginMap;
+		out << YAML::Key << "Duration" << YAML::Value << p_entity->GetDuration(); 
 		out << YAML::EndMap;
 
 		//Cooldown
@@ -143,19 +151,27 @@ namespace AbilityEditorNameSpace
 		
 		switch (p_type)
 		{
-			case AbilityComponents::ComponentType::TRANSFORM:
+			case AbilityComponents::ComponentType::STARTPOS:
 				{
-					AbilityComponents::Transform* transform = static_cast<AbilityComponents::Transform*>(p_component);
-					glm::vec3 rotation = glm::vec3(transform->m_rotation.x(), transform->m_rotation.y(), transform->m_rotation.z());
-					glm::vec3 scale = glm::vec3(transform->m_scale.x(), transform->m_scale.y(), transform->m_scale.z());
-					p_emitter << YAML::Key << "Rotation" << YAML::Value << YAML::Flow << YAML::BeginSeq << rotation.x << rotation.y << rotation.z << YAML::EndSeq;
-					p_emitter << YAML::Key << "scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << scale.x << scale.y << scale.z << YAML::EndSeq;
-					
+					AbilityComponents::StartPos* startPos = static_cast<AbilityComponents::StartPos*>(p_component);
+					glm::vec3 pos = glm::vec3(startPos->m_absolutePos.x(), startPos->m_absolutePos.y(), startPos->m_absolutePos.z());
+					p_emitter << YAML::Key << "StartPos" << YAML::Value << startPos->m_startPos;
+					p_emitter << YAML::Key << "AbsoluteStartPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
 				}
 				break;
-			case AbilityComponents::ComponentType::COLLISION:			
+			case AbilityComponents::ComponentType::TARGPOS:
 				{
-					//Nothing in this one yet, might never be, might be removed, who knows
+					AbilityComponents::TargetPos* targetPos = static_cast<AbilityComponents::TargetPos*>(p_component);
+					glm::vec3 pos = glm::vec3(targetPos->m_absolutePos.x(), targetPos->m_absolutePos.y(), targetPos->m_absolutePos.z());
+					p_emitter << YAML::Key << "TargetPos" << YAML::Value << targetPos->m_targPos;
+					p_emitter << YAML::Key << "AbsoluteTargetPos" << YAML::Value << YAML::Flow << YAML::BeginSeq << pos.x << pos.y << pos.z << YAML::EndSeq;
+				}
+				break;
+			case AbilityComponents::ComponentType::VELOCITY:
+				{
+					AbilityComponents::Velocity* velocity = static_cast<AbilityComponents::Velocity*>(p_component);
+					p_emitter << YAML::Key << "Direction" << YAML::Value << velocity->m_direction;
+					p_emitter << YAML::Key << "Speed" << YAML::Value << velocity->m_speed;
 				}
 				break;
 			case AbilityComponents::ComponentType::ABILITYMODEL:
@@ -185,26 +201,68 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "Size" << YAML::Value << particle->m_size;
 				}
 				break;
-			case AbilityComponents::ComponentType::PHYSICSCONTROLLED:
+			case AbilityComponents::ComponentType::DAMAGE:
 				{
-					AbilityComponents::PhysicsControlled* physCon = static_cast<AbilityComponents::PhysicsControlled*>(p_component);
-					p_emitter << YAML::Key << "Speed" << YAML::Value << physCon->m_speed;
-					p_emitter << YAML::Key << "Mass" << YAML::Value << physCon->m_mass;
+					AbilityComponents::Damage* damage = static_cast<AbilityComponents::Damage*>(p_component);
+					p_emitter << YAML::Key << "DamagePlayers" << YAML::Value << damage->m_affectedPlayers;
+					p_emitter << YAML::Key << "Damage" << YAML::Value << damage->m_damage;
+				}
+				break;
+			case AbilityComponents::ComponentType::KNOCKBACK:
+				{
+					AbilityComponents::Knockback* knockback = static_cast<AbilityComponents::Knockback*>(p_component);
+					p_emitter << YAML::Key << "KnockbackPlayers" << YAML::Value << knockback->m_affectedPlayers;
+					p_emitter << YAML::Key << "Knockback" << YAML::Value << knockback->m_knockback;
+				}
+				break;
+			case AbilityComponents::ComponentType::STATCHANGECASTER:
+				{
+					AbilityComponents::StatChangeCaster* statCaster = static_cast<AbilityComponents::StatChangeCaster*>(p_component);
+					p_emitter << YAML::Key << "CasterSpeed" << YAML::Value << statCaster->m_speed;
+					p_emitter << YAML::Key << "CasterJumpHeight" << YAML::Value << statCaster->m_jumpHeight;
+					p_emitter << YAML::Key << "CasterKnockbackResistance" << YAML::Value << statCaster->m_knockbackResistance;
+				}
+				break;
+			case AbilityComponents::ComponentType::STATCHANGETARGET:
+				{
+					AbilityComponents::StatChangeTarget* statTarget = static_cast<AbilityComponents::StatChangeTarget*>(p_component);
+					p_emitter << YAML::Key << "TargetSpeed" << YAML::Value << statTarget->m_speed;
+					p_emitter << YAML::Key << "TargetJumpHeight" << YAML::Value << statTarget->m_jumpHeight;
+					p_emitter << YAML::Key << "TargetKnockbackResistance" << YAML::Value << statTarget->m_knockbackResistance;
+				}
+				break;
+			case AbilityComponents::ComponentType::PHYSICS:
+				{
+					AbilityComponents::Physics* physCon = static_cast<AbilityComponents::Physics*>(p_component);
+					p_emitter << YAML::Key << "PhysicsMass" << YAML::Value << physCon->m_mass;
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
-					p_emitter << YAML::Key << "Gravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
+					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
+					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
 				}
 				break;
-			case AbilityComponents::ComponentType::OFFENSIVEABILITY:
+			case AbilityComponents::ComponentType::CHARGEVARIABLES:
 				{
-					AbilityComponents::OffensiveAbility* offensive = static_cast<AbilityComponents::OffensiveAbility*>(p_component);
-					p_emitter << YAML::Key << "Damage" << YAML::Value << offensive->m_damage;
-					p_emitter << YAML::Key << "KnockbackPower" << YAML::Value << offensive->m_knockbackPower;
+					AbilityComponents::ChargeVariables* chargeVar = static_cast<AbilityComponents::ChargeVariables*>(p_component);
+					p_emitter << YAML::Key << "ChargeRequired" << YAML::Value << chargeVar->m_chargeReq;
+					p_emitter << YAML::Key << "ChargeFactor" << YAML::Value << chargeVar->m_chargeFactor;
 				}
 				break;
-			case AbilityComponents::ComponentType::EXPLOSIVE:
+			case AbilityComponents::ComponentType::WATER:
 				{
-					AbilityComponents::Explosive* explosive = static_cast<AbilityComponents::Explosive*>(p_component);
-					p_emitter << YAML::Key << "Radius" << YAML::Value << explosive->m_radius;
+					AbilityComponents::Water* water = static_cast<AbilityComponents::Water*>(p_component);
+					p_emitter << YAML::Key << "WaterPower" << YAML::Value << water->m_power;
+					p_emitter << YAML::Key << "WaterInterval" << YAML::Value << water->m_interval;
+					p_emitter << YAML::Key << "WaterRadius" << YAML::Value << water->m_radius;
+				}
+				break;
+			case AbilityComponents::ComponentType::SOUND:
+				{
+					AbilityComponents::Sound* sound = static_cast<AbilityComponents::Sound*>(p_component);
+					p_emitter << YAML::Key << "SoundName" << YAML::Value << sound->m_soundName;
+					p_emitter << YAML::Key << "SoundVolume" << YAML::Value << sound->m_volume;
+					p_emitter << YAML::Key << "SoundRangeMin" << YAML::Value << sound->m_rangeMin;
+					p_emitter << YAML::Key << "SoundRangeMax" << YAML::Value << sound->m_rangeMax;
+					p_emitter << YAML::Key << "SoundLoop" << YAML::Value << sound->m_loop;
 				}
 				break;
 			default:

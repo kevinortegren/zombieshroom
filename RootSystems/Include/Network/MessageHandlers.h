@@ -13,7 +13,7 @@
 #include <RootSystems/Include/Network/LanList.h>
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
-#include <RootSystems/Include/AbilityRespawnSystem.h>
+#include <RootSystems/Include/AbilitySpawnSystem.h>
 
 namespace RootForce
 {
@@ -42,7 +42,7 @@ namespace RootForce
 			void SetLanList(RootSystems::LanList* p_list);
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void SetWorldSystem(WorldSystem* p_worldSystem);
-			void SetAbilitySpawnSystem(AbilityRespawnSystem* p_abilityspawnSystem) { m_abilitySpawnSystem = p_abilityspawnSystem; }
+			void SetAbilitySpawnSystem(AbilitySpawnSystem* p_abilityspawnSystem) { m_abilitySpawnSystem = p_abilityspawnSystem; }
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp);
 		private:
@@ -50,7 +50,7 @@ namespace RootForce
 			RootSystems::LanList* m_list;
 			RootForce::ChatSystem* m_chatSystem;
 			WorldSystem* m_worldSystem;
-			AbilityRespawnSystem* m_abilitySpawnSystem;
+			AbilitySpawnSystem* m_abilitySpawnSystem;
 		};
 
 

@@ -590,3 +590,8 @@ void BulletCharacter::StopKnockback()
 	m_knockbackVelocity.setZero();
 	m_hasBeenKnockbacked = false;
 }
+
+void BulletCharacter::JumpBoost( float p_boostPower )
+{
+	m_verticalVelocity += p_boostPower;
+}

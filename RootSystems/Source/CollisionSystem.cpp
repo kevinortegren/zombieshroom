@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 
 namespace RootForce
@@ -30,6 +31,9 @@ namespace RootForce
 			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
 			m_engineContext->m_script->ExecuteScript();
+
+			if(p_entity->GetId() == -1)
+				return;
 		}
 
 		cr->m_collisions.clear();
@@ -39,5 +43,12 @@ namespace RootForce
 	{
 
 	}
+
+	Collision::~Collision()
+	{
+		if(m_handle != NULL)
+			g_engineContext.m_physics->RemoveObject(*m_handle);
+	}
+
 }
 #endif
