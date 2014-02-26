@@ -17,14 +17,14 @@ namespace RootForce
 	void ParticleSystem::Init()
 	{
 		m_emitters.Init(m_world->GetEntityManager());
-		m_transforms.Init(m_world->GetEntityManager());
-
-		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
+		m_transforms.Init(m_world->GetEntityManager());	
 	}
 
 	void ParticleSystem::Begin()
 	{
 		g_engineContext.m_renderer->BeginTransform(m_world->GetDelta());
+
+		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
 	}
 
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
