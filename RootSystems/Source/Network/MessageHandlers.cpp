@@ -2075,10 +2075,10 @@ namespace RootForce
 
 							//if a team has two or more players than the other team, joining it is not allowed
 							if(m.TeamID == 1) 
-								if(team1 >= team2 + 2)
+								if(team1 > team2)
 									break;
 							else if(m.TeamID == 2)
-								if(team2 >= team1 + 2)
+								if(team2 > team1)
 									break;
 						}
 
