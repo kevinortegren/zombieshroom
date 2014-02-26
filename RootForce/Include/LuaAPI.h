@@ -2102,6 +2102,7 @@ namespace RootForce
 			r->m_forward = true;
 			r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
 			r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
+			r->m_pass = 1;
 
 			luaL_setmetatable(p_luaState, "Ray");
 			return 1;
