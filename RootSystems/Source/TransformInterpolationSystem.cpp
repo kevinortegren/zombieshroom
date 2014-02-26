@@ -36,7 +36,7 @@ namespace RootForce
 		}
 
 		// Do not interpolate non-players.
-		if (m_world->GetEntityManager()->GetComponent<PlayerComponent>(p_entity))
+		if (m_world->GetEntityManager()->GetComponent<PlayerComponent>(p_entity) == nullptr)
 		{
 			transform->m_renderingPosition = transform->m_position;
 			return;
