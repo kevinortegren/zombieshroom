@@ -12,7 +12,6 @@ namespace RootForce
 	{
 		SetUsage<Transform>();
 		SetUsage<Renderable>();
-		SetUsage<PlayerComponent>();
 	}
 
 	void TransformInterpolationSystem::Init()
@@ -29,8 +28,15 @@ namespace RootForce
 	{
 		Transform* transform = m_transforms.Get(p_entity);
 		
-		// Ignore the local player.
+		// Do not interpolate the local player.
 		if (p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+		{
+			transform->m_renderingPosition = transform->m_position;
+			return;
+		}
+
+		// Do not interpolate non-players.
+		if (m_world->GetEntityManager()->GetComponent<PlayerComponent>(p_entity))
 		{
 			transform->m_renderingPosition = transform->m_position;
 			return;
@@ -39,7 +45,7 @@ namespace RootForce
 		
 		const float HIGH = 4.0f;
 		const float LOW = 0.01f;
-		const float BASE = 0.10f;
+		const float BASE = 0.50f;
 
 		// If the distance between rendering position and actual position is too large, snap to the position instantly.
 		// If the distance is too small, also snap to the position.
@@ -55,7 +61,7 @@ namespace RootForce
 			transform->m_renderingPosition += BASE * displacement;
 		*/
 
-
+		/*
 		if (p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
 		{
 			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Displacement: (%f, %f, %f) : %f", displacement.x, displacement.y, displacement.z, std::sqrt(sqDistance));
@@ -67,6 +73,7 @@ namespace RootForce
 			else
 				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Interpolating distance: %f", BASE * displacement);
 		}
+		*/
 	}
 
 	void TransformInterpolationSystem::End()
