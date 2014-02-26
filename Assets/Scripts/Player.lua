@@ -38,7 +38,7 @@ function Player.OnTeamSelect(self, teamId)
 	local prevTeamId = playerComponent:GetTeamId();
 	playerComponent:SetTeamId(teamId);
 	
-  if prevTeamId == 3 and teamId ~= 3 then
+  if prevTeamId == 0 and teamId ~= 0 then
     local playerPhysics = PlayerPhysics.New(self);
     local health = Health.New(self);
     local physics = Physics.New(self);
@@ -96,7 +96,7 @@ function Player.OnTeamSelect(self, teamId)
       waterCollider:SetDisturbInterval(0.5);
       waterCollider:SetRadius(5);
     end
-  elseif teamId == 3 and prevTeamId ~= 3 then
+  elseif teamId == 0 and prevTeamId ~= 0 then
 		self:RemovePlayerPhysics();
 		self:RemoveHealth();
 		self:RemovePhysics();
