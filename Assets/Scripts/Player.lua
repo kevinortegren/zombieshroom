@@ -14,7 +14,7 @@ function Player.OnCreate(userId, actionId)
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
-	playerComponent:SetTeamId(3);
+	playerComponent:SetTeamId(0);
 	
   Entity.RegisterGroup("NonExport", player);
 

@@ -1052,6 +1052,21 @@ namespace RootForce
 						}
 
 					} return true;
+				case NetworkMessage::MessageType::PlayerTeamSelect:
+					{
+						NetworkMessage::PlayerTeamSelect m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+
+						// Call the OnCreate script
+						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+						g_engineContext.m_script->AddParameterNumber(m.TeamID);
+						g_engineContext.m_script->ExecuteScript();
+
+
+					} return true;
 			}
 
 			return false;
@@ -2035,6 +2050,57 @@ namespace RootForce
 						} break;
 					}
 				} return true;
+				case NetworkMessage::MessageType::PlayerTeamSelect:
+					{
+						NetworkMessage::PlayerTeamSelect m;
+						m.Serialize(false, p_bs);
+
+						//Only do these calculations if we want to join a playing team, not the spectators
+						if(m.TeamID == 1 || m.TeamID == 2)
+						{
+							//Save down the number of players in each team
+							int team1, team2;
+							team1 = team2 = 0;
+							for(auto pair : g_networkEntityMap)
+							{
+								if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY || !pair.second)
+									continue;
+
+								RootForce::PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(pair.second);
+								if(playerComponent->TeamID == 1)
+									team1 ++;
+								else if(playerComponent->TeamID == 2)
+									team2 ++;
+							}
+
+							//if a team has two or more players than the other team, joining it is not allowed
+							if(m.TeamID == 1) 
+								if(team1 >= team2 + 2)
+									break;
+							else if(m.TeamID == 2)
+								if(team2 >= team1 + 2)
+									break;
+						}
+
+						if (m_world->GetTagManager()->GetEntityByTag("Client") == nullptr)
+						{
+							ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+
+							// Call the OnCreate script
+							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+							g_engineContext.m_script->AddParameterNumber(m.TeamID);
+							g_engineContext.m_script->ExecuteScript();
+						}
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
+						m.Serialize(true, &bs);
+
+						m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					} return true;
 			}
 			
 			return false;
