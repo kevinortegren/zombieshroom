@@ -2031,7 +2031,7 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			ECS::Entity** f = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
 			RootForce::FollowComponent *s = g_world->GetEntityManager()->CreateComponent<RootForce::FollowComponent>(*e);
-			RootForce::Network::NetworkComponent *n = g_world->GetEntityManager()->CreateComponent<RootForce::Network::NetworkComponent>(*f);
+			RootForce::Network::NetworkComponent *n = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*f);
 			s->TargetID = n->ID;
 			s->Offset = (float)luaL_checknumber(p_luaState, 3);
 
@@ -2090,6 +2090,18 @@ namespace RootForce
 			bool IsAbility = lua_toboolean(p_luaState, 7) != 0;
 
 			(*s)->HitEntity = (ECS::Entity*)g_engineContext.m_physics->CastRay(Handle, (*s)->StartPosition, (*s)->Direction, (*s)->Distance, &(*s)->HitPos, IsAbility);
+
+			RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
+			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+
+			t->m_position = (*s)->StartPosition;
+
+			r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
+			r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
+			r->m_model = g_engineContext.m_resourceManager->CreateModel("rayModel");
+			r->m_forward = true;
+			r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
+			r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
 
 			luaL_setmetatable(p_luaState, "Ray");
 			return 1;

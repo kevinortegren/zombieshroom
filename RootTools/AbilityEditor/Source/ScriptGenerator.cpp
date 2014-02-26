@@ -128,9 +128,9 @@ namespace AbilityEditorNameSpace
 			m_file << "\t--Entities\n";
 			m_file << "\tlocal self = Entity.New();\n";
 			m_file << "\tlocal casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
-			m_file << "\tlocal networkEnt = Network.New(self, userId, actionId);\n";
 
 			m_file << "\t--Components\n";
+			m_file << "\tlocal networkComp = Network.New(self, userId, actionId);\n";
 			m_file << "\tlocal transformComp = Transformation.New(self);\n";
 			m_file << "\tlocal collisionComp = Collision.New(self);\n";
 			m_file << "\tlocal colRespComp = CollisionResponder.New(self);\n";

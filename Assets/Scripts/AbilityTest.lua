@@ -27,7 +27,6 @@ function AbilityTest.OnCreate (userId, actionId)
 	local scriptComp = Script.New(self, "AbilityTest");
 	local timerComp = Timer.New(self, AbilityTest.duration);
 	local homingComp = Homing.New(self, 0.1, 50);
-	--local rayComp = Ray.New()
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -35,7 +34,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
-	local rayComp = Ray.New(self, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, false, false);
+	local rayComp = Ray.New(self, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, true, false);
 	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
@@ -97,4 +96,5 @@ function AbilityTest.OnCollide (self, entity)
 end
 --Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 function AbilityTest.OnDestroy (self)
+	Entity.Remove(self);
 end

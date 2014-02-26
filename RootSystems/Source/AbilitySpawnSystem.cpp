@@ -95,6 +95,7 @@ namespace RootForce
 			while(std::getline(file, temp))
 			{
 				m_levelAbilities.push_back(temp);
+				m_engineContext->m_resourceManager->LoadScript(temp);
 			}
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Succesfully loaded the ability pack");
 		}
@@ -128,7 +129,7 @@ namespace RootForce
 
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
 
-		m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
+		//m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
 
 		//Remove all components used for rendering and collision
 		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);

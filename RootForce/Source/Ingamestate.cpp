@@ -59,15 +59,11 @@ namespace RootForce
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
-		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
-		g_engineContext.m_resourceManager->LoadScript("FireBall");
-		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
 		
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
@@ -204,6 +200,7 @@ namespace RootForce
 		
 		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
@@ -234,6 +231,22 @@ namespace RootForce
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
+
+		g_engineContext.m_resourceManager->LoadEffect("Ray");
+		RootEngine::Model* rayModel = g_engineContext.m_resourceManager->CreateModel("rayModel");
+		
+		Render::Vertex1P rayVertices;
+		rayVertices.m_pos = glm::vec3(0.0f);
+		
+		// Create 1P mesh for shadows.
+		Render::MeshInterface* mesh1P = g_engineContext.m_renderer->CreateMesh();
+		mesh1P->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
+		mesh1P->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&rayVertices), 1);
+		mesh1P->SetPrimitiveType(GL_POINTS);
+
+		rayModel->m_meshes[0] = mesh1P;
+		
 	}
 
 	void IngameState::Exit()
@@ -244,7 +257,7 @@ namespace RootForce
 		m_animationSystem->Terminate();
 
 		// Remove all networked entities and reset the entity map and sequence map.
-		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
+		//Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -263,6 +276,7 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -275,7 +289,6 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
-
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
@@ -386,6 +399,11 @@ namespace RootForce
 		}
 
 		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
+		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
 		}
@@ -395,10 +413,7 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		{
-			PROFILE("Ragdoll system", g_engineContext.m_profiler);
-			m_ragdollSystem->Process();
-		}
+		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
@@ -623,7 +638,7 @@ namespace RootForce
 				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
 			if(playerComponent->AbilityScripts[2].Cooldown > 0)
 				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility + 1);
 		}
 
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));

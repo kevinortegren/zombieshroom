@@ -7,12 +7,15 @@ Explosion.channelingTime = 0.0;
 Explosion.duration = 1;
 
 function Explosion.OnCreate (userId, actionId)
-	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
+	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
-	local prevHandle = fatherEntity:GetCollision():GetHandle();
-	--Logging.Log(LogLevel.DEBUG_PRINT, "Handle in Expl: "..prevHandle);
-	local posVec = fatherEntity:GetTransformation():GetPos(); --playerEnt:GetCollisionResponder():GetCollisionPosition(playerEnt);
+	local posVec = Vec3.New(0,0,0);
+	if fatherEntity:DoesExist() then
+		--local prevHandle = fatherEntity:GetCollision():GetHandle();
+		--Logging.Log(LogLevel.DEBUG_PRINT, "Handle in Expl: "..prevHandle);
+		posVec = fatherEntity:GetTransformation():GetPos(); --playerEnt:GetCollisionResponder():GetCollisionPosition(playerEnt);
+	end
 	
 	--local frontVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local networkEnt = Network.New(self, userId, actionId);
@@ -33,7 +36,7 @@ function Explosion.OnCreate (userId, actionId)
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "explosion");
 	end
-	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
+	Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end
 
 function Explosion.OnCollide (self, entity)
@@ -63,5 +66,5 @@ function Explosion.OnCollide (self, entity)
 	end
 end
 function Explosion.OnDestroy (self)
-	--Entity.Remove(self);
+	Entity.Remove(self);
 end

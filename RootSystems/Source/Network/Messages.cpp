@@ -80,6 +80,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
 			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, IsPush);
 		}
 
 		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -584,13 +585,32 @@ namespace RootForce
 				g_engineContext.m_script->AddParameterNumber(id.UserID);
 				g_engineContext.m_script->AddParameterNumber(id.ActionID);
 				g_engineContext.m_script->ExecuteScript();
-
+				
 				entity = Network::FindEntity(p_map, id);
-				assert(entity != nullptr);
+				// If entity is not found, assume unsynched sequence ID
+				if(entity == nullptr)
+				{
+					Network::NetworkEntityID tempId = id;
+					tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
+					
+					// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
+					if(id.SequenceID > tempId.SequenceID)
+						Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] = id.SequenceID + 1;
+
+					entity = Network::FindEntity(p_map, tempId);
+					assert(entity != nullptr);
+
+					Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
+					netcomp->ID = id;
+
+					p_map[id] = entity;
+					p_map.erase(p_map.find(tempId));
+				}
 			}
 			else
 			{
 				entity = it->second;
+				assert(entity != nullptr);
 			}
 
 			// Read the number of components

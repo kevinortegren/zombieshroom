@@ -86,4 +86,5 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	Entity.Remove(self);
 end

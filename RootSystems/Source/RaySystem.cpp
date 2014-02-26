@@ -10,7 +10,12 @@ namespace RootForce
 
 	void RaySystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		//Render stuff i guess
+		RootForce::RayComponent* ray = m_ray.Get(p_entity);
+
+		if (ray->Render)
+		{
+
+		}
 	}
 
 }

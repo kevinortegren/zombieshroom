@@ -2,7 +2,6 @@
 
 - name: Water_Compute_Tech
   
-  # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
   techniques:
 
     - name: Water_Compute  

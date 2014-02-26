@@ -1,6 +1,6 @@
-- name: Mesh
+- name: Ray
   techniques:
-    - name: Mesh
+    - name: RayTech
       bindings:
         - name: PerFrame
           slot: 0
@@ -9,23 +9,31 @@
       uniforms:
           - sem: MODEL
             offset: 0
-          - sem: NORMAL
+          - sem: POSITION
             offset: 64
       textures:
         - name: g_Diffuse
           slot: 6
-        - name: g_Specular
-          slot: 7
         - name: g_Glow
           slot: 9
       flags:
         - name: Forward
       programs:
-        - name: Mesh
+        - name: RayProg
           shaders:
-            - name: mesh
+            - name: ray
               type: vertex
-            - name: mesh_trans
+            - name: ray
+              type: geometry
+            - name: ray
               type: fragment
-              
-
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Additive = 2
+          blend: 1
+          
+          # Depth settings.
+          depth:
+            write: 0
+            test: 1

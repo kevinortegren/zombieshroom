@@ -1,0 +1,36 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+};
+
+layout(std140) uniform PerObject
+{
+	mat4 modelMatrix;
+	vec4 endPosition;
+};
+
+void main() 
+{
+	vec3 directionFromFirstPointToCameraPosition = -normalize(gl_in[0].gl_Position.xyz);
+	vec3 viewSpaceEndPosition = (viewMatrix * vec4(endPosition.xyz, 1.0)).xyz;
+	vec3 rayDirection = normalize(viewSpaceEndPosition - gl_in[0].gl_Position.xyz);
+	vec3 lateralAxis = normalize(cross(directionFromFirstPointToCameraPosition, rayDirection));
+
+	float rayWidth = 2.0;
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + rayWidth * vec4(lateralAxis, 0.0));
+	EmitVertex();
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position - rayWidth * vec4(lateralAxis, 0.0));
+	EmitVertex();
+	gl_Position = projectionMatrix * (vec4(viewSpaceEndPosition, 1.0) + rayWidth * vec4(lateralAxis, 0.0));
+	EmitVertex();
+	gl_Position = projectionMatrix * (vec4(viewSpaceEndPosition, 1.0) - rayWidth * vec4(lateralAxis, 0.0));
+	EmitVertex();
+	EndPrimitive();
+}
