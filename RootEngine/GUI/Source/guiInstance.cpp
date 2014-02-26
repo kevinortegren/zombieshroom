@@ -107,7 +107,7 @@ namespace RootEngine
 			m_loadList.push_back(std::pair<WebViewImpl*,Awesomium::WebURL>(temp,url));
 			m_loadListMutex.unlock();
 
-			while(!temp->m_webView)
+			while(!temp->m_webView || temp->m_webView->IsLoading())
 				Sleep(100);
 
 			return temp;
@@ -233,10 +233,16 @@ namespace RootEngine
 				return Awesomium::KeyCodes::AK_RETURN;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_BACKSPACE)
 				return Awesomium::KeyCodes::AK_BACK;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_DELETE)
+				return Awesomium::KeyCodes::AK_DELETE;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_TAB)
 				return Awesomium::KeyCodes::AK_TAB;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_ESCAPE)
 				return Awesomium::KeyCodes::AK_ESCAPE;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_HOME)
+				return Awesomium::KeyCodes::AK_HOME;
+			else if(p_key == SDL_Scancode::SDL_SCANCODE_END)
+				return Awesomium::KeyCodes::AK_END;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_PAGEUP)
 				return Awesomium::KeyCodes::AK_PRIOR;
 			else if(p_key == SDL_Scancode::SDL_SCANCODE_PAGEDOWN)
