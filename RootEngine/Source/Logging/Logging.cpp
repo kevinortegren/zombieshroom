@@ -37,6 +37,7 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::PACKET_PRINT]		= TagLevelInfo("PACKET     ", false);
 	m_levelInfo[LogLevel::MASS_DATA_PRINT]	= TagLevelInfo("DATA_PRINT ", false);
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
+	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
 
 #ifdef _DEBUG
 	OpenLogStream();
@@ -209,6 +210,12 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 			std::cout<<"";
 			break;
 		}
+	case LogLevel::HELP_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::DARK_GREEN, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
 	default:
 		break;
 	}
@@ -280,7 +287,16 @@ void Logging::ParseCommand( std::stringstream* p_data )
 	std::getline(*p_data, module, ' ');
 	std::getline(*p_data, module, ' ');
 
-	if(module == "clear")
+	if(module == "help")
+	{
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[LOGGING COMMANDS]");
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l clear - Clear log");
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l [on/off] - Turn logging on or off");
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l status - Print status of log prints and levels");
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l [LogLevel] [0/1] - Activate or deactivate a specific log level");
+		LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l [LogTag] [0/1] - Activate or deactivate a specific log tag");
+	}
+	else if(module == "clear")
 	{
 		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "Cleared console log!");
 		ClearLog();
@@ -299,7 +315,7 @@ void Logging::ParseCommand( std::stringstream* p_data )
 	{
 		PrintStatus();
 	}
-	else if(module == "NOLEVEL" || module == "NOTAG")
+	else if(module == "NOLEVEL" || module == "NOTAG" || module == "HELP_PRINT")
 	{
 	}
 	else
