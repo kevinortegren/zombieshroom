@@ -338,6 +338,7 @@ void Export()
 			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].normalPath);
 			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].specularPath);
 			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].glowPath);
+			copyTexture(saveToDir, SM.materialList[SM.meshList[i].MaterialID].translucencePath);
 
 			//MString textureName = cleanFullPathName(texturePath.c_str());			
 			//string newTexturePath = savToDir + textureName.asChar();
