@@ -11,7 +11,6 @@ extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
-
 	struct ParticleEmitter : public ECS::Component<ParticleEmitter>
 	{
 		std::vector<RootEngine::ParticleSystemStruct*> m_particleSystems;
@@ -39,5 +38,7 @@ namespace RootForce
 	private:
 		ECS::ComponentMapper<ParticleEmitter> m_emitters;
 		ECS::ComponentMapper<Transform> m_transforms;
+
+		float m_waterHeight;
 	};
 }

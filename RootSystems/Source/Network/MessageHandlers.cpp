@@ -313,12 +313,13 @@ namespace RootForce
 							assert(aimingEntity != nullptr);
 
 
-							// Set the actions for the client, to be parsed by the action system later.
+							// Set the actions for the client, to be parsed by the action system later. Preserve ActiveAbility.
 							PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 							assert(playerAction != nullptr);
 
+							uint8_t activeAbility = playerAction->ActiveAbility;
 							*playerAction = m.Action;
-
+							playerAction->ActiveAbility = activeAbility;
 
 							// Set the position of the player, as given by the other client.
 							PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(playerEntity);
@@ -461,6 +462,7 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
+								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
 								// Log the action (debug)
 								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart received from user %d", m.User);
@@ -661,11 +663,11 @@ namespace RootForce
 					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
-						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(g_networkEntityMap[m.AbilitySpawnPointID]);
+						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
 						assert(spawnPoint);
 						spawnPoint->Claimed = m.User;
 
-						ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+						ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 					
 						// Don't set stuff on entities that don't exist.
 						if (player)
@@ -1003,7 +1005,7 @@ namespace RootForce
 					NetworkMessage::TimeUp m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* entity = g_networkEntityMap[m.ID];
+					ECS::Entity* entity = FindEntity(g_networkEntityMap, m.ID);
 					if(entity != nullptr)
 					{
 						TimerComponent* timer = m_world->GetEntityManager()->GetComponent<TimerComponent>(entity);
@@ -1019,7 +1021,7 @@ namespace RootForce
 					NetworkMessage::AbilitySpawn m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* point = g_networkEntityMap[m.ID];
+					ECS::Entity* point = FindEntity(g_networkEntityMap, m.ID);
 
 					// Entity needs to exist.
 					if (point)
@@ -1265,10 +1267,13 @@ namespace RootForce
 							// TODO: Let the extrapolation be done by the action system and physics instead.
 							if (clientComponent->IsRemote)
 							{
-								// Update the action for the user
+								// Update the action for the user (preserve ActiveAbility).
 								PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(playerAction != nullptr);
+								
+								uint8_t activeAbility = playerAction->ActiveAbility;
 								*playerAction = m.Action;
+								playerAction->ActiveAbility = activeAbility;
 
 								// Set the position of the player
 								playerTransform->m_position = m.Position;
@@ -1467,7 +1472,7 @@ namespace RootForce
 					NetworkMessage::AbilityChargeStart m;
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-
+					
 					// Make sure we have a client entity associated with this peer.
 					ECS::Entity* clientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
 					if (clientEntity != nullptr)
@@ -1490,8 +1495,15 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
+								// TODO: Use ActionID here?
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
+								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
+								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+
+								// DEBUG
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1564,6 +1576,10 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::START_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1633,9 +1649,19 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
-								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+								if (playerComponent->AbilityState == AbilityState::START_CHANNELING || playerComponent->AbilityState == AbilityState::CHARGING)
+									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+								else
+									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u) (stop charging as well)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
+								else
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1708,6 +1734,10 @@ namespace RootForce
 								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
+
+								// DEBUG
+								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop charge and channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
+								// /DEBUG
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1754,7 +1784,7 @@ namespace RootForce
 					NetworkMessage::AbilityTryClaim m;
 					m.Serialize(false, p_bs);
 
-					ECS::Entity* player = g_networkEntityMap[NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY)];
+					ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 					if (player)
 					{
 						TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
