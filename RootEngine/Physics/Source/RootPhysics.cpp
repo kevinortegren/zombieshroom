@@ -215,7 +215,7 @@ namespace Physics
 		}
 		else //TODO : Remove the shapeless ability!
 		{
-			unsigned int removedIndex = userPointer->m_vectorIndex;
+			int removedIndex = userPointer->m_vectorIndex;
 			if (userPointer->m_shape == PhysicsShape::SHAPE_NONE)
 			{
 				delete m_shapelessObjects.at(removedIndex);
@@ -229,7 +229,8 @@ namespace Physics
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
@@ -249,7 +250,8 @@ namespace Physics
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
@@ -265,9 +267,10 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_externalControlled == true && m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_externalControlled == true && m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_type != PhysicsType::TYPE_RAGDOLL && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE )
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
