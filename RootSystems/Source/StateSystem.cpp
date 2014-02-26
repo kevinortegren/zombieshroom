@@ -30,7 +30,9 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 	}
 	else if(!m_engineContext->m_physics->IsOnGround(*(collision->m_handle)))
 	{
-		if(state->PrevPosition.y < transform->m_position.y)
+		float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+
+		if (verticalVelocity > 0.0f)
 		{
 			if (state->CurrentState != RootForce::EntityState::ASCENDING)
 			{
@@ -39,7 +41,7 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 
 			state->CurrentState = RootForce::EntityState::ASCENDING;
 		}
-		else //if(state->PrevPosition.y > transform->m_position.y)
+		else if (verticalVelocity < 0.0f)
 		{
 			if (state->CurrentState != RootForce::EntityState::DESCENDING)
 			{

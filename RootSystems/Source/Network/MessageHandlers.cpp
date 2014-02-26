@@ -331,13 +331,24 @@ namespace RootForce
 							Transform* aimingTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingEntity);
 							assert(aimingTransform != nullptr);
 							
-							playerTransform->m_position = m.Position;
+							// Set the position of the player
+							Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+							assert(collision != nullptr);
+							float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+							glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+							// Check if the displacement has the same sign as the local velocity.
+							if (displacement.y * verticalVelocity >= 0.0f)
+								playerTransform->m_position.y = m.Position.y;
+							playerTransform->m_position.x = m.Position.x;
+							playerTransform->m_position.z = m.Position.z;
 							playerTransform->m_orientation.SetOrientation(m.Orientation);
 							aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
 
 							// Extrapolate the position using ping time.
 							// TODO: Possibly let the action system and physics do the extrapolation.
+							/*
 							glm::vec3 facing = playerTransform->m_orientation.GetFront();
 							glm::vec3 right = playerTransform->m_orientation.GetRight();
 							glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -345,7 +356,7 @@ namespace RootForce
 								movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 							playerTransform->m_position += movement;
-
+							*/
 							// Log the action (debug)
 							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
 						}
@@ -1276,11 +1287,21 @@ namespace RootForce
 								playerAction->ActiveAbility = activeAbility;
 
 								// Set the position of the player
-								playerTransform->m_position = m.Position;
+								Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+								assert(collision != nullptr);
+								float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+								glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+								// Check if the displacement has the same sign as the local velocity.
+								if (displacement.y * verticalVelocity >= 0.0f)
+									playerTransform->m_position.y = m.Position.y;
+								playerTransform->m_position.x = m.Position.x;
+								playerTransform->m_position.z = m.Position.z;
 								playerTransform->m_orientation.SetOrientation(m.Orientation);
 								aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
 								// Extrapolate the position using ping time
+								/*
 								glm::vec3 facing = playerTransform->m_orientation.GetFront();
 								glm::vec3 right = playerTransform->m_orientation.GetRight();
 								glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -1288,6 +1309,7 @@ namespace RootForce
 									movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 								playerTransform->m_position += movement;
+								*/
 							}
 
 							// Broadcast the action to all other connected clients.
