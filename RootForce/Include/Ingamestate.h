@@ -25,6 +25,7 @@
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
 #include <RootSystems/Include/BotanySystem.h>
+#include <RootSystems/Include/TransformInterpolationSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -83,6 +84,7 @@ namespace RootForce
 		RootForce::BotanySystem*						m_botanySystem;
 		RootForce::TimerSystem*							m_timerSystem;
 		RootForce::FollowSystem*						m_followSystem;
+        RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
 
 		Keymapper* m_keymapper;
 

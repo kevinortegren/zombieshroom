@@ -98,6 +98,10 @@ namespace RootForce
 		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
+        // Initialize the interpolation system
+		m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
+        
 		// Initialize anim system.
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -448,6 +452,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+            m_transformInterpolationSystem->Process();
 			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
