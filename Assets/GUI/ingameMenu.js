@@ -25,11 +25,11 @@ function UpdateScoreScreen(p_localTeam, p_localName, p_list)
 			continue;
 		var team;
 		if(p_list[player][0] == 0)
-			team = $("#SpectatorTable");
+			team = $("#SpectatorTable tbody");
 		else if(p_list[player][0] == 1)
-			team = $("#BlueScoreTable");
+			team = $("#BlueScoreTable tbody");
 		else if(p_list[player][0] == 2)
-			team = $("#RedScoreTable");
+			team = $("#RedScoreTable tbody");
 		else
 			continue;
 		teamSize[p_list[player][0]]++;
