@@ -9,8 +9,8 @@ function Player.OnCreate(userId, actionId)
 	local transform = Transformation.New(player);
 	
 	transform:SetPos(Vec3.New(100,10,0));
-			
- 	playerComponent:SetAbility(3, "Push", -1);
+
+	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
@@ -62,7 +62,7 @@ function Player.OnTeamSelect(self, teamId)
     playerAction:SetStrafePower(0);
     playerAction:SetAngle(Vec2.New(0, 0));
     playerAction:SetAbilityTime(0.0);
-    playerAction:SelectAbility(1);
+    playerAction:SelectAbility(0);
 
     playerPhysics:SetMovementSpeed(25);
     playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
@@ -148,7 +148,5 @@ function Player.OnCollide (self, entity)
 end
 
 function Player.OnDestroy (self)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
+	Entity.Remove(self);
 end

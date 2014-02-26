@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v2.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v6.mb</source_data>
     </contributor>
-    <created>2014-02-24T11:46:31</created>
-    <modified>2014-02-24T11:46:31</modified>
+    <created>2014-02-26T13:50:34</created>
+    <modified>2014-02-26T13:50:34</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -130,16 +130,6 @@
     </effect>
   </library_effects>
   <library_images>
-    <image id="file16" name="file16">
-      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/Tree1GreenLeaf.dds</init_from>
-      <extra>
-        <technique profile="OpenCOLLADAMaya">
-          <dgnode_type>kFile</dgnode_type>
-          <image_sequence>0</image_sequence>
-          <originalMayaNodeId>file16</originalMayaNodeId>
-        </technique>
-      </extra>
-    </image>
     <image id="file17" name="file17">
       <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/Tree1Normal.dds</init_from>
       <extra>
@@ -147,6 +137,16 @@
           <dgnode_type>kFile</dgnode_type>
           <image_sequence>0</image_sequence>
           <originalMayaNodeId>file17</originalMayaNodeId>
+        </technique>
+      </extra>
+    </image>
+    <image id="file16" name="file16">
+      <init_from>file:///C:/Users/BTH/Documents/zombieshroom/Assets/Textures/Tree2GreenLeaf.dds</init_from>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <dgnode_type>kFile</dgnode_type>
+          <image_sequence>0</image_sequence>
+          <originalMayaNodeId>file16</originalMayaNodeId>
         </technique>
       </extra>
     </image>
@@ -224,13 +224,13 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v2">
+    <visual_scene id="VisualSceneNode" name="v6">
       <node id="RootCaveTreeMother" name="RootCaveTreeMother" type="NODE">
         <translate sid="translate">-17.91311 30.79183 21.72644</translate>
         <rotate sid="rotateZ">0 0 1 0.03161214</rotate>
         <rotate sid="rotateY">0 1 0 139.8612</rotate>
         <rotate sid="rotateX">1 0 0 0.08624497</rotate>
-        <scale sid="scale">8.494367 8.494367 8.494367</scale>
+        <scale sid="scale">7.441906 7.441906 7.441906</scale>
         <instance_geometry url="#RootCaveTreeMotherShape">
           <bind_material>
             <technique_common>
