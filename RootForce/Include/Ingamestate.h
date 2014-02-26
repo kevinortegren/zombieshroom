@@ -88,5 +88,6 @@ namespace RootForce
 
 		GameStates::GameStates UpdateConsole();
 		void UpdateHUD();
+		void PrintGlobalCommandHelp();
 	};
 }

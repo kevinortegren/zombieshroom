@@ -67,7 +67,15 @@ namespace Render
 		std::getline(*p_ss, module, ' ');
 		std::getline(*p_ss, module, ' ');
 
-		if(module == "glow" || module == "g")
+		if(module == "help")
+		{
+			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[RENDER COMMANDS]");
+			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r la [int] [1/0] -Activate or deactivate layer of choice");
+			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r s [1/0] -Activate or deactivate shadows");
+			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r l -Light settings");
+			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r g -Glow settings ");
+		}
+		else if(module == "glow" || module == "g")
 		{	
 			std::getline(*p_ss, param, ' ');
 			std::getline(*p_ss, value, ' ');

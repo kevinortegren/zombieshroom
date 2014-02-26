@@ -9,7 +9,7 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f))
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f)), m_playerWaterDeath(true)
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -82,7 +82,7 @@ namespace RootForce
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
 		{	
 			//Check if player and kill
-			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity))
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
 			}
@@ -360,6 +360,12 @@ namespace RootForce
 		m_waterOptions.y = (m_waterOptions.y == 0.0f) ? 1.0f : 0.0f;
 	}
 
+	void WaterSystem::ToggleCollideDeath()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water collision death toggled!");
+		m_playerWaterDeath = m_playerWaterDeath ? false : true;
+	}
+
 	void WaterSystem::IncreaseSpeed()
 	{
 		m_speed += 2.0f;
@@ -444,7 +450,7 @@ namespace RootForce
 		return glm::vec2((p_worldSpace.x + scaleHalfWidth) * m_texSize, (p_worldSpace.y + scaleHalfWidth) * m_texSize) / (scaleHalfWidth*2.0f);
 	}
 
-	void WaterSystem::ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data )
+	void WaterSystem::ParseCommands(std::stringstream* p_data )
 	{
 		std::string module;
 		std::string param;
@@ -453,7 +459,11 @@ namespace RootForce
 		std::getline(*p_data, module, ' ');
 		std::getline(*p_data, module, ' ');
 
-		if(module == "wireframe" || module == "wf")
+		if(module == "collide" || module == "c")
+		{	
+			ToggleCollideDeath();
+		}
+		else if(module == "wireframe" || module == "wf")
 		{	
 			ToggleWireFrame();
 
@@ -508,10 +518,10 @@ namespace RootForce
 			}
 			else if(param == "help")
 			{
-				p_chat->JSAddMessage("[WATER DAMPING COMMANDS]");
-				p_chat->JSAddMessage("/W[ATER] d[amping] i[ncrease] - Increase water damping");
-				p_chat->JSAddMessage("/W[ATER] d[amping] d[ecrease] - Decrease water damping");
-				p_chat->JSAddMessage("/W[ATER] d[amping] s[et] X	- Set water damping to X(float)");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[WATER DAMPING COMMANDS]");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w d i - Increase water damping");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w d d - Decrease water damping");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w d s [float] - Set water damping to X(float)");
 			}
 		}
 		else if(module == "speed" || module == "s")
@@ -533,10 +543,10 @@ namespace RootForce
 			}
 			else if(param == "help")
 			{
-				p_chat->JSAddMessage("[WATER SPEED COMMANDS]");
-				p_chat->JSAddMessage("/W[ATER] s[peed] i[ncrease] - Increase water speed");
-				p_chat->JSAddMessage("/W[ATER] s[peed] d[ecrease] - Decrease water speed");
-				p_chat->JSAddMessage("/W[ATER] s[peed] s[et] X	  - Set water speed to X(float)");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[WATER SPEED COMMANDS]");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w s i - Increase water speed");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w s d - Decrease water speed");
+				m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w s s [float] - Set water speed to X(float)");
 			}
 		}
 		else if(module == "height" || module == "h")
@@ -553,19 +563,20 @@ namespace RootForce
 		}
 		else if(module == "help")
 		{
-			p_chat->JSAddMessage("[WATER COMMANDS]");
-			p_chat->JSAddMessage("/W[ATER] p[ause]		 - Toggle water simulation pause");
-			p_chat->JSAddMessage("/W[ATER] w[ire]f[rame] - Toggle water wireframe mode");
-			p_chat->JSAddMessage("/W[ATER] refl			 - Toggle reflections");
-			p_chat->JSAddMessage("/W[ATER] refr			 - Toggle refractions");
-			p_chat->JSAddMessage("/W[ATER] norm			 - Toggle normal maps");
-			p_chat->JSAddMessage("/W[ATER] depth X		 - Set water depth factor X(float)");
-			p_chat->JSAddMessage("/W[ATER] r[eset]		 - Reset the water simulation");
-			p_chat->JSAddMessage("/W[ATER] init 		 - Init water movement with default values");
-			p_chat->JSAddMessage("/W[ATER] dis[turb]	 - Disturb water at player position");
-			p_chat->JSAddMessage("/W[ATER] h[eight] X	 - Set water height to X(float)");
-			p_chat->JSAddMessage("/W[ATER] d[amping]	 - Damping settings");
-			p_chat->JSAddMessage("/W[ATER] s[peed]		 - Speed settings");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[WATER COMMANDS]");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w p - Toggle water simulation pause");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w wf - Toggle water wireframe mode");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w refl - Toggle reflections");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w refr - Toggle refractions");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w norm - Toggle normal maps");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w c - Toggle water death collide");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w depth [float]	- Set water depth factor X(float)");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w r - Reset the water simulation");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w init - Init water movement with default values");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w dis - Disturb water at player position");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w h [float] - Set water height to X(float)");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w d - Damping settings");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w s - Speed settings");
 		}
 		else if(module == "save")
 		{
@@ -619,4 +630,5 @@ namespace RootForce
 
 		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is moving!");
 	}
+
 }
