@@ -80,6 +80,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
 			p_bs->Serialize(p_writeToBitstream, Action);
+			p_bs->Serialize(p_writeToBitstream, IsPush);
 		}
 
 		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -609,6 +610,7 @@ namespace RootForce
 			else
 			{
 				entity = it->second;
+				assert(entity != nullptr);
 			}
 
 			// Read the number of components

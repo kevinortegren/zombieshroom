@@ -104,8 +104,9 @@ namespace RootForce
 		if(p_killerID != Network::ReservedUserID::NONE)
 		{
 			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
 			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
-			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(g_networkEntityMap[killerNetworkID]);
+			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(killerEntity);
 
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
