@@ -4,6 +4,7 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootForce/Include/GameStates.h>
+#include <RootEngine/GUI/Include/WebView.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 extern ECS::World* g_world;
@@ -73,7 +74,7 @@ namespace RootForce
 				first = !first;
 			else
 				scoreString += ",";
-			scoreString += "["+std::to_string(score.Team)+",'" + score.Name + "',"+std::to_string(score.Kills)+","+std::to_string(score.Deaths)+"]";
+			scoreString += "["+std::to_string(score.Team)+",'" + RootEngine::GUISystem::PreventHTMLInjections(score.Name) + "',"+std::to_string(score.Kills)+","+std::to_string(score.Deaths)+"]";
 		}
 		scoreString += "]";
 		return scoreString;

@@ -181,7 +181,7 @@ namespace RootForce
 							PlayerComponent* senderPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(sender);
 							assert(senderPlayerComponent != nullptr);
 						
-							std::string message = senderPlayerComponent->Name + ": " + m.Message.C_String();
+							std::string message = RootEngine::GUISystem::PreventHTMLInjections(senderPlayerComponent->Name) + ": " + m.Message.C_String();
 							m_chatSystem->JSAddMessage(message);
 						}
 						else

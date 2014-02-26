@@ -10,6 +10,48 @@ namespace RootEngine
 {
 	namespace GUISystem
 	{
+		inline std::string PreventHTMLInjections(std::string p_source)
+		{
+			size_t pos = 0;
+			// & - &amp;
+			/*while ((pos = p_source.find("&", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&amp;");
+				pos += 5;
+			}*/
+			// < - &lt;
+			pos = 0;
+			while ((pos = p_source.find("<", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&lt;");
+				pos += 4;
+			}
+			// > - &gt;
+			pos = 0;
+			while ((pos = p_source.find(">", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&gt;");
+				pos += 4;
+			}
+			// ` - &#96;
+			pos = 0;
+			while ((pos = p_source.find("`", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&#96;");
+				pos += 5;
+			}
+			// ' - &#39;
+			pos = 0;
+			while ((pos = p_source.find("'", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&#39;");
+				pos += 5;
+			}
+			// " - &quot;
+			pos = 0;
+			while ((pos = p_source.find("\"", pos)) != std::string::npos) {
+				p_source.replace(pos, 1, "&quot;");
+				pos += 6;
+			}
+
+			return p_source;
+		}
+
 		class WebView abstract
 		{
 		public:
