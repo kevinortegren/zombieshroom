@@ -801,9 +801,16 @@ namespace RootForce
 							if (playerEntity != nullptr)
 							{
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+								TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"));
 								assert(health != nullptr);
+								assert(playerComp != nullptr);
+								assert(rules != nullptr);
 
 								health->Health = 0;
+								playerComp->Score --;
+								playerComp->Deaths ++;
+								rules->TeamScore[playerComp->TeamID] --;
 							}
 							else
 							{
@@ -1918,8 +1925,16 @@ namespace RootForce
 								assert(playerEntity != nullptr);
 
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+								TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"));
 								assert(health != nullptr);
+								assert(playerComp != nullptr);
+								assert(rules != nullptr);
+
 								health->Health = 0;
+								playerComp->Score --;
+								playerComp->Deaths ++;
+								rules->TeamScore[playerComp->TeamID] --;
 							}
 
 							// Broadcast the suicide to all other connected clients.

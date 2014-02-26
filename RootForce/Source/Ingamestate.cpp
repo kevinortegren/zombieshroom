@@ -586,7 +586,10 @@ namespace RootForce
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			PlayerComponent* playerComp =  g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+			playerComp->Score --;
+			playerComp->Deaths ++;
+			g_world->GetEntityManager()->GetComponent<TDMRuleSet>(g_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playerComp->TeamID] --;
 
 			// Notify the server of our suicide.
 			NetworkMessage::Suicide m;
