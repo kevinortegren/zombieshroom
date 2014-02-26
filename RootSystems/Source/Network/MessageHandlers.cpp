@@ -339,7 +339,9 @@ namespace RootForce
 								
 							// Check if the displacement has the same sign as the local velocity.
 							if (displacement.y * verticalVelocity >= 0.0f)
-								playerTransform->m_position = m.Position;
+								playerTransform->m_position.y = m.Position.y;
+							playerTransform->m_position.x = m.Position.x;
+							playerTransform->m_position.z = m.Position.z;
 							playerTransform->m_orientation.SetOrientation(m.Orientation);
 							aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
@@ -1291,8 +1293,9 @@ namespace RootForce
 								
 								// Check if the displacement has the same sign as the local velocity.
 								if (displacement.y * verticalVelocity >= 0.0f)
-									playerTransform->m_position = m.Position;
-
+									playerTransform->m_position.y = m.Position.y;
+								playerTransform->m_position.x = m.Position.x;
+								playerTransform->m_position.z = m.Position.z;
 								playerTransform->m_orientation.SetOrientation(m.Orientation);
 								aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
