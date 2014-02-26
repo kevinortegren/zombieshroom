@@ -101,6 +101,7 @@ namespace RootForce
 			Network::UserID_t User;
 			bool IsYou;
 			RakNet::RakString Name;
+			uint8_t TeamID;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

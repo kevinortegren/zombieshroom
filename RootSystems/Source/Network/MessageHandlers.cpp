@@ -227,6 +227,15 @@ namespace RootForce
 							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 							assert(playerEntity != nullptr);
 
+							if(m.TeamID != 0)
+							{
+								// Call the OnCreate script
+								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+								g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
+								g_engineContext.m_script->AddParameterNumber(m.TeamID);
+								g_engineContext.m_script->ExecuteScript();
+							}
+
 							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 							assert(playerComponent != nullptr);
 
@@ -303,12 +312,16 @@ namespace RootForce
 					// Only remote clients need to parse. A local server would already have updated the entities.
 					if (clientComponent->IsRemote)
 					{
-						// Make sure we are connected before parsing commands.
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							assert(playerEntity != nullptr);
 
+						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+						assert(playerEntity != nullptr);
+
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+						assert(playerComponent != nullptr);
+
+						// Make sure we are connected before parsing commands.
+						if (ClientState::IsConnected(clientComponent->State) && playerComponent->TeamID != 0)
+						{
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
 
@@ -1986,6 +1999,7 @@ namespace RootForce
 											n.User = userID;
 											n.IsYou = false;
 											n.Name = RakNet::RakString(playerComponent->Name.c_str());
+											n.TeamID = 0;
 
 											ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
 											if (otherClientEntity != nullptr)
@@ -2029,6 +2043,7 @@ namespace RootForce
 												n.User = m_peer->GetIndexFromSystemAddress(addresses[i]);
 												n.IsYou = addresses[i] == p_packet->systemAddress;
 												n.Name = RakNet::RakString(otherPlayerComponent->Name.c_str());
+												n.TeamID = otherPlayerComponent->TeamID;
 
 												RakNet::BitStream bs;
 												bs.Write((RakNet::MessageID) ID_TIMESTAMP);
