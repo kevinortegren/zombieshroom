@@ -13,6 +13,7 @@ namespace RootForce
 		ECS::Entity* TargetPlayer;
 		glm::vec3 TargetPosition;
 		float Controllability;
+		float Speed;
 		HomingComponent()
 			: TargetPlayer(nullptr),
 			  TargetPosition(glm::vec3(0,0,0)),

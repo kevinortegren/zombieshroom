@@ -24,12 +24,12 @@ namespace RootForce
 		}
 		Transform* abilityTransform = m_world->GetEntityManager()->GetComponent<Transform>(p_entity);
 		glm::vec3 currentVelocity = physics->m_velocity;//g_engineContext.m_physics->GetVelocity(*collision->m_handle);
-		float speed = glm::length(currentVelocity);
-		glm::vec3 targetVelocity = glm::normalize(target->TargetPosition - abilityTransform->m_position) * speed;
+		//target->Speed = glm::length(currentVelocity);
+		glm::vec3 targetVelocity = glm::normalize(target->TargetPosition - abilityTransform->m_position) * target->Speed;
 
 		glm::vec3 changeVel = (targetVelocity - currentVelocity) * target->Controllability;
 
-		physics->m_velocity = glm::normalize(currentVelocity + changeVel) * speed;
+		physics->m_velocity = glm::normalize(currentVelocity + changeVel) * target->Speed;
 	}
 
 }

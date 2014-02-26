@@ -2044,11 +2044,12 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int HomingCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(2);
+			NumberOfArgs(3);
 			RootForce::HomingComponent **s = (RootForce::HomingComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::HomingComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HomingComponent>(*e);
 			(*s)->Controllability = (float)luaL_checknumber(p_luaState, 2);
+			(*s)->Speed = (float)luaL_checknumber(p_luaState, 3);
 			luaL_setmetatable(p_luaState, "Homing");
 			return 1;
 		}
