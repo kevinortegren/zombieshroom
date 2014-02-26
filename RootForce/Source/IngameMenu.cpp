@@ -2,6 +2,8 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <RakNet/GetTime.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
@@ -60,14 +62,21 @@ namespace RootForce
 
 		if(m_changeTeam >= 0)
 		{
-			// TODO: Instead, send a message to server, handle team change on response
-			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-			
-			// Call the OnCreate script
-			g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-			g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-			g_engineContext.m_script->AddParameterNumber(m_changeTeam);
-			g_engineContext.m_script->ExecuteScript();
+			if(m_clientPeer != nullptr)
+			{
+				Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(g_world->GetTagManager()->GetEntityByTag("Player"));
+				RootForce::NetworkMessage::PlayerTeamSelect m;
+				m.TeamID = m_changeTeam;
+				m.UserID = network->ID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityClaimedBy);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
 
 			m_return = true;
 			m_changeTeam = -1;
