@@ -431,6 +431,10 @@ namespace RootForce
 		}
 
 		{
+			m_transformInterpolationSystem->Process();
+		}
+
+		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
 		}
@@ -452,7 +456,6 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
-            m_transformInterpolationSystem->Process();
 			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();

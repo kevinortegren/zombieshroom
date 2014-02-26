@@ -1,6 +1,7 @@
 #include <RootSystems/Include/TransformInterpolationSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootSystems/Include/PlayerSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -11,6 +12,7 @@ namespace RootForce
 	{
 		SetUsage<Transform>();
 		SetUsage<Renderable>();
+		SetUsage<PlayerComponent>();
 	}
 
 	void TransformInterpolationSystem::Init()
