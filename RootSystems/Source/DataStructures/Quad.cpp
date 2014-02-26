@@ -42,11 +42,14 @@ namespace RootForce
 			transformMatrix = glm::rotate(transformMatrix, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 			transformMatrix = glm::scale(transformMatrix, transform->m_scale);
 
+			glm::mat4x4 normalMatrix;
+			normalMatrix = glm::mat4(glm::transpose(glm::inverse(glm::mat3(transformMatrix))));
+
 			// Parse vertex data.
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
 			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
-			int offset = 0;
+			unsigned offset = m_vertices.size();
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
 				Render::Vertex1P1N1UV1T1BT v;
@@ -59,37 +62,72 @@ namespace RootForce
 				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
 				v.m_pos = glm::vec3(tf.x, tf.y, tf.z);
 
+				glm::vec4 tfn = normalMatrix * glm::vec4(v.m_normal, 1.0f);
+				v.m_normal = glm::vec3(tfn.x, tfn.y, tfn.z);
+
+				glm::vec4 tfb = normalMatrix * glm::vec4(v.m_bitangent, 1.0f);
+				v.m_bitangent = glm::vec3(tfb.x, tfb.y, tfb.z);
+
+				glm::vec4 tbt = normalMatrix * glm::vec4(v.m_tangent, 1.0f);
+				v.m_tangent = glm::vec3(tbt.x, tbt.y, tbt.z);
+
 				m_vertices.push_back(std::move(v));
-				offset++;
+			}
+
+			if(mesh->GetElementBuffer() == nullptr)
+			{
+				for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetNumElements(); i += 3)
+				{		
+					Polygon p;
+
+					p.m_indices.push_back(i + offset);
+					p.m_indices.push_back(i + 1 + offset);
+					p.m_indices.push_back(i + 2 + offset);
+
+					/*std::cout << "P0: " << i + indexOffset << std::endl;
+					std::cout << "P1: " << i + 1 + indexOffset << std::endl;
+					std::cout << "P2: " << i + 2 + indexOffset << std::endl;
+					std::cout << "----" << std::endl;*/
+
+					p.m_materialIndex = materialIndex;
+
+					m_boundsPolygons.push_back(std::move(p));
+				}
 			}
 
 			glUnmapBuffer(GL_ARRAY_BUFFER);
 
-			// Parse index data.
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
-			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-
-			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+			if(mesh->GetElementBuffer() != nullptr)
 			{
-				Polygon p;
-				int i0, i1, i2;
+				// Parse index data.
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
+				data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 
-				memcpy(&i0, &data[i], sizeof(int));
-				memcpy(&i1, &data[i + 4], sizeof(int));
-				memcpy(&i2, &data[i + 8], sizeof(int));
+				for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+				{
+					Polygon p;
+					int i0, i1, i2;
 
-				p.m_indices.push_back(i0 + indexOffset);
-				p.m_indices.push_back(i1 + indexOffset);
-				p.m_indices.push_back(i2 + indexOffset);
+					memcpy(&i0, &data[i], sizeof(int));
+					memcpy(&i1, &data[i + 4], sizeof(int));
+					memcpy(&i2, &data[i + 8], sizeof(int));
 
-				p.m_materialIndex = materialIndex;
+					p.m_indices.push_back(i0 + offset);
+					p.m_indices.push_back(i1 + offset);
+					p.m_indices.push_back(i2 + offset);
 
-				m_boundsPolygons.push_back(std::move(p));
+					/*std::cout << "P0: " << i0 + indexOffset << std::endl;
+					std::cout << "P1: " << i1 + indexOffset << std::endl;
+					std::cout << "P2: " << i2 + indexOffset << std::endl;
+					std::cout << "----" << std::endl;*/
+
+					p.m_materialIndex = materialIndex;
+
+					m_boundsPolygons.push_back(std::move(p));
+				}
+
+				glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 			}
-
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-
-			indexOffset += offset;
 		}
 		
 		// Create an AABB for the quad tree structure.
@@ -609,7 +647,7 @@ namespace RootForce
 		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialStringStream.str());
 		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
 		renderable->m_material->m_tileFactor = m_materials[p_materialIndex]->m_tileFactor;
-
+		renderable->m_material->m_flipped = m_materials[p_materialIndex]->m_flipped;
 
 		// Add tile factor for blended meshes.
 		if(renderable->m_material->m_tileFactor != 0)

@@ -33,6 +33,7 @@ namespace RootForce
 			void SetID(ECS::Entity* p_entity, UserID_t p_userID, ActionID_t p_actionID);
 			void SetID(ECS::Entity* p_entity, NetworkComponent* p_parent);
 			static void ResetSequenceForUser(UserID_t p_id);
+			static UserActionKey_t GetUserActionKey(UserID_t p_user, ActionID_t p_action);
 		};
 
 

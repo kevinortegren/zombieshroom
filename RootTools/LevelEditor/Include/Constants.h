@@ -54,7 +54,7 @@ struct UpdateMessage
 
 struct Flags
 {
-	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard, _AbilitySpawnPoint, _NoRender;
+	bool _Transparent, _Static, _SpawnPoint, _Particle, _Water, _Hazard, _AbilitySpawnPoint, _NoRender, _Grass;
 	int _PaintStatus; // -1: False, 0: Painting, 1: Painted
 
 	Flags()
@@ -67,6 +67,7 @@ struct Flags
 		_Hazard = false;
 		_AbilitySpawnPoint = false;
 		_NoRender = false;
+		_Grass = false;
 		_PaintStatus = -1;
 	}
 };

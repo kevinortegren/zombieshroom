@@ -10,9 +10,9 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/Transform.h>
 #include "glm/glm.hpp"
-#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/ChatSystem.h>
-#endif
+#include <RootSystems/Include/PlayerSystem.h>
+
 namespace RootForce
 {
 	namespace WaterState
@@ -54,9 +54,7 @@ namespace RootForce
 		float GetWaterHeight();
 		void SetWaterHeight(float p_height);
 
-		#ifndef COMPILE_LEVEL_EDITOR
 		void ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data);
-		#endif
 
 	private:
 

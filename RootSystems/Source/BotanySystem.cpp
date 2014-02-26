@@ -15,7 +15,7 @@ namespace RootForce
 		m_renderUniforms.m_lod1Distance = 20.0f;
 		m_renderUniforms.m_lod2Distance = 60.0f;
 
-		m_updateUniforms.m_grassFactor = 2.0f;
+		m_updateUniforms.m_grassFactor = 6.0f;
 
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
@@ -24,7 +24,7 @@ namespace RootForce
 		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(m_updateUniforms), &m_updateUniforms);
 
 		// Buffer botany rendering uniforms.
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferData(1, sizeof(m_renderUniforms), &m_renderUniforms);
+		m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferData(1, sizeof(m_renderUniforms), &m_renderUniforms);
 
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
@@ -34,7 +34,7 @@ namespace RootForce
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
-		m_quadTree.Initialize(m_engineContext, m_world, "Painted", "Painted_Split");
+		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split");
 
 		Divide();
 
@@ -69,7 +69,8 @@ namespace RootForce
 		}
 
 		m_initialized = true;
-		m_show = false;
+		m_show = true;
+		m_reconstruct = true;
 	}
 
 	void BotanySystem::Construct(QuadNode* p_node)
@@ -106,8 +107,12 @@ namespace RootForce
 
 			mesh->BindTransformFeedback();
 
+			int flipped = 0;
+			if(renderable->m_material->m_flipped)
+				flipped = 1;
+
 			// Apply update program.
-			m_effect->GetTechniques()[0]->GetPrograms()[0]->Apply();
+			m_effect->GetTechniques()[flipped]->GetPrograms()[0]->Apply();
 
 			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES);
 
@@ -126,23 +131,68 @@ namespace RootForce
 		glDisable(GL_RASTERIZER_DISCARD); 
 	}
 
+	void BotanySystem::Construct(QuadNode* p_node, unsigned p_id)
+	{
+		glEnable(GL_RASTERIZER_DISCARD); 
+		int i = 0;
+		for(auto entity = p_node->m_indices.begin(); entity != p_node->m_indices.end(); ++entity)
+		{
+			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*entity)]);
+			renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]->Bind(6);				
+			renderable->m_model->m_meshes[0]->Bind();
+
+			// Fetch an empty mesh to output data into.
+			if(i >= m_cells[p_node->m_id].m_meshSize)
+				return;
+
+			Render::MeshInterface* mesh = m_meshes[m_cells[p_node->m_id].m_meshIndices[i]];
+
+			mesh->BindTransformFeedback();
+
+			int flipped = 0;
+			if(renderable->m_material->m_flipped)
+				flipped = 1;
+
+			// Apply update program.
+			m_effect->GetTechniques()[flipped]->GetPrograms()[0]->Apply();
+
+			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_PATCHES);
+
+			glBeginTransformFeedback(GL_POINTS);
+			renderable->m_model->m_meshes[0]->Draw();
+			glEndTransformFeedback();
+
+			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_TRIANGLES);
+			renderable->m_model->m_meshes[0]->Unbind();
+
+			i++;
+		}
+		glDisable(GL_RASTERIZER_DISCARD); 
+	}
+
+	void BotanySystem::Reconstruct()
+	{
+		m_reconstruct = true;
+	}
 
 	void BotanySystem::Process()
 	{
 		if(m_initialized && m_show)
 		{
+#ifndef COMPILE_LEVEL_EDITOR
 			// Get player position.
 			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-
 			// Buffer player position.
-			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &ptransform->m_position);
-
+			m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &ptransform->m_position);
+#endif
 			// Get eye camera.
 			ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 			RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity);
 			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
-
+#ifdef COMPILE_LEVEL_EDITOR
+			m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &transform->m_position);
+#endif
 			float farPlane = BOTANY_CULL_RANGE;
 			glm::mat4 projectionMatrix = glm::perspectiveFov<float>(camera->m_frustum.m_fov, (float)m_engineContext->m_renderer->GetWidth(),
 				(float)m_engineContext->m_renderer->GetHeight(), camera->m_frustum.m_near, farPlane);
@@ -170,6 +220,10 @@ namespace RootForce
 				{
 					Construct((*itr));
 				}
+				else if(m_reconstruct)
+				{
+					Construct((*itr), id);
+				}
 
 				// Render result.
 				for(int j = 0; j < m_cells[id].m_meshSize; j++)
@@ -180,9 +234,14 @@ namespace RootForce
 					job.m_mesh = m_meshes[m_cells[id].m_meshIndices[j]];
 					job.m_mesh->SetNoCulling(true);
 					job.m_material = m_material;
+					job.m_forward = false;
+					job.m_refractive = false,
+					job.m_renderPass = RenderPass::RENDERPASS_DEFAULT;
 					m_engineContext->m_renderer->AddRenderJob(job);
 				}
 			}
+
+			m_reconstruct = false;
 		}
 	}
 

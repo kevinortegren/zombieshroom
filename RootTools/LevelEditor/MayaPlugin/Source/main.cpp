@@ -740,6 +740,8 @@ void getMeshFlags(MObject object, Transform& transformation)
 					transformation.flags._Water = true;
 				if(name == "NoRender")
 					transformation.flags._NoRender = true;
+				if(name == "Grass")
+					transformation.flags._Grass = true;
 
 				getMeshFlags(trans.parent(i), transformation);
 			}

@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 			textures.m_billboard = "grass_billboard";
 			textures.m_terrainTexture = "customGrass3";
 
-			//botanySystem->Initialize(textures);
+			botanySystem->Initialize(textures);
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
 				particleSystem->Process();	
-				shadowSystem->Process();			
+				shadowSystem->Process();
 				renderingSystem->Process();
 
 
@@ -555,6 +555,8 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
 			painter->BufferData(RM.PpaintList[paintID]->Pixels);
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+			mat->m_flipped = true;
+			botanySystem->Reconstruct();
 		}
 		else if(painted)
 		{
@@ -704,6 +706,9 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 
 	if(transformation.flags._Transparent)
 		p_world->GetGroupManager()->RegisterEntity("Transparent", entity);
+
+	if(transformation.flags._Grass)
+		p_world->GetGroupManager()->RegisterEntity("Grass", entity);
 
 	if(transformation.flags._Water)
 	{
@@ -1079,7 +1084,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			if(!NoRender)
 			{
 				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
-				rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));				
+				rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
 			}
 		}
 		

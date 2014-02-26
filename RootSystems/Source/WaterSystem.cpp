@@ -46,7 +46,7 @@ namespace RootForce
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
-			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  m_computeJob.m_textures[1];
+			m_renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE1] =  m_computeJob.m_textures[1];
 			//Swap the textures for next simulation step
 			std::swap(m_computeJob.m_textures[0], m_computeJob.m_textures[1]);
 			//Reset timer and preserve non-exact time additions
@@ -80,7 +80,15 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{	//Disturb
+		{	
+			#ifndef COMPILE_LEVEL_EDITOR
+			//Check if player and kill
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity))
+			{
+				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
+			}
+			#endif
+			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
 			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
@@ -154,7 +162,6 @@ namespace RootForce
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 		
-
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
@@ -163,8 +170,9 @@ namespace RootForce
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
-		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+		m_renderable->m_pass = RenderPass::RENDERPASS_WATER;
 		m_renderable->m_forward = true;
+		m_renderable->m_refractive = true;
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;

@@ -45,6 +45,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -56,15 +57,11 @@ namespace RootForce
 		
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
-		g_engineContext.m_resourceManager->LoadScript("AbilityBall");
-		g_engineContext.m_resourceManager->LoadScript("FireBall");
-		g_engineContext.m_resourceManager->LoadScript("AbilityDash");
-		g_engineContext.m_resourceManager->LoadScript("AbilityTest");
-		g_engineContext.m_resourceManager->LoadScript("AbilityRay");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
 		
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
@@ -149,8 +146,13 @@ namespace RootForce
 
 		m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
 
+		// Initialize the timer system.
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+		// Initialize the follow system.
+		m_followSystem = new RootForce::FollowSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
 
 		// Set debug visualization flags.
@@ -175,9 +177,10 @@ namespace RootForce
 
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
-#endif
+
 		// Subdivide world.
-		//m_sharedSystems.m_worldSystem->SubdivideTree();
+		m_sharedSystems.m_worldSystem->SubdivideTree();
+#endif
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -188,6 +191,7 @@ namespace RootForce
 		
 		// Set network peer interfaces on the systems that needs to send messages.
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
+		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
 		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
@@ -228,7 +232,7 @@ namespace RootForce
 		m_animationSystem->Terminate();
 
 		// Remove all networked entities and reset the entity map and sequence map.
-		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
+		//Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager());
 		g_networkEntityMap.clear();
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
@@ -247,6 +251,7 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -259,7 +264,6 @@ namespace RootForce
 		g_world->SetDelta(p_deltaTime);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
-
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
@@ -370,6 +374,11 @@ namespace RootForce
 		}
 
 		{
+			PROFILE("Ragdoll system", g_engineContext.m_profiler);
+			m_ragdollSystem->Process();
+		}
+
+		{
 			PROFILE("Respawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_respawnSystem->Process();
 		}
@@ -379,10 +388,7 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		{
-			PROFILE("Ragdoll system", g_engineContext.m_profiler);
-			m_ragdollSystem->Process();
-		}
+		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
@@ -391,7 +397,12 @@ namespace RootForce
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
 		}
-	
+
+		{
+			PROFILE("Follow system", g_engineContext.m_profiler);
+			m_followSystem->Process();
+		}
+		
 		{
 			PROFILE("Collision system", g_engineContext.m_profiler);
 			m_collisionSystem->Process();
@@ -592,7 +603,7 @@ namespace RootForce
 				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
 			if(playerComponent->AbilityScripts[2].Cooldown > 0)
 				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility);
+			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility + 1);
 		}
 
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));

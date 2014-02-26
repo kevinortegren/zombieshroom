@@ -80,6 +80,6 @@ function AbilityTest.OnCollide (self, entity)
 		end
 	end
 end
-
+--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 function AbilityTest.OnDestroy (self)
 end

@@ -113,7 +113,7 @@ namespace Render
 		if(m_display)
 		{
 			// Bind glow as input.
-			glActiveTexture(GL_TEXTURE0 + 5);
+			glActiveTexture(GL_TEXTURE0 + GLRenderer::s_textureSlots[TextureSemantic::SHADER_INPUT]);
 			glBindTexture(GL_TEXTURE_2D, m_glowTexture->GetHandle());
 
 			// Vertical pass.

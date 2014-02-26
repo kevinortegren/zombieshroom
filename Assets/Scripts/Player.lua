@@ -16,11 +16,7 @@ function Player.OnCreate(userId, actionId)
 	local stateComponent = StateComponent.New(player);
 	local network = Network.New(player, userId, actionId);
 	local tryPickup = TryPickupComponent.New(player);
-	--local waterCollider = WaterCollider.New(player);
-	--waterCollider:SetDisturbPower(0.0);
-	--waterCollider:SetDisturbInterval(0.5);
-	--waterCollider:SetRadius(5);
-
+	
 	-- TODO: Decide where to put spawn logic
 	transform:SetPos(Vec3.New(100,10,0));
 
@@ -32,14 +28,14 @@ function Player.OnCreate(userId, actionId)
 	playerAction:SetStrafePower(0);
 	playerAction:SetAngle(Vec2.New(0, 0));
 	playerAction:SetAbilityTime(0.0);
-	playerAction:SelectAbility(1);
+	playerAction:SelectAbility(0);
 
 	playerComponent:SetAbility(3, "Push", -1);
 	playerComponent:SelectAbility(0);
 
 	playerPhysics:SetMovementSpeed(25);
-	playerPhysics:SetJumpForce(20);
-	playerPhysics:SetJumpBoostForce(0.1);
+	playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
+	playerPhysics:SetJumpBoostForce(0.9); --See comment above //Kim
 
 	collision:SetMeshHandle("testchar0");
 	Collision.AddPlayerObjectToWorld(player, collision, transform, playerPhysics, collisionResponder);
@@ -80,6 +76,11 @@ function Player.OnCreate(userId, actionId)
 		renderable:SetMaterialNormal("WSNormal");
 		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
 		renderable:SetAnimation(animation);
+		local waterCollider = WaterCollider.New(player);
+		waterCollider:SetDisturbPower(0.5);
+		waterCollider:SetDisturbInterval(0.5);
+		waterCollider:SetRadius(5);
+
 	end
   
 	if Global.UserID == userId then
@@ -115,7 +116,5 @@ function Player.OnCollide (self, entity)
 end
 
 function Player.OnDestroy (self)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Entity destroyed");
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
+	Entity.Remove(self);
 end

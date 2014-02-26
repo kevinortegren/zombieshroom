@@ -9,12 +9,12 @@
 
 #define BOTANY_MAX_CELLS 1000
 #define BOTANY_VERTEX_SIZE 28
-#define BOTANY_MAX_POINTS_PER_CELL 5000
+#define BOTANY_MAX_POINTS_PER_CELL 20000
 #define BOTANY_CELL_SIZE BOTANY_VERTEX_SIZE * BOTANY_MAX_POINTS_PER_CELL
 #define BOTANY_MESHES_SIZE 200
 #define BOTANY_MESHES_PER_CELL 5
-#define BOTANY_VERTICES_PER_TERRAIN_CHUNK 500
-#define BOTANY_CULL_RANGE 100
+#define BOTANY_VERTICES_PER_TERRAIN_CHUNK 100
+#define BOTANY_CULL_RANGE 200
 
 namespace RootForce
 {
@@ -49,11 +49,13 @@ namespace RootForce
 		void SetLOD1Distance(float p_distance);
 		void SetLOD2Distance(float p_distance);
 
+		void Reconstruct();
 
 		void ParseCommands(std::stringstream* p_ss);
 
 	private:
 		void Construct(QuadNode* p_node);
+		void Construct(QuadNode* p_node, unsigned p_id);
 
 		QuadTree m_quadTree;
 
@@ -68,7 +70,7 @@ namespace RootForce
 		Render::EffectInterface* m_effect;
 		Render::Material* m_material;
 		bool m_initialized;
-
+		bool m_reconstruct;
 		bool m_show;
 
 		struct
