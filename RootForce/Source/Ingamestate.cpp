@@ -177,9 +177,10 @@ namespace RootForce
 
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
-#endif
+
 		// Subdivide world.
-		//m_sharedSystems.m_worldSystem->SubdivideTree();
+		m_sharedSystems.m_worldSystem->SubdivideTree();
+#endif
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
