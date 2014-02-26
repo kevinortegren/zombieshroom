@@ -161,7 +161,6 @@ namespace RootForce
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 		
-
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
@@ -170,7 +169,7 @@ namespace RootForce
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//Set pass
-		m_renderable->m_renderFlags = RenderPass::RENDERPASS_WATER;
+		m_renderable->m_pass = RenderPass::RENDERPASS_WATER;
 		m_renderable->m_forward = true;
 		m_renderable->m_refractive = true;
 

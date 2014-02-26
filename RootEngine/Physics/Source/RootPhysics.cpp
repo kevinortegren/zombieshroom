@@ -215,7 +215,7 @@ namespace Physics
 		}
 		else //TODO : Remove the shapeless ability!
 		{
-			unsigned int removedIndex = userPointer->m_vectorIndex;
+			int removedIndex = userPointer->m_vectorIndex;
 			if (userPointer->m_shape == PhysicsShape::SHAPE_NONE)
 			{
 				delete m_shapelessObjects.at(removedIndex);
@@ -229,7 +229,8 @@ namespace Physics
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_shape == PhysicsShape::SHAPE_NONE)
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
@@ -249,7 +250,8 @@ namespace Physics
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
@@ -265,9 +267,10 @@ namespace Physics
 				{
 
 					m_userPointer.at(i)->m_id[0] --;
-					if(m_userPointer.at(i)->m_externalControlled == true && m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE)
+					if(m_userPointer.at(i)->m_externalControlled == true && m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_type != PhysicsType::TYPE_RAGDOLL && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE )
 					{
-						m_userPointer.at(i)->m_vectorIndex--;
+						if(m_userPointer.at(i)->m_vectorIndex > removedIndex)
+							m_userPointer.at(i)->m_vectorIndex--;
 					}
 				}
 			}
@@ -1204,7 +1207,7 @@ namespace Physics
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled && m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
 			m_externallyControlled.at(index)->SetPosition(p_position);
 		}
@@ -1238,7 +1241,7 @@ namespace Physics
 		
 		if(index  == -1)
 		{
-			m_playerObjects.at(indexplayer)->Deactivate();
+			
 			Ragdoll::Ragdoll* ragdoll = new Ragdoll::Ragdoll(m_dynamicWorld);
 			btTransform trans = m_playerObjects.at(indexplayer)->GetTransform();
 			float x,y,z,w;
@@ -1257,10 +1260,12 @@ namespace Physics
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
+			m_playerObjects.at(indexplayer)->Deactivate();
+			index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
 			
 		}	
-		index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-		m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
+		
 	}
 
 	glm::mat4* RootPhysics::GetBones( int p_objectHandle)
@@ -1311,6 +1316,7 @@ namespace Physics
 
 	bool RootPhysics::IsRagdoll( int p_objecthandle )
 	{
+		assert(DoesObjectExist(p_objecthandle));
 		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
 	}
 

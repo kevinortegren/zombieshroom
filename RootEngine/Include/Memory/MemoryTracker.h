@@ -39,7 +39,7 @@ namespace RootEngine
 
 		void UpdateMemory();
 
-		MemInfo* m_memInfo;
+		MemInfo m_memInfo;
 		Logging* m_logger;
 	};
 }

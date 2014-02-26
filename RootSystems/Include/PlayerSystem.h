@@ -9,6 +9,8 @@
 
 namespace RootForce
 {
+	const uint8_t ABILITY_INDEX_NONE = 0xFF;
+	const uint8_t PUSH_ABILITY_INDEX = 3;
 	const float JUMP_TIME_LIMIT = 0.5f; //Do not fucking change without good reason, I know where you live //Kim
 
 	namespace EntityState
@@ -51,6 +53,7 @@ namespace RootForce
 
 		float AbilityTime;
 		uint8_t SelectedAbility;
+		uint8_t ActiveAbility;
 
 		bool WantRespawn;
 
@@ -61,7 +64,8 @@ namespace RootForce
 			, JumpTime(0.0f)
 			, JumpDir(glm::vec3(0))
 			, AbilityTime(0.0f)
-			, SelectedAbility(1)
+			, SelectedAbility(0)
+			, ActiveAbility(ABILITY_INDEX_NONE)
 			, WantRespawn(false)
 		{}
 	};
@@ -129,7 +133,6 @@ namespace RootForce
 		std::array<AbilityInfo, PLAYER_NUM_ABILITIES> AbilityScripts;
 		int SelectedAbility;
 		AbilityState::AbilityState AbilityState;
-		AbilityState::AbilityState PushAbilityState;
 		int Score;
 		int Deaths;
 
@@ -138,7 +141,6 @@ namespace RootForce
 			TeamID = 0;
 			SelectedAbility = 0;
 			AbilityState = AbilityState::OFF;
-			PushAbilityState = AbilityState::OFF;
 			Score = 0;
 			Deaths = 0;
 		}
