@@ -220,6 +220,14 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityRemoveCollision(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Collision>(*e);
+			return 0;
+		}
+
 		static int EntityGetCollisionResponder(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -228,6 +236,14 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>(*e);
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
+		}
+
+		static int EntityRemoveCollisionResponder(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::CollisionResponder>(*e);
+			return 0;
 		}
 
 		static int EntityGetNetwork(lua_State* p_luaState)
@@ -2256,7 +2272,9 @@ namespace RootForce
 			{"GetPhysics", EntityGetPhysics},
 			{"RemovePhysics", EntityRemovePhysics},
 			{"GetCollision", EntityGetCollision},
+			{"RemoveCollision", EntityRemoveCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
+			{"RemoveCollisionResponder", EntityRemoveCollisionResponder},
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
 			{"RemoveHealth", EntityRemoveHealth},

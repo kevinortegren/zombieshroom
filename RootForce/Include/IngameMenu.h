@@ -20,8 +20,10 @@ namespace RootForce
 		bool GetExit() { return m_exit; }
 		void Reset();
 		void Update();
+		void SetScoreList(std::string p_score);
 		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
+
 	private:
 		void Return(const Awesomium::JSArray& p_array);
 		void Exit(const Awesomium::JSArray& p_array);
