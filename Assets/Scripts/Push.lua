@@ -7,10 +7,10 @@ Push.channelingTime = 0;
 Push.duration = 0.2;
 
 function Push.ChargeDone (time, userId, actionId)
-	if time >= Push.chargeTime * 0.5 then
+	--if time >= Push.chargeTime * 0.5 then
 		Push.OnCreate(userId, actionId);
 		Push.knockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
-	end
+	--end
 end
 
 function Push.ChannelingDone (time, userId, actionId)
@@ -71,4 +71,5 @@ function Push.OnCollide (self, entity)
 end
 
 function Push.OnDestroy (self)
+	Entity.Remove(self);
 end

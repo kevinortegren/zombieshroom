@@ -185,7 +185,8 @@ namespace Ragdoll
 			body->setRestitution(1.0f);
 			body->setActivationState(DISABLE_DEACTIVATION);
 			//This is supposed to stop collision  with abilities and other players, doesn't work atm
-			body->setCollisionFlags(btBroadphaseProxy::DebrisFilter);
+			body->getBroadphaseHandle()->m_collisionFilterGroup = short(btBroadphaseProxy::DebrisFilter);
+			body->getBroadphaseHandle()->m_collisionFilterMask = short(btBroadphaseProxy::StaticFilter);
 			m_bodies[index] = body;
 			
 			//create children and constraints

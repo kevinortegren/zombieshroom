@@ -1,4 +1,4 @@
-
+﻿
 #include <GL/glew.h>
 
 #include <RootEngine/Include/Logging/Logging.h>
@@ -298,16 +298,28 @@ namespace Render
 		m_lighting.Init(this, width, height, &m_gbuffer, &m_fullscreenQuad);
 	
 		// Setup render target for forward renderer and post processes to use.
-		glGenFramebuffers(1, &m_fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		glGenFramebuffers(2, m_forwardFramebuffers);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[0]);
 
-		m_color0 = CreateTexture();
-		m_color0->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+		m_forwardColors[0] = CreateTexture();
+		m_forwardColors[0]->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[0]->GetHandle(), 0);
 
 		// Share depth attachment between gbuffer and forward.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer.m_depthTexture->GetHandle(), 0);
+		m_forwardDepth[0] = m_gbuffer.m_depthTexture;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_forwardDepth[0]->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
+
+		m_forwardColors[1] = CreateTexture();
+		m_forwardColors[1]->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
+
+		m_forwardDepth[1] = CreateTexture();
+		m_forwardDepth[1]->CreateEmptyTexture(width, height, TextureFormat::TEXTURE_DEPTH_STENCIL);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_forwardDepth[1]->GetHandle(), 0);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		m_renderEffect = g_context.m_resourceManager->LoadEffect("Renderer/Render");
@@ -370,7 +382,8 @@ namespace Render
 	
 		// Slot reserved for lighting.
 		s_textureSlots[TextureSemantic::LIGHTING_ACCUMULATION] = 5;
-		
+		s_textureSlots[TextureSemantic::FORWARD_COLOR] = 5;
+
 
 		// Various texture semantics for render jobs.
 		s_textureSlots[TextureSemantic::SHADER_INPUT]   = 6;
@@ -428,9 +441,20 @@ namespace Render
 		m_lighting.Resize(m_width, m_height);
 		m_glowDevice.Resize(m_width, m_height);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-		m_color0->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color0->GetHandle(), 0);
+		// Resize forward framebuffers.
+		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[0]);
+		m_forwardColors[0]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[0]->GetHandle(), 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
+		m_forwardColors[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		m_forwardDepth[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
+		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -491,9 +515,6 @@ namespace Render
 		// Buffer Lights data.
 		m_lighting.BufferLights();
 
-		BindForwardFramebuffer();
-		ClearForwardFramebuffer();
-
 		glEnable(GL_STENCIL_TEST);
 		m_gbuffer.UnbindTextures();	
 		m_gbuffer.Enable();
@@ -513,15 +534,14 @@ namespace Render
 		glDisable(GL_STENCIL_TEST);
 
 		{
-			PROFILE("Forward Pass", g_context.m_profiler);
-			ForwardPass();
-		}
-
-		{
 			PROFILE("PostProcess Pass", g_context.m_profiler);
 			PostProcessPass();
 		}
 
+		{
+			PROFILE("Forward Pass", g_context.m_profiler);
+			ForwardPass();
+		}
 
 		{
 			PROFILE("Render Lines", g_context.m_profiler);
@@ -567,10 +587,16 @@ namespace Render
 		  return false;
 	};
 
+	static bool SortForwardRenderJobs(RenderJob* a, RenderJob* b)
+	{
+		if( a->m_renderPass < b->m_renderPass ) return true;
+		return false;
+	};
+
 	void GLRenderer::Sorting()
 	{	
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
-		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortRenderJobs);
+		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortForwardRenderJobs);
 	}
 
 	void GLRenderer::ShadowPass()
@@ -689,19 +715,98 @@ namespace Render
 	{
 		if(m_showForward)
 		{
-			m_gbuffer.BindTextures();
-
 			m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED1;
 
-			ProcessRenderJobs(m_forwardJobs);
+			int currentMaterialID = -1;
+			for(auto job = m_forwardJobs.begin(); job != m_forwardJobs.end(); ++job)
+			{
+				// Swap framebuffer if render job is refractive.
+				if((*job)->m_refractive)
+				{
+					BindForwardDepthAndColor();	
+					SwapForwardFramebuffer();
+					CopyDepthAndColor();	
+					BindForwardFramebuffer();
+
+					m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+					m_fullscreenQuad.Bind();
+					m_fullscreenQuad.Draw();
+					m_fullscreenQuad.Unbind();
+				}
+
+				if((*job)->m_material->m_id != currentMaterialID)
+				{
+					UnbindTexture(TextureSemantic::DIFFUSE);
+					UnbindTexture(TextureSemantic::SPECULAR);
+					UnbindTexture(TextureSemantic::NORMAL);
+					UnbindTexture(TextureSemantic::GLOW);
+
+					for(auto texture = (*job)->m_material->m_textures.begin(); texture != (*job)->m_material->m_textures.end(); ++texture)
+					{
+						if((*texture).second != nullptr)
+							(*texture).second->Bind(s_textureSlots[(*texture).first]);
+					}
+
+					currentMaterialID = (*job)->m_material->m_id;
+				}
+
+				(*job)->m_mesh->Bind();
+
+				// Itterate techniques.
+				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
+				{
+					if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
+					{
+						(*tech)->Apply();
+
+						// Buffer uniforms.
+						for(auto param = (*job)->m_params.begin(); param != (*job)->m_params.end(); ++param)
+						{	
+							m_uniforms->BufferSubData((*tech)->m_uniformsParams[param->first], s_sizes[param->first], param->second);
+						}
+
+						// Itterate programs.
+						for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
+						{
+							(*program)->Apply();
+
+							(*job)->m_mesh->Draw();						
+						}
+					}
+				}
+
+				(*job)->m_mesh->Unbind();
+			}
 		}
 	}
 
 	void GLRenderer::PostProcessPass()
 	{
+		// Clear framebuffer 1.
+		m_activeForwardFramebuffer = 1;
+		BindForwardFramebuffer();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Bind framebuffer 0.
+		m_activeForwardFramebuffer = 0;
+		BindForwardFramebuffer();
+
+		// Bind GBuffer for read.
 		m_gbuffer.BindTextures();
+
+		// Bind LA.
 		m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::LIGHTING_ACCUMULATION]);
 
+		// Output LA to framebuffer 0.
+		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+		m_fullscreenQuad.Bind();
+		m_fullscreenQuad.Draw();
+		m_fullscreenQuad.Unbind();
+
+		// Bind framebuffer 0 for read.
+		BindForwardDepthAndColor();
+
+		// Do Glow pass.
 		m_fullscreenQuad.Bind();
 		m_glowDevice.HorizontalPass(&m_fullscreenQuad);
 		BindForwardFramebuffer();
@@ -709,38 +814,51 @@ namespace Render
 		m_fullscreenQuad.Unbind();
 	}
 
-
 	void GLRenderer::Output()
 	{
+		// Bind active framebuffer for read.
+		BindForwardDepthAndColor();
+
 		// Restore backbuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		m_color0->Bind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
-
-		if(!m_glowDevice.m_display)
-			m_lighting.m_la->Bind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
 
 		m_fullscreenQuadTech->GetPrograms()[0]->Apply();
 
 		m_fullscreenQuad.Bind();
 		m_fullscreenQuad.Draw();
 		m_fullscreenQuad.Unbind();
+	}
 
-		m_color0->Unbind(s_textureSlots[TextureSemantic::SHADER_INPUT]);
+	void GLRenderer::SwapForwardFramebuffer()
+	{
+		m_activeForwardFramebuffer = (m_activeForwardFramebuffer == 1) ? 0 : 1;
 	}
 
 	void GLRenderer::BindForwardFramebuffer()
 	{
-		// Bind forward target.
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[m_activeForwardFramebuffer]);
+
+		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, buffers);		
 	}
 
-	void GLRenderer::ClearForwardFramebuffer()
+	void GLRenderer::BindForwardDepthAndColor()
 	{	
-		GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
+		m_forwardColors[m_activeForwardFramebuffer]->Bind(s_textureSlots[TextureSemantic::FORWARD_COLOR]);
+		m_forwardDepth[m_activeForwardFramebuffer]->Bind(s_textureSlots[TextureSemantic::DEPTH]);
+	}
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	void GLRenderer::CopyDepthAndColor()
+	{
+		glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
+		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
+
+		//glReadBuffer(GL_COLOR_ATTACHMENT0);
+		//glBindTexture(GL_TEXTURE_2D, m_forwardColors[m_activeForwardFramebuffer]->GetHandle());
+		//glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
+		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, m_width, m_height, 0);
+		
 	}
 
 	void GLRenderer::UnbindTexture(TextureSemantic::TextureSemantic p_semantic)
