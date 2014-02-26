@@ -50,27 +50,6 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 
 			state->CurrentState = RootForce::EntityState::DESCENDING;
 		}
-
-		/*
-		if(state->PrevPosition.y < transform->m_position.y)
-		{
-			if (state->CurrentState != RootForce::EntityState::ASCENDING)
-			{
-				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to ASCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::ASCENDING, state->CurrentState);
-			}
-
-			state->CurrentState = RootForce::EntityState::ASCENDING;
-		}
-		else //if(state->PrevPosition.y > transform->m_position.y)
-		{
-			if (state->CurrentState != RootForce::EntityState::DESCENDING)
-			{
-				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to DESCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::DESCENDING, state->CurrentState);
-			}
-
-			state->CurrentState = RootForce::EntityState::DESCENDING;
-		}
-		*/
 	}
 
 	state->PrevPosition = transform->m_position;

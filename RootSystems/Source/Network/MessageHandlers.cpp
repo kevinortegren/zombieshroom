@@ -331,7 +331,15 @@ namespace RootForce
 							Transform* aimingTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingEntity);
 							assert(aimingTransform != nullptr);
 							
-							playerTransform->m_position = m.Position;
+							// Set the position of the player
+							Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+							assert(collision != nullptr);
+							float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+							glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+							// Check if the displacement has the same sign as the local velocity.
+							if (displacement.y * verticalVelocity >= 0.0f)
+								playerTransform->m_position = m.Position;
 							playerTransform->m_orientation.SetOrientation(m.Orientation);
 							aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
@@ -1276,7 +1284,15 @@ namespace RootForce
 								playerAction->ActiveAbility = activeAbility;
 
 								// Set the position of the player
-								playerTransform->m_position = m.Position;
+								Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+								assert(collision != nullptr);
+								float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+								glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+								// Check if the displacement has the same sign as the local velocity.
+								if (displacement.y * verticalVelocity >= 0.0f)
+									playerTransform->m_position = m.Position;
+
 								playerTransform->m_orientation.SetOrientation(m.Orientation);
 								aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
