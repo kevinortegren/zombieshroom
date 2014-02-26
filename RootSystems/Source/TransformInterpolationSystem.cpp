@@ -31,49 +31,24 @@ namespace RootForce
 		// Do not interpolate the local player.
 		if (p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
 		{
-			transform->m_renderingPosition = transform->m_position;
+			transform->m_interpolatedPosition = transform->m_position;
 			return;
 		}
 
 		// Do not interpolate non-players.
 		if (m_world->GetEntityManager()->GetComponent<PlayerComponent>(p_entity) == nullptr)
 		{
-			transform->m_renderingPosition = transform->m_position;
+			transform->m_interpolatedPosition = transform->m_position;
 			return;
 		}
-
 		
-		const float HIGH = 4.0f;
-		const float LOW = 0.01f;
+		// Exponentially decrease the distance between actual and interpolated position every frame.
 		const float BASE = 0.50f;
-
-		// If the distance between rendering position and actual position is too large, snap to the position instantly.
-		// If the distance is too small, also snap to the position.
-		// Otherwise, exponentially decrease the distance each frame.
-		glm::vec3 displacement = transform->m_position - transform->m_renderingPosition;
+		
+		glm::vec3 displacement = transform->m_position - transform->m_interpolatedPosition;
 		glm::mediump_float sqDistance = glm::dot(displacement, displacement);
 		
-		transform->m_renderingPosition += BASE * displacement;
-		/*
-		if (sqDistance > HIGH)
-			transform->m_renderingPosition = transform->m_position;
-		else if (sqDistance > LOW)
-			transform->m_renderingPosition += BASE * displacement;
-		*/
-
-		/*
-		if (p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
-		{
-			g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Displacement: (%f, %f, %f) : %f", displacement.x, displacement.y, displacement.z, std::sqrt(sqDistance));
-
-			if (sqDistance >= HIGH)
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Snap: Too big");
-			else if (sqDistance <= LOW)
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Snap: Too small");
-			else
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Interpolating distance: %f", BASE * displacement);
-		}
-		*/
+		transform->m_interpolatedPosition += BASE * displacement;
 	}
 
 	void TransformInterpolationSystem::End()
