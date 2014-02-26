@@ -467,7 +467,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 {
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
-	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
+	//RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
 
@@ -500,6 +500,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 	bool painted = false;
 	bool painting = false;
 	bool transparent = false;
+	bool noRender = false;
 	int paintID;
 	string temp;
 	string NormalName;
@@ -511,6 +512,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 		paintID = RM.PmegaMeshes[meshID]->paintIndex;
 
 		transparent = RM.PmegaMeshes[meshID]->transformation.flags._Transparent;
+		noRender = RM.PmegaMeshes[meshID]->transformation.flags._NoRender;
 		if(meshID != -1)
 		{
 			if(RM.PmegaMeshes[meshID]->transformation.flags._PaintStatus == 0)
@@ -524,6 +526,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 		paintID = RM.PmeshList[meshID]->paintIndex;
 
 		transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
+		noRender = RM.PmeshList[meshID]->transformation.flags._NoRender;
 		if(meshID != -1)
 		{
 			if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
@@ -634,6 +637,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 	{
 		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+
 		if(specularMap != "" && specularMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
@@ -642,17 +646,29 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 		{
 			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
 		}
-		if(normalMap != "" && normalMap != "NONE" && !transparent)
+		if(normalMap != "" && normalMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
-			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+
+			if(transparent)
+			{
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
+			}
+			else
+			{				
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+			}
 		}
-		else if(translucenceMap != "" && translucenceMap != "NONE" && transparent)
+		else if(translucenceMap != "" && translucenceMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture(translucenceMap, Render::TextureType::TEXTURE_2D);
 
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
+		}
+		else if(noRender)
+		{
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("NoRender");
 		}
 		else
 		{

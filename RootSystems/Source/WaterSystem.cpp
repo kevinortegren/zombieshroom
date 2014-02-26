@@ -177,6 +177,7 @@ namespace RootForce
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
 
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
+		m_world->GetTagManager()->RegisterEntity("NonExport", waterEnt);
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
