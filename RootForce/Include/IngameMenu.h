@@ -21,7 +21,6 @@ namespace RootForce
 		void Reset();
 		void Update();
 		void SetScoreList(std::string p_score);
-		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
 
 	private:
@@ -36,7 +35,6 @@ namespace RootForce
 		bool m_exit;
 		int m_changeTeam;
 
-		RakNet::RakPeerInterface* m_serverPeer;
 		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }
