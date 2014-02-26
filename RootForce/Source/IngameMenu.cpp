@@ -44,16 +44,7 @@ namespace RootForce
 	{
 		if(p_array[0].IsInteger())
 		{
-			// TODO: Instead, send a message to server, handle team change on response
-			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-			
-			// Call the OnCreate script
-			g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-			g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-			g_engineContext.m_script->AddParameterNumber(p_array[0].ToInteger());
-			g_engineContext.m_script->ExecuteScript();
-
-			m_return = true;
+			m_changeTeam = p_array[0].ToInteger();
 		}
 	}
 
@@ -66,6 +57,21 @@ namespace RootForce
 	void IngameMenu::Update()
 	{
 		m_settingsMenu->Update();
+
+		if(m_changeTeam >= 0)
+		{
+			// TODO: Instead, send a message to server, handle team change on response
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			
+			// Call the OnCreate script
+			g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+			g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+			g_engineContext.m_script->AddParameterNumber(m_changeTeam);
+			g_engineContext.m_script->ExecuteScript();
+
+			m_return = true;
+			m_changeTeam = -1;
+		}
 	}
 
 }

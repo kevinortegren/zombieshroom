@@ -35,7 +35,10 @@ end
 
 function Player.OnTeamSelect(self, teamId)
   local playerComponent = self:GetPlayerComponent();
-  if playerComponent:GetTeamId() == 3 then
+	local prevTeamId = playerComponent:GetTeamId();
+	playerComponent:SetTeamId(teamId);
+	
+  if prevTeamId == 3 and teamId ~= 3 then
     local playerPhysics = PlayerPhysics.New(self);
     local health = Health.New(self);
     local physics = Physics.New(self);
@@ -76,7 +79,7 @@ function Player.OnTeamSelect(self, teamId)
       renderable:SetPass(RenderPass.RENDERPASS_DEFAULT);
       renderable:SetShadowTechnique(ShadowTechnique.SHADOW_ANIMATED);
       renderable:SetModel("testchar");
-      if playerComponent:GetTeamId() == 1 then
+      if teamId == 1 then
         renderable:SetMaterial("BlueSpirit");
         renderable:SetMaterialGlow("WSGlowBlue");
       else
@@ -93,9 +96,30 @@ function Player.OnTeamSelect(self, teamId)
       waterCollider:SetDisturbInterval(0.5);
       waterCollider:SetRadius(5);
     end
-  elseif teamId == 3 then
+  elseif teamId == 3 and prevTeamId ~= 3 then
+		self:RemovePlayerPhysics();
+		self:RemoveHealth();
+		self:RemovePhysics();
+		Collision.RemoveObjectFromWorld(self:GetCollision());
+		self:RemoveCollision();
+		self:RemoveCollisionResponder();
+		self:RemoveScript();
+		self:RemovePlayerAction();
+		self:RemoveStateComponent();
+		self:RemoveTryPickupComponent();
   else
-
+		local renderable = self:GetRenderable();
+		if teamId == 1 then
+			renderable:SetMaterial("BlueSpirit");
+			renderable:SetMaterialGlow("WSGlowBlue");
+		else
+			renderable:SetMaterial("RedSpirit");
+			renderable:SetMaterialGlow("WSGlowRed");
+		end
+		renderable:SetMaterialDiffuse("WStexture");
+		renderable:SetMaterialSpecular("WSSpecular");
+		renderable:SetMaterialNormal("WSNormal");
+		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
   end
 end
 

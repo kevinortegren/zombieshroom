@@ -30,5 +30,6 @@ namespace RootForce
 
 		bool m_return;
 		bool m_exit;
+		int m_changeTeam;
 	};
 }

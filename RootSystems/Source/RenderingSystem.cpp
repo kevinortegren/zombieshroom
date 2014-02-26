@@ -24,6 +24,9 @@ namespace RootForce
 		Transform* transform = m_transforms.Get(p_entity);
 		Renderable* renderable = m_renderables.Get(p_entity);
 
+		if(p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
+			int o = 0;
+
 		if(!renderable->m_material)
 		{
 			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
