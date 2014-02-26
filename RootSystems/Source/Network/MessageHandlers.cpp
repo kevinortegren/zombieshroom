@@ -348,6 +348,7 @@ namespace RootForce
 
 							// Extrapolate the position using ping time.
 							// TODO: Possibly let the action system and physics do the extrapolation.
+							/*
 							glm::vec3 facing = playerTransform->m_orientation.GetFront();
 							glm::vec3 right = playerTransform->m_orientation.GetRight();
 							glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -355,7 +356,7 @@ namespace RootForce
 								movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 							playerTransform->m_position += movement;
-
+							*/
 							// Log the action (debug)
 							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
 						}
@@ -1300,6 +1301,7 @@ namespace RootForce
 								aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
 								// Extrapolate the position using ping time
+								/*
 								glm::vec3 facing = playerTransform->m_orientation.GetFront();
 								glm::vec3 right = playerTransform->m_orientation.GetRight();
 								glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -1307,6 +1309,7 @@ namespace RootForce
 									movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 								playerTransform->m_position += movement;
+								*/
 							}
 
 							// Broadcast the action to all other connected clients.
