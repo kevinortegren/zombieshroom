@@ -587,10 +587,16 @@ namespace Render
 		  return false;
 	};
 
+	static bool SortForwardRenderJobs(RenderJob* a, RenderJob* b)
+	{
+		if( a->m_renderPass < b->m_renderPass ) return true;
+		return false;
+	};
+
 	void GLRenderer::Sorting()
 	{	
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
-		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortRenderJobs);
+		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortForwardRenderJobs);
 	}
 
 	void GLRenderer::ShadowPass()

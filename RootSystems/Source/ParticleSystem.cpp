@@ -18,6 +18,8 @@ namespace RootForce
 	{
 		m_emitters.Init(m_world->GetEntityManager());
 		m_transforms.Init(m_world->GetEntityManager());
+
+		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
 	}
 
 	void ParticleSystem::Begin()
@@ -47,10 +49,18 @@ namespace RootForce
 				emitter->m_systems[i]->Update();
 			}
 
+			// Simple sort of particle based on water height.
+			unsigned pass = 0;
+			if(trans->m_position.y > m_waterHeight)
+				pass = RenderPass::RENDERPASS_PARTICLES1;
+			else
+				pass = RenderPass::RENDERPASS_PARTICLES0;
+
+
 			Render::RenderJob job;
 			job.m_mesh = emitter->m_systems[i]->GetMesh();
 			job.m_material = emitter->m_particleSystems[i]->m_material;
-			job.m_renderPass = RenderPass::RENDERPASS_PARTICLES;
+			job.m_renderPass = pass;
 			job.m_forward = true;
 
 			g_engineContext.m_renderer->AddRenderJob(job);
