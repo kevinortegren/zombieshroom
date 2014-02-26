@@ -475,7 +475,7 @@ namespace Render
 	{
 		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
 
-		if(job->m_forward)
+		if((job->m_material->m_effect->GetTechniques().at(0)->m_flags & TechniqueFlags::RENDER_DEFERRED1) == TechniqueFlags::RENDER_DEFERRED1)
 			m_forwardJobs.push_back(job);
 		else
 			m_jobs.push_back(job);
@@ -728,20 +728,6 @@ namespace Render
 			int currentMaterialID = -1;
 			for(auto job = m_forwardJobs.begin(); job != m_forwardJobs.end(); ++job)
 			{
-				// Swap framebuffer if render job is refractive.
-				if((*job)->m_refractive)
-				{
-					BindForwardDepthAndColor();	
-					SwapForwardFramebuffer();
-					CopyDepthAndColor();	
-					BindForwardFramebuffer();
-
-					m_fullscreenQuadTech->GetPrograms()[0]->Apply();
-					m_fullscreenQuad.Bind();
-					m_fullscreenQuad.Draw();
-					m_fullscreenQuad.Unbind();
-				}
-
 				if((*job)->m_material->m_id != currentMaterialID)
 				{
 					UnbindTexture(TextureSemantic::DIFFUSE);
@@ -758,13 +744,28 @@ namespace Render
 					currentMaterialID = (*job)->m_material->m_id;
 				}
 
-				(*job)->m_mesh->Bind();
-
+				
 				// Itterate techniques.
 				for(auto tech = (*job)->m_material->m_effect->GetTechniques().begin(); tech != (*job)->m_material->m_effect->GetTechniques().end(); ++tech)
 				{
 					if((m_renderFlags & (*tech)->m_flags) == m_renderFlags)
 					{
+						// Swap framebuffer if render job is refractive.
+						if(((*tech)->m_flags & TechniqueFlags::REFRACTIVE) == TechniqueFlags::REFRACTIVE)
+						{
+							BindForwardDepthAndColor();	
+							SwapForwardFramebuffer();
+							CopyDepthAndColor();	
+							BindForwardFramebuffer();
+
+							m_fullscreenQuadTech->GetPrograms()[0]->Apply();
+							m_fullscreenQuad.Bind();
+							m_fullscreenQuad.Draw();
+							m_fullscreenQuad.Unbind();
+						}
+
+						(*job)->m_mesh->Bind();
+
 						(*tech)->Apply();
 
 						// Buffer uniforms.

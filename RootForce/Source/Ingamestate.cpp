@@ -62,7 +62,8 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
-		
+		g_engineContext.m_resourceManager->LoadScript("RefractiveBall");
+
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
