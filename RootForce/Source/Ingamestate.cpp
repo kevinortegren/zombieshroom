@@ -490,6 +490,30 @@ namespace RootForce
 	{
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 1, "HELP"))
+		{
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[COMMANDS]");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w -Water settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r -Render settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l -Logging settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/b -Botany settings");
+			PrintGlobalCommandHelp();
+		}
+
+		if(RootServer::MatchAny(event.EventType, 1, "HELPALL"))
+		{
+			std::stringstream helpStream;
+			helpStream << "help help ";
+			m_waterSystem->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			g_engineContext.m_renderer->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			m_botanySystem->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			g_engineContext.m_logger->ParseCommand(&helpStream);
+			PrintGlobalCommandHelp();
+		}
+
 		if(RootServer::MatchAny(event.EventType, 2, "R", "RENDER"))
 		{
 			g_engineContext.m_renderer->ParseCommands(&event.Data);
@@ -524,7 +548,7 @@ namespace RootForce
 
 		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
 		{
-			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+			m_waterSystem->ParseCommands(&event.Data);
 		}
 
 		if(RootServer::MatchAny(event.EventType, 2, "B", "BOTANY"))
@@ -609,4 +633,19 @@ namespace RootForce
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 	}
+
+	void IngameState::PrintGlobalCommandHelp()
+	{
+		//Print help functions for global commands
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[GLOBAL CONSOLE COMMANDS]");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/helpall - Print help for all subsystems and globals");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/so - Toggle profiler sorting");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/pr - Toggle profiler display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/pd - Toggle physics debug lines display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/nd - Toggle normal lines display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/rs - Reload all scripts");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/kill	- Suicide");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/quit	- Disconnect from server");
+	}
+
 }

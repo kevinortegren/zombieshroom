@@ -49,6 +49,7 @@ namespace LogLevel
 		PACKET_PRINT,
 		MASS_DATA_PRINT,
 		NOLEVEL,
+		HELP_PRINT,
 	};
 }
 

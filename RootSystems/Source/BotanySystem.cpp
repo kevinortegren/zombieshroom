@@ -195,6 +195,12 @@ namespace RootForce
 		std::getline(*p_ss, module, ' ');
 		std::getline(*p_ss, module, ' ');
 
+		if(module == "help" )
+		{	
+			m_engineContext->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[BOTANY COMMANDS]");
+			m_engineContext->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/b f [float] - Set botany factor");
+			m_engineContext->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/b s [0/1] - Activate or deactivate botany");
+		}
 		if(module == "factor" || module == "f")
 		{	
 			std::getline(*p_ss, value, ' ');
