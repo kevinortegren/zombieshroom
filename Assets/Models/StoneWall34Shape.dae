@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v2.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v6.mb</source_data>
     </contributor>
-    <created>2014-02-24T11:46:31</created>
-    <modified>2014-02-24T11:46:31</modified>
+    <created>2014-02-26T13:50:33</created>
+    <modified>2014-02-26T13:50:33</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -224,7 +224,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v2">
+    <visual_scene id="VisualSceneNode" name="v6">
       <node id="StoneWall34" name="StoneWall34" type="NODE">
         <translate sid="translate">11.74678 9.920723 -24.59697</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>

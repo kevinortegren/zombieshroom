@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include "StateSystem.h"
+#include <Network/NetworkComponents.h>
 
 
 void RootSystems::StateSystem::Init()
@@ -17,6 +18,7 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 	RootForce::PlayerPhysics* playphys = m_physic.Get(p_entity);
 	RootForce::Collision* collision = m_collision.Get(p_entity);
 	RootForce::StateComponent* state = m_state.Get(p_entity);
+	RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
 
 	
 	if(m_engineContext->m_physics->IsOnGround(*(collision->m_handle))
@@ -29,9 +31,23 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 	else if(!m_engineContext->m_physics->IsOnGround(*(collision->m_handle)))
 	{
 		if(state->PrevPosition.y < transform->m_position.y)
+		{
+			if (state->CurrentState != RootForce::EntityState::ASCENDING)
+			{
+				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to ASCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::ASCENDING, state->CurrentState);
+			}
+
 			state->CurrentState = RootForce::EntityState::ASCENDING;
+		}
 		else //if(state->PrevPosition.y > transform->m_position.y)
+		{
+			if (state->CurrentState != RootForce::EntityState::DESCENDING)
+			{
+				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to DESCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::DESCENDING, state->CurrentState);
+			}
+
 			state->CurrentState = RootForce::EntityState::DESCENDING;
+		}
 	}
 
 	state->PrevPosition = transform->m_position;
