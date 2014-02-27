@@ -28,19 +28,19 @@ namespace RootForce
 			if(playerComponent->TeamID != 0)
 				numPlayers++;
 		}
-		switch(m_currentState)
+		switch(ruleSet->CurrentState)
 		{
 			case MatchState::Warmup:
 				m_hud->GetView()->BufferJavascript("Announce('Waiting for players...', -1);");
-				if(numPlayers >= ruleSet->minPlayers)
+				if(numPlayers >= ruleSet->MinPlayers)
 				{
-					m_countDown = 5.0f;
-					m_currentState = MatchState::CountDown;
+					ruleSet->CountDown = 5.0f;
+					ruleSet->CurrentState = MatchState::CountDown;
 					m_hud->GetView()->BufferJavascript("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);");
 				}
 				break;
 			case MatchState::CountDown:
-				if(m_countDown <= 0.0f)
+				if(ruleSet->CountDown <= 0.0f)
 				{
 					ruleSet->TeamScore[1] = 0;
 					ruleSet->TeamScore[2] = 0;
@@ -79,7 +79,7 @@ namespace RootForce
 							g_world->GetEntityManager()->RemoveEntity(pair.second);
 						}
 					}
-					m_currentState = MatchState::Match;
+					ruleSet->CurrentState = MatchState::Match;
 					m_hud->GetView()->BufferJavascript("Announce('May the roots be with you!',3);");
 				}
 				break;
@@ -91,10 +91,13 @@ namespace RootForce
 
 	void MatchStateSystem::UpdateDeltatime( float p_deltaTime )
 	{
-		if(m_currentState == MatchState::Match)
+		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
+		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
+
+		if(ruleSet->CurrentState == MatchState::Match)
 			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft -= p_deltaTime;
-		else if(m_currentState == MatchState::CountDown)
-			m_countDown -= p_deltaTime;
+		else if(ruleSet->CurrentState == MatchState::CountDown)
+			ruleSet->CountDown -= p_deltaTime;
 	}
 
 	void MatchStateSystem::SetLoggingInterface( Logging* p_logger )
@@ -159,10 +162,12 @@ namespace RootForce
 
 	bool MatchStateSystem::IsMatchOver()
 	{
-		if(m_currentState == MatchState::Warmup)
-			return false;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
 		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
+
+		if(ruleSet->CurrentState == MatchState::Warmup)
+			return false;
+
 		if(ruleSet->ScoreLimit > 0
 			&& (ruleSet->TeamScore[1] >= ruleSet->ScoreLimit || 
 			ruleSet->TeamScore[2] >= ruleSet->ScoreLimit))

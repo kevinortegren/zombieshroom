@@ -12,24 +12,6 @@ namespace RootForce
 {
 	struct NetworkContext;
 
-	struct TDMRuleSet : public ECS::Component<TDMRuleSet>
-	{
-		float TimeLeft;
-		int ScoreLimit;
-		int TeamScore[3];
-		int minPlayers;
-		TDMRuleSet()
-		{
-			minPlayers = 2;
-			TimeLeft = 0.0f;
-			ScoreLimit = 1;
-
-			TeamScore[0] = 0;
-			TeamScore[1] = 0;
-			TeamScore[2] = 0;
-		}
-	};
-
 	enum MatchState
 	{
 		Warmup,
@@ -38,14 +20,35 @@ namespace RootForce
 		
 	};
 
+	struct TDMRuleSet : public ECS::Component<TDMRuleSet>
+	{
+		float TimeLeft;
+		int ScoreLimit;
+		int TeamScore[3];
+		int MinPlayers;
+		float CountDown;
+		MatchState CurrentState;
+
+		TDMRuleSet()
+		{
+			MinPlayers = 2;
+			TimeLeft = 0.0f;
+			ScoreLimit = 1;
+			CountDown = 0;
+			CurrentState = MatchState::Warmup;
+
+			TeamScore[0] = 0;
+			TeamScore[1] = 0;
+			TeamScore[2] = 0;
+		}
+	};
+
 	class MatchStateSystem : public ECS::VoidSystem
 	{
 	public:
 		MatchStateSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_gameSharedContext)
 			: ECS::VoidSystem(p_world)
-			, m_gameSharedContext(p_gameSharedContext)
-			, m_countDown(0.0f)
-			, m_currentState(MatchState::Warmup){}
+			, m_gameSharedContext(p_gameSharedContext) {}
 		void Process();
 		void UpdateDeltatime(float p_deltaTime);
 		static std::string GetScoreList();
@@ -64,8 +67,6 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_gameSharedContext;
 		Logging* m_logger;
 
-		float m_countDown;
-		MatchState m_currentState;
 		HUD* m_hud;
 		AbilitySpawnSystem* m_abilitySpawnSystem;
 	};
