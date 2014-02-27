@@ -28,24 +28,23 @@ namespace Render
 
 		struct
 		{
-			int halfWidth;
-			int halfHeight;
-			float blurFactor;
-			float blurStrength;
+			float halfWidth;
+			float halfHeight;
 			float blurRadius;
 			float gauss[11];
 		} data;
 
 		data.halfWidth = p_width / 2;
 		data.halfHeight = p_height / 2;
-		data.blurRadius = 1.0f;
-		data.blurFactor = 9.0f;
-		data.blurStrength = 0.2f;
+		data.blurRadius = 1.4f;
 
-		data.gauss[0] = Gaussian(data.blurFactor * (1.0f - data.blurStrength), (float)pow(data.blurFactor * 0.35, 2));
+		float blurFactor = 9.0f;
+		float blurStrength = 0.3f;
+
+		data.gauss[0] = Gaussian(blurFactor * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
 		for(int i = 0; i < 10; i++)
 		{
-			data.gauss[i+1] = Gaussian(i * (1.0f - data.blurStrength), (float)pow(data.blurFactor * 0.35, 2));
+			data.gauss[i+1] = Gaussian(i * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
 		}
 
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
@@ -58,14 +57,14 @@ namespace Render
 		return (float)((1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation))));	
 	}
 
-	void GlowDevice::SetHalfWidth(int p_halfWidth)
+	void GlowDevice::SetHalfWidth(float p_halfWidth)
 	{
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(int), &p_halfWidth);
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &p_halfWidth);
 	}
 
-	void GlowDevice::SetHalfHeight(int p_halfHeight)
+	void GlowDevice::SetHalfHeight(float p_halfHeight)
 	{
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(4, sizeof(int), &p_halfHeight);
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(4, sizeof(float), &p_halfHeight);
 	}
 
 	void GlowDevice::SetGlowFactor(float p_factor)

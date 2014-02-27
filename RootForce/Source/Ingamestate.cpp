@@ -181,10 +181,10 @@ namespace RootForce
 		textures.m_terrainTexture = "grass";
 
 		// Subdivide terrain for grass chunk rendering.
-		m_botanySystem->Initialize(textures);
+		//m_botanySystem->Initialize(textures, 0.0f);
 
 		// Subdivide world.
-		m_sharedSystems.m_worldSystem->SubdivideTree();
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 
 		// Lock the mouse
@@ -298,7 +298,6 @@ namespace RootForce
 				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
-
 
 		// Check for disconnection from the server
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");

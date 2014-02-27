@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "RagdollSystem.h"
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootSystems/Include/CameraSystem.h>
@@ -122,3 +123,5 @@ namespace RootForce
 	}
 
 }
+
+#endif

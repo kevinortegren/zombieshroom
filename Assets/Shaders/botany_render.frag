@@ -12,9 +12,16 @@ layout(std140) uniform PerFrame
     mat4 invView;
 };
 
+layout(std140) uniform PerTech
+{
+    vec3 g_PlayerPosition;
+    float g_Lod1Distance;
+    float g_Lod2Distance;
+	float g_GrassAmbient;
+};
+
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Billboard;
-uniform sampler2D g_TerrainGrass;
 uniform sampler2D g_Translucency;
 
 layout (location = 0) out vec4 diffuse;
@@ -25,34 +32,40 @@ layout (location = 3) out vec4 background;
 void main()
 {
     vec4 color = vec4(1.0);
+	float ambient = 0.0;
     float trans = 0.0;
     if(vert_texture1 == 0) // Geometry based fragment.
     {
-        float dif = texture(g_Diffuse, vert_texcoord1).r;
         trans = texture(g_Translucency, vert_texcoord1).r;      
-        color = texture(g_TerrainGrass, vert_texcoord1);  
-                
-        color.rgb *= dif;
+        color = texture(g_Diffuse, vert_texcoord1); 
+
+		ambient = g_GrassAmbient;
+
+		// Set diffuse color.
+		diffuse = vec4(color.rgb, 0.1);
+
+		// Store normals.
+		vec3 normal = normalize(vert_normal1);    
+		float p = sqrt(normal.z*8+8);
+		normals = normal.xy/p + 0.5;
+
+		// Output translucency.
+		glow = vec4(vec3(0.0), trans);     
+		background = vec4(0,0,0, ambient);
     }
     else // Billboarded fragment.
     {
         color = texture(g_Billboard, vert_texcoord1);
-        color.rgb *= 0.8;
         
         // Alpha-Testing.
         if(color.a < 0.5)
             discard;
-    }
 
-    // Set diffuse color.
-	diffuse = vec4(color.rgb, 0.1);    
-    
-    // Store normals.
-    vec3 normal = normalize(vert_normal1);    
-    float p = sqrt(normal.z*8+8);
-    normals = normal.xy/p + 0.5;
-    
-    // Output translucency.
-	glow = vec4(vec3(0.0), trans);     
-    background = vec4(0,0,0,0);
+		diffuse = vec4(color.xyz,0.1);
+		vec3 normal = normalize(vert_normal1);    
+		float p = sqrt(normal.z*8+8);
+		normals = normal.xy/p + 0.5;
+		glow = vec4(0,0,0,0);   
+		background = vec4(0,0,0, ambient);
+    }
 }

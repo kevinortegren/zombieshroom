@@ -19,10 +19,11 @@ public:
 	void RemoveMesh(int id, int nrOfMeshes);
 	void RemoveLight(int id, int nrOfLights);
 	int InitalizeSharedMemory();
-	void UpdateSharedMaterials(int nrOfMaterials, int meshID);
+	void UpdateSharedMaterials(int nrOfMaterials, int meshID, bool itsAmegaMesh);
 	void UpdateSharedLocator(int index, int nrOfLocators);
 	void AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove); //Valid types are "Mesh", "Camera", "Light", "Locator"
-
+	void LockMeshMutex();
+	void UnLockMeshMutex();
 	
 	//Variables
 	Mesh meshList[g_maxMeshes];
@@ -40,6 +41,7 @@ public:
 	int* NumberOfLocators;
 	int* NumberOfMessages;
 	int* NumberOfPaintTextures;
+	int* NumberOfMegaMeshes;
 
 	UpdateMessage* updateMessages[g_maxMessages];
 	WorldData* worldData;
@@ -51,6 +53,7 @@ public:
 	HANDLE IdMutexHandle;
 	HANDLE LightMutexHandle;
 
+	MegaMesh* PmegaMeshes[g_maxMegaMeshes];
 private:
 	//Functions
 	
@@ -67,5 +70,6 @@ private:
 	Camera* PcameraList[g_maxCameras];
 	Material* PmaterialList[g_maxMeshes];
 	Locator* PlocatorList[g_maxLocators];
+
 
 };

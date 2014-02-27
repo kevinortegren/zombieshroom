@@ -16,7 +16,7 @@ namespace ECS
 		template<class T>
 		void CreateList(size_t p_numElements)
 		{
-			assert(sizeof(T) >= 4);
+			assert(sizeof(T) >= 8 && "Component size must atleast be 8 bytes.");
 
 			unsigned id = Component<T>::GetTypeId();
 

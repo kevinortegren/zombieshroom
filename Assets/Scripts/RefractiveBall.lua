@@ -1,6 +1,6 @@
 RefractiveBall = {};
-RefractiveBall.damage = 20;
-RefractiveBall.knockback = 20;
+RefractiveBall.damage = 0;
+RefractiveBall.knockback = 40;
 RefractiveBall.cooldown = 3;
 RefractiveBall.charges = 0;
 RefractiveBall.chargeTime = 0;
@@ -34,26 +34,18 @@ function RefractiveBall.OnCreate (userId, actionId)
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3))
 	
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 2.5, 1, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 2.5, 1, true, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
-	transformComp:SetScale(Vec3.New(5, 5, 5));
+	transformComp:SetScale(Vec3.New(40, 40, 40));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("RefractiveBall");
+		renderComp:SetModel("Primitives/box");
+		renderComp:SetMaterial("RefractiveBaller");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
-		renderComp:SetMaterialDiffuse("fireballDiffuse");
-		renderComp:SetMaterialSpecular("fireballSpecular");
-		renderComp:SetMaterialNormal("fireballNormal");
-		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_Refractive");
-		local pointlightComp = PointLight.New(self);
-		pointlightComp:SetColor(Vec4.New(0.0, 0.5, 1.0, 1.0));
-		pointlightComp:SetRange(10.0);
-		pointlightComp:SetAttenuation(Vec3.New(0, 0.151515, 0));
 	end
 end
 

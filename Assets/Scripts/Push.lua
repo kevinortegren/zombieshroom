@@ -40,7 +40,7 @@ function Push.OnCreate (userId, actionId)
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindConeShape(collisionComp, startPos, rotQuat, 6, 3, 1, false);
+	physicsComp:BindConeShape(collisionComp, startPos, rotQuat, 6, 3, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);

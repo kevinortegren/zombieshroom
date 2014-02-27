@@ -6,8 +6,11 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/DataStructures/Quad.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #define SHADOWSYSTEM_CULL
 //#define SHADOWSYSTEM_DEBUG
+#endif
 
 namespace RootForce
 {

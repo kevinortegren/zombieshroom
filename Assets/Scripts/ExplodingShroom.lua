@@ -34,7 +34,7 @@ function ExplodingShroom.OnCreate (userId, actionId)
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 0.25, 1, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 0.25, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 20, dirVec.y * 20, dirVec.z * 20));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);

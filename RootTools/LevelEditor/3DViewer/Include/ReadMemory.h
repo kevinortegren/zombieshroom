@@ -31,6 +31,7 @@ public:
 
 	int* NumberOfMessages;
 	int* NumberOfPaintTextures;
+	int* NumberOfMegaMeshes;
 
 	UpdateMessage* updateMessages[g_maxMessages];
 
@@ -41,16 +42,9 @@ public:
 	Locator* PlocatorList[g_maxLocators];
 	PaintTexture* PpaintList[g_maxPaintTextures];
 	WorldData* worldData;
+	MegaMesh* PmegaMeshes[g_maxMegaMeshes];
 
 	int* export;
-
-	HANDLE MeshMutexHandle;
-	HANDLE IdMutexHandle;
-	HANDLE LightMutexHandle;
-	HANDLE CameraMutexHandle;
-	HANDLE LocatorMutexHandle;
-	HANDLE TextureMutexHandle;
-	DWORD milliseconds;
 
 	void ReadMessage(string &out_type, int &out_updateIndex, int &out_removeIndex, bool &out_updateTransform, bool &out_updateShape);
 	UpdateMessage PeekMessageAt(int index);
@@ -63,6 +57,8 @@ public:
 	Material getMaterial(int index);
 	Counters getCounters();
 	PaintTexture getPaintTexture(int index);
+	void LockMutex(string mutexName);
+	void UnlockMutex(string mutexName);
 	
 private:
 	//Functions
@@ -74,5 +70,12 @@ private:
 	//Variables
 
 	HANDLE shared_memory_handle;
+	HANDLE MeshMutexHandle;
+	HANDLE IdMutexHandle;
+	HANDLE LightMutexHandle;
+	HANDLE CameraMutexHandle;
+	HANDLE LocatorMutexHandle;
+	HANDLE TextureMutexHandle;
+	DWORD milliseconds;
 	unsigned char* raw_data;	
 };

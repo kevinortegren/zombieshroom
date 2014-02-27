@@ -43,6 +43,10 @@ namespace RootForce
 			return;
 		}
 
+#ifdef COMPILE_LEVEL_EDITOR
+		transform->m_interpolatedPosition = transform->m_position;
+#endif
+
 		m_matrices[p_entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
 		m_matrices[p_entity].m_model = glm::rotate(m_matrices[p_entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 		m_matrices[p_entity].m_model = glm::scale(m_matrices[p_entity].m_model, transform->m_scale);

@@ -15,6 +15,7 @@ uniform sampler2D g_Glow;
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec2 normals;
 layout (location = 2) out vec4 glow;
+layout (location = 3) out vec4 background;
 
 void main()
 {
@@ -41,4 +42,5 @@ void main()
     normals = normal.xy/p + 0.5;
     
 	glow = vec4(vec3(glow_color.xyz), 0.0f);
+	background.w = 0.0;
 }

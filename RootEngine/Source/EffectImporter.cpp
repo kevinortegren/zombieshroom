@@ -96,7 +96,7 @@ namespace RootEngine
 				if(programs[j].FindValue("feedback"))
 				{
 					std::vector<std::string> varyingsVector;
-					const YAML::Node& varyings = programs[i]["feedback"];
+					const YAML::Node& varyings = programs[j]["feedback"];
 					for(unsigned k = 0; k < varyings.size(); k++)
 					{
 						std::string varying;

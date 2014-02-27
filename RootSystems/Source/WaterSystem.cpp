@@ -81,11 +81,14 @@ namespace RootForce
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
 		{	
+
+#ifndef COMPILE_LEVEL_EDITOR
 			//Check if player and kill
 			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
 			}
+#endif
 		
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
@@ -184,6 +187,7 @@ namespace RootForce
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
 
 		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
+		m_world->GetTagManager()->RegisterEntity("NonExport", waterEnt);
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
