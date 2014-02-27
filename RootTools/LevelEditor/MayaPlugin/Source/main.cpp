@@ -129,7 +129,7 @@ void GivePaintId(int index, string filePath)
 			//Print(SM.meshList[index].modelName, " given paintID ", paintCount);
 			SM.meshList[index].paintIndex = paintCount;
 
-			paintCount++;
+			//paintCount++;
 		}
 		else
 		{
@@ -155,7 +155,7 @@ void GivePaintIdToMegaMesh(int index, string filePath)
 			//Print(SM.meshList[index].modelName, " given paintID ", paintCount);
 			SM.PmegaMeshes[index]->paintIndex = paintCount;
 
-			paintCount++;
+			//paintCount++;
 		}
 		else
 		{

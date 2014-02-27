@@ -132,7 +132,9 @@ int main(int argc, char* argv[])
 			g_running = true;
 
 			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
-			painter->CreateEmptyTexture(256, 256, Render::TextureFormat::TEXTURE_RGBA);
+			RM.LockMutex("TextureMutex");
+			painter->CreateEmptyTexture(RM.PpaintList[0]->width, RM.PpaintList[0]->heigth, Render::TextureFormat::TEXTURE_RGBA);
+			RM.UnlockMutex("TextureMutex");
 
 			Initialize(g_engineContext);
 
@@ -140,12 +142,17 @@ int main(int argc, char* argv[])
 
 
 			RootForce::BotanyTextures textures;
-			textures.m_diffuse = "ugotaflatgrass2";
-			textures.m_translucency = "grass_translucency";
-			textures.m_billboard = "grass_billboard";
-			textures.m_terrainTexture = "customGrass3";
+			textures.m_diffuse = g_GrassDiffuse;
+			textures.m_translucency = g_GrassTranslucency;
+			textures.m_billboard = g_GrassBillboard;
 
-			botanySystem->Initialize(textures);
+			botanySystem->Initialize(textures, g_Ambient);
+
+			m_world.GetStorage()->SetStringValue("GrassDiffuse", g_GrassDiffuse);
+			m_world.GetStorage()->SetStringValue("GrassTranslucency", g_GrassTranslucency);
+			m_world.GetStorage()->SetStringValue("GrassBillboard", g_GrassBillboard);
+
+			worldSystem->BuildStaticShadowMesh();
 
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,6 +263,7 @@ int main(int argc, char* argv[])
 				g_engineContext.m_renderer->Clear();
 				botanySystem->Process();
 				waterSystem->Process();
+				worldSystem->Process();
 				cameraSystem->Process();
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
@@ -561,7 +569,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 		else if(painted)
 		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+			
 		}
 
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
@@ -584,6 +592,13 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+			//mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Normal");
+			if(painted)
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+		}
+		else if(painted)
+		{
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 		}
 
 		temp = RM.PpaintList[paintID]->textureGreen;

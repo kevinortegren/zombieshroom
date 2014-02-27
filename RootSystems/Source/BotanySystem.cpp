@@ -10,12 +10,14 @@ namespace RootForce
 		m_quadTree.BeginDivide(BOTANY_VERTICES_PER_TERRAIN_CHUNK, true, false);
 	}
 
-	void BotanySystem::Initialize(BotanyTextures& m_textures)
+	void BotanySystem::Initialize(BotanyTextures& m_textures, float m_grassAmbient)
 	{
 		m_renderUniforms.m_lod1Distance = 20.0f;
 		m_renderUniforms.m_lod2Distance = 60.0f;
+		m_renderUniforms.m_grassAmbient = m_grassAmbient;
 
 		m_updateUniforms.m_grassFactor = 6.0f;
+
 
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
@@ -82,7 +84,6 @@ namespace RootForce
 			if(m_meshCount >= BOTANY_MESHES_SIZE)
 			{
 				m_meshCount = 0;
-				std::cout << "cflush" << std::endl;
 			}
 
 			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_quadTree.m_entities[(*entity)]);

@@ -16,7 +16,7 @@ const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 50;
 const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/"; 
-const string g_textureLookPath = "C:/Users/BTH/Documents/zombieshroom/Assets/Textures/";
+const string g_textureLookPath = "C:/ZombieShroom/LevelEditor/Assets/Textures/";
 
 const string g_levelName = "CaveTestV1";
 
@@ -30,10 +30,15 @@ const int g_maxMessages = g_maxMeshes;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
 const int g_tileFactor = 24;
-const int g_maxPaintTextures = 10;
+const int g_maxPaintTextures = 1;
 
 const int g_maxMegaMeshes = 2;
 const int g_maxVerticesPerMegaMesh = 100000;
+
+const string g_GrassDiffuse = "ugotaflatgrass2";
+const string g_GrassTranslucency = "grass_translucency";
+const string g_GrassBillboard = "grass_billboard";
+const float g_Ambient = 0.0f;
 
 struct UpdateMessage
 {

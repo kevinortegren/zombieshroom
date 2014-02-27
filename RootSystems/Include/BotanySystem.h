@@ -13,7 +13,7 @@
 #define BOTANY_CELL_SIZE BOTANY_VERTEX_SIZE * BOTANY_MAX_POINTS_PER_CELL
 #define BOTANY_MESHES_SIZE 200
 #define BOTANY_MESHES_PER_CELL 5
-#define BOTANY_VERTICES_PER_TERRAIN_CHUNK 100
+#define BOTANY_VERTICES_PER_TERRAIN_CHUNK 150
 #define BOTANY_CULL_RANGE 200
 
 namespace RootForce
@@ -24,6 +24,7 @@ namespace RootForce
 			: m_meshSize(0) {}
 
 		int m_meshSize;
+
 		int m_meshIndices[BOTANY_MESHES_PER_CELL];
 	};
 
@@ -41,7 +42,7 @@ namespace RootForce
 		BotanySystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
 			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_initialized(false) {}
 
-		void Initialize(BotanyTextures& m_textures);
+		void Initialize(BotanyTextures& m_textures, float m_grassAmbient);
 		void Process();
 		void Divide();
 
@@ -84,6 +85,7 @@ namespace RootForce
 			glm::vec3 m_playerPosition;
 			float m_lod1Distance;
 			float m_lod2Distance;
+			float m_grassAmbient;
 		} m_renderUniforms;
 
 
