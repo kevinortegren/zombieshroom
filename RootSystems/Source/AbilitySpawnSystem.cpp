@@ -244,9 +244,13 @@ namespace RootForce
 	void AbilitySpawnSystem::ResetAllPoints()
 	{
 		ECS::GroupManager::GroupRange points = m_world->GetGroupManager()->GetEntitiesInGroup("AbilitySpawnPoint"); //Get all the entities that are Ability spawn points
-
+		
 		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
-			RevealSpawnpoint(itr->second);
+		{
+			NewServerAbility(itr->second);
+			AbilitySpawnComponent* component = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(itr->second);
+			component->Timer = 0.0f;
+		}
 	}
 
 }
