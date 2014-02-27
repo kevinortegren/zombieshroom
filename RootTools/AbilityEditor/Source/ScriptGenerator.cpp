@@ -149,6 +149,8 @@ namespace AbilityEditorNameSpace
 				m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 
+			m_file << "\tlocal facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);\n";
+
 			//Some standard
 			//Collision Shape
 			float radius = 1.0f;
@@ -278,23 +280,27 @@ namespace AbilityEditorNameSpace
 				{
 					m_file << "\tstartPos = Vec3.New(tempPos.x, tempPos.y - 2, tempPos.z);\n"; 
 				}
-				else if (startEnum == AbilityComponents::StartPos::ENEMYPLAYER)
+				else if (startEnum == AbilityComponents::StartPos::ENEMYPLAYER || startEnum == AbilityComponents::StartPos::FRIENDPLAYER)
 				{
-					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
+					m_file << "\tlocal entityAtAim = rayComp:GetHitEntity();\n";
 					m_file << "\tif entityAtAim:DoesExist() then\n";
-					m_file << "\t\tif entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
-					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
-					m_file << "\t\tend\n";
-					m_file << "\tend\n";
-				}
-				else if (startEnum == AbilityComponents::StartPos::FRIENDPLAYER)
-				{
-					m_file << "\tlocal tempPos = casterEnt:GetTransformation():GetPos();\n"; 
-					m_file << "\tlocal entityAtAim = physicsComp:GetPlayerAtAim(collisionComp:GetHandle(), tempPos, Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront(), 10000);\n";
-					m_file << "\tif entityAtAim:DoesExist() then\n";
-					m_file << "\t\tif entityAtAim:GetType(collisionComp) == PhysicsType.TYPE_PLAYER and self:GetPlayerComponent():GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
-					m_file << "\t\t\tstartPos = entityAtAim:GetTransformation():GetPos();\n";
-					m_file << "\t\tend\n";
+					m_file << "\t	local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());\n";
+					m_file << "\t	if type == PhysicsType.TYPE_PLAYER then\n";
+					m_file << "\t		local abilityOwnerNetwork = self:GetNetwork();\n";
+					m_file << "\t		local abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+					m_file << "\t		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+					m_file << "\t		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+
+					if(startEnum == AbilityComponents::StartPos::ENEMYPLAYER)
+						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					else
+						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+
+					m_file << "\t			startPos = entityAtAim:GetTransformation():GetPos();\n";
+					m_file << "\t		end\n";
+					m_file << "\t	end\n";
+					m_file << "\telse\n";
+					m_file << "\t	startPos = rayComp:GetHitPos();\n";
 					m_file << "\tend\n";
 				}
 				else// if (startEnum == AbilityComponents::StartPos::ABSOLUTE)
@@ -310,8 +316,10 @@ namespace AbilityEditorNameSpace
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
 			{
 				m_file << "\tlocal homingComp = Homing.New(self, " << homingStrength << ", " << homingSpeed << ");\n";
-				m_file << "\tlocal rayDirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
-				m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, rayDirVec, 10000, false, false);\n";
+				m_file << "\tlocal dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+				m_file << "\tlocal rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));\n";
+				m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
+				m_file << "\trayComp = Ray.New(rayEnt, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
 				if (startEnum == AbilityComponents::TargetPos::ONAIM)
 				{
 					m_file << "\thomingComp:SetTargetPosition(rayComp:GetHitPos());\n";
@@ -326,10 +334,12 @@ namespace AbilityEditorNameSpace
 					m_file << "\t		local abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
 					m_file << "\t		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
 					m_file << "\t		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+
 					if(startEnum == AbilityComponents::TargetPos::ENEMYPLAYER)
 						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
 					else
 						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+
 					m_file << "\t			homingComp:SetTargetEntity(entityAtAim);\n";
 					m_file << "\t		end\n";
 					m_file << "\t	end\n";
@@ -360,12 +370,15 @@ namespace AbilityEditorNameSpace
 				}
 				else if (colShape == AbilityComponents::CollisionShape::RAY)
 				{
-					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), startPos, rotQuat);\n";
-					m_file << "\tlocal rayComp = Ray.New(self, collisionComp:GetHandle(), startPos, dirVec, " << height << ", true, true);\n";
+					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), facePos, rotQuat);\n";
+					m_file << "\tlocal dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
+					m_file << "\tlocal rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));\n";
+					m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
+					m_file << "\trayComp = Ray.New(rayEnt, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::MESH)
 				{
-					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, rotQuat, Vec3.New(1,1,1), "/*<-- scale, what do?*/<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, rotQuat, Vec3.New(1,1,1), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
 				}
 			}
 

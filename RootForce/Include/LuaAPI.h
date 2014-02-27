@@ -2100,23 +2100,26 @@ namespace RootForce
 
 			(*s)->HitEntity = (ECS::Entity*)g_engineContext.m_physics->CastRay(Handle, (*s)->StartPosition, (*s)->Direction, (*s)->Distance, &(*s)->HitPos, IsAbility);
 
-			RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
-			RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+			if ((*s)->Render)
+			{
+				RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
+				RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
 
-			t->m_position = (*s)->StartPosition;
+				t->m_position = (*s)->StartPosition;
 
-			r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
-			r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
-			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
-			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			r->m_model = g_engineContext.m_resourceManager->CreateModel("rayModel");
-			r->m_forward = true;
-			r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
-			r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
-			r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES;
+				r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
+				r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				r->m_model = g_engineContext.m_resourceManager->CreateModel("rayModel");
+				r->m_forward = true;
+				r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
+				r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
+				r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES;
+			}
 
 			luaL_setmetatable(p_luaState, "Ray");
 			return 1;

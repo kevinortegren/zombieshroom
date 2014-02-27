@@ -33,10 +33,13 @@ function AbilityTest.OnCreate (userId, actionId)
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();
-	local tempPos = casterEnt:GetTransformation():GetPos();
+	local tempPos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
-	local rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, true, false);
+	local rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));
+	-- Get the position which is aimed at
+	local rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), rayStartPos, dirVecForward, 10000, false, false);
+	rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, rayComp:GetHitPos() - tempPos, 10000, true, false);
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
 		local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());
