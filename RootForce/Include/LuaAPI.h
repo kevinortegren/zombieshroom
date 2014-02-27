@@ -292,7 +292,7 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "TryPickupComponent");
 			return 1;
 		} 
-		static int EntityGetDamageAndknockback(lua_State* p_luaState)
+		static int EntityGetDamageAndKnockback(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback **)lua_newuserdata(p_luaState, sizeof(RootForce::DamageAndKnockback *));
@@ -2122,7 +2122,7 @@ namespace RootForce
 				r->m_forward = true;
 				r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
 				r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
-				r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES;
+				r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES0;
 			}
 
 			luaL_setmetatable(p_luaState, "Ray");
@@ -2328,7 +2328,7 @@ namespace RootForce
 			{"GetPlayerAction", EntityGetPlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{"GetTryPickupComponent", EntityGetTryPickupComponent},
-			{"GetDamageAndknockback", EntityGetDamageAndknockback},
+			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{NULL, NULL}
 		};
 

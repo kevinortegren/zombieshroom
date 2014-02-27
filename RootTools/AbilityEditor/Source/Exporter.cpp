@@ -238,6 +238,7 @@ namespace AbilityEditorNameSpace
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
 					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
+					p_emitter << YAML::Key << "PhysicsCollideStatic" << YAML::Value << physCon->m_colWStatic;
 				}
 				break;
 			case AbilityComponents::ComponentType::CHARGEVARIABLES:

@@ -171,6 +171,7 @@ namespace AbilityEditorNameSpace
 			float speed = 0.0f;
 			//Collision
 			bool colWithWorld = false;
+			bool colWithStatic = false;
 			//Follow
 			float followOffset = 0.0f;
 			//Setting values
@@ -187,6 +188,7 @@ namespace AbilityEditorNameSpace
 					mass = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_mass;
 					grav = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_gravity;
 					colWithWorld = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_collide;
+					colWithStatic = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_colWStatic;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STARTPOS)
 				{
@@ -358,27 +360,27 @@ namespace AbilityEditorNameSpace
 			{
 				if (colShape == AbilityComponents::CollisionShape::CYLINDER)
 				{
-					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindCylinderShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<", "<<(colWithStatic ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::CONE)
 				{
-					m_file << "\tphysicsComp:BindConeShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindConeShape(collisionComp, startPos, rotQuat, "<<height<<", "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<", "<<(colWithStatic ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::SPHERE)
 				{
-					m_file << "\tphysicsComp:BindSphereShape(collisionComp, startPos, rotQuat, "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindSphereShape(collisionComp, startPos, rotQuat, "<<radius<<", "<<mass<<", "<<(colWithWorld ? "true" : "false")<<", "<<(colWithStatic ? "true" : "false")<<");\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::RAY)
 				{
-					m_file << "\tphysicsComp:BindNoShape(collisionComp:GetHandle(), facePos, rotQuat);\n";
+					m_file << "\tphysicsComp:BindNoShape(collisionComp, facePos, rotQuat);\n";
 					m_file << "\tlocal dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
 					m_file << "\tlocal rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));\n";
-					m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
-					m_file << "\trayComp = Ray.New(rayEnt, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
+					m_file << "\tlocal rayComp = Ray.New(self, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
+					m_file << "\trayComp = Ray.New(self, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
 				}
 				else if (colShape == AbilityComponents::CollisionShape::MESH)
 				{
-					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, rotQuat, Vec3.New(1,1,1), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<");\n";
+					m_file << "\tphysicsComp:BindMeshShape(collisionComp, startPos, rotQuat, Vec3.New(1,1,1), "<<mass<<", "<<(colWithWorld ? "true" : "false")<<", "<<(colWithStatic ? "true" : "false")<<");\n";
 				}
 			}
 

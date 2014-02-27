@@ -686,15 +686,17 @@ namespace AbilityEditorNameSpace
 			float m_mass;
 			QVector3D m_gravity;
 			bool m_collide;
-			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true) : MainComponent(ComponentType::PHYSICS)
+			bool m_colWStatic;
+			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true, bool p_colWStatic = true) : MainComponent(ComponentType::PHYSICS)
 			{
 				m_mass = p_mass;
 				m_gravity =	p_gravity;
 				m_collide = p_collide;
+				m_colWStatic = p_colWStatic;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide;
+				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide, *colWStatic;
 				QList<QtProperty*> list;
 				QString combinedValue;
 				mass = p_propMan->addProperty(QVariant::Double, "Mass");
@@ -721,6 +723,10 @@ namespace AbilityEditorNameSpace
 				collide = p_propMan->addProperty(QVariant::Bool, "Collide with world");
 				p_propMan->setValue(collide, m_collide);
 				p_propBrows->addProperty(collide);
+
+				colWStatic = p_propMan->addProperty(QVariant::Bool, "Collide with static");
+				p_propMan->setValue(colWStatic, m_colWStatic);
+				p_propBrows->addProperty(colWStatic);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -736,6 +742,7 @@ namespace AbilityEditorNameSpace
 				}
 
 				m_collide = p_propMan->variantProperty(props.at(2))->value().toBool();
+				m_colWStatic = p_propMan->variantProperty(props.at(3))->value().toBool();
 			}
 		};
 

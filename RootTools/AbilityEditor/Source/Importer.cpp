@@ -333,6 +333,8 @@ namespace AbilityEditorNameSpace
 				}
 				if(p_node.FindValue("PhysicsCollide"))
 					p_node["PhysicsCollide"] >> tempcomp->m_collide;
+				if(p_node.FindValue("PhysicsCollideStatic"))
+					p_node["PhysicsCollideStatic"] >> tempcomp->m_colWStatic;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
