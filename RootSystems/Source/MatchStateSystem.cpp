@@ -31,11 +31,12 @@ namespace RootForce
 		switch(m_currentState)
 		{
 			case MatchState::Warmup:
-				
+				m_hud->GetView()->BufferJavascript("Announce('Waiting for players...', -1);");
 				if(numPlayers >= ruleSet->minPlayers)
 				{
 					m_countDown = 5.0f;
 					m_currentState = MatchState::CountDown;
+					m_hud->GetView()->BufferJavascript("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);");
 				}
 				break;
 			case MatchState::CountDown:
@@ -75,6 +76,7 @@ namespace RootForce
 						}
 					}
 					m_currentState = MatchState::Match;
+					m_hud->GetView()->BufferJavascript("Announce('May the roots be with you!',3);");
 				}
 				break;
 			case MatchState::Match:
@@ -103,7 +105,7 @@ namespace RootForce
 
 	int MatchStateSystem::GetTeamScore( int p_team )
 	{
-			return m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TeamScore[p_team];
+		return m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TeamScore[p_team];
 	}
 	
 	struct Score
