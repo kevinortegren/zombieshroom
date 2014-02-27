@@ -56,7 +56,7 @@ end
 
 function PowerRay.OnCollide (self, entity)
 if entity:DoesExist() then
-	local dakComp = self:GetDamageAndknockback();
+	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);

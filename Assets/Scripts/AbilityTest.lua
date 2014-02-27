@@ -56,7 +56,7 @@ function AbilityTest.OnCreate (userId, actionId)
 		--local pos = rayComp:GetHitPos();
 		homingComp:SetTargetPosition(rayComp:GetHitPos());
 	end
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);

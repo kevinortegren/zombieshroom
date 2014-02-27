@@ -315,6 +315,8 @@ namespace AbilityEditorNameSpace
 				m_file << "\tlocal startPos = Vec3.New(0,0,0);\n";
 			}
 
+			m_file << "\ttransformComp:SetPos(startPos);\n";
+
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
 			{
 				m_file << "\tlocal homingComp = Homing.New(self, " << homingStrength << ", " << homingSpeed << ");\n";
@@ -389,8 +391,6 @@ namespace AbilityEditorNameSpace
 				m_file << "\tphysicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * " << speed << ", dirVec.y * " << speed << ", dirVec.z * " << speed << "));\n";
 				m_file << "\tphysicsComp:SetGravity(collisionComp, Vec3.New(" << grav.x() << ", " << grav.y() << ", " << grav.z() << "));\n";
 			}
-			
-			m_file << "\ttransformComp:SetPos(startPos);\n";
 
 			m_file << "\n";
 
