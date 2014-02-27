@@ -658,12 +658,18 @@ namespace RootForce
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-					if(playerComponent->AbilityScripts[0].Cooldown > 0)
-						m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-					if(playerComponent->AbilityScripts[1].Cooldown > 0)
-						m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-					if(playerComponent->AbilityScripts[2].Cooldown > 0)
-						m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
+						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));
+					else
+						m_hud->SetCooldown(1, 0);
+					if(playerComponent->AbilityScripts[1].Cooldown > 0 && playerComponent->AbilityScripts[1].Name.compare("") != 0)
+						m_hud->SetCooldown(2, playerComponent->AbilityScripts[1].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[1].Name));
+					else
+						m_hud->SetCooldown(2, 0);
+					if(playerComponent->AbilityScripts[2].Cooldown > 0 && playerComponent->AbilityScripts[2].Name.compare("") != 0)
+						m_hud->SetCooldown(3, playerComponent->AbilityScripts[2].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[2].Name));
+					else
+						m_hud->SetCooldown(3, 0);
 					m_hud->SetSelectedAbility(playerActionComponent->SelectedAbility + 1);
 				}
 			}

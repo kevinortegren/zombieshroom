@@ -193,14 +193,10 @@ function SetAbilityFocus(p_slot)
 	$(".slotselected").removeClass("slotselected");
 	$("#slot"+p_slot).addClass("slotselected");
 }
-function StartCooldown(p_slot, p_duration)
+function SetCooldown(p_slot, p_percent)
 {
 	var slot = $("#slot"+p_slot+"-cooldown");
-	if(parseInt(slot.css("background-position-y").split("px")[0]) == 75)
-	{
-		slot.css("background-position", "50% 0px");
-		slot.animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
-	}
+	slot.css("background-position", "50% "+(1-p_percent)*75+"px");
 }
 
 function DamageIndicator(p_damage)
