@@ -63,7 +63,9 @@ namespace RootForce
 							health->RespawnDelay = 0.0f;
 						}
 						// If the entity has a script and it is neither Player or AbilitySpawnPoint, assume it's an ability and attempt to remove it
-						else if(g_world->GetEntityManager()->GetComponent<Script>(pair.second) && g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("AbilitySpawnPoint") != 0)
+						else if(g_world->GetEntityManager()->GetComponent<Script>(pair.second)
+							&& g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("AbilitySpawnPoint") != 0
+							&& g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("MatchState") != 0)
 						{
 							Script* script = g_world->GetEntityManager()->GetComponent<Script>(pair.second);
 							g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
