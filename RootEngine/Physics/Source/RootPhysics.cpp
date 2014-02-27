@@ -346,7 +346,7 @@ namespace Physics
 	
 
 
-	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld )
+	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
 	{
 		
 		btVector3 pos;
@@ -373,17 +373,17 @@ namespace Physics
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 
 
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld);	
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic);	
 
 			return;
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
+			AddController(p_objectHandle, shape, p_collideWithWorld, p_collidesWithStatic, trans);
 		}
 	}
 
-	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld )
+	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -409,16 +409,16 @@ namespace Physics
 		{
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld);	
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
+			AddController(p_objectHandle, shape, p_collideWithWorld, p_collidesWithStatic, trans);
 		}
 	}
 
-	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld )
+	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -444,16 +444,16 @@ namespace Physics
 		{
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld);	
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
+			AddController(p_objectHandle, shape, p_collideWithWorld, p_collidesWithStatic, trans);
 		}
 	}
 
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld )
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -479,16 +479,16 @@ namespace Physics
 		{
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld);	
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
 		}
 		else //Create a controller
 		{
-			AddController(p_objectHandle, shape, p_collideWithWorld, trans);
+			AddController(p_objectHandle, shape, p_collideWithWorld, p_collidesWithStatic, trans);
 		}
 	}
 
-	void RootPhysics::BindHullShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld )
+	void RootPhysics::BindHullShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
 	{
 		btRigidBody* body = CreateMesh(p_modelHandle, p_position, p_rotation, p_mass);
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
@@ -1378,7 +1378,7 @@ namespace Physics
 		return nullptr;
 	}
 
-	void RootPhysics::AddRigidBody( int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld )
+	void RootPhysics::AddRigidBody( int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld, bool p_collidesWithStatic )
 	{
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 				p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
@@ -1389,6 +1389,8 @@ namespace Physics
 		}
 		if(!p_collideWithWorld)
 			p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		else if(!p_collidesWithStatic)
+			p_body->getBroadphaseHandle()->m_collisionFilterMask = p_body->getBroadphaseHandle()->m_collisionFilterMask ^short(btBroadphaseProxy::StaticFilter);
 		m_dynamicWorld->addRigidBody(p_body);
 		m_dynamicObjects.push_back(p_body);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
@@ -1397,7 +1399,7 @@ namespace Physics
 		p_body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 	}
 
-	void RootPhysics::AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, const btTransform& p_transform)
+	void RootPhysics::AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, bool p_collidesWithStatic, const btTransform& p_transform)
 	{
 		btPairCachingGhostObject* ghostObject = new btPairCachingGhostObject();
 		ghostObject->setCollisionShape(p_collisionShape);
@@ -1405,6 +1407,8 @@ namespace Physics
 		ghostObject->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_CHARACTER_OBJECT);
 		if(!p_collideWithWorld)
 			ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		else if(!p_collidesWithStatic)
+			ghostObject->getBroadphaseHandle()->m_collisionFilterMask = ghostObject->getBroadphaseHandle()->m_collisionFilterMask ^short(btBroadphaseProxy::StaticFilter);
 		ObjectController* controller = new ObjectController();
 		controller->Init(ghostObject, (btConvexShape*)p_collisionShape, m_dynamicWorld);
 		m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter);
