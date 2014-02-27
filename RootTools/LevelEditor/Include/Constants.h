@@ -30,7 +30,7 @@ const int g_maxMessages = g_maxMeshes;
 //textureBawlsheit
 const int g_MaxResolution = 512 * 512 *4;
 const int g_tileFactor = 24;
-const int g_maxPaintTextures = 1;
+const int g_maxPaintTextures = 10;
 
 const int g_maxMegaMeshes = 2;
 const int g_maxVerticesPerMegaMesh = 100000;
