@@ -61,7 +61,7 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
-		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
+		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
 		
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
@@ -168,6 +168,8 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
+
+
 #ifndef _DEBUG
 		BotanyTextures textures;
 		textures.m_diffuse = "ugotaflatgrass2";
@@ -177,6 +179,8 @@ namespace RootForce
 
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures);
+
+
 
 		// Subdivide world.
 		m_sharedSystems.m_worldSystem->SubdivideTree();
