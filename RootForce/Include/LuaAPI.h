@@ -2107,9 +2107,9 @@ namespace RootForce
 			if ((*s)->Render)
 			{
 				RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(*e);
-				RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
+			//	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(*e);
 
-				t->m_position = (*s)->StartPosition;
+			//	t->m_position = (*s)->StartPosition;
 
 				r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
 				r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
