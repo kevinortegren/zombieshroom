@@ -15,7 +15,7 @@ namespace Render
 	{
 		enum BackgroundBlend
 		{
-			ADDATIVE,
+			ADDITIVE,
 			ALPHABLEND
 		};
 	}
@@ -95,7 +95,7 @@ namespace Render
 		std::shared_ptr<ProgramInterface> m_pointLightFullScreen;
 		std::shared_ptr<ProgramInterface> m_pointLightStencil;
 		std::shared_ptr<ProgramInterface> m_pointLight;
-		std::shared_ptr<ProgramInterface> m_backgroundAddative;
+		std::shared_ptr<ProgramInterface> m_backgroundAdditive;
 		std::shared_ptr<ProgramInterface> m_backgroundAlphaBlend;
 
 		bool m_showAmbient;

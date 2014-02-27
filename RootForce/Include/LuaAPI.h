@@ -2110,6 +2110,8 @@ namespace RootForce
 			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
 			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			r->m_model = g_engineContext.m_resourceManager->CreateModel("rayModel");
 			r->m_forward = true;
 			r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
