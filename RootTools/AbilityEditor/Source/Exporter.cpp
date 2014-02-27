@@ -265,6 +265,12 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "SoundLoop" << YAML::Value << sound->m_loop;
 				}
 				break;
+			case AbilityComponents::ComponentType::FOLLOW:
+				{
+					AbilityComponents::Follow* follow = static_cast<AbilityComponents::Follow*>(p_component);
+					p_emitter << YAML::Key << "FollowOffset" << YAML::Value << follow->m_offset;
+				}
+				break;
 			default:
 				break;
 		}

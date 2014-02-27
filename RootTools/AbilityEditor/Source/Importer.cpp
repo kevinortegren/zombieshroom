@@ -378,6 +378,15 @@ namespace AbilityEditorNameSpace
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
+		case AbilityComponents::ComponentType::FOLLOW:
+			{
+				AbilityComponents::Follow* tempcomp = new AbilityComponents::Follow();
+				if(p_node.FindValue("FollowOffset"))
+					p_node["FollowOffset"] >> tempcomp->m_offset;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
 		default:
 			break;
 		}

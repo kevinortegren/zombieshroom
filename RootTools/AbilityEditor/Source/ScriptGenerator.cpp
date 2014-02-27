@@ -145,23 +145,28 @@ namespace AbilityEditorNameSpace
 				m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
 			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
 
-			//Some standard values
-			//Collision Shape variables
+			//Some standard
+			//Collision Shape
 			float radius = 1.0f;
 			float height = 1.0f;
 			int colShape = 3;
-			//Physics variables
+			//Physics
 			float mass = 1.0f;
 			QVector3D grav = QVector3D(0,9.82f,0);
 			//Positions
 			int startEnum, targetEnum;
 			QVector3D startPos = QVector3D(0,0,0);
 			QVector3D targetPos = QVector3D(0,0,0);
+			//Homing
+			float homingStrength = 0.1f;
+			float homingSpeed = 20.0f;
 			//Velocity
 			int direction = 0;
 			float speed = 0.0f;
-			//Collision variable
+			//Collision
 			bool colWithWorld = false;
+			//Follow
+			float followOffset = 0.0f;
 			//Setting values
 			for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
 			{
@@ -186,16 +191,24 @@ namespace AbilityEditorNameSpace
 				{
 					targetEnum = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_targPos;
 					targetPos = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_absolutePos;
+					homingStrength = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_controllability;
+					homingSpeed = ((AbilityComponents::TargetPos*)m_entity->GetComponents()->at(i))->m_speed;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::VELOCITY)
 				{
 					direction = ((AbilityComponents::Velocity*)m_entity->GetComponents()->at(i))->m_direction;
 					speed = ((AbilityComponents::Velocity*)m_entity->GetComponents()->at(i))->m_speed;
 				}
-				//Rotation and stuff will be set by the followPlayer System
+				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::FOLLOW)
+				{
+					followOffset = ((AbilityComponents::Follow*)m_entity->GetComponents()->at(i))->m_offset;
+				}
 			}
 			//Writing values
-
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::FOLLOW))
+			{
+				m_file << "\tFollower.New(self, casterEnt, " << followOffset << ");\n";
+			}
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::VELOCITY))
 			{
 				if (direction == AbilityComponents::Velocity::FORWARD)
@@ -292,26 +305,55 @@ namespace AbilityEditorNameSpace
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
 			{
+				m_file << "\tlocal homingComp = Homing.New(self, " << homingStrength << ", " << homingSpeed << ");\n";
+				m_file << "\tlocal rayDirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
 				if (startEnum == AbilityComponents::TargetPos::ONAIM)
 				{
-					//tarPos = rayCast.getPosition()
-					//SetTargetPosition(tarPos);
+					m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, rayDirVec, 10000, true, false);\n";
+					m_file << "\thomingComp:SetTargetPosition(rayComp:GetHitPos());\n";
 				}
 				else if (startEnum == AbilityComponents::TargetPos::ENEMYPLAYER)
 				{
-					//if getClosestPlayer == enemy
-					//tarPos = enemy.getPosition()
-					//SetTargetPosition(tarPos);
+					m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, rayDirVec, 10000, true, false);\n";
+					m_file << "\tlocal entityAtAim = rayComp:GetHitEntity();\n";
+					m_file << "\tif entityAtAim:DoesExist() then\n";
+					m_file << "\t	local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());\n";
+					m_file << "\t	if type == PhysicsType.TYPE_PLAYER then\n";
+					m_file << "\t		local abilityOwnerNetwork = self:GetNetwork();\n";
+					m_file << "\t		local abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+					m_file << "\t		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+					m_file << "\t		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+					m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t			homingComp:SetTargetEntity(entityAtAim);\n";
+					m_file << "\t		end\n";
+					m_file << "\t	end\n";
+					m_file << "\telse\n";
+					m_file << "\t	homingComp:SetTargetPosition(rayComp:GetHitPos());\n";
+					m_file << "\tend\n";
 				}
 				else if (startEnum == AbilityComponents::TargetPos::FRIENDLYPLAYER)
 				{
-					//if getClosestPlayer == friend
-					//tarPos = friend.getPosition()
-					//SetTargetPosition(tarPos);
+					m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, rayDirVec, 10000, true, false);\n";
+					m_file << "\tlocal entityAtAim = rayComp:GetHitEntity();\n";
+					m_file << "\tif entityAtAim:DoesExist() then\n";
+					m_file << "\t	local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());\n";
+					m_file << "\t	if type == PhysicsType.TYPE_PLAYER then\n";
+					m_file << "\t		local abilityOwnerNetwork = self:GetNetwork();\n";
+					m_file << "\t		local abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+					m_file << "\t		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+					m_file << "\t		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+					m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
+					m_file << "\t			homingComp:SetTargetEntity(entityAtAim);\n";
+					m_file << "\t		end\n";
+					m_file << "\t	end\n";
+					m_file << "\telse\n";
+					m_file << "\t	homingComp:SetTargetPosition(rayComp:GetHitPos());\n";
+					m_file << "\tend\n";
 				}
 				else if (startEnum == AbilityComponents::TargetPos::ABSOLUTE)
 				{
-					//SetTargetPosition(Vec3.New(targetPos));
+					m_file << "\tlocal targPos = Vec3.New(" << targetPos.x() << ", " << targetPos.y() << ", " << targetPos.z() << ");\n"; 
+					m_file << "\thomingComp:SetTargetPosition(targPos);\n";
 				}
 			}
 

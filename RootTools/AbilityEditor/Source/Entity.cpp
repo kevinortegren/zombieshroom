@@ -121,6 +121,12 @@ namespace AbilityEditorNameSpace
 				AddComponent(temp);
 			}
 			break;
+		case AbilityComponents::ComponentType::FOLLOW:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Follow();
+				AddComponent(temp);
+			}
+			break;
 		default:
 			break; 
 		}

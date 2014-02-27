@@ -37,7 +37,6 @@ function AbilityTest.OnCreate (userId, actionId)
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), tempPos, dirVecForward, 10000, true, false);
-	--local bajs = rayComp:GetHitPosition();
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
 		local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());

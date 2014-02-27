@@ -39,8 +39,7 @@ namespace Physics
 
 	struct RayAbilityCast : public btCollisionWorld::ClosestRayResultCallback
 	{
-		CustomUserPointer* m_caster, *m_hit;
-		glm::vec3 from, to;
+		CustomUserPointer* m_hit;
 		RayAbilityCast() : btCollisionWorld::ClosestRayResultCallback(btVector3(0.f, 0.f, 0.f), btVector3(0.f, 0.f, 0.f))
 		{
 
@@ -1331,14 +1330,14 @@ namespace Physics
 	void* RootPhysics::CastRay( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length, glm::vec3* p_hitPos, bool p_isAbility )
 	{
 		RayAbilityCast rayResult;
-		rayResult.m_caster = m_userPointer.at(p_objectHandle);
-		rayResult.from = p_startPos;
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
-		rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(end[0], end[1], end[2]), rayResult);
 
 		if(!rayResult.hasHit())
+		{
+			*p_hitPos = p_startPos + p_direction * p_length;
 			return nullptr;
+		}
 		
 		glm::vec3 castVector = end - p_startPos;
 		glm::vec3 relativePosition = castVector * rayResult.m_closestHitFraction;
@@ -1350,7 +1349,7 @@ namespace Physics
 		{
 			RootForce::CollisionInfo info;
 			info.m_collisionPosition = hitPos;
-			rayResult.m_caster->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
+			m_userPointer.at(p_objectHandle)->m_collisions->insert(std::make_pair(rayResult.m_hit->m_entity, info));
 
 			return rayResult.m_hit->m_entity;
 		}
@@ -1387,10 +1386,10 @@ namespace Physics
 	void* RootPhysics::GetPlayerAtAim( int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length )
 	{
 		RayAbilityCast rayResult;
-		rayResult.m_caster = m_userPointer.at(p_objectHandle);
-		rayResult.from = p_startPos;
+		//rayResult.m_caster = m_userPointer.at(p_objectHandle);
+		//rayResult.from = p_startPos;
 		glm::vec3 end = p_startPos + glm::normalize(p_direction) * p_length;
-		rayResult.to = end;
+		//rayResult.to = end;
 		m_dynamicWorld->rayTest(btVector3(p_startPos[0], p_startPos[1], p_startPos[2]), btVector3(end[0], end[1], end[2]), rayResult);
 		if (rayResult.m_hit->m_type == PhysicsType::TYPE_PLAYER)
 		{

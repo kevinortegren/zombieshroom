@@ -25,7 +25,7 @@ namespace AbilityEditorNameSpace
 			enum ComponentType
 			{
 				STARTPOS, //done
-				TARGPOS, //Needs system
+				TARGPOS, //done
 				VELOCITY, //done
 				ABILITYMODEL, //done
 				COLLISIONSHAPE, //done
@@ -38,6 +38,7 @@ namespace AbilityEditorNameSpace
 				CHARGEVARIABLES, //done
 				WATER, //done
 				SOUND, //done
+				FOLLOW, //done
 				END_OF_ENUM //TODO : EntityChange
 			};
 		}
@@ -47,7 +48,7 @@ namespace AbilityEditorNameSpace
 			ComponentNameList()
 			{
 				m_compNames.append("Start Position");
-				m_compNames.append("Target Position [WIP]");
+				m_compNames.append("Homing");
 				m_compNames.append("Velocity");
 				m_compNames.append("Ability Model");
 				m_compNames.append("Collision Shape");
@@ -171,17 +172,20 @@ namespace AbilityEditorNameSpace
 			std::map<pos, QString> m_enumToText;
 			pos m_targPos;
 			QVector3D m_absolutePos;
-			TargetPos(pos p_pos = pos::ENEMYPLAYER, QVector3D p_targPos = QVector3D(0,0,0)): MainComponent(ComponentType::TARGPOS)
+			float m_controllability, m_speed;
+			TargetPos(pos p_pos = pos::ENEMYPLAYER, QVector3D p_targPos = QVector3D(0,0,0), float p_control = 0.1f, float p_speed = 10.0f): MainComponent(ComponentType::TARGPOS)
 			{
 				m_enumToText[ENEMYPLAYER] = "Enemy Player";
 				m_enumToText[FRIENDLYPLAYER] = "Friendly Player";
 				m_enumToText[ONAIM] = "On Aim";
 				m_enumToText[ABSOLUTE] = "Absolute";
 				m_absolutePos = p_targPos;
+				m_controllability = p_control;
+				m_speed = p_speed;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
-				QtVariantProperty* position, *x, *y, *z; 
+				QtVariantProperty* position, *x, *y, *z, *control, *speed; 
 				QList<QtProperty*> list;
 				QString combinedValue;
 
@@ -193,7 +197,7 @@ namespace AbilityEditorNameSpace
 				{
 					enumTypes << m_enumToText[(pos)i];
 				}
-				enumPos = enumMan->addProperty("Target position");
+				enumPos = enumMan->addProperty("Target");
 				enumMan->setEnumNames(enumPos,enumTypes);
 				enumMan->setValue(enumPos, m_targPos);
 
@@ -211,11 +215,19 @@ namespace AbilityEditorNameSpace
 				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
 				p_propMan->setValue(position,combinedValue);
 
+				control = p_propMan->addProperty(QVariant::Double, "Homing Strength");
+				p_propMan->setValue(control, m_controllability);
+
+				speed = p_propMan->addProperty(QVariant::Double, "Speed");
+				p_propMan->setValue(speed, m_speed);
+
 				//Add to browser widget
 				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(enumPos);
 				p_propBrows->addProperty(position);
+				p_propBrows->addProperty(control);
+				p_propBrows->addProperty(speed);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -234,6 +246,9 @@ namespace AbilityEditorNameSpace
 				{
 					m_absolutePos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
+
+				m_speed = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_controllability = p_propMan->variantProperty(props.at(3))->value().toFloat();
 			}
 		};
 
@@ -834,6 +849,32 @@ namespace AbilityEditorNameSpace
 				m_rangeMin = p_propMan->variantProperty(props.at(2))->value().toFloat();
 				m_rangeMax = p_propMan->variantProperty(props.at(3))->value().toFloat();
 				m_loop = p_propMan->variantProperty(props.at(4))->value().toBool();
+			}
+		};
+
+		struct Follow : MainComponent
+		{
+			float m_offset;
+			Follow(float p_offset = 0.0f) : MainComponent(ComponentType::FOLLOW)
+			{
+				m_offset = p_offset;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* offset;
+
+				offset = p_propMan->addProperty(QVariant::Double, "Offset");
+				p_propMan->setValue(offset, m_offset);
+				offset->setToolTip("Offset from followee");
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(offset);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props, subprops;
+				props = p_propBrows->properties();
+				m_offset = p_propMan->variantProperty(props.at(0))->value().toFloat();
 			}
 		};
 	}
