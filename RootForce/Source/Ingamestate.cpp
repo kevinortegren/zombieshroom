@@ -299,7 +299,6 @@ namespace RootForce
 			}
 		}
 
-
 		// Check for disconnection from the server
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);

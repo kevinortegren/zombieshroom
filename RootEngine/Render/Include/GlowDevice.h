@@ -15,8 +15,8 @@ namespace Render
 		void Init(GLRenderer* p_renderer, int p_width, int p_height);
 		void Resize(int p_width, int p_height);
 
-		void SetHalfWidth(int p_halfWidth);
-		void SetHalfHeight(int p_halfHeight);
+		void SetHalfWidth(float p_halfWidth);
+		void SetHalfHeight(float p_halfHeight);
 		void SetGlowFactor(float p_factor);
 		void SetGlowStrength(float p_strength);
 		void SetGlowRadius(float p_radius);
