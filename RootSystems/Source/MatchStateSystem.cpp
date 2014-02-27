@@ -5,6 +5,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootForce/Include/GameStates.h>
 #include <RootEngine/GUI/Include/WebView.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 extern ECS::World* g_world;
@@ -13,11 +14,77 @@ namespace RootForce
 {
 	void MatchStateSystem::Process()
 	{
+		int numPlayers = 0;
+		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
+		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
+		for(auto pair : g_networkEntityMap)
+		{
+			if(pair.first.ActionID != Network::ReservedActionID::CONNECT
+				|| pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY
+				|| !pair.second)
+				continue;
+
+			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
+			if(playerComponent->TeamID != 0)
+				numPlayers++;
+		}
+		switch(m_currentState)
+		{
+			case MatchState::Warmup:
+				
+				if(numPlayers >= ruleSet->minPlayers)
+				{
+					m_countDown = 5.0f;
+					m_currentState = MatchState::CountDown;
+				}
+				break;
+			case MatchState::CountDown:
+				if(m_countDown <= 0.0f)
+				{
+					ruleSet->TeamScore[1] = 0;
+					ruleSet->TeamScore[2] = 0;
+					m_abilitySpawnSystem->ResetAllPoints();
+					for(auto pair : g_networkEntityMap)
+					{
+						if(!pair.second)
+							continue;
+						if(pair.first.ActionID == Network::ReservedActionID::CONNECT && pair.first.SequenceID == RootForce::Network::SEQUENCE_PLAYER_ENTITY)
+						{
+							PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
+							playerComponent->Score = 0;
+							playerComponent->Deaths = 0;
+
+							HealthComponent* health = g_world->GetEntityManager()->GetComponent<HealthComponent>(pair.second);
+							health->Health = 0;
+							health->IsDead = true;
+							health->WantsRespawn = true;
+							health->RespawnDelay = 0.0f;
+						}
+						// If the entity has a script and it is neither Player or AbilitySpawnPoint, assume it's an ability and attempt to remove it
+						else if(g_world->GetEntityManager()->GetComponent<Script>(pair.second) && g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("AbilitySpawnPoint") != 0)
+						{
+							Script* script = g_world->GetEntityManager()->GetComponent<Script>(pair.second);
+							g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
+							g_engineContext.m_script->AddParameterUserData(pair.second, sizeof(ECS::Entity*), "Entity");
+							g_engineContext.m_script->ExecuteScript();
+							g_world->GetEntityManager()->RemoveEntity(pair.second);
+						}
+					}
+					m_currentState = MatchState::Match;
+				}
+				break;
+			case MatchState::Match:
+				//Nothing, and you will never be nothing!
+				break;
+		}
 	}
 
 	void MatchStateSystem::UpdateDeltatime( float p_deltaTime )
 	{
-		m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft -= p_deltaTime;
+		if(m_currentState == MatchState::Match)
+			m_world->GetEntityManager()->GetComponent<TDMRuleSet>( m_world->GetTagManager()->GetEntityByTag("MatchState") )->TimeLeft -= p_deltaTime;
+		else if(m_currentState == MatchState::CountDown)
+			m_countDown -= p_deltaTime;
 	}
 
 	void MatchStateSystem::SetLoggingInterface( Logging* p_logger )
@@ -82,6 +149,8 @@ namespace RootForce
 
 	bool MatchStateSystem::IsMatchOver()
 	{
+		if(m_currentState == MatchState::Warmup)
+			return false;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
 		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
 		if(ruleSet->ScoreLimit > 0
