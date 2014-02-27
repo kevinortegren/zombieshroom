@@ -44,7 +44,9 @@ namespace RootForce
 					ruleSet->TeamScore[1] = 0;
 					ruleSet->TeamScore[2] = 0;
 					m_abilitySpawnSystem->ResetAllPoints();
-					for(auto pair : g_networkEntityMap)
+					// Make a copy of entity vector to avoid iterator issues on deletion
+					RootForce::Network::NetworkEntityMap entities = g_networkEntityMap;
+					for(auto pair : entities)
 					{
 						if(!pair.second)
 							continue;
