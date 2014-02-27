@@ -51,17 +51,21 @@ namespace RootForce
 					{
 						if(!pair.second)
 							continue;
-						if(pair.first.ActionID == Network::ReservedActionID::CONNECT && pair.first.SequenceID == RootForce::Network::SEQUENCE_PLAYER_ENTITY)
+						if(pair.first.ActionID == Network::ReservedActionID::CONNECT
+							&& pair.first.SequenceID == RootForce::Network::SEQUENCE_PLAYER_ENTITY)
 						{
 							PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
 							playerComponent->Score = 0;
 							playerComponent->Deaths = 0;
 
-							HealthComponent* health = g_world->GetEntityManager()->GetComponent<HealthComponent>(pair.second);
-							health->Health = 0;
-							health->IsDead = true;
-							health->WantsRespawn = true;
-							health->RespawnDelay = 0.0f;
+							if(playerComponent->TeamID != 0)
+							{
+								HealthComponent* health = g_world->GetEntityManager()->GetComponent<HealthComponent>(pair.second);
+								health->Health = 0;
+								health->IsDead = true;
+								health->WantsRespawn = true;
+								health->RespawnDelay = 0.0f;
+							}
 						}
 						// If the entity has a script and it is neither Player or AbilitySpawnPoint, assume it's an ability and attempt to remove it
 						else if(g_world->GetEntityManager()->GetComponent<Script>(pair.second)
