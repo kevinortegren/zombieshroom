@@ -96,7 +96,7 @@
           # None = 0
           # AlphaBlend = 1
           # Additive = 2
-          blend: 2
+          blend: 1
           
           # Depth settings.
           depth:

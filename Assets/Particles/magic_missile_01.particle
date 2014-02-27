@@ -16,7 +16,7 @@
   ORBITRADIUS: 0.0
   TEMPLATE: 0
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: 1
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 2
@@ -36,5 +36,5 @@
   TEMPLATE: 0
   SPAWNTIME: 0.04
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: 2

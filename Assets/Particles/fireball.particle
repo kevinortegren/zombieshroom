@@ -16,5 +16,5 @@
   ORBITRADIUS: 0
   TEMPLATE: 0
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: Fire
