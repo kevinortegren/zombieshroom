@@ -181,10 +181,10 @@ namespace RootForce
 		textures.m_terrainTexture = "grass";
 
 		// Subdivide terrain for grass chunk rendering.
-		//m_botanySystem->Initialize(textures, 0.0f);
+		m_botanySystem->Initialize(textures, 0.0f);
 
 		// Subdivide world.
-		//m_sharedSystems.m_worldSystem->SubdivideTree();
+		m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 
 		// Lock the mouse
@@ -258,7 +258,6 @@ namespace RootForce
 		g_world->GetGroupManager()->UnregisterAll();
 		g_world->GetSystemManager()->Clear();
 		g_engineContext.m_physics->RemoveAll();
-
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
