@@ -676,7 +676,7 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 			}
 		}
-		else if(translucenceMap != "" && translucenceMap != "NONE")
+		if(translucenceMap != "" && translucenceMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
 			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture(translucenceMap, Render::TextureType::TEXTURE_2D);
