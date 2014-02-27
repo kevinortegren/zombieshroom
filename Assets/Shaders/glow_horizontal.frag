@@ -1,6 +1,6 @@
 #version 400
 
-#define TEXTURE_TAPS 10
+#define TEXTURE_TAPS 5
 
 in vec2 vert_texCoord;
 
@@ -55,7 +55,7 @@ void main()
 
     vec4 blur = texture(g_Glow, TexelCoord) * g_Gauss[0];
 
-    for( int i = 1; i < 10; i++ )
+    for( int i = 1; i < TEXTURE_TAPS; i++ )
 	{
 		blur += texture(g_Glow, TexelCoord + vec2( PixelOffset[i], 0.0 ) * dx * g_BlurRadius) * g_Gauss[i + 1];
 		blur += texture(g_Glow, TexelCoord - vec2( PixelOffset[i], 0.0 ) * dx * g_BlurRadius) * g_Gauss[i + 1];

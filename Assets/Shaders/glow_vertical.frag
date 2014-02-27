@@ -1,6 +1,6 @@
 #version 400
 
-#define TEXTURE_TAPS 10
+#define TEXTURE_TAPS 5
 
 in vec2 vert_texCoord;
 

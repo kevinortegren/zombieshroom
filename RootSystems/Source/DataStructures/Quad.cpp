@@ -31,8 +31,20 @@ namespace RootForce
 			auto material = renderable->m_material;
 			auto mesh = renderable->m_model->m_meshes[0];
 
-			unsigned materialIndex = m_materials.size();
-			m_materials.push_back(material);
+			unsigned materialIndex = 0;
+
+			auto materialItr = std::find(m_materials.begin(), m_materials.end(), material);
+
+			if(materialItr == m_materials.end())
+			{
+				materialIndex = m_materials.size();
+				m_materials.push_back(material);
+			}
+			else
+			{
+				materialIndex = materialItr - m_materials.begin();
+			}
+			
 			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
 
 			RootForce::Transform* transform = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
