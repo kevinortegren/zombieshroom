@@ -40,6 +40,8 @@ namespace RootForce
 		void AttachComponentToPoints(); 
 		void SetServerPeerInterface(RakNet::RakPeerInterface* p_serverPeer) { m_serverPeer = p_serverPeer; }
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
+
+		void ResetAllPoints();
 	private:
 		//Removes all the components used to interact with the spawnpoint ingame
 		void HideSpawnpoint(ECS::Entity* p_entity); 
