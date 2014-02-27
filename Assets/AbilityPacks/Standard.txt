@@ -2,3 +2,4 @@ AbilityDash
 AbilityBall
 FireBall
 AbilityTest
+PowerRay

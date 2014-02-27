@@ -805,13 +805,7 @@ namespace Physics
 			retVal[1] = temp.getY();
 			retVal[2] = temp.getZ();
 		}
-		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled )
-		{
-			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
-			retVal[0] = temp.getX();
-			retVal[1] = temp.getY();
-			retVal[2] = temp.getZ();		
-		}
+		
 		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
 			unsigned int indexrag = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
@@ -823,6 +817,13 @@ namespace Physics
 		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
 		{
 			retVal = m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->GetPos();
+		}
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled )
+		{
+			temp = m_dynamicObjects.at(index)->getWorldTransform().getOrigin();
+			retVal[0] = temp.getX();
+			retVal[1] = temp.getY();
+			retVal[2] = temp.getZ();		
 		}
 		else
 		{
