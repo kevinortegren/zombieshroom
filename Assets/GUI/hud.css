@@ -28,6 +28,18 @@ img
 }
 .textcenter
 {
+  text-align: center;
+}
+.floatright
+{
+  float: right;
+}
+.floatleft
+{
+  float: left;
+}
+.textcenter
+{
 	text-align: center;
 }
 .textleft
@@ -45,6 +57,10 @@ img
 .blue
 {
 	color: #9999FF;
+}
+.gray
+{
+	color: #AAAAAA;
 }
 .highlight
 {
@@ -189,12 +205,17 @@ img
   background-image: url('damageTaken.png');
   background-size: 100% 100%;
 }
-.scorewrapper
+#scorescreen-wrapper
 {
-	width: 400px;
-	height: 200px;
+	width: 600px;
+	height: 350px;
 	margin: auto;
 	background: rgba(0,0,0,0.5);
+}
+.scorewrapper
+{
+	width: 300px;
+	height: 200px;
 	font-size: 24px;
 }
 .scoretable
@@ -209,9 +230,8 @@ img
 .slot
 {
 	background-color:rgba(60,60,60,0.4);
-	width: 71px;
-	height: 71px;
-	border: 2px solid rgba(0,0,0,0);
+	width: 75px;
+	height: 75px;
 	font-size: 18px;
 	margin: 0 5px;
 	display: inline-block;
@@ -220,7 +240,11 @@ img
 	background-repeat: no-repeat;
 	background-position: -2px -2px;
 }
-.slotselected
+.slot div
+{
+	border: 2px solid rgba(0,0,0,0);
+}
+.slotselected div
 {
 	border: 2px solid white;
 }

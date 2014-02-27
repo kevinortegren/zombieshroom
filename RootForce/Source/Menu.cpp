@@ -38,9 +38,9 @@ namespace RootForce
 	void RootForce::Menu::AddServer(const std::pair<uint64_t, RootSystems::ServerInfoInternal>& p_serverInfo)
 	{
 		std::string command = "AddServer(";
-		command = command + "'" + p_serverInfo.second.IP + ":" + std::to_string(p_serverInfo.second.Port) + "',";
-		command = command + "'" + p_serverInfo.second.Information.ServerName.C_String() + "',";
-		command = command + "'" + p_serverInfo.second.Information.MapName.C_String() + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_serverInfo.second.IP) + ":" + std::to_string(p_serverInfo.second.Port) + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_serverInfo.second.Information.ServerName.C_String()) + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_serverInfo.second.Information.MapName.C_String()) + "',";
 		command = command + std::to_string(p_serverInfo.second.Information.CurrentPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.second.Information.MaxPlayers) + ",";
 		command = command + std::to_string(p_serverInfo.first/1000) + ",";
@@ -53,11 +53,11 @@ namespace RootForce
 	{
 		m_workingDir = p_workingDir;
 		std::string command = "SetDefaults(";
-		command = command + "'" + p_configMan->GetConfigValueAsString("ServerName") + "',";
-		command = command + "'" + p_configMan->GetConfigValueAsString("ServerMapfile") + "',";
-		command = command + "'" + p_configMan->GetConfigValueAsString("ServerAbilityfile") + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_configMan->GetConfigValueAsString("ServerName")) + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_configMan->GetConfigValueAsString("ServerMapfile")) + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_configMan->GetConfigValueAsString("ServerAbilityfile")) + "',";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerPort")) + ",";
-		command = command + "'" + p_configMan->GetConfigValueAsString("ServerPassword") + "',";
+		command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(p_configMan->GetConfigValueAsString("ServerPassword")) + "',";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerMaxPlayers")) + ",";
 		command = command + std::to_string(p_configMan->GetConfigValueAsFloat("ServerMatchLength")) + ",";
 		command = command + std::to_string(p_configMan->GetConfigValueAsInteger("ServerKillVictory")) + ",";
@@ -163,7 +163,7 @@ namespace RootForce
 					command += ",";
 				else
 					first = !first;
-				command = command + "'" + fname.substr(0,fname.length() - p_extension.length()) + "'";
+				command = command + "'" + RootEngine::GUISystem::PreventHTMLInjections(fname.substr(0,fname.length() - p_extension.length())) + "'";
 			}
 			closedir (dir);
 		}

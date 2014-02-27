@@ -23,35 +23,33 @@ function UpdateScoreScreen(p_localTeam, p_localName, p_list)
 {
 	var blue, bluetitle;
 	var red, redtitle;
-	if(p_localTeam == 2) // Red
-	{
-		red = $("#TeamScoreTable tbody");
-		redtitle = $("#TeamTitle");
-		blue = $("#EnemyScoreTable tbody");
-		bluetitle = $("#EnemyTitle");
-	}
-	else // Blue or spectator
-	{
-		blue = $("#TeamScoreTable");
-		bluetitle = $("#TeamTitle");
-		red = $("#EnemyScoreTable");
-		redtitle = $("#EnemyTitle");
-	}
-	redtitle.removeClass("blue");
-	redtitle.addClass("red");
-	redtitle.html("Red");
-	bluetitle.removeClass("red");
-	bluetitle.addClass("blue");
-	bluetitle.html("Blue");
-	$("#TeamScoreTable tbody > tr").remove();
-	$("#EnemyScoreTable tbody > tr").remove();
+	
+	$("#BlueScoreTable tbody > tr").remove();
+	$("#RedScoreTable tbody > tr").remove();
+	$("#SpectatorTable tbody > tr").remove();
 	
 	for(var player in p_list)
 	{
-		if(p_list[player][0] == 0 || !p_list[player])
-			continue; // Skip spectators
-		var team = (p_list[player][0]==1?blue:red);
-		team.append("<tr"+(p_list[player][1]==p_localName?" class='highlight'":"")+"><td class='textright'>"+p_list[player][1]+"</td><td class='textcenter'>"+p_list[player][2]+"</td><td class='textcenter'>"+p_list[player][3]+"</td></tr>");
+		if(!p_list[player])
+			continue;
+		var team;
+		if(p_list[player][0] == 0)
+			team = $("#SpectatorTable tbody");
+		else if(p_list[player][0] == 1)
+			team = $("#BlueScoreTable tbody");
+		else if(p_list[player][0] == 2)
+			team = $("#RedScoreTable tbody");
+		else
+			continue;
+		
+		team.append("<tr"+(p_list[player][1]==p_localName?" class='highlight'":"")+">"
+				+(p_list[player][0] != 0
+					?"<td class='textright'>"+p_list[player][1]+"</td>"
+						+"<td class='textcenter'>"+p_list[player][2]+"</td>"
+						+"<td class='textcenter'>"+p_list[player][3]+"</td>"
+					:"<td class='textcenter'>"+p_list[player][1]+"</td>"
+				)
+			+"</tr>");
 	}
 }
 

@@ -4,6 +4,7 @@
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootForce/Include/GameStates.h>
+#include <RootEngine/GUI/Include/WebView.h>
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 extern ECS::World* g_world;
@@ -66,9 +67,14 @@ namespace RootForce
 			scoreList.push_back(Score(playerComponent->TeamID, playerComponent->Name, playerComponent->Score, playerComponent->Deaths));
 		}
 		std::sort(scoreList.begin(), scoreList.end(), &CompareScores);
+		bool first = true;
 		for(auto score : scoreList)
 		{
-			scoreString += "["+std::to_string(score.Team)+",'" + score.Name + "',"+std::to_string(score.Kills)+","+std::to_string(score.Deaths)+"],";
+			if(first)
+				first = !first;
+			else
+				scoreString += ",";
+			scoreString += "["+std::to_string(score.Team)+",'" + RootEngine::GUISystem::PreventHTMLInjections(score.Name) + "',"+std::to_string(score.Kills)+","+std::to_string(score.Deaths)+"]";
 		}
 		scoreString += "]";
 		return scoreString;

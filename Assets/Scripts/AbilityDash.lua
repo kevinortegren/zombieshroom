@@ -6,7 +6,7 @@ AbilityDash = {};
 AbilityDash.cooldown = 3;
 AbilityDash.chargeTime = 0.0;
 AbilityDash.channelingTime = 0.0;
-AbilityDash.power = 50;
+AbilityDash.power = 25;
 
 function AbilityDash.ChargeDone(time, userId, actionId)
 end
