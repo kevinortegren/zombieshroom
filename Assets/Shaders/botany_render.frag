@@ -40,6 +40,18 @@ void main()
         color = texture(g_Diffuse, vert_texcoord1); 
 
 		ambient = g_GrassAmbient;
+
+		// Set diffuse color.
+		diffuse = vec4(color.rgb, 0.1);
+
+		// Store normals.
+		vec3 normal = normalize(vert_normal1);    
+		float p = sqrt(normal.z*8+8);
+		normals = normal.xy/p + 0.5;
+
+		// Output translucency.
+		glow = vec4(vec3(0.0), trans);     
+		background = vec4(0,0,0, ambient);
     }
     else // Billboarded fragment.
     {
@@ -48,17 +60,12 @@ void main()
         // Alpha-Testing.
         if(color.a < 0.5)
             discard;
-    }
 
-    // Set diffuse color.
-	diffuse = vec4(color.rgb, 0.1);    
-    
-    // Store normals.
-    vec3 normal = normalize(vert_normal1);    
-    float p = sqrt(normal.z*8+8);
-    normals = normal.xy/p + 0.5;
-    
-    // Output translucency.
-	glow = vec4(vec3(0.0), trans);     
-    background = vec4(0,0,0,ambient);
+		diffuse = vec4(color.xyz,0.1);
+		vec3 normal = normalize(vert_normal1);    
+		float p = sqrt(normal.z*8+8);
+		normals = normal.xy/p + 0.5;
+		glow = vec4(0,0,0,0);   
+		background = vec4(0,0,0, ambient);
+    }
 }

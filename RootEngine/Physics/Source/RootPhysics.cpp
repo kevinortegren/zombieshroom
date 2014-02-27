@@ -320,6 +320,7 @@ namespace Physics
 			delete temp;
 		}
 		m_ragdolls.clear();
+		m_externallyControlled.clear();
 		m_shapelessObjects.clear();
 		m_dynamicObjects.clear();
 		m_playerObjects.clear();
