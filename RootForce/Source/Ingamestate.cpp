@@ -233,7 +233,7 @@ namespace RootForce
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-		m_displayIngameMenu = !m_displayIngameMenu;
+		m_displayIngameMenu = true;
 		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 		m_ingameMenu->Reset();
 	}

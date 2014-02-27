@@ -226,6 +226,6 @@ $(document).ready(function(){
   // DamageIndicator(40);
   // setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
-	Announce("Waiting for players...", -1);
-	setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
+	// Announce("Waiting for players...", -1);
+	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 });
