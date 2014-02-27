@@ -49,7 +49,7 @@ namespace RootForce
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBuffer()->GetBufferId());
 			unsigned char* data = (unsigned char*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
-			int offset = 0;
+			unsigned offset = m_vertices.size();
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
 				Render::Vertex1P1N1UV1T1BT v;
@@ -72,18 +72,17 @@ namespace RootForce
 				v.m_tangent = glm::vec3(tbt.x, tbt.y, tbt.z);
 
 				m_vertices.push_back(std::move(v));
-				offset++;
 			}
 
 			if(mesh->GetElementBuffer() == nullptr)
 			{
-				for(unsigned i = offset; i < offset + mesh->GetVertexBuffer()->GetNumElements(); i += 3)
+				for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetNumElements(); i += 3)
 				{		
 					Polygon p;
 
-					p.m_indices.push_back(i + indexOffset);
-					p.m_indices.push_back(i + 1 + indexOffset);
-					p.m_indices.push_back(i + 2 + indexOffset);
+					p.m_indices.push_back(i + offset);
+					p.m_indices.push_back(i + 1 + offset);
+					p.m_indices.push_back(i + 2 + offset);
 
 					/*std::cout << "P0: " << i + indexOffset << std::endl;
 					std::cout << "P1: " << i + 1 + indexOffset << std::endl;
@@ -113,9 +112,9 @@ namespace RootForce
 					memcpy(&i1, &data[i + 4], sizeof(int));
 					memcpy(&i2, &data[i + 8], sizeof(int));
 
-					p.m_indices.push_back(i0 + indexOffset);
-					p.m_indices.push_back(i1 + indexOffset);
-					p.m_indices.push_back(i2 + indexOffset);
+					p.m_indices.push_back(i0 + offset);
+					p.m_indices.push_back(i1 + offset);
+					p.m_indices.push_back(i2 + offset);
 
 					/*std::cout << "P0: " << i0 + indexOffset << std::endl;
 					std::cout << "P1: " << i1 + indexOffset << std::endl;
@@ -129,8 +128,6 @@ namespace RootForce
 
 				glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 			}
-
-			indexOffset += offset;
 		}
 		
 		// Create an AABB for the quad tree structure.
@@ -650,7 +647,7 @@ namespace RootForce
 		renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialStringStream.str());
 		renderable->m_material->m_textures = m_materials[p_materialIndex]->m_textures;
 		renderable->m_material->m_tileFactor = m_materials[p_materialIndex]->m_tileFactor;
-
+		renderable->m_material->m_flipped = m_materials[p_materialIndex]->m_flipped;
 
 		// Add tile factor for blended meshes.
 		if(renderable->m_material->m_tileFactor != 0)

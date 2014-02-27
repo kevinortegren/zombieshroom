@@ -21,6 +21,7 @@ void FreeList::Initialize(void* p_start, unsigned p_elementSize, unsigned p_numE
 	}
 
 	runner->m_next = nullptr;
+	FreeList* completeList = (FreeList*) p_start;
 };
 
 void* FreeList::Obtain()

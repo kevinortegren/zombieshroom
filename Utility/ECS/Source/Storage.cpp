@@ -29,6 +29,13 @@ namespace ECS
 		SetStringValue(p_key, ss.str());
 	}
 
+	void Storage::SetValue(const std::string& p_key, const float p_value)
+	{
+		std::stringstream ss;
+		ss << p_value;
+		SetStringValue(p_key, ss.str());
+	}
+
 	void Storage::SetValue(const std::string& p_key, const int p_value)
 	{
 		std::stringstream ss;

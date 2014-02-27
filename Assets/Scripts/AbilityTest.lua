@@ -38,7 +38,7 @@ function AbilityTest.OnCreate (userId, actionId)
 			startPos = entityAtAim:GetTransformation():GetPos();
 		end
 	end
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 1, dirVec.y * 1, dirVec.z * 1));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);

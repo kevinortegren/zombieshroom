@@ -97,6 +97,7 @@ namespace Render
 		std::shared_ptr<ProgramInterface> m_pointLight;
 		std::shared_ptr<ProgramInterface> m_backgroundAddative;
 		std::shared_ptr<ProgramInterface> m_backgroundAlphaBlend;
+		std::shared_ptr<ProgramInterface> m_pointLightFSQ;
 
 		bool m_showAmbient;
 		bool m_showDirectional;

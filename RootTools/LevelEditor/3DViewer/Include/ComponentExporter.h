@@ -74,6 +74,21 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]);
 						p_emitter << YAML::Key << "TextureBlue" << YAML::Value << s;
 					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_RN] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_RN]);
+						p_emitter << YAML::Key << "TextureRedNormal" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_GN] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_GN]);
+						p_emitter << YAML::Key << "TextureGreenNormal" << YAML::Value << s;
+					}
+					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_BN] != nullptr)
+					{
+						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_BN]);
+						p_emitter << YAML::Key << "TextureBlueNormal" << YAML::Value << s;
+					}
 					if(renderable->m_material->m_tileFactor != 0)
 					{
 						std::ostringstream oss;
@@ -144,7 +159,14 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			{
 				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
 
-				p_emitter << YAML::Key << "Name" << YAML::Value << particle->m_name;
+				p_emitter << YAML::Key << "File" << YAML::Value << particle->m_name;
+			}
+			break;
+		case RootForce::ComponentType::SHADOWCASTER:
+			{
+				RootForce::Shadowcaster* shadow = static_cast<RootForce::Shadowcaster*>(p_component);
+
+				p_emitter << YAML::Key << "LightSlot" << YAML::Value << shadow->m_directionalLightSlot;
 			}
 			break;
 		default:

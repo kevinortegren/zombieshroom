@@ -13,6 +13,9 @@
 #include <RootSystems\Include\CameraSystem.h>
 #include <RootSystems\Include\WorldSystem.h>
 #include <RootSystems\Include\ShadowSystem.h>
+#include <RootSystems\Include\WaterSystem.h>
+#include <RootSystems\Include\BotanySystem.h>
+
 
 #include <Utility\ECS\Include\World.h>
 
@@ -36,6 +39,7 @@ ReadMemory RM;
 int numberMeshes;
 int numberLights;
 int numberCameras;
+int numberMegaMeshes= 0;
 
 // Setup world.
 ECS::World m_world;
@@ -46,11 +50,14 @@ RootForce::DirectionalLightSystem* directionalLightSystem;
 RootForce::ParticleSystem* particleSystem;
 RootForce::WorldSystem* worldSystem;
 RootForce::ShadowSystem* shadowSystem;
+RootForce::WaterSystem* waterSystem;
+RootForce::BotanySystem* botanySystem;
 
 std::vector<ECS::Entity*> cameras;
 std::vector<ECS::Entity*> LightEntities;
 std::vector<ECS::Entity*> Entities;
 std::vector<ECS::Entity*> locatorEntities;
+std::vector<ECS::Entity*> MegaMeshes;
 
 Utility::CPUTimer timer;
 
@@ -58,9 +65,9 @@ void HandleEvents();
 std::string GetNameFromPath( std::string p_path );
 void Initialize(RootEngine::GameSharedContext g_engineContext);
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID);
+void CopyMayaMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, string translucenceMap, int meshID, bool itsAmegaMesh);
 ECS::Entity* CreateLightEntity(ECS::World* p_world);
-ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index);
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh);
 ECS::Entity* CreateTransformEntity(ECS::World* p_world, int index);
 ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int index);
 void CreateCameraEntity(int index);
@@ -69,11 +76,11 @@ void UpdateCamera(int index);
 void LoadLocators();
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 void UpdateLight(int index, bool remove, bool firstTimeLoad, string type);
-
+void UpdateLocator(int index);
+void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool remove);
 
 void ExportToLevel();
 void LoadSceneFromMaya();
-void UpdateParticle(int index);
 
 Render::TextureInterface* painter;
 
@@ -125,15 +132,31 @@ int main(int argc, char* argv[])
 			g_running = true;
 
 			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
-			painter->CreateEmptyTexture(256, 256, Render::TextureFormat::TEXTURE_RGBA);
+			RM.LockMutex("TextureMutex");
+			painter->CreateEmptyTexture(512, 512, Render::TextureFormat::TEXTURE_RGBA);
+			RM.UnlockMutex("TextureMutex");
 
 			Initialize(g_engineContext);
 
 			LoadSceneFromMaya();
 
+
+			RootForce::BotanyTextures textures;
+			textures.m_diffuse = g_GrassDiffuse;
+			textures.m_translucency = g_GrassTranslucency;
+			textures.m_billboard = g_GrassBillboard;
+
+			botanySystem->Initialize(textures, g_Ambient);
+
+			m_world.GetStorage()->SetStringValue("GrassDiffuse", g_GrassDiffuse);
+			m_world.GetStorage()->SetStringValue("GrassTranslucency", g_GrassTranslucency);
+			m_world.GetStorage()->SetStringValue("GrassBillboard", g_GrassBillboard);
+
+			worldSystem->BuildStaticShadowMesh();
+
 			///////////////////////////////////////////////////////////////     MAIN LOOP STARTS HERE  //////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+			
 			uint64_t old = SDL_GetPerformanceCounter();
 			while (g_running)
 			{
@@ -147,22 +170,15 @@ int main(int argc, char* argv[])
 				string type;
 				int updateID = -1;
 				int	removeID = -1;
-				bool updateTransform, updateShape;
+				bool updateTransform = false, updateShape = false;
 				std::deque<UpdateMessage> localMessages;
 				int numberMessages = 0;
 
-				if(type != "")
-				{
-					cout << type << " ID " << updateID << endl;
-					//cout << "NumberOfMessages " << *RM.NumberOfMessages << endl;
-				}
-
 				// GET EXPORT STATE
-				RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-				WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+				RM.LockMutex("IdMutex");
 				entityExport = *RM.export;				
 				numberMessages = *RM.NumberOfMessages;
-				ReleaseMutex(RM.IdMutexHandle);
+				RM.UnlockMutex("IdMutex");
 
 				for(int i = 0; i < numberMessages; i ++)
 				{
@@ -179,23 +195,6 @@ int main(int argc, char* argv[])
 				{			
 					ExportToLevel();
 				}
-				/////////////////////// UPDATE LOCATORS //////////////////////////////
-
-				if(type == "Locator")
-				{
-					//cout << RM.PlocatorList[updateID]->transformation.name << " updated!" << endl;
-
-					//for(int i = 0; i < RM.PlocatorList[updateID]->transformation.nrOfFlags; i++)
-					//{
-					//	string temp = RM.PlocatorList[updateID]->transformation.flags[i];
-					//	if(temp == "Particle")
-					//		UpdateParticle(updateID);
-					//}
-
-					if(RM.PlocatorList[updateID]->transformation.flags._Particle)
-						UpdateParticle(updateID);
-				}
-
 
 				//UPDATE
 				while(localMessages.size() > 0)
@@ -240,32 +239,38 @@ int main(int argc, char* argv[])
 					{
 						if(updateID != -1)
 						{
-							RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-							WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+							RM.LockMutex("TextureMutex");
 							cout << RM.PpaintList[updateID]->heigth << endl;
 							cout << RM.PpaintList[updateID]->width << endl;
 
 							//painter->BufferData(RM.PpaintList[updateID]->Pixels);
-							ReleaseMutex(RM.TextureMutexHandle);
+							RM.UnlockMutex("TextureMutex");
 						}
 					}
 
 					if(type == "Locator")
 					{
-						if(RM.PlocatorList[updateID]->transformation.flags._Particle)
-							UpdateParticle(updateID);
+						UpdateLocator(updateID);
+					}
+
+					if(type == "MegaMesh")
+					{
+						UpdateMegaMesh(updateID, updateTransform, updateShape, false);
 					}
 				}							
 
 				HandleEvents();
 				g_engineContext.m_renderer->Clear();
-
+				botanySystem->Process();
+				waterSystem->Process();
+				worldSystem->Process();
 				cameraSystem->Process();
 				directionalLightSystem->Process();
 				pointLightSystem->Process();			
-				particleSystem->Process();				
-				shadowSystem->Process();			
-				renderingSystem->Process();	
+				particleSystem->Process();	
+				shadowSystem->Process();
+				renderingSystem->Process();
+
 
 				g_engineContext.m_renderer->Render();
 
@@ -318,12 +323,15 @@ void HandleEvents()
 				if(event.key.keysym.scancode == SDL_SCANCODE_P)
 				{
 					entityExport = true;
-					RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-					WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+					RM.LockMutex("IdMutex");
 
 					*RM.export = 1;
 
-					ReleaseMutex(RM.IdMutexHandle);
+					RM.UnlockMutex("IdMutex");
+				}
+				if(event.key.keysym.scancode == SDL_SCANCODE_T)
+				{
+					waterSystem->InitDisturb();
 				}
 			}
 			break;
@@ -338,13 +346,12 @@ void HandleEvents()
 
 void Initialize(RootEngine::GameSharedContext g_engineContext)
 {
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+	RM.LockMutex("IdMutex");
 
 	*RM.export = 0;
 	entityExport = 0;
 
-	ReleaseMutex(RM.IdMutexHandle);
+	RM.UnlockMutex("IdMutex");
 
 	// Enable components to use.
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -355,6 +362,8 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	RootForce::Collision::SetTypeId(RootForce::ComponentType::COLLISION);
 	RootForce::ParticleEmitter::SetTypeId(RootForce::ComponentType::PARTICLE);
 	RootForce::Shadowcaster::SetTypeId(RootForce::ComponentType::SHADOWCASTER);
+	RootForce::WaterCollider::SetTypeId(RootForce::ComponentType::WATERCOLLIDER);
+
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	RM.InitalizeSharedMemory();
 
@@ -366,7 +375,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(10000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Shadowcaster>(100);
-
+	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100);
 
 
 	// Initialize systems.
@@ -393,66 +402,71 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
 	worldSystem->CreateSun();
 	worldSystem->CreateSkyBox();
+	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
+	waterSystem->Init();
+
+	botanySystem = new RootForce::BotanySystem(&m_world, &g_engineContext);
 }
 
 void LoadSceneFromMaya()
 {
-	RM.ClearAllMessages();
-	//LOAD						
-	LoadLocators();
+	RM.ClearAllMessages();					
+
 
 	//LOAD CAMERAS
-	RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-	WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+	RM.LockMutex("CameraMutex");
 	numberCameras = *RM.NumberOfCameras;
-	ReleaseMutex(RM.CameraMutexHandle);
+	RM.UnlockMutex("CameraMutex");
 	CreateCameraEntity(0);
 
+	LoadLocators();
 	//LOAD MATERIALS
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-	int renderNrOfMaterials = *RM.NumberOfMaterials;
+	RM.LockMutex("MeshMutex");
 
+	int renderNrOfMaterials = *RM.NumberOfMaterials;
 	for(int i = 0; i < renderNrOfMaterials; i++)
 	{
-		CreateMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath), -1);
+		//ITS a Mega Mesh false here correct?
+		CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[i]->texturePath), GetNameFromPath(RM.PmaterialList[i]->materialName), GetNameFromPath(RM.PmaterialList[i]->normalPath),GetNameFromPath(RM.PmaterialList[i]->specularPath),GetNameFromPath(RM.PmaterialList[i]->glowPath),GetNameFromPath(RM.PmaterialList[i]->translucencePath), -1, false);
 	}
-
-	ReleaseMutex(RM.MeshMutexHandle);
 
 	/////////////////////// LOAD MESHES ////////////////////////////////
 
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+
 	numberMeshes = *RM.NumberOfMeshes;
-	
+	numberMegaMeshes = *RM.NumberOfMegaMeshes;
+
 
 	for(int i = 0; i < numberMeshes; i++)
 	{				
 		string name = RM.PmeshList[i]->modelName;
-		Entities.push_back(CreateMeshEntity(&m_world, name, i));
-		auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[i])->m_model;
-		auto mesh = model->m_meshes[0];
-		auto buffer = g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER);
-		mesh->SetVertexBuffer(buffer);
+		Entities.push_back(CreateMeshEntity(&m_world, name, i, false));
 
 		UpdateMesh(i, true, true, false);
 	}			
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	for(int i = 0; i < numberMegaMeshes; i++)
+	{				
+		string name = RM.PmegaMeshes[i]->modelName;
+		MegaMeshes.push_back(CreateMeshEntity(&m_world, name, i, true));
+		//auto model = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[i])->m_model;
 
+		UpdateMegaMesh(i, true, true, false);
+	}	
+
+	RM.UnlockMutex("MeshMutex");
 	///////////////////////// Load Lights ////////////////////////////////
 
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	RM.LockMutex("LightMutex");
 	numberLights = *RM.NumberOfLights;
-	ReleaseMutex(RM.LightMutexHandle);
+
 
 	for(int i = 0; i < numberLights; i++)
 	{
 		UpdateLight(i, false, true, RM.PlightList[i]->LightType);
 	}
 
+	RM.UnlockMutex("LightMutex");
 	UpdateLight(0, false, true, "AmbientLight");
 	UpdateLight(0, false, true, "DirectionalLight");
 }
@@ -461,7 +475,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 {
 	ECS::Entity* lightEntity = p_world->GetEntityManager()->CreateEntity();
 
-	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
+	//RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(lightEntity);
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(lightEntity);
 
@@ -470,7 +484,7 @@ ECS::Entity* CreateLightEntity(ECS::World* p_world)
 	pl->m_color.r = 0.5;
 	pl->m_color.b = 0.5;
 	pl->m_color.g = 0.5;
-	pl->m_range = 1000;
+	pl->m_range = 10;
 	pl->m_attenuation = glm::vec3(0,0,0.01);
 
 	return lightEntity;
@@ -489,44 +503,48 @@ bool fexists(const std::string& filename)
   return Exists;
 }
 
-void CreateMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, int meshID)
+void CopyMayaMaterial(string textureName, string materialName, string normalMap, string specularMap, string glowMap, string translucenceMap, int meshID, bool itsAmegaMesh)
 {
 	bool painted = false;
 	bool painting = false;
 	bool transparent = false;
+	bool noRender = false;
 	int paintID;
 	string temp;
 	string NormalName;
 	ifstream ifile;
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
-	paintID = RM.PmeshList[meshID]->paintIndex;
+	RM.LockMutex("MeshMutex");
 
-	transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
+	if(itsAmegaMesh)
+	{
+		paintID = RM.PmegaMeshes[meshID]->paintIndex;
 
-	if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
-		painting = true;
-	else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
-		painted = true;
+		transparent = RM.PmegaMeshes[meshID]->transformation.flags._Transparent;
+		noRender = RM.PmegaMeshes[meshID]->transformation.flags._NoRender;
+		if(meshID != -1)
+		{
+			if(RM.PmegaMeshes[meshID]->transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(RM.PmegaMeshes[meshID]->transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
+	}
+	else
+	{
+		paintID = RM.PmeshList[meshID]->paintIndex;
 
-	//for(int i = 0; i < RM.PmeshList[meshID]->transformation.nrOfFlags; i++)
-	//{
-	//	string flag = RM.PmeshList[meshID]->transformation.flags[i];
-	//	if(flag == "Painted")
-	//	{
-	//		painted = true;
-	//	}
-	//	if(flag == "Painting")
-	//	{
-	//		painting = true;
-	//	}
-	//	if(flag == "Transparent")
-	//	{
-	//		transparent = true;
-	//	}
-	//}
+		transparent = RM.PmeshList[meshID]->transformation.flags._Transparent;
+		noRender = RM.PmeshList[meshID]->transformation.flags._NoRender;
+		if(meshID != -1)
+		{
+			if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 0)
+				painting = true;
+			else if(RM.PmeshList[meshID]->transformation.flags._PaintStatus == 1)
+				painted = true;
+		}
+	}
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
 
 	if(textureName == "" || textureName == "NONE")
 	{
@@ -536,8 +554,7 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 	}
 	else if(textureName == "PaintTexture" || painted || painting)
 	{
-		RM.TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
-		WaitForSingleObject(RM.TextureMutexHandle, RM.milliseconds);
+		RM.LockMutex("TextureMutex");
 
 		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 
@@ -546,13 +563,15 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Flipped");
 			painter->BufferData(RM.PpaintList[paintID]->Pixels);
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = painter;
+			mat->m_flipped = true;
+			botanySystem->Reconstruct();
 		}
 		else if(painted)
 		{
 			mat->m_textures[Render::TextureSemantic::TEXTUREMAP] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
-			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+			
 		}
-		
+
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R] = g_engineContext.m_resourceManager->LoadTexture(RM.PpaintList[paintID]->textureRed, Render::TextureType::TEXTURE_2D);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		mat->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -573,6 +592,13 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN] = g_engineContext.m_resourceManager->LoadTexture(NormalName, Render::TextureType::TEXTURE_2D);
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 			mat->m_textures[Render::TextureSemantic::TEXTURE_RN]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+			//mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend_Normal");
+			if(painted)
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+		}
+		else if(painted)
+		{
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 		}
 
 		temp = RM.PpaintList[paintID]->textureGreen;
@@ -603,7 +629,16 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		//UPDATE TILEFACTOR
 		if(meshID != -1)
 		{
-			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+			RootForce::Renderable* rendy;
+			if(itsAmegaMesh)
+			{
+				rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[meshID]);
+			}
+			else
+			{
+				rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[meshID]);
+			}
+
 			if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
 			{
 				rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
@@ -611,14 +646,15 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 
 			mat->m_tileFactor = RM.PpaintList[paintID]->tileFactor;	
 		}
-	
 
-		ReleaseMutex(RM.TextureMutexHandle);
+
+		RM.UnlockMutex("TextureMutex");
 	}
 	else
 	{
 		Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(materialName);
 		mat->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
+
 		if(specularMap != "" && specularMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture(specularMap, Render::TextureType::TEXTURE_2D);
@@ -627,21 +663,35 @@ void CreateMaterial(string textureName, string materialName, string normalMap, s
 		{
 			mat->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture(glowMap, Render::TextureType::TEXTURE_2D);
 		}
-		if(normalMap != "" && normalMap != "NONE" && !transparent)
+		if(normalMap != "" && normalMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
-			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+
+			if(transparent)
+			{
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
+			}
+			else
+			{				
+				mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+			}
 		}
-		else if(normalMap != "" && normalMap != "NONE" && transparent)
+		if(translucenceMap != "" && translucenceMap != "NONE")
 		{
 			mat->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture(normalMap, Render::TextureType::TEXTURE_2D);
+			mat->m_textures[Render::TextureSemantic::TRANSLUCENCY] = g_engineContext.m_resourceManager->LoadTexture(translucenceMap, Render::TextureType::TEXTURE_2D);
+
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Normal_Trans");
+		}
+		else if(noRender)
+		{
+			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("NoRender");
 		}
 		else
 		{
 			mat->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 		}
-			
+
 	}
 
 	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
@@ -663,39 +713,148 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 	if(transformation.flags._SpawnPoint)
 		p_world->GetGroupManager()->RegisterEntity("SpawnPoint", entity);
 
+	if(transformation.flags._AbilitySpawnPoint)
+		p_world->GetGroupManager()->RegisterEntity("AbilitySpawnPoint", entity);
+
 	if(transformation.flags._Static)
 		p_world->GetGroupManager()->RegisterEntity("Static", entity);
 
 	if(transformation.flags._Transparent)
 		p_world->GetGroupManager()->RegisterEntity("Transparent", entity);
 
+	if(transformation.flags._Grass)
+		p_world->GetGroupManager()->RegisterEntity("Grass", entity);
+
 	if(transformation.flags._Water)
+	{
 		p_world->GetGroupManager()->RegisterEntity("Water", entity);
+		p_world->GetGroupManager()->RegisterEntity("NonExport", entity);
+	}
+
+	if(transformation.flags._NoRender)
+		p_world->GetGroupManager()->RegisterEntity("NoRender", entity);
 }
 
-ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index)
+float getLengthOfVector(glm::vec3 myVector1, glm::vec3 myVector2)
+{
+	return sqrt((myVector1.x - myVector2.x)*(myVector1.x - myVector2.x) + (myVector1.y - myVector2.y)*(myVector1.y - myVector2.y) + (myVector1.z - myVector2.z)*(myVector1.z - myVector2.z));
+}
+
+string modelExists(int meshIndex)
+{	
+		float THRESHOLD = 0.01;
+		RM.LockMutex("MeshMutex");
+		int count = 0;
+		bool exists = true;
+		int saveJ = 0;
+
+		if(meshIndex == 0)
+		{
+			exists = false;
+		}
+		else
+		{
+			for(int j = 0; j < meshIndex; j++)
+			{
+				int countVertex = 0;
+				if(RM.PmeshList[meshIndex]->nrOfVertices == RM.PmeshList[j]->nrOfVertices)
+				{
+					for(int v = 0; v < RM.PmeshList[meshIndex]->nrOfVertices; v++)
+					{
+						//if(SM.meshList[i].vertex[v] != SM.meshList[j].vertex[v])	//Ska hoppa ut när den hittar en identisk.
+						// (SM.meshList[i].vertex[v] - SM.meshList[j].vertex[v]).length();
+						float dist = getLengthOfVector(RM.PmeshList[meshIndex]->vertex[v], RM.PmeshList[j]->vertex[v]);
+						if (dist >= THRESHOLD)
+						{
+							//Om den är falsk hela vägen
+							exists = false;
+						}
+						else
+						{
+							countVertex++;
+							if(countVertex == RM.PmeshList[meshIndex]->nrOfVertices)
+							{
+								exists = true;
+								saveJ = j;
+								break;
+							}
+						}
+
+					}
+					if(exists)
+						break;
+				}
+				else
+				{
+					count++;
+					if(count == meshIndex)
+						exists = false;
+				}
+
+			}
+
+		}
+
+		if(exists)
+		{
+			return RM.PmeshList[saveJ]->modelName;
+		}
+		else
+		{
+			return RM.PmeshList[meshIndex]->modelName;
+		}
+
+		RM.UnlockMutex("MeshMutex");
+}
+
+ECS::Entity* CreateMeshEntity(ECS::World* p_world, std::string p_name, int index, bool ItsAmegaMesh)
 {
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
+	bool noRender = false;
 
-	RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
-	renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
-	renderable->m_model->m_transform = glm::mat4x4(1);
+	if(ItsAmegaMesh)
+	{
+		if(RM.PmegaMeshes[index]->transformation.flags._NoRender)
+		{
+			noRender = true;
+		}
+	}
+	else
+	{
+		if(RM.PmeshList[index]->transformation.flags._NoRender)
+		{
+			noRender = true;
+		}
+	}
+
+
+
+	if(!noRender)
+	{
+		RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(entity);
+		renderable->m_model = g_engineContext.m_resourceManager->CreateModel(p_name);
+		renderable->m_model->m_transform = glm::mat4x4(1);
+	}
+
+	RM.LockMutex("MeshMutex");
+
+	if(!ItsAmegaMesh)
+		p_name = modelExists(index);
+
+	RM.UnlockMutex("MeshMutex");
 
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(entity);
 	collision->m_meshHandle = p_name;
 
-	RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
-
-	//for(int i = 0; i < RM.PmeshList[index]->transformation.nrOfFlags; i++)
-	//{
-	//	p_world->GetGroupManager()->RegisterEntity(RM.PmeshList[index]->transformation.flags[i], entity);
-	//}
-	//p_world->GetGroupManager()->RegisterEntity("Static", entity);
-	//p_world->GetGroupManager()->UnregisterEntity("Static", entity);
-
-
-
+	if(ItsAmegaMesh)
+	{
+		RegisterEntityFlags(RM.PmegaMeshes[index]->transformation, entity, p_world);
+	}
+	else
+	{
+		RegisterEntityFlags(RM.PmeshList[index]->transformation, entity, p_world);
+	}
 
 	return entity;
 }
@@ -732,7 +891,7 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	ECS::Entity* entity = p_world->GetEntityManager()->CreateEntity();
 	RootForce::Transform* transform = p_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 	RootForce::ParticleEmitter* particle = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(entity);
-	locatorEntities.push_back(entity);
+	//locatorEntities.push_back(entity);
 
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
 
@@ -741,21 +900,22 @@ ECS::Entity* CreateParticleEntity(ECS::World* p_world, std::string p_name, int i
 	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
 		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 
-	//for(int i = 0; i < RM.PlocatorList[index]->transformation.nrOfFlags; i++)
-	//{
-	//	p_world->GetGroupManager()->RegisterEntity(RM.PlocatorList[index]->transformation.flags[i], entity);
-	//}
-
 	RegisterEntityFlags(RM.PlocatorList[index]->transformation, entity, p_world);
 
 	return entity;
 }
 
-void UpdateParticle(int index)
+void UpdateLocator(int index)
 {
 	RootForce::Transform* transform =  m_world.GetEntityManager()->GetComponent<RootForce::Transform>(locatorEntities[index]);
-	
+
 	transform->m_position = RM.PlocatorList[index]->transformation.position;
+
+	if(RM.PlocatorList[index]->transformation.flags._Water)
+	{
+		m_world.GetStorage()->SetValue("WaterHeight", transform->m_position.y);
+		waterSystem->SetWaterHeight(transform->m_position.y);
+	}
 }
 
 void CreateCameraEntity(int index)
@@ -796,8 +956,7 @@ void UpdateCamera(int index)
 		RootForce::Transform* cameraTransform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameras[0]);
 		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameras[0]);
 
-		RM.CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
-		WaitForSingleObject(RM.CameraMutexHandle, RM.milliseconds);
+		RM.LockMutex("CameraMutex");
 
 		glm::quat rotation;
 		rotation.x = RM.PcameraList[index]->transformation.rotation.x;
@@ -816,56 +975,45 @@ void UpdateCamera(int index)
 		camera->m_frustum.m_near = RM.PcameraList[index]->nearClippingPlane;
 		camera->m_frustum.m_fov = glm::degrees(RM.PcameraList[index]->verticalFieldOfView);
 
-		ReleaseMutex(RM.CameraMutexHandle);
+		RM.UnlockMutex("CameraMutex");
 	}
 }
 
 void LoadLocators()
 {
-	RM.LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("LocatorMutex");
 	int nrLoc = *RM.NumberOfLocators;
 
 	for(int i = 0; i < nrLoc; i++)
 	{
-		cout << "Found locator " << i << " " << RM.PlocatorList[i]->transformation.name << endl;
-		cout << "POS X Y Z " << RM.PlocatorList[i]->transformation.position.x << RM.PlocatorList[i]->transformation.position.y << RM.PlocatorList[i]->transformation.position.z << endl;
-
-		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		//{
-		//	string flagName = "Particle";
-		//	if(flagName.compare(RM.PlocatorList[i]->transformation.flags[j]) == 0)
-		//	{
-		//		locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
-		//	}
-		//}
-
-		//for(int j = 0; j < RM.PlocatorList[i]->transformation.nrOfFlags; j++)
-		//{
-		//	string flagName = "SpawnPoint";
-		//	string flagName2 = RM.PlocatorList[i]->transformation.flags[j];
-
-		//	if(flagName == flagName2)
-		//	{
-		//		locatorEntities.push_back(CreateTransformEntity(&m_world, i));
-		//	}
-		//}
-
 		if(RM.PlocatorList[i]->transformation.flags._Particle)
 			locatorEntities.push_back(CreateParticleEntity(&m_world, RM.PlocatorList[i]->transformation.name, i));
 
 		if(RM.PlocatorList[i]->transformation.flags._SpawnPoint)
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
 
+		if(RM.PlocatorList[i]->transformation.flags._AbilitySpawnPoint)
+		{
+			locatorEntities.push_back(CreateParticleEntity(&m_world, "AbilitySpawn", i));
+		}
+		if(RM.PlocatorList[i]->transformation.flags._Water)
+		{
+			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
+			m_world.GetStorage()->SetValue("WaterHeight", RM.PlocatorList[i]->transformation.position.y);
+			waterSystem->CreateWater(RM.PlocatorList[i]->transformation.position.y);
+			//waterSystem->ToggleWireFrame();
+		}
+
 	}
 
-	ReleaseMutex(RM.LocatorMutexHandle);
+	RM.UnlockMutex("LocatorMutex");
 }
 
 void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool remove)
 {
 	int MeshIndex = -1;
 	int RemoveMeshIndex = -1;
+	bool NoRender = false;
 
 	if(remove)
 	{
@@ -878,13 +1026,12 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		RemoveMeshIndex = -1;
 	}
 
-
-	RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
+	RM.LockMutex("MeshMutex");
 	numberMeshes = *RM.NumberOfMeshes;	
 
 	if(MeshIndex != -1)					
 	{
+		NoRender = RM.PmeshList[MeshIndex]->transformation.flags._NoRender;
 		bool newMaterial = false;
 		int size = Entities.size()-1;
 		if(MeshIndex > size)
@@ -892,7 +1039,7 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			string name = RM.PmeshList[MeshIndex]->transformation.name;
 			if(name != "")
 			{
-				Entities.push_back(CreateMeshEntity(&m_world, name, MeshIndex));
+				Entities.push_back(CreateMeshEntity(&m_world, name, MeshIndex, false));
 				cout << "Adding " << name << " to index: " << MeshIndex << endl;
 			}
 		}
@@ -910,15 +1057,12 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			transform->m_scale = RM.PmeshList[MeshIndex]->transformation.scale;
 
 			////Update material list
-			CreateMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), MeshIndex);
+			if(RM.PmeshList[MeshIndex]->MaterialID >= 0 && RM.PmeshList[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
+				CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmeshList[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->glowPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->translucencePath), MeshIndex, false);
 			
-			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+
 
 			Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));
-			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
-			//{
-			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
-			//}
 
 			/// ROTATION
 			glm::quat rotation;
@@ -944,10 +1088,6 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
 			transform->m_position += modifiedPos;
 
-			//cout << "position x " << transform->m_position.x << endl;
-			//cout << "position y " << transform->m_position.y << endl;
-			//cout << "position z " << transform->m_position.z << endl;
-
 			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
 
 			float x,y,z;
@@ -955,20 +1095,16 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			y = atan2(-rotationTest[2][0], sqrt(pow(rotationTest[2][1],2) + pow(rotationTest[2][2],2)));
 			z = atan2(rotationTest[1][0], rotationTest[0][0]);
 
-				
-			//cout << "rot x " << -glm::degrees(x) << endl;
-			//cout << "rot y " << -glm::degrees(y) << endl;
-			//cout << "rot z " << -glm::degrees(z) << endl;
-
 			// Get material connected to mesh and set it from materiallist
-			
-			rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
-
-			
+			if(!NoRender)
+			{
+				RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex]);
+				rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmeshList[MeshIndex]->materialName));	
+			}
 		}
 		
 
-		if(updateShape)
+		if(updateShape && !NoRender)
 		{
 		// COPY VERTICES
 		Render::Vertex1P1N1UV1T1BT* m_vertices;
@@ -981,17 +1117,16 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 			m_vertices[j].m_UV = RM.PmeshList[MeshIndex]->UV[j];
 			m_vertices[j].m_tangent = RM.PmeshList[MeshIndex]->tangent[j];
 			m_vertices[j].m_bitangent = RM.PmeshList[MeshIndex]->binormal[j];
-
-		}
-
-		// SET INFORMATION TO GAME
-		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
-		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
-
 		}
 
 		
+		// SET INFORMATION TO GAME
+		
+		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(Entities[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmeshList[MeshIndex]->nrOfVertices); 
+		delete m_vertices;
+		}		
 	}
 
 	//Remove mesh at index
@@ -1002,7 +1137,131 @@ void UpdateMesh(int index, bool updateTransformation, bool updateShape, bool rem
 		Entities.pop_back();
 	}
 
-	ReleaseMutex(RM.MeshMutexHandle);
+	RM.UnlockMutex("MeshMutex");
+}
+
+void UpdateMegaMesh(int index, bool updateTransformation, bool updateShape, bool remove)
+{
+	int MeshIndex = -1;
+	int RemoveMeshIndex = -1;
+
+	if(remove)
+	{
+		MeshIndex = -1;
+		RemoveMeshIndex = index;
+	}
+	else
+	{
+		MeshIndex = index;
+		RemoveMeshIndex = -1;
+	}
+
+
+	RM.LockMutex("MeshMutex");
+	numberMegaMeshes = *RM.NumberOfMegaMeshes;	
+
+	if(MeshIndex != -1)					
+	{
+		bool newMaterial = false;
+		int size = MegaMeshes.size()-1;
+		if(MeshIndex > size)
+		{
+			string name = RM.PmegaMeshes[MeshIndex]->transformation.name;
+			if(name != "")
+			{
+				MegaMeshes.push_back(CreateMeshEntity(&m_world, name, MeshIndex, true));
+				cout << "Adding " << name << " to index: " << MeshIndex << endl;
+			}
+		}
+
+		if(updateTransformation)
+		{
+			// TRANSFORM AND SCALE
+			RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(MegaMeshes[MeshIndex]);
+
+			transform->m_position = RM.PmegaMeshes[MeshIndex]->transformation.position;
+			transform->m_scale = RM.PmegaMeshes[MeshIndex]->transformation.scale;
+
+			////Update material list
+			if(RM.PmegaMeshes[MeshIndex]->MaterialID >= 0 && RM.PmegaMeshes[MeshIndex]->MaterialID < *RM.NumberOfMaterials)
+				CopyMayaMaterial(GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->texturePath), GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->normalPath), GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->specularPath),GetNameFromPath(RM.PmaterialList[RM.PmegaMeshes[MeshIndex]->MaterialID]->glowPath), GetNameFromPath(RM.PmaterialList[RM.PmeshList[MeshIndex]->MaterialID]->translucencePath), MeshIndex, true);
+
+			RootForce::Renderable* rendy = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex]);
+
+			Render::Material* mat = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName));
+			//if(mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend") || mat->m_effect == g_engineContext.m_resourceManager->GetEffect("Mesh_Blend_Flipped"))
+			//{
+			//	rendy->m_params[Render::Semantic::SIZEMIN] = &mat->m_tileFactor;
+			//}
+
+			/// ROTATION
+			glm::quat rotation;
+			rotation.x = RM.PmegaMeshes[MeshIndex]->transformation.rotation.x;
+			rotation.y = RM.PmegaMeshes[MeshIndex]->transformation.rotation.y;
+			rotation.z = RM.PmegaMeshes[MeshIndex]->transformation.rotation.z;
+			rotation.w = RM.PmegaMeshes[MeshIndex]->transformation.rotation.w;	
+
+			transform->m_orientation.SetOrientation(rotation);
+
+			//PIVOT
+			glm::mat4x4 pivotRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.x, -RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.y, -RM.PmegaMeshes[MeshIndex]->transformation.rotPivot.z));
+			glm::mat4x4 scaleRotMat = glm::translate(glm::mat4(1), glm::vec3(-RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.x, -RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.y, -RM.PmegaMeshes[MeshIndex]->transformation.scalePivot.z));
+
+			glm::mat4x4 scaleMatrix = glm::scale(transform->m_scale);
+			glm::mat4x4 modifiedScale = glm::inverse(scaleRotMat) * scaleMatrix * scaleRotMat;
+
+			glm::mat4x4 rotationMatrix = glm::rotate(glm::mat4(1.0f), transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+			glm::mat4x4 modifiedRotation = glm::inverse(pivotRotMat) * rotationMatrix * pivotRotMat;
+
+			glm::mat4x4 modifiedSR = modifiedRotation * modifiedScale;
+
+			glm::vec3 modifiedPos = glm::vec3(modifiedSR[3][0], modifiedSR[3][1], modifiedSR[3][2]);
+			transform->m_position += modifiedPos;
+
+			glm::mat3 rotationTest = transform->m_orientation.GetMatrix();
+
+			float x,y,z;
+			x = atan2(rotationTest[2][1], rotationTest[2][2]);
+			y = atan2(-rotationTest[2][0], sqrt(pow(rotationTest[2][1],2) + pow(rotationTest[2][2],2)));
+			z = atan2(rotationTest[1][0], rotationTest[0][0]);
+
+			rendy->m_material = g_engineContext.m_renderer->CreateMaterial(GetNameFromPath(RM.PmegaMeshes[MeshIndex]->materialName));	
+		}
+
+
+		if(updateShape)
+		{
+			// COPY VERTICES
+			Render::Vertex1P1N1UV1T1BT* m_vertices;
+			m_vertices = new Render::Vertex1P1N1UV1T1BT[g_maxVerticesPerMegaMesh];
+
+			for(int j = 0; j < RM.PmegaMeshes[MeshIndex]->nrOfVertices; j++)
+			{
+				m_vertices[j].m_pos = RM.PmegaMeshes[MeshIndex]->vertex[j];
+				m_vertices[j].m_normal = RM.PmegaMeshes[MeshIndex]->normal[j];
+				m_vertices[j].m_UV = RM.PmegaMeshes[MeshIndex]->UV[j];
+				m_vertices[j].m_tangent = RM.PmegaMeshes[MeshIndex]->tangent[j];
+				m_vertices[j].m_bitangent = RM.PmegaMeshes[MeshIndex]->binormal[j];
+
+			}
+
+			// SET INFORMATION TO GAME
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+			m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(MegaMeshes[MeshIndex])->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV1T1BT(reinterpret_cast<Render::Vertex1P1N1UV1T1BT*>(m_vertices), RM.PmegaMeshes[MeshIndex]->nrOfVertices); 
+			delete m_vertices;
+		}
+	}
+
+	////Remove mesh at index
+	//if(RemoveMeshIndex >= 0)	
+	//{
+	//	m_world.GetEntityManager()->RemoveAllComponents(MegaMeshes[MegaMeshes.size()-1]);
+	//	m_world.GetEntityManager()->RemoveEntity(MegaMeshes[MegaMeshes.size()-1]);
+	//	MegaMeshes.pop_back();
+	//}
+
+	RM.UnlockMutex("MeshMutex");
 }
 
 void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
@@ -1022,15 +1281,11 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 		RemoveLightIndex = -1;
 	}
 
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.LightMutexHandle, RM.milliseconds);
+	RM.LockMutex("LightMutex");
 	numberLights = *RM.NumberOfLights;
-	ReleaseMutex(RM.LightMutexHandle);
+
 
 	int size = LightEntities.size()-1;
-	//string type = RM.PlightList[LightIndex]->LightType;
-	RM.LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
-	WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 
 	if(LightIndex != -1)					
 	{		
@@ -1041,11 +1296,13 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 				LightEntities.push_back(CreateLightEntity(&m_world));
 			}
 
+			float density = 1.0f;
+
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_position = RM.PlightList[LightIndex]->transformation.position;
 			m_world.GetEntityManager()->GetComponent<RootForce::Transform>(LightEntities[LightIndex])->m_scale = RM.PlightList[LightIndex]->transformation.scale;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_color = RM.PlightList[LightIndex]->color;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.x = 0.0f;
-			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = 1-0.1 * RM.PlightList[LightIndex]->Intensity;
+			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.y = (5.0f - (RM.PlightList[LightIndex]->Intensity * 0.5f)) / density;
 			m_world.GetEntityManager()->GetComponent<RootForce::PointLight>(LightEntities[LightIndex])->m_attenuation.z = 0.0f;
 		}		
 	}
@@ -1071,10 +1328,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 		//ambientInfoExists = true;
 	}
 
-	//if(!ambientInfoExists)
-		//g_engineContext.m_renderer->SetAmbientLight(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-	ReleaseMutex(RM.LightMutexHandle);
+	RM.UnlockMutex("LightMutex");
 
 	if(RemoveLightIndex >= 0)	
 	{					
@@ -1089,28 +1343,45 @@ void ExportToLevel()
 {
 	for(int i = 0; i < Entities.size(); i++)
 	{
+		RM.LockMutex("MeshMutex");
 		//UPDATE modelName for all Entities from shared memory
 
-		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
-		string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
-		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
-
-		RM.MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
-		WaitForSingleObject(RM.MeshMutexHandle, RM.milliseconds);
 		string name = RM.PmeshList[i]->modelName;
-		ReleaseMutex(RM.MeshMutexHandle);
+		if(!RM.PmeshList[i]->transformation.flags._NoRender)
+		{
+			RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(Entities[i]);
+			string materialName = GetNameFromPath(RM.PmeshList[i]->materialName);
+			mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+			mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
+		}
+
+		RM.UnlockMutex("MeshMutex");
 
 		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(Entities[i]);
+		collision->m_meshHandle = name + "0";
+	}
+
+	for(int i = 0; i < MegaMeshes.size(); i++)
+	{
+		//UPDATE modelName for all Entities from shared memory
+
+		RootForce::Renderable *mesh = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(MegaMeshes[i]);
+		string materialName = GetNameFromPath(RM.PmegaMeshes[i]->materialName);
+		mesh->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+
+		RM.LockMutex("MeshMutex");
+		string name = RM.PmegaMeshes[i]->modelName;
+		RM.UnlockMutex("MeshMutex");
+
+		RootForce::Collision* collision = m_world.GetEntityManager()->GetComponent<RootForce::Collision>(MegaMeshes[i]);
 		collision->m_meshHandle = name + "0";
 
 		mesh->m_model = g_engineContext.m_resourceManager->CreateModel(name);
 	}
-
 	m_world.GetEntityExporter()->Export(g_savepath + "Levels/" + g_levelName + ".world");
 
 	entityExport = false;
-	RM.IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(RM.IdMutexHandle, RM.milliseconds);
+	RM.LockMutex("IdMutex");
 	*RM.export = 0;
-	ReleaseMutex(RM.IdMutexHandle);
+	RM.UnlockMutex("IdMutex");
 }

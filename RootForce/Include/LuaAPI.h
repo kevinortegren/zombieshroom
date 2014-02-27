@@ -167,13 +167,6 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Transformation");
 			return 1;
 		}
-		static int EntityRemoveTransformation(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(*e);
-			return 0;
-		}
 
 		static int EntityGetRenderable(lua_State* p_luaState)
 		{
@@ -183,13 +176,6 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(*e);
 			luaL_setmetatable(p_luaState, "Renderable");
 			return 1;
-		}
-		static int EntityRemoveRenderable(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>(*e);
-			return 0;
 		}
 
 		static int EntityGetPhysics(lua_State* p_luaState)
@@ -202,14 +188,6 @@ namespace RootForce
 			return 1;
 		}
 
-		static int EntityRemovePhysics(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(*e);
-			return 0;
-		}
-
 		static int EntityGetCollision(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -220,14 +198,6 @@ namespace RootForce
 			return 1;
 		}
 
-		static int EntityRemoveCollision(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Collision>(*e);
-			return 0;
-		}
-
 		static int EntityGetCollisionResponder(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -236,14 +206,6 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>(*e);
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
-		}
-
-		static int EntityRemoveCollisionResponder(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::CollisionResponder>(*e);
-			return 0;
 		}
 
 		static int EntityGetNetwork(lua_State* p_luaState)
@@ -265,15 +227,8 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Health");
 			return 1;
 		}
-		static int EntityRemoveHealth(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::HealthComponent>(*e);
-			return 0;
-		}
 
-		static int EntityGetPlayerComponent(lua_State* p_luaState)
+		static int GetPlayerComponent(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
@@ -281,13 +236,6 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerComponent");
 			return 1;
-		}
-		static int EntityRemovePlayerComponent(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerComponent>(*e);
-			return 0;
 		}
 
 		static int EntityGetPlayerPhysics(lua_State* p_luaState)
@@ -299,6 +247,15 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
+		/*static int EntityGetPlayer(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
+			luaL_setmetatable(p_luaState, "Player");
+			return 1;
+		}*/
 		static int EntityGetPlayerAction(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -307,13 +264,6 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
 			return 1;
-		}
-		static int EntityRemovePlayerAction(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerActionComponent>(*e);
-			return 0;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
 		{
@@ -341,62 +291,6 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::TryPickupComponent>(*e);
 			luaL_setmetatable(p_luaState, "TryPickupComponent");
 			return 1;
-		}
-		static int EntityRemoveTryPickupComponent(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::TryPickupComponent>(*e);
-			return 0;
-		}
-		static int EntityRemovePlayerPhysics(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerPhysics>(*e);
-			return 0;
-		}
-		static int EntityRemoveScript(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Script>(*e);
-			return 0;
-		}
-		static int EntityRemoveAnimation(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Animation>(*e);
-			return 0;
-		}
-		static int EntityRemoveRagdoll(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::Ragdoll>(*e);
-			return 0;
-		}
-		static int EntityRemoveStateComponent(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::StateComponent>(*e);
-			return 0;
-		}
-		static int EntityRemovePlayerControl(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerControl>(*e);
-			return 0;
-		}
-		static int EntityRemoveWaterCollider(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			g_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(*e);
-			return 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -749,7 +643,7 @@ namespace RootForce
 		}
 		static int PhysicsBindShapeSphere(lua_State* p_luaState)
 		{
-			NumberOfArgs(7);
+			NumberOfArgs(8);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
@@ -757,13 +651,14 @@ namespace RootForce
 			float radius = (float)luaL_checknumber(p_luaState, 5);
 			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 6);
 			bool collideWorld = lua_toboolean(p_luaState, 7) != 0;
-			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, (*ptemp)->m_mass, collideWorld);
+			bool collideStatic = lua_toboolean(p_luaState, 8) != 0;
+			g_engineContext.m_physics->BindSphereShape((*(*rtemp)->m_handle), (*v1), (*q1), radius, (*ptemp)->m_mass, collideWorld, collideStatic);
 			return 0;
 		}
 
 		static int PhysicsBindShapeCone(lua_State* p_luaState)
 		{
-			NumberOfArgs(8);
+			NumberOfArgs(9);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
@@ -772,13 +667,14 @@ namespace RootForce
 			float radius = (float)luaL_checknumber(p_luaState, 6);
 			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindConeShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld);
+			bool collideStatic = lua_toboolean(p_luaState, 9) != 0;
+			g_engineContext.m_physics->BindConeShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld, collideStatic);
 			return 0;
 		}
 
 		static int PhysicsBindShapeCylinder(lua_State* p_luaState)
 		{
-			NumberOfArgs(8);
+			NumberOfArgs(9);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3");
@@ -787,13 +683,14 @@ namespace RootForce
 			float radius = (float)luaL_checknumber(p_luaState, 6);
 			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindCylinderShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld);
+			bool collideStatic = lua_toboolean(p_luaState, 9) != 0;
+			g_engineContext.m_physics->BindCylinderShape((*(*rtemp)->m_handle), (*v1), (*q1), height, radius, (*ptemp)->m_mass, collideWorld, collideStatic);
 			return 0;
 		}
 
 		static int PhysicsBindShapeMesh(lua_State* p_luaState)
 		{
-			NumberOfArgs(8);
+			NumberOfArgs(9);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 			std::string handle = luaL_checkstring(p_luaState, 3);
@@ -802,7 +699,8 @@ namespace RootForce
 			glm::vec3* scale = (glm::vec3*)luaL_checkudata(p_luaState, 6, "Vec3");
 			(*ptemp)->m_mass = (float)luaL_checknumber(p_luaState, 7);
 			bool collideWorld = lua_toboolean(p_luaState, 8) != 0;
-			g_engineContext.m_physics->BindMeshShape((*(*rtemp)->m_handle), handle, (*v1), (*q1), *scale , (*ptemp)->m_mass, collideWorld);
+			bool collideStatic = lua_toboolean(p_luaState, 9) != 0;
+			g_engineContext.m_physics->BindMeshShape((*(*rtemp)->m_handle), handle, (*v1), (*q1), *scale , (*ptemp)->m_mass, collideWorld, collideStatic);
 			return 0;
 		}
 
@@ -2266,32 +2164,16 @@ namespace RootForce
 			{"GetId", EntityGetId},
 			{"DoesExist", EntityDoesExist},
 			{"GetTransformation", EntityGetTransformation},
-			{"RemoveTransformation", EntityRemoveTransformation},
 			{"GetRenderable", EntityGetRenderable},
-			{"RemoveRenderable", EntityRemoveRenderable},
 			{"GetPhysics", EntityGetPhysics},
-			{"RemovePhysics", EntityRemovePhysics},
 			{"GetCollision", EntityGetCollision},
-			{"RemoveCollision", EntityRemoveCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
-			{"RemoveCollisionResponder", EntityRemoveCollisionResponder},
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
-			{"RemoveHealth", EntityRemoveHealth},
-			{"GetPlayerComponent", EntityGetPlayerComponent},
-			{"RemovePlayercomponent", EntityRemovePlayerComponent},
+			{"GetPlayerComponent", GetPlayerComponent},
 			{"GetPlayerAction", EntityGetPlayerAction},
-			{"RemovePlayerAction", EntityRemovePlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{"GetTryPickupComponent", EntityGetTryPickupComponent},
-			{"RemoveTryPickupComponent", EntityRemoveTryPickupComponent},
-			{"RemovePlayerPhysics", EntityRemovePlayerPhysics},
-			{"RemoveScript", EntityRemoveScript},
-			{"RemoveAnimation", EntityRemoveAnimation},
-			{"RemoveRagdoll", EntityRemoveRagdoll},
-			{"RemoveStateComponent", EntityRemoveStateComponent},
-			{"RemovePlayerControl", EntityRemovePlayerControl},
-			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{NULL, NULL}
 		};
 

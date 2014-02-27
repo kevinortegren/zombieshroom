@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "TimerSystem.h"
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Script/Include/RootScript.h>
@@ -62,3 +63,4 @@ void RootForce::TimerSystem::Begin()
 	int asdf = 0;
 }
 
+#endif

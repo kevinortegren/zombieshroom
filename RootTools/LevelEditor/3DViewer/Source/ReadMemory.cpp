@@ -25,8 +25,9 @@ int ReadMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Locator) * g_maxLocators;
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
-	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(int) * 8; //NumberOfStuffs
 	total_memory_size += sizeof(WorldData);
+	total_memory_size += sizeof(MegaMesh)*g_maxMegaMeshes;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -120,6 +121,17 @@ int ReadMemory::InitalizeSharedMemory()
 	mem = (unsigned char*)(mem + sizeof(int));
 
 	worldData = (WorldData*)mem;
+
+	mem = (unsigned char*)(mem + sizeof(WorldData));
+
+	for(int i = 0; i < g_maxMegaMeshes; i++)
+	{
+		PmegaMeshes[i] = ((MegaMesh*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(MegaMesh) * g_maxMegaMeshes);
+
+	NumberOfMegaMeshes = (int*)mem;
 
 	if(first_process)
 	{
@@ -266,6 +278,7 @@ void ReadMemory::ClearAllMessages()
 	UpdateMessage mess;
 	string nada = "";
 	memcpy(mess.name, nada.c_str(), g_maxNameLength);
+	*NumberOfMessages = 0;
 
 	for(int i = 0; i < g_maxMessages; i++)
 	{		
@@ -284,4 +297,76 @@ int ReadMemory::shutdown()
 	CloseHandle(LightMutexHandle);
 	CloseHandle(CameraMutexHandle);
 	return 0;
+}
+
+void ReadMemory::LockMutex(string mutexName)
+{
+	if(mutexName == "MeshMutex")
+	{
+		MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+		WaitForSingleObject(MeshMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "IdMutex")
+	{
+		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+		WaitForSingleObject(IdMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "LightMutex")
+	{
+		LightMutexHandle = CreateMutex(nullptr, false, L"LightMutex");
+		WaitForSingleObject(LightMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "CameraMutex")
+	{
+		CameraMutexHandle = CreateMutex(nullptr, false, L"CameraMutex");
+		WaitForSingleObject(CameraMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "LocatorMutex")
+	{
+		LocatorMutexHandle = CreateMutex(nullptr, false, L"LocatorMutex");
+		WaitForSingleObject(LocatorMutexHandle, milliseconds);
+	}
+
+	if(mutexName == "TextureMutex")
+	{
+		TextureMutexHandle = CreateMutex(nullptr, false, L"TextureMutex");
+		WaitForSingleObject(TextureMutexHandle, milliseconds);
+	}
+}
+
+void ReadMemory::UnlockMutex(string mutexName)
+{
+	if(mutexName == "MeshMutex")
+	{
+		ReleaseMutex(MeshMutexHandle);
+	}
+
+	if(mutexName == "IdMutex")
+	{
+		ReleaseMutex(IdMutexHandle);
+	}
+
+	if(mutexName == "LightMutex")
+	{
+		ReleaseMutex(LightMutexHandle);
+	}
+
+	if(mutexName == "CameraMutex")
+	{
+		ReleaseMutex(CameraMutexHandle);
+	}
+
+	if(mutexName == "LocatorMutex")
+	{
+		ReleaseMutex(LocatorMutexHandle);
+	}
+
+	if(mutexName == "TextureMutex")
+	{
+		ReleaseMutex(TextureMutexHandle);
+	}
 }
