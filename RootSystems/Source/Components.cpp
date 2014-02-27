@@ -40,6 +40,7 @@ namespace RootForce
 			RootForce::FollowComponent::SetTypeId(RootForce::ComponentType::FOLLOW);
 			RootForce::HomingComponent::SetTypeId(RootForce::ComponentType::HOMING);
 			RootForce::RayComponent::SetTypeId(RootForce::ComponentType::RAY);
+			RootForce::RayComponent::SetTypeId(RootForce::ComponentType::DAMAGEANDKNOCKBACK);
 		}
 
 		void InitializeServerComponents()

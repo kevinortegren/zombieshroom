@@ -61,6 +61,7 @@ namespace AbilityEditorNameSpace
 				m_compNames.append("Charge Variables"); 
 				m_compNames.append("Water Disturb");
 				m_compNames.append("Sound");
+				m_compNames.append("Follow");
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -872,7 +873,7 @@ namespace AbilityEditorNameSpace
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QList<QtProperty*> props, subprops;
+				QList<QtProperty*> props;
 				props = p_propBrows->properties();
 				m_offset = p_propMan->variantProperty(props.at(0))->value().toFloat();
 			}

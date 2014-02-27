@@ -48,6 +48,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}

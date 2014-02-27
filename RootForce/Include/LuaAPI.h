@@ -291,6 +291,15 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::TryPickupComponent>(*e);
 			luaL_setmetatable(p_luaState, "TryPickupComponent");
 			return 1;
+		} 
+		static int EntityGetDamageAndknockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback **)lua_newuserdata(p_luaState, sizeof(RootForce::DamageAndKnockback *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::DamageAndKnockback>(*e);
+			luaL_setmetatable(p_luaState, "DamageAndKnockback");
+			return 1;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -2225,6 +2234,55 @@ namespace RootForce
 			return 1;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//Damage and knockback
+		//////////////////////////////////////////////////////////////////////////
+		static int DamageAndKnockbackCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback**)lua_newuserdata(p_luaState, sizeof(RootForce::DamageAndKnockback*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::DamageAndKnockback>(*e);
+
+			(*s)->Damage = (float)luaL_checknumber(p_luaState, 2);
+			(*s)->Knockback = (float)luaL_checknumber(p_luaState, 3);
+			//(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
+
+			luaL_setmetatable(p_luaState, "DamageAndKnockback");
+			return 1;
+		}
+		static int DamageAndKnockbackGetDamage(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback**)luaL_checkudata(p_luaState, 1, "DamageAndKnockback");
+			lua_pushnumber(p_luaState, (*s)->Damage);
+			return 1;
+		}
+		static int DamageAndKnockbackGetKnockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback**)luaL_checkudata(p_luaState, 1, "DamageAndKnockback");
+			lua_pushnumber(p_luaState, (*s)->Knockback);
+			return 1;
+		}
+		static int DamageAndKnockbackSetDamage(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback**)luaL_checkudata(p_luaState, 1, "DamageAndKnockback");
+			(*s)->Damage = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int DamageAndKnockbackSetKnockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::DamageAndKnockback **s = (RootForce::DamageAndKnockback**)luaL_checkudata(p_luaState, 1, "DamageAndKnockback");
+			(*s)->Knockback = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{NULL, NULL}
@@ -2261,6 +2319,7 @@ namespace RootForce
 			{"GetPlayerAction", EntityGetPlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{"GetTryPickupComponent", EntityGetTryPickupComponent},
+			{"GetDamageAndknockback", EntityGetDamageAndknockback},
 			{NULL, NULL}
 		};
 
@@ -2735,6 +2794,17 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg damageandknockback_f [] = {
+			{"New", DamageAndKnockbackCreate},
+			{"GetDamage", DamageAndKnockbackGetDamage},
+			{"GetKnockback", DamageAndKnockbackGetKnockback},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg damageandknockback_m [] = {
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -2798,6 +2868,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec4_f, RootForce::LuaAPI::vec4_m, "Vec4");
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::quat_f, RootForce::LuaAPI::quat_m, "Quat");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::abilityspawn_f, RootForce::LuaAPI::abilityspawn_m, "AbilitySpawn");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::damageandknockback_f, RootForce::LuaAPI::damageandknockback_m, "DamageAndKnockback"); 
 		}
 	}
 }

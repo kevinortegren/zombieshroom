@@ -39,6 +39,7 @@ namespace RootForce
 			FOLLOW,
 			HOMING,
 			RAY,
+			DAMAGEANDKNOCKBACK,
 		};
 	}
 }

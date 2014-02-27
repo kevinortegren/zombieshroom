@@ -26,7 +26,7 @@
       <x>10</x>
       <y>69</y>
       <width>771</width>
-      <height>631</height>
+      <height>621</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="mainLayout">
@@ -42,11 +42,16 @@
         <attribute name="title">
          <string>Components</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <widget class="CustomListWidget" name="listComponents"/>
-         </item>
-        </layout>
+        <widget class="CustomListWidget" name="listComponents">
+         <property name="geometry">
+          <rect>
+           <x>9</x>
+           <y>9</y>
+           <width>361</width>
+           <height>271</height>
+          </rect>
+         </property>
+        </widget>
        </widget>
        <widget class="QWidget" name="tabEntities">
         <attribute name="title">
@@ -126,7 +131,9 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QWidget" name="propertyWidget" native="true"/>
+      <widget class="QWidget" name="propertyWidget" native="true">
+       <zorder>listComponents</zorder>
+      </widget>
      </item>
     </layout>
    </widget>
