@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 
 			painter = g_engineContext.m_resourceManager->CreateTexture("painter");
 			RM.LockMutex("TextureMutex");
-			painter->CreateEmptyTexture(RM.PpaintList[0]->width, RM.PpaintList[0]->heigth, Render::TextureFormat::TEXTURE_RGBA);
+			painter->CreateEmptyTexture(512, 512, Render::TextureFormat::TEXTURE_RGBA);
 			RM.UnlockMutex("TextureMutex");
 
 			Initialize(g_engineContext);
