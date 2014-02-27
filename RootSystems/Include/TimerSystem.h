@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
@@ -41,3 +42,4 @@ namespace RootForce
 		RakNet::RakPeerInterface* m_serverPeer;
 	};
 }
+#endif

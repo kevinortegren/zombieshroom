@@ -46,22 +46,6 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
-	// Export Storage.
-	out << YAML::BeginMap;
-	out << YAML::Key << "Storage";
-	out << YAML::Value << YAML::BeginSeq;
-	
-	for(auto itr = m_world->GetStorage()->m_values.begin(); itr != m_world->GetStorage()->m_values.end(); ++itr)
-	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "Key" << YAML::Value << (*itr).first;
-		out << YAML::Key << "Value" << YAML::Value << (*itr).second;
-		out << YAML::EndMap;
-	}
-
-	out << YAML::EndSeq;
-	out << YAML::EndMap;
-
 	// Export Components.
 	out << YAML::BeginMap;
 	out << YAML::Key << "Components";
@@ -133,7 +117,21 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
-	
+	// Export Storage.
+	out << YAML::BeginMap;
+	out << YAML::Key << "Storage";
+	out << YAML::Value << YAML::BeginSeq;
+
+	for(auto itr = m_world->GetStorage()->m_values.begin(); itr != m_world->GetStorage()->m_values.end(); ++itr)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "Key" << YAML::Value << (*itr).first;
+		out << YAML::Key << "Value" << YAML::Value << (*itr).second;
+		out << YAML::EndMap;
+	}
+
+	out << YAML::EndSeq;
+	out << YAML::EndMap;
 
 	out << YAML::EndSeq;
 

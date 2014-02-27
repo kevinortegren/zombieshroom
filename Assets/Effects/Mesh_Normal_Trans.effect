@@ -20,6 +20,8 @@
           slot: 8
         - name: g_Glow
           slot: 9
+        - name: g_Translucency
+          slot: 17
       programs:
         - name: Mesh_Normal
           shaders:

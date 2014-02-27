@@ -1,6 +1,7 @@
 #include <RootEngine\Render\Include\LightingDevice.h>
 #include <RootEngine\Render\Include\RenderExtern.h>
 #include <RootEngine\Include\ResourceManager\ResourceManager.h>
+#include <ctime>
 
 namespace Render
 {
@@ -18,6 +19,7 @@ namespace Render
 		m_pointLightStencil = lightingEffect->GetTechniques()[0]->GetPrograms()[3];
 		m_backgroundAlphaBlend = lightingEffect->GetTechniques()[0]->GetPrograms()[4];
 		m_backgroundAddative = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
+		m_pointLightFSQ = lightingEffect->GetTechniques()[0]->GetPrograms()[6];
 
 		Render::EffectInterface* ssaoEffect = g_context.m_resourceManager->LoadEffect("Renderer/SSAO");
 		m_ssaoTech = ssaoEffect->GetTechniques()[0];
@@ -25,7 +27,7 @@ namespace Render
 		m_fullscreenQuad = p_fullscreenQuad;
 
 		// Load unit sphere mesh.
-		m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
+		//m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
 
 		// TODO: Init triangle.
 
@@ -176,14 +178,16 @@ namespace Render
 	{
 		if(m_showPointlights)
 		{
-			PointLightStencil();
-			PointLightRender();
+			PointLightFSQ();
 		}
 	}
 
 	void LightingDevice::PointLightFSQ()
 	{
-
+		m_fullscreenQuad->Bind();
+		m_pointLightFSQ->Apply();
+		m_fullscreenQuad->DrawInstanced(m_numPointLights);
+		m_fullscreenQuad->Unbind();
 	}
 
 	void LightingDevice::BackgroundBlend(BackgroundBlend::BackgroundBlend p_mode)

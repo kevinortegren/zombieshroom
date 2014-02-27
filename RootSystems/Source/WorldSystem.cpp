@@ -42,7 +42,7 @@ namespace RootForce
 			
 			// Render data.
 			RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
-			auto mesh = renderable->m_model->m_meshes[1];
+			auto mesh = renderable->m_model->m_meshes[0];
 
 			// Transform.
 			RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
@@ -60,7 +60,11 @@ namespace RootForce
 			for(unsigned i = 0; i < mesh->GetVertexBuffer()->GetBufferSize(); i += mesh->GetVertexBuffer()->GetElementSize())
 			{
 				Render::Vertex1P v;
-				memcpy(&v, &data[i], mesh->GetVertexBuffer()->GetElementSize());
+				Render::Vertex1P1N1UV1T1BT vtemp;
+				
+				memcpy(&vtemp, &data[i], mesh->GetVertexBuffer()->GetElementSize());
+
+				v.m_pos = vtemp.m_pos;
 
 				// Transform vertex to world space.
 				glm::vec4 tf = transformMatrix * glm::vec4(v.m_pos, 1.0f);
@@ -71,35 +75,38 @@ namespace RootForce
 
 			glUnmapBuffer(GL_ARRAY_BUFFER);
 
-			// Parse index data.
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
-			data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-
-			for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+			if(mesh->GetElementBuffer() != nullptr)
 			{
-				int i0, i1, i2;
+				// Parse index data.
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetElementBuffer()->GetBufferId());
+				data = (unsigned char*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 
-				memcpy(&i0, &data[i], sizeof(int));
-				memcpy(&i1, &data[i + 4], sizeof(int));
-				memcpy(&i2, &data[i + 8], sizeof(int));
+				for(unsigned i = 0; i < mesh->GetElementBuffer()->GetBufferSize(); i += mesh->GetElementBuffer()->GetElementSize() * 3)
+				{
+					int i0, i1, i2;
 
-				indices.push_back(i0 + offset);
-				indices.push_back(i1 + offset);
-				indices.push_back(i2 + offset);
+					memcpy(&i0, &data[i], sizeof(int));
+					memcpy(&i1, &data[i + 4], sizeof(int));
+					memcpy(&i2, &data[i + 8], sizeof(int));
 
-			}
+					indices.push_back(i0 + offset);
+					indices.push_back(i1 + offset);
+					indices.push_back(i2 + offset);
 
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+				}
+				glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+			}		
 		}
 
 		m_staticMesh = g_engineContext.m_renderer->CreateMesh();
 		m_staticMesh->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 		m_staticMesh->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 		m_staticMesh->CreateVertexBuffer1P(&vertices[0], vertices.size());
-		m_staticMesh->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+#ifndef COMPILE_LEVEL_EDITOR
+		m_staticMesh->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));	
 		m_staticMesh->CreateIndexBuffer(&indices[0], indices.size());
+#endif
 
-		unsigned* ptr = &indices[0];
 		m_staticMesh->SetPrimitiveType(GL_TRIANGLES);
 
 		m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Creating static mesh vertices: %d indices %d", vertices.size(), indices.size());
@@ -281,7 +288,7 @@ namespace RootForce
 		job.m_mesh = m_staticMesh;
 
 		g_engineContext.m_renderer->AddShadowJob(job);
-
+#ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
 		RootForce::Frustum* frustrum = &m_world->GetEntityManager()->GetComponent<RootForce::Camera>(entity)->m_frustum;
@@ -303,6 +310,7 @@ namespace RootForce
 
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
+#endif
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

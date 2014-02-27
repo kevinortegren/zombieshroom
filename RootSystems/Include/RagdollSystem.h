@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/World.h>
@@ -49,3 +50,4 @@ namespace RootForce
 		RootEngine::GameSharedContext* m_engineContext;
 	};
 }
+#endif

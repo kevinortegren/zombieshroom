@@ -23,6 +23,18 @@ void ECS::GroupManager::UnregisterEntity(const std::string& p_group, ECS::Entity
 
 }
 
+bool ECS::GroupManager::IsEntityInGroup(ECS::Entity* p_entity, const std::string& p_group)
+{
+	GroupRange range = GetEntitiesInGroup(p_group);
+	for(auto itr = range.first; itr != range.second; ++itr)
+	{
+		if(p_entity == (*itr).second)
+			return true;
+	}
+	return false;
+}
+
+
 void ECS::GroupManager::PrintEntitiesInGroup(const std::string& p_group)
 {
 	GroupRange range = m_groups.equal_range(p_group);
