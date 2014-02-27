@@ -680,7 +680,7 @@ namespace Render
 		m_lighting.Ambient();
 		m_lighting.Directional();
 		m_lighting.Point();
-		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+		m_lighting.BackgroundBlend(BackgroundBlend::ADDITIVE);
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}

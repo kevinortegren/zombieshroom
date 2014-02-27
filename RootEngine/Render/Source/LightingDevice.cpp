@@ -17,7 +17,7 @@ namespace Render
 		m_pointLight = lightingEffect->GetTechniques()[0]->GetPrograms()[2];
 		m_pointLightStencil = lightingEffect->GetTechniques()[0]->GetPrograms()[3];
 		m_backgroundAlphaBlend = lightingEffect->GetTechniques()[0]->GetPrograms()[4];
-		m_backgroundAddative = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
+		m_backgroundAdditive = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
 
 		Render::EffectInterface* ssaoEffect = g_context.m_resourceManager->LoadEffect("Renderer/SSAO");
 		m_ssaoTech = ssaoEffect->GetTechniques()[0];
@@ -196,8 +196,8 @@ namespace Render
 		
 			switch(p_mode)
 			{
-			case BackgroundBlend::ADDATIVE:
-				m_backgroundAddative->Apply();
+			case BackgroundBlend::ADDITIVE:
+				m_backgroundAdditive->Apply();
 				break;
 			case BackgroundBlend::ALPHABLEND:
 			default:
