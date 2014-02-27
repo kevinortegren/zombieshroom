@@ -140,11 +140,6 @@ namespace RootEngine
 	{
 		m_renderer = p_renderer;
 	}
-#ifndef COMPILE_LEVEL_EDITOR
-	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
-	{
-		m_debugOverlay = p_debugOverlay;
-	}
 
 	void Profiling::BeginGPUTimer()
 	{
@@ -168,6 +163,14 @@ namespace RootEngine
 	{
 		glGenQueries(1, &m_queryID);
 	}
+
+#ifndef COMPILE_LEVEL_EDITOR
+	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
+	{
+		m_debugOverlay = p_debugOverlay;
+	}
+
+
 
 
 #endif

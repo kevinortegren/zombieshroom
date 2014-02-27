@@ -38,7 +38,7 @@
 #define RENDER_SLOT_LIGHTS 2
 #define RENDER_SLOT_PEREFFECT 3
 
-//#define RENDER_USE_COMPUTE
+#define RENDER_USE_COMPUTE
 
 namespace Render
 {
@@ -156,9 +156,8 @@ namespace Render
 
 		void Compute(ComputeJob* p_job);
 
-		void BindForwardFramebuffer();
-		void ClearForwardFramebuffer();
-		void UnbindTexture(TextureSemantic::TextureSemantic p_semantic);
+
+		
 
 		void InitialziePostProcesses();
 
@@ -168,6 +167,13 @@ namespace Render
 		void ParseCommands(std::stringstream* p_ss);
 
 	private:
+
+		void BindForwardFramebuffer();
+		void BindForwardDepthAndColor();
+		void CopyDepthAndColor();
+		void SwapForwardFramebuffer();
+
+		void UnbindTexture(TextureSemantic::TextureSemantic p_semantic);
 
 		bool CheckExtension(const char* p_extension);
 		void InitializeSemanticSizes();
@@ -198,10 +204,10 @@ namespace Render
 		int m_sjobCount[RENDER_SHADOW_CASCADES];
 		std::vector<ShadowJob> m_sjobs;
 
-		// Default framebuffer.
-		GLuint m_fbo;
-		Render::TextureInterface* m_color0;
-		Render::TextureInterface* m_color1;
+		int m_activeForwardFramebuffer;
+		GLuint m_forwardFramebuffers[2];
+		Render::TextureInterface* m_forwardColors[2];
+		Render::TextureInterface* m_forwardDepth[2];
 
 		RenderResourceManager m_resources;
 		GeometryBuffer m_gbuffer;

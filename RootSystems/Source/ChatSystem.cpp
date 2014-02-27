@@ -56,7 +56,7 @@ namespace RootForce
 			m_eventBuffer.push_back(ev);
 		}
 		else
-			m_messageBuffer.push_back(Awesomium::ToString(p_array[0].ToString()));
+			m_messageBuffer.push_back(RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(p_array[0].ToString())));
 	}
 
 	std::string ChatSystem::PollMessage()

@@ -3,12 +3,13 @@
 
 SharedMemory::SharedMemory()
 {
-	NumberOfMeshes = nullptr;
-	NumberOfLights = nullptr;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
-	NumberOfCameras = nullptr;
-	NumberOfMaterials = nullptr;
-	NumberOfLocators = nullptr;
+	NumberOfMeshes = 0;
+	NumberOfLights = 0;	//STRUNTAT I HUR MÅNGA KAMEROR ATM KÖR PÅ KAMERA 0;
+	NumberOfCameras = 0;
+	NumberOfMaterials = 0;
+	NumberOfLocators = 0;
 	NumberOfMessages = 0;
+	NumberOfMegaMeshes = 0;
 	export = 0;
 	InitalizeSharedMemory();
 }
@@ -29,8 +30,9 @@ int SharedMemory::InitalizeSharedMemory()
 	total_memory_size += sizeof(Locator) * g_maxLocators;
 	total_memory_size += sizeof(UpdateMessage) * g_maxMessages;
 	total_memory_size += sizeof(PaintTexture) * g_maxPaintTextures;
-	total_memory_size += sizeof(int) * 7; //NumberOfStuffs
+	total_memory_size += sizeof(int) * 8; //NumberOfStuffs
 	total_memory_size += sizeof(WorldData);
+	total_memory_size += sizeof(MegaMesh)*g_maxMegaMeshes;
 
 
 	shared_memory_handle = CreateFileMapping(
@@ -125,6 +127,17 @@ int SharedMemory::InitalizeSharedMemory()
 
 	worldData = (WorldData*)mem;
 
+	mem = (unsigned char*)(mem + sizeof(WorldData));
+
+	for(int i = 0; i < g_maxMegaMeshes; i++)
+	{
+		PmegaMeshes[i] = ((MegaMesh*)mem) + i ;
+	}
+
+	mem = (unsigned char*)(mem + sizeof(MegaMesh) * g_maxMegaMeshes);
+
+	NumberOfMegaMeshes = (int*)mem;
+
 	//if(first_process)
 	//{
 		memset(raw_data,0,total_memory_size);
@@ -134,71 +147,101 @@ int SharedMemory::InitalizeSharedMemory()
 
 void SharedMemory::AddUpdateMessage(string type, int index, bool updateTransform, bool updateShape, bool remove) //Valid types are "Mesh", "Camera", "Light", "Locator"
 {
-	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-	WaitForSingleObject(IdMutexHandle, milliseconds);
-
-	int nrOfMessages = *NumberOfMessages;
-	bool stop = false;
-
-	//Check if last message is of same type and don't add new if true
-	if(nrOfMessages > 0)
+	if(type != "")
 	{
-		for(int i = 0; i < nrOfMessages; i++)
+
+		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+		WaitForSingleObject(IdMutexHandle, milliseconds);
+
+		int nrOfMessages = *NumberOfMessages;
+		bool stop = false;
+		int overwrite = -1;
+
+		//Check if last message is of same type and don't add new if true
+		if(nrOfMessages > 0 && nrOfMessages < g_maxMessages)
 		{
-			if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
+			for(int i = 0; i < nrOfMessages; i++)
 			{
-				stop = true;
-				break;
+				if(type == updateMessages[i]->name && ((index == updateMessages[i]->updateID && !remove) || (index == updateMessages[i]->removeID && remove)))
+					//&& updateShape == updateMessages[i]->updateShape && updateTransform == updateMessages[i]->updateTransform)
+				{
+					stop = true;
+					overwrite = i;
+					break;
+				}
 			}
 		}
-	}
 
-	if(!stop && index >= 0)
-	{
-		//Maybe check last message for duplicate aswell
-		if(nrOfMessages < g_maxMessages)
+		if(overwrite != -1)
 		{
-			updateMessages[nrOfMessages]->updateTransform = updateTransform;
-			updateMessages[nrOfMessages]->updateShape = updateShape;
+			updateMessages[overwrite]->updateTransform = updateTransform;
+			updateMessages[overwrite]->updateShape = updateShape;
 			if(type != "")
 			{
-				memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
+				memcpy(updateMessages[overwrite]->name, type.c_str(), g_maxNameLength);
 				int minusOne = -1;
 				if(remove)
 				{
-					updateMessages[nrOfMessages]->updateID = minusOne;
-					updateMessages[nrOfMessages]->removeID = index;
+					updateMessages[overwrite]->updateID = minusOne;
+					updateMessages[overwrite]->removeID = index;
 				}
 				else
 				{
-					updateMessages[nrOfMessages]->updateID = index;
-					updateMessages[nrOfMessages]->removeID = minusOne;
+					updateMessages[overwrite]->updateID = index;
+					updateMessages[overwrite]->removeID = minusOne;
 				}
 			}
 			nrOfMessages++;
 			*NumberOfMessages = nrOfMessages;
 		}
-		else if(nrOfMessages > 0)
+
+		if(!stop && index >= 0)
 		{
-			//Remove oldest / first message and try again
-			//UpdateMessage tempCopy[g_maxMessages];
-
-			for(int i = 0; i < nrOfMessages-1; i++)
+			//Maybe check last message for duplicate aswell
+			if(nrOfMessages < g_maxMessages)
 			{
-				*updateMessages[i] = *updateMessages[i+1];
+				updateMessages[nrOfMessages]->updateTransform = updateTransform;
+				updateMessages[nrOfMessages]->updateShape = updateShape;
+				if(type != "")
+				{
+					memcpy(updateMessages[nrOfMessages]->name, type.c_str(), g_maxNameLength);
+					int minusOne = -1;
+					if(remove)
+					{
+						updateMessages[nrOfMessages]->updateID = minusOne;
+						updateMessages[nrOfMessages]->removeID = index;
+					}
+					else
+					{
+						updateMessages[nrOfMessages]->updateID = index;
+						updateMessages[nrOfMessages]->removeID = minusOne;
+					}
+				}
+				nrOfMessages++;
+				*NumberOfMessages = nrOfMessages;
 			}
+			else if(nrOfMessages > 0)
+			{
+				//Remove oldest / first message and try again
+				//UpdateMessage tempCopy[g_maxMessages];
 
-			updateMessages[g_maxMessages]->removeID = -1;
-			updateMessages[g_maxMessages]->updateID = -1;
-			updateMessages[g_maxMessages]->updateShape = false;
-			updateMessages[g_maxMessages]->updateTransform = false;
-			//*updateMessages = tempCopy;
-			nrOfMessages--;
-			*NumberOfMessages = nrOfMessages;
-			AddUpdateMessage(type, index, updateTransform, updateShape, remove);
+				for(int i = 0; i < nrOfMessages-1; i++)
+				{
+					*updateMessages[i] = *updateMessages[i+1];
+				}
+
+				updateMessages[g_maxMessages]->removeID = -1;
+				updateMessages[g_maxMessages]->updateID = -1;
+				updateMessages[g_maxMessages]->updateShape = false;
+				updateMessages[g_maxMessages]->updateTransform = false;
+				//*updateMessages = tempCopy;
+				nrOfMessages--;
+				*NumberOfMessages = nrOfMessages;
+				AddUpdateMessage(type, index, updateTransform, updateShape, remove);
+			}
 		}
+		ReleaseMutex(IdMutexHandle);
 	}
-	ReleaseMutex(IdMutexHandle);
 }
 
 void SharedMemory::UpdateSharedLight(int index, int nrOfLights)	
@@ -286,6 +329,12 @@ void SharedMemory::UpdateSharedMesh(int index, bool updateTransformation, bool u
 		PmeshList[index]->transformation.flags = meshList[index].transformation.flags;		
 	}
 
+	IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+	WaitForSingleObject(IdMutexHandle, milliseconds);
+	PmeshList[index]->MaterialID = meshList[index].MaterialID;
+	PmeshList[index]->paintIndex = meshList[index].paintIndex;
+	ReleaseMutex(IdMutexHandle);
+
 	ReleaseMutex(MeshMutexHandle);
 }
 
@@ -302,18 +351,11 @@ void SharedMemory::UpdateSharedLocator(int index, int nrOfLocators)
 	PlocatorList[index]->transformation.scale = locatorList[index].transformation.scale;
 	PlocatorList[index]->transformation.rotation = locatorList[index].transformation.rotation;
 
-	//PlocatorList[index]->transformation.nrOfFlags = locatorList[index].transformation.nrOfFlags;
-	//for(int i = 0; i < locatorList[index].transformation.nrOfFlags; i++)
-	//{
-	//	memset(PlocatorList[index]->transformation.flags[i], NULL, sizeof(PlocatorList[index]->transformation.flags[i]));
-	//	memcpy(PlocatorList[index]->transformation.flags[i], locatorList[index].transformation.flags[i], g_shortMaxNameLength);
-	//}
-
 	PlocatorList[index]->transformation.flags = locatorList[index].transformation.flags;
 	ReleaseMutex(LocatorMutexHandle);
 }
 
-void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
+void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID, bool itsAmegaMesh)
 {
 	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
 	WaitForSingleObject(MeshMutexHandle, milliseconds);
@@ -325,23 +367,33 @@ void SharedMemory::UpdateSharedMaterials(int nrOfMaterials, int meshID)
 		memcpy(PmaterialList[i]->normalPath, materialList[i].normalPath, g_maxPathLength);
 		memcpy(PmaterialList[i]->specularPath, materialList[i].specularPath, g_maxPathLength);
 		memcpy(PmaterialList[i]->glowPath, materialList[i].glowPath, g_maxPathLength);
+		memcpy(PmaterialList[i]->translucencePath, materialList[i].translucencePath, g_maxPathLength);
 	}
 
 	*NumberOfMaterials = nrOfMaterials;		
 
-	if(meshID != -1)
+	if(itsAmegaMesh && meshID != -1)
 	{
-		memcpy(PmeshList[meshID]->materialName, meshList[meshID].materialName, g_maxNameLength);
-
-		IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
-		WaitForSingleObject(IdMutexHandle, milliseconds);
-		AddUpdateMessage("Mesh", meshID, true, true, false);
-		PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
-		PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
-		ReleaseMutex(IdMutexHandle);
-
-		AddUpdateMessage("Mesh", meshID, true, true, false);
+		AddUpdateMessage("MegaMesh", meshID, true, true, false);
 	}
+	else
+	{
+		if(meshID != -1)
+		{
+			memcpy(PmeshList[meshID]->materialName, meshList[meshID].materialName, g_maxNameLength);
+
+			//MESH MUTEX SHOULD BE HERE INSTEAD?
+			IdMutexHandle = CreateMutex(nullptr, false, L"IdMutex");
+			WaitForSingleObject(IdMutexHandle, milliseconds);
+			//AddUpdateMessage("Mesh", meshID, true, true, false);
+			PmeshList[meshID]->MaterialID = meshList[meshID].MaterialID;
+			PmeshList[meshID]->paintIndex = meshList[meshID].paintIndex;
+			ReleaseMutex(IdMutexHandle);
+
+			AddUpdateMessage("Mesh", meshID, true, true, false);
+		}
+	}
+
 
 	ReleaseMutex(MeshMutexHandle);
 }
@@ -378,4 +430,15 @@ int SharedMemory::shutdown()
 	CloseHandle(LightMutexHandle);
 	CloseHandle(CameraMutexHandle);
 	return 0;
+}
+
+void SharedMemory::LockMeshMutex()
+{
+	MeshMutexHandle = CreateMutex(nullptr, false, L"MeshMutex");
+	WaitForSingleObject(MeshMutexHandle, milliseconds);
+}
+
+void SharedMemory::UnLockMeshMutex()
+{
+	ReleaseMutex(MeshMutexHandle);
 }

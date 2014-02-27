@@ -27,6 +27,7 @@
 #include <RootSystems/Include/BotanySystem.h>
 #include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/RaySystem.h>
+#include <RootSystems/Include/TransformInterpolationSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -87,10 +88,12 @@ namespace RootForce
 		RootForce::FollowSystem*						m_followSystem;
 		RootForce::HomingSystem*						m_homingSystem;
 		RootForce::RaySystem*							m_raySystem;
+        RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
 
 		Keymapper* m_keymapper;
 
 		GameStates::GameStates UpdateConsole();
 		void UpdateHUD();
+		void PrintGlobalCommandHelp();
 	};
 }

@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootEngine/Include/GameSharedContext.h>
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/EntitySystem.h>
@@ -69,3 +69,4 @@ namespace RootForce
 		RakNet::RakPeerInterface* m_clientPeer;
 	};
 }
+#endif

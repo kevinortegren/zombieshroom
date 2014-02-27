@@ -154,7 +154,7 @@ namespace RootForce
 
 							if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
 							{
-								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+								clientComponent->State = ClientState::CONNECTED;
 							}
 						}
 						else
@@ -181,7 +181,7 @@ namespace RootForce
 							PlayerComponent* senderPlayerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(sender);
 							assert(senderPlayerComponent != nullptr);
 						
-							std::string message = senderPlayerComponent->Name + ": " + m.Message.C_String();
+							std::string message = RootEngine::GUISystem::PreventHTMLInjections(senderPlayerComponent->Name) + ": " + m.Message.C_String();
 							m_chatSystem->JSAddMessage(message);
 						}
 						else
@@ -227,6 +227,15 @@ namespace RootForce
 							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 							assert(playerEntity != nullptr);
 
+							if(m.TeamID != 0)
+							{
+								// Call the OnCreate script
+								g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+								g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
+								g_engineContext.m_script->AddParameterNumber(m.TeamID);
+								g_engineContext.m_script->ExecuteScript();
+							}
+
 							PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 							assert(playerComponent != nullptr);
 
@@ -237,7 +246,7 @@ namespace RootForce
 							// For a local client, just set the client state. The server has already created the entities for us.
 							if (m.IsYou)
 							{
-								clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+								clientComponent->State = ClientState::CONNECTED;
 							}
 						}
 
@@ -303,12 +312,16 @@ namespace RootForce
 					// Only remote clients need to parse. A local server would already have updated the entities.
 					if (clientComponent->IsRemote)
 					{
-						// Make sure we are connected before parsing commands.
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							assert(playerEntity != nullptr);
 
+						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+						assert(playerEntity != nullptr);
+
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+						assert(playerComponent != nullptr);
+
+						// Make sure we are connected before parsing commands.
+						if (ClientState::IsConnected(clientComponent->State) && playerComponent->TeamID != 0)
+						{
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
 
@@ -331,13 +344,24 @@ namespace RootForce
 							Transform* aimingTransform = m_world->GetEntityManager()->GetComponent<Transform>(aimingEntity);
 							assert(aimingTransform != nullptr);
 							
-							playerTransform->m_position = m.Position;
+							// Set the position of the player
+							Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+							assert(collision != nullptr);
+							float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+							glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+							// Check if the displacement has the same sign as the local velocity.
+							if (displacement.y * verticalVelocity >= 0.0f)
+								playerTransform->m_position.y = m.Position.y;
+							playerTransform->m_position.x = m.Position.x;
+							playerTransform->m_position.z = m.Position.z;
 							playerTransform->m_orientation.SetOrientation(m.Orientation);
 							aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
 
 							// Extrapolate the position using ping time.
 							// TODO: Possibly let the action system and physics do the extrapolation.
+							/*
 							glm::vec3 facing = playerTransform->m_orientation.GetFront();
 							glm::vec3 right = playerTransform->m_orientation.GetRight();
 							glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -345,7 +369,7 @@ namespace RootForce
 								movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 							playerTransform->m_position += movement;
-
+							*/
 							// Log the action (debug)
 							//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "PlayerCommand received from user %d", m.User);
 						}
@@ -777,9 +801,16 @@ namespace RootForce
 							if (playerEntity != nullptr)
 							{
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+								TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"));
 								assert(health != nullptr);
+								assert(playerComp != nullptr);
+								assert(rules != nullptr);
 
 								health->Health = 0;
+								playerComp->Score --;
+								playerComp->Deaths ++;
+								rules->TeamScore[playerComp->TeamID] --;
 							}
 							else
 							{
@@ -1054,6 +1085,21 @@ namespace RootForce
 						}
 
 					} return true;
+				case NetworkMessage::MessageType::PlayerTeamSelect:
+					{
+						NetworkMessage::PlayerTeamSelect m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+
+						// Call the OnCreate script
+						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+						g_engineContext.m_script->AddParameterNumber(m.TeamID);
+						g_engineContext.m_script->ExecuteScript();
+
+
+					} return true;
 			}
 
 			return false;
@@ -1245,10 +1291,14 @@ namespace RootForce
 						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
 						assert(clientComponent != nullptr);
 
-						if (ClientState::IsConnected(clientComponent->State))
+						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+						assert(playerEntity != nullptr);
+
+						PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+						assert(playerComponent != nullptr);
+
+						if (ClientState::IsConnected(clientComponent->State) && playerComponent->TeamID != 0)
 						{
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							assert(playerEntity != nullptr);
 
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
@@ -1276,11 +1326,21 @@ namespace RootForce
 								playerAction->ActiveAbility = activeAbility;
 
 								// Set the position of the player
-								playerTransform->m_position = m.Position;
+								Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
+								assert(collision != nullptr);
+								float verticalVelocity = g_engineContext.m_physics->GetPlayerVerticalVelocity(*collision->m_handle);
+								glm::vec3 displacement = m.Position - playerTransform->m_position;
+								
+								// Check if the displacement has the same sign as the local velocity.
+								if (displacement.y * verticalVelocity >= 0.0f)
+									playerTransform->m_position.y = m.Position.y;
+								playerTransform->m_position.x = m.Position.x;
+								playerTransform->m_position.z = m.Position.z;
 								playerTransform->m_orientation.SetOrientation(m.Orientation);
 								aimingTransform->m_orientation.SetOrientation(m.AimingDeviceOrientation);
 
 								// Extrapolate the position using ping time
+								/*
 								glm::vec3 facing = playerTransform->m_orientation.GetFront();
 								glm::vec3 right = playerTransform->m_orientation.GetRight();
 								glm::vec3 movement = facing * playerAction->MovePower + right * playerAction->StrafePower;
@@ -1288,6 +1348,7 @@ namespace RootForce
 									movement = glm::normalize(movement) * playerPhysics->MovementSpeed * halfPing;
 
 								playerTransform->m_position += movement;
+								*/
 							}
 
 							// Broadcast the action to all other connected clients.
@@ -1864,8 +1925,16 @@ namespace RootForce
 								assert(playerEntity != nullptr);
 
 								HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+								PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+								TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"));
 								assert(health != nullptr);
+								assert(playerComp != nullptr);
+								assert(rules != nullptr);
+
 								health->Health = 0;
+								playerComp->Score --;
+								playerComp->Deaths ++;
+								rules->TeamScore[playerComp->TeamID] --;
 							}
 
 							// Broadcast the suicide to all other connected clients.
@@ -1967,6 +2036,7 @@ namespace RootForce
 											n.User = userID;
 											n.IsYou = false;
 											n.Name = RakNet::RakString(playerComponent->Name.c_str());
+											n.TeamID = 0;
 
 											ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
 											if (otherClientEntity != nullptr)
@@ -2010,6 +2080,7 @@ namespace RootForce
 												n.User = m_peer->GetIndexFromSystemAddress(addresses[i]);
 												n.IsYou = addresses[i] == p_packet->systemAddress;
 												n.Name = RakNet::RakString(otherPlayerComponent->Name.c_str());
+												n.TeamID = otherPlayerComponent->TeamID;
 
 												RakNet::BitStream bs;
 												bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -2034,12 +2105,12 @@ namespace RootForce
 									}
 
 									// Make sure the player will be spawned at a spawn point.
-									HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
+									/*HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(playerEntity);
 									assert(health != nullptr);
 									health->WantsRespawn = true;
-									health->RespawnDelay = 0.0f;
+									health->RespawnDelay = 0.0f;*/ //TODO: This must happen when selecting team instead!
 
-									clientComponent->State = ClientState::AWAITING_SPAWN_POINT;
+									clientComponent->State = ClientState::CONNECTED;
 								}
 								else
 								{
@@ -2065,6 +2136,57 @@ namespace RootForce
 						} break;
 					}
 				} return true;
+				case NetworkMessage::MessageType::PlayerTeamSelect:
+					{
+						NetworkMessage::PlayerTeamSelect m;
+						m.Serialize(false, p_bs);
+
+						//Only do these calculations if we want to join a playing team, not the spectators
+						if(m.TeamID == 1 || m.TeamID == 2)
+						{
+							//Save down the number of players in each team
+							int team1, team2;
+							team1 = team2 = 0;
+							for(auto pair : g_networkEntityMap)
+							{
+								if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY || !pair.second)
+									continue;
+
+								RootForce::PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(pair.second);
+								if(playerComponent->TeamID == 1)
+									team1 ++;
+								else if(playerComponent->TeamID == 2)
+									team2 ++;
+							}
+
+							//if a team has two or more players than the other team, joining it is not allowed
+							if(m.TeamID == 1) 
+								if(team1 > team2)
+									break;
+							else if(m.TeamID == 2)
+								if(team2 > team1)
+									break;
+						}
+
+						if (m_world->GetTagManager()->GetEntityByTag("Client") == nullptr)
+						{
+							ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+
+							// Call the OnCreate script
+							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+							g_engineContext.m_script->AddParameterNumber(m.TeamID);
+							g_engineContext.m_script->ExecuteScript();
+						}
+
+						RakNet::BitStream bs;
+						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+						bs.Write(RakNet::GetTime());
+						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
+						m.Serialize(true, &bs);
+
+						m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					} return true;
 			}
 			
 			return false;

@@ -24,10 +24,11 @@ public:
 	{
 		if (convexResult.m_hitCollisionObject == m_me)
 			return btScalar(1.0);
-
+		
 		if (!convexResult.m_hitCollisionObject->hasContactResponse())
 			return btScalar(1.0);
-		
+		if(convexResult.m_hitCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup == btBroadphaseProxy::DebrisFilter)
+			return btScalar(1.0);
 		btVector3 hitNormalWorld;
 		if (normalInWorldSpace)
 		{

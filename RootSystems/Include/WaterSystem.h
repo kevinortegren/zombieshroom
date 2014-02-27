@@ -10,7 +10,6 @@
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <RootSystems/Include/Transform.h>
 #include "glm/glm.hpp"
-#include <RootSystems/Include/ChatSystem.h>
 #include <RootSystems/Include/PlayerSystem.h>
 
 namespace RootForce
@@ -54,7 +53,7 @@ namespace RootForce
 		float GetWaterHeight();
 		void SetWaterHeight(float p_height);
 
-		void ParseCommands(RootForce::ChatSystem* p_chat, std::stringstream* p_data);
+		void ParseCommands(std::stringstream* p_data);
 
 	private:
 
@@ -70,7 +69,7 @@ namespace RootForce
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;
 
-		bool		m_wireFrame, m_pause;
+		bool		m_wireFrame, m_pause, m_playerWaterDeath;
 		int			m_texSize, m_gridSize;	
 		float		m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*		m_textureData;
@@ -94,6 +93,7 @@ namespace RootForce
 		void ToggleReflections();
 		void ToggleRefractions();
 		void ToggleNormalMaps();
+		void ToggleCollideDeath();
 
 		void ResetWater();
 

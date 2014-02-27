@@ -10,6 +10,7 @@ uniform sampler2D g_Diffuse;
 uniform sampler2D g_Specular;
 uniform sampler2D g_Normal;
 uniform sampler2D g_Glow;
+uniform sampler2D g_Translucency;
 
 layout (location = 0) out vec4 diffuse;
 layout (location = 1) out vec2 normals;
@@ -20,10 +21,11 @@ void main()
 	if(texture(g_Diffuse, vert_texcoord).a < 0.5)
 		discard;
 
+	float trans = texture(g_Translucency, vert_texcoord).r;
+
 	float specTerm = texture(g_Specular, vert_texcoord).r;
 	vec3 frag_color = texture(g_Diffuse, vert_texcoord).xyz;
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
-	
 
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
 	normalT = normalT * 2.0f - 1.0f;
@@ -35,5 +37,5 @@ void main()
 	diffuse = vec4(frag_color, specTerm);
     float p = sqrt(bumpNormal.z*8+8);
     normals = bumpNormal.xy/p + 0.5;
-	glow = vec4(vec3(glow_color.xyz), 0.0f);
+	glow = vec4(vec3(glow_color.xyz), trans);
 }

@@ -34,7 +34,7 @@ function ExplodingShroom.OnCreate (userId, actionId)
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 0.25, 1, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 0.25, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 20, dirVec.y * 20, dirVec.z * 20));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
@@ -52,11 +52,12 @@ end
 
 function ExplodingShroom.OnCollide (self, entity)
 if entity:DoesExist() then
-	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+		local network = self:GetNetwork();
+		XplodingMushroomPlanted.OnCreate(network:GetUserId(), network:GetActionId());
+		ExplodingShroom.OnDestroy(self);
 end
 end
 
 function ExplodingShroom.OnDestroy (self)
+	Entity.Remove(self);
 end

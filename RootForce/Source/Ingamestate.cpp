@@ -65,7 +65,8 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
-		
+		g_engineContext.m_resourceManager->LoadScript("RefractiveBall");
+
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -101,6 +102,10 @@ namespace RootForce
 		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
+        // Initialize the interpolation system
+		m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
+        
 		// Initialize anim system.
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -187,10 +192,11 @@ namespace RootForce
 		textures.m_terrainTexture = "grass";
 
 		// Subdivide terrain for grass chunk rendering.
-		m_botanySystem->Initialize(textures);
-#endif
+		//m_botanySystem->Initialize(textures, 0.0f);
+
 		// Subdivide world.
 		//m_sharedSystems.m_worldSystem->SubdivideTree();
+#endif
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -222,6 +228,7 @@ namespace RootForce
 
 		// Reset the ingame menu before we start the match
 		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
+		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
 		
 		m_animationSystem->Start();
@@ -233,6 +240,7 @@ namespace RootForce
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
+		//Ray stuff
 		g_engineContext.m_resourceManager->LoadEffect("Ray");
 		RootEngine::Model* rayModel = g_engineContext.m_resourceManager->CreateModel("rayModel");
 		
@@ -248,6 +256,11 @@ namespace RootForce
 
 		rayModel->m_meshes[0] = mesh1P;
 		
+		//Team selection stuff
+		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+		m_displayIngameMenu = !m_displayIngameMenu;
+		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+		m_ingameMenu->Reset();
 	}
 
 	void IngameState::Exit()
@@ -463,6 +476,10 @@ namespace RootForce
 		}
 
 		{
+			m_transformInterpolationSystem->Process();
+		}
+
+		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
 			m_shadowSystem->Process();
 		}
@@ -526,6 +543,30 @@ namespace RootForce
 	{
 		RootServer::EventData event = m_hud->GetChatSystem()->PollEvent();
 
+		if(RootServer::MatchAny(event.EventType, 1, "HELP"))
+		{
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[COMMANDS]");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w -Water settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r -Render settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/l -Logging settings");
+			g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/b -Botany settings");
+			PrintGlobalCommandHelp();
+		}
+
+		if(RootServer::MatchAny(event.EventType, 1, "HELPALL"))
+		{
+			std::stringstream helpStream;
+			helpStream << "help help ";
+			m_waterSystem->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			g_engineContext.m_renderer->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			m_botanySystem->ParseCommands(&helpStream);
+			helpStream << "help help ";
+			g_engineContext.m_logger->ParseCommand(&helpStream);
+			PrintGlobalCommandHelp();
+		}
+
 		if(RootServer::MatchAny(event.EventType, 2, "R", "RENDER"))
 		{
 			g_engineContext.m_renderer->ParseCommands(&event.Data);
@@ -560,7 +601,7 @@ namespace RootForce
 
 		if(RootServer::MatchAny(event.EventType, 2, "W", "WATER"))
 		{
-			m_waterSystem->ParseCommands(m_hud->GetChatSystem().get(), &event.Data);
+			m_waterSystem->ParseCommands(&event.Data);
 		}
 
 		if(RootServer::MatchAny(event.EventType, 2, "B", "BOTANY"))
@@ -584,7 +625,10 @@ namespace RootForce
 			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
 
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
-			MatchStateSystem::AwardPlayerKill(Network::ReservedUserID::NONE, g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player)->ID.UserID);
+			PlayerComponent* playerComp =  g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+			playerComp->Score --;
+			playerComp->Deaths ++;
+			g_world->GetEntityManager()->GetComponent<TDMRuleSet>(g_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playerComp->TeamID] --;
 
 			// Notify the server of our suicide.
 			NetworkMessage::Suicide m;
@@ -618,31 +662,64 @@ namespace RootForce
 		{
 			m_hud->SetValue("ShowScore", "false" );
 		}
-
-		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver())
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+			m_displayIngameMenu = !m_displayIngameMenu;
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
+		if(m_displayIngameMenu)
+		{
+			m_ingameMenu->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
+		}
+		else
+		{
+			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+			if (!m_sharedSystems.m_matchStateSystem->IsMatchOver())
+			{
+				PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+				HealthComponent* healthComponent = g_world->GetEntityManager()->GetComponent<HealthComponent>(player);
+				PlayerActionComponent* playerActionComponent = g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 
-			//Update all the data that is displayed in the HUD
-			m_hud->SetValue("Health", std::to_string(g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health) );
-			m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
-			m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-			m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) ); //TODO: Fix so that we read the player team instead of hardcoding it
-			m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
-			m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
-			m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
-			m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-			if(playerComponent->AbilityScripts[0].Cooldown > 0)
-				m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-			if(playerComponent->AbilityScripts[1].Cooldown > 0)
-				m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-			if(playerComponent->AbilityScripts[2].Cooldown > 0)
-				m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
-			m_hud->SetSelectedAbility(g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player)->SelectedAbility + 1);
+				//Update all the data that is displayed in the HUD
+				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
+				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
+				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
+				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				if(healthComponent && playerActionComponent)
+				{
+					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
+					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
+					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
+					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+					if(playerComponent->AbilityScripts[0].Cooldown > 0)
+						m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
+					if(playerComponent->AbilityScripts[1].Cooldown > 0)
+						m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
+					if(playerComponent->AbilityScripts[2].Cooldown > 0)
+						m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+					m_hud->SetSelectedAbility(playerActionComponent->SelectedAbility + 1);
+				}
+			}
 		}
 
 		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
 		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 	}
+
+	void IngameState::PrintGlobalCommandHelp()
+	{
+		//Print help functions for global commands
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[GLOBAL CONSOLE COMMANDS]");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/helpall - Print help for all subsystems and globals");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/so - Toggle profiler sorting");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/pr - Toggle profiler display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/pd - Toggle physics debug lines display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/nd - Toggle normal lines display");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/rs - Reload all scripts");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/kill	- Suicide");
+		g_engineContext.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/quit	- Disconnect from server");
+	}
+
 }

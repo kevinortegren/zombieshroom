@@ -40,20 +40,6 @@ a
   cursor: pointer;
   color: #000000;
 }
-@-webkit-keyframes blinker
-{  
-  0% { color: #ff0000;}
-  16% { color: #aaaa00;}
-  33% { color: #00ff00;}
-  50% { color: #00aaaa;}
-  66% { color: #0000ff;}
-  83% { color: #aa00aa;}
-  100% { color: #ff0000;}
-}
-.blink
-{
-  -webkit-animation: blinker 5s linear infinite alternate;
-}
 .textcenter
 {
   text-align: center;
@@ -66,9 +52,26 @@ a
 {
   float: left;
 }
+.textcenter
+{
+	text-align: center;
+}
+.textleft
+{
+	text-align: left;
+}
+.textright
+{
+	text-align: right;
+}
 .clear
 {
   clear: both;
+}
+.center
+{
+	margin-left: auto;
+	margin-right: auto;
 }
 .verticaltablehax
 {
@@ -330,4 +333,58 @@ a
 	background-size: contain;
 	background-position: center;
 	background-repeat: no-repeat;
+}
+#team-select-wrapper
+{
+	width: 1000px;
+	height: 650px;
+	margin: auto;
+	background-color: rgba(0,0,0,0.1);
+}
+#team-select-blue,
+#team-select-red
+{
+	width: 491px;
+	height: 350px;
+	margin: 6px;
+}
+#team-select-blue,
+#team-select-red,
+#team-select-spectate
+{
+	text-align: center;
+	font-size: 36px;
+	opacity: 0.6;
+	overflow: auto;
+}
+#team-select-blue thead,
+#team-select-red thead,
+#team-select-spectate thead
+{
+	font-size: 36px;
+}
+#team-select-blue:hover,
+#team-select-red:hover,
+#team-select-spectate:hover
+{
+	opacity: 1;
+}
+#team-select-red
+{
+	float: left;
+	margin-right: 0;
+	background-color: rgba(255,0,0,0.5);
+}
+#team-select-blue
+{
+	float: right;
+	background-color: rgba(0,0,255,0.5);
+}
+#team-select-spectate
+{
+	background-color: rgba(127,127,127,0.5);
+	width: 500px;
+	height: 160px;
+	margin: 0 auto 12px auto;
+	clear: both;
 }

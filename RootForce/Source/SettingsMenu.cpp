@@ -80,8 +80,8 @@ namespace RootForce
 				m_shouldUpdate = true;
 			}
 			m_context.m_configManager->SetConfigValue(
-				Awesomium::ToString(keys[i].ToString()),
-				Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString())
+				RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(keys[i].ToString())),
+				RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()))
 			);
 		}
 

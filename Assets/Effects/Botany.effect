@@ -26,7 +26,32 @@
             - name: vert_pos
             - name: vert_normal
             - name: vert_density
-     
+         
+    - name: Botany_Update_Flipped
+      bindings:
+        - name: PerTech
+          slot: 3
+      textures:
+        - name: g_Density
+          slot: 6
+      flags:
+        - name: RenderIgnore
+      programs:
+        - name: Botany_Update
+          shaders:
+            - name: botany_update_flipped
+              type: vertex
+            - name: botany_update
+              type: tess_control
+            - name: botany_update
+              type: tess_evaluation
+            - name: botany_update
+              type: geometry
+          feedback:
+            - name: vert_pos
+            - name: vert_normal
+            - name: vert_density
+            
     # Render technique.
     - name: Botany_Render
       bindings:

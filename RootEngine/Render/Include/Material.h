@@ -7,13 +7,15 @@ namespace Render
 {
 	struct Material
 	{
-		Material(int p_id) : m_id(p_id), m_effect(nullptr), m_tileFactor(0) {}
+		Material(int p_id) : m_id(p_id), m_effect(nullptr), m_tileFactor(0), m_flipped(false) {}
 
 		// ID.
 		int m_id;
 
 		// Material Data.
 		float m_tileFactor;
+
+		bool m_flipped;
 
 		// Effect.
 		Render::EffectInterface* m_effect;
