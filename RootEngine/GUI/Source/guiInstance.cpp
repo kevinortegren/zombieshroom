@@ -126,10 +126,8 @@ namespace RootEngine
 
 		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
 		{
-			SDL_GLContext tmp = SDL_GL_GetCurrentContext();
-			GLuint texture = p_surface->GetTexture();
 			if(p_surface)
-				glBindTexture(GL_TEXTURE_2D, texture);
+				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
