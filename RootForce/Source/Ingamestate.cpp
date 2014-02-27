@@ -215,6 +215,9 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
+		m_sharedSystems.m_matchStateSystem->SetHUD(m_hud.get());
+		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
+
 		// Reset the ingame menu before we start the match
 		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
