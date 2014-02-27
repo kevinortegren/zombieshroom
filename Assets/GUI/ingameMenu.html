@@ -11,6 +11,7 @@
 		<div id="ingame-menu" class="verticaltablehax"><div class="verticalcenterhax">
 			<div id="ingame-wrapper">
 				<input id="ingame-return" type="submit" class="ingame-button" value="Return" />
+				<input id="ingame-change-team" type="submit" class="ingame-button" value="Change team" />
 				<input id="ingame-settings" type="submit" class="ingame-button" value="Settings" />
 				<input id="ingame-exit" type="submit" class="ingame-button" value="Exit" />
 			</div>
@@ -49,16 +50,47 @@
 						<option value="1366x768">1366x768</option>
 						<option value="1024x768">1024x768</option>
 				</select></div>
-				<input id="graphics-settings-back" type="submit" class="button" value="Back" />
-				<input id="graphics-settings-save" type="submit" class="button floatright" value="Save" /></div>
+				<div>
+					<input id="graphics-settings-back" type="submit" class="button" value="Back" />
+					<input id="graphics-settings-save" type="submit" class="button floatright" value="Save" />
+				</div>
 			</div>
 		</div></div>
 		
 		<div id="controls-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
 			<div id="controls-settings-wrapper" class="windowbackground">
 				<h1 class="textcenter">Keybinding settings</h1>
-				<input id="controls-settings-back" type="submit" class="button" value="Back" />
-				<input id="controls-settings-save" type="submit" class="button floatright" value="Save" /></div>
+				<div>
+					<input id="controls-settings-back" type="submit" class="button" value="Back" />
+					<input id="controls-settings-save" type="submit" class="button floatright" value="Save" />
+				</div>
+			</div>
+		</div></div>
+		
+		<div id="team-select" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
+			<div id="team-select-wrapper">
+				<h1 class="textcenter">Select team</h1>
+				<div id="team-select-red">
+					<table id="RedScoreTable" class="scoretable center">
+						<thead><tr><td style="width:200px;overflow:hidden;" class="textleft" id="RedTitle">Socialists</td><td><img src="Swordaxe.png" style="height: 75%;"/></td><td><img src="RIP.png" style="height: 75%;"/></td></tr></thead>
+						<tr><td class="textright">asd</td><td class="textcenter">1</td><td class="textcenter">11</td></tr>
+					</table>
+				</div>
+				<div id="team-select-blue">
+					<table id="BlueScoreTable" class="scoretable center">
+						<thead><tr><td style="width:200px;overflow:hidden;" class="textleft" id="BlueTitle">Capitalists</td><td><img src="Swordaxe.png" style="height: 75%;"/></td><td><img src="RIP.png" style="height: 75%;"/></td></tr></thead>
+						<tr><td class="textright">asdasd</td><td class="textcenter">12</td><td class="textcenter">1</td></tr>
+					</table>
+				</div>
+				<div id="team-select-spectate">
+					<table id="SpectatorTable" class="scoretable center">
+						<thead><tr><td style="width:200px;overflow:hidden;" class="textleft" id="SpectatorTitle">Anarchists</td></tr></thead>
+						<tr><td class="textcenter">ghost</td></tr>
+					</table>
+				</div>
+				<div class="clear textcenter">
+					<input id="team-select-back" type="submit" class="button" value="Back" />
+				</div>
 			</div>
 		</div></div>
 		

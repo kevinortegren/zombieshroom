@@ -72,6 +72,7 @@ namespace RootForce
 				TimeUp,
 				AbilitySpawn,
 				Death,
+				PlayerTeamSelect,
 			};
 		}
 
@@ -100,6 +101,7 @@ namespace RootForce
 			Network::UserID_t User;
 			bool IsYou;
 			RakNet::RakString Name;
+			uint8_t TeamID;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -383,6 +385,13 @@ namespace RootForce
 		struct Death
 		{
 			Network::UserID_t User;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+		struct PlayerTeamSelect
+		{
+			Network::NetworkEntityID UserID;
+			uint8_t TeamID;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

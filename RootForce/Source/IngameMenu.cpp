@@ -1,4 +1,12 @@
 #include "IngameMenu.h"
+#include <Utility/ECS/Include/World.h>
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Script/Include/RootScript.h>
+#include <RakNet/GetTime.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
+
+extern RootEngine::GameSharedContext g_engineContext;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -14,6 +22,7 @@ namespace RootForce
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &IngameMenu::Exit));
 		m_view->RegisterJSCallback("Return", JSDelegate1(this, &IngameMenu::Return));
+		m_view->RegisterJSCallback("SelectTeam", JSDelegate1(this, &IngameMenu::ChangeTeam));
 
 		m_settingsMenu->BindEvents(m_view);
 		m_view->Focus();
@@ -33,6 +42,13 @@ namespace RootForce
 	{
 		m_exit = true;
 	}
+	void IngameMenu::ChangeTeam(const Awesomium::JSArray& p_array)
+	{
+		if(p_array[0].IsInteger())
+		{
+			m_changeTeam = p_array[0].ToInteger();
+		}
+	}
 
 	void IngameMenu::Reset()
 	{
@@ -43,6 +59,36 @@ namespace RootForce
 	void IngameMenu::Update()
 	{
 		m_settingsMenu->Update();
+
+		if(m_changeTeam >= 0)
+		{
+			if(m_clientPeer != nullptr)
+			{
+				Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(g_world->GetTagManager()->GetEntityByTag("Player"));
+				RootForce::NetworkMessage::PlayerTeamSelect m;
+				m.TeamID = m_changeTeam;
+				m.UserID = network->ID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
+
+			m_return = true;
+			m_changeTeam = -1;
+		}
+	}
+
+	void IngameMenu::SetScoreList(std::string p_score)
+	{
+		ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
+		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+
+		m_view->BufferJavascript("UpdateScoreScreen(" + std::to_string(playerComponent->TeamID) + ",'" + RootEngine::GUISystem::PreventHTMLInjections(playerComponent->Name) + "'," + p_score + ");");
 	}
 
 }

@@ -34,6 +34,7 @@
             slot: 18
       flags:
           - name: Forward
+          - name: Refractive
       programs:
         - name: Mesh
           shaders:

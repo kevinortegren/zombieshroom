@@ -119,7 +119,10 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entity);
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(entity);
 
-		bool onGround =  g_engineContext.m_physics->IsOnGround(*collision->m_handle);
+		if(!controller || !action || !health || !playerComponent || !transform || !aimingDeviceTransform || !network || !collision)
+			return;
+
+		bool onGround = g_engineContext.m_physics->IsOnGround(*collision->m_handle);
 		float power = 0;
 		action->MovePower = 0;
 		action->StrafePower = 0;

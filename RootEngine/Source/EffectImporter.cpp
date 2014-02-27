@@ -355,6 +355,10 @@ namespace RootEngine
 					{
 						technique->m_flags |= Render::TechniqueFlags::RENDER_SHADOW;
 					}
+					if(name == "Refractive")
+					{
+						technique->m_flags |= Render::TechniqueFlags::REFRACTIVE;
+					}
 				}
 			}
 			else
