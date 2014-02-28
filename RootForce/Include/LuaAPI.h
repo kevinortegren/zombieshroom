@@ -2063,13 +2063,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HomingComponent>(*e);
 			(*s)->Controllability = (float)luaL_checknumber(p_luaState, 2);
 			(*s)->Speed = (float)luaL_checknumber(p_luaState, 3);
-			luaL_setmetatable(p_luaState, "Homing");
+			luaL_setmetatable(p_luaState, "HomingComponent");
 			return 1;
 		}
 		static int HomingSetTargetEntity(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
 			(*s)->TargetPlayer = *e;
 			return 0;
@@ -2077,7 +2077,7 @@ namespace RootForce
 		static int HomingSetTargetPosition(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent** ptemp = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
+			RootForce::HomingComponent** ptemp = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
 			(*ptemp)->TargetPosition = (*v1);
 			return 0;
@@ -2869,7 +2869,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f, RootForce::LuaAPI::tdmruleset_m, "TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f, RootForce::LuaAPI::particlecomponent_m, "ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f, RootForce::LuaAPI::followercomponent_m, "Follower");
-			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f, RootForce::LuaAPI::homingcomponent_m, "Homing");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f, RootForce::LuaAPI::homingcomponent_m, "HomingComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::raycomponent_f, RootForce::LuaAPI::raycomponent_m, "Ray");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f, RootForce::LuaAPI::watercollider_m, "WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f, RootForce::LuaAPI::soundable_m, "Soundable");
