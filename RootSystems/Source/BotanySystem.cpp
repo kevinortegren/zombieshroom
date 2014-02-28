@@ -16,7 +16,7 @@ namespace RootForce
 		m_renderUniforms.m_lod2Distance = 60.0f;
 		m_renderUniforms.m_grassAmbient = m_grassAmbient;
 
-		m_updateUniforms.m_grassFactor = 6.0f;
+		m_updateUniforms.m_grassFactor = 4.0f;
 
 
 		// Load effect.
