@@ -350,7 +350,7 @@ namespace RootForce
 							glm::vec3 displacement = m.Position - playerTransform->m_position;
 								
 							// Check if the displacement has the same sign as the local velocity.
-							if (displacement.y * verticalVelocity >= 0.0f)
+							//if (displacement.y * verticalVelocity >= 0.0f)
 								playerTransform->m_position.y = m.Position.y;
 							playerTransform->m_position.x = m.Position.x;
 							playerTransform->m_position.z = m.Position.z;
@@ -1343,7 +1343,7 @@ namespace RootForce
 								glm::vec3 displacement = m.Position - playerTransform->m_position;
 								
 								// Check if the displacement has the same sign as the local velocity.
-								if (displacement.y * verticalVelocity >= 0.0f)
+								//if (displacement.y * verticalVelocity >= 0.0f)
 									playerTransform->m_position.y = m.Position.y;
 								playerTransform->m_position.x = m.Position.x;
 								playerTransform->m_position.z = m.Position.z;
