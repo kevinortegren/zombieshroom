@@ -175,16 +175,15 @@ namespace RootForce
 
 #ifndef _DEBUG
 		BotanyTextures textures;
-		textures.m_diffuse = "ugotaflatgrass2";
-		textures.m_translucency = "grass_translucency";
-		textures.m_billboard = "grass_billboard";
-		textures.m_terrainTexture = "grass";
+		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
+		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
+		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
 
 		// Subdivide terrain for grass chunk rendering.
 		m_botanySystem->Initialize(textures, 0.0f);
 
 		// Subdivide world.
-		m_sharedSystems.m_worldSystem->SubdivideTree();
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 
 		// Lock the mouse
