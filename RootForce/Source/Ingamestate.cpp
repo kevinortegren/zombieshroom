@@ -179,8 +179,12 @@ namespace RootForce
 		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
 		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
 
-		// Subdivide terrain for grass chunk rendering.
-		m_botanySystem->Initialize(textures, 0.0f);
+		if(textures.m_diffuse != "")
+		{
+			// Subdivide terrain for grass chunk rendering.
+			m_botanySystem->Initialize(textures, 0.0f);
+		}
+
 
 		// Subdivide world.
 		//m_sharedSystems.m_worldSystem->SubdivideTree();
