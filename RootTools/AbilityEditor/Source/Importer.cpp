@@ -333,6 +333,10 @@ namespace AbilityEditorNameSpace
 				}
 				if(p_node.FindValue("PhysicsCollide"))
 					p_node["PhysicsCollide"] >> tempcomp->m_collide;
+				if(p_node.FindValue("PhysicsCollideStatic"))
+					p_node["PhysicsCollideStatic"] >> tempcomp->m_colWStatic;
+				if(p_node.FindValue("PhysicsExternally"))
+					p_node["PhysicsExternally"] >> tempcomp->m_externally;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
@@ -374,6 +378,15 @@ namespace AbilityEditorNameSpace
 					p_node["SoundRangeMax"] >> tempcomp->m_rangeMax;
 				if(p_node.FindValue("SoundLoop"))
 					p_node["SoundLoop"] >> tempcomp->m_loop;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::FOLLOW:
+			{
+				AbilityComponents::Follow* tempcomp = new AbilityComponents::Follow();
+				if(p_node.FindValue("FollowOffset"))
+					p_node["FollowOffset"] >> tempcomp->m_offset;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

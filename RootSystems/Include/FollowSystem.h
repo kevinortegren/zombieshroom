@@ -5,15 +5,17 @@
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 namespace RootForce
 {
 	struct FollowComponent : public ECS::Component<FollowComponent>
 	{
-		ECS::Entity* Target;
+		//ECS::Entity* Target;
+		Network::NetworkEntityID TargetID;
 		float Offset;
 		FollowComponent()
-			: Target(nullptr),
+			: TargetID(),
 			  Offset(0.0f)
 		{}
 	};

@@ -36,5 +36,5 @@
   ORBITRADIUS: 0.0
   TEMPLATE: 0
   TEXTURE: Leaf
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAlphaBlend
   NAME: LeafDarkGreen

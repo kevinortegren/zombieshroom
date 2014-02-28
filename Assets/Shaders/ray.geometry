@@ -1,0 +1,44 @@
+#version 400
+#extension GL_EXT_geometry_shader4 : enable  
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+layout(std140) uniform PerFrame
+{
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+};
+
+layout(std140) uniform PerObject
+{
+	mat4 modelMatrix;
+	vec4 endPosition;
+};
+
+out vec2 texCoord;
+
+void main() 
+{
+	vec3 directionFromFirstPointToCameraPosition = -normalize(gl_in[0].gl_Position.xyz);
+	vec3 viewSpaceEndPosition = (viewMatrix * vec4(endPosition.xyz, 1.0)).xyz;
+	vec3 rayDirection = normalize(viewSpaceEndPosition - gl_in[0].gl_Position.xyz);
+	vec3 lateralAxis = normalize(cross(directionFromFirstPointToCameraPosition, rayDirection));
+
+	float rayLength = length(viewSpaceEndPosition - gl_in[0].gl_Position.xyz);
+
+	float rayWidth = 1.0;
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + rayWidth * vec4(lateralAxis, 0.0));
+	texCoord = vec2(0.0, 0.0);
+	EmitVertex();
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position - rayWidth * vec4(lateralAxis, 0.0));
+	texCoord = vec2(0.0, 1.0);
+	EmitVertex();
+	gl_Position = projectionMatrix * (vec4(viewSpaceEndPosition, 1.0) + rayWidth * vec4(lateralAxis, 0.0));
+	texCoord = vec2(rayLength/10, 0.0);
+	EmitVertex();
+	gl_Position = projectionMatrix * (vec4(viewSpaceEndPosition, 1.0) - rayWidth * vec4(lateralAxis, 0.0));
+	texCoord = vec2(rayLength/10, 1.0);
+	EmitVertex();
+	EndPrimitive();
+}

@@ -37,6 +37,9 @@ namespace RootForce
 			SOUND,
 			TIMER,
 			FOLLOW,
+			HOMING,
+			RAY,
+			DAMAGEANDKNOCKBACK,
 		};
 	}
 }

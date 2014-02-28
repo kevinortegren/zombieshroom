@@ -39,7 +39,6 @@ function FireBall.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
-		local renderComp = Renderable.New(self);
 		local particleComp = ParticleEmitter.New(self, "fireball");
 	end
 end

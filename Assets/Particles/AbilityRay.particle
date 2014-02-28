@@ -16,5 +16,5 @@
   ORBITRADIUS: 0.8
   TEMPLATE: 0
   TEXTURE: Sparkle
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: AbilitySpawn

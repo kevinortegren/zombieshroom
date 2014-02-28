@@ -13,10 +13,10 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV1.9.mb</source_data>
+      <source_data>file:///C:/ZombieShroom/LevelEditor/Assets/Levels/Maya%20Source%20Files/TortugaCoveV2.0.mb</source_data>
     </contributor>
-    <created>2014-02-21T15:44:22</created>
-    <modified>2014-02-21T15:44:22</modified>
+    <created>2014-02-28T11:57:09</created>
+    <modified>2014-02-28T11:57:09</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
@@ -169,13 +169,13 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="TortugaCoveV1.9">
+    <visual_scene id="VisualSceneNode" name="TortugaCoveV2.0">
       <node id="Stone9" name="Stone9" type="NODE">
-        <translate sid="translate">96.12577 -7.751926 25.35408</translate>
+        <translate sid="translate">76.90305 -6.201737 20.28391</translate>
         <rotate sid="rotateZ">0 0 1 42.41757</rotate>
         <rotate sid="rotateY">0 1 0 0</rotate>
         <rotate sid="rotateX">1 0 0 0</rotate>
-        <scale sid="scale">5.092105 5.092105 5.092105</scale>
+        <scale sid="scale">4.073813 4.073813 4.073813</scale>
         <instance_geometry url="#Stone9Shape">
           <bind_material>
             <technique_common>

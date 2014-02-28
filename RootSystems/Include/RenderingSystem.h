@@ -6,9 +6,6 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
 
-#include <RootEngine/Include/GameSharedContext.h>
-extern RootEngine::GameSharedContext g_engineContext;
-
 namespace RootForce
 {
 	namespace RenderPass

@@ -38,6 +38,9 @@ namespace RootForce
 			RootForce::SoundComponent::SetTypeId(RootForce::ComponentType::SOUND);
 			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
 			RootForce::FollowComponent::SetTypeId(RootForce::ComponentType::FOLLOW);
+			RootForce::HomingComponent::SetTypeId(RootForce::ComponentType::HOMING);
+			RootForce::RayComponent::SetTypeId(RootForce::ComponentType::RAY);
+			RootForce::DamageAndKnockback::SetTypeId(RootForce::ComponentType::DAMAGEANDKNOCKBACK);
 		}
 
 		void InitializeServerComponents()
