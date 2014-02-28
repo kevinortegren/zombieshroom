@@ -488,7 +488,7 @@ namespace RootForce
 								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeStart received from user %d", m.User);
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
 							}
 							else
 							{
@@ -532,7 +532,7 @@ namespace RootForce
 								action->AbilityTime = m.Time;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeDone received from user %d", m.User);
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
 							}
 							else
 							{
@@ -571,12 +571,20 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
-								playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+								if (playerComponent->AbilityState == AbilityState::START_CHANNELING 
+								 || playerComponent->AbilityState == AbilityState::CHARGING 
+								 || playerComponent->AbilityState == AbilityState::START_CHARGING)
+									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+								else
+									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
 								action->ActionID = m.Action;
 								action->AbilityTime = m.Time;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChannelingDone received from user %d", m.User);
+								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
+									g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u, Action: %u) (stop charging as well)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
+								else
+									g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
 							}
 							else
 							{
@@ -620,7 +628,7 @@ namespace RootForce
 								action->AbilityTime = m.Time;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityChargeAndChannelingDone received from user %d", m.User);
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
 							}
 							else
 							{
@@ -1721,7 +1729,9 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
-								if (playerComponent->AbilityState == AbilityState::START_CHANNELING || playerComponent->AbilityState == AbilityState::CHARGING)
+								if (playerComponent->AbilityState == AbilityState::START_CHANNELING 
+								 || playerComponent->AbilityState == AbilityState::CHARGING 
+								 || playerComponent->AbilityState == AbilityState::START_CHARGING)
 									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
 								else
 									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
