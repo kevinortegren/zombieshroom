@@ -55,6 +55,7 @@ namespace RootForce
 		// Bind c++ functions and members to Lua.
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
+		//Do not add scripts for abilities that are included in the abilitypacks. They will be loaded automatically
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
@@ -62,7 +63,6 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
 		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
-		g_engineContext.m_resourceManager->LoadScript("RefractiveBall");
 
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
