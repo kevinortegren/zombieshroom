@@ -35,7 +35,7 @@ const int g_maxPaintTextures = 10;
 const int g_maxMegaMeshes = 2;
 const int g_maxVerticesPerMegaMesh = 100000;
 
-const string g_GrassDiffuse = "grassStraw";
+const string g_GrassDiffuse = "Grass";
 const string g_GrassTranslucency = "grass_translucency";
 const string g_GrassBillboard = "grassStrawBillboard";
 const float g_Ambient = 0.0f;
