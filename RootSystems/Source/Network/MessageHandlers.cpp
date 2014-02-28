@@ -1068,37 +1068,49 @@ namespace RootForce
 				} return true;
 
 				case NetworkMessage::MessageType::Death:
+				{
+					NetworkMessage::Death m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+					if(player)
 					{
-						NetworkMessage::Death m;
-						m.Serialize(false, p_bs);
+						RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(player);
+						assert(health);
+						health->Health = 0;
+						health->IsDead = true;
+						health->RespawnDelay = 3.0f;
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
+					}
 
-						ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-						if(player)
-						{
-							RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(player);
-							assert(health);
-							health->Health = 0;
-							health->IsDead = true;
-							health->RespawnDelay = 3.0f;
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
-						}
-
-					} return true;
+				} return true;
 				case NetworkMessage::MessageType::PlayerTeamSelect:
+				{
+					NetworkMessage::PlayerTeamSelect m;
+					m.Serialize(false, p_bs);
+						
+					// Make sure we are in the correct state.
+					if (clientComponent->State == ClientState::CONNECTED)
 					{
-						NetworkMessage::PlayerTeamSelect m;
-						m.Serialize(false, p_bs);
 
 						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
 
 						// Call the OnCreate script
-						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-						g_engineContext.m_script->AddParameterNumber(m.TeamID);
-						g_engineContext.m_script->ExecuteScript();
+						if(player)
+						{
+							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+							g_engineContext.m_script->AddParameterNumber(m.TeamID);
+							g_engineContext.m_script->ExecuteScript();
+						}
+					}
+					else
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "PlayerTeamSelect received in an invalid state (%d).", clientComponent->State);
+					}
 
 
-					} return true;
+				} return true;
 			}
 
 			return false;
