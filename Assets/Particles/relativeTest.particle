@@ -1,0 +1,20 @@
+- POSITION: [0, 1.82, 0]
+  LIFETIMEMIN: 2
+  LIFETIMEMAX: 2
+  SPEEDMIN: 1
+  SPEEDMAX: 1
+  SIZEMIN: [0.5, 0.5]
+  SIZEMAX: [0.5, 0.5]
+  SIZEEND: [0, 0]
+  COLOR: [1, 0, 0, 1]
+  COLOREND: [0, 0, 0, 0]
+  GRAVITY: [0, 0, 0]
+  DIRECTION: [0, 0, 0]
+  SPREAD: 0
+  SPAWNTIME: 0.1
+  ORBITSPEED: 1
+  ORBITRADIUS: 0.5
+  TEMPLATE: 2
+  TEXTURE: smoke
+  EFFECT: Particle/ParticleAdditiveRelative
+  NAME: asD

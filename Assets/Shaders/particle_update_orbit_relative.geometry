@@ -29,6 +29,8 @@ layout(std140) uniform PerObject
 	vec4 	g_colorEnd;
 	vec3	g_transPos;
 	float	g_spawnTime;
+	float	g_orbitSpeed;
+	float	g_orbitRadius;
 };
 
 in vec3 vert_initialVel[];
@@ -39,7 +41,6 @@ in vec4 vert_color[];
 in vec3 vert_accel[];
 in float vert_rotation[];
 
-
 // Transform feedback values.
 out vec3 vert_initialPos1;
 out vec3 vert_initialVel1;
@@ -49,7 +50,6 @@ out float vert_type1;
 out vec4 vert_color1;
 out vec3 vert_accel1;
 out float vert_rotation1;
-
 
 
 vec3 GetRandomDir(float TexCoord)
@@ -76,7 +76,11 @@ void main()
 		if(lifeTime <= 0.0f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 	= g_Position;
+
+			float cs = cos(g_time*g_orbitSpeed) * g_orbitRadius;
+			float ss = sin(g_time*g_orbitSpeed) * g_orbitRadius;
+			
+			vert_initialPos1 	= vec3(cs,0,ss) + g_Position;
 
 			if(g_direction == vec3(0,0,0))
 			{

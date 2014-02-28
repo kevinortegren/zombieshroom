@@ -74,6 +74,7 @@ private:
 	void ResetTemplates();
 	float GetDragOffset(float p_pointOnAxis, float p_pointOfEmitter);
 	PointOnPlane GetPointOnPlane(glm::vec3 p_camPos, glm::vec3 p_worldCamPos, glm::vec3 p_rayDir);
+	bool CalculateMaxParticles();
 	
 	QMessageBox::StandardButton SaveWarningDialog();
 

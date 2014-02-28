@@ -184,6 +184,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 
 	cameraThirdPerson->m_targetTag = "AimingDevice";
 	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraThirdPerson->m_distance = 10.0f;
 
 	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
 	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
