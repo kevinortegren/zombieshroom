@@ -15,22 +15,22 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(12);
@@ -40,15 +40,15 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
