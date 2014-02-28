@@ -2805,12 +2805,14 @@ namespace RootForce
 
 		static const struct luaL_Reg damageandknockback_f [] = {
 			{"New", DamageAndKnockbackCreate},
-			{"GetDamage", DamageAndKnockbackGetDamage},
-			{"GetKnockback", DamageAndKnockbackGetKnockback},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg damageandknockback_m [] = {
+			{"GetDamage", DamageAndKnockbackGetDamage},
+			{"GetKnockback", DamageAndKnockbackGetKnockback},
+			{"SetDamage", DamageAndKnockbackSetDamage},
+			{"SetKnockback", DamageAndKnockbackSetKnockback},
 			{NULL, NULL}
 		};
 

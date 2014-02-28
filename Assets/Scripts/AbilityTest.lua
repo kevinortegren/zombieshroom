@@ -90,6 +90,7 @@ function AbilityTest.OnCollide (self, entity)
 				local receiverId = network:GetUserId();
 				health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
 			end
+			AbilityTest.OnDestroy(self);
 		end
 		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
 			local hitPos = entity:GetTransformation():GetPos();
