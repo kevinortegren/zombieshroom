@@ -4,8 +4,8 @@ RefractiveBall.knockback = 40;
 RefractiveBall.cooldown = 3;
 RefractiveBall.charges = 0;
 RefractiveBall.chargeTime = 0;
-RefractiveBall.channelingTime = 0;
-RefractiveBall.duration = 10;
+RefractiveBall.channelingTime = 5;
+RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
 
 function RefractiveBall.ChargeDone (time, userId, actionId)
@@ -13,6 +13,7 @@ function RefractiveBall.ChargeDone (time, userId, actionId)
 end
 
 function RefractiveBall.ChannelingDone (time, userId, actionId)
+	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
 end
 
 function RefractiveBall.OnCreate (userId, actionId)
@@ -26,14 +27,14 @@ function RefractiveBall.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "RefractiveBall");
-	local timerComp = Timer.New(self, RefractiveBall.duration);
+	--local timerComp = Timer.New(self, RefractiveBall.duration);
 	Follower.New(self, casterEnt, 0);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	
-	physicsComp:BindSphereShape(collisionComp, tempPos, Quat.New(0,0,0,1), 5.0, 1, true, false);
+	physicsComp:BindSphereShape(collisionComp, tempPos, Quat.New(0,0,0,1), 5.0, 10000, true, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(0, 0, 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(tempPos);

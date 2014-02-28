@@ -1393,7 +1393,7 @@ namespace Physics
 			p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		if(!p_collidesWithStatic)
 		{
-			m_dynamicWorld->addRigidBody(p_body, 1, -3); //DO NOT QUESTION WHY THIS WORKS
+			m_dynamicWorld->addRigidBody(p_body, 1, -35); //DO NOT QUESTION WHY THIS WORKS
 		}
 		else
 		{
