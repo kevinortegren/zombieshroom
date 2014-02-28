@@ -657,6 +657,7 @@ namespace RootForce
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
+					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
