@@ -130,6 +130,12 @@ namespace Render
 					}
 				}
 
+				for(auto texture = (*itr)->m_textures.begin(); texture != (*itr)->m_textures.end(); ++texture)
+				{
+					if((*texture).second != nullptr)
+						(*texture).second->Bind(6); //hard-coded! :(
+				}
+
 				(*itr)->m_mesh->Bind();
 
 				for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
