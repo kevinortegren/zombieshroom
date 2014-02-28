@@ -285,13 +285,14 @@ namespace RootForce
 			PROFILE("GUI", g_engineContext.m_profiler);
 
 			g_engineContext.m_gui->Update();
+			//Update Menu to make sure Setting changes are made in the main thread
+			m_ingameMenu->Update();
 			if (m_displayIngameMenu)
 			{
 				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
 				m_ingameMenu->GetView()->Focus();
 
-				//Update Menu to make sure Setting changes are made in the main thread
-				m_ingameMenu->Update();
+				
 			}
 			else
 			{
