@@ -27,8 +27,9 @@ namespace Render
 		m_fullscreenQuad = p_fullscreenQuad;
 
 		// Load unit sphere mesh.
-		//m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
-
+#ifndef COMPILE_LEVEL_EDITOR
+		m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
+#endif
 		// TODO: Init triangle.
 
 		// Light uniforms.
@@ -178,7 +179,12 @@ namespace Render
 	{
 		if(m_showPointlights)
 		{
+#ifndef COMPILE_LEVEL_EDITOR
+			PointLightStencil();
+			PointLightRender();
+#else
 			PointLightFSQ();
+#endif
 		}
 	}
 
