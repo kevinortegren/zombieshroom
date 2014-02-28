@@ -1850,6 +1850,13 @@ namespace RootForce
 			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
+		static int PlayerActionSetWantRespawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			(*s)->WantRespawn = 0 != lua_toboolean(p_luaState, 2);
+			return 0;
+		}
 		static int PlayerActionGetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1892,6 +1899,13 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
 			lua_pushnumber(p_luaState, (*s)->SelectedAbility);
+			return 1;
+		}
+		static int PlayerActionGetWantRespawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			lua_pushboolean(p_luaState, (*s)->WantRespawn);
 			return 1;
 		}
 		
@@ -2595,12 +2609,14 @@ namespace RootForce
 			{"SetAngle", PlayerActionSetAngle},
 			{"SetAbilityTime", PlayerActionSetAbilityTime},
 			{"SelectAbility", PlayerActionSelectAbility},
+			{"SetWantRespawn", PlayerActionSetWantRespawn},
 			{"GetJumpTime", PlayerActionGetJumpTime},
 			{"GetMovePower", PlayerActionGetMovePower},
 			{"GetStrafePower", PlayerActionGetStrafePower},
 			{"GetAngle", PlayerActionGetAngle},
 			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
+			{"GetWantRespawn", PlayerActionGetWantRespawn},
 			{NULL, NULL}
 		};
 
