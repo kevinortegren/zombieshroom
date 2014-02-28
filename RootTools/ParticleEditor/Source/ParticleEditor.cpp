@@ -330,7 +330,7 @@ void ParticleEditor::NewEmitter()
 	//Set default data 
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_renderer->CreateMaterial("particle" + std::to_string(m_materialIndex++));
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position		= glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin	= 2.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax	= 2.0f;
@@ -1046,7 +1046,7 @@ void ParticleEditor::TemplateChanged( int p_val )
 	if(p_val == 0)
 	{
 		ResetTemplates();
-		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/Particle");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
 	}
 	else if(p_val == 1)

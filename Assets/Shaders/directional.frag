@@ -208,7 +208,7 @@ void main() {
     float transFactor = clamp(EdotL * LdotN, 0.0, 1.0) * translucency;
     float diffuseFactor = max(0.0, dot( normalize( vert_lightVec ), normal ));
     
-	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
+	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
 	vec3 diffuse_color = clamp(diffuseFactor + transFactor, 0.0, 1.0) * diffuse * ex_Light.Color.xyz;
 
 	out_Color = vec4(diffuse_color + spec_color, 1.0);

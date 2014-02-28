@@ -13,7 +13,7 @@ CustomListWidget::CustomListWidget( QWidget* parent /*= 0*/ ) : QListWidget(pare
 void CustomListWidget::mousePressEvent( QMouseEvent* event )
 {
 	QListWidget::mousePressEvent(event);
-	if(event->button() == Qt::LeftButton && this->geometry().contains(event->pos()))
+	if(event->button() == Qt::LeftButton)// && this->geometry().contains(event->pos()))
 	{
 		if(currentItem() != nullptr && (currentItem() == this->itemAt(event->pos())))
 		{	

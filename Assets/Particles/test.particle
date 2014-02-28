@@ -13,5 +13,5 @@
   SPREAD: 1
   SPAWNTIME: 0.05
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: test

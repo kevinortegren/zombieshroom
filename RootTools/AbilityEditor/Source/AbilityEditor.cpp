@@ -17,8 +17,9 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
 	
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with enemy player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then"));
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with friendly player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then"));
+	m_conditions.push_back(new AbilityEditorNameSpace::Condition("Always", ""));
+	//m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with enemy player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then"));
+	//m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with friendly player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then"));
 }
 
 AbilityEditor::~AbilityEditor()

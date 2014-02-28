@@ -16,7 +16,7 @@
   ORBITRADIUS: 0.0
   TEMPLATE: 0
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: Fire
 - POSITION: [0, 2.4, 0]
   LIFETIMEMIN: 2
@@ -36,5 +36,5 @@
   ORBITRADIUS: 0.0
   TEMPLATE: 0
   TEXTURE: smoke
-  EFFECT: Particle/Particle
+  EFFECT: Particle/ParticleAdditive
   NAME: Smoke

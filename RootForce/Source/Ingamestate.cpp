@@ -46,6 +46,9 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(100000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -163,6 +166,14 @@ namespace RootForce
 		m_networkDebugSystem = new RootForce::Network::NetworkDebugSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::Network::NetworkDebugSystem>(m_networkDebugSystem);
 
+		// Initialize the homing system.
+		m_homingSystem = new RootForce::HomingSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::HomingSystem>(m_homingSystem);
+
+		// Initialize the ray system.
+		m_raySystem = new RootForce::RaySystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
+
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -239,6 +250,23 @@ namespace RootForce
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
+		//Ray stuff
+		g_engineContext.m_resourceManager->LoadEffect("Ray");
+		RootEngine::Model* rayModel = g_engineContext.m_resourceManager->CreateModel("rayModel");
+		
+		Render::Vertex1P rayVertices;
+		rayVertices.m_pos = glm::vec3(0.0f);
+		
+		// Create 1P mesh for shadows.
+		Render::MeshInterface* mesh1P = g_engineContext.m_renderer->CreateMesh();
+		mesh1P->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
+		mesh1P->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&rayVertices), 1);
+		mesh1P->SetPrimitiveType(GL_POINTS);
+
+		rayModel->m_meshes[0] = mesh1P;
+		
+		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
 		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
@@ -425,6 +453,16 @@ namespace RootForce
 		{
 			PROFILE("Follow system", g_engineContext.m_profiler);
 			m_followSystem->Process();
+		}
+
+		{
+			PROFILE("Homing system", g_engineContext.m_profiler);
+			m_homingSystem->Process();
+		}
+
+		{
+			PROFILE("Ray system", g_engineContext.m_profiler);
+			m_raySystem->Process();
 		}
 		
 		{

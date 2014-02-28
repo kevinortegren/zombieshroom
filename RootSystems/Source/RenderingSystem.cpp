@@ -1,6 +1,10 @@
 #include <RenderingSystem.h>
 #include <RootEngine/Render/Include/Renderer.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	Renderable::~Renderable()
@@ -29,19 +33,22 @@ namespace RootForce
 
 		if(!renderable->m_material)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no material", p_entity->GetId());
 			return;
 		}
 		if(renderable->m_material->m_effect == nullptr)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no effect", p_entity->GetId());
 			return;
 		}
 		if(renderable->m_model == nullptr)
 		{
-			m_logger->LogText(LogTag::GAME, LogLevel::MASS_DATA_PRINT, "Renderable of Entity %i has no model", p_entity->GetId());
+			m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Renderable of Entity %i has no model", p_entity->GetId());
 			return;
 		}
+
+
+		//m_matrices[p_entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_position);
 
 #ifdef COMPILE_LEVEL_EDITOR
 		transform->m_interpolatedPosition = transform->m_position;
@@ -70,7 +77,12 @@ namespace RootForce
 			sjob.m_technique = (Render::ShadowTechnique::ShadowTechnique)renderable->m_shadowTech;
 			sjob.m_mesh = renderable->m_model->m_meshes[1];
 			sjob.m_params = job.m_params;
-			
+
+			if(renderable->m_shadowTech == Render::ShadowTechnique::SHADOW_TRANSPARENT)
+			{
+				sjob.m_textures[Render::TextureSemantic::TextureSemantic::DIFFUSE] = renderable->m_material->m_textures[Render::TextureSemantic::TextureSemantic::DIFFUSE];
+			}
+
 			if(renderable->m_shadowTech == Render::ShadowTechnique::SHADOW_ANIMATED)
 			{
 				sjob.m_mesh = renderable->m_model->m_meshes[0];

@@ -238,6 +238,8 @@ namespace AbilityEditorNameSpace
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
 					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
+					p_emitter << YAML::Key << "PhysicsCollideStatic" << YAML::Value << physCon->m_colWStatic;
+					p_emitter << YAML::Key << "PhysicsExternally" << YAML::Value << physCon->m_externally;
 				}
 				break;
 			case AbilityComponents::ComponentType::CHARGEVARIABLES:
@@ -263,6 +265,12 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "SoundRangeMin" << YAML::Value << sound->m_rangeMin;
 					p_emitter << YAML::Key << "SoundRangeMax" << YAML::Value << sound->m_rangeMax;
 					p_emitter << YAML::Key << "SoundLoop" << YAML::Value << sound->m_loop;
+				}
+				break;
+			case AbilityComponents::ComponentType::FOLLOW:
+				{
+					AbilityComponents::Follow* follow = static_cast<AbilityComponents::Follow*>(p_component);
+					p_emitter << YAML::Key << "FollowOffset" << YAML::Value << follow->m_offset;
 				}
 				break;
 			default:

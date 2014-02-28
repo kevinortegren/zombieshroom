@@ -1,3 +1,6 @@
 AbilityDash
 AbilityBall
 FireBall
+PowerRay
+RefractiveBall
+IceCube

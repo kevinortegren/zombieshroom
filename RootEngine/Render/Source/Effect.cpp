@@ -157,7 +157,7 @@ namespace Render
 				break;
 			case BLEND_ADDITIVE:
 				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				break;
 			case BLEND_INV_ALPHA:
 				glEnable(GL_BLEND);

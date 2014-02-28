@@ -25,6 +25,8 @@
 #include <RootSystems/Include/SoundSystem.h>
 #include <RootSystems/Include/FollowSystem.h>
 #include <RootSystems/Include/BotanySystem.h>
+#include <RootSystems/Include/HomingSystem.h>
+#include <RootSystems/Include/RaySystem.h>
 #include <RootSystems/Include/TransformInterpolationSystem.h>
 #include <RootSystems/Include/Network/NetworkDebugSystem.h>
 
@@ -85,6 +87,8 @@ namespace RootForce
 		RootForce::BotanySystem*						m_botanySystem;
 		RootForce::TimerSystem*							m_timerSystem;
 		RootForce::FollowSystem*						m_followSystem;
+		RootForce::HomingSystem*						m_homingSystem;
+		RootForce::RaySystem*							m_raySystem;
         RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
 		RootForce::Network::NetworkDebugSystem*			m_networkDebugSystem;
 

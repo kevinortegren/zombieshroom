@@ -5,6 +5,9 @@
 #include <glm/gtx/transform.hpp>
 #include <RootSystems/Include/Shapes/OBB.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
