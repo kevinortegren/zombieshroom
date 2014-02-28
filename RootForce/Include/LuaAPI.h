@@ -167,6 +167,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Transformation");
 			return 1;
 		}
+		static int EntityRemoveTransformation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(*e);
+			return 0;
+		}
 
 		static int EntityGetRenderable(lua_State* p_luaState)
 		{
@@ -176,6 +183,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(*e);
 			luaL_setmetatable(p_luaState, "Renderable");
 			return 1;
+		}
+		static int EntityRemoveRenderable(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>(*e);
+			return 0;
 		}
 
 		static int EntityGetPhysics(lua_State* p_luaState)
@@ -188,6 +202,14 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityRemovePhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(*e);
+			return 0;
+		}
+
 		static int EntityGetCollision(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -198,6 +220,14 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityRemoveCollision(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Collision>(*e);
+			return 0;
+		}
+
 		static int EntityGetCollisionResponder(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -206,6 +236,14 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>(*e);
 			luaL_setmetatable(p_luaState, "CollisionResponder");
 			return 1;
+		}
+
+		static int EntityRemoveCollisionResponder(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::CollisionResponder>(*e);
+			return 0;
 		}
 
 		static int EntityGetNetwork(lua_State* p_luaState)
@@ -227,8 +265,15 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Health");
 			return 1;
 		}
+		static int EntityRemoveHealth(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::HealthComponent>(*e);
+			return 0;
+		}
 
-		static int GetPlayerComponent(lua_State* p_luaState)
+		static int EntityGetPlayerComponent(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
@@ -236,6 +281,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerComponent");
 			return 1;
+		}
+		static int EntityRemovePlayerComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerComponent>(*e);
+			return 0;
 		}
 
 		static int EntityGetPlayerPhysics(lua_State* p_luaState)
@@ -247,15 +299,6 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "PlayerPhysics");
 			return 1;
 		}
-		/*static int EntityGetPlayer(lua_State* p_luaState)
-		{
-			NumberOfArgs(1);
-			RootForce::PlayerComponent **s = (RootForce::PlayerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::PlayerComponent *));
-			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(*e);
-			luaL_setmetatable(p_luaState, "Player");
-			return 1;
-		}*/
 		static int EntityGetPlayerAction(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -264,6 +307,13 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(*e);
 			luaL_setmetatable(p_luaState, "PlayerAction");
 			return 1;
+		}
+		static int EntityRemovePlayerAction(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerActionComponent>(*e);
+			return 0;
 		}
 		static int EntityGetAnimation(lua_State* p_luaState)
 		{
@@ -300,6 +350,62 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::DamageAndKnockback>(*e);
 			luaL_setmetatable(p_luaState, "DamageAndKnockback");
 			return 1;
+		}
+		static int EntityRemoveTryPickupComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::TryPickupComponent>(*e);
+			return 0;
+		}
+		static int EntityRemovePlayerPhysics(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerPhysics>(*e);
+			return 0;
+		}
+		static int EntityRemoveScript(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Script>(*e);
+			return 0;
+		}
+		static int EntityRemoveAnimation(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Animation>(*e);
+			return 0;
+		}
+		static int EntityRemoveRagdoll(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::Ragdoll>(*e);
+			return 0;
+		}
+		static int EntityRemoveStateComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::StateComponent>(*e);
+			return 0;
+		}
+		static int EntityRemovePlayerControl(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PlayerControl>(*e);
+			return 0;
+		}
+		static int EntityRemoveWaterCollider(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(*e);
+			return 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -1753,6 +1859,13 @@ namespace RootForce
 			(*s)->SelectedAbility = (int) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
+		static int PlayerActionSetWantRespawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			(*s)->WantRespawn = 0 != lua_toboolean(p_luaState, 2);
+			return 0;
+		}
 		static int PlayerActionGetJumpTime(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1795,6 +1908,13 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
 			lua_pushnumber(p_luaState, (*s)->SelectedAbility);
+			return 1;
+		}
+		static int PlayerActionGetWantRespawn(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
+			lua_pushboolean(p_luaState, (*s)->WantRespawn);
 			return 1;
 		}
 		
@@ -2318,16 +2438,32 @@ namespace RootForce
 			{"GetId", EntityGetId},
 			{"DoesExist", EntityDoesExist},
 			{"GetTransformation", EntityGetTransformation},
+			{"RemoveTransformation", EntityRemoveTransformation},
 			{"GetRenderable", EntityGetRenderable},
+			{"RemoveRenderable", EntityRemoveRenderable},
 			{"GetPhysics", EntityGetPhysics},
+			{"RemovePhysics", EntityRemovePhysics},
 			{"GetCollision", EntityGetCollision},
+			{"RemoveCollision", EntityRemoveCollision},
 			{"GetCollisionResponder", EntityGetCollisionResponder},
+			{"RemoveCollisionResponder", EntityRemoveCollisionResponder},
 			{"GetNetwork", EntityGetNetwork},
 			{"GetHealth", EntityGetHealth},
-			{"GetPlayerComponent", GetPlayerComponent},
+			{"RemoveHealth", EntityRemoveHealth},
+			{"GetPlayerComponent", EntityGetPlayerComponent},
+			{"RemovePlayercomponent", EntityRemovePlayerComponent},
 			{"GetPlayerAction", EntityGetPlayerAction},
+			{"RemovePlayerAction", EntityRemovePlayerAction},
 			{"GetAbilitySpawn", EntityGetAbilitySpawn},
 			{"GetTryPickupComponent", EntityGetTryPickupComponent},
+			{"RemoveTryPickupComponent", EntityRemoveTryPickupComponent},
+			{"RemovePlayerPhysics", EntityRemovePlayerPhysics},
+			{"RemoveScript", EntityRemoveScript},
+			{"RemoveAnimation", EntityRemoveAnimation},
+			{"RemoveRagdoll", EntityRemoveRagdoll},
+			{"RemoveStateComponent", EntityRemoveStateComponent},
+			{"RemovePlayerControl", EntityRemovePlayerControl},
+			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{NULL, NULL}
 		};
@@ -2628,12 +2764,14 @@ namespace RootForce
 			{"SetAngle", PlayerActionSetAngle},
 			{"SetAbilityTime", PlayerActionSetAbilityTime},
 			{"SelectAbility", PlayerActionSelectAbility},
+			{"SetWantRespawn", PlayerActionSetWantRespawn},
 			{"GetJumpTime", PlayerActionGetJumpTime},
 			{"GetMovePower", PlayerActionGetMovePower},
 			{"GetStrafePower", PlayerActionGetStrafePower},
 			{"GetAngle", PlayerActionGetAngle},
 			{"GetAbilityTime", PlayerActionGetAbilityTime},
 			{"GetSelectedAbility", PlayerActionGetSelectedAbility},
+			{"GetWantRespawn", PlayerActionGetWantRespawn},
 			{NULL, NULL}
 		};
 

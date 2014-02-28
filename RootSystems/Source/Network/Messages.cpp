@@ -317,6 +317,9 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->ScoreLimit);
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->TeamScore[i]);
+			p_bs->Serialize(p_writeToBitstream, p_c->MinPlayers);
+			p_bs->Serialize(p_writeToBitstream, p_c->CountDown);
+			p_bs->Serialize(p_writeToBitstream, p_c->CurrentState);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c)

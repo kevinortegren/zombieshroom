@@ -28,6 +28,7 @@
 #include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/RaySystem.h>
 #include <RootSystems/Include/TransformInterpolationSystem.h>
+#include <RootSystems/Include/Network/NetworkDebugSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -89,6 +90,7 @@ namespace RootForce
 		RootForce::HomingSystem*						m_homingSystem;
 		RootForce::RaySystem*							m_raySystem;
         RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
+		RootForce::Network::NetworkDebugSystem*			m_networkDebugSystem;
 
 		Keymapper* m_keymapper;
 

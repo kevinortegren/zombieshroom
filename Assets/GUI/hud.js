@@ -1,6 +1,48 @@
+var announcements = [];
+function Announce(p_message, p_fadeout)
+{
+	// If there are existing announcements, push it in the queue
+	if(announcements.length > 0)
+	{
+		// If the last announcement can be overwritten, do it!
+		if(announcements[announcements.length-1][1] < 0)
+		{
+			announcements[announcements.length-1] = [p_message, p_fadeout];
+			// If that was the only announcement, show the new one
+			if(announcements.length-1 == 0)
+				AnnounceNext();
+		}
+		else
+		{
+			announcements.push([p_message, p_fadeout]);
+		}
+	}
+	// Else, push into queue and show it
+	else
+	{
+			announcements.push([p_message, p_fadeout]);
+			AnnounceNext();
+	}
+}
+function AnnounceNext()
+{
+	if(announcements.length == 0)
+		return;
+	$("#Announcement").html(announcements[0][0]);
+	$("#Announcement").fadeIn(0, function(){
+		if(announcements[0][1]-0.5 >= 0)
+			setTimeout(function(){
+				$("#Announcement").fadeOut(500, function(){
+					announcements.splice(0,1);
+					AnnounceNext();
+				})
+			},
+			announcements[0][1]*1000-500);
+	});
+}
 function AddMessage(p_message)
 {
-	$("#chatlog").html( $("#chatlog").html() + p_message + "<br>");
+	$( "<a>" + p_message + "<br></a>").appendTo( $("#chatlog") ).delay(5000).fadeOut(500);
 	$("#chatlog").scrollTop($("#chatlog")[0].scrollHeight);
 }
 function Send(event)
@@ -111,9 +153,13 @@ function Set(p_id, p_value)
 	{
     var oldHealth = parseInt($("#"+p_id).html());
     var newHealth = parseInt(value);
-		SetDeathScreen(newHealth <= 0);
     DamageIndicator(oldHealth-newHealth);
     value = newHealth;
+	}
+	if(p_id == "IsDead")
+	{
+		SetDeathScreen(p_value == "true");
+		return;
 	}
 	if(p_id == "EndGame")
 	{
@@ -151,14 +197,10 @@ function SetAbilityFocus(p_slot)
 	$(".slotselected").removeClass("slotselected");
 	$("#slot"+p_slot).addClass("slotselected");
 }
-function StartCooldown(p_slot, p_duration)
+function SetCooldown(p_slot, p_percent)
 {
 	var slot = $("#slot"+p_slot+"-cooldown");
-	if(parseInt(slot.css("background-position-y").split("px")[0]) == 75)
-	{
-		slot.css("background-position", "50% 0px");
-		slot.animate({'background-position-y': '75px'}, p_duration*1000, 'linear');
-	}
+	slot.css("background-position", "50% "+(1-p_percent)*75+"px");
 }
 
 function DamageIndicator(p_damage)
@@ -184,4 +226,6 @@ $(document).ready(function(){
   // DamageIndicator(40);
   // setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
+	// Announce("Waiting for players...", -1);
+	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 });
