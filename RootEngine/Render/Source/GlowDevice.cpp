@@ -34,8 +34,8 @@ namespace Render
 			float gauss[11];
 		} data;
 
-		data.halfWidth = p_width / 2;
-		data.halfHeight = p_height / 2;
+		data.halfWidth = (float)p_width / 2.0f;
+		data.halfHeight = (float)p_height / 2.0f;
 		data.blurRadius = 1.4f;
 
 		float blurFactor = 9.0f;
@@ -131,8 +131,8 @@ namespace Render
 		glBindFramebuffer(GL_FRAMEBUFFER, m_glowFramebuffer);
 		m_glowTexture->CreateEmptyTexture(p_width / 2, p_height / 2, TextureFormat::TEXTURE_RGBA);	
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		SetHalfWidth(p_width/2);
-		SetHalfHeight(p_height/2);
+		SetHalfWidth((float)p_width/2.0f);
+		SetHalfHeight((float)p_height/2.0f);
 	}
 
 	void GlowDevice::Display(bool p_value)

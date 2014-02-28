@@ -183,7 +183,7 @@ namespace RootForce
 		m_botanySystem->Initialize(textures, 0.0f);
 
 		// Subdivide world.
-		m_sharedSystems.m_worldSystem->SubdivideTree();
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
 #endif
 
 		// Lock the mouse
