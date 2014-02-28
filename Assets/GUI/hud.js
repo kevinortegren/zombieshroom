@@ -42,7 +42,7 @@ function AnnounceNext()
 }
 function AddMessage(p_message)
 {
-	$("#chatlog").html( $("#chatlog").html() + p_message + "<br>");
+	$( "<a>" + p_message + "<br></a>").appendTo( $("#chatlog") ).delay(5000).fadeOut(500);
 	$("#chatlog").scrollTop($("#chatlog")[0].scrollHeight);
 }
 function Send(event)
@@ -153,9 +153,13 @@ function Set(p_id, p_value)
 	{
     var oldHealth = parseInt($("#"+p_id).html());
     var newHealth = parseInt(value);
-		SetDeathScreen(newHealth <= 0);
     DamageIndicator(oldHealth-newHealth);
     value = newHealth;
+	}
+	if(p_id == "IsDead")
+	{
+		SetDeathScreen(p_value == "true");
+		return;
 	}
 	if(p_id == "EndGame")
 	{

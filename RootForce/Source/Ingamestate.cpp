@@ -159,6 +159,10 @@ namespace RootForce
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
+		// Initialize the network debug system.
+		m_networkDebugSystem = new RootForce::Network::NetworkDebugSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::Network::NetworkDebugSystem>(m_networkDebugSystem);
+
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -369,6 +373,10 @@ namespace RootForce
 		{
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
+		}
+
+		{
+			m_networkDebugSystem->Process();
 		}
 
 		{
@@ -657,6 +665,7 @@ namespace RootForce
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
+					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
