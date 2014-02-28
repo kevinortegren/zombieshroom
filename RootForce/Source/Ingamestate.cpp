@@ -159,6 +159,10 @@ namespace RootForce
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
+		// Initialize the network debug system.
+		m_networkDebugSystem = new RootForce::Network::NetworkDebugSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::Network::NetworkDebugSystem>(m_networkDebugSystem);
+
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -369,6 +373,10 @@ namespace RootForce
 		{
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
+		}
+
+		{
+			m_networkDebugSystem->Process();
 		}
 
 		{

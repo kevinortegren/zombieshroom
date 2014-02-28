@@ -26,6 +26,7 @@
 #include <RootSystems/Include/FollowSystem.h>
 #include <RootSystems/Include/BotanySystem.h>
 #include <RootSystems/Include/TransformInterpolationSystem.h>
+#include <RootSystems/Include/Network/NetworkDebugSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -85,6 +86,7 @@ namespace RootForce
 		RootForce::TimerSystem*							m_timerSystem;
 		RootForce::FollowSystem*						m_followSystem;
         RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
+		RootForce::Network::NetworkDebugSystem*			m_networkDebugSystem;
 
 		Keymapper* m_keymapper;
 

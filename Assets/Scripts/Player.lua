@@ -150,6 +150,6 @@ end
 
 function Player.OnDestroy (self)
 	local network = self:GetNetwork();
-	Logging.Log(LogLevel.DEBUG_PRINT, "Destroying player (userId: "..tostring(network:GetUserId())..", actionId: "..tostring(network:GetActionId))..")");
+	Logging.Log(LogLevel.DEBUG_PRINT, "Destroying player (userId: "..tostring(network:GetUserId())..", actionId: "..tostring(network:GetActionId())..")");
 	Entity.Remove(self);
 end
