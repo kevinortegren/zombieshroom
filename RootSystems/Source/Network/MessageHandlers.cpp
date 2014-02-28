@@ -310,7 +310,7 @@ namespace RootForce
 					m.Serialize(false, p_bs);
 
 					// Only remote clients need to parse. A local server would already have updated the entities.
-					if (clientComponent->IsRemote)
+					if (clientComponent->IsRemote && ClientState::IsConnected(clientComponent->State))
 					{
 
 						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
@@ -320,7 +320,7 @@ namespace RootForce
 						assert(playerComponent != nullptr);
 
 						// Make sure we are connected before parsing commands.
-						if (ClientState::IsConnected(clientComponent->State) && playerComponent->TeamID != 0)
+						if (playerComponent->TeamID != 0)
 						{
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
