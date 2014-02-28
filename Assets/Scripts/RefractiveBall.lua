@@ -4,8 +4,8 @@ RefractiveBall.knockback = 40;
 RefractiveBall.cooldown = 3;
 RefractiveBall.charges = 0;
 RefractiveBall.chargeTime = 0;
-RefractiveBall.channelingTime = 0;
-RefractiveBall.duration = 10;
+RefractiveBall.channelingTime = 5;
+RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
 
 function RefractiveBall.ChargeDone (time, userId, actionId)
@@ -13,6 +13,7 @@ function RefractiveBall.ChargeDone (time, userId, actionId)
 end
 
 function RefractiveBall.ChannelingDone (time, userId, actionId)
+	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
 end
 
 function RefractiveBall.OnCreate (userId, actionId)
@@ -26,23 +27,22 @@ function RefractiveBall.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "RefractiveBall");
-	local timerComp = Timer.New(self, RefractiveBall.duration);
+	--local timerComp = Timer.New(self, RefractiveBall.duration);
+	Follower.New(self, casterEnt, 0);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();
-	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3))
 	
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 2.5, 1, true, false);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
-	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
-	transformComp:SetPos(startPos);
-	transformComp:SetScale(Vec3.New(40, 40, 40));
+	physicsComp:BindSphereShape(collisionComp, tempPos, Quat.New(0,0,0,1), 5.0, 10000, true, false);
+	physicsComp:SetVelocity(collisionComp, Vec3.New(0, 0, 0));
+	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
+	transformComp:SetPos(tempPos);
+	transformComp:SetScale(Vec3.New(5, 5, 5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/box");
+		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("RefractiveBaller");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive");

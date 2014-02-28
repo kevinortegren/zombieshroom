@@ -186,13 +186,16 @@ namespace RootForce
 
 #ifndef _DEBUG
 		BotanyTextures textures;
-		textures.m_diffuse = "ugotaflatgrass2";
-		textures.m_translucency = "grass_translucency";
-		textures.m_billboard = "grass_billboard";
-		textures.m_terrainTexture = "grass";
+		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
+		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
+		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
 
-		// Subdivide terrain for grass chunk rendering.
-		//m_botanySystem->Initialize(textures, 0.0f);
+		if(textures.m_diffuse != "")
+		{
+			// Subdivide terrain for grass chunk rendering.
+			m_botanySystem->Initialize(textures, 0.0f);
+		}
+
 
 		// Subdivide world.
 		//m_sharedSystems.m_worldSystem->SubdivideTree();
@@ -287,7 +290,6 @@ namespace RootForce
 		g_world->GetSystemManager()->Clear();
 		g_engineContext.m_physics->RemoveAll();
 
-
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
@@ -326,7 +328,6 @@ namespace RootForce
 				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
-
 
 		// Check for disconnection from the server
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");

@@ -1,5 +1,6 @@
 AbilityDash
 AbilityBall
 FireBall
-AbilityTest
 PowerRay
+RefractiveBall
+IceCube
