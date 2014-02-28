@@ -69,6 +69,7 @@ namespace RootForce
 						}
 						// If the entity has a script and it is neither Player or AbilitySpawnPoint, assume it's an ability and attempt to remove it
 						else if(g_world->GetEntityManager()->GetComponent<Script>(pair.second)
+							&& g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("Player") != 0
 							&& g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("AbilitySpawnPoint") != 0
 							&& g_world->GetEntityManager()->GetComponent<Script>(pair.second)->Name.compare("MatchState") != 0)
 						{
