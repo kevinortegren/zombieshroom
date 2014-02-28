@@ -239,6 +239,7 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
 					p_emitter << YAML::Key << "PhysicsCollideStatic" << YAML::Value << physCon->m_colWStatic;
+					p_emitter << YAML::Key << "PhysicsExternally" << YAML::Value << physCon->m_externally;
 				}
 				break;
 			case AbilityComponents::ComponentType::CHARGEVARIABLES:

@@ -65,16 +65,16 @@ namespace AbilityEditorNameSpace
 			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::DAMAGE)
 			{
 				m_damage = ((AbilityComponents::Damage*)m_entity->GetComponents()->at(j))->m_damage;
-				m_file << m_name << ".damage = " << m_damage << ";\n";
 				//m_file << m_name << ".damageNew = " << m_damage << ";\n";
 			}
 			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::KNOCKBACK)
 			{
 				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(j))->m_knockback;
-				m_file << m_name << ".knockback = " << m_knockback << ";\n";
 				//m_file << m_name << ".knockbackNew = " << m_knockback << ";\n";
 			}
 		}
+		m_file << m_name << ".damage = " << m_damage << ";\n";
+		m_file << m_name << ".knockback = " << m_knockback << ";\n";
 		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
 		m_file << m_name << ".charges = " << m_entity->GetCharges() << ";\n";
 		m_file << m_name << ".chargeTime = " << m_entity->GetChargeTime() << ";\n";
@@ -97,6 +97,7 @@ namespace AbilityEditorNameSpace
 		}
 
 		m_file << "\tlocal self = Entity.New();\n";
+		m_file << "\tlocal networkComp = Network.New(self, userId, actionId);\n";
 		m_file << "\tlocal dakComp = DamageAndKnockback.New(self, " << m_name << ".damage , " << m_name << ".knockback);\n";
 
 		if (chargeReq > 0.0f)
@@ -134,7 +135,6 @@ namespace AbilityEditorNameSpace
 			m_file << "\tlocal casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
 
 			m_file << "\t--Components\n";
-			m_file << "\tlocal networkComp = Network.New(self, userId, actionId);\n";
 			m_file << "\tlocal transformComp = Transformation.New(self);\n";
 			m_file << "\tlocal collisionComp = Collision.New(self);\n";
 			m_file << "\tlocal colRespComp = CollisionResponder.New(self);\n";
@@ -142,15 +142,7 @@ namespace AbilityEditorNameSpace
 			m_file << "\tlocal scriptComp = Script.New(self, \"" << m_name << "\");\n";
 			m_file << "\tlocal timerComp = Timer.New(self, " << m_name << ".duration);\n";
 
-			m_file << "\t--Setting stuff\n";
-			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICS))
-				m_file << "\tcollisionComp:CreateHandle(self, 1, false);\n";
-			else //The '1' is Type::ABILITY
-				m_file << "\tcollisionComp:CreateHandle(self, 1, true);\n";
-			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
-
-			m_file << "\tlocal facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);\n";
-
+			
 			//Some standard
 			//Collision Shape
 			float radius = 1.0f;
@@ -159,6 +151,7 @@ namespace AbilityEditorNameSpace
 			//Physics
 			float mass = 1.0f;
 			QVector3D grav = QVector3D(0,9.82f,0);
+			bool externally = false;
 			//Positions
 			int startEnum, targetEnum;
 			QVector3D startPos = QVector3D(0,0,0);
@@ -189,6 +182,7 @@ namespace AbilityEditorNameSpace
 					grav = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_gravity;
 					colWithWorld = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_collide;
 					colWithStatic = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_colWStatic;
+					externally = ((AbilityComponents::Physics*)m_entity->GetComponents()->at(i))->m_externally;
 				}
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STARTPOS)
 				{
@@ -213,6 +207,17 @@ namespace AbilityEditorNameSpace
 				}
 			}
 			//Writing values
+
+			m_file << "\t--Setting stuff\n";
+			if(m_entity->DoesComponentExist(AbilityComponents::ComponentType::PHYSICS)) 
+			{
+				m_file << "\tcollisionComp:CreateHandle(self, 1, " << (externally ? "true" : "false") << ");\n";
+			}
+			m_file << "\tcolRespComp:SetContainer(collisionComp);\n";
+
+			m_file << "\tlocal facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);\n";
+
+
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::FOLLOW))
 			{
 				m_file << "\tFollower.New(self, casterEnt, " << followOffset << ");\n";

@@ -687,16 +687,18 @@ namespace AbilityEditorNameSpace
 			QVector3D m_gravity;
 			bool m_collide;
 			bool m_colWStatic;
-			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true, bool p_colWStatic = true) : MainComponent(ComponentType::PHYSICS)
+			bool m_externally;
+			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true, bool p_colWStatic = true, bool p_externally = false) : MainComponent(ComponentType::PHYSICS)
 			{
 				m_mass = p_mass;
 				m_gravity =	p_gravity;
 				m_collide = p_collide;
 				m_colWStatic = p_colWStatic;
+				m_externally = p_externally;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide, *colWStatic;
+				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide, *colWStatic, *external;
 				QList<QtProperty*> list;
 				QString combinedValue;
 				mass = p_propMan->addProperty(QVariant::Double, "Mass");
@@ -727,6 +729,10 @@ namespace AbilityEditorNameSpace
 				colWStatic = p_propMan->addProperty(QVariant::Bool, "Collide with static");
 				p_propMan->setValue(colWStatic, m_colWStatic);
 				p_propBrows->addProperty(colWStatic);
+
+				external = p_propMan->addProperty(QVariant::Bool, "Externally controlled");
+				p_propMan->setValue(external, m_externally);
+				p_propBrows->addProperty(external);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -743,6 +749,7 @@ namespace AbilityEditorNameSpace
 
 				m_collide = p_propMan->variantProperty(props.at(2))->value().toBool();
 				m_colWStatic = p_propMan->variantProperty(props.at(3))->value().toBool();
+				m_externally = p_propMan->variantProperty(props.at(4))->value().toBool();
 			}
 		};
 

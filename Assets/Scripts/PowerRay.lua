@@ -8,7 +8,9 @@ PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
 
 function PowerRay.ChargeDone (time, userId, actionId)
-	
+	local self = Entity.New();
+	local networkComp = Network.New(self, userId, actionId);
+	local dakComp = DamageAndKnockback.New(self, PowerRay.damage , PowerRay.knockback);
 	PowerRay.OnCreate(userId, actionId);
 end
 
@@ -17,9 +19,7 @@ end
 
 function PowerRay.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.New();
-	local dakComp = DamageAndKnockback.New(self, PowerRay.damage , PowerRay.knockback);
-	--local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
@@ -30,7 +30,7 @@ function PowerRay.OnCreate (userId, actionId)
 	local scriptComp = Script.New(self, "PowerRay");
 	local timerComp = Timer.New(self, PowerRay.duration);
 	--Setting stuff
-	collisionComp:CreateHandle(self, 1, false);
+	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
 	local facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetUp();
@@ -42,8 +42,8 @@ function PowerRay.OnCreate (userId, actionId)
 	local rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));
 	local rayComp = Ray.New(self, collisionComp:GetHandle(), rayStartPos, dirVecForward, 2000, false, false);
 	rayComp = Ray.New(self, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, 2000, true, true);
-	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
-	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
+	--physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
+	--physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(facePos);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "FallingLeafsParticle");

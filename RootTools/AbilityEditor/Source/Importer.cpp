@@ -335,6 +335,8 @@ namespace AbilityEditorNameSpace
 					p_node["PhysicsCollide"] >> tempcomp->m_collide;
 				if(p_node.FindValue("PhysicsCollideStatic"))
 					p_node["PhysicsCollideStatic"] >> tempcomp->m_colWStatic;
+				if(p_node.FindValue("PhysicsExternally"))
+					p_node["PhysicsExternally"] >> tempcomp->m_externally;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
