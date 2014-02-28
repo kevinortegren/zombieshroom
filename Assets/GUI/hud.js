@@ -154,7 +154,8 @@ function Set(p_id, p_value)
     var oldHealth = parseInt($("#"+p_id).html());
     var newHealth = parseInt(value);
     DamageIndicator(oldHealth-newHealth);
-    value = newHealth;
+    $("#healthbar>div>div").css("width", ($("#healthbar>div").width()*(newHealth/100.0))+"px");
+    return;
 	}
 	if(p_id == "IsDead")
 	{

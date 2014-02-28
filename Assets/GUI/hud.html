@@ -5,12 +5,14 @@
 		<script type="text/javascript" src="hud.js"></script>
 	</head>
 	<body onload="OnLoad();">
-		<div id="score" style="z-index:100;">
-			<img src="Team.png" style="height: 45%;"/> <a id="TeamScore" style="color: green">573</a> : <a id="EnemyScore" style="color: red;">195</a><br />
-			<img src="Swordaxe.png" style="height: 45%;"/> <a id="PlayerScore" style="color: green">21</a> <img src="RIP.png" style="height: 45%;"/> <a id="PlayerDeaths" style="color: red;">16</a>
-		</div>
 		<div id="TimeLeftContainer" style="z-index:100;">
-		  <a id="TimeLeft">
+      <a id="Team1Score" style="display:inline-block; vertical-align: text-top; background:rgba(0,0,255,1); font-size: 20px;">
+      0
+      </a>
+      <a id="Team2Score" style="display:inline-block; vertical-align: text-top; background:rgba(255,0,0,1); font-size: 20px;">
+      0
+      </a>
+		  <a id="TimeLeft" style="display:inline-block; vertical-align: text-top;">
 			30:00
 		  </a>
 		</div>
@@ -23,9 +25,11 @@
 			</div>
 			<input id="chatinput" type="text" />
 		</div>
-		<div id="healthcontainer" style="z-index:0;">
-			<img src="health.png" />
-			<a id="Health" style="display: inline-block; vertical-align: middle;"> 100 </a>
+		<div id="healthbar" style="z-index:0;">
+			<div>
+				<div>
+				</div>
+			</div>
 		</div>
 		<div id="chargebar" style="z-index:0;">
 			<div>
@@ -34,24 +38,16 @@
 			</div>
 		</div>
 		<div id="abilitybar" style="z-index:0;">
-			<div id="slot0" class="slot">
-				<div id="slot0-cooldown" class="cooldown">
-					RMB
-				</div>
-			</div>
 			<div id="slot1" class="slot slotselected">
 				<div id="slot1-cooldown" class="cooldown">
-					1
 				</div>
 			</div>
 			<div id="slot2" class="slot">
 				<div id="slot2-cooldown" class="cooldown">
-					2
 				</div>
 			</div>
 			<div id="slot3" class="slot">
 				<div id="slot3-cooldown" class="cooldown">
-					3
 				</div>
 			</div>
 		</div>
