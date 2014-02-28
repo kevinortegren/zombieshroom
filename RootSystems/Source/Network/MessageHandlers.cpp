@@ -1088,9 +1088,9 @@ namespace RootForce
 				{
 					NetworkMessage::PlayerTeamSelect m;
 					m.Serialize(false, p_bs);
-						
+					
 					// Make sure we are in the correct state.
-					if (clientComponent->State == ClientState::CONNECTED)
+					if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
 					{
 
 						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
@@ -2172,22 +2172,25 @@ namespace RootForce
 							//if a team has two or more players than the other team, joining it is not allowed
 							if(m.TeamID == 1) 
 								if(team1 > team2)
+								{
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Client tried to join a full team 1: %d vs %d", team1, team2);
 									break;
+								}
 							else if(m.TeamID == 2)
 								if(team2 > team1)
+								{
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Client tried to join a full team 2: %d vs %d", team1, team2);
 									break;
+								}
 						}
 
-						if (m_world->GetTagManager()->GetEntityByTag("Client") == nullptr)
-						{
-							ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
 
-							// Call the OnCreate script
-							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-							g_engineContext.m_script->AddParameterNumber(m.TeamID);
-							g_engineContext.m_script->ExecuteScript();
-						}
+						// Call the OnCreate script
+						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+						g_engineContext.m_script->AddParameterNumber(m.TeamID);
+						g_engineContext.m_script->ExecuteScript();
 
 						RakNet::BitStream bs;
 						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
