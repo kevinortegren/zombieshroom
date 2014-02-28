@@ -82,12 +82,13 @@ img
 	position: absolute;
 	top:0;
 	left:100%;
-	margin-left: -200px;
+	margin-left: -204px;
+	padding-right: 4px;
 	width: 200px;
-	height: 35px;
-	text-align: center;
+	height: 28px;
+	text-align: right;
 	background-color: rgba(60,60,60,0.5);
-	font-size: 32px;
+	font-size: 24px;
 }
 #AnnouncementContainer
 {
@@ -143,21 +144,23 @@ img
 	left: 0;
 	top: 100%;
 	width: 100%;
-	margin: -14px 0 0 0;
-	height: 12px;
+	margin: -35px 0 0 0;
+	height: 33px;
 }
 #healthbar div
 {
-	width: 345px;
-	height: 12px;
-	background-color: rgba(0,0,0,0.2);
+	padding: 0 11px;
+	width: 304px;
+	height: 33px;
+	background: center url('healthBorder.png');
 	margin: auto;
 }
 #healthbar div div
 {
-	height: 12px;
-	width: 100px;
-	background-color: rgba(0,255,0,0.8);
+	padding: 0;
+	height: 33px;
+	width: 304px;
+	background: center url('healthBackground.png');
 	margin: auto;
 }
 #chargebar

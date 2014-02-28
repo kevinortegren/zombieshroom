@@ -229,4 +229,5 @@ $(document).ready(function(){
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
+	$("#healthbar>div>div").css('width', $("#healthbar>div>div").width()*(99.5/100.0)+"px");
 });
