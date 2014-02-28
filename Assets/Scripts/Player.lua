@@ -63,6 +63,7 @@ function Player.OnTeamSelect(self, teamId)
     playerAction:SetAngle(Vec2.New(0, 0));
     playerAction:SetAbilityTime(0.0);
     playerAction:SelectAbility(0);
+		playerAction:SetWantRespawn(true);
 
     playerPhysics:SetMovementSpeed(25);
     playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
