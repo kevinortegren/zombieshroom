@@ -1156,7 +1156,7 @@ namespace Physics
 		
 	}
 
-	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position )
+	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position, float p_dt )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
@@ -1165,7 +1165,7 @@ namespace Physics
 		btVector3 temp (p_position[0], p_position[1], p_position[2]);
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
 		{
-			m_playerObjects.at(index)->Move(p_position, m_dt);
+			m_playerObjects.at(index)->Move(p_position, p_dt);
 		}
 		else if (m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{

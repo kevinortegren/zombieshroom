@@ -94,11 +94,11 @@ namespace Render
 
 	void LightingDevice::SSAO()
 	{
+		BeginSSAO();
+
 		if(m_showSSAO)
 		{
 			m_fullscreenQuad->Bind();
-			//SSAO
-			BeginSSAO();
 			glDisable(GL_STENCIL_TEST);
 			auto ssao = m_ssaoTech->GetPrograms()[0];
 			m_noiseSSAOTex->Bind(GLRenderer::s_textureSlots[TextureSemantic::SSAO]);

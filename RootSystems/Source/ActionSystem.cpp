@@ -80,7 +80,7 @@ namespace RootSystems
 				if(glm::length2(action->JumpDir) > 1)
 					action->JumpDir = glm::normalize(action->JumpDir);
 				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
-				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position);
+				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position, dt);
 			}
 
 			m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
