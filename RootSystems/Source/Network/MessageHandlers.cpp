@@ -1880,9 +1880,8 @@ namespace RootForce
 								assert(playerEntity != nullptr);
 
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								action->WantRespawn = true;
+								if(action != nullptr)
+									action->WantRespawn = true;
 							}
 							else
 							{
