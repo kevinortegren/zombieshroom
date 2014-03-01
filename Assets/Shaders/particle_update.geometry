@@ -76,7 +76,7 @@ void main()
 		if(lifeTime <= 0.0f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 	= g_Position;
+			vert_initialPos1 	= g_Position + g_transPos;
 
 			if(g_direction == vec3(0,0,0))
 			{

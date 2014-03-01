@@ -49,6 +49,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -177,6 +178,10 @@ namespace RootForce
 		//Initialize water death system.
 		m_waterDeathSystem = new RootForce::WaterDeathSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::WaterDeathSystem>(m_waterDeathSystem);
+
+		//Initialize scale system.
+		m_scaleSystem = new RootForce::ScaleSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -444,8 +449,6 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		
-
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
 
@@ -518,6 +521,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_scaleSystem->Process();
 			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
