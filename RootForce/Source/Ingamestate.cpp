@@ -174,6 +174,9 @@ namespace RootForce
 		m_raySystem = new RootForce::RaySystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
 
+		//Initialize water death system.
+		m_waterDeathSystem = new RootForce::WaterDeathSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterDeathSystem>(m_waterDeathSystem);
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -378,6 +381,7 @@ namespace RootForce
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
+			m_waterDeathSystem->Process();
 		}
 
 		{

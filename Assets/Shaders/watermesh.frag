@@ -82,14 +82,14 @@ void main()
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
 		normalMap 				= TBN * normalT;
 	}
-	vec3 viewNormal			= normalize(viewMatrix*vec4(normalMap,0.0f)).rgb;
+	vec3 viewNormal			= normalize(viewMatrix* normalMatrix * vec4(normalMap,0.0f)).rgb;
 
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate transparent color and refraction
 	////////////////////////////////////////////////////////////////////////////
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
 	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
-	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 100.0f), ivec2(0), textureSize(g_LA, 0));
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 70.0f), ivec2(0), textureSize(g_LA, 0));
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 	vec3 refractionColor;
 	//Check if refracted vector is hitting an object in the foreground

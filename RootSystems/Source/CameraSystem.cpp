@@ -11,10 +11,10 @@ namespace RootForce
 		Orientation tempOrientation = transform->m_orientation;
 		tempOrientation.Yaw(180.0f);
 		glm::mat4 tempWorldMatrix;
-		/*#ifndef COMPILE_LEVEL_EDITOR
-		if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("WaterHeight") + 8.0f)
-			transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("WaterHeight") + 8.0f;
-		#endif*/
+		#ifndef COMPILE_LEVEL_EDITOR
+		if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("WaterHeight"))
+			transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
+		#endif
 		glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
 		glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
 		glm::mat4 viewMatrix = glm::inverse(rotation);
@@ -51,23 +51,17 @@ namespace RootForce
 				{
 					//Move the entity
 					glm::vec3 targetPosition = targetTransform->m_position;
-					if(thirdPersonBehavior->m_rotateWithTarget)
-					{
-						Orientation tOrientation = targetTransform->m_orientation;
-						glm::vec3 localDisplacement(0.0f);
-						localDisplacement.z = -thirdPersonBehavior->m_distance;
-						glm::vec3 worldDisplacement;
-						worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
-						float distFrac = 1.0f;
-						if(thirdPersonBehavior->m_checkWithRay)
-							distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
-						transform->m_position = targetPosition + worldDisplacement*distFrac;
-						
-					}
-					else
-					{
-						transform->m_position = targetPosition + glm::vec3(0,25.0f,0.0f);
-					}
+				
+					Orientation tOrientation = targetTransform->m_orientation;
+					glm::vec3 localDisplacement(0.0f);
+					localDisplacement.z = -thirdPersonBehavior->m_distance;
+					glm::vec3 worldDisplacement;
+					worldDisplacement = tOrientation.GetRight() * -localDisplacement.x + tOrientation.GetUp() * localDisplacement.y + tOrientation.GetFront() * localDisplacement.z;
+					float distFrac = 1.0f;
+					if(thirdPersonBehavior->m_checkWithRay)
+						distFrac = m_engineContext->m_physics->RayTest(targetPosition, targetPosition + worldDisplacement);
+					transform->m_position = targetPosition + worldDisplacement*distFrac;
+				
 				}
 				else
 				{
