@@ -49,7 +49,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "relativeOrbit");
+		local particleComp = ParticleEmitter.New(self, "Fire2");
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
 		pointlightComp:SetRange(10.0);

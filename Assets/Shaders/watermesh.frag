@@ -29,6 +29,7 @@ layout(std140) uniform PerObject
 	vec3 gEyeWorldPos;
 	float gTime;
 	vec4 gOptions;
+	float dx2; //Length between height values
 };    
 
 vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
@@ -67,29 +68,28 @@ void main()
 	float time = gTime/40.0;
 
 	////////////////////////////////////////////////////////////////////////////
-	//Normal mapping
+	//Normal mapping 2.0
 	////////////////////////////////////////////////////////////////////////////
-    vec3 normalMap			= texture(g_Normal, TexCoord_FS_in).rgb;
-	normalMap				= normalize(normalMap.xyz*2-1); 
-	if(gOptions.y == 0.0)
+	vec2 calcNorm		= texture(g_Normal, TexCoord_FS_in).xy; //RG16F from compute shader
+	vec3 normalMap		= normalize(vec3(calcNorm.x, dx2*2, calcNorm.y));
+	if(gOptions.y == 1.0)
 	{
-		vec3 normal1 			= texture(g_NormalMap, TexCoord_FS_in * 64.0 + vec2(sin(time - 1.0) , time) ).xyz;
-		vec3 normal2 			= texture(g_NormalMap, -TexCoord_FS_in * 32.0 + vec2(sin(time*0.5)+1.0 , time*0.5) ).xyz;
+		vec3 normal1 			= normalize(texture(g_NormalMap, TexCoord_FS_in * 32.0 + vec2(sin(time - 1.0) , time))*2.0-1.0).xyz;
+		vec3 normal2 			= normalize(texture(g_NormalMap, -TexCoord_FS_in * 16.0 + vec2(sin(time*0.5)+1.0 , time*0.5))*2.0-1.0).xyz;
 		vec3 normalT 			= mix(normal1, normal2, 0.5);
 		normalT 				= normalize(normalT);
-		vec3 tangent			= cross(vec3(0,1,0), normalMap);
-		vec3 bitangent			= cross(tangent, normalMap);
+		vec3 tangent			= normalize(vec3(dx2, 0, calcNorm.x));
+		vec3 bitangent			= normalize(vec3(0, dx2, calcNorm.y));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
 		normalMap 				= TBN * normalT;
 	}
-	vec3 viewNormal			= normalize(viewMatrix* normalMatrix * vec4(normalMap,0.0f)).rgb;
-
+	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0f)).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate transparent color and refraction
 	////////////////////////////////////////////////////////////////////////////
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
 	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
-	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 70.0f), ivec2(0), textureSize(g_LA, 0));
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 80.0), ivec2(0), textureSize(g_LA, 0)); //Want to use view space normals, but it doesn't seem to work
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 	vec3 refractionColor;
 	//Check if refracted vector is hitting an object in the foreground
@@ -102,7 +102,7 @@ void main()
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	//Cubemap reflections
+	//Cubemap reflections WIP - Should reflect skyshader when complete
 	////////////////////////////////////////////////////////////////////////////
  	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW				= reflect(incidentW, normalMap);
@@ -239,7 +239,7 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate result color
 	////////////////////////////////////////////////////////////////////////////
-	vec4 result				= vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
+	vec4 result = vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs

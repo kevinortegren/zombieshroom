@@ -19,7 +19,7 @@ ECS::World* g_world;
 class MainParticle
 {
 public:
-	MainParticle(std::string p_workingDirectory, ParticleEditor* p_particleEdtiorQt);
+	MainParticle(std::string p_workingDirectory, ParticleEditor* p_particleEdtiorQt, std::string p_loadFile );
 	~MainParticle();
 	void HandleEvents();
 	void Update(float p_delta);

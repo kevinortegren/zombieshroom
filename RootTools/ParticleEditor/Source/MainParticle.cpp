@@ -12,6 +12,14 @@
 int main(int argc, char *argv[])
 {
 	std::string path(argv[0]);
+	std::string loadFile;
+
+	if(argv[1] == 0)
+		loadFile = "";
+	else
+		loadFile = argv[1];//If a .particle file was opened with application
+	
+	
 	std::string rootforcename = "ParticleEditor.exe";
 	path = path.substr(0, path.size() - rootforcename.size());
 	
@@ -20,7 +28,7 @@ int main(int argc, char *argv[])
 		QApplication a(argc, argv);
 		ParticleEditor w;
 		
-		MainParticle m(path, &w);
+		MainParticle m(path, &w, loadFile);
 		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
 		bool notExit = true;
@@ -54,7 +62,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt )
+MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt, std::string p_loadFile )
 {
 	m_particleEditorQt = p_particleEditorQt;
 	m_workingDirectory = p_workingDirectory;
@@ -202,6 +210,8 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_dragging = 0;
 
 	CreateSkyBox();
+
+	m_particleEditorQt->OpenParticleFile(p_loadFile);
 }
 
 MainParticle::~MainParticle()

@@ -123,12 +123,12 @@ namespace RootForce
 		m_texture[1]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 		m_texture[2] = m_context->m_resourceManager->CreateTexture("computeTex3");
-		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RG16 );
 		m_texture[2]->SetAccess(GL_READ_WRITE);
 
-		std::vector<glm::u8vec4> emptyData(m_texSize * m_texSize, glm::u8vec4(127,255,127,0));
+		//std::vector<glm::u8vec4> emptyData(m_texSize * m_texSize, glm::u8vec4(127,255,127,0));
 		
-		m_texture[2]->BufferData(&emptyData[0]);
+		//m_texture[2]->BufferData(&emptyData[0]);
 
 		//Create compute effect
 		m_effect = m_context->m_resourceManager->LoadEffect("WaterCompute");
@@ -179,6 +179,9 @@ namespace RootForce
 
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
+
+		//DX
+		m_renderable->m_params[Render::Semantic::LIFETIMEMAX] = &m_dx;
 
 		//Water options
 		m_renderable->m_params[Render::Semantic::COLOR] = &m_waterOptions;

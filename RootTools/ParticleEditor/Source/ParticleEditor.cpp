@@ -236,6 +236,11 @@ void ParticleEditor::MenuOpen()
 	if(fullFileName.compare("") == 0)
 		return;
 
+	OpenParticleFileQ(fullFileName);
+}
+
+void ParticleEditor::OpenParticleFileQ( QString p_filePath )
+{
 	ClearScene();
 	//Enable the New Emitter button 
 	ui.newEmitterButton->setEnabled(true);
@@ -255,7 +260,7 @@ void ParticleEditor::MenuOpen()
 		m_selectedEntityIndex = 0; 
 	}
 
-	e->m_particleSystems = m_context->m_resourceManager->LoadParticleEmitter(fullFileName.toStdString(), true);
+	e->m_particleSystems = m_context->m_resourceManager->LoadParticleEmitter(p_filePath.toStdString(), true);
 
 	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
 	{
@@ -279,9 +284,18 @@ void ParticleEditor::MenuOpen()
 		}
 	}
 
-	QFileInfo fileinfo(fullFileName);
+	QFileInfo fileinfo(p_filePath);
 	m_particleTab->setTabText(0, fileinfo.baseName());
 	Saved();
+}
+
+void ParticleEditor::OpenParticleFile( std::string p_filePath )
+{
+	if(p_filePath.compare("") == 0)
+		return;
+
+	QString fullFileName = QString::fromStdString(p_filePath);
+	OpenParticleFileQ(fullFileName);
 }
 
 void ParticleEditor::MenuSave()
@@ -1316,9 +1330,3 @@ bool ParticleEditor::CalculateMaxParticles()
 	else
 		return true;
 }
-
-
-
-
-
-
