@@ -24,6 +24,7 @@ GLRAMTextureSurface::GLRAMTextureSurface(int width, int height) : texture_id_(0)
   if(m_bufferTexture == 0)
   {
 	  glGenTextures(1, &m_bufferTexture);
+	  glBindTexture(GL_TEXTURE_2D, m_bufferTexture);
 	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -142,13 +143,14 @@ void GLRAMTextureSurface::UpdateTexture()
 		GLenum result;
 		while(true) 
 		{ 
-			result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+			result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, 0); //5 Second timeout 
 			if(result == GL_CONDITION_SATISFIED)
 				break;
 			if(result == GL_WAIT_FAILED)
 				break;
 			if(result == GL_ALREADY_SIGNALED)
 				break;
+			Sleep(10);
 		} 
 		glDeleteSync(fenceId);
 		std::swap(m_bufferTexture, texture_id_);
