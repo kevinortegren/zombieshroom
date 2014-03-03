@@ -300,25 +300,47 @@ namespace RootSystems
 
 				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
 				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(playerEntity);
-
+				RootForce::HealthComponent*	health	= m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(playerEntity);
 				ECS::Entity* aimingDeviceEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_AIMING_DEVICE_ENTITY));
 				if (aimingDeviceEntity == nullptr)
 					continue;
 
 				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(aimingDeviceEntity);
 
-				if(!m_inMenu && action && transform)
+				if(!m_inMenu && action && transform)//assuming there is a health component
 				{
-					// Rotate the model and reset the angle
-					transform->m_orientation.YawGlobal(action->Angle.x);
-					action->Angle.x = 0;
+					if(health->Health > 0)
+					{
+						// Rotate the model and reset the angle
+						transform->m_orientation.YawGlobal(action->Angle.x);
+						action->Angle.x = 0;
 
-					aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+						aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+					}
+					else //Dead
+					{
+						aimingDeviceTransform->m_orientation.YawGlobal(action->Angle.x);
+						action->Angle.x = 0;
+						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+						action->Angle.y = 0;
+					}
 				}
 
 				if(transform)
-					aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+				{
+					if(health)
+					{
+						if(health->Health > 0)
+							aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+						else //Dead
+							aimingDeviceTransform->m_position = transform->m_position;
+					}
+					else
+					{//no health component
+						aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+					}
+				}
 			}
 		}
 	}

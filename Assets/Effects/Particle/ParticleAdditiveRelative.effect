@@ -1,0 +1,108 @@
+# Sample effect for a simple particle system.
+
+- name: Particle_SampleTechnique
+  
+  # The particle effects in RootEngine uses two techniques one for updates and one for rendering. 
+  techniques:
+
+    - name: Particle_Update
+      bindings:   
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      textures:
+        - name: g_Random
+          slot: 11
+      
+      uniforms:
+        - sem: POSITION
+          offset: 0
+        - sem: LIFETIMEMIN
+          offset: 12
+        - sem: GRAVITY
+          offset: 16
+        - sem: LIFETIMEMAX
+          offset: 28
+        - sem: DIRECTION
+          offset: 32
+        - sem: SPEEDMIN
+          offset: 44
+        - sem: SIZEMIN
+          offset: 48
+        - sem: SPEEDMAX
+          offset: 56
+        - sem: SPREAD
+          offset: 60
+        - sem: SIZEMAX
+          offset: 64
+        - sem: SIZEEND
+          offset: 72
+        - sem: COLOR
+          offset: 80
+        - sem: COLOREND
+          offset: 96
+        - sem: TRANSPOSITION
+          offset: 112
+        - sem: SPAWNTIME
+          offset: 124
+      # The update techniques should be ignored by the render job processor.
+      flags:
+        - name: RenderIgnore
+
+      # Program specification and feedback.
+      programs:
+        - name: particle_update
+          shaders:
+            - name: particle_update
+              type: vertex
+            - name: particle_update_relative
+              type: geometry
+          feedback:
+            - name: vert_initialPos1
+            - name: vert_initialVel1
+            - name: vert_scale1
+            - name: vert_age1
+            - name: vert_type1
+            - name: vert_color1
+            - name: vert_accel1
+            - name: vert_rotation1
+
+    - name: Particle_Render
+    
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1        
+      textures:
+        - name: g_Diffuse
+          slot: 6
+        - name: g_Depth
+          slot: 2
+      uniforms:
+        - sem: POSITION
+          offset: 0
+      flags: 
+        - name: Forward
+      
+      programs:
+        - name: particle_render
+          shaders:
+            - name: particle-render-relative
+              type: vertex
+            - name: particle-render
+              type: geometry
+            - name: particle-render
+              type: fragment
+          
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Additive = 2
+          blend: 2
+          
+          # Depth settings.
+          depth:
+            write: 0
+            test: 1

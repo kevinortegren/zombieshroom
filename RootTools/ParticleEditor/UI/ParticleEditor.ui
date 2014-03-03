@@ -287,6 +287,16 @@
            <string>Orbit</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>RelativeNormal</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>RelativeOrbit</string>
+          </property>
+         </item>
         </widget>
        </widget>
        <widget class="QStackedWidget" name="stackedWidget">
@@ -1709,7 +1719,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>93</x>
        <y>24</y>
-       <width>77</width>
+       <width>97</width>
        <height>22</height>
       </rect>
      </property>
@@ -1717,7 +1727,7 @@ p, li { white-space: pre-wrap; }
       <double>0.250000000000000</double>
      </property>
      <property name="value">
-      <double>0.500000000000000</double>
+      <double>1.000000000000000</double>
      </property>
     </widget>
     <widget class="QLabel" name="label_5">
@@ -1725,9 +1735,14 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>18</x>
        <y>26</y>
-       <width>59</width>
+       <width>69</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Grid space:</string>
@@ -1738,9 +1753,14 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>12</x>
        <y>68</y>
-       <width>63</width>
+       <width>75</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Background:</string>
@@ -1788,6 +1808,61 @@ p, li { white-space: pre-wrap; }
        <string>Blue</string>
       </property>
      </item>
+    </widget>
+    <widget class="QDoubleSpinBox" name="particleCountSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>108</y>
+       <width>103</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="wrapping">
+      <bool>false</bool>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
+     <property name="keyboardTracking">
+      <bool>true</bool>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>2</x>
+       <y>110</y>
+       <width>85</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Particle count:</string>
+     </property>
     </widget>
    </widget>
   </widget>

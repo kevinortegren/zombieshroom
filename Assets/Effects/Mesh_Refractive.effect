@@ -34,7 +34,7 @@
           
           # Depth settings.
           depth:
-            write: 0
+            write: 1
             test: 1
            
 

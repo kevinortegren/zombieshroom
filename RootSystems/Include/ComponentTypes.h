@@ -40,6 +40,7 @@ namespace RootForce
 			HOMING,
 			RAY,
 			DAMAGEANDKNOCKBACK,
+			SCALABLE,
 		};
 	}
 }

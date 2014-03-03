@@ -42,10 +42,8 @@ void main()
 	else
 		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
 
-	//vec3 refractionColor = texture(g_LA, screenTexCoord + vec2(vert_normal.x, vert_normal.y) * 0.05).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
-	vec3 result = mix(refractionColor, vec3(0.2, 0.4, 0.47), 0.2);
-    out_color = vec4(result, 1.0);
+    out_color = vec4(refractionColor, 1.0);
 }

@@ -1,0 +1,20 @@
+- POSITION: [0, 0, 0]
+  LIFETIMEMIN: 1
+  LIFETIMEMAX: 1
+  SPEEDMIN: 0
+  SPEEDMAX: 0
+  SIZEMIN: [0.21, 0.21]
+  SIZEMAX: [0.99, 0.99]
+  SIZEEND: [0, 0]
+  COLOR: [0, 1, 0.933333, 0]
+  COLOREND: [0.14902, 1, 0, 1]
+  GRAVITY: [0, 0, 0]
+  DIRECTION: [0, 0, 0]
+  SPREAD: 0
+  SPAWNTIME: 0.08
+  ORBITSPEED: 6
+  ORBITRADIUS: 2.3
+  TEMPLATE: 2
+  TEXTURE: blockMana
+  EFFECT: Particle/ParticleAdditiveRelative
+  NAME: plasma

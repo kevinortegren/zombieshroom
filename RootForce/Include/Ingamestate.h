@@ -29,6 +29,8 @@
 #include <RootSystems/Include/RaySystem.h>
 #include <RootSystems/Include/TransformInterpolationSystem.h>
 #include <RootSystems/Include/Network/NetworkDebugSystem.h>
+#include <RootSystems/Include/WaterDeathSystem.h>
+#include <RootSystems/Include/ScaleSystem.h>
 
 #include <RootForce/Include/GameStates.h>
 #include <RootSystems/Include/Network/Server.h>
@@ -91,6 +93,8 @@ namespace RootForce
 		RootForce::RaySystem*							m_raySystem;
         RootForce::TransformInterpolationSystem*        m_transformInterpolationSystem;
 		RootForce::Network::NetworkDebugSystem*			m_networkDebugSystem;
+		RootForce::WaterDeathSystem*					m_waterDeathSystem;
+		RootForce::ScaleSystem*							m_scaleSystem;
 
 		Keymapper* m_keymapper;
 

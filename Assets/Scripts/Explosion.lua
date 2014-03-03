@@ -4,7 +4,7 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 Explosion.chargeTime = 0.0;
 Explosion.channelingTime = 0.0;
-Explosion.duration = 1;
+Explosion.duration = 1.0;
 
 function Explosion.OnCreate (userId, actionId)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
@@ -26,8 +26,10 @@ function Explosion.OnCreate (userId, actionId)
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "Explosion");
 	local timerComp = Timer.New(self, Explosion.duration);
+	--Scalable.New(self, 20, 400);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
+	transformComp:SetScale(Vec3.New(10,10,10));
 	colRespComp:SetContainer(collisionComp);
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Explosion handle: "..collisionComp:GetHandle());
 	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
@@ -35,6 +37,11 @@ function Explosion.OnCreate (userId, actionId)
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "explosion");
+		--local renderComp = Renderable.New(self);
+		--renderComp:SetModel("Primitives/sphere");
+		--renderComp:SetMaterial("ExplosiveMat");
+		--renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
+		--renderComp:SetMaterialEffect("Mesh_Refractive_Clear");
 	end
 	Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end

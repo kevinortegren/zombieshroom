@@ -263,7 +263,7 @@ namespace Render
 			m_textureType = GL_UNSIGNED_BYTE;
 			m_textureFormat = GL_RGBA;
 			m_internalFormat = GL_RGBA8;
-			m_bpp = 3;
+			m_bpp = 4;
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
