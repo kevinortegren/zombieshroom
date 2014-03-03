@@ -245,7 +245,7 @@ namespace RootForce
 					{
 						action->WantRespawn = true;
 					}
-					else 
+					else if (playerComponent->AbilityState == AbilityState::OFF)
 					{
 						action->ActiveAbility = PUSH_ABILITY_INDEX;
 						HandleAbilityPressed(dt);
