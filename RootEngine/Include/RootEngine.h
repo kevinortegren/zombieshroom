@@ -65,7 +65,6 @@ namespace RootEngine
 		SubsystemSharedContext m_subsystemSharedContext;
 		GameSharedContext m_gameSharedContext;
 
-		Logging m_logger;
 		MemoryTracker* m_memTracker;
 		ResourceManager m_resourceManager;
 

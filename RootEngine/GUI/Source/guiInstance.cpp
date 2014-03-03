@@ -316,11 +316,13 @@ namespace RootEngine
 							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
 							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
 						} 
+						glDeleteSync(fenceId); //Memory leak fix 
 					m_drawMutex.unlock();
 				
 					uint64_t newTime = SDL_GetPerformanceCounter();
 					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
 					oldTime = newTime;
+
 					if(dt < 0.032f)
 					{
 						long time = (long)floorf((0.032f-dt)*1000);

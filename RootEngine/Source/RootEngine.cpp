@@ -67,9 +67,10 @@ namespace RootEngine
 
 	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
 	{
+		g_logger.OpenLogStream(p_workingDirectory);
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
-		m_configManager.LoadConfig("config.yaml");
+		m_configManager.LoadConfig(p_workingDirectory + "config.yaml");
 
 #ifndef COMPILING_LEVEL_EDITOR
 		m_network = nullptr;
@@ -280,12 +281,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::PHYSICS, LogLevel::FATAL_ERROR, "Failed to load physics subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
 
@@ -303,12 +304,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Failed to load script subsystem %s", DynamicLoader::GetLastError());
 		}
 		
 	}
@@ -327,12 +328,12 @@ namespace RootEngine
 			}
 			else
 			{
-				m_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+				g_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
 			}
 		}
 		else
 		{
-			m_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
+			g_logger.LogText(LogTag::SOUND, LogLevel::FATAL_ERROR, "Failed to load sound subsystem %s", DynamicLoader::GetLastError());
 		}
 	}
 

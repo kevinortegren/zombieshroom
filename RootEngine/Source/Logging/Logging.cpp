@@ -39,9 +39,6 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
 
-#ifdef _DEBUG
-	OpenLogStream();
-#endif // _DEBUG
 }
 
 Logging::~Logging()
@@ -51,8 +48,9 @@ Logging::~Logging()
 #endif // _DEBUG
 }
 
-bool Logging::OpenLogStream()
+bool Logging::OpenLogStream(std::string p_path)
 {
+#ifdef _DEBUG
 	// current date/time based on current system
 	time_t currentTime = time(0);
 
@@ -61,11 +59,12 @@ bool Logging::OpenLogStream()
 	gmtime_s(&gmtm, &currentTime);
 	//Generate file name from date and time
 	std::string fileName = std::to_string(gmtm.tm_year+1900) + std::to_string(gmtm.tm_mon+1) + std::to_string(gmtm.tm_mday) + "_" + GetTimeString(gmtm.tm_hour+1) + "-" + GetTimeString(gmtm.tm_min) + "-" + GetTimeString(gmtm.tm_sec);
-	std::string logName = fileName + ".txt";
+	std::string logName = p_path + fileName + ".txt";
 	//Open log file stream
 	fopen_s(&m_logFile, logName.c_str(), "w");
-
+#endif // _DEBUG
 	return true;
+
 }
 
 bool Logging::CloseLogStream()

@@ -14,6 +14,7 @@
 
 namespace RootForce
 {
+
 	namespace WaterState
 	{
 		enum WaterState
@@ -46,7 +47,6 @@ namespace RootForce
 		void End();
 		void CreateWater(float p_height);
 		void Disturb(float p_x, float p_z, float p_power, int p_radius );
-		void InitDisturb();
 		
 		void CalculateWaterConstants();
 
@@ -69,7 +69,7 @@ namespace RootForce
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;
 
-		bool		m_wireFrame, m_pause, m_playerWaterDeath;
+		bool		m_wireFrame, m_pause, m_playerWaterDeath, m_showDebugDraw;
 		int			m_texSize, m_gridSize;	
 		float		m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*		m_textureData;
@@ -94,6 +94,7 @@ namespace RootForce
 		void ToggleRefractions();
 		void ToggleNormalMaps();
 		void ToggleCollideDeath();
+		void ToggleCollisionDebugDraw();
 
 		void ResetWater();
 
