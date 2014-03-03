@@ -79,7 +79,7 @@ namespace ECS
 	float Storage::GetValueAsFloat(const std::string& p_key)
 	{
 		if(m_values.find(p_key) == m_values.end())
-			return 0;
+			return -99999.0f;
 
 		float r;
 		std::stringstream ss( m_values[p_key] );
