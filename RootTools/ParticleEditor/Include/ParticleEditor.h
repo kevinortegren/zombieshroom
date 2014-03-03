@@ -165,5 +165,7 @@ private slots:
 	void ModelTexDoubleClicked(const QModelIndex& p_index);
 	void BackgroundColorChanged(int p_value);
 	void RemoveObjectButton();
+	void RotationSpeedMinChanged(double p_val);
+	void RotationSpeedMaxChanged(double p_val);
 };
 

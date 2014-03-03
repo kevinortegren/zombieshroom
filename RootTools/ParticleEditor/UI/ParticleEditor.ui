@@ -243,9 +243,9 @@
        <property name="geometry">
         <rect>
          <x>5</x>
-         <y>328</y>
+         <y>406</y>
          <width>497</width>
-         <height>429</height>
+         <height>351</height>
         </rect>
        </property>
        <property name="title">
@@ -316,10 +316,10 @@
          <widget class="QWidget" name="gridLayoutWidget_3">
           <property name="geometry">
            <rect>
-            <x>6</x>
-            <y>4</y>
+            <x>0</x>
+            <y>0</y>
             <width>479</width>
-            <height>347</height>
+            <height>281</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -376,8 +376,8 @@
         <rect>
          <x>2</x>
          <y>16</y>
-         <width>499</width>
-         <height>307</height>
+         <width>511</width>
+         <height>391</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
@@ -709,6 +709,46 @@
           </property>
           <property name="tickPosition">
            <enum>QSlider::NoTicks</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="1">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>Rotspdmin:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="5">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Rotspdmax:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="4">
+         <widget class="QDoubleSpinBox" name="RotspeedminSpinbox">
+          <property name="minimum">
+           <double>-30.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>30.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="6">
+         <widget class="QDoubleSpinBox" name="RotspeedmaxSpinbox">
+          <property name="minimum">
+           <double>-30.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>30.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>

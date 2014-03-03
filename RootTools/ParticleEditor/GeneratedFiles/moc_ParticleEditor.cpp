@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ParticleEditor_t {
-    QByteArrayData data[56];
-    char stringdata[844];
+    QByteArrayData data[58];
+    char stringdata[892];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -84,7 +84,9 @@ QT_MOC_LITERAL(51, 752, 18),
 QT_MOC_LITERAL(52, 771, 21),
 QT_MOC_LITERAL(53, 793, 22),
 QT_MOC_LITERAL(54, 816, 7),
-QT_MOC_LITERAL(55, 824, 18)
+QT_MOC_LITERAL(55, 824, 18),
+QT_MOC_LITERAL(56, 843, 23),
+QT_MOC_LITERAL(57, 867, 23)
     },
     "ParticleEditor\0MenuNew\0\0MenuOpen\0"
     "MenuSave\0ManuSaveAs\0MenuExit\0MenuViewStats\0"
@@ -109,6 +111,7 @@ QT_MOC_LITERAL(55, 824, 18)
     "SpreadSliderChanged\0ModelDoubleClicked\0"
     "ModelTexDoubleClicked\0BackgroundColorChanged\0"
     "p_value\0RemoveObjectButton\0"
+    "RotationSpeedMinChanged\0RotationSpeedMaxChanged\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -118,7 +121,7 @@ static const uint qt_meta_data_ParticleEditor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      47,   14, // methods
+      49,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -126,53 +129,55 @@ static const uint qt_meta_data_ParticleEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  249,    2, 0x08,
-       3,    0,  250,    2, 0x08,
-       4,    0,  251,    2, 0x08,
-       5,    0,  252,    2, 0x08,
-       6,    0,  253,    2, 0x08,
-       7,    0,  254,    2, 0x08,
-       8,    0,  255,    2, 0x08,
-       9,    0,  256,    2, 0x08,
-      10,    0,  257,    2, 0x08,
-      11,    0,  258,    2, 0x08,
-      12,    0,  259,    2, 0x08,
-      13,    0,  260,    2, 0x08,
-      14,    0,  261,    2, 0x08,
-      15,    1,  262,    2, 0x08,
-      17,    1,  265,    2, 0x08,
-      19,    1,  268,    2, 0x08,
-      21,    1,  271,    2, 0x08,
-      23,    1,  274,    2, 0x08,
-      25,    1,  277,    2, 0x08,
-      26,    1,  280,    2, 0x08,
-      27,    1,  283,    2, 0x08,
-      28,    1,  286,    2, 0x08,
-      29,    1,  289,    2, 0x08,
-      30,    1,  292,    2, 0x08,
-      31,    1,  295,    2, 0x08,
-      32,    1,  298,    2, 0x08,
-      33,    1,  301,    2, 0x08,
-      34,    1,  304,    2, 0x08,
-      35,    1,  307,    2, 0x08,
-      36,    1,  310,    2, 0x08,
-      37,    1,  313,    2, 0x08,
-      38,    1,  316,    2, 0x08,
-      39,    1,  319,    2, 0x08,
-      40,    1,  322,    2, 0x08,
-      41,    1,  325,    2, 0x08,
-      43,    0,  328,    2, 0x08,
-      44,    1,  329,    2, 0x08,
-      45,    1,  332,    2, 0x08,
-      46,    1,  335,    2, 0x08,
-      47,    1,  338,    2, 0x08,
-      48,    1,  341,    2, 0x08,
-      49,    1,  344,    2, 0x08,
-      50,    1,  347,    2, 0x08,
-      51,    1,  350,    2, 0x08,
-      52,    1,  353,    2, 0x08,
-      53,    1,  356,    2, 0x08,
-      55,    0,  359,    2, 0x08,
+       1,    0,  259,    2, 0x08,
+       3,    0,  260,    2, 0x08,
+       4,    0,  261,    2, 0x08,
+       5,    0,  262,    2, 0x08,
+       6,    0,  263,    2, 0x08,
+       7,    0,  264,    2, 0x08,
+       8,    0,  265,    2, 0x08,
+       9,    0,  266,    2, 0x08,
+      10,    0,  267,    2, 0x08,
+      11,    0,  268,    2, 0x08,
+      12,    0,  269,    2, 0x08,
+      13,    0,  270,    2, 0x08,
+      14,    0,  271,    2, 0x08,
+      15,    1,  272,    2, 0x08,
+      17,    1,  275,    2, 0x08,
+      19,    1,  278,    2, 0x08,
+      21,    1,  281,    2, 0x08,
+      23,    1,  284,    2, 0x08,
+      25,    1,  287,    2, 0x08,
+      26,    1,  290,    2, 0x08,
+      27,    1,  293,    2, 0x08,
+      28,    1,  296,    2, 0x08,
+      29,    1,  299,    2, 0x08,
+      30,    1,  302,    2, 0x08,
+      31,    1,  305,    2, 0x08,
+      32,    1,  308,    2, 0x08,
+      33,    1,  311,    2, 0x08,
+      34,    1,  314,    2, 0x08,
+      35,    1,  317,    2, 0x08,
+      36,    1,  320,    2, 0x08,
+      37,    1,  323,    2, 0x08,
+      38,    1,  326,    2, 0x08,
+      39,    1,  329,    2, 0x08,
+      40,    1,  332,    2, 0x08,
+      41,    1,  335,    2, 0x08,
+      43,    0,  338,    2, 0x08,
+      44,    1,  339,    2, 0x08,
+      45,    1,  342,    2, 0x08,
+      46,    1,  345,    2, 0x08,
+      47,    1,  348,    2, 0x08,
+      48,    1,  351,    2, 0x08,
+      49,    1,  354,    2, 0x08,
+      50,    1,  357,    2, 0x08,
+      51,    1,  360,    2, 0x08,
+      52,    1,  363,    2, 0x08,
+      53,    1,  366,    2, 0x08,
+      55,    0,  369,    2, 0x08,
+      56,    1,  370,    2, 0x08,
+      57,    1,  373,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -222,6 +227,8 @@ static const uint qt_meta_data_ParticleEditor[] = {
     QMetaType::Void, QMetaType::QModelIndex,   42,
     QMetaType::Void, QMetaType::Int,   54,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,   24,
+    QMetaType::Void, QMetaType::Double,   24,
 
        0        // eod
 };
@@ -278,6 +285,8 @@ void ParticleEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 44: _t->ModelTexDoubleClicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
         case 45: _t->BackgroundColorChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 46: _t->RemoveObjectButton(); break;
+        case 47: _t->RotationSpeedMinChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 48: _t->RotationSpeedMaxChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -308,13 +317,13 @@ int ParticleEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 47)
+        if (_id < 49)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 47;
+        _id -= 49;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 47)
+        if (_id < 49)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 47;
+        _id -= 49;
     }
     return _id;
 }

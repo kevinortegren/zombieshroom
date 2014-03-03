@@ -67,6 +67,8 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
 	connect(ui.bgColorComboBox,		SIGNAL(currentIndexChanged(int)),			this, SLOT(BackgroundColorChanged(int)));
 	connect(ui.removeObjectButton,	SIGNAL(clicked()),							this, SLOT(RemoveObjectButton()));
+	connect(ui.RotspeedminSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMinChanged(double)));
+	connect(ui.RotspeedmaxSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMaxChanged(double)));
 }
 
 void ParticleEditor::Init()
@@ -783,6 +785,24 @@ void ParticleEditor::BackgroundColorChanged( int p_value )
 	default:
 		break;
 	}
+}
+
+void ParticleEditor::RotationSpeedMinChanged( double p_val )
+{
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin = (float)p_val;
+	if(p_val > ui.RotspeedmaxSpinbox->value())
+		ui.RotspeedmaxSpinbox->setValue(p_val);
+	Changed();
+}
+
+void ParticleEditor::RotationSpeedMaxChanged( double p_val )
+{
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax = (float)p_val;
+	if(p_val < ui.RotspeedminSpinbox->value())
+		ui.RotspeedminSpinbox->setValue(p_val);
+	Changed();
 }
 
 #pragma endregion
