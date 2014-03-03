@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
+#include <queue>
 
 #define PLAYER_NUM_ABILITIES 4
 
@@ -41,6 +42,30 @@ namespace RootForce
 
 
 #ifndef COMPILE_LEVEL_EDITOR
+	namespace AbilityEventType
+	{
+		enum AbilityEventType
+		{
+			CHARGE_START,
+			CHANNELING_START,
+			CHANNELING_DONE
+		};
+	}
+	
+	struct AbilityEvent
+	{
+		AbilityEventType::AbilityEventType Type;
+		Network::ActionID_t ActionID;
+		float Time;
+		uint8_t ActiveAbility;
+
+		AbilityEvent()
+			: Type(AbilityEventType::CHARGE_START)
+			, ActionID(Network::ReservedActionID::NONE)
+			, Time(0.0f)
+			, ActiveAbility(ABILITY_INDEX_NONE) {}
+	};
+
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
 		Network::ActionID_t ActionID;
@@ -51,9 +76,8 @@ namespace RootForce
 		float JumpTime;
 		glm::vec3 JumpDir;
 
-		float AbilityTime;
 		uint8_t SelectedAbility;
-		uint8_t ActiveAbility;
+		std::queue<AbilityEvent> AbilityEvents;
 
 		bool WantRespawn;
 
@@ -63,9 +87,7 @@ namespace RootForce
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
 			, JumpDir(glm::vec3(0))
-			, AbilityTime(0.0f)
 			, SelectedAbility(0)
-			, ActiveAbility(ABILITY_INDEX_NONE)
 			, WantRespawn(false)
 		{}
 	};

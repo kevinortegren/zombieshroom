@@ -305,7 +305,7 @@ namespace RootForce
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 
-	void PlayerControlSystem::HandleAbilityPressed(float dt)
+	AbilityEvent PlayerControlSystem::HandleAbilityPressed(float p_dt, bool p_push)
 	{
 		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
 		
@@ -313,7 +313,15 @@ namespace RootForce
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
 
-		if (action->ActiveAbility != ABILITY_INDEX_NONE && !playerComponent->AbilityScripts[action->ActiveAbility].OnCooldown)
+		AbilityEvent e;
+
+		//const AbilityEvent& front = action->AbilityEvents.front();
+		/*
+		if (playerComponent->AbilityScripts[action->
+		   (action->AbilityEvents.empty() || 
+		   (!action->AbilityEvents.empty() && action->AbilityEvents.front().ActiveAbility != ABILITY_INDEX_NONE))
+		*/
+		//if (action->ActiveAbility != ABILITY_INDEX_NONE && !playerComponent->AbilityScripts[action->ActiveAbility].OnCooldown)
 		{
 			if (playerComponent->AbilityState == AbilityState::OFF)
 			{
@@ -402,7 +410,7 @@ namespace RootForce
 		} 
 	}
 
-	void PlayerControlSystem::HandleAbilityReleased()
+	AbilityEvent PlayerControlSystem::HandleAbilityReleased()
 	{
 		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
 		
