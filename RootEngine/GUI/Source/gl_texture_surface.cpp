@@ -1,7 +1,10 @@
 // Author: princeofcode
 // URL: https://gist.github.com/princeofcode/5133370 (02-12-2013)
+#include <GL/glew.h>
 #include "gl_texture_surface.h"
 #include <iostream>
+
+GLuint GLRAMTextureSurface::m_bufferTexture = 0;
 
 GLRAMTextureSurface::GLRAMTextureSurface(int width, int height) : texture_id_(0),
   buffer_(0), bpp_(4), rowspan_(0), width_(width), height_(height) {
@@ -16,7 +19,18 @@ GLRAMTextureSurface::GLRAMTextureSurface(int width, int height) : texture_id_(0)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
-               bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, buffer_);
+               bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, 0);
+
+  if(m_bufferTexture == 0)
+  {
+	  glGenTextures(1, &m_bufferTexture);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
+		  bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, 0);
+  }
 }
 
 GLRAMTextureSurface::~GLRAMTextureSurface() {
@@ -44,7 +58,7 @@ void GLRAMTextureSurface::Paint(unsigned char* src_buffer,
 	
   // If texture can be updated from here, do it
   // unless a full update is needed already
-  if(!needs_update_
+  /*if(!needs_update_
 	  && src_rect.x == 0 && src_rect.y == 0
 	  && src_rect.width == dest_rect.width
 	  && src_rect.height == dest_rect.height)
@@ -55,7 +69,7 @@ void GLRAMTextureSurface::Paint(unsigned char* src_buffer,
 		src_buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
   }
-  else
+  else*/
   {
 	needs_update_ = true;
   }
@@ -117,12 +131,27 @@ void GLRAMTextureSurface::UpdateTexture()
 	m_needsUpdateMutex.lock();
 	if (needs_update_)
 	{
-		glBindTexture(GL_TEXTURE_2D, texture_id_);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_,
-			bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE,
-			buffer_);
+		glInvalidateTexImage(m_bufferTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, m_bufferTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
+			bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, buffer_);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		needs_update_ = false;
+
+		GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+		GLenum result;
+		while(true) 
+		{ 
+			result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
+			if(result == GL_CONDITION_SATISFIED)
+				break;
+			if(result == GL_WAIT_FAILED)
+				break;
+			if(result == GL_ALREADY_SIGNALED)
+				break;
+		} 
+		glDeleteSync(fenceId);
+		std::swap(m_bufferTexture, texture_id_);
 	}
 	m_needsUpdateMutex.unlock();
 }

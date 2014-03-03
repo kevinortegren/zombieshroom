@@ -240,6 +240,7 @@ namespace RootForce
 		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
+		m_ingameMenu->GetView()->SetActive(false);
 		
 		m_animationSystem->Start();
 
@@ -269,6 +270,7 @@ namespace RootForce
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
+		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 		m_ingameMenu->Reset();
 	}
@@ -330,10 +332,12 @@ namespace RootForce
 			}
 			else
 			{
+				m_hud->GetView()->SetActive(m_displayGuiHUD);
 				if(m_displayGuiHUD)
-				g_engineContext.m_gui->Render(m_hud->GetView());
+					g_engineContext.m_gui->Render(m_hud->GetView());
+				g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
 				if(m_displayDebugHUD)
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+					g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 			}
 		}
 
@@ -537,12 +541,14 @@ namespace RootForce
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			m_displayIngameMenu = !m_displayIngameMenu;
+			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
 			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
 		{
 			m_displayIngameMenu = false;
+			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game

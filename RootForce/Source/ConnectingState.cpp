@@ -38,6 +38,7 @@ namespace RootForce
 	{
 		// Render a frame of loading screen to indicate the loading state
 		m_loadingScreen->WaitLoading();
+		m_loadingScreen->SetActive(true);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();
@@ -110,6 +111,7 @@ namespace RootForce
 
 	void ConnectingState::Exit()
 	{
+		m_loadingScreen->SetActive(false);
 	}
 
 	GameStates::GameStates ConnectingState::Update()

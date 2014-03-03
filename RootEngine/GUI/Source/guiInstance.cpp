@@ -75,15 +75,18 @@ namespace RootEngine
 
 		void guiInstance::Render(WebView* p_view)
 		{
+			if(!((WebViewImpl*)p_view)->m_isActive)
+				return;
+
 			m_program->Apply();
 
 			glBindVertexArray(m_vertexArrayBuffer);
-			m_drawMutex.lock();
+			//m_drawMutex.lock();
 			glActiveTexture(GL_TEXTURE0);
 			SurfaceToTexture((GLTextureSurface*)((WebViewImpl*)p_view)->m_webView->surface());
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			glBindTexture(GL_TEXTURE_2D, 0);
-			m_drawMutex.unlock();
+			//m_drawMutex.unlock();
 			
 			glBindVertexArray(0);
 		}
@@ -128,6 +131,8 @@ namespace RootEngine
 		{
 			if(p_surface)
 				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
+			else
+				glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -299,24 +304,24 @@ namespace RootEngine
 								m_viewBuffer[i]->Update();
 					m_viewBufferMutex.unlock();
 
-					m_drawMutex.lock();
+					//m_drawMutex.lock();
 						m_core->Update();
 						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
+							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
 							{
 								GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
 								if(surface)
 									surface->UpdateTexture(); // Force a texture update
 							}
 						// Wait until texture updates are complete before releasing the lock
-						GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
+						/*GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
 						GLenum result; 
 						while(true) 
 						{ 
 							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
 							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
-						} 
-					m_drawMutex.unlock();
+						} */
+					//m_drawMutex.unlock();
 				
 					uint64_t newTime = SDL_GetPerformanceCounter();
 					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();

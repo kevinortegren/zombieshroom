@@ -4,6 +4,7 @@
 #include <mutex>
 #include <queue>
 #include <vector>
+#include <atomic>
 #include "Dispatcher.h"
 
 namespace RootEngine
@@ -69,6 +70,8 @@ namespace RootEngine
 
 			virtual Awesomium::WebView* GetView() = 0;
 
+			virtual void SetActive(bool p_active) = 0;
+
 			virtual void InjectKeyboardEvent(Awesomium::WebKeyboardEvent p_event) = 0;
 			virtual void InjectMouseDown(Awesomium::MouseButton p_mousebutton) = 0;
 			virtual void InjectMouseUp(Awesomium::MouseButton p_mousebutton) = 0;
@@ -88,7 +91,9 @@ namespace RootEngine
 				m_callbackObject(nullptr),
 				m_dispatcher(p_dispatcher),
 				m_callbackObjectName(p_callbackObjectName)
-			{}
+			{
+				m_isActive = true;
+			}
 			~WebViewImpl();
 		public:
 
@@ -107,6 +112,11 @@ namespace RootEngine
 			Awesomium::WebView* GetView()
 			{
 				return m_webView;
+			}
+
+			void SetActive(bool p_active)
+			{
+				m_isActive = p_active;
 			}
 
 		private:
@@ -136,6 +146,7 @@ namespace RootEngine
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;
 			std::vector<std::pair<int,int>> m_injectMouseMove;
 			std::vector<std::pair<int,int>> m_injectMouseWheel;
+			std::atomic_bool m_isActive;
 		};
 	}
 }

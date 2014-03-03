@@ -27,6 +27,7 @@ public:
 
 class GLRAMTextureSurface : public GLTextureSurface {
   GLuint texture_id_;
+  static GLuint m_bufferTexture;
   unsigned char* buffer_;
   int bpp_, rowspan_, width_, height_;
   bool needs_update_;
