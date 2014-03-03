@@ -609,16 +609,18 @@ namespace AbilityEditorNameSpace
 
 		struct StatChangeCaster : MainComponent
 		{
-			float m_speed, m_jumpHeight, m_knockbackResistance;
-			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
+			float m_speed, m_jumpHeight, m_knockbackResistance, m_damageResistance, m_time;
+			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f, float p_damageResistance = 1.0f, float p_time = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
 			{
 				m_speed = p_speed;
 				m_jumpHeight = p_jumpHeight;
 				m_knockbackResistance = p_knockbackResistance;
+				m_damageResistance = p_damageResistance;
+				m_time = p_time;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance, *dmgResistance, *time;
 
 				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
 				p_propMan->setValue(speed, m_speed);
@@ -629,10 +631,18 @@ namespace AbilityEditorNameSpace
 				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
 				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
 
+				dmgResistance = p_propMan->addProperty(QVariant::Double, "Damage Resistance" );
+				p_propMan->setValue(dmgResistance, m_damageResistance);
+
+				time = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(time, m_time);
+
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(speed);
 				p_propBrows->addProperty(jumpHeight);
 				p_propBrows->addProperty(knockbackResistance);
+				p_propBrows->addProperty(dmgResistance);
+				p_propBrows->addProperty(time);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -641,21 +651,25 @@ namespace AbilityEditorNameSpace
 				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
 				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
 				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_damageResistance = p_propMan->variantProperty(props.at(3))->value().toFloat();
+				m_time = p_propMan->variantProperty(props.at(4))->value().toFloat();
 			}
 		};
 
 		struct StatChangeTarget : MainComponent
 		{
-			float m_speed, m_jumpHeight, m_knockbackResistance;
-			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
+			float m_speed, m_jumpHeight, m_knockbackResistance, m_damageResistance, m_time;
+			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f, float p_damageResistance = 1.0f, float p_time = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
 			{
 				m_speed = p_speed;
 				m_jumpHeight = p_jumpHeight;
 				m_knockbackResistance = p_knockbackResistance;
+				m_damageResistance = p_damageResistance;
+				m_time = p_time;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance, *dmgResistance, *time;
 
 				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
 				p_propMan->setValue(speed, m_speed);
@@ -666,10 +680,18 @@ namespace AbilityEditorNameSpace
 				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
 				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
 
+				dmgResistance = p_propMan->addProperty(QVariant::Double, "Damage Resistance" );
+				p_propMan->setValue(dmgResistance, m_damageResistance);
+
+				time = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(time, m_time);
+
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(speed);
 				p_propBrows->addProperty(jumpHeight);
 				p_propBrows->addProperty(knockbackResistance);
+				p_propBrows->addProperty(dmgResistance);
+				p_propBrows->addProperty(time);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -678,6 +700,8 @@ namespace AbilityEditorNameSpace
 				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
 				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
 				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_damageResistance = p_propMan->variantProperty(props.at(3))->value().toFloat();
+				m_time = p_propMan->variantProperty(props.at(4))->value().toFloat();
 			}
 		};
 

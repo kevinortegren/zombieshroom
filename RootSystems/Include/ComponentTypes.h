@@ -41,6 +41,7 @@ namespace RootForce
 			RAY,
 			DAMAGEANDKNOCKBACK,
 			SCALABLE,
+			STATCHANGE,
 		};
 	}
 }

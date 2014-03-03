@@ -351,6 +351,15 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "DamageAndKnockback");
 			return 1;
 		}
+		static int EntityGetStatChange(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange **)lua_newuserdata(p_luaState, sizeof(RootForce::StatChange *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::StatChange>(*e);
+			luaL_setmetatable(p_luaState, "StatChange");
+			return 1;
+		}
 		static int EntityRemoveTryPickupComponent(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -1642,6 +1651,7 @@ namespace RootForce
 			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
+			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 
 			if((*s)->Health <= 0)
@@ -2411,6 +2421,76 @@ namespace RootForce
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		//Stat change
+		//////////////////////////////////////////////////////////////////////////
+		static int StatChangeCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange**)lua_newuserdata(p_luaState, sizeof(RootForce::StatChange*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::StatChange>(*e);
+
+			luaL_setmetatable(p_luaState, "StatChange");
+			return 1;
+		}
+		static int StatChangeGetSpeed(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			lua_pushnumber(p_luaState, (*s)->SpeedChange);
+			return 1;
+		}
+		static int StatChangeGetJumpHeight(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			lua_pushnumber(p_luaState, (*s)->JumpHeightChange);
+			return 1;
+		}
+		static int StatChangeGetKnockbackResistance(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			lua_pushnumber(p_luaState, (*s)->KnockbackResistance);
+			return 1;
+		}
+		static int StatChangeGetDamageResistance(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			lua_pushnumber(p_luaState, (*s)->DamageResistance);
+			return 1;
+		}
+		static int StatChangeSetSpeed(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			(*s)->SpeedChange = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int StatChangeSetJumpHeight(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			(*s)->JumpHeightChange = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int StatChangeSetKnockbackResistance(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			(*s)->KnockbackResistance = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+		static int StatChangeSetDamageResistance(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
+			(*s)->DamageResistance = (float)luaL_checknumber(p_luaState, 2);
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//Scalable
 		//////////////////////////////////////////////////////////////////////////
 		static int ScalableCreate(lua_State* p_luaState)
@@ -2483,6 +2563,7 @@ namespace RootForce
 			{"RemovePlayerControl", EntityRemovePlayerControl},
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
+			{"GetStatChange", EntityGetStatChange},
 			{NULL, NULL}
 		};
 
@@ -2972,6 +3053,23 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg statchange_f [] = {
+			{"New", StatChangeCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg statchange_m [] = {
+			{"GetSpeed", StatChangeGetSpeed},
+			{"GetJumpHeight", StatChangeGetJumpHeight},
+			{"GetKnockbackResistance", StatChangeGetKnockbackResistance},
+			{"GetDamageResistance", StatChangeGetDamageResistance},
+			{"SetSpeed", StatChangeSetSpeed},
+			{"SetJumpHeight", StatChangeSetJumpHeight},
+			{"SetKnockbackResistance", StatChangeSetKnockbackResistance},
+			{"SetDamageResistance", StatChangeSetDamageResistance},
+			{NULL, NULL}
+		};
+
 		static const struct luaL_Reg scalable_f [] = {
 			{"New", ScalableCreate},
 			{NULL, NULL}
@@ -3042,6 +3140,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::abilityspawn_f,			RootForce::LuaAPI::abilityspawn_m,			"AbilitySpawn");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::damageandknockback_f,	RootForce::LuaAPI::damageandknockback_m,	"DamageAndKnockback"); 
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::scalable_f,				RootForce::LuaAPI::scalable_m,				"Scalable");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statchange_f,			RootForce::LuaAPI::statchange_m,			"StatChange");
 
 			//No methods
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");

@@ -80,7 +80,7 @@ namespace RootSystems
 			{
 				if(glm::length2(action->JumpDir) > 1)
 					action->JumpDir = glm::normalize(action->JumpDir);
-				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed; //* speedChange
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position, dt);
 			}
 
@@ -168,7 +168,7 @@ namespace RootSystems
 					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 					{
 						// Apply jump force and go into jump animation
-						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce); //* jumpheightChange
 
 						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 						{

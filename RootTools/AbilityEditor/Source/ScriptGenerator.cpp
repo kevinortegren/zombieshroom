@@ -452,6 +452,7 @@ namespace AbilityEditorNameSpace
 	{
 
 		int dmgEnum = 0, knockEnum = 0;
+		float kbRes = 1.0f, dmgRes = 1.0f, speed = 1.0f, jumpHeight = 1.0f, time = 1.0f;
 		//float dmg = 0.0f, knockb = 0.0f;
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
@@ -470,6 +471,14 @@ namespace AbilityEditorNameSpace
 			{
 				knockEnum = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
 				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_knockback;
+			}
+			else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STATCHANGETARGET)
+			{
+				time = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_time;
+				kbRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_knockbackResistance;
+				dmgRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_damageResistance;
+				speed = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_speed;
+				jumpHeight = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_jumpHeight;
 			}
 		}
 
@@ -500,7 +509,7 @@ namespace AbilityEditorNameSpace
 						m_file << "\t\t\tif not health:IsDead() then\n";
 							m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
 							m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage(), receiverId);\n";
+							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance, receiverId);\n";
 						m_file << "\t\t\tend\n";
 					if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
 						m_file << "\t\tend\n";
@@ -517,10 +526,26 @@ namespace AbilityEditorNameSpace
 
 						m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
 						m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback());\n";
+						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance);\n";
 
 					if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
 						m_file << "\t\tend\n";
+				}
+				//Change stat on collided entity
+				if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STATCHANGETARGET)) FUCKING LÖS DETTA SÅ FORT SOM MÖJILGT!!!
+				{
+					m_file << "\t\tlocal statEnt = Entity.New();\n";
+					//Network comp?
+					m_file << "\t\tlocal timeComp = Timer.New(statEnt, " << time << ");\n";
+					m_file << "\t\tlocal statComp = entity:GetStatChange();\n";
+					if(kbRes != 1.0f)
+						m_file << "\t\tstatComp:SetKnockbackResistance(" << kbRes << ");\n";
+					if(dmgRes != 1.0f)
+						m_file << "\t\tstatComp:SetDamageResistance(" << dmgRes << ");\n";
+					if(speed != 1.0f)
+						m_file << "\t\tstatComp:SetSpeed(" << speed << ");\n";
+					if(jumpHeight != 1.0f)
+						m_file << "\t\tstatComp:SetJumpHeight(" << jumpHeight << ");\n";
 				}
 			m_file << "\tend\n";
 		}
