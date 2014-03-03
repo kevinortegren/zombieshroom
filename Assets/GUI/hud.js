@@ -204,6 +204,15 @@ function SetCooldown(p_slot, p_percent)
 	slot.css("background-position", "50% "+(1-p_percent)*75+"px");
 }
 
+function SetCharges(p_slot, p_charges)
+{
+  var slot = $("#slot"+p_slot+"-cooldown");
+  if(p_charges > 0)
+    slot.html(p_charges);
+  else
+    slot.html("");
+}
+
 function DamageIndicator(p_damage)
 {
   if(p_damage > 0)
@@ -228,6 +237,7 @@ $(document).ready(function(){
   // setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
+  //SetCharges(1,3);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 	$("#healthbar>div>div").css('width', $("#healthbar>div>div").width()*(99.5/100.0)+"px");
 });
