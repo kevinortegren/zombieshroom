@@ -27,7 +27,7 @@ public:
 	bool recoverFromPenetration ( btCollisionWorld* collisionWorld);
 	
 
-	float test(const btVector3& start,const btVector3& end, btCollisionWorld* world );
+	
 	btVector3 GetKnockbackVector() const {return m_knockbackVelocity;}
 	float GetVerticalVelocity() const {return m_verticalVelocity;}
 private:

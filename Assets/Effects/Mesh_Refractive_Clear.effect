@@ -1,6 +1,6 @@
-- name: MeshWater
+- name: MeshRefract
   techniques:
-    - name: MeshWater
+    - name: MeshRefract
       bindings:
         - name: PerFrame
           slot: 0
@@ -11,42 +11,20 @@
             offset: 0
           - sem: NORMAL
             offset: 64
-          - sem: EYEWORLDPOS
-            offset: 128
-          - sem: LIFETIMEMIN
-            offset: 140
-          - sem: COLOR
-            offset: 144
-          - sem: LIFETIMEMAX
-            offset: 160
       textures:
-          - name: g_SceneNormals
-            slot: 1
           - name: g_LA
             slot: 5
-          - name: g_Normal
-            slot: 8
-          - name: g_CubeMap
-            slot: 9
           - name: g_Depth
             slot: 10
-          - name: g_NormalMap
-            slot: 16
-          - name: g_Diffuse
-            slot: 18
       flags:
           - name: Forward
           - name: Refractive
       programs:
-        - name: Mesh
+        - name: RefractMesh
           shaders:
-            - name: watermesh
+            - name: refractmesh
               type: vertex
-            - name: watermesh
-              type: tess_control
-            - name: watermesh
-              type: tess_evaluation
-            - name: watermesh
+            - name: refractmeshClear
               type: fragment
           # Blend Mode:
           # None = 0

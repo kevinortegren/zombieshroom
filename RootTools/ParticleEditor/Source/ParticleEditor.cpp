@@ -84,7 +84,7 @@ void ParticleEditor::Init()
 	m_selectedEmitterIndex	= -1;
 	m_selectedEntityIndex	= -1;
 	m_materialIndex			= 0;
-	m_gridSpace				= 0.5f;
+	m_gridSpace				= 1.0f;
 	m_samples				= 0;
 	m_collectedTime			= 0.0f;
 
@@ -236,6 +236,11 @@ void ParticleEditor::MenuOpen()
 	if(fullFileName.compare("") == 0)
 		return;
 
+	OpenParticleFileQ(fullFileName);
+}
+
+void ParticleEditor::OpenParticleFileQ( QString p_filePath )
+{
 	ClearScene();
 	//Enable the New Emitter button 
 	ui.newEmitterButton->setEnabled(true);
@@ -255,7 +260,7 @@ void ParticleEditor::MenuOpen()
 		m_selectedEntityIndex = 0; 
 	}
 
-	e->m_particleSystems = m_context->m_resourceManager->LoadParticleEmitter(fullFileName.toStdString(), true);
+	e->m_particleSystems = m_context->m_resourceManager->LoadParticleEmitter(p_filePath.toStdString(), true);
 
 	for (unsigned int i = 0; i < e->m_particleSystems.size(); i++)
 	{
@@ -279,9 +284,18 @@ void ParticleEditor::MenuOpen()
 		}
 	}
 
-	QFileInfo fileinfo(fullFileName);
+	QFileInfo fileinfo(p_filePath);
 	m_particleTab->setTabText(0, fileinfo.baseName());
 	Saved();
+}
+
+void ParticleEditor::OpenParticleFile( std::string p_filePath )
+{
+	if(p_filePath.compare("") == 0)
+		return;
+
+	QString fullFileName = QString::fromStdString(p_filePath);
+	OpenParticleFileQ(fullFileName);
 }
 
 void ParticleEditor::MenuSave()
@@ -334,10 +348,10 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position		= glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin	= 2.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax	= 2.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin		= 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax		= 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin		= glm::vec2(0.05f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax		= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin		= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax		= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin		= glm::vec2(0.5f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax		= glm::vec2(0.5f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd		= glm::vec2(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_color		= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd		= glm::vec4(0.0f);
@@ -346,7 +360,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread		= 0.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed	= 1.0f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius	= 0.5f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.05f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.1f;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_name			= ui.nameEmitterLineEdit->text().toStdString();
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_template		= 0;
 
@@ -540,6 +554,8 @@ void ParticleEditor::SizeMinXChanged( double p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMin.x = (float)p_val;
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMin.y = (float)p_val;
+	if(p_val > ui.sizeMaxSpinBoxX->value())
+		ui.sizeMaxSpinBoxX->setValue(p_val);
 	Changed();
 }
 
@@ -548,6 +564,8 @@ void ParticleEditor::SizeMaxXChanged( double p_val )
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMax.x = (float)p_val;
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_sizeMax.y = (float)p_val;
+	if(p_val < ui.sizeMinSpinBoxX->value())
+		ui.sizeMinSpinBoxX->setValue(p_val);
 	Changed();
 }
 
@@ -564,14 +582,21 @@ void ParticleEditor::LifeTimeMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMin = (float)p_val;
+	if(p_val > ui.lifeTimeMaxSpinBox->value())
+		ui.lifeTimeMaxSpinBox->setValue(p_val);
 	Changed();
 }
 
 void ParticleEditor::LifeTimeMaxChanged( double p_val )
 {
-	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMax = (float)p_val;
-	Changed();
+	if(CalculateMaxParticles())
+	{
+		RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_lifeTimeMax = (float)p_val;
+		if(p_val < ui.lifeTimeMinSpinBox->value())
+			ui.lifeTimeMinSpinBox->setValue(p_val);
+		Changed();
+	}
 }
 
 void ParticleEditor::GravityXChanged( double p_val )
@@ -620,6 +645,8 @@ void ParticleEditor::SpeedMinChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMin = (float)p_val;
+	if(p_val > ui.speedMaxSpinBox->value())
+		ui.speedMaxSpinBox->setValue(p_val);
 	Changed();
 }
 
@@ -627,6 +654,8 @@ void ParticleEditor::SpeedMaxChanged( double p_val )
 {
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
 	pe->m_particleSystems[m_selectedEmitterIndex]->m_speedMax = (float)p_val;
+	if(p_val < ui.speedMinSpinBox->value())
+		ui.speedMinSpinBox->setValue(p_val);
 	Changed();
 }
 
@@ -640,9 +669,13 @@ void ParticleEditor::SpreadChanged( double p_val )
 
 void ParticleEditor::SpawnTimeChanged( double p_val )
 {
-	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime = (float)p_val;
-	Changed();
+	if(CalculateMaxParticles())
+	{
+		RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_spawnTime = (float)p_val;
+	
+		Changed();
+	}
 }
 
 void ParticleEditor::ColorChanged( const QColor& p_val )
@@ -1057,6 +1090,21 @@ void ParticleEditor::TemplateChanged( int p_val )
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleOrbit");
 		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
 	}
+	else if(p_val == 2)
+	{
+		ResetTemplates();
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditiveRelative");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
+	}
+	else if(p_val == 3)
+	{
+		ResetTemplates();
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITSPEED]  = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed;
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_params[Render::Semantic::ORBITRADIUS] = &pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitRadius;
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditiveRelativeOrbit");
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_template = p_val;
+		ui.stackedWidget->setCurrentIndex(1);//orbit settings
+	}
 	Changed();
 }
 
@@ -1270,8 +1318,15 @@ ParticleEditor::PointOnPlane ParticleEditor::GetPointOnPlane( glm::vec3 p_camPos
 	return PointOnPlane(p_worldCamPos + (p_rayDir * t), hit);
 }
 
-
-
-
-
-
+bool ParticleEditor::CalculateMaxParticles()
+{
+	double count = ui.lifeTimeMaxSpinBox->value() / ui.spawnTimeSpinBox->value();
+	ui.particleCountSpinBox->setValue(count);
+	if(count > 1000.0)
+	{
+		ShowMessageBox("Particle count over 1000 is not supported!");		
+		return false;
+	}
+	else
+		return true;
+}
