@@ -55,6 +55,7 @@ namespace RootSystems
 					health->WantsRespawn = true;
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
+					action->JumpDir = glm::vec3(0.0f);
 					action->AbilityTime = 0.0f;
 					player->AbilityState = RootForce::AbilityState::OFF;
 				}

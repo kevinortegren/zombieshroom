@@ -154,7 +154,11 @@ function Set(p_id, p_value)
     var oldHealth = parseInt($("#"+p_id).html());
     var newHealth = parseInt(value);
     DamageIndicator(oldHealth-newHealth);
-    value = newHealth;
+		// Health (0~100)
+		$("#healthbar>div>div").css('width', $("#healthbar>div").width()*((newHealth<100?newHealth:100)/100.0)+"px");
+		// Health overflow (100~200)
+		$("#healthbar>div>div>div").css('width', $("#healthbar>div").width()*(((newHealth<200?newHealth:200)-100)/100.0)+"px");
+    return;
 	}
 	if(p_id == "IsDead")
 	{
@@ -199,8 +203,17 @@ function SetAbilityFocus(p_slot)
 }
 function SetCooldown(p_slot, p_percent)
 {
-	var slot = $("#slot"+p_slot+"-cooldown");
+	var slot = $("#slot"+p_slot+">div");
 	slot.css("background-position", "50% "+(1-p_percent)*75+"px");
+}
+
+function SetCharges(p_slot, p_charges)
+{
+  var slot = $("#slot"+p_slot+">div>div");
+  if(p_charges > 0)
+    slot.html(p_charges);
+  else
+    slot.html("");
 }
 
 function DamageIndicator(p_damage)
@@ -227,5 +240,8 @@ $(document).ready(function(){
   // setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
+  //SetCharges(1,3);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
+	//$("#healthbar>div>div").css('width', $("#healthbar>div").width()*(99/100.0)+"px");
+	Set('Health', 166);
 });

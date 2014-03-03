@@ -49,7 +49,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "Fire2");
+		local particleComp = ParticleEmitter.New(self, "AbilityBallFire");
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
 		pointlightComp:SetRange(10.0);
@@ -68,8 +68,9 @@ function AbilityBall.OnCollide (self, entity)
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local health = entity:GetHealth();
+				
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
@@ -79,7 +80,7 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback, health:GetHealth());
 			end
 		end
 	end

@@ -1,6 +1,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 #include <iostream>
 #include <fstream>
 
@@ -86,7 +87,21 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{		
+		{	
+
+#ifndef COMPILE_LEVEL_EDITOR
+			//Check if player and kill
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
+			{
+				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
+				PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
+				playercomp->Score --;
+				playercomp->Deaths ++;
+				m_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playercomp->TeamID] --;
+			}
+#endif
+		
+				
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);

@@ -28,7 +28,7 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
-	assert(p_entity->m_id != -1);
+	//assert(p_entity->m_id != -1);
 	if (p_entity->m_id != -1)
 	{
 		m_recycledIds.push(p_entity->m_id);

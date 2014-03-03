@@ -60,8 +60,8 @@ function RefractiveBall.OnCollide (self, entity)
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+      local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local health = entity:GetHealth();
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
@@ -71,7 +71,7 @@ function RefractiveBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), RefractiveBall.knockback);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), RefractiveBall.knockback, health:GetHealth());
 			end
 		end
 	end

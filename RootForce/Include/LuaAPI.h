@@ -842,9 +842,11 @@ namespace RootForce
 		}
 		static int PhysicsKnockBack(lua_State* p_luaState)
 		{
-			NumberOfArgs(4);
+			NumberOfArgs(5);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
+			//Multiply the knockback depending on the health of the target
+			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 5) ) / 100;
+			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")) * multiplier, (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
 		static int PhysicsCheckRadius(lua_State* p_luaState)
@@ -1805,6 +1807,13 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->TeamID);
 			return 1;
 		}
+		static int PlayercomponentAddSelectedCharges(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(*s)->SelectedAbility].Charges += (int)luaL_checknumber(p_luaState, 2);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//PLAYERACTION
 		//////////////////////////////////////////////////////////////////////////
@@ -2183,21 +2192,22 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::HomingComponent>(*e);
 			(*s)->Controllability = (float)luaL_checknumber(p_luaState, 2);
 			(*s)->Speed = (float)luaL_checknumber(p_luaState, 3);
-			luaL_setmetatable(p_luaState, "Homing");
+			luaL_setmetatable(p_luaState, "HomingComponent");
 			return 1;
 		}
 		static int HomingSetTargetEntity(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
+			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
-			(*s)->TargetPlayer = *e;
+			RootForce::Network::NetworkComponent *n = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
+			(*s)->TargetID = n->ID;
 			return 0;
 		}
 		static int HomingSetTargetPosition(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
-			RootForce::HomingComponent** ptemp = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "Homing");
+			RootForce::HomingComponent** ptemp = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
 			(*ptemp)->TargetPosition = (*v1);
 			return 0;
@@ -2242,7 +2252,7 @@ namespace RootForce
 				r->m_forward = true;
 				r->m_shadowTech = Render::ShadowTechnique::SHADOW_NONE;
 				r->m_params[Render::Semantic::POSITION] = &((*s)->HitPos.x);
-				r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES0;
+				r->m_pass = RootForce::RenderPass::RENDERPASS_PARTICLES1;
 			}
 
 			luaL_setmetatable(p_luaState, "Ray");
@@ -2766,6 +2776,7 @@ namespace RootForce
 			{"GetDeaths",			PlayerComponentGetDeaths},
 			{"GetScore",			PlayerComponentGetScore},
 			{"GetTeamId",			PlayerComponentGetTeamId},
+			{"AddSelectedCharges",	PlayercomponentAddSelectedCharges},
 			{NULL, NULL}
 		};
 
@@ -3033,7 +3044,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f,			RootForce::LuaAPI::tdmruleset_m,			"TDMRuleSet");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f,		RootForce::LuaAPI::particlecomponent_m,		"ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f,		RootForce::LuaAPI::followercomponent_m,		"Follower");
-			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f,		RootForce::LuaAPI::homingcomponent_m,		"Homing");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f,		RootForce::LuaAPI::homingcomponent_m,		"HomingComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::raycomponent_f,			RootForce::LuaAPI::raycomponent_m,			"Ray");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::watercollider_f,			RootForce::LuaAPI::watercollider_m,			"WaterCollider");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::soundable_f,				RootForce::LuaAPI::soundable_m,				"Soundable");
