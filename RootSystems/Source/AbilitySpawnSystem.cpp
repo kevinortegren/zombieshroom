@@ -132,13 +132,17 @@ namespace RootForce
 		respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
-
+		Renderable* render = m_world->GetEntityManager()->GetComponent<Renderable>(p_entity);
+		CollisionResponder* cr = m_world->GetEntityManager()->GetComponent<CollisionResponder>(p_entity);
 		//m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
 
 		//Remove all components used for rendering and collision
-		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
-		m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
-		m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
+		if(render != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
+		if(cr != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
+		if(collision != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
 
 		respawn->Timer = 30.0f; //30 second timer until a new ability respawns
 		respawn->Claimed = Network::ReservedUserID::NONE; //no current claimiant
