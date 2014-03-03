@@ -198,8 +198,13 @@ function SetAbility(p_slot, p_ability)
 
 function SetAbilityFocus(p_slot)
 {
+  if($(".slotselected") == $("#slot"+p_slot))
+    return;
+  $(".slotselected>div>div>div").stop();
 	$(".slotselected").removeClass("slotselected");
 	$("#slot"+p_slot).addClass("slotselected");
+  
+  $(".slotselected>div>div>div").animate({transform: 'rotate(180deg)'}, 3000);
 }
 function SetCooldown(p_slot, p_percent)
 {
@@ -209,7 +214,7 @@ function SetCooldown(p_slot, p_percent)
 
 function SetCharges(p_slot, p_charges)
 {
-  var slot = $("#slot"+p_slot+">div>div");
+  var slot = $("#slot"+p_slot+">div>div>div>div");
   if(p_charges > 0)
     slot.html(p_charges);
   else
@@ -230,7 +235,7 @@ function DamageIndicator(p_damage)
 }
 
 $(document).ready(function(){
-	// SetAbilityFocus(0);
+	SetAbilityFocus(1);
 	// SetAbility(1, "TestBall");
 	// StartCooldown(1, 3);
 	//UpdateScoreScreen(2, "doqunbop", [[2,"doqunbop",1,11],[1,"The Enemy",11,2],[1,"The Enemy2",0,2],[2,"The Ally",3,0]]);

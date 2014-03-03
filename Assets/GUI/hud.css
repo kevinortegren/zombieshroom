@@ -163,7 +163,7 @@ img
 	padding: 0;
 	height: 33px;
 	/*width: 304px;*/
-	background: center url('healthBackground.png');
+	background: center url('healthBackground.gif');
 	margin: auto;
 }
 #healthbar div div div
@@ -171,7 +171,7 @@ img
 	padding: 0;
 	height: 33px;
 	/*width: 304px;*/
-	background: center url('healthOverflowBackground.png');
+	background: center url('healthOverflowBackground.gif');
 	margin: auto;
 }
 #chargebar
@@ -274,26 +274,52 @@ img
 	display: inline-block;
 	text-align: right;
 }
-.slot div
+.slot>div
 {
 	background-image: url('cooldown.png');
 	background-size: 64px;
 	background-repeat: no-repeat;
 	background-position: 0% 64px;
 }
-.slot div div
+.slot>div>div
+{
+
+	background-image: url('Abilityring.png');
+	background-repeat: no-repeat;
+	background-position: 0;
+}
+.slot>div>div>div
 {
 	padding: 30px 15px 0 15px;
 	width: 34px;
 	height: 34px;
 	overflow: hidden;
-	background-image: url('Abilityring.png');
-	background-repeat: no-repeat;
-	background-position: -2px -2px;
+  background: transparent;
 }
-.slotselected div div
+.slot>div>div>div>div 
 {
-	background-image: url('AbilityringSelected.png');
+	padding: 30px 15px 0 15px;
+	width: 34px;
+	height: 34px;
+	overflow: hidden;
+  position: static;
+  background: transparent;
+}
+@-webkit-keyframes spin {  
+  from {  
+    -webkit-transform: rotate(0deg);  
+  }  
+  to {  
+    -webkit-transform: rotate(360deg);  
+  } 
+}
+.slotselected>div>div>div
+{
+  background-image: url('JustGlow.png');
+  -webkit-animation-name: spin; 
+  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-duration: 15s; 
 }
 #slot2
 {
