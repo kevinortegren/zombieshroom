@@ -130,6 +130,7 @@ img
 	height: 20px;
 	font-family: Comic Sans MS;
   color: transparent;
+  background: transparent;
   border: 0;
 }
 #chatinput:focus
@@ -262,11 +263,25 @@ img
 	margin: 32px 0 0 0;
 	display: inline-block;
 	text-align: right;
+}
+.slot div
+{
+	background-image: url('cooldown.png');
+	background-size: 64px;
+	background-repeat: no-repeat;
+	background-position: 0% 64px;
+}
+.slot div div
+{
+	padding: 30px 15px 0 15px;
+	width: 34px;
+	height: 34px;
+	overflow: hidden;
 	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
 	background-position: -2px -2px;
 }
-.slotselected
+.slotselected div div
 {
 	background-image: url('AbilityringSelected.png');
 }
@@ -274,17 +289,6 @@ img
 {
   position: relative;
   top: -32px;
-}
-.cooldown
-{
-	padding: 30px 15px 0 15px;
-	width: 34px;
-	height: 34px;
-	overflow: hidden;
-	background-image: url('cooldown.png');
-	background-size: 75px;
-	background-repeat: no-repeat;
-	background-position: 0% 75px;
 }
 
 .verticaltablehax

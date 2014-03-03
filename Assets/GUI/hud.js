@@ -200,13 +200,13 @@ function SetAbilityFocus(p_slot)
 }
 function SetCooldown(p_slot, p_percent)
 {
-	var slot = $("#slot"+p_slot+"-cooldown");
+	var slot = $("#slot"+p_slot+">div");
 	slot.css("background-position", "50% "+(1-p_percent)*75+"px");
 }
 
 function SetCharges(p_slot, p_charges)
 {
-  var slot = $("#slot"+p_slot+"-cooldown");
+  var slot = $("#slot"+p_slot+">div>div");
   if(p_charges > 0)
     slot.html(p_charges);
   else
