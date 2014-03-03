@@ -324,16 +324,16 @@ namespace AbilityEditorNameSpace
 
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::TARGPOS))
 			{
-				m_file << "\tlocal homingComp = Homing.New(self, " << homingStrength << ", " << homingSpeed << ");\n";
+				m_file << "\tlocal homingComp = HomingComponent.New(self, " << homingStrength << ", " << homingSpeed << ");\n";
 				m_file << "\tlocal dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();\n";
 				m_file << "\tlocal rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));\n";
-				m_file << "\tlocal rayComp = Ray.New(rayEnt, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
-				m_file << "\trayComp = Ray.New(rayEnt, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
-				if (startEnum == AbilityComponents::TargetPos::ONAIM)
+				m_file << "\tlocal rayComp = Ray.New(self, collisionComp:GetHandle(), rayStartPos, dirVecForward, " << height << ", false, false);\n";
+				m_file << "\trayComp = Ray.New(self, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, " << height << ", true, true);\n";
+				if (targetEnum == AbilityComponents::TargetPos::ONAIM)
 				{
 					m_file << "\thomingComp:SetTargetPosition(rayComp:GetHitPos());\n";
 				}
-				else if (startEnum == AbilityComponents::TargetPos::ENEMYPLAYER || startEnum == AbilityComponents::TargetPos::FRIENDLYPLAYER)
+				else if (targetEnum == AbilityComponents::TargetPos::ENEMYPLAYER || targetEnum == AbilityComponents::TargetPos::FRIENDLYPLAYER)
 				{
 					m_file << "\tlocal entityAtAim = rayComp:GetHitEntity();\n";
 					m_file << "\tif entityAtAim:DoesExist() then\n";
@@ -344,7 +344,7 @@ namespace AbilityEditorNameSpace
 					m_file << "\t		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
 					m_file << "\t		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
 
-					if(startEnum == AbilityComponents::TargetPos::ENEMYPLAYER)
+					if(targetEnum == AbilityComponents::TargetPos::ENEMYPLAYER)
 						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then\n";
 					else
 						m_file << "\t		if abilityOwnerPlayerComponent:GetTeamId() == entityAtAim:GetPlayerComponent():GetTeamId() then\n";
@@ -356,7 +356,7 @@ namespace AbilityEditorNameSpace
 					m_file << "\t	homingComp:SetTargetPosition(rayComp:GetHitPos());\n";
 					m_file << "\tend\n";
 				}
-				else if (startEnum == AbilityComponents::TargetPos::ABSOLUTE)
+				else if (targetEnum == AbilityComponents::TargetPos::ABSOLUTE)
 				{
 					m_file << "\tlocal targPos = Vec3.New(" << targetPos.x() << ", " << targetPos.y() << ", " << targetPos.z() << ");\n"; 
 					m_file << "\thomingComp:SetTargetPosition(targPos);\n";

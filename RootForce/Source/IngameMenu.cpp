@@ -47,6 +47,7 @@ namespace RootForce
 		if(p_array[0].IsInteger())
 		{
 			m_changeTeam = p_array[0].ToInteger();
+			m_return = true;
 		}
 	}
 
@@ -75,10 +76,9 @@ namespace RootForce
 				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
 				m.Serialize(true, &bs);
 
-				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 
-			m_return = true;
 			m_changeTeam = -1;
 		}
 	}

@@ -18,3 +18,5 @@
   TEXTURE: particle
   EFFECT: Particle/ParticleAdditive
   NAME: Fire
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

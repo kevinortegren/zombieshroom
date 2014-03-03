@@ -18,6 +18,8 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleAdditive
   NAME: 1
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 2
   LIFETIMEMAX: 2
@@ -38,3 +40,5 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleAdditive
   NAME: 2
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

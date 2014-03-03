@@ -312,7 +312,6 @@ namespace RootForce
 					// Only remote clients need to parse. A local server would already have updated the entities.
 					if (clientComponent->IsRemote && ClientState::IsConnected(clientComponent->State))
 					{
-
 						ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
 						assert(playerEntity != nullptr);
 
@@ -351,7 +350,7 @@ namespace RootForce
 							glm::vec3 displacement = m.Position - playerTransform->m_position;
 								
 							// Check if the displacement has the same sign as the local velocity.
-							if (displacement.y * verticalVelocity >= 0.0f)
+							//if (displacement.y * verticalVelocity >= 0.0f)
 								playerTransform->m_position.y = m.Position.y;
 							playerTransform->m_position.x = m.Position.x;
 							playerTransform->m_position.z = m.Position.z;
@@ -1069,37 +1068,49 @@ namespace RootForce
 				} return true;
 
 				case NetworkMessage::MessageType::Death:
+				{
+					NetworkMessage::Death m;
+					m.Serialize(false, p_bs);
+
+					ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+					if(player)
 					{
-						NetworkMessage::Death m;
-						m.Serialize(false, p_bs);
+						RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(player);
+						assert(health);
+						health->Health = 0;
+						health->IsDead = true;
+						health->RespawnDelay = 3.0f;
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
+					}
 
-						ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-						if(player)
-						{
-							RootForce::HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(player);
-							assert(health);
-							health->Health = 0;
-							health->IsDead = true;
-							health->RespawnDelay = 3.0f;
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
-						}
-
-					} return true;
+				} return true;
 				case NetworkMessage::MessageType::PlayerTeamSelect:
+				{
+					NetworkMessage::PlayerTeamSelect m;
+					m.Serialize(false, p_bs);
+					
+					// Make sure we are in the correct state.
+					if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
 					{
-						NetworkMessage::PlayerTeamSelect m;
-						m.Serialize(false, p_bs);
 
 						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
 
 						// Call the OnCreate script
-						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-						g_engineContext.m_script->AddParameterNumber(m.TeamID);
-						g_engineContext.m_script->ExecuteScript();
+						if(player)
+						{
+							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+							g_engineContext.m_script->AddParameterNumber(m.TeamID);
+							g_engineContext.m_script->ExecuteScript();
+						}
+					}
+					else
+					{
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "PlayerTeamSelect received in an invalid state (%d).", clientComponent->State);
+					}
 
 
-					} return true;
+				} return true;
 			}
 
 			return false;
@@ -1332,7 +1343,7 @@ namespace RootForce
 								glm::vec3 displacement = m.Position - playerTransform->m_position;
 								
 								// Check if the displacement has the same sign as the local velocity.
-								if (displacement.y * verticalVelocity >= 0.0f)
+								//if (displacement.y * verticalVelocity >= 0.0f)
 									playerTransform->m_position.y = m.Position.y;
 								playerTransform->m_position.x = m.Position.x;
 								playerTransform->m_position.z = m.Position.z;
@@ -1881,9 +1892,8 @@ namespace RootForce
 								assert(playerEntity != nullptr);
 
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								action->WantRespawn = true;
+								if(action != nullptr)
+									action->WantRespawn = true;
 							}
 							else
 							{
@@ -2162,22 +2172,25 @@ namespace RootForce
 							//if a team has two or more players than the other team, joining it is not allowed
 							if(m.TeamID == 1) 
 								if(team1 > team2)
+								{
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Client tried to join a full team 1: %d vs %d", team1, team2);
 									break;
+								}
 							else if(m.TeamID == 2)
 								if(team2 > team1)
+								{
+									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "Client tried to join a full team 2: %d vs %d", team1, team2);
 									break;
+								}
 						}
 
-						if (m_world->GetTagManager()->GetEntityByTag("Client") == nullptr)
-						{
-							ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
+						ECS::Entity* player = FindEntity(g_networkEntityMap, m.UserID);
 
-							// Call the OnCreate script
-							g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
-							g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
-							g_engineContext.m_script->AddParameterNumber(m.TeamID);
-							g_engineContext.m_script->ExecuteScript();
-						}
+						// Call the OnCreate script
+						g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+						g_engineContext.m_script->AddParameterUserData(player, sizeof(ECS::Entity*), "Entity");
+						g_engineContext.m_script->AddParameterNumber(m.TeamID);
+						g_engineContext.m_script->ExecuteScript();
 
 						RakNet::BitStream bs;
 						bs.Write((RakNet::MessageID) ID_TIMESTAMP);

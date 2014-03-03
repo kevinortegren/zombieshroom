@@ -5,17 +5,18 @@
 #include <Utility/ECS/Include/Component.h>
 #include <Utility/ECS/Include/EntitySystem.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 
 namespace RootForce
 {
 	struct HomingComponent : public ECS::Component<HomingComponent>
 	{
-		ECS::Entity* TargetPlayer;
+		Network::NetworkEntityID TargetID;
 		glm::vec3 TargetPosition;
 		float Controllability;
 		float Speed;
 		HomingComponent()
-			: TargetPlayer(nullptr),
+			: TargetID(),
 			  TargetPosition(glm::vec3(0,0,0)),
 			  Controllability(0.0f)
 		{}

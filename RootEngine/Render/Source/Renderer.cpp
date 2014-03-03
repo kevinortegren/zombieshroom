@@ -862,7 +862,8 @@ namespace Render
 
 	void GLRenderer::CopyDepthAndColor()
 	{
-		glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
+		m_forwardDepth[m_activeForwardFramebuffer]->Bind(0);
+	//	glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
 		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
 		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 

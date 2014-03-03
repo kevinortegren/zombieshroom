@@ -31,6 +31,8 @@ layout(std140) uniform PerObject
 	float	g_spawnTime;
 	float	g_orbitSpeed;
 	float	g_orbitRadius;
+	float	g_rotationSpeedMin;
+	float	g_rotationSpeedMax;
 };
 
 in vec3 vert_initialVel[];
@@ -106,7 +108,7 @@ void main()
 		 	vert_accel1			= g_gravity;
 			lifeTime			= g_spawnTime;
 			vert_rotation1		= GetRandomNumber(g_time+0.01f, 0.0f, 6.29f);
-			vert_rotationSpeed1 = (vert_rotation1 * 2 - 6.29);
+			vert_rotationSpeed1 = GetRandomNumber(g_time, g_rotationSpeedMin, g_rotationSpeedMax);
 			EmitVertex();
 			EndPrimitive();
 		}
@@ -120,7 +122,7 @@ void main()
 		vert_color1			= vert_color[0];  
 		vert_accel1			= vert_accel[0];
 		vert_rotation1		= vert_rotation[0];
-		vert_rotationSpeed1 = 1.0f;
+		vert_rotationSpeed1 = 0.0;
 		EmitVertex();
 		EndPrimitive();
 	}
@@ -142,8 +144,8 @@ void main()
 			vert_type1			= 1.0f;
 			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
 			vert_accel1			= vert_accel[0];
-			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_time;
-			vert_rotationSpeed1 = 1.0;
+			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_dt;
+			vert_rotationSpeed1 = vert_rotationSpeed[0];
 			EmitVertex();
 			EndPrimitive();
 		}

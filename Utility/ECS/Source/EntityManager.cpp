@@ -28,12 +28,16 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
-	m_recycledIds.push(p_entity->m_id);
+	//assert(p_entity->m_id != -1);
+	if (p_entity->m_id != -1)
+	{
+		m_recycledIds.push(p_entity->m_id);
 
-	p_entity->m_id = -1;
-	p_entity->m_flag = 0;
+		p_entity->m_id = -1;
+		p_entity->m_flag = 0;
 	
-	p_entity = nullptr;
+		p_entity = nullptr;
+	}
 }
 
 ECS::ComponentAllocator* ECS::EntityManager::GetAllocator()

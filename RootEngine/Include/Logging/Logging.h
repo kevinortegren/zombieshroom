@@ -78,6 +78,7 @@ class Logging : public LoggingInterface
 
 		void ParseCommand( std::stringstream* p_data );
 
+		bool OpenLogStream(std::string p_path);
 	private:
 
 		struct TagLevelInfo
@@ -90,7 +91,6 @@ class Logging : public LoggingInterface
 
 		bool m_enableLogging;
 
-		bool OpenLogStream();
 		bool CloseLogStream();
 
 		FILE* m_logFile;

@@ -169,6 +169,8 @@ public:
     QLabel *label_5;
     QLabel *label_20;
     QComboBox *bgColorComboBox;
+    QDoubleSpinBox *particleCountSpinBox;
+    QLabel *label_19;
 
     void setupUi(QMainWindow *ParticleEditorClass)
     {
@@ -864,18 +866,36 @@ public:
         dockWidgetContents_5->setObjectName(QStringLiteral("dockWidgetContents_5"));
         gridSpaceSpinBox = new QDoubleSpinBox(dockWidgetContents_5);
         gridSpaceSpinBox->setObjectName(QStringLiteral("gridSpaceSpinBox"));
-        gridSpaceSpinBox->setGeometry(QRect(93, 24, 77, 22));
+        gridSpaceSpinBox->setGeometry(QRect(93, 24, 97, 22));
         gridSpaceSpinBox->setSingleStep(0.25);
-        gridSpaceSpinBox->setValue(0.5);
+        gridSpaceSpinBox->setValue(1);
         label_5 = new QLabel(dockWidgetContents_5);
         label_5->setObjectName(QStringLiteral("label_5"));
-        label_5->setGeometry(QRect(18, 26, 59, 16));
+        label_5->setGeometry(QRect(18, 26, 69, 16));
+        label_5->setFont(font1);
         label_20 = new QLabel(dockWidgetContents_5);
         label_20->setObjectName(QStringLiteral("label_20"));
-        label_20->setGeometry(QRect(12, 68, 63, 16));
+        label_20->setGeometry(QRect(12, 68, 75, 16));
+        label_20->setFont(font1);
         bgColorComboBox = new QComboBox(dockWidgetContents_5);
         bgColorComboBox->setObjectName(QStringLiteral("bgColorComboBox"));
         bgColorComboBox->setGeometry(QRect(90, 66, 103, 22));
+        particleCountSpinBox = new QDoubleSpinBox(dockWidgetContents_5);
+        particleCountSpinBox->setObjectName(QStringLiteral("particleCountSpinBox"));
+        particleCountSpinBox->setGeometry(QRect(90, 108, 103, 22));
+        particleCountSpinBox->setWrapping(false);
+        particleCountSpinBox->setFrame(true);
+        particleCountSpinBox->setReadOnly(true);
+        particleCountSpinBox->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        particleCountSpinBox->setKeyboardTracking(true);
+        particleCountSpinBox->setDecimals(3);
+        particleCountSpinBox->setMinimum(0);
+        particleCountSpinBox->setMaximum(1000);
+        particleCountSpinBox->setValue(0);
+        label_19 = new QLabel(dockWidgetContents_5);
+        label_19->setObjectName(QStringLiteral("label_19"));
+        label_19->setGeometry(QRect(2, 110, 85, 16));
+        label_19->setFont(font1);
         gridDockWidget->setWidget(dockWidgetContents_5);
         ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), gridDockWidget);
 
@@ -937,6 +957,8 @@ public:
         templateComboBox->insertItems(0, QStringList()
          << QApplication::translate("ParticleEditorClass", "Normal", 0)
          << QApplication::translate("ParticleEditorClass", "Orbit", 0)
+         << QApplication::translate("ParticleEditorClass", "RelativeNormal", 0)
+         << QApplication::translate("ParticleEditorClass", "RelativeOrbit", 0)
         );
         label_15->setText(QApplication::translate("ParticleEditorClass", "Orbit radius", 0));
         label_14->setText(QApplication::translate("ParticleEditorClass", "Orbit speed", 0));
@@ -1016,6 +1038,7 @@ public:
          << QApplication::translate("ParticleEditorClass", "Green", 0)
          << QApplication::translate("ParticleEditorClass", "Blue", 0)
         );
+        label_19->setText(QApplication::translate("ParticleEditorClass", "Particle count:", 0));
     } // retranslateUi
 
 };

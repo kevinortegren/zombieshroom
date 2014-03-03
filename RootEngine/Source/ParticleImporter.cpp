@@ -112,7 +112,8 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::SPAWNTIME]			= &outStruct->at(i)->m_spawnTime;
 			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &outStruct->at(i)->m_rotationSpeedMin;
 			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &outStruct->at(i)->m_rotationSpeedMax;
-			if(outStruct->at(i)->m_template == 1)
+
+			if(outStruct->at(i)->m_template == 1 || outStruct->at(i)->m_template == 3)
 			{
 				outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]	= &outStruct->at(i)->m_orbitRadius;
 				outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]	= &outStruct->at(i)->m_orbitSpeed;

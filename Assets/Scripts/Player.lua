@@ -63,6 +63,7 @@ function Player.OnTeamSelect(self, teamId)
     playerAction:SetAngle(Vec2.New(0, 0));
     playerAction:SetAbilityTime(0.0);
     playerAction:SelectAbility(0);
+		playerAction:SetWantRespawn(true);
 
     playerPhysics:SetMovementSpeed(25);
     playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
@@ -148,5 +149,7 @@ function Player.OnCollide (self, entity)
 end
 
 function Player.OnDestroy (self)
+	local network = self:GetNetwork();
+	Logging.Log(LogLevel.DEBUG_PRINT, "Destroying player (userId: "..tostring(network:GetUserId())..", actionId: "..tostring(network:GetActionId())..")");
 	Entity.Remove(self);
 end

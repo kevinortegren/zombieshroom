@@ -34,9 +34,9 @@ namespace RootForce
 		m_commandBuffer = m_commandBuffer + "Set('" + p_key + "','" + p_value + "');";
 	}
 
-	void HUD::StartCooldown( int p_slot, float p_duration )
+	void HUD::SetCooldown( int p_slot, float p_duration )
 	{
-		m_commandBuffer = m_commandBuffer + "StartCooldown('" + std::to_string(p_slot) + "'," + std::to_string(p_duration) + ");";
+		m_commandBuffer = m_commandBuffer + "SetCooldown('" + std::to_string(p_slot) + "'," + std::to_string(p_duration) + ");";
 	}
 
 	void HUD::SetSelectedAbility( int p_slot )

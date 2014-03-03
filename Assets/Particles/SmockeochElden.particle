@@ -18,6 +18,8 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleOrbit
   NAME: Smocke
+  ROTATIONSPEEDMIN: -3.14
+  ROTATIONSPEEDMAX: 3.14
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 2
   LIFETIMEMAX: 2
@@ -38,3 +40,5 @@
   TEXTURE: elden
   EFFECT: Particle/ParticleAdditive
   NAME: Elden
+  ROTATIONSPEEDMIN: -3.14
+  ROTATIONSPEEDMAX: 3.14

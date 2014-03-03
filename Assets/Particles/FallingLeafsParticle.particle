@@ -18,6 +18,8 @@
   TEXTURE: Leaf
   EFFECT: Particle/Particle
   NAME: LeafEmiter
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 39
   LIFETIMEMAX: 40
@@ -38,3 +40,5 @@
   TEXTURE: Leaf
   EFFECT: Particle/ParticleAlphaBlend
   NAME: LeafDarkGreen
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
