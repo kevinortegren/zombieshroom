@@ -324,14 +324,15 @@ namespace RootForce
 							ECS::Entity* aimingEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_AIMING_DEVICE_ENTITY));
 							assert(aimingEntity != nullptr);
 
-
 							// Set the actions for the client, to be parsed by the action system later. Preserve ActiveAbility.
 							PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 							assert(playerAction != nullptr);
 
-							uint8_t activeAbility = playerAction->ActiveAbility;
-							*playerAction = m.Action;
-							playerAction->ActiveAbility = activeAbility;
+							playerAction->MovePower = m.MovePower;
+							playerAction->StrafePower = m.StrafePower;
+							playerAction->Angle = m.Angle;
+							playerAction->JumpTime = m.JumpTime;
+							playerAction->SelectedAbility = m.SelectedAbility;
 
 							// Set the position of the player, as given by the other client.
 							PlayerPhysics* playerPhysics = m_world->GetEntityManager()->GetComponent<PlayerPhysics>(playerEntity);
@@ -1340,9 +1341,11 @@ namespace RootForce
 								PlayerActionComponent* playerAction = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(playerAction != nullptr);
 								
-								uint8_t activeAbility = playerAction->ActiveAbility;
-								*playerAction = m.Action;
-								playerAction->ActiveAbility = activeAbility;
+								playerAction->MovePower = m.MovePower;
+								playerAction->StrafePower = m.StrafePower;
+								playerAction->Angle = m.Angle;
+								playerAction->JumpTime = m.JumpTime;
+								playerAction->SelectedAbility = m.SelectedAbility;
 
 								// Set the position of the player
 								Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(playerEntity);
@@ -1575,11 +1578,17 @@ namespace RootForce
 								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
 								assert(playerComponent != nullptr);
 
+								AbilityEvent e;
+								e.ActionID = m.Action;
+								//e.
+								//action->AbilityEvents
+								/*
 								// TODO: Use ActionID here?
 								playerComponent->AbilityState = AbilityState::START_CHARGING;
 								action->ActionID = m.Action;
 								action->AbilityTime = halfPing;
 								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+								*/
 
 								// DEBUG
 								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);

@@ -31,12 +31,8 @@ namespace RootForce
 		enum AbilityState
 		{
 			OFF,
-			START_CHARGING,
 			CHARGING,
-			START_CHANNELING,
 			CHANNELING,
-			STOP_CHANNELING,
-			STOP_CHARGING_AND_CHANNELING
 		};
 	}
 
@@ -48,7 +44,7 @@ namespace RootForce
 		{
 			CHARGE_START,
 			CHANNELING_START,
-			CHANNELING_DONE
+			CHANNELING_DONE,
 		};
 	}
 	
@@ -68,7 +64,6 @@ namespace RootForce
 
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
-		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
 		glm::vec2 Angle;
@@ -78,12 +73,12 @@ namespace RootForce
 
 		uint8_t SelectedAbility;
 		std::queue<AbilityEvent> AbilityEvents;
+		AbilityEvent CurrentAbilityEvent;
 
 		bool WantRespawn;
 
-		PlayerActionComponent() 
-			: ActionID(Network::ReservedActionID::NONE)
-			, MovePower(0.0f)
+		PlayerActionComponent()
+			: MovePower(0.0f)
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
 			, JumpDir(glm::vec3(0))

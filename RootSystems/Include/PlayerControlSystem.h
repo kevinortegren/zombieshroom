@@ -74,8 +74,8 @@ namespace RootForce
 		void Process();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
-		AbilityEvent HandleAbilityPressed(float p_dt, bool p_push);
-		AbilityEvent HandleAbilityReleased();
+		void HandleAbilityPressed(float p_dt, bool p_push);
+		void HandleAbilityReleased();
 
 		static Network::ActionID_t s_nextActionID;
 		std::vector<Keybinding> m_keybindings;
