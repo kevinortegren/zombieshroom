@@ -170,8 +170,5 @@ namespace RootEngine
 		m_debugOverlay = p_debugOverlay;
 	}
 
-
-
-
 #endif
 }

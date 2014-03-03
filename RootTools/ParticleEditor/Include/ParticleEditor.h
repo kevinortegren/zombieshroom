@@ -42,6 +42,7 @@ public:
 	float CheckRayVsAABB(glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2);
 	void DragEmitter(int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
 	glm::vec3 GetSelectedPosition();
+	void OpenParticleFile(std::string p_filePath);
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
@@ -74,7 +75,8 @@ private:
 	void ResetTemplates();
 	float GetDragOffset(float p_pointOnAxis, float p_pointOfEmitter);
 	PointOnPlane GetPointOnPlane(glm::vec3 p_camPos, glm::vec3 p_worldCamPos, glm::vec3 p_rayDir);
-	
+	bool CalculateMaxParticles();
+	void OpenParticleFileQ(QString p_filePath);
 	QMessageBox::StandardButton SaveWarningDialog();
 
 	//MEMBERS
