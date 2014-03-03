@@ -47,50 +47,53 @@ namespace RootEngine
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
 
 			//Position
-			doc[i]["POSITION"][0]	>> outStruct->at(i)->m_position.x;
-			doc[i]["POSITION"][1]	>> outStruct->at(i)->m_position.y;
-			doc[i]["POSITION"][2]	>> outStruct->at(i)->m_position.z;
-			//Life time					
-			doc[i]["LIFETIMEMIN"]	>> outStruct->at(i)->m_lifeTimeMin;
-			doc[i]["LIFETIMEMAX"]	>> outStruct->at(i)->m_lifeTimeMax;
-			//Speed						
-			doc[i]["SPEEDMIN"]		>> outStruct->at(i)->m_speedMin;
-			doc[i]["SPEEDMAX"]		>> outStruct->at(i)->m_speedMax;
-			//Size						
-			doc[i]["SIZEMIN"][0]	>> outStruct->at(i)->m_sizeMin.x;
-			doc[i]["SIZEMIN"][1]	>> outStruct->at(i)->m_sizeMin.y;
-			doc[i]["SIZEMAX"][0]	>> outStruct->at(i)->m_sizeMax.x;
-			doc[i]["SIZEMAX"][1]	>> outStruct->at(i)->m_sizeMax.y;
-			doc[i]["SIZEEND"][0]	>> outStruct->at(i)->m_sizeEnd.x;
-			doc[i]["SIZEEND"][1]	>> outStruct->at(i)->m_sizeEnd.y;
-			//Color						
-			doc[i]["COLOR"][0]		>> outStruct->at(i)->m_color.r;
-			doc[i]["COLOR"][1]		>> outStruct->at(i)->m_color.g;
-			doc[i]["COLOR"][2]		>> outStruct->at(i)->m_color.b;
-			doc[i]["COLOR"][3]		>> outStruct->at(i)->m_color.a;
-			doc[i]["COLOREND"][0]	>> outStruct->at(i)->m_colorEnd.r;
-			doc[i]["COLOREND"][1]	>> outStruct->at(i)->m_colorEnd.g;
-			doc[i]["COLOREND"][2]	>> outStruct->at(i)->m_colorEnd.b;
-			doc[i]["COLOREND"][3]	>> outStruct->at(i)->m_colorEnd.a;
-			//Gravity					
-			doc[i]["GRAVITY"][0]	>> outStruct->at(i)->m_gravity.x;
-			doc[i]["GRAVITY"][1]	>> outStruct->at(i)->m_gravity.y;
-			doc[i]["GRAVITY"][2]	>> outStruct->at(i)->m_gravity.z;
-			//Direction					
-			doc[i]["DIRECTION"][0]	>> outStruct->at(i)->m_direction.x;
-			doc[i]["DIRECTION"][1]	>> outStruct->at(i)->m_direction.y;
-			doc[i]["DIRECTION"][2]	>> outStruct->at(i)->m_direction.z;
-			//Spread					
-			doc[i]["SPREAD"]		>> outStruct->at(i)->m_spread;
-			//Spawn time				
-			doc[i]["SPAWNTIME"]		>> outStruct->at(i)->m_spawnTime;
+			doc[i]["POSITION"][0]		>> outStruct->at(i)->m_position.x;
+			doc[i]["POSITION"][1]		>> outStruct->at(i)->m_position.y;
+			doc[i]["POSITION"][2]		>> outStruct->at(i)->m_position.z;
+			//Life time						
+			doc[i]["LIFETIMEMIN"]		>> outStruct->at(i)->m_lifeTimeMin;
+			doc[i]["LIFETIMEMAX"]		>> outStruct->at(i)->m_lifeTimeMax;
+			//Speed							
+			doc[i]["SPEEDMIN"]			>> outStruct->at(i)->m_speedMin;
+			doc[i]["SPEEDMAX"]			>> outStruct->at(i)->m_speedMax;
+			//Size							
+			doc[i]["SIZEMIN"][0]		>> outStruct->at(i)->m_sizeMin.x;
+			doc[i]["SIZEMIN"][1]		>> outStruct->at(i)->m_sizeMin.y;
+			doc[i]["SIZEMAX"][0]		>> outStruct->at(i)->m_sizeMax.x;
+			doc[i]["SIZEMAX"][1]		>> outStruct->at(i)->m_sizeMax.y;
+			doc[i]["SIZEEND"][0]		>> outStruct->at(i)->m_sizeEnd.x;
+			doc[i]["SIZEEND"][1]		>> outStruct->at(i)->m_sizeEnd.y;
+			//Color							
+			doc[i]["COLOR"][0]			>> outStruct->at(i)->m_color.r;
+			doc[i]["COLOR"][1]			>> outStruct->at(i)->m_color.g;
+			doc[i]["COLOR"][2]			>> outStruct->at(i)->m_color.b;
+			doc[i]["COLOR"][3]			>> outStruct->at(i)->m_color.a;
+			doc[i]["COLOREND"][0]		>> outStruct->at(i)->m_colorEnd.r;
+			doc[i]["COLOREND"][1]		>> outStruct->at(i)->m_colorEnd.g;
+			doc[i]["COLOREND"][2]		>> outStruct->at(i)->m_colorEnd.b;
+			doc[i]["COLOREND"][3]		>> outStruct->at(i)->m_colorEnd.a;
+			//Gravity						
+			doc[i]["GRAVITY"][0]		>> outStruct->at(i)->m_gravity.x;
+			doc[i]["GRAVITY"][1]		>> outStruct->at(i)->m_gravity.y;
+			doc[i]["GRAVITY"][2]		>> outStruct->at(i)->m_gravity.z;
+			//Direction						
+			doc[i]["DIRECTION"][0]		>> outStruct->at(i)->m_direction.x;
+			doc[i]["DIRECTION"][1]		>> outStruct->at(i)->m_direction.y;
+			doc[i]["DIRECTION"][2]		>> outStruct->at(i)->m_direction.z;
+			//Spread						
+			doc[i]["SPREAD"]			>> outStruct->at(i)->m_spread;
+			//Spawn time					
+			doc[i]["SPAWNTIME"]			>> outStruct->at(i)->m_spawnTime;
 			//Orbit
-			doc[i]["ORBITSPEED"]	>> outStruct->at(i)->m_orbitSpeed;
-			doc[i]["ORBITRADIUS"]	>> outStruct->at(i)->m_orbitRadius;
+			doc[i]["ORBITSPEED"]		>> outStruct->at(i)->m_orbitSpeed;
+			doc[i]["ORBITRADIUS"]		>> outStruct->at(i)->m_orbitRadius;
 			//Template
-			doc[i]["TEMPLATE"]		>> outStruct->at(i)->m_template;
+			doc[i]["TEMPLATE"]			>> outStruct->at(i)->m_template;
 			//Name						
-			doc[i]["NAME"]			>> outStruct->at(i)->m_name;
+			doc[i]["NAME"]				>> outStruct->at(i)->m_name;
+			//Rotation speed
+			doc[i]["ROTATIONSPEEDMIN"]	>> outStruct->at(i)->m_rotationSpeedMin;
+			doc[i]["ROTATIONSPEEDMAX"]	>> outStruct->at(i)->m_rotationSpeedMax;
 
 			//Set params
 			outStruct->at(i)->m_params[Render::Semantic::POSITION]			= &outStruct->at(i)->m_position;
@@ -107,10 +110,12 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::DIRECTION]			= &outStruct->at(i)->m_direction;
 			outStruct->at(i)->m_params[Render::Semantic::SPREAD]			= &outStruct->at(i)->m_spread;
 			outStruct->at(i)->m_params[Render::Semantic::SPAWNTIME]			= &outStruct->at(i)->m_spawnTime;
+			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &outStruct->at(i)->m_rotationSpeedMin;
+			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &outStruct->at(i)->m_rotationSpeedMax;
 			if(outStruct->at(i)->m_template == 1)
 			{
-				outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]			= &outStruct->at(i)->m_orbitRadius;
-				outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]			= &outStruct->at(i)->m_orbitSpeed;
+				outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]	= &outStruct->at(i)->m_orbitRadius;
+				outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]	= &outStruct->at(i)->m_orbitSpeed;
 			}
 		}
 		return outStruct;

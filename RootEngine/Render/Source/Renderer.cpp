@@ -354,32 +354,35 @@ namespace Render
 	void GLRenderer::InitializeSemanticSizes()
 	{
 		// Sizes for common semantics for use in render jobs uniform params.
-		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
-		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
-		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
-		s_sizes[Semantic::SHADOW]		= sizeof(glm::mat4);
-		s_sizes[Semantic::POSITION]		= sizeof(glm::vec3);
-		s_sizes[Semantic::LIFETIMEMIN]	= sizeof(float);
-		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);
-		s_sizes[Semantic::SPEEDMIN]		= sizeof(float);
-		s_sizes[Semantic::SPEEDMAX]		= sizeof(float);
-		s_sizes[Semantic::SIZEMIN]		= sizeof(glm::vec2);
-		s_sizes[Semantic::SIZEMAX]		= sizeof(glm::vec2);
-		s_sizes[Semantic::SIZEEND]		= sizeof(glm::vec2);
-		s_sizes[Semantic::COLOR]		= sizeof(glm::vec4);
-		s_sizes[Semantic::COLOREND]		= sizeof(glm::vec4);
-		s_sizes[Semantic::GRAVITY]		= sizeof(glm::vec3);
-		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
-		s_sizes[Semantic::SPREAD]		= sizeof(float);
-		s_sizes[Semantic::SPAWNTIME]	= sizeof(float);
-		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
-		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
-		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
-		s_sizes[Semantic::MK1]			= sizeof(float);
-		s_sizes[Semantic::MK2]			= sizeof(float);
-		s_sizes[Semantic::MK3]			= sizeof(float);
-		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
-		s_sizes[Semantic::DX]			= sizeof(float);
+		s_sizes[Semantic::MODEL]			= sizeof(glm::mat4);
+		s_sizes[Semantic::NORMAL]			= sizeof(glm::mat4);
+		s_sizes[Semantic::BONES]			= 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::SHADOW]			= sizeof(glm::mat4);
+		s_sizes[Semantic::POSITION]			= sizeof(glm::vec3);
+		s_sizes[Semantic::LIFETIMEMIN]		= sizeof(float);
+		s_sizes[Semantic::LIFETIMEMAX]		= sizeof(float);
+		s_sizes[Semantic::SPEEDMIN]			= sizeof(float);
+		s_sizes[Semantic::SPEEDMAX]			= sizeof(float);
+		s_sizes[Semantic::SIZEMIN]			= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEMAX]			= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEEND]			= sizeof(glm::vec2);
+		s_sizes[Semantic::COLOR]			= sizeof(glm::vec4);
+		s_sizes[Semantic::COLOREND]			= sizeof(glm::vec4);
+		s_sizes[Semantic::GRAVITY]			= sizeof(glm::vec3);
+		s_sizes[Semantic::DIRECTION]		= sizeof(glm::vec3);
+		s_sizes[Semantic::SPREAD]			= sizeof(float);
+		s_sizes[Semantic::SPAWNTIME]		= sizeof(float);
+		s_sizes[Semantic::TRANSPOSITION]	= sizeof(glm::vec3);
+		s_sizes[Semantic::ORBITSPEED]		= sizeof(float);
+		s_sizes[Semantic::ORBITRADIUS]		= sizeof(float);
+		s_sizes[Semantic::MK1]				= sizeof(float);
+		s_sizes[Semantic::MK2]				= sizeof(float);
+		s_sizes[Semantic::MK3]				= sizeof(float);
+		s_sizes[Semantic::EYEWORLDPOS]		= sizeof(glm::vec3);
+		s_sizes[Semantic::DX]				= sizeof(float);
+		s_sizes[Semantic::ROTATIONSPEEDMIN] = sizeof(float);
+		s_sizes[Semantic::ROTATIONSPEEDMAX] = sizeof(float);
+
 
 		// Slots reserved for geometry buffer and lighting.
 		s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]	= 0;

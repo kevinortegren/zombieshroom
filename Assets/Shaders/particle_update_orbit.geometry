@@ -120,6 +120,7 @@ void main()
 		vert_color1			= vert_color[0];  
 		vert_accel1			= vert_accel[0];
 		vert_rotation1		= vert_rotation[0];
+		vert_rotationSpeed1 = 1.0f;
 		EmitVertex();
 		EndPrimitive();
 	}
@@ -141,7 +142,8 @@ void main()
 			vert_type1			= 1.0f;
 			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
 			vert_accel1			= vert_accel[0];
-			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_dt;
+			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_time;
+			vert_rotationSpeed1 = 1.0;
 			EmitVertex();
 			EndPrimitive();
 		}

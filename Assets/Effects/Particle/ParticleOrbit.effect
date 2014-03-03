@@ -50,6 +50,10 @@
           offset: 128
         - sem: ORBITRADIUS
           offset: 132
+        - sem: ROTATIONSPEEDMIN
+          offset: 136
+        - sem: ROTATIONSPEEDMAX
+          offset: 140
       # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
