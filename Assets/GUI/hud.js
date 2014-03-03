@@ -154,7 +154,10 @@ function Set(p_id, p_value)
     var oldHealth = parseInt($("#"+p_id).html());
     var newHealth = parseInt(value);
     DamageIndicator(oldHealth-newHealth);
-    $("#healthbar>div>div").css("width", ($("#healthbar>div").width()*(newHealth/100.0))+"px");
+		// Health (0~100)
+		$("#healthbar>div>div").css('width', $("#healthbar>div").width()*((newHealth<100?newHealth:100)/100.0)+"px");
+		// Health overflow (100~200)
+		$("#healthbar>div>div>div").css('width', $("#healthbar>div").width()*(((newHealth<200?newHealth:200)-100)/100.0)+"px");
     return;
 	}
 	if(p_id == "IsDead")
@@ -229,5 +232,6 @@ $(document).ready(function(){
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
-	$("#healthbar>div>div").css('width', $("#healthbar>div>div").width()*(99.5/100.0)+"px");
+	//$("#healthbar>div>div").css('width', $("#healthbar>div").width()*(99/100.0)+"px");
+	Set('Health', 166);
 });

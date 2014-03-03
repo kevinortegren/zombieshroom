@@ -82,12 +82,14 @@ img
 	position: absolute;
 	top:0;
 	left:100%;
-	margin-left: -204px;
+	margin-left: -141px;
+	padding: 0 4px 10px 30px;
 	padding-right: 4px;
-	width: 200px;
-	height: 28px;
+	width: 107px;
+	height: 55px;
 	text-align: right;
-	background-color: rgba(60,60,60,0.5);
+	background: url('TimeBar.png') no-repeat;
+	background-size: 100% 100%;
 	font-size: 24px;
 }
 #AnnouncementContainer
@@ -159,8 +161,16 @@ img
 {
 	padding: 0;
 	height: 33px;
-	width: 304px;
+	/*width: 304px;*/
 	background: center url('healthBackground.png');
+	margin: auto;
+}
+#healthbar div div div
+{
+	padding: 0;
+	height: 33px;
+	/*width: 304px;*/
+	background: center url('healthOverflowBackground.png');
 	margin: auto;
 }
 #chargebar
