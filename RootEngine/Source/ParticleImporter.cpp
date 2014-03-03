@@ -42,9 +42,11 @@ namespace RootEngine
 			doc[i]["EFFECT"]		>> effectName;
 			doc[i]["TEXTURE"]		>> textureName;
 			
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Particle material: %d", materialIndex);
 			outStruct->at(i)->m_material					= m_context->m_renderer->CreateMaterial(p_fileName + std::to_string(materialIndex++));
 			outStruct->at(i)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
+			
 
 			//Position
 			doc[i]["POSITION"][0]		>> outStruct->at(i)->m_position.x;

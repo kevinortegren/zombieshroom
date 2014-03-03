@@ -383,8 +383,9 @@ public:
 
         spawnTimeSpinBox = new QDoubleSpinBox(gridLayoutWidget);
         spawnTimeSpinBox->setObjectName(QStringLiteral("spawnTimeSpinBox"));
+        spawnTimeSpinBox->setDecimals(3);
         spawnTimeSpinBox->setMaximum(1024);
-        spawnTimeSpinBox->setSingleStep(0.01);
+        spawnTimeSpinBox->setSingleStep(0.005);
         spawnTimeSpinBox->setValue(0.1);
 
         gridLayout->addWidget(spawnTimeSpinBox, 13, 8, 1, 1);

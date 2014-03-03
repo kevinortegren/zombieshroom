@@ -531,6 +531,9 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	ui.orbitSpeedSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed);
 	TemplateChanged(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
 	ui.templateComboBox->setCurrentIndex(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
+	//Rotation speed
+	ui.RotspeedminSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin);
+	ui.RotspeedmaxSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax);
 }
 #pragma endregion
 

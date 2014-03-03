@@ -453,11 +453,14 @@
         </item>
         <item row="13" column="8">
          <widget class="QDoubleSpinBox" name="spawnTimeSpinBox">
+          <property name="decimals">
+           <number>3</number>
+          </property>
           <property name="maximum">
            <double>1024.000000000000000</double>
           </property>
           <property name="singleStep">
-           <double>0.010000000000000</double>
+           <double>0.005000000000000</double>
           </property>
           <property name="value">
            <double>0.100000000000000</double>

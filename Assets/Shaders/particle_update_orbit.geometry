@@ -65,7 +65,7 @@ vec3 GetRandomDir(float TexCoord)
 
 float GetRandomNumber(float TexCoord, float min, float max)
 {
-	vec3 direction = texture(g_Random, TexCoord + 0.2f).xyz;
+	vec3 direction = texture(g_Random, TexCoord + g_spawnTime * 500).xyz;
 	float magnitud = max - min;
 	float number =  direction.x * magnitud + min;
     return number;
