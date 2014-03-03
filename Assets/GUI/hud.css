@@ -287,9 +287,9 @@ img
 }
 .cooldown
 {
-	padding: 50px 5px 0 5px;
-	width: 61px;
-	height: 21px;
+	padding: 30px 15px 0 15px;
+	width: 34px;
+	height: 34px;
 	overflow: hidden;
 	background-image: url('cooldown.png');
 	background-size: 75px;
