@@ -1,6 +1,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 #include <iostream>
 #include <fstream>
 
@@ -87,6 +88,10 @@ namespace RootForce
 			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
+				PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
+				playercomp->Score --;
+				playercomp->Deaths ++;
+				m_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playercomp->TeamID] --;
 			}
 #endif
 		

@@ -842,9 +842,11 @@ namespace RootForce
 		}
 		static int PhysicsKnockBack(lua_State* p_luaState)
 		{
-			NumberOfArgs(4);
+			NumberOfArgs(5);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
+			//Multiply the knockback depending on the health of the target
+			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 5) ) / 100;
+			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")) * multiplier, (float)luaL_checknumber(p_luaState, 4));
 			return 0;
 		}
 		static int PhysicsCheckRadius(lua_State* p_luaState)
@@ -1805,6 +1807,13 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->TeamID);
 			return 1;
 		}
+		static int PlayercomponentAddSelectedCharges(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(*s)->SelectedAbility].Charges += (int)luaL_checknumber(p_luaState, 2);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//PLAYERACTION
 		//////////////////////////////////////////////////////////////////////////
@@ -2749,6 +2758,7 @@ namespace RootForce
 			{"GetDeaths",			PlayerComponentGetDeaths},
 			{"GetScore",			PlayerComponentGetScore},
 			{"GetTeamId",			PlayerComponentGetTeamId},
+			{"AddSelectedCharges",	PlayercomponentAddSelectedCharges},
 			{NULL, NULL}
 		};
 

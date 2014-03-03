@@ -1,15 +1,19 @@
 FireBall = {};
-FireBall.damage = 20;
 FireBall.knockback = 20;
 FireBall.cooldown = 3;
-FireBall.charges = 0;
-FireBall.chargeTime = 0;
+FireBall.chargeTime = 2;
 FireBall.channelingTime = 0;
 FireBall.duration = 0;
-FireBall.charges = -1;
+FireBall.charges = 5;
 
 function FireBall.ChargeDone (time, userId, actionId)
-	FireBall.OnCreate(userId, actionId);
+  if(time >= FireBall.chargeTime) then
+    FireBall.OnCreate(userId, actionId);
+  else
+    local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+    local playerComp = casterEnt:GetPlayerComponent();
+    playerComp:AddSelectedCharges(1);
+  end
 end
 
 function FireBall.ChannelingDone (time, userId, actionId)
