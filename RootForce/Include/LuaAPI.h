@@ -2191,7 +2191,8 @@ namespace RootForce
 			NumberOfArgs(2);
 			RootForce::HomingComponent **s = (RootForce::HomingComponent**)luaL_checkudata(p_luaState, 1, "HomingComponent");
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
-			(*s)->TargetPlayer = *e;
+			RootForce::Network::NetworkComponent *n = g_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(*e);
+			(*s)->TargetID = n->ID;
 			return 0;
 		}
 		static int HomingSetTargetPosition(lua_State* p_luaState)
