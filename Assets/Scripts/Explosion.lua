@@ -66,7 +66,7 @@ function Explosion.OnCollide (self, entity)
 			    local health = entity:GetHealth();
 			    if not health:IsDead() then
 				    local receiverId = network:GetUserId();
-				    health:Damage(abilityOwnerId, Explosion.damage, receiverId);
+				    health:Damage(abilityOwnerId, Explosion.damage * entity:GetStatChange():GetDamageResistance, receiverId);
 			    end
 			end
 		end

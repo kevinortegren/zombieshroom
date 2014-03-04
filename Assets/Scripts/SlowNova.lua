@@ -59,7 +59,7 @@ if entity:DoesExist() then
 		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
+		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local statComp = entity:GetStatChange();
 			statComp:SetSpeed(0.5, 5);
 			statComp:SetJumpHeight(0, 5);
