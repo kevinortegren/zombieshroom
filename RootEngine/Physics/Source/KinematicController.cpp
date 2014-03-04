@@ -81,7 +81,7 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_kinController = new BulletCharacter(m_ghostObject, capsuleShape, p_stepHeight);
 	
 	m_kinController->setGravity(9.82f * 3.0f);
-	m_kinController->setJumpSpeed(20.0f);
+	m_kinController->setJumpSpeed(50.0f);
 	m_kinController->setFallSpeed(200.0f);
 	//m_kinController->setMaxJumpHeight(0.001f); //Does not seem to do anything
 
@@ -147,12 +147,12 @@ void KinematicController::Update(float p_dt)
 	
 }
 
-void KinematicController::Jump()
+void KinematicController::Jump(float p_jumpPower)
 {
 	if(m_kinController->canJump())
 	{
 		m_kinController->StopKnockback();
-		m_kinController->jump();
+		m_kinController->Jump(p_jumpPower);
 	}
 }
 

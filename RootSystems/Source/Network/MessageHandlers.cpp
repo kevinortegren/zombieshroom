@@ -8,6 +8,7 @@
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/AbilitySpawnSystem.h>
+#include <RootSystems/Include/StatChangeSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -972,6 +973,43 @@ namespace RootForce
 
 
 				} return true;
+				case NetworkMessage::MessageType::StatChangeTimeUp:
+					{
+						NetworkMessage::StatChangeTimeUp m;
+						m.Serialize(false, p_bs);
+
+						// Make sure we are in the correct state.
+						if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+
+							ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.UserID, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+
+							// Call the OnCreate script
+							if(player)
+							{
+								StatChange* stat = m_world->GetEntityManager()->GetComponent<StatChange>(player);
+								switch (m.StatToReset)
+								{
+								case 0: 
+									stat->SpeedChangeTime = 0.0f;
+								case 1: 
+									stat->JumpHeightChangeTime = 0.0f;
+								case 2: 
+									stat->KnockbackResistanceTime = 0.0f;
+								case 3: 
+									stat->DamageResistanceTime = 0.0f;
+								default:
+									break;
+								}
+							}
+						}
+						else
+						{
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "StatChangeTimeUp received in an invalid state (%d).", clientComponent->State);
+						}
+
+
+					} return true;
 			}
 
 			return false;

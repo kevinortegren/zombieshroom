@@ -27,7 +27,7 @@ void main()
 
 	float rayLength = length(viewSpaceEndPosition - gl_in[0].gl_Position.xyz);
 
-	float rayWidth = 1.0;
+	float rayWidth = 0.3;
 	gl_Position = projectionMatrix * (gl_in[0].gl_Position + rayWidth * vec4(lateralAxis, 0.0));
 	texCoord = vec2(0.0, 0.0);
 	EmitVertex();

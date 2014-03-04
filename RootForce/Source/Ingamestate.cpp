@@ -50,6 +50,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -158,6 +159,10 @@ namespace RootForce
 		// Initialize the timer system.
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+		// Initialize the stat change timer system.
+		m_statChangeSystem = new RootForce::StatChangeSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::StatChangeSystem>(m_statChangeSystem);
 
 		// Initialize the follow system.
 		m_followSystem = new RootForce::FollowSystem(g_world);
@@ -273,6 +278,9 @@ namespace RootForce
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
+		if(m_networkContext.m_server != nullptr)
+			m_statChangeSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
 		//Ray stuff
@@ -331,6 +339,7 @@ namespace RootForce
 		m_actionSystem->SetServerPeerInterface(nullptr);
 		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
+		m_statChangeSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -447,6 +456,11 @@ namespace RootForce
 		{
 			PROFILE("Timer system", g_engineContext.m_profiler);
 			m_timerSystem->Process();
+		}
+
+		{
+			PROFILE("Stat change system", g_engineContext.m_profiler);
+			m_statChangeSystem->Process();
 		}
 
 		m_animationSystem->Run();

@@ -167,6 +167,12 @@ namespace AbilityEditorNameSpace
 			bool colWithStatic = false;
 			//Follow
 			float followOffset = 0.0f;
+			//Stat changes on caster
+			float kbRes = 1.0f, dmgRes = 1.0f, speedStat = 1.0f, jumpHeight = 1.0f, 
+				speedTime = 1.0f, jumpTime = 1.0f, kbResTime = 1.0f, dmgTime = 1.0f;
+
+
+
 			//Setting values
 			for (unsigned int i = 0; i < m_entity->GetComponents()->size(); i++)
 			{
@@ -204,6 +210,17 @@ namespace AbilityEditorNameSpace
 				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::FOLLOW)
 				{
 					followOffset = ((AbilityComponents::Follow*)m_entity->GetComponents()->at(i))->m_offset;
+				}
+				else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STATCHANGECASTER)
+				{
+					speedStat = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_speed;
+					jumpHeight = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_jumpHeight;
+					kbRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_knockbackResistance;
+					dmgRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_damageResistance;
+					speedTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_speedTime;
+					jumpTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_jumpTime;
+					kbResTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_kbResTime;
+					dmgTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_dmgResTime;
 				}
 			}
 			//Writing values
@@ -397,6 +414,20 @@ namespace AbilityEditorNameSpace
 				m_file << "\tphysicsComp:SetGravity(collisionComp, Vec3.New(" << grav.x() << ", " << grav.y() << ", " << grav.z() << "));\n";
 			}
 
+			//Change stat on caster
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STATCHANGECASTER))
+			{
+				m_file << "\tlocal statComp = casterEnt:GetStatChange();\n";
+				if(speed != 1.0f)
+					m_file << "\tstatComp:SetSpeed(" << speedStat << ", " << speedTime << ");\n";
+				if(jumpHeight != 1.0f)
+					m_file << "\tstatComp:SetJumpHeight(" << jumpHeight << ", " << jumpTime << ");\n";
+				if(kbRes != 1.0f)
+					m_file << "\tstatComp:SetKnockbackResistance(" << kbRes << ", " << kbResTime << ");\n";
+				if(dmgRes != 1.0f)
+					m_file << "\tstatComp:SetDamageResistance(" << dmgRes << ", " << dmgTime << ");\n";
+			}
+
 			m_file << "\n";
 
 
@@ -452,6 +483,8 @@ namespace AbilityEditorNameSpace
 	{
 
 		int dmgEnum = 0, knockEnum = 0;
+		float kbRes = 1.0f, dmgRes = 1.0f, speed = 1.0f, jumpHeight = 1.0f, 
+			speedTime = 1.0f, jumpTime = 1.0f, kbResTime = 1.0f, dmgTime = 1.0f;
 		//float dmg = 0.0f, knockb = 0.0f;
 
 		m_file << "function " << m_name << ".OnCollide (self, entity)\n";
@@ -471,60 +504,84 @@ namespace AbilityEditorNameSpace
 				knockEnum = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_affectedPlayers;
 				m_knockback = ((AbilityComponents::Knockback*)m_entity->GetComponents()->at(i))->m_knockback;
 			}
+			else if (m_entity->GetComponents()->at(i)->m_type == AbilityComponents::ComponentType::STATCHANGETARGET)
+			{
+				speed = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_speed;
+				jumpHeight = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_jumpHeight;
+				kbRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_knockbackResistance;
+				dmgRes = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_damageResistance;
+				speedTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_speedTime;
+				jumpTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_jumpTime;
+				kbResTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_kbResTime;
+				dmgTime = ((AbilityComponents::StatChangeTarget*)m_entity->GetComponents()->at(i))->m_dmgResTime;
+			}
 		}
 
 		m_file << "\tlocal hitCol = entity:GetCollision();\n";
 		m_file << "\tlocal hitPhys = entity:GetPhysics();\n";
 		m_file << "\tlocal type = hitPhys:GetType(hitCol);\n";
 
-		if (m_damage != 0.0f || m_knockback != 0.0f)
-		{
-			m_file << "\tif type == PhysicsType.TYPE_PLAYER then\n";
-				m_file << "\t\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
-				m_file << "\t\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
-				m_file << "\t\tlocal abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
-				m_file << "\t\tlocal abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
-				m_file << "\t\tlocal abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
+		m_file << "\tif type == PhysicsType.TYPE_PLAYER then\n";
+			m_file << "\t\tlocal targetPlayerComponent = entity:GetPlayerComponent();\n";
+			m_file << "\t\tlocal abilityOwnerNetwork = self:GetNetwork();\n";
+			m_file << "\t\tlocal abilityOwnerId = abilityOwnerNetwork:GetUserId();\n";
+			m_file << "\t\tlocal abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);\n";
+			m_file << "\t\tlocal abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();\n";
 
-				//Do damage
-				if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::DAMAGE))
-				{
-					if(dmgEnum == AbilityComponents::Damage::ENEMIES)
-						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
-					else if(dmgEnum == AbilityComponents::Damage::FRIENDLIES)
-						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
-					else if(dmgEnum == AbilityComponents::Damage::EVERYONE)
-						m_file << "\n"; //always
+			//Do damage
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::DAMAGE))
+			{
+				if(dmgEnum == AbilityComponents::Damage::ENEMIES)
+					m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
+				else if(dmgEnum == AbilityComponents::Damage::FRIENDLIES)
+					m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+				else if(dmgEnum == AbilityComponents::Damage::EVERYONE)
+					m_file << "\n"; //always
 
-						m_file << "\t\t\tlocal health = entity:GetHealth();\n";
-						m_file << "\t\t\tif not health:IsDead() then\n";
-							m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
-							m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-							m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage(), receiverId);\n";
-						m_file << "\t\t\tend\n";
-					if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
-						m_file << "\t\tend\n";
-				}
-				//Knockback
-				if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::KNOCKBACK))
-				{
-					if(dmgEnum == AbilityComponents::Knockback::ENEMIES)
-						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
-					else if(dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
-						m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
-					else if(dmgEnum == AbilityComponents::Knockback::EVERYONE)
-						m_file << "\n"; //always
+					m_file << "\t\t\tlocal health = entity:GetHealth();\n";
+					m_file << "\t\t\tif not health:IsDead() then\n";
+						m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
+						m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
+						m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);\n";
+					m_file << "\t\t\tend\n";
+				if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
+					m_file << "\t\tend\n";
+			}
+			//Knockback
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::KNOCKBACK))
+			{
+				if(dmgEnum == AbilityComponents::Knockback::ENEMIES)
+					m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then\n";
+				else if(dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
+					m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+				else if(dmgEnum == AbilityComponents::Knockback::EVERYONE)
+					m_file << "\n"; //always
 
-						m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
-						m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-						m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback());\n";
+					m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
+					m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
+					m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance());\n";
 
-					if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
-						m_file << "\t\tend\n";
-				}
-			m_file << "\tend\n";
-		}
-
+				if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
+					m_file << "\t\tend\n";
+			}
+			//Change stat on collided entity
+			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STATCHANGETARGET))
+			{
+				m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+				m_file << "\t\t\tlocal statComp = entity:GetStatChange();\n";
+				if(speed != 1.0f)
+					m_file << "\t\t\tstatComp:SetSpeed(" << speed << ", " << speedTime << ");\n";
+				if(jumpHeight != 1.0f)
+					m_file << "\t\t\tstatComp:SetJumpHeight(" << jumpHeight << ", " << jumpTime << ");\n";
+				if(kbRes != 1.0f)
+					m_file << "\t\t\tstatComp:SetKnockbackResistance(" << kbRes << ", " << kbResTime << ");\n";
+				if(dmgRes != 1.0f)
+					m_file << "\t\t\tstatComp:SetDamageResistance(" << dmgRes << ", " << dmgTime << ");\n";
+				m_file << "\t\tend\n";
+			}
+			
+		m_file << "\tend\n";
+	
 		WriteNewAbilities(p_onCollide);
 
 		m_file << "end\n";

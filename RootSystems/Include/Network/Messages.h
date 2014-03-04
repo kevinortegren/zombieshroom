@@ -70,6 +70,7 @@ namespace RootForce
 				AbilitySpawn,
 				Death,
 				PlayerTeamSelect,
+				StatChangeTimeUp,
 			};
 		}
 
@@ -357,6 +358,13 @@ namespace RootForce
 		{
 			Network::NetworkEntityID UserID;
 			uint8_t TeamID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+		struct StatChangeTimeUp
+		{
+			Network::UserID_t UserID;
+			uint8_t StatToReset;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
