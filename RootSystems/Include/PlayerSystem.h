@@ -45,6 +45,7 @@ namespace RootForce
 			CHARGE_START,
 			CHANNELING_START,
 			CHANNELING_DONE,
+			INTERRUPTED
 		};
 	}
 	

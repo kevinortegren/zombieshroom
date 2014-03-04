@@ -55,9 +55,11 @@ namespace RootSystems
 					health->WantsRespawn = true;
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
-					action->AbilityEvents = std::queue<RootForce::AbilityEvent>();
-					player->AbilityState = RootForce::AbilityState::OFF;
 				}
+
+				// Check abilities here as well, to make sure abilities are properly interrupted.
+				AbilitySwitch(p_entity);
+				player->AbilityState = RootForce::AbilityState::OFF;
 
 				animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 				return;
@@ -202,6 +204,8 @@ namespace RootSystems
 			std::string abilityName = player->AbilityScripts[abilityEvent.ActiveAbility].Name;
 			if (abilityName != "")
 			{
+				g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Received ability event. Slot %d, Event %d", abilityEvent.ActiveAbility, abilityEvent.Type);
+
 				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
 				switch (abilityEvent.Type)
 				{
@@ -245,7 +249,32 @@ namespace RootSystems
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
+
+					case RootForce::AbilityEventType::INTERRUPTED:
+					{
+						player->AbilityState = RootForce::AbilityState::OFF;
+
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "Interrupted");
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->ExecuteScript();
+
+						// Put ability on cooldown and decrease charges.
+						player->AbilityScripts[abilityEvent.ActiveAbility].OnCooldown = true;
+						player->AbilityScripts[abilityEvent.ActiveAbility].Cooldown = abilityCooldownTime;
+
+						player->AbilityScripts[abilityEvent.ActiveAbility].Charges--;
+						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
+							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Interrupted ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
+					} break;
 				}
+			}
+			else
+			{
+				g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::WARNING, "Received ability event for empty slot. Slot %d, Event: %d", abilityEvent.ActiveAbility, abilityEvent.Type);
 			}
 
 			// Pop the event.

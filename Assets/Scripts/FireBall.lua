@@ -15,6 +15,9 @@ end
 function FireBall.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function FireBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

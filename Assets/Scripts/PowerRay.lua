@@ -17,6 +17,9 @@ end
 function PowerRay.ChannelingDone (time, userId, actionId)
 end
 
+function PowerRay.Interrupted (time, userId, actionId)
+end
+
 function PowerRay.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);

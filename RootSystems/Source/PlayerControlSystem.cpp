@@ -234,6 +234,21 @@ namespace RootForce
 			}
 			break;
 
+			case PlayerAction::PICK_UP_ABILITY:
+			{
+				RootForce::NetworkMessage::AbilityTryClaim m;
+				m.User = network->ID.UserID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
+			break;
+
 			case PlayerAction::JUMP_PRESSED:
 			{
 				if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
@@ -281,26 +296,40 @@ namespace RootForce
 			}
 			break;
 
-			case PlayerAction::PICK_UP_ABILITY:
+			default:
+				break;
+			}
+		}
+
+		// Check if we are dead and are currently charging/channeling, in which case, we should interrupt the ability.
+		if (health->IsDead)
+		{
+			if (playerComponent->AbilityState == AbilityState::CHARGING || playerComponent->AbilityState == AbilityState::CHANNELING)
 			{
-				RootForce::NetworkMessage::AbilityTryClaim m;
-				m.User = network->ID.UserID;
+				assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+				action->CurrentAbilityEvent.Type = AbilityEventType::INTERRUPTED;
+				action->AbilityEvents.push(action->CurrentAbilityEvent);
+
+				// Send this action to the server
+				RootForce::NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 				bs.Write(RakNet::GetTime());
-				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityEvent);
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-			}
-			break;
 
-			default:
-				break;
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityInterrupted with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+
+				// Reset the current event.
+				playerComponent->AbilityState = AbilityState::OFF;
+				action->CurrentAbilityEvent = AbilityEvent();
 			}
-			
-			
+
+			return;
 		}
 
 		
@@ -343,9 +372,14 @@ namespace RootForce
 		PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
+		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
 		// Determine the ability we want to activate.
 		uint8_t activeAbility = p_push ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+
+		/*
+		
+		*/
 
 		// Check if we already have an ability active that needs to be cancelled.
 		if (action->CurrentAbilityEvent.ActiveAbility != activeAbility)

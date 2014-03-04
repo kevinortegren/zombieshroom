@@ -15,6 +15,9 @@ end
 function AbilityBall.ChannelingDone (time, userId, actionId)
 end
 
+function AbilityBall.Interrupted(time, userId, actionId)
+end
+
 function AbilityBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

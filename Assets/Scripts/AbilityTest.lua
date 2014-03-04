@@ -14,6 +14,9 @@ end
 function AbilityTest.ChannelingDone (time, userId, actionId)
 end
 
+function AbilityTest.Interrupted (time, userId, actionId)
+end
+
 function AbilityTest.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

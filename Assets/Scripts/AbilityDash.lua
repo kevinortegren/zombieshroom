@@ -19,3 +19,6 @@ function AbilityDash.ChannelingDone(time, userId, actionId)
 	local handle = playerEnt:GetCollision():GetHandle();
 	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.1,0)+frontVec, AbilityDash.power);
 end
+
+function AbilityDash.Interrupted(time, userId, actionId)
+end
