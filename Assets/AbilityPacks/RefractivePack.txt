@@ -1,4 +1,2 @@
 RefractiveBall
 IceCube
-SlowNova
-Boost
