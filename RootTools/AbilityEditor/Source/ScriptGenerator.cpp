@@ -542,7 +542,7 @@ namespace AbilityEditorNameSpace
 					m_file << "\t\t\tif not health:IsDead() then\n";
 						m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
 						m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-						m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance, receiverId);\n";
+						m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);\n";
 					m_file << "\t\t\tend\n";
 				if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
 					m_file << "\t\tend\n";
@@ -559,7 +559,7 @@ namespace AbilityEditorNameSpace
 
 					m_file << "\t\t\tlocal hitPos = entity:GetTransformation():GetPos();\n";
 					m_file << "\t\t\tlocal selfPos = self:GetTransformation():GetPos();\n";
-					m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance);\n";
+					m_file << "\t\t\thitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance());\n";
 
 				if(dmgEnum == AbilityComponents::Knockback::ENEMIES || dmgEnum == AbilityComponents::Knockback::FRIENDLIES)
 					m_file << "\t\tend\n";

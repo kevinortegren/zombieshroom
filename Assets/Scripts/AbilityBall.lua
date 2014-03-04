@@ -73,13 +73,13 @@ function AbilityBall.OnCollide (self, entity)
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance, receiverId);
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance());
 			end
 		end
 	end
