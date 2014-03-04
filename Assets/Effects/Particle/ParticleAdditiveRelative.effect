@@ -46,6 +46,10 @@
           offset: 112
         - sem: SPAWNTIME
           offset: 124
+        - sem: ROTATIONSPEEDMIN
+          offset: 128
+        - sem: ROTATIONSPEEDMAX
+          offset: 132
       # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
@@ -67,6 +71,7 @@
             - name: vert_color1
             - name: vert_accel1
             - name: vert_rotation1
+            - name: vert_rotationSpeed1
 
     - name: Particle_Render
     

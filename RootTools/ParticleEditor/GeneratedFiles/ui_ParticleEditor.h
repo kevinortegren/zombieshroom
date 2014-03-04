@@ -110,6 +110,10 @@ public:
     QDoubleSpinBox *lifeTimeMaxSpinBox;
     QDoubleSpinBox *speedMaxSpinBox;
     QSlider *spreadSlider;
+    QLabel *label_21;
+    QLabel *label_22;
+    QDoubleSpinBox *RotspeedminSpinbox;
+    QDoubleSpinBox *RotspeedmaxSpinbox;
     QWidget *tab_2;
     QWidget *gridLayoutWidget_2;
     QGridLayout *gridLayout_2;
@@ -264,7 +268,7 @@ public:
         groupBox_3->setFont(font1);
         groupBox_5 = new QGroupBox(groupBox_3);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
-        groupBox_5->setGeometry(QRect(5, 328, 497, 429));
+        groupBox_5->setGeometry(QRect(5, 406, 497, 351));
         groupBox_2 = new QGroupBox(groupBox_5);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
         groupBox_2->setGeometry(QRect(2, 14, 265, 57));
@@ -282,7 +286,7 @@ public:
         page_3->setObjectName(QStringLiteral("page_3"));
         gridLayoutWidget_3 = new QWidget(page_3);
         gridLayoutWidget_3->setObjectName(QStringLiteral("gridLayoutWidget_3"));
-        gridLayoutWidget_3->setGeometry(QRect(6, 4, 479, 347));
+        gridLayoutWidget_3->setGeometry(QRect(0, 0, 479, 281));
         gridLayout_3 = new QGridLayout(gridLayoutWidget_3);
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -326,7 +330,7 @@ public:
         stackedWidget->addWidget(page_2);
         gridLayoutWidget = new QWidget(groupBox_3);
         gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(2, 16, 499, 307));
+        gridLayoutWidget->setGeometry(QRect(2, 16, 511, 391));
         gridLayout = new QGridLayout(gridLayoutWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
@@ -379,8 +383,9 @@ public:
 
         spawnTimeSpinBox = new QDoubleSpinBox(gridLayoutWidget);
         spawnTimeSpinBox->setObjectName(QStringLiteral("spawnTimeSpinBox"));
+        spawnTimeSpinBox->setDecimals(3);
         spawnTimeSpinBox->setMaximum(1024);
-        spawnTimeSpinBox->setSingleStep(0.01);
+        spawnTimeSpinBox->setSingleStep(0.005);
         spawnTimeSpinBox->setValue(0.1);
 
         gridLayout->addWidget(spawnTimeSpinBox, 13, 8, 1, 1);
@@ -543,6 +548,32 @@ public:
         spreadSlider->setTickPosition(QSlider::NoTicks);
 
         gridLayout->addWidget(spreadSlider, 3, 5, 1, 3);
+
+        label_21 = new QLabel(gridLayoutWidget);
+        label_21->setObjectName(QStringLiteral("label_21"));
+
+        gridLayout->addWidget(label_21, 14, 1, 1, 1);
+
+        label_22 = new QLabel(gridLayoutWidget);
+        label_22->setObjectName(QStringLiteral("label_22"));
+
+        gridLayout->addWidget(label_22, 14, 5, 1, 1);
+
+        RotspeedminSpinbox = new QDoubleSpinBox(gridLayoutWidget);
+        RotspeedminSpinbox->setObjectName(QStringLiteral("RotspeedminSpinbox"));
+        RotspeedminSpinbox->setMinimum(-30);
+        RotspeedminSpinbox->setMaximum(30);
+        RotspeedminSpinbox->setSingleStep(0.1);
+
+        gridLayout->addWidget(RotspeedminSpinbox, 14, 4, 1, 1);
+
+        RotspeedmaxSpinbox = new QDoubleSpinBox(gridLayoutWidget);
+        RotspeedmaxSpinbox->setObjectName(QStringLiteral("RotspeedmaxSpinbox"));
+        RotspeedmaxSpinbox->setMinimum(-30);
+        RotspeedmaxSpinbox->setMaximum(30);
+        RotspeedmaxSpinbox->setSingleStep(0.1);
+
+        gridLayout->addWidget(RotspeedmaxSpinbox, 14, 6, 1, 1);
 
         tabWidget->addTab(tabProperties, QString());
         tab_2 = new QWidget();
@@ -974,6 +1005,8 @@ public:
         label_3->setText(QApplication::translate("ParticleEditorClass", "SizeEnd:", 0));
         label_13->setText(QApplication::translate("ParticleEditorClass", "Spread:", 0));
         label_6->setText(QApplication::translate("ParticleEditorClass", "Gravity:", 0));
+        label_21->setText(QApplication::translate("ParticleEditorClass", "Rotspdmin:", 0));
+        label_22->setText(QApplication::translate("ParticleEditorClass", "Rotspdmax:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Textures", 0));

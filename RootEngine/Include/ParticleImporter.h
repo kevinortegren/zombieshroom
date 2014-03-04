@@ -32,6 +32,8 @@ namespace RootEngine
 		float		m_orbitSpeed;
 		float		m_orbitRadius;
 		int			m_template;
+		float		m_rotationSpeedMin;
+		float		m_rotationSpeedMax;
 	};
 
 	class ParticleImporter

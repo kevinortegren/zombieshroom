@@ -15,3 +15,5 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleAdditive
   NAME: test
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

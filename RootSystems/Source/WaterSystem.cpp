@@ -130,7 +130,7 @@ namespace RootForce
 	void WaterSystem::CreateWater(float p_height)
 	{
 		//Don't create water if there is no water on the level
-		if(p_height == 0)
+		if(p_height == -99999.0f)
 			return;
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");

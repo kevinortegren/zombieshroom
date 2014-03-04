@@ -2243,7 +2243,7 @@ namespace RootForce
 
 				r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
 				r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
-				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("magic_lightning", Render::TextureType::TEXTURE_2D);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);

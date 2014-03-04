@@ -18,3 +18,5 @@
   TEXTURE: Sparkle
   EFFECT: Particle/ParticleOrbit
   NAME: AbilitySpawn
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

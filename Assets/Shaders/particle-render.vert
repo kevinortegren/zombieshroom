@@ -8,6 +8,7 @@ layout(location = 4) in float	in_type;
 layout(location = 5) in vec4	in_color;
 layout(location = 6) in vec3	in_accel;
 layout(location = 7) in float	in_rot;
+layout(location = 8) in float	in_rotSpeed;
 
 out vec2 vert_scale;
 out vec4 vert_color;

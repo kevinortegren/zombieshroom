@@ -18,3 +18,5 @@
   TEXTURE: Sparkle
   EFFECT: Particle/ParticleAdditive
   NAME: Homing
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

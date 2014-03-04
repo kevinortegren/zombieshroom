@@ -18,3 +18,5 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleAdditive
   NAME: fire
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
