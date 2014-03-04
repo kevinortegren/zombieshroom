@@ -1430,6 +1430,34 @@ namespace RootForce
 								// Push the event.
 								action->AbilityEvents.push(m.Event);
 							}
+
+							// Forward the event to all the other clients.
+							DataStructures::List<RakNet::SystemAddress> addresses;
+							DataStructures::List<RakNet::RakNetGUID> guids;
+							m_peer->GetSystemList(addresses, guids);
+
+							RakNet::BitStream bs;
+							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+							bs.Write(RakNet::GetTime());
+							bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
+							m.Serialize(true, &bs);
+
+							for (unsigned int i = 0; i < addresses.Size(); ++i)
+							{
+								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
+								if (otherClientEntity != nullptr)
+								{
+									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
+									assert(otherClientComponent != nullptr);
+
+									if (p_packet->systemAddress != addresses[i] && 
+										otherClientComponent->IsRemote &&
+										ClientState::IsConnected(otherClientComponent->State))
+									{
+										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
+									}
+								}
+							}
 						}
 						else
 						{
