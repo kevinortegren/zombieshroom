@@ -16,6 +16,10 @@ function RefractiveBall.ChannelingDone (time, userId, actionId)
 	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
 end
 
+function RefractiveBall.Interrupted (time, userId, actionId)
+	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
+end
+
 function RefractiveBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

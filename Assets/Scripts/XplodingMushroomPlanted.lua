@@ -12,6 +12,9 @@ end
 function XplodingMushroomPlanted.ChannelingDone (time, userId, actionId)
 end
 
+function XplodingMushroomPlanted.Interrupted (time, userId, actionId)
+end
+
 function XplodingMushroomPlanted.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

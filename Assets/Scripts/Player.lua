@@ -44,6 +44,7 @@ function Player.OnTeamSelect(self, teamId)
     local physics = Physics.New(self);
     local collision = Collision.New(self);
     local collisionResponder = CollisionResponder.New(self);
+    local statComp = StatChange.New(self);
     local script = Script.New(self, "Player");
     local playerAction = PlayerAction.New(self);
     local stateComponent = StateComponent.New(self);
@@ -140,11 +141,11 @@ function Player.OnTeamSelect(self, teamId)
 end
 
 function Player.OnCollide (self, entity)
- 	local hitCol = entity:GetCollision();
- 	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
-  if  type == PhysicsType.TYPE_ABILITYSPAWN then
-  end
+ 	--local hitCol = entity:GetCollision();
+ 	--local hitPhys = entity:GetPhysics();
+	--local type = hitPhys:GetType(hitCol);
+  --if  type == PhysicsType.TYPE_ABILITYSPAWN then
+  --end
   
 end
 

@@ -12,6 +12,9 @@ end
 function ExplodingShroom.ChannelingDone (time, userId, actionId)
 end
 
+function ExplodingShroom.Interrupted (time, userId, actionId)
+end
+
 function ExplodingShroom.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

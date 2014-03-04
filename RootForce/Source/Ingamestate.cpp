@@ -50,6 +50,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -159,6 +160,10 @@ namespace RootForce
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
 
+		// Initialize the stat change timer system.
+		m_statChangeSystem = new RootForce::StatChangeSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::StatChangeSystem>(m_statChangeSystem);
+
 		// Initialize the follow system.
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
@@ -220,19 +225,36 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 		
-		// Set network peer interfaces on the systems that needs to send messages.
+		// Set server peers to null
+		/*
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
+		*/
+
+		// Set the network client peer interfaces.
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
-		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
-		// Set the server peer to the action and abilityspawn system, if we are a server.
+		// Set the network server peer interfaces if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
-			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}	
+			m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		}
+
+		// Give the player control system access to the HUD.
+		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -255,6 +277,9 @@ namespace RootForce
 
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+
+		if(m_networkContext.m_server != nullptr)
+			m_statChangeSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
@@ -307,7 +332,14 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
+		m_statChangeSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -424,6 +456,11 @@ namespace RootForce
 		{
 			PROFILE("Timer system", g_engineContext.m_profiler);
 			m_timerSystem->Process();
+		}
+
+		{
+			PROFILE("Stat change system", g_engineContext.m_profiler);
+			m_statChangeSystem->Process();
 		}
 
 		m_animationSystem->Run();

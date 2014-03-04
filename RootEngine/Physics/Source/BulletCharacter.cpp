@@ -584,3 +584,12 @@ void BulletCharacter::JumpBoost( float p_boostPower )
 {
 	m_verticalVelocity += p_boostPower;
 }
+
+void BulletCharacter::Jump( float p_jumpPower )
+{
+	if (!canJump())
+		return;
+
+	m_verticalVelocity = p_jumpPower;
+	m_wasJumping = true;
+}

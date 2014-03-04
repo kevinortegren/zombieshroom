@@ -15,6 +15,9 @@ end
 function IceCube.ChannelingDone (time, userId, actionId)
 end
 
+function IceCube.Interrupted (time, userId, actionId)
+end
+
 function IceCube.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -70,7 +73,7 @@ function IceCube.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), IceCube.knockback, health:GetHealth());
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), IceCube.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

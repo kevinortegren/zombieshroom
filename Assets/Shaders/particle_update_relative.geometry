@@ -29,6 +29,8 @@ layout(std140) uniform PerObject
 	vec4 	g_colorEnd;
 	vec3	g_transPos;
 	float	g_spawnTime;
+	float	g_orbitSpeed;
+	float	g_orbitRadius;
 	float	g_rotationSpeedMin;
 	float	g_rotationSpeedMax;
 };
@@ -80,7 +82,17 @@ void main()
 		if(lifeTime <= 0.0f)
 		{
 			// Spawn new particles with new start values using the initial values.
-			vert_initialPos1 	= g_Position;
+			if(g_orbitRadius > 0.0)
+			{
+				float cs = cos(g_time*g_orbitSpeed) * g_orbitRadius;
+				float ss = sin(g_time*g_orbitSpeed) * g_orbitRadius;
+			
+				vert_initialPos1 	= vec3(cs,0,ss) + g_Position + g_transPos;
+			}
+			else
+			{
+				vert_initialPos1 	= g_Position;
+			}
 
 			if(g_direction == vec3(0,0,0))
 			{

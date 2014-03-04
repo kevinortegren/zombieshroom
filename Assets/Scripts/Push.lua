@@ -16,6 +16,9 @@ end
 function Push.ChannelingDone (time, userId, actionId)
 end
 
+function Push.Interrupted (time, userId, actionId)
+end
+
 function Push.OnCreate (userId, actionId)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
@@ -64,8 +67,8 @@ function Push.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-        local health = entity:GetHealth();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.knockback, health:GetHealth());
+				local health = entity:GetHealth();
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

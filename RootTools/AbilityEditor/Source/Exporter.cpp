@@ -219,16 +219,26 @@ namespace AbilityEditorNameSpace
 				{
 					AbilityComponents::StatChangeCaster* statCaster = static_cast<AbilityComponents::StatChangeCaster*>(p_component);
 					p_emitter << YAML::Key << "CasterSpeed" << YAML::Value << statCaster->m_speed;
+					p_emitter << YAML::Key << "CasterSpeedTime" << YAML::Value << statCaster->m_speedTime;
 					p_emitter << YAML::Key << "CasterJumpHeight" << YAML::Value << statCaster->m_jumpHeight;
+					p_emitter << YAML::Key << "CasterJumpTime" << YAML::Value << statCaster->m_jumpTime;
 					p_emitter << YAML::Key << "CasterKnockbackResistance" << YAML::Value << statCaster->m_knockbackResistance;
+					p_emitter << YAML::Key << "CasterKnockbackTime" << YAML::Value << statCaster->m_kbResTime;
+					p_emitter << YAML::Key << "CasterDamageResistance" << YAML::Value << statCaster->m_damageResistance;
+					p_emitter << YAML::Key << "CasterDamageTime" << YAML::Value << statCaster->m_dmgResTime;
 				}
 				break;
 			case AbilityComponents::ComponentType::STATCHANGETARGET:
 				{
 					AbilityComponents::StatChangeTarget* statTarget = static_cast<AbilityComponents::StatChangeTarget*>(p_component);
 					p_emitter << YAML::Key << "TargetSpeed" << YAML::Value << statTarget->m_speed;
+					p_emitter << YAML::Key << "TargetSpeedTime" << YAML::Value << statTarget->m_speedTime;
 					p_emitter << YAML::Key << "TargetJumpHeight" << YAML::Value << statTarget->m_jumpHeight;
+					p_emitter << YAML::Key << "TargetJumpTime" << YAML::Value << statTarget->m_jumpTime;
 					p_emitter << YAML::Key << "TargetKnockbackResistance" << YAML::Value << statTarget->m_knockbackResistance;
+					p_emitter << YAML::Key << "TargetKnockbackTime" << YAML::Value << statTarget->m_kbResTime;
+					p_emitter << YAML::Key << "TargetDamageResistance" << YAML::Value << statTarget->m_knockbackResistance;
+					p_emitter << YAML::Key << "TargetDamageTime" << YAML::Value << statTarget->m_dmgResTime;
 				}
 				break;
 			case AbilityComponents::ComponentType::PHYSICS:

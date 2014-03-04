@@ -31,7 +31,8 @@ namespace RootForce
 			Transform* transform = m_transforms.Get(p_entity);
 
 			std::stringstream ss;
-			ss << network->ID.UserID << ": " << player->Name << " (" << transform->m_position.x << ", " << transform->m_position.y << ", " << transform->m_position.z << ")";
+			ss << network->ID.UserID << ": " << player->Name << " (" << transform->m_position.x << ", " << transform->m_position.y << ", " << transform->m_position.z << ") ";
+			ss << "(" << player->AbilityScripts[0].Name << ", " << player->AbilityScripts[1].Name << ", " << player->AbilityScripts[2].Name << ") ";
 			ss << "<br/>";
 
 			g_engineContext.m_debugOverlay->AddHTMLToBuffer(ss.str().c_str());
