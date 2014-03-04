@@ -567,15 +567,17 @@ namespace AbilityEditorNameSpace
 			//Change stat on collided entity
 			if (m_entity->DoesComponentExist(AbilityComponents::ComponentType::STATCHANGETARGET))
 			{
-				m_file << "\tlocal statComp = entity:GetStatChange();\n";
+				m_file << "\t\tif abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then\n";
+				m_file << "\t\t\tlocal statComp = entity:GetStatChange();\n";
 				if(speed != 1.0f)
-					m_file << "\tstatComp:SetSpeed(" << speed << ", " << speedTime << ");\n";
+					m_file << "\t\t\tstatComp:SetSpeed(" << speed << ", " << speedTime << ");\n";
 				if(jumpHeight != 1.0f)
-					m_file << "\tstatComp:SetJumpHeight(" << jumpHeight << ", " << jumpTime << ");\n";
+					m_file << "\t\t\tstatComp:SetJumpHeight(" << jumpHeight << ", " << jumpTime << ");\n";
 				if(kbRes != 1.0f)
-					m_file << "\tstatComp:SetKnockbackResistance(" << kbRes << ", " << kbResTime << ");\n";
+					m_file << "\t\t\tstatComp:SetKnockbackResistance(" << kbRes << ", " << kbResTime << ");\n";
 				if(dmgRes != 1.0f)
-					m_file << "\tstatComp:SetDamageResistance(" << dmgRes << ", " << dmgTime << ");\n";
+					m_file << "\t\t\tstatComp:SetDamageResistance(" << dmgRes << ", " << dmgTime << ");\n";
+				m_file << "\t\tend\n";
 			}
 			
 		m_file << "\tend\n";

@@ -39,7 +39,7 @@ function SlowNova.OnCreate (userId, actionId)
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	transformComp:SetPos(startPos);
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 5, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 15, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 
@@ -54,11 +54,18 @@ if entity:DoesExist() then
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
 	if type == PhysicsType.TYPE_PLAYER then
-		local statComp = entity:GetStatChange();
-		statComp:SetSpeed(0.5, 5);
-		statComp:SetJumpHeight(0, 5);
-		statComp:SetKnockbackResistance(2, 5);
-		statComp:SetDamageResistance(2, 1);
+		local targetPlayerComponent = entity:GetPlayerComponent();
+		local abilityOwnerNetwork = self:GetNetwork();
+		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+		if abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then
+			local statComp = entity:GetStatChange();
+			statComp:SetSpeed(0.5, 5);
+			statComp:SetJumpHeight(0, 5);
+			statComp:SetKnockbackResistance(2, 5);
+			statComp:SetDamageResistance(2, 5);
+		end
 	end
 end
 end
