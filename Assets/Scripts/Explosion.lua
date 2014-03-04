@@ -63,11 +63,11 @@ function Explosion.OnCollide (self, entity)
 			    local hitPos = entity:GetTransformation():GetPos();
 			    local selfPos = self:GetTransformation():GetPos();
 			    local health = entity:GetHealth();
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback, health:GetHealth());
-			    if not health:IsDead() then
+          if not health:IsDead() then
 				    local receiverId = network:GetUserId();
 				    health:Damage(abilityOwnerId, Explosion.damage, receiverId);
 			    end
+			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback, health:GetHealth());
 			end
 		end
 	end
