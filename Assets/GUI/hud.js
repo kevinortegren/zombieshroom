@@ -200,7 +200,7 @@ function SetAbilityFocus(p_slot)
 {
   if($(".slotselected") == $("#slot"+p_slot))
     return;
-  $(".slotselected>div>div>div").stop();
+  $(".slotselected>div>div>div:first-child").stop();
 	$(".slotselected").removeClass("slotselected");
 	$("#slot"+p_slot).addClass("slotselected");
   
@@ -214,7 +214,7 @@ function SetCooldown(p_slot, p_percent)
 
 function SetCharges(p_slot, p_charges)
 {
-  var slot = $("#slot"+p_slot+">div>div>div>div");
+  var slot = $("#slot"+p_slot+">div>div>div:nth-child(2)");
   if(p_charges > 0)
     slot.html(p_charges);
   else
@@ -245,7 +245,7 @@ $(document).ready(function(){
   // setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
-  //SetCharges(1,3);
+  SetCharges(1,3);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 	//$("#healthbar>div>div").css('width', $("#healthbar>div").width()*(99/100.0)+"px");
 	Set('Health', 166);

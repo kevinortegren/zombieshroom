@@ -706,8 +706,8 @@ namespace RootForce
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
-				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
+				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );

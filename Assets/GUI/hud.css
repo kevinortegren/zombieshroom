@@ -147,7 +147,7 @@ img
 	left: 0;
 	top: 100%;
 	width: 100%;
-	margin: -35px 0 0 0;
+	margin: -35px 0 0 450px;
 	height: 33px;
 }
 #healthbar div
@@ -270,13 +270,13 @@ img
 	width: 64px;
 	height: 64px;
 	font-size: 18px;
-	margin: 32px 0 0 0;
+	margin: 64px 0 0 0;
 	display: inline-block;
 	text-align: right;
 }
 .slot>div
 {
-	background-image: url('cooldown.png');
+<!--	background-image: url('cooldown.png'); -->
 	background-size: 64px;
 	background-repeat: no-repeat;
 	background-position: 0% 64px;
@@ -286,7 +286,6 @@ img
 
 	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
-	background-position: 0;
 }
 .slot>div>div>div
 {
@@ -296,14 +295,12 @@ img
 	overflow: hidden;
   background: transparent;
 }
-.slot>div>div>div>div 
+.slot>div>div>div:nth-child(2)
 {
-	padding: 30px 15px 0 15px;
-	width: 34px;
-	height: 34px;
 	overflow: hidden;
-  position: static;
+  position: relative;
   background: transparent;
+  top:-64px;
 }
 @-webkit-keyframes spin {  
   from {  
@@ -313,13 +310,13 @@ img
     -webkit-transform: rotate(360deg);  
   } 
 }
-.slotselected>div>div>div
+.slotselected>div>div>div:first-child
 {
   background-image: url('JustGlow.png');
-  -webkit-animation-name: spin; 
+  -webkit-animation-name: blinker;
   -webkit-animation-iteration-count: infinite; 
   -webkit-animation-timing-function: linear;
-  -webkit-animation-duration: 15s; 
+  -webkit-animation-duration: 2s; 
 }
 #slot2
 {
