@@ -53,11 +53,11 @@ namespace RootForce
 			}
 			
 			//Give the ability to the correct player
-			RootForce::Network::NetworkEntityID id;
-			id.UserID = respawn->Claimed;
-			id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
-			id.SequenceID = 0;
-			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, id));
+			ECS::Entity* playerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(respawn->Claimed, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+			PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
+
+			// Switch the ability.
 			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
 
 			//Remove the collision and renderable component as well as clean out the current ability

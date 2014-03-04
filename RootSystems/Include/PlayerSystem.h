@@ -1,9 +1,11 @@
 #pragma once
 
+#include <RakNet/RakString.h>
 #include <Utility/ECS/Include/Component.h>
 #include <glm/glm.hpp>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <array>
+#include <queue>
 
 #define PLAYER_NUM_ABILITIES 4
 
@@ -30,20 +32,41 @@ namespace RootForce
 		enum AbilityState
 		{
 			OFF,
-			START_CHARGING,
 			CHARGING,
-			START_CHANNELING,
 			CHANNELING,
-			STOP_CHANNELING,
-			STOP_CHARGING_AND_CHANNELING
 		};
 	}
 
 
 #ifndef COMPILE_LEVEL_EDITOR
+	namespace AbilityEventType
+	{
+		enum AbilityEventType
+		{
+			CHARGE_START,
+			CHANNELING_START,
+			CHANNELING_DONE,
+			INTERRUPTED
+		};
+	}
+	
+	struct AbilityEvent
+	{
+		AbilityEventType::AbilityEventType Type;
+		Network::ActionID_t ActionID;
+		float Time;
+		uint8_t ActiveAbility;
+		RakNet::RakString ActiveAbilityScript;
+
+		AbilityEvent()
+			: Type(AbilityEventType::CHARGE_START)
+			, ActionID(Network::ReservedActionID::NONE)
+			, Time(0.0f)
+			, ActiveAbility(ABILITY_INDEX_NONE) {}
+	};
+
 	struct PlayerActionComponent : public ECS::Component<PlayerActionComponent>
 	{
-		Network::ActionID_t ActionID;
 		float MovePower;
 		float StrafePower;
 		glm::vec2 Angle;
@@ -51,21 +74,18 @@ namespace RootForce
 		float JumpTime;
 		glm::vec3 JumpDir;
 
-		float AbilityTime;
 		uint8_t SelectedAbility;
-		uint8_t ActiveAbility;
+		std::queue<AbilityEvent> AbilityEvents;
+		AbilityEvent CurrentAbilityEvent;
 
 		bool WantRespawn;
 
-		PlayerActionComponent() 
-			: ActionID(Network::ReservedActionID::NONE)
-			, MovePower(0.0f)
+		PlayerActionComponent()
+			: MovePower(0.0f)
 			, StrafePower(0.0f)
 			, JumpTime(0.0f)
 			, JumpDir(glm::vec3(0))
-			, AbilityTime(0.0f)
 			, SelectedAbility(0)
-			, ActiveAbility(ABILITY_INDEX_NONE)
 			, WantRespawn(false)
 		{}
 	};

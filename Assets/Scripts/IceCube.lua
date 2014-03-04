@@ -15,6 +15,9 @@ end
 function IceCube.ChannelingDone (time, userId, actionId)
 end
 
+function IceCube.Interrupted (time, userId, actionId)
+end
+
 function IceCube.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

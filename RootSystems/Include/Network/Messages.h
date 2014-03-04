@@ -51,10 +51,7 @@ namespace RootForce
 				PlayerCommand,
 				JumpStart,
 				JumpStop,
-				AbilityChargeStart,
-				AbilityChargeDone,
-				AbilityChannelingDone,
-				AbilityChargeAndChannelingDone,
+				AbilityEvent,
 				AbilityCooldownOff,
 				AbilityTryClaim,
 				AbilityClaimedBy,
@@ -132,7 +129,13 @@ namespace RootForce
 		struct PlayerCommand
 		{
 			Network::UserID_t User;
-			PlayerActionComponent Action;
+
+			float MovePower;
+			float StrafePower;
+			glm::vec2 Angle;
+			float JumpTime;
+			uint8_t SelectedAbility;
+
 			glm::vec3 Position;
 			glm::quat Orientation;
 			glm::quat AimingDeviceOrientation;
@@ -162,53 +165,15 @@ namespace RootForce
 		};
 
 		/*
-			Sent by a client when an ability is activated and the charging starts. Forwarded by the server.
+			Sent by a client when an ability event is done. Forwarded by the server.
 		*/
-		struct AbilityChargeStart
+		struct AbilityEvent
 		{
 			Network::UserID_t User;
-			Network::ActionID_t Action;
-			bool IsPush;
+			RootForce::AbilityEvent Event;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
-
-		/*
-			Sent by a client when the ability charge is done or interrupted. Forwarded by the server.
-		*/
-		struct AbilityChargeDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
-		/*
-			Sent by a client when the ability channeling is done or interrupted. Forwarded by the server.
-		*/
-		struct AbilityChannelingDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
-		/*
-			Sent by a client when the ability charging is interrupted. Forwarded by the server.
-		*/
-		struct AbilityChargeAndChannelingDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
 
 		/*
 			Sent to the client whenever the cooldown for a certain ability on the server reaches zero.
