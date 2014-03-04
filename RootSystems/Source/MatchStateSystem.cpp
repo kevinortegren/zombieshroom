@@ -202,6 +202,10 @@ namespace RootForce
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
 		}
+		else
+		{
+			g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Score --;
+		}
 		g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Deaths ++;
 	}
 
