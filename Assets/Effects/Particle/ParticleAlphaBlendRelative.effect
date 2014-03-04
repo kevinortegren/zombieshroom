@@ -64,7 +64,7 @@
           shaders:
             - name: particle_update
               type: vertex
-            - name: particle_update_orbit_relative
+            - name: particle_update_relative
               type: geometry
           feedback:
             - name: vert_initialPos1
@@ -109,7 +109,7 @@
           # None = 0
           # AlphaBlend = 1
           # Additive = 2
-          blend: 2
+          blend: 1
           
           # Depth settings.
           depth:

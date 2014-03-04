@@ -46,11 +46,14 @@
           offset: 112
         - sem: SPAWNTIME
           offset: 124
-        - sem: ROTATIONSPEEDMIN
+        - sem: ORBITSPEED
           offset: 128
-        - sem: ROTATIONSPEEDMAX
+        - sem: ORBITRADIUS
           offset: 132
-      # The update techniques should be ignored by the render job processor.
+        - sem: ROTATIONSPEEDMIN
+          offset: 136
+        - sem: ROTATIONSPEEDMAX
+          offset: 140      # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
 
