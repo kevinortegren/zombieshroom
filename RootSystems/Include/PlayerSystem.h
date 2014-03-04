@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RakNet/RakString.h>
 #include <Utility/ECS/Include/Component.h>
 #include <glm/glm.hpp>
 #include <RootSystems/Include/Network/NetworkTypes.h>
@@ -55,6 +56,7 @@ namespace RootForce
 		Network::ActionID_t ActionID;
 		float Time;
 		uint8_t ActiveAbility;
+		RakNet::RakString ActiveAbilityScript;
 
 		AbilityEvent()
 			: Type(AbilityEventType::CHARGE_START)

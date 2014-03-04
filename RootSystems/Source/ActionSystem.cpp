@@ -201,7 +201,7 @@ namespace RootSystems
 			// Retrieve the first event in the queue.
 			const RootForce::AbilityEvent& abilityEvent = action->AbilityEvents.front();
 
-			std::string abilityName = player->AbilityScripts[abilityEvent.ActiveAbility].Name;
+			std::string abilityName = abilityEvent.ActiveAbilityScript.C_String();
 			if (abilityName != "")
 			{
 				g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Received ability event. Slot %d, Event %d", abilityEvent.ActiveAbility, abilityEvent.Type);

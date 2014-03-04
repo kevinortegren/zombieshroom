@@ -377,10 +377,6 @@ namespace RootForce
 		// Determine the ability we want to activate.
 		uint8_t activeAbility = p_push ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
-		/*
-		
-		*/
-
 		// Check if we already have an ability active that needs to be cancelled.
 		if (action->CurrentAbilityEvent.ActiveAbility != activeAbility)
 		{
@@ -404,6 +400,7 @@ namespace RootForce
 			assert(activeAbility != ABILITY_INDEX_NONE);
 			action->CurrentAbilityEvent.ActionID = s_nextActionID++;
 			action->CurrentAbilityEvent.ActiveAbility = activeAbility;
+			action->CurrentAbilityEvent.ActiveAbilityScript = playerComponent->AbilityScripts[activeAbility].Name.c_str();
 			action->CurrentAbilityEvent.Time = 0.0f;
 			action->CurrentAbilityEvent.Type = AbilityEventType::CHARGE_START;
 			action->AbilityEvents.push(action->CurrentAbilityEvent);
@@ -427,9 +424,9 @@ namespace RootForce
 		action->CurrentAbilityEvent.Time += p_dt;
 
 		// Check for time limits.
-		float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-		float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
-		float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
+		float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+		float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+		float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
 
 		// Update the HUD (charging/channeling bar). TODO: Perhaps move this outside?
 		if(action->CurrentAbilityEvent.Time <= abilityChargeTime)
