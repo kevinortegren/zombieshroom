@@ -122,6 +122,8 @@ namespace RootForce
 		if(!controller || !action || !health || !playerComponent || !transform || !aimingDeviceTransform || !network || !collision)
 			return;
 
+		bool abilityUpdatedThisFrame = false;
+
 		bool onGround = g_engineContext.m_physics->IsOnGround(*collision->m_handle);
 		float power = 0;
 		action->MovePower = 0;
@@ -167,115 +169,167 @@ namespace RootForce
 						action->Angle.y = 90;
 				}
 				break;
+
 			case PlayerAction::SELECT_ABILITY1:
+			{
+				//HandleAbilityReleased();
 				action->SelectedAbility = 0;
-				break;
+			} break;
+
 			case PlayerAction::SELECT_ABILITY2:
+			{
+				//HandleAbilityReleased();
 				action->SelectedAbility = 1;
-				break;
+			} break;
+
 			case PlayerAction::SELECT_ABILITY3:
+			{
+				//HandleAbilityReleased();
 				action->SelectedAbility = 2;
-				break;
+			} break;
+
 			case PlayerAction::ACTIVATE_ABILITY_PRESSED:
+			{
+				if (health->IsDead)
 				{
-					if (health->IsDead)
+					action->WantRespawn = true;
+				}
+				else
+				{
+					if (!abilityUpdatedThisFrame)
 					{
-						action->WantRespawn = true;
-					}
-					else
-					{
-						action->ActiveAbility = playerComponent->SelectedAbility;
-						HandleAbilityPressed(dt);
+						HandleAbilityPressed(dt, false);
+						abilityUpdatedThisFrame = true;
 					}
 				}
-				break;
+			}
+			break;
+
 			case PlayerAction::ACTIVATE_ABILITY_RELEASED:
+			{
+				HandleAbilityReleased();
+			}
+			break;
+
+			case PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED:
+			{
+				if (health->IsDead)
 				{
-					HandleAbilityReleased();
+					action->WantRespawn = true;
 				}
-				break;
-			case PlayerAction::JUMP_PRESSED:
+				else
 				{
-					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
+					if (!abilityUpdatedThisFrame)
 					{
-						if (action->JumpTime <= 0.0f && m_clientPeer != nullptr)
-						{
-							// Send this action to the server
-							RootForce::NetworkMessage::JumpStart m;
-							m.User = network->ID.UserID;
-
-							RakNet::BitStream bs;
-							bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-							bs.Write(RakNet::GetTime());
-							bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStart);
-							m.Serialize(true, &bs);
-
-							m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-						}
-
-						// Start/Keep jumping
-						action->JumpTime += dt;
+						HandleAbilityPressed(dt, true);
+						abilityUpdatedThisFrame = true;
 					}
 				}
-				break;
-			case PlayerAction::JUMP_RELEASED:
+			}
+			break;
+
+			case PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED:
+			{
+				HandleAbilityReleased();
+			}
+			break;
+
+			case PlayerAction::PICK_UP_ABILITY:
+			{
+				RootForce::NetworkMessage::AbilityTryClaim m;
+				m.User = network->ID.UserID;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
+			break;
+
+			case PlayerAction::JUMP_PRESSED:
+			{
+				if (g_engineContext.m_physics->IsOnGround(*collision->m_handle) || (action->JumpTime > 0.0f && action->JumpTime < JUMP_TIME_LIMIT))
 				{
-					if (m_clientPeer != nullptr)
+					if (action->JumpTime <= 0.0f && m_clientPeer != nullptr)
 					{
 						// Send this action to the server
-						RootForce::NetworkMessage::JumpStop m;
+						RootForce::NetworkMessage::JumpStart m;
 						m.User = network->ID.UserID;
-						m.Time = action->JumpTime;
 
 						RakNet::BitStream bs;
 						bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 						bs.Write(RakNet::GetTime());
-						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStop);
+						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStart);
 						m.Serialize(true, &bs);
 
 						m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 					}
 
-					action->JumpTime = 0.0f;
+					// Start/Keep jumping
+					action->JumpTime += dt;
 				}
-				break;
-			case PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED:
+			}
+			break;
+
+			case PlayerAction::JUMP_RELEASED:
+			{
+				if (m_clientPeer != nullptr)
 				{
-					if (health->IsDead)
-					{
-						action->WantRespawn = true;
-					}
-					else 
-					{
-						action->ActiveAbility = PUSH_ABILITY_INDEX;
-						HandleAbilityPressed(dt);
-					}
-				}
-				break;
-			case PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED:
-				{
-					HandleAbilityReleased();
-				}
-				break;
-			case PlayerAction::PICK_UP_ABILITY:
-				{
-					RootForce::NetworkMessage::AbilityTryClaim m;
+					// Send this action to the server
+					RootForce::NetworkMessage::JumpStop m;
 					m.User = network->ID.UserID;
+					m.Time = action->JumpTime;
 
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityTryClaim);
+					bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStop);
 					m.Serialize(true, &bs);
 
 					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				}
-				break;
+
+				action->JumpTime = 0.0f;
+			}
+			break;
+
 			default:
 				break;
 			}
-			
-			
+		}
+
+		// Check if we are dead and are currently charging/channeling, in which case, we should interrupt the ability.
+		if (health->IsDead)
+		{
+			if (playerComponent->AbilityState == AbilityState::CHARGING || playerComponent->AbilityState == AbilityState::CHANNELING)
+			{
+				assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+				action->CurrentAbilityEvent.Type = AbilityEventType::INTERRUPTED;
+				action->AbilityEvents.push(action->CurrentAbilityEvent);
+
+				// Send this action to the server
+				RootForce::NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
+
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityEvent);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityInterrupted with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+
+				// Reset the current event.
+				playerComponent->AbilityState = AbilityState::OFF;
+				action->CurrentAbilityEvent = AbilityEvent();
+			}
+
+			return;
 		}
 
 		
@@ -286,7 +340,13 @@ namespace RootForce
 		// Send the action to the server.
 		RootForce::NetworkMessage::PlayerCommand m;
 		m.User = network->ID.UserID;
-		m.Action = *action;
+
+		m.MovePower = action->MovePower;
+		m.StrafePower = action->StrafePower;
+		m.Angle = action->Angle;
+		m.JumpTime = action->JumpTime;
+		m.SelectedAbility = action->SelectedAbility;
+
 		m.Position = transform->m_position;
 		m.Orientation = transform->m_orientation.GetQuaternion();
 		m.AimingDeviceOrientation = aimingDeviceTransform->m_orientation.GetQuaternion();
@@ -305,101 +365,117 @@ namespace RootForce
 		m_inputtedActionsPreviousFrame = m_inputtedActionsCurrentFrame;
 	}
 
-	void PlayerControlSystem::HandleAbilityPressed(float dt)
+	void PlayerControlSystem::HandleAbilityPressed(float p_dt, bool p_push)
 	{
 		ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
 		
 		PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
+		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
-		if (action->ActiveAbility != ABILITY_INDEX_NONE && !playerComponent->AbilityScripts[action->ActiveAbility].OnCooldown)
+		// Determine the ability we want to activate.
+		uint8_t activeAbility = p_push ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
+
+		// Check if we already have an ability active that needs to be cancelled.
+		if (action->CurrentAbilityEvent.ActiveAbility != activeAbility)
 		{
-			if (playerComponent->AbilityState == AbilityState::OFF)
-			{
-				playerComponent->AbilityState = AbilityState::START_CHARGING; // Set all ability states
-				action->ActionID = s_nextActionID++;
-
-				//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Activating ability %s with action ID: %u", playerComponent->AbilityScripts[playerComponent->SelectedAbility].Name.c_str(), action->ActionID);
-
-				// Send this action to the server
-				RootForce::NetworkMessage::AbilityChargeStart m;
-				m.User = network->ID.UserID;
-				m.Action = action->ActionID;
-				m.IsPush = action->ActiveAbility == PUSH_ABILITY_INDEX;
-
-				RakNet::BitStream bs;
-				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-				bs.Write(RakNet::GetTime());
-				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityChargeStart);
-				m.Serialize(true, &bs);
-
-				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeStart with ActionID: %d", action->ActionID);
-			}
-
-			if (playerComponent->AbilityState != AbilityState::OFF)
-				action->AbilityTime += dt;
-
-			std::string abilityName = playerComponent->AbilityScripts[action->ActiveAbility].Name;
-			if (abilityName != "")
-			{
-
-				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
-				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
-
-                if(action->AbilityTime <= abilityChargeTime)
-                    m_hud->SetValue("ChargeBarValue", std::to_string(action->AbilityTime/abilityChargeTime));
-                else if(abilityChannelingTime > 0)
-                    m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->AbilityTime)/abilityChannelingTime));
-                else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
-                    m_hud->SetValue("ChargeBarValue", "1");
-                
-				if (action->AbilityTime >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
-				{
-					playerComponent->AbilityState = AbilityState::START_CHANNELING;
-
-					NetworkMessage::AbilityChargeDone m;
-					m.User = network->ID.UserID;
-					m.Action = action->ActionID;
-					m.Time = action->AbilityTime;
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
-					m.Serialize(true, &bs);
-
-					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->ActionID);
-				}
-
-				if (action->AbilityTime >= abilityChargeTime + abilityChannelingTime && playerComponent->AbilityState == AbilityState::CHANNELING)
-				{
-					playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
-
-					NetworkMessage::AbilityChannelingDone m;
-					m.User = network->ID.UserID;
-					m.Action = action->ActionID;
-					m.Time = action->AbilityTime;
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
-					m.Serialize(true, &bs);
-
-					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->ActionID);
-				}
-			}	
+			// Cancel the ability and reset the current ability.
+			//g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed ability while holding mouse button (Active: %d, New: %d)", action->CurrentAbilityEvent.ActiveAbility, activeAbility);
+			HandleAbilityReleased();
 		}
-		else
+
+		// Check if the new active ability is an empty slot, in which case, do not start activating.
+		std::string abilityName = playerComponent->AbilityScripts[activeAbility].Name;
+		if (abilityName == "")
+			return;
+
+		// Make sure the ability is off cooldown.
+		if (playerComponent->AbilityScripts[activeAbility].OnCooldown)
+			return;
+
+		// Check if we should start charging.
+		if (playerComponent->AbilityState == AbilityState::OFF)
 		{
-			playerComponent->AbilityState = AbilityState::OFF;
-			action->ActiveAbility = ABILITY_INDEX_NONE;
-		} 
+			assert(activeAbility != ABILITY_INDEX_NONE);
+			action->CurrentAbilityEvent.ActionID = s_nextActionID++;
+			action->CurrentAbilityEvent.ActiveAbility = activeAbility;
+			action->CurrentAbilityEvent.ActiveAbilityScript = playerComponent->AbilityScripts[activeAbility].Name.c_str();
+			action->CurrentAbilityEvent.Time = 0.0f;
+			action->CurrentAbilityEvent.Type = AbilityEventType::CHARGE_START;
+			action->AbilityEvents.push(action->CurrentAbilityEvent);
+
+			// Send this action to the server
+			RootForce::NetworkMessage::AbilityEvent m;
+			m.Event = action->CurrentAbilityEvent;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::AbilityEvent);
+			m.Serialize(true, &bs);
+
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+
+			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeStart with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+		}
+
+		// Increase the time the ability has been activated.
+		action->CurrentAbilityEvent.Time += p_dt;
+
+		// Check for time limits.
+		float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+		float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+		float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+
+		// Update the HUD (charging/channeling bar). TODO: Perhaps move this outside?
+		if(action->CurrentAbilityEvent.Time <= abilityChargeTime)
+            m_hud->SetValue("ChargeBarValue", std::to_string(action->CurrentAbilityEvent.Time/abilityChargeTime));
+        else if(abilityChannelingTime > 0)
+            m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->CurrentAbilityEvent.Time)/abilityChannelingTime));
+        else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
+            m_hud->SetValue("ChargeBarValue", "1");
+
+		// Check to see if the charge time is up.
+		if (action->CurrentAbilityEvent.Time >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
+		{
+			assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+			action->CurrentAbilityEvent.Type = AbilityEventType::CHANNELING_START;
+			action->AbilityEvents.push(action->CurrentAbilityEvent);
+
+			// Send this action to the server
+			RootForce::NetworkMessage::AbilityEvent m;
+			m.Event = action->CurrentAbilityEvent;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
+			m.Serialize(true, &bs);
+
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+		}
+
+		if (action->CurrentAbilityEvent.Time >= abilityChargeTime + abilityChannelingTime && playerComponent->AbilityState == AbilityState::CHANNELING)
+		{
+			assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+			action->CurrentAbilityEvent.Type = AbilityEventType::CHANNELING_DONE;
+			action->AbilityEvents.push(action->CurrentAbilityEvent);
+
+			// Send this action to the server
+			NetworkMessage::AbilityEvent m;
+			m.Event = action->CurrentAbilityEvent;
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+			bs.Write(RakNet::GetTime());
+			bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
+			m.Serialize(true, &bs);
+
+			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+		}
 	}
 
 	void PlayerControlSystem::HandleAbilityReleased()
@@ -412,55 +488,55 @@ namespace RootForce
 		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
         m_hud->SetValue("ChargeBarValue", "0");
-		if (!health->IsDead && playerComponent->AbilityState != AbilityState::OFF && action->ActiveAbility != ABILITY_INDEX_NONE)
+
+		switch (playerComponent->AbilityState)
 		{
-			std::string abilityName = playerComponent->AbilityScripts[action->ActiveAbility].Name;
-			if (abilityName != "")
+			case AbilityState::CHARGING:
 			{
+				assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+				action->CurrentAbilityEvent.Type = AbilityEventType::CHANNELING_START;
+				action->AbilityEvents.push(action->CurrentAbilityEvent);
 
-				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
-				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
+				// Send this action to the server
+				NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
 
-				if (playerComponent->AbilityState == AbilityState::CHARGING)
-				{
-					playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
+				m.Serialize(true, &bs);
 
-					NetworkMessage::AbilityChargeAndChannelingDone m;
-					m.User = network->ID.UserID;
-					m.Action = action->ActionID;
-					m.Time = action->AbilityTime;
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+			} 
+			
+			// Fall through here!
 
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
-					m.Serialize(true, &bs);
+			case AbilityState::CHANNELING:
+			{
+				assert(action->CurrentAbilityEvent.ActiveAbility != ABILITY_INDEX_NONE);
+				action->CurrentAbilityEvent.Type = AbilityEventType::CHANNELING_DONE;
+				action->AbilityEvents.push(action->CurrentAbilityEvent);
 
-					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeAndChannelingDone with ActionID: %d", action->ActionID);
-				}
+				// Send this action to the server
+				NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
 
-				if (playerComponent->AbilityState == AbilityState::CHANNELING)
-				{
-					playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
+				m.Serialize(true, &bs);
 
-					NetworkMessage::AbilityChannelingDone m;
-					m.User = network->ID.UserID;
-					m.Action = action->ActionID;
-					m.Time = action->AbilityTime;
-
-					RakNet::BitStream bs;
-					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
-					m.Serialize(true, &bs);
-
-					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->ActionID);
-				}
-			}
+				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+			} break;
 		}
+
+		// Reset the current event.
+		playerComponent->AbilityState = AbilityState::OFF;
+		action->CurrentAbilityEvent = AbilityEvent();
 	}
 
 }

@@ -16,6 +16,9 @@ end
 function Push.ChannelingDone (time, userId, actionId)
 end
 
+function Push.Interrupted (time, userId, actionId)
+end
+
 function Push.OnCreate (userId, actionId)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
