@@ -169,6 +169,7 @@ namespace RootForce
 		*/
 		struct AbilityEvent
 		{
+			Network::UserID_t User;
 			RootForce::AbilityEvent Event;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);

@@ -76,32 +76,13 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, Time);
 		}
 
-		void AbilityChargeStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		void AbilityEvent::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, IsPush);
-		}
-
-		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
-		}
-
-		void AbilityChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
-		}
-
-		void AbilityChargeAndChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
+			p_bs->Serialize(p_writeToBitstream, Event.ActionID);
+			p_bs->Serialize(p_writeToBitstream, Event.Type);
+			p_bs->Serialize(p_writeToBitstream, Event.ActiveAbility);
+			p_bs->Serialize(p_writeToBitstream, Event.Time);
 		}
 
 		void AbilityCooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)

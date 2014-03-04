@@ -170,19 +170,19 @@ namespace RootForce
 
 			case PlayerAction::SELECT_ABILITY1:
 			{
-				HandleAbilityReleased();
+				//HandleAbilityReleased();
 				action->SelectedAbility = 0;
 			} break;
 
 			case PlayerAction::SELECT_ABILITY2:
 			{
-				HandleAbilityReleased();
+				//HandleAbilityReleased();
 				action->SelectedAbility = 1;
 			} break;
 
 			case PlayerAction::SELECT_ABILITY3:
 			{
-				HandleAbilityReleased();
+				//HandleAbilityReleased();
 				action->SelectedAbility = 2;
 			} break;
 
@@ -338,14 +338,13 @@ namespace RootForce
 		uint8_t activeAbility = p_push ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
 
 		// Make sure the ability is off cooldown.
-		if (!playerComponent->AbilityScripts[action->CurrentAbilityEvent.ActiveAbility].OnCooldown)
+		if (!playerComponent->AbilityScripts[activeAbility].OnCooldown)
 		{
 			// Check if we already have an ability active that needs to be cancelled.
 			if (action->CurrentAbilityEvent.ActiveAbility != activeAbility)
 			{
 				// Cancel the ability and reset the current ability.
 				HandleAbilityReleased();
-				action->CurrentAbilityEvent = AbilityEvent();
 			}
 
 			// Check if we should start charging.
@@ -417,15 +416,13 @@ namespace RootForce
 					action->AbilityEvents.push(action->CurrentAbilityEvent);
 
 					// Send this action to the server
-					NetworkMessage::AbilityChannelingDone m;
-					m.User = network->ID.UserID;
-					m.Action = action->CurrentAbilityEvent.ActionID;
-					m.Time = action->CurrentAbilityEvent.Time;
+					NetworkMessage::AbilityEvent m;
+					m.Event = action->CurrentAbilityEvent;
 
 					RakNet::BitStream bs;
 					bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 					bs.Write(RakNet::GetTime());
-					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
+					bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
 					m.Serialize(true, &bs);
 
 					m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
@@ -459,15 +456,13 @@ namespace RootForce
 				action->AbilityEvents.push(action->CurrentAbilityEvent);
 
 				// Send this action to the server
-				NetworkMessage::AbilityChargeDone m;
-				m.User = network->ID.UserID;
-				m.Action = action->CurrentAbilityEvent.ActionID;
-				m.Time = action->CurrentAbilityEvent.Time;
+				NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 				bs.Write(RakNet::GetTime());
-				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
+				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
@@ -482,19 +477,20 @@ namespace RootForce
 				action->AbilityEvents.push(action->CurrentAbilityEvent);
 
 				// Send this action to the server
-				NetworkMessage::AbilityChannelingDone m;
-				m.User = network->ID.UserID;
-				m.Action = action->CurrentAbilityEvent.ActionID;
-				m.Time = action->CurrentAbilityEvent.Time;
+				NetworkMessage::AbilityEvent m;
+				m.Event = action->CurrentAbilityEvent;
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
 				bs.Write(RakNet::GetTime());
-				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
+				bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityEvent);
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+
+				// Reset the current event.
+				action->CurrentAbilityEvent = AbilityEvent();
 			} break;
 		}
 	}

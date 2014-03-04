@@ -462,9 +462,9 @@ namespace RootForce
 					}
 				} return true;
 
-				case NetworkMessage::MessageType::AbilityChargeStart:
+				case NetworkMessage::MessageType::AbilityEvent:
 				{
-					NetworkMessage::AbilityChargeStart m;
+					NetworkMessage::AbilityEvent m;
 					m.Serialize(false, p_bs);
 
 					// Only remote clients need to parse. A local server would already have updated for us.
@@ -480,170 +480,22 @@ namespace RootForce
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(action != nullptr);
 
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								playerComponent->AbilityState = AbilityState::START_CHARGING;
-								action->ActionID = m.Action;
-								action->AbilityTime = halfPing;
-								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
-
-								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
+								// Push the event.
+								action->AbilityEvents.push(m.Event);
 							}
 							else
 							{
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeStart received without the player entity existing. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityEvent received without the player entity existing. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeStart received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityEvent received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
 					{
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeStart received as a local client.");
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChargeDone:
-				{
-					NetworkMessage::AbilityChargeDone m;
-					m.Serialize(false, p_bs);
-
-					// Only remote clients need to parse. A local server would already have updated for us.
-					if (clientComponent->IsRemote)
-					{
-						// Make sure we are connected before parsing user commands.
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Make sure we have the entity associated with this player.
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							if (playerEntity != nullptr)
-							{
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								playerComponent->AbilityState = AbilityState::START_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeDone received without the player entity existing. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeStart received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeDone received as a local client.");
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChannelingDone:
-				{
-					NetworkMessage::AbilityChannelingDone m;
-					m.Serialize(false, p_bs);
-
-					// Only remote clients need to parse. A local server would already have updated for us.
-					if (clientComponent->IsRemote)
-					{
-						// Make sure we are connected before parsing user commands.
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Make sure we have the entity associated with this player.
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							if (playerEntity != nullptr)
-							{
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								if (playerComponent->AbilityState == AbilityState::START_CHANNELING 
-								 || playerComponent->AbilityState == AbilityState::CHARGING 
-								 || playerComponent->AbilityState == AbilityState::START_CHARGING)
-									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
-								else
-									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// Log the action (debug)
-								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
-									g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u, Action: %u) (stop charging as well)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
-								else
-									g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChannelingDone received without the player entity existing. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChannelingDone received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChannelingDone received as a local client.");
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
-				{
-					NetworkMessage::AbilityChargeAndChannelingDone m;
-					m.Serialize(false, p_bs);
-
-					// Only remote clients need to parse. A local server would already have updated for us.
-					if (clientComponent->IsRemote)
-					{
-						// Make sure we are connected before parsing user commands.
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Make sure we have the entity associated with this player.
-							ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-							if (playerEntity != nullptr)
-							{
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User, action->ActionID);
-							}
-							else
-							{
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeAndChannelingDone received without the player entity existing. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeAndChannelingDone received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityChargeAndChannelingDone received as a local client.");
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityEvent received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 					}
 				} return true;
 
@@ -1550,93 +1402,9 @@ namespace RootForce
 					}
 				} return true;
 
-				case NetworkMessage::MessageType::AbilityChargeStart:
+				case NetworkMessage::MessageType::AbilityEvent:
 				{
-					NetworkMessage::AbilityChargeStart m;
-					m.Serialize(false, p_bs);
-					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-					
-					// Make sure we have a client entity associated with this peer.
-					ECS::Entity* clientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-					if (clientEntity != nullptr)
-					{
-						// Local clients will handle their own user commands. Only acknowledge this if it is a remote client and make sure it is connected.
-						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
-						assert(clientComponent != nullptr);
-
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Update the action component only for remote clients.
-							if (clientComponent->IsRemote)
-							{
-								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-								assert(playerEntity != nullptr);
-
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								AbilityEvent e;
-								e.ActionID = m.Action;
-								//e.
-								//action->AbilityEvents
-								/*
-								// TODO: Use ActionID here?
-								playerComponent->AbilityState = AbilityState::START_CHARGING;
-								action->ActionID = m.Action;
-								action->AbilityTime = halfPing;
-								action->ActiveAbility = m.IsPush ? PUSH_ABILITY_INDEX : playerComponent->SelectedAbility;
-								*/
-
-								// DEBUG
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start charging ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
-								// /DEBUG
-							}
-
-							// Broadcast the action to all other connected clients.
-							DataStructures::List<RakNet::SystemAddress> addresses;
-							DataStructures::List<RakNet::RakNetGUID> guids;
-							m_peer->GetSystemList(addresses, guids);
-
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
-							{
-								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-								if (otherClientEntity != nullptr)
-								{
-									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-									assert(otherClientComponent != nullptr);
-
-									if (p_packet->systemAddress != addresses[i] && 
-										otherClientComponent->IsRemote &&
-										ClientState::IsConnected(otherClientComponent->State))
-									{
-										RakNet::BitStream bs;
-										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-										bs.Write(RakNet::GetTime());
-										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeStart);
-										m.Serialize(true, &bs);
-
-										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-									}
-								}
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeStart received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeStart received for client without client entity. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChargeDone:
-				{
-					NetworkMessage::AbilityChargeDone m;
+					NetworkMessage::AbilityEvent m;
 					m.Serialize(false, p_bs);
 					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
 
@@ -1659,214 +1427,18 @@ namespace RootForce
 								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
 								assert(action != nullptr);
 
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								playerComponent->AbilityState = AbilityState::START_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// DEBUG
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Start channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
-								// /DEBUG
-							}
-
-							// Broadcast the action to all other connected clients.
-							DataStructures::List<RakNet::SystemAddress> addresses;
-							DataStructures::List<RakNet::RakNetGUID> guids;
-							m_peer->GetSystemList(addresses, guids);
-
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
-							{
-								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-								if (otherClientEntity != nullptr)
-								{
-									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-									assert(otherClientComponent != nullptr);
-
-									if (p_packet->systemAddress != addresses[i] && 
-										otherClientComponent->IsRemote &&
-										ClientState::IsConnected(otherClientComponent->State))
-									{
-										RakNet::BitStream bs;
-										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-										bs.Write(RakNet::GetTime());
-										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeDone);
-										m.Serialize(true, &bs);
-
-										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-									}
-								}
+								// Push the event.
+								action->AbilityEvents.push(m.Event);
 							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
+							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityEvent received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
 					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeDone received for client without client entity. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChannelingDone:
-				{
-					NetworkMessage::AbilityChannelingDone m;
-					m.Serialize(false, p_bs);
-					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-
-					// Make sure we have a client entity associated with this peer.
-					ECS::Entity* clientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-					if (clientEntity != nullptr)
-					{
-						// Local clients will handle their own user commands. Only acknowledge this if it is a remote client and make sure it is connected.
-						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
-						assert(clientComponent != nullptr);
-
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Update the action component only for remote clients.
-							if (clientComponent->IsRemote)
-							{
-								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-								assert(playerEntity != nullptr);
-
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								if (playerComponent->AbilityState == AbilityState::START_CHANNELING 
-								 || playerComponent->AbilityState == AbilityState::CHARGING 
-								 || playerComponent->AbilityState == AbilityState::START_CHARGING)
-									playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
-								else
-									playerComponent->AbilityState = AbilityState::STOP_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// DEBUG
-								if (playerComponent->AbilityState == AbilityState::STOP_CHARGING_AND_CHANNELING)
-									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u) (stop charging as well)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
-								else
-									g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
-								// /DEBUG
-							}
-
-							// Broadcast the action to all other connected clients.
-							DataStructures::List<RakNet::SystemAddress> addresses;
-							DataStructures::List<RakNet::RakNetGUID> guids;
-							m_peer->GetSystemList(addresses, guids);
-
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
-							{
-								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-								if (otherClientEntity != nullptr)
-								{
-									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-									assert(otherClientComponent != nullptr);
-
-									if (p_packet->systemAddress != addresses[i] && 
-										otherClientComponent->IsRemote &&
-										ClientState::IsConnected(otherClientComponent->State))
-									{
-										RakNet::BitStream bs;
-										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-										bs.Write(RakNet::GetTime());
-										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChannelingDone);
-										m.Serialize(true, &bs);
-
-										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-									}
-								}
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChannelingDone received for client without client entity. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
-					}
-				} return true;
-
-				case NetworkMessage::MessageType::AbilityChargeAndChannelingDone:
-				{
-					NetworkMessage::AbilityChargeAndChannelingDone m;
-					m.Serialize(false, p_bs);
-					m.User = m_peer->GetIndexFromSystemAddress(p_packet->systemAddress);
-
-					// Make sure we have a client entity associated with this peer.
-					ECS::Entity* clientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-					if (clientEntity != nullptr)
-					{
-						// Local clients will handle their own user commands. Only acknowledge this if it is a remote client and make sure it is connected.
-						ClientComponent* clientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(clientEntity);
-						assert(clientComponent != nullptr);
-
-						if (ClientState::IsConnected(clientComponent->State))
-						{
-							// Update the action component only for remote clients.
-							if (clientComponent->IsRemote)
-							{
-								ECS::Entity* playerEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-								assert(playerEntity != nullptr);
-
-								PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
-								assert(action != nullptr);
-
-								PlayerComponent* playerComponent = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
-								assert(playerComponent != nullptr);
-
-								playerComponent->AbilityState = AbilityState::STOP_CHARGING_AND_CHANNELING;
-								action->ActionID = m.Action;
-								action->AbilityTime = m.Time;
-
-								// DEBUG
-								g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::PINK_PRINT, "Stop charge and channeling ability %s (User: %u)", playerComponent->AbilityScripts[action->ActiveAbility].Name.c_str(), m.User);
-								// /DEBUG
-							}
-
-							// Broadcast the action to all other connected clients.
-							DataStructures::List<RakNet::SystemAddress> addresses;
-							DataStructures::List<RakNet::RakNetGUID> guids;
-							m_peer->GetSystemList(addresses, guids);
-
-							for (unsigned int i = 0; i < addresses.Size(); ++i)
-							{
-								ECS::Entity* otherClientEntity = FindEntity(g_networkEntityMap, NetworkEntityID(m_peer->GetIndexFromSystemAddress(addresses[i]), ReservedActionID::CONNECT, ReservedSequenceID::CLIENT_ENTITY));
-								if (otherClientEntity != nullptr)
-								{
-									ClientComponent* otherClientComponent = m_world->GetEntityManager()->GetComponent<ClientComponent>(otherClientEntity);
-									assert(otherClientComponent != nullptr);
-
-									if (p_packet->systemAddress != addresses[i] && 
-										otherClientComponent->IsRemote &&
-										ClientState::IsConnected(otherClientComponent->State))
-									{
-										RakNet::BitStream bs;
-										bs.Write((RakNet::MessageID) ID_TIMESTAMP);
-										bs.Write(RakNet::GetTime());
-										bs.Write((RakNet::MessageID) NetworkMessage::MessageType::AbilityChargeAndChannelingDone);
-										m.Serialize(true, &bs);
-
-										m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, addresses[i], false);
-									}
-								}
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeAndChannelingDone received for client in invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
-						}
-					}
-					else
-					{
-						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityChargeAndChannelingDone received for client without client entity. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
+						g_engineContext.m_logger->LogText(LogTag::SERVER, LogLevel::WARNING, "AbilityEvent received for client without client entity. User (%d: %s).", m.User, p_packet->systemAddress.ToString());
 					}
 				} return true;
 

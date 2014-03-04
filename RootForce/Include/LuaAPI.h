@@ -1849,7 +1849,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->AbilityTime = (float) luaL_checknumber(p_luaState, 2);
+			(*s)->CurrentAbilityEvent.Time = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSelectAbility(lua_State* p_luaState)
@@ -1900,7 +1900,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushnumber(p_luaState, (*s)->AbilityTime);
+			lua_pushnumber(p_luaState, (*s)->CurrentAbilityEvent.Time);
 			return 1;
 		}
 		static int PlayerActionGetSelectedAbility(lua_State* p_luaState)
