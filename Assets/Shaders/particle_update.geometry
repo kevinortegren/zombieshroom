@@ -2,7 +2,7 @@
 #extension GL_EXT_geometry_shader4 : enable  
 
 layout(points) in;
-layout(points, max_vertices = 2) out;
+layout(points, max_vertices = 51) out;
 
 uniform sampler1D g_Random;
 
@@ -77,10 +77,15 @@ void main()
 {	
 	float lifeTime = vert_age[0] - g_dt;
 
+	int max = 50;
+	float step = 1.0 / max;
+
 	if(vert_type[0] == 0)
 	{
 		if(lifeTime <= 0.0f)
 		{
+			for(int i = 0; i < max; i++)
+			{
 			// Spawn new particles with new start values using the initial values.
 			if(g_orbitRadius > 0.0)
 			{
@@ -96,29 +101,30 @@ void main()
 
 			if(g_direction == vec3(0,0,0))
 			{
-				vert_initialVel1	= normalize(GetRandomDir(g_time)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+				vert_initialVel1	= normalize(GetRandomDir(g_time + i*step)) * GetRandomNumber(g_time + i*step, g_speedMin, g_speedMax);
 			}
 			else
 			{
-				float xspread = GetRandomNumber(g_time+0.1f, -g_spread, g_spread);
-				float yspread = GetRandomNumber(g_time+0.2f, -g_spread, g_spread);
-				float zspread = GetRandomNumber(g_time+0.3f, -g_spread, g_spread);
+				float xspread = GetRandomNumber(g_time+0.1f + i*step, -g_spread, g_spread);
+				float yspread = GetRandomNumber(g_time+0.2f + i*step, -g_spread, g_spread);
+				float zspread = GetRandomNumber(g_time+0.3f + i*step, -g_spread, g_spread);
 				
 				vec3 vektre = vec3(xspread, yspread, zspread);
 
-				vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time, g_speedMin, g_speedMax);
+				vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time + i*step, g_speedMin, g_speedMax);
 			}
 
-			vert_scale1 		= vec2(GetRandomNumber(g_time, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time, g_sizeMin.y, g_sizeMax.y));
-			vert_age1 			= GetRandomNumber(g_time, g_lifeTimeMin, g_lifeTimeMax);
+			vert_scale1 		= vec2(GetRandomNumber(g_time + i*step, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time + i*step, g_sizeMin.y, g_sizeMax.y));
+			vert_age1 			= GetRandomNumber(g_time + i*0.1, g_lifeTimeMin, g_lifeTimeMax);
 			vert_type1 			= 1.0f;
 		 	vert_color1 		= g_color;
 		 	vert_accel1			= g_gravity;
 			lifeTime			= g_spawnTime;
-			vert_rotation1		= GetRandomNumber(g_time+0.01f, 0.0f, 6.29f);
-			vert_rotationSpeed1 = GetRandomNumber(g_time, g_rotationSpeedMin, g_rotationSpeedMax);
+			vert_rotation1		= GetRandomNumber(g_time+0.01f + i*step, 0.0f, 6.29f);
+			vert_rotationSpeed1 = GetRandomNumber(g_time + i*step, g_rotationSpeedMin, g_rotationSpeedMax);
 			EmitVertex();
 			EndPrimitive();
+			}
 		}
 
 		// Always output the emitter particle with initial values.
